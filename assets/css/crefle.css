@@ -1,0 +1,108 @@
+/* ============================================================
+   CREFLE Design Tokens — web build (omf-mes report)
+   Source: viskit_killer Figma DS (Material Design 3 token map)
+   Web adaptation: Spoqa Han Sans Neo loaded via Spoqa CDN
+   (local 12MB OTFs are not committed to the repo).
+   ============================================================ */
+
+/* @import rules must precede all other rules per CSS spec */
+@import url("https://spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap");
+
+.material-symbols-rounded,
+.ms {
+  font-family: "Material Symbols Rounded";
+  font-weight: normal; font-style: normal; line-height: 1;
+  letter-spacing: normal; text-transform: none; display: inline-block;
+  white-space: nowrap; word-wrap: normal; direction: ltr;
+  font-feature-settings: "liga"; -webkit-font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+:root {
+  /* 1. BRAND */
+  --brand-red:       #C9252C;
+  --brand-red-dark:  #A81E24;
+  --brand-red-deep:  #7D161B;
+  --brand-red-soft:  #F4DDDE;
+  --brand-charcoal:        #3E4146;
+  --brand-charcoal-soft:   #5C5F66;
+  --brand-charcoal-deep:   #1F2125;
+  --brand-primary:        var(--brand-red);
+  --brand-accent-1:       #FFAFB1;
+  --brand-accent-2:       #C9CACE;
+  --brand-accent-3:       #EAEBEC;
+
+  /* 2. M3 ROLE TOKENS (Light) */
+  --surface:                 #FBF8FD;
+  --surface-bright:          #FFFFFF;
+  --surface-container-low:   #F5F2F7;
+  --surface-container:       #EFEDF1;
+  --surface-container-high:  #E9E7EB;
+  --surface-container-highest:#E3E1E5;
+  --on-surface:              #1B1B1F;
+  --on-surface-variant:      #2D2C33;
+  --on-surface-muted:        #77767F;
+  --primary:                 #4758A9;
+  --on-primary:              #FFFFFF;
+  --primary-container:       #DDE1FF;
+  --on-primary-container:    #001257;
+  --secondary-container:     #DFE1F9;
+  --on-secondary-container:  #171B2C;
+  --outline:                 #767680;
+  --outline-variant:         #C6C5D0;
+
+  /* 3. SEMANTIC — verdict / status / delta only */
+  --semantic-success:        #1F883D;
+  --semantic-error:          #B3261E;
+  --semantic-error-strong:   #93000A;
+  --semantic-warning:        #E8A100;
+  --semantic-info:           #0B57D0;
+  --semantic-idle:           #6E7781;
+  --on-semantic:             #FFFFFF;
+  --success-container:       #DCEFE2;
+  --error-container:         #F9DEDC;
+  --warning-container:       #FDECC8;
+  --info-container:          #DCE5FA;
+
+  /* 4. TYPE */
+  --font-sans: "Spoqa Han Sans Neo", "Noto Sans KR", -apple-system,
+               BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  --text-title:    20px;
+  --text-body:     16px;
+  --text-small:    12px;
+  --text-label:    14px;
+
+  --w-thin: 100; --w-light: 300; --w-regular: 400; --w-medium: 500; --w-bold: 700;
+  --leading-tight: 1.15; --leading-snug: 1.35; --leading-body: 1.55; --leading-loose: 1.75;
+  --tracking-tight: -0.02em; --tracking-eyebrow: 0.14em;
+
+  /* 5. SHAPE */
+  --radius-xs: 4px; --radius-sm: 8px; --radius-md: 12px;
+  --radius-lg: 16px; --radius-xl: 28px; --radius-pill: 9999px;
+
+  /* 6. ELEVATION */
+  --elev-0: none;
+  --elev-1: 0 1px 2px 0 rgba(0,0,0,0.10), 0 1px 3px 1px rgba(0,0,0,0.06);
+  --elev-2: 0 1px 2px 0 rgba(0,0,0,0.10), 0 2px 6px 2px rgba(0,0,0,0.08);
+  --elev-3: 0 4px 8px 3px rgba(0,0,0,0.08), 0 1px 3px 0 rgba(0,0,0,0.12);
+  --elev-4: 0 6px 10px 4px rgba(0,0,0,0.10), 0 2px 3px 0 rgba(0,0,0,0.14);
+  --elev-5: 0 8px 12px 6px rgba(0,0,0,0.10), 0 4px 4px 0 rgba(0,0,0,0.16);
+  --inset-1: inset 0 1px 0 0 rgba(255,255,255,0.6), inset 0 -1px 0 0 rgba(0,0,0,0.04);
+
+  /* 7. SPACING (4-pt) */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px; --s-6: 24px;
+  --s-8: 32px; --s-10: 40px; --s-12: 48px; --s-16: 64px; --s-20: 80px; --s-24: 96px;
+
+  /* 8. MOTION */
+  --ease-standard:   cubic-bezier(0.2, 0.0, 0, 1.0);
+  --ease-decelerate: cubic-bezier(0.0, 0.0, 0, 1.0);
+  --ease-emphasized: cubic-bezier(0.2, 0.0, 0, 1.0);
+  --dur-short: 150ms; --dur-medium: 250ms; --dur-long: 400ms; --dur-emph: 500ms;
+
+  /* report-specific dark gradient (from viskit banner) */
+  --grad-dark: linear-gradient(135deg, #1A1C2E 0%, #2E4090 55%, #4758A9 100%);
+}

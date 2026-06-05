@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="CREFLE mark">
+    <g fill="#C9252C">
+      <circle cx="10" cy="10" r="7"></circle><circle cx="32" cy="10" r="7"></circle><circle cx="54" cy="10" r="7"></circle>
+      <circle cx="10" cy="32" r="7"></circle><circle cx="32" cy="32" r="7"></circle><circle cx="54" cy="32" r="7"></circle>
+      <path d="M 14,32 C 17,29 25,29 28,32 C 25,35 17,35 14,32 Z"></path>
+      <path d="M 36,32 C 39,29 47,29 50,32 C 47,35 39,35 36,32 Z"></path>
+      <circle cx="10" cy="54" r="7"></circle><circle cx="32" cy="54" r="7"></circle><circle cx="54" cy="54" r="7"></circle>
+    </g></svg>

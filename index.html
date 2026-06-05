@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MES 시장조사 — AI Agent 적용 범위 | CREFLE OMF</title>
+<meta name="description" content="한국·글로벌 주요 MES 제품의 핵심 기능 모듈과 AI Agent 적용 범위 시장조사. 다중 출처 검증 리포트. CREFLE Inc." />
+<link rel="icon" href="assets/crefle-mark.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="assets/css/crefle.css" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+  body {
+    margin: 0; background: var(--surface); color: var(--on-surface);
+    font: var(--w-regular) var(--text-body)/var(--leading-body) var(--font-sans);
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+  a { color: var(--primary); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  h1, h2, h3, h4 { margin: 0; letter-spacing: var(--tracking-tight); line-height: var(--leading-snug); }
+
+  /* ---------- Top app bar ---------- */
+  .appbar {
+    position: sticky; top: 0; z-index: 50; height: 64px;
+    display: flex; align-items: center; gap: var(--s-4);
+    padding: 0 var(--s-6);
+    background: rgba(251,248,253,0.86); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--outline-variant);
+  }
+  .appbar .mark { width: 30px; height: 30px; flex: none; }
+  .appbar .brand-txt { display: flex; flex-direction: column; line-height: 1.15; }
+  .appbar .brand-txt b { font-weight: var(--w-bold); font-size: 15px; letter-spacing: -0.01em; }
+  .appbar .brand-txt span { font-size: 11px; color: var(--on-surface-muted); }
+  .appbar .spacer { flex: 1; }
+  .appbar .date-chip {
+    font: var(--w-medium) var(--text-small)/1 var(--font-mono);
+    color: var(--on-surface-variant); padding: 6px 12px;
+    border: 1px solid var(--outline-variant); border-radius: var(--radius-pill);
+    background: var(--surface-bright);
+  }
+  .appbar .menu-btn { display: none; background: none; border: none; cursor: pointer;
+    color: var(--on-surface); font-size: 26px; padding: 4px; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative; overflow: hidden;
+    background: var(--grad-dark); color: #fff;
+    padding: clamp(56px, 9vw, 104px) var(--s-6) clamp(48px, 7vw, 88px);
+  }
+  .hero::before {
+    content: ""; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 40px 40px; opacity: 0.5; pointer-events: none;
+  }
+  .hero-inner { max-width: 1180px; margin: 0 auto; position: relative; }
+  .eyebrow {
+    font: var(--w-medium) 13px/1 var(--font-sans); text-transform: uppercase;
+    letter-spacing: var(--tracking-eyebrow); color: var(--brand-accent-1);
+    display: inline-flex; align-items: center; gap: 10px; margin-bottom: var(--s-5);
+  }
+  .eyebrow::before { content: ""; width: 28px; height: 3px; background: var(--brand-red); border-radius: 2px; }
+  .hero h1 {
+    font-weight: var(--w-bold); font-size: clamp(30px, 5vw, 54px);
+    line-height: 1.12; max-width: 18ch; margin-bottom: var(--s-5);
+  }
+  .hero h1 .accent { color: var(--brand-accent-1); }
+  .hero .lead { font-size: clamp(16px, 2vw, 20px); font-weight: var(--w-light);
+    color: rgba(255,255,255,0.88); max-width: 60ch; line-height: var(--leading-body); }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-8); }
+  .meta-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.18);
+    border-radius: var(--radius-pill); padding: 8px 16px;
+    font-size: 13px; color: #fff;
+  }
+  .meta-chip b { font-weight: var(--w-bold); }
+  .meta-chip .ms { font-size: 17px; color: var(--brand-accent-1); }
+
+  /* ---------- Layout shell ---------- */
+  .shell { max-width: 1180px; margin: 0 auto; display: grid;
+    grid-template-columns: 248px minmax(0,1fr); gap: var(--s-12);
+    padding: var(--s-12) var(--s-6) var(--s-24); align-items: start; }
+
+  /* ---------- TOC ---------- */
+  .toc { position: sticky; top: 88px; align-self: start; }
+  .toc .toc-title { font: var(--w-bold) var(--text-small)/1 var(--font-sans);
+    text-transform: uppercase; letter-spacing: 0.12em; color: var(--on-surface-muted);
+    margin-bottom: var(--s-4); padding-left: var(--s-3); }
+  .toc ol { list-style: none; margin: 0; padding: 0; border-left: 2px solid var(--outline-variant); }
+  .toc li a {
+    display: flex; gap: 10px; padding: 7px var(--s-3); margin-left: -2px;
+    border-left: 2px solid transparent; color: var(--on-surface-muted);
+    font-size: 13.5px; line-height: 1.3; transition: color var(--dur-short) var(--ease-standard),
+      border-color var(--dur-short) var(--ease-standard), background var(--dur-short) var(--ease-standard); }
+  .toc li a .n { font: var(--w-medium) 12px/1.3 var(--font-mono); color: var(--outline); flex: none; width: 16px; }
+  .toc li a:hover { color: var(--on-surface); text-decoration: none; background: rgba(71,88,169,0.06); }
+  .toc li a.active { color: var(--brand-red); border-left-color: var(--brand-red); font-weight: var(--w-medium); }
+  .toc li a.active .n { color: var(--brand-red); }
+
+  /* ---------- Content ---------- */
+  .content { min-width: 0; }
+  section.block { scroll-margin-top: 88px; margin-bottom: var(--s-16); }
+  .sec-head { display: flex; align-items: baseline; gap: var(--s-4); margin-bottom: var(--s-6);
+    padding-bottom: var(--s-4); border-bottom: 1px solid var(--outline-variant); }
+  .sec-head .sec-n { font: var(--w-bold) 15px/1 var(--font-mono); color: #fff;
+    background: var(--brand-red); border-radius: var(--radius-sm);
+    padding: 7px 10px; flex: none; }
+  .sec-head h2 { font-size: clamp(22px, 3vw, 28px); font-weight: var(--w-bold); }
+  .sec-head .sub { color: var(--on-surface-muted); font-size: 14px; margin-top: 4px; font-weight: var(--w-regular); }
+
+  p { margin: 0 0 var(--s-4); }
+  .content p { color: var(--on-surface-variant); }
+  strong { font-weight: var(--w-bold); color: var(--on-surface); }
+  .lead-p { font-size: 17px; }
+
+  /* cards */
+  .card { background: var(--surface-bright); border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-md); box-shadow: var(--elev-1); padding: var(--s-6); }
+  .card + .card { margin-top: var(--s-4); }
+
+  /* thesis / callout */
+  .thesis { position: relative; background: var(--surface-bright);
+    border: 1px solid var(--brand-red-soft); border-left: 5px solid var(--brand-red);
+    border-radius: var(--radius-md); box-shadow: var(--elev-1);
+    padding: var(--s-6) var(--s-8); margin-bottom: var(--s-6); }
+  .thesis .label { font: var(--w-bold) var(--text-small)/1 var(--font-sans);
+    text-transform: uppercase; letter-spacing: 0.1em; color: var(--brand-red); margin-bottom: var(--s-3);
+    display: flex; align-items: center; gap: 8px; }
+  .thesis .label .ms { font-size: 18px; }
+  .thesis .big { font-size: clamp(18px, 2.4vw, 23px); font-weight: var(--w-bold);
+    line-height: var(--leading-snug); color: var(--on-surface); letter-spacing: var(--tracking-tight); }
+  .thesis .big em { font-style: normal; color: var(--brand-red); }
+
+  /* stat row */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s-4); margin: var(--s-6) 0; }
+  .stat { background: var(--surface-container-low); border-radius: var(--radius-md);
+    padding: var(--s-5); text-align: center; }
+  .stat .num { font: var(--w-bold) 32px/1 var(--font-sans); color: var(--primary); letter-spacing: -0.03em; }
+  .stat .num.red { color: var(--brand-red); }
+  .stat .lbl { font-size: 12.5px; color: var(--on-surface-muted); margin-top: 8px; }
+
+  /* tables */
+  .tbl-wrap { overflow-x: auto; border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-md); box-shadow: var(--elev-1); background: var(--surface-bright); }
+  table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14px; }
+  thead th { background: var(--surface-container); color: var(--on-surface);
+    font-weight: var(--w-bold); text-align: left; padding: 14px var(--s-4);
+    font-size: 13px; border-bottom: 2px solid var(--outline-variant); white-space: nowrap; }
+  tbody td { padding: 14px var(--s-4); border-bottom: 1px solid var(--outline-variant);
+    vertical-align: top; color: var(--on-surface-variant); line-height: 1.5; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: rgba(71,88,169,0.04); }
+  td .v-name { font-weight: var(--w-bold); color: var(--on-surface); }
+  td .v-prod { font-family: var(--font-mono); font-size: 12.5px; color: var(--primary); }
+
+  /* chips / badges */
+  .chip { display: inline-flex; align-items: center; gap: 5px; font: var(--w-medium) 11.5px/1 var(--font-sans);
+    padding: 5px 9px; border-radius: var(--radius-sm); white-space: nowrap; }
+  .chip .ms { font-size: 14px; }
+  .chip.ok   { background: var(--success-container); color: var(--semantic-success); }
+  .chip.info { background: var(--info-container);    color: var(--semantic-info); }
+  .chip.warn { background: var(--warning-container);  color: #8a6000; }
+  .chip.err  { background: var(--error-container);    color: var(--semantic-error); }
+  .chip.idle { background: var(--surface-container-high); color: var(--on-surface-muted); }
+  .chip.brand{ background: var(--brand-red-soft);     color: var(--brand-red-deep); }
+
+  /* axis cards grid */
+  .axes { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s-4); }
+  .axis { background: var(--surface-bright); border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-md); box-shadow: var(--elev-1); padding: var(--s-5);
+    display: flex; flex-direction: column; gap: var(--s-3); transition: box-shadow var(--dur-medium) var(--ease-standard); }
+  .axis:hover { box-shadow: var(--elev-3); }
+  .axis .ax-top { display: flex; align-items: center; gap: var(--s-3); }
+  .axis .ax-ic { width: 40px; height: 40px; flex: none; display: grid; place-items: center;
+    background: var(--primary-container); color: var(--on-primary-container);
+    border-radius: var(--radius-sm); }
+  .axis .ax-ic .ms { font-size: 22px; }
+  .axis .ax-t { font-weight: var(--w-bold); font-size: 15.5px; color: var(--on-surface); }
+  .axis .ax-d { font-size: 13.5px; color: var(--on-surface-variant); line-height: 1.5; }
+  .axis .ax-foot { margin-top: auto; padding-top: var(--s-2); display: flex; align-items: center; gap: 8px; }
+  .axis .ax-foot .ml { font-size: 11.5px; color: var(--on-surface-muted); }
+
+  /* comparison split */
+  .vs { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); }
+  .vs .col { border-radius: var(--radius-md); padding: var(--s-6); box-shadow: var(--elev-1); }
+  .vs .col.kr { background: var(--surface-container-low); border: 1px solid var(--outline-variant); }
+  .vs .col.gl { background: #fff; border: 1px solid var(--brand-red-soft); }
+  .vs .col h4 { font-size: 16px; display: flex; align-items: center; gap: 8px; margin-bottom: var(--s-4); }
+  .vs .col.kr h4 { color: var(--on-surface); }
+  .vs .col.gl h4 { color: var(--brand-red); }
+  .vs ul { margin: 0; padding-left: 18px; }
+  .vs li { font-size: 14px; color: var(--on-surface-variant); margin-bottom: 10px; line-height: 1.5; }
+
+  /* notes / caveat list */
+  .notes { list-style: none; margin: 0; padding: 0; counter-reset: note; }
+  .notes li { position: relative; padding: var(--s-4) var(--s-4) var(--s-4) 52px;
+    background: var(--surface-bright); border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-md); margin-bottom: var(--s-3); font-size: 14px;
+    color: var(--on-surface-variant); line-height: 1.55; }
+  .notes li::before { counter-increment: note; content: counter(note);
+    position: absolute; left: var(--s-4); top: var(--s-4);
+    width: 24px; height: 24px; display: grid; place-items: center;
+    background: var(--warning-container); color: #8a6000;
+    border-radius: var(--radius-sm); font: var(--w-bold) 13px/1 var(--font-mono); }
+  .notes.q li::before { background: var(--info-container); color: var(--semantic-info); }
+
+  /* sources */
+  .src-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .src-list li { display: flex; align-items: center; gap: var(--s-3); padding: 12px var(--s-4);
+    background: var(--surface-bright); border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-sm); font-size: 13.5px; }
+  .src-list li .ms { color: var(--on-surface-muted); font-size: 18px; flex: none; }
+  .src-list li .s-url { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-family: var(--font-mono); font-size: 12.5px; color: var(--on-surface-variant); }
+
+  .callout-refute { background: var(--error-container); border: 1px solid #f1c4c0;
+    border-radius: var(--radius-md); padding: var(--s-5) var(--s-6); margin-top: var(--s-4); }
+  .callout-refute .label { font: var(--w-bold) var(--text-small)/1 var(--font-sans);
+    text-transform: uppercase; letter-spacing: 0.1em; color: var(--semantic-error);
+    display: flex; align-items: center; gap: 8px; margin-bottom: var(--s-3); }
+  .callout-refute ul { margin: 0; padding-left: 18px; }
+  .callout-refute li { font-size: 13.5px; color: var(--on-surface-variant); margin-bottom: 8px; line-height: 1.5; }
+
+  /* footer */
+  footer { background: var(--brand-charcoal-deep); color: rgba(255,255,255,0.7);
+    padding: var(--s-12) var(--s-6); }
+  .foot-inner { max-width: 1180px; margin: 0 auto; display: flex; flex-wrap: wrap;
+    align-items: center; gap: var(--s-6); justify-content: space-between; }
+  footer .wm { height: 30px; opacity: 0.95; }
+  footer .foot-meta { font-size: 12.5px; line-height: 1.7; }
+  footer .foot-meta b { color: #fff; font-weight: var(--w-medium); }
+  footer .disclaimer { width: 100%; border-top: 1px solid rgba(255,255,255,0.12);
+    margin-top: var(--s-6); padding-top: var(--s-5); font-size: 11.5px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+
+  .inline-note { font-size: 12.5px; color: var(--on-surface-muted); font-style: normal; }
+
+  /* responsive */
+  @media (max-width: 1023px) {
+    .shell { grid-template-columns: 1fr; gap: var(--s-6); }
+    .toc { display: none; }
+    .appbar .menu-btn { display: block; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .axes { grid-template-columns: 1fr; }
+    .vs { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .stats { grid-template-columns: 1fr 1fr; }
+    .hero-meta { gap: 8px; }
+    .meta-chip { font-size: 12px; padding: 7px 12px; }
+  }
+
+  /* print */
+  @media print {
+    .appbar, .toc, .hero-meta { display: none !important; }
+    body { background: #fff; }
+    .shell { display: block; padding: 0; max-width: none; }
+    .hero { background: #fff !important; color: #000; padding: 0 0 24px; }
+    .hero::before { display: none; }
+    .hero h1, .hero .lead { color: #000; }
+    .hero h1 .accent { color: var(--brand-red); }
+    .card, .axis, .tbl-wrap, .thesis, .notes li, .src-list li { box-shadow: none; break-inside: avoid; }
+    section.block { break-inside: avoid; }
+    a { color: #000; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== TOP APP BAR ===================== -->
+<header class="appbar">
+  <svg class="mark" viewBox="0 0 64 64" role="img" aria-label="CREFLE">
+    <g fill="#C9252C">
+      <circle cx="10" cy="10" r="7"/><circle cx="32" cy="10" r="7"/><circle cx="54" cy="10" r="7"/>
+      <circle cx="10" cy="32" r="7"/><circle cx="32" cy="32" r="7"/><circle cx="54" cy="32" r="7"/>
+      <path d="M 14,32 C 17,29 25,29 28,32 C 25,35 17,35 14,32 Z"/>
+      <path d="M 36,32 C 39,29 47,29 50,32 C 47,35 39,35 36,32 Z"/>
+      <circle cx="10" cy="54" r="7"/><circle cx="32" cy="54" r="7"/><circle cx="54" cy="54" r="7"/>
+    </g>
+  </svg>
+  <div class="brand-txt">
+    <b>CREFLE · OMF</b>
+    <span>MES 시장조사 리포트</span>
+  </div>
+  <div class="spacer"></div>
+  <span class="date-chip">2026-06-05</span>
+  <button class="menu-btn" id="menuBtn" aria-label="목차"><span class="material-symbols-rounded">menu</span></button>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">Market Research · MES &amp; AI Agent</div>
+    <h1>MES 제품 시장조사<br><span class="accent">AI Agent 적용 범위</span> 중심</h1>
+    <p class="lead">한국·글로벌 주요 제조실행시스템(MES)의 핵심 기능 모듈과, 생성형 AI·코파일럿·자율 에이전트가
+      기능적으로 어디까지 적용되어 있는지 다중 출처로 조사·검증한 리포트.</p>
+    <div class="hero-meta">
+      <span class="meta-chip"><span class="ms">calendar_month</span>조사일 <b>2026-06-05</b></span>
+      <span class="meta-chip"><span class="ms">travel_explore</span>검색 각도 <b>5</b></span>
+      <span class="meta-chip"><span class="ms">description</span>출처 <b>26건</b></span>
+      <span class="meta-chip"><span class="ms">fact_check</span>검증 주장 <b>25 → 20 확정</b></span>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SHELL ===================== -->
+<div class="shell">
+
+  <!-- TOC -->
+  <nav class="toc" id="toc" aria-label="목차">
+    <div class="toc-title">목차</div>
+    <ol>
+      <li><a href="#s0"><span class="n">00</span>핵심 결론</a></li>
+      <li><a href="#s1"><span class="n">01</span>MES 기능 표준 (ISA-95)</a></li>
+      <li><a href="#s2"><span class="n">02</span>한국 주요 벤더·제품</a></li>
+      <li><a href="#s3"><span class="n">03</span>글로벌 AI Agent 현황</a></li>
+      <li><a href="#s4"><span class="n">04</span>한국 vs 글로벌 격차</a></li>
+      <li><a href="#s5"><span class="n">05</span>AI Agent 적용 5축</a></li>
+      <li><a href="#s6"><span class="n">06</span>신뢰성 주의사항</a></li>
+      <li><a href="#s7"><span class="n">07</span>미확인 · 다음 단계</a></li>
+      <li><a href="#s8"><span class="n">08</span>출처</a></li>
+    </ol>
+  </nav>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- 00 핵심 결론 -->
+    <section class="block" id="s0">
+      <div class="sec-head"><span class="sec-n">00</span>
+        <div><h2>핵심 결론</h2><div class="sub">한 줄 전략 시사점</div></div>
+      </div>
+      <div class="thesis">
+        <div class="label"><span class="ms">target</span>전략적 시사점</div>
+        <div class="big">한국 MES 벤더의 <em>'본 제품'에는 아직 LLM 기반 AI Agent</em>(생성형 AI·코파일럿·자율 에이전트)가
+          거의 탑재되어 있지 않다. 반면 글로벌 벤더는 MES·산업 플랫폼에 명시적 AI Agent를 빠르게 탑재 중 —
+          <em>"AI Agent 네이티브 한국형 MES"는 현재 시장의 공백(white space)</em>이다.</div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="num">5</div><div class="lbl">검색 각도</div></div>
+        <div class="stat"><div class="num">26</div><div class="lbl">조사 출처 (1차 중심)</div></div>
+        <div class="stat"><div class="num red">20</div><div class="lbl">검증 확정 주장 (3표 검증)</div></div>
+        <div class="stat"><div class="num">5</div><div class="lbl">반박·폐기 주장</div></div>
+      </div>
+      <p class="lead-p">한국 벤더는 AI/ML 기능을 MES 본체가 아니라 <strong>별도의 분석·엔지니어링 제품</strong>으로
+        분리해 제공하는 패턴을 보인다 — 삼성SDS의 Brightics·Nexplant Analytics, 미라콤 EES의 FDC/EPT/sDM,
+        VMS의 MOZART 제조AI, BISTel eDataLyzer 등. 이들 대부분은 <strong>ML 기반 분석·예측</strong> 수준이며,
+        한 화면·한 대화창에서 작동하는 통합형 대화·자율 에이전트 경험은 아직 약하다.</p>
+    </section>
+
+    <!-- 01 ISA-95 -->
+    <section class="block" id="s1">
+      <div class="sec-head"><span class="sec-n">01</span>
+        <div><h2>MES 기능 표준 프레임 (ISA-95)</h2><div class="sub">AI Agent가 얹히는 계층의 정의</div></div>
+      </div>
+      <div class="card">
+        <p>ISA-95 / IEC 62264 자동화 계층은 <strong>Level 0~4의 5단계</strong>로 구성된다.
+          <strong>MES(제조실행시스템 = 제조운영관리, MOM)는 Level 3</strong>에 위치하며,
+          "원하는 최종 제품을 생산하기 위한 워크플로우 활동을 정의"하는 계층이다.</p>
+        <p style="margin-bottom:0">즉 MES에 AI Agent를 적용한다는 것은 결국 이 <strong>Level 3 워크플로우</strong>
+          — 생산지시·실적·품질·설비·자재 — 위에 지능형 에이전트를 얹는다는 의미다. 본 리포트의 기능 분석은 이 표준 프레임을 기준으로 한다.</p>
+        <div style="margin-top:var(--s-5)"><span class="chip ok"><span class="ms">verified</span>검증 3-0</span>
+          <span class="inline-note" style="margin-left:8px">출처: Siemens ISA-95 framework · ISA.org / IEC 62264</span></div>
+      </div>
+    </section>
+
+    <!-- 02 한국 벤더 -->
+    <section class="block" id="s2">
+      <div class="sec-head"><span class="sec-n">02</span>
+        <div><h2>한국 주요 MES 벤더 · 제품 및 핵심 기능 모듈</h2>
+          <div class="sub">벤더 공식 자료 기준 · 검증된 모듈 구성</div></div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>벤더</th><th>제품</th><th>핵심 기능 모듈</th><th>AI Agent 탑재 현황</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="v-name">미라콤아이앤씨</span></td>
+              <td><span class="v-prod">Nexplant MESplus</span></td>
+              <td><strong>MES Core 4모듈</strong> — 생산관리(WIP) · 자재관리(INV) · 품질관리(QCM) · 설비관리(RAS). Cloud Edition도 동일</td>
+              <td>MES Core엔 없음. 확장(EES)에 FDC·EPT·sDM 등 <strong>ML 기반 설비 분석</strong> <span class="chip ok"><span class="ms">verified</span>3-0</span></td>
+            </tr>
+            <tr>
+              <td><span class="v-name">삼성SDS</span></td>
+              <td><span class="v-prod">Nexplant MES</span></td>
+              <td><strong>5모듈</strong> — Schedule &amp; Dispatch · Manufacturing Operation · Equipment Engineering · Machine Control · Materials Control</td>
+              <td>본 제품엔 'AI Agent' 명시 없음(advanced analytics 수준). AI는 별도 제품(Brightics·Nexplant Analytics·Visual Insight·EAM/CBM)에 귀속 <span class="chip ok"><span class="ms">verified</span>3-0</span></td>
+            </tr>
+            <tr>
+              <td><span class="v-name">LG CNS</span></td>
+              <td><span class="v-prod">Factova MES</span></td>
+              <td>시스템관리·실시간모니터링·라벨디자인 / 공정물류자동화(RTD·온라인설비) / 공정·라인 품질관리 / 모델링 기반 개발도구(웹·모바일 UI) / 멀티 OS·DBMS / 메시지 기반 미들웨어 통합</td>
+              <td>본 제품 페이지에 명시적 AI Agent 기능 불명확 <span class="chip info"><span class="ms">info</span>단정 보류</span></td>
+            </tr>
+            <tr>
+              <td><span class="v-name">VMS Solutions</span></td>
+              <td><span class="v-prod">MOZART</span> <span class="chip idle">MES 아님</span></td>
+              <td>AI·디지털트윈 기반 <strong>APS(생산계획·스케줄링)·SCM</strong>. 모듈: 생산계획(Resilient Planning) · 생산스케줄링(Optimized Scheduling) · 시뮬레이션&amp;디지털트윈 · 제조AI</td>
+              <td>제조 AI는 <strong>ML 기반</strong>(시뮬레이터 대량학습). 생성형/코파일럿/자율 에이전트 명시 없음. Gartner APAC SCP MQ Notable Vendor <span class="chip ok"><span class="ms">verified</span>3-0</span></td>
+            </tr>
+            <tr>
+              <td><span class="v-name">BISTel</span></td>
+              <td><span class="v-prod">eDataLyzer</span> <span class="chip idle">분석 플랫폼</span></td>
+              <td>Map Analyzer · IntelliMine · Trace Analyzer 3개 도구. 수율·품질 근본원인분석(RCA). MES·YMS·FDC·EPT/OEE·PPM DB와 통합</td>
+              <td>"detect/analyze/predict/adapt" 포지셔닝. <strong>ML 기반 분석</strong>이며 '자율 에이전트'로 단정하는 주장은 반박됨 <span class="chip ok"><span class="ms">verified</span>3-0</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card" style="margin-top:var(--s-5);background:var(--surface-container-low);border-style:dashed">
+        <p style="margin:0"><strong>미확인(추가 조사 필요)</strong> — 포스코DX · 신성이엔지 · 더존비즈온 · 영림원소프트랩은
+          이번 검증에서 1차 출처로 제품 모듈·AI 현황이 확인되지 않았다.</p>
+      </div>
+      <div class="callout-refute">
+        <div class="label"><span class="ms">gpp_bad</span>검증에서 반박된 주장 — 단정 금지</div>
+        <ul>
+          <li>BISTel eDataLyzer의 RCA와 VMS '제조 AI'를 <strong>'자율/agentic'</strong>으로 규정한 주장 (0-3 반박)</li>
+          <li>LG CNS·미라콤 페이지에 <strong>'AI 언급이 전무'</strong>하다는 주장 (0-3 / 1-2 반박)</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 03 글로벌 -->
+    <section class="block" id="s3">
+      <div class="sec-head"><span class="sec-n">03</span>
+        <div><h2>글로벌 벤더의 AI Agent 탑재 현황</h2>
+          <div class="sub">선두 그룹 — 대부분 GA 예정/베타/시연 단계</div></div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>벤더</th><th>AI Agent 제품</th><th>형태</th><th>적용 범위</th><th>단계</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="v-name">SAP</span></td>
+              <td><span class="v-prod">Joule Agents (14종)</span></td>
+              <td>자율형 에이전트</td>
+              <td>재무·HR·조달·공급망에 임베딩. <strong>Production Planning &amp; Operations Agent</strong>가 조건 충족 시 <strong>주문 자동 검증·릴리스</strong> → 생산 착수 시간 단축</td>
+              <td><span class="chip warn"><span class="ms">schedule</span>2026 Q1 GA 예정</span></td>
+            </tr>
+            <tr>
+              <td><span class="v-name">Siemens</span></td>
+              <td><span class="v-prod">Industrial Copilot</span></td>
+              <td>생성형 AI 어시스턴트<br>(Azure AI/OpenAI)</td>
+              <td>설계·계획~운영·서비스 전 가치사슬. <strong>자연어 대화형 정비 지원</strong>(문제 설명 → 상세 요청 → 변경 논의)</td>
+              <td><span class="chip ok"><span class="ms">check_circle</span>2024-07 GA</span></td>
+            </tr>
+            <tr>
+              <td><span class="v-name">AVEVA</span></td>
+              <td><span class="v-prod">Industrial AI Assistant</span></td>
+              <td>LLM + RAG<br>(Azure OpenAI)</td>
+              <td>CONNECT 플랫폼 위 <strong>채팅형 자연어 질의</strong> → 공정 데이터·이벤트·자산/태그 검색·요약. HMI/SCADA/<strong>MES</strong> 지원</td>
+              <td><span class="chip info"><span class="ms">science</span>일부 Open Beta</span></td>
+            </tr>
+            <tr>
+              <td><span class="v-name">Rockwell</span></td>
+              <td><span class="v-prod">NVIDIA Nemotron Nano (SLM)</span></td>
+              <td>엣지형 소형 언어 모델</td>
+              <td>FactoryTalk Design Studio 등 워크플로 최적화. <strong>엣지·오프라인·에어갭</strong> 환경에서 클라우드 없이 작동</td>
+              <td><span class="chip warn"><span class="ms">campaign</span>2025-11 발표(초기)</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 04 격차 -->
+    <section class="block" id="s4">
+      <div class="sec-head"><span class="sec-n">04</span>
+        <div><h2>한국 vs 글로벌 — 핵심 격차</h2><div class="sub">제품 단위 AI Agent 통합 수준</div></div>
+      </div>
+      <div class="vs">
+        <div class="col kr">
+          <h4><span class="material-symbols-rounded">factory</span>한국 벤더</h4>
+          <ul>
+            <li><strong>ML 기반 분석·예측은 강함</strong> — FDC 이상탐지, 설비 성능 추적, RCA, APS 최적화</li>
+            <li>그러나 <strong>LLM 기반 대화형·자율 에이전트는 MES 본 제품에 거의 부재</strong></li>
+            <li>AI가 <strong>별도 제품으로 분리</strong> — MES와 AI가 한 경험으로 통합되지 않음</li>
+          </ul>
+        </div>
+        <div class="col gl">
+          <h4><span class="material-symbols-rounded">smart_toy</span>글로벌 벤더</h4>
+          <ul>
+            <li>명시적 <strong>'AI Agent / Copilot / 자율 에이전트'를 MES·산업 플랫폼 안에</strong> 탑재</li>
+            <li>SAP의 <strong>자율 주문 검증·릴리스</strong>, Siemens·AVEVA의 <strong>자연어 인터페이스</strong></li>
+            <li>단, 다수가 <strong>GA 예정/베타/시연</strong> 단계 — 실증 제품은 아직 제한적</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 5축 -->
+    <section class="block" id="s5">
+      <div class="sec-head"><span class="sec-n">05</span>
+        <div><h2>MES에서 AI Agent가 적용될 수 있는 기능 영역</h2>
+          <div class="sub">검증된 5개 축 · 성숙도 표기</div></div>
+      </div>
+      <div class="axes">
+        <div class="axis">
+          <div class="ax-top"><div class="ax-ic"><span class="ms">query_stats</span></div>
+            <div class="ax-t">① 품질 예측 · 근본원인 분석(RCA)</div></div>
+          <div class="ax-d">BISTel eDataLyzer RCA, 삼성·미라콤 SPC·분석. 불량 발생 전 예측과 원인 추적.</div>
+          <div class="ax-foot"><span class="chip info"><span class="ms">model_training</span>ML 분석 단계</span>
+            <span class="ml">자율 에이전트 아님</span></div>
+        </div>
+        <div class="axis">
+          <div class="ax-top"><div class="ax-ic"><span class="ms">build</span></div>
+            <div class="ax-t">② 설비 이상탐지(FDC) · 예지보전</div></div>
+          <div class="ax-d">미라콤 FDC/EPT/sDM, BISTel 설비 헬스 모니터링, Siemens 생성형 AI 정비.</div>
+          <div class="ax-foot"><span class="chip info"><span class="ms">model_training</span>ML</span>
+            <span class="chip brand">+ 생성형(Siemens)</span></div>
+        </div>
+        <div class="axis">
+          <div class="ax-top"><div class="ax-ic"><span class="ms">schema</span></div>
+            <div class="ax-t">③ 생산계획 · 스케줄링 최적화</div></div>
+          <div class="ax-d">VMS MOZART APS, SAP 생산계획·운영 에이전트. 수요·제약 반영 자동 재계획.</div>
+          <div class="ax-foot"><span class="chip ok"><span class="ms">smart_toy</span>자율 에이전트 등장(SAP)</span></div>
+        </div>
+        <div class="axis">
+          <div class="ax-top"><div class="ax-ic"><span class="ms">chat</span></div>
+            <div class="ax-t">④ 자연어 질의 · 요약(NLQ)</div></div>
+          <div class="ax-d">AVEVA Industrial AI Assistant, Siemens Industrial Copilot. 현장 데이터를 대화로 조회·요약.</div>
+          <div class="ax-foot"><span class="chip brand"><span class="ms">auto_awesome</span>생성형 코파일럿 단계</span></div>
+        </div>
+        <div class="axis" style="grid-column:1/-1">
+          <div class="ax-top"><div class="ax-ic" style="background:var(--success-container);color:var(--semantic-success)"><span class="ms">bolt</span></div>
+            <div class="ax-t">⑤ 자율 업무 실행</div></div>
+          <div class="ax-d">SAP Joule Agent — 조건 충족 시 <strong>주문 자동 검증·릴리스</strong>. 현재까지 명백한 '자율(autonomous) 에이전트' 수준은
+            SAP Joule Agent와 Siemens Copilot(생성형 정비)에 한정되며, 한국 벤더·BISTel·VMS의 AI는 주로 ML 기반 분석·예측이다.</div>
+          <div class="ax-foot"><span class="chip ok"><span class="ms">verified</span>유일한 '자율 에이전트' 수준</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 주의 -->
+    <section class="block" id="s6">
+      <div class="sec-head"><span class="sec-n">06</span>
+        <div><h2>신뢰성 주의사항</h2><div class="sub">해석 시 반드시 함께 고려</div></div>
+      </div>
+      <ol class="notes">
+        <li><strong>시간 민감성</strong> — SAP 생산 에이전트는 2026 Q1 GA <em>예정</em>, Rockwell-NVIDIA는 시연 예정, AVEVA MES 질의는 Open Beta. 모두 <strong>"실증된 GA 제품"이 아니라 발표/로드맵 단계</strong>.</li>
+        <li><strong>출처 품질</strong> — 한국 벤더 정보는 대부분 <strong>벤더 자체 마케팅 페이지·데이터시트</strong> 의존. 기능 존재 여부엔 적절하나 <strong>성능 수치(예: 정비시간 25%↓)는 독립 검증 안 됨</strong>(벤더 주장).</li>
+        <li><strong>'본 제품' vs '확장/별도 제품' 경계</strong> — 삼성SDS MES 본 제품엔 AI 없지만 Brightics 등 별도 제품엔 있음. 미라콤 FDC/EPT/sDM은 MES Core가 아닌 EES 확장. "MES에 AI가 있다/없다"는 <strong>어느 제품 단위로 보느냐</strong>에 따라 달라진다.</li>
+        <li><strong>반박된 주장 주의</strong> — BISTel RCA·VMS 제조AI를 '자율/agentic'으로 규정 / LG CNS·미라콤에 'AI 언급 전무' 주장은 검증에서 반박됨(0-3 또는 1-2). 단정하지 말 것.</li>
+        <li>삼성SDS 한국어 본 제품 URL이 현재 /error 리다이렉트 → US/EN 미러로 검증.</li>
+      </ol>
+    </section>
+
+    <!-- 07 다음 단계 -->
+    <section class="block" id="s7">
+      <div class="sec-head"><span class="sec-n">07</span>
+        <div><h2>미확인 항목 · 다음 단계</h2><div class="sub">기획서 작성 전 보강 필요</div></div>
+      </div>
+      <ol class="notes q">
+        <li>포스코DX · 신성이엔지 · 더존비즈온 · 영림원소프트랩 MES 기능·AI 현황 추가 조사.</li>
+        <li>삼성SDS AI 제품(Brightics·Nexplant Analytics)이 MES와 실제 통합되는 깊이/UX — 'MES 내 AI Agent'처럼 작동하는지.</li>
+        <li>한국 벤더가 2025~2026년 LLM 기반 코파일럿/NLQ를 MES에 출시·로드맵에 두었는지(글로벌 대응 국산 동향).</li>
+        <li>SAP ME/MII, Siemens Opcenter의 모듈 단위 기능 및 Joule Agent/Copilot의 MES 직접 임베딩 범위.</li>
+      </ol>
+    </section>
+
+    <!-- 08 출처 -->
+    <section class="block" id="s8">
+      <div class="sec-head"><span class="sec-n">08</span>
+        <div><h2>출처</h2><div class="sub">1차 · 공식 자료 위주</div></div>
+      </div>
+      <ul class="src-list">
+        <li><span class="ms">link</span><span class="s-url">miracom-inc.com</span><span class="chip ok">primary</span> 미라콤 Nexplant MESplus / EES</li>
+        <li><span class="ms">link</span><span class="s-url">samsungsds.com</span><span class="chip ok">primary</span> 삼성SDS Nexplant MES</li>
+        <li><span class="ms">link</span><span class="s-url">lgcns.com</span><span class="chip ok">primary</span> LG CNS Factova MES</li>
+        <li><span class="ms">link</span><span class="s-url">vms-solutions.com</span><span class="chip ok">primary</span> VMS MOZART</li>
+        <li><span class="ms">link</span><span class="s-url">synopsys.com (BISTel datasheet)</span><span class="chip ok">primary</span> eDataLyzer</li>
+        <li><span class="ms">link</span><span class="s-url">siemens.com · press.siemens.com</span><span class="chip ok">primary</span> Industrial Copilot · ISA-95</li>
+        <li><span class="ms">link</span><span class="s-url">news.sap.com (2025-10)</span><span class="chip ok">primary</span> Joule Agents</li>
+        <li><span class="ms">link</span><span class="s-url">aveva.com</span><span class="chip ok">primary</span> Industrial AI Assistant</li>
+        <li><span class="ms">link</span><span class="s-url">rockwellautomation.com (2025-11)</span><span class="chip ok">primary</span> NVIDIA Nemotron</li>
+      </ul>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+  <div class="foot-inner">
+    <svg class="wm" viewBox="0 0 320 88" role="img" aria-label="CREFLE">
+      <g transform="translate(0 12)"><g fill="#E6494F">
+        <circle cx="10" cy="10" r="7"/><circle cx="32" cy="10" r="7"/><circle cx="54" cy="10" r="7"/>
+        <circle cx="10" cy="32" r="7"/><circle cx="32" cy="32" r="7"/><circle cx="54" cy="32" r="7"/>
+        <path d="M 14,32 C 17,29 25,29 28,32 C 25,35 17,35 14,32 Z"/>
+        <path d="M 36,32 C 39,29 47,29 50,32 C 47,35 39,35 36,32 Z"/>
+        <circle cx="10" cy="54" r="7"/><circle cx="32" cy="54" r="7"/><circle cx="54" cy="54" r="7"/>
+      </g></g>
+      <g font-family="Spoqa Han Sans Neo, Noto Sans KR, sans-serif" font-size="40" font-weight="300" letter-spacing="3" fill="#FFFFFF"><text x="84" y="58">CREFLE</text></g>
+      <rect x="114" y="28" width="3.5" height="30" fill="#E6494F"/>
+    </svg>
+    <div class="foot-meta">
+      <b>OMF · MES 시장조사 리포트</b><br>
+      조사일 2026-06-05 · 다중 출처 웹 검색 + 3표 적대적 검증<br>
+      © 2026 CREFLE Inc.
+    </div>
+  </div>
+  <div class="disclaimer">
+    본 리포트는 공개된 벤더 공식 자료·보도자료·데이터시트를 다중 출처로 교차 검증해 작성됨. 글로벌 AI Agent 기능 다수는
+    발표/로드맵/베타 단계이며 성능 수치는 벤더 주장으로 독립 검증되지 않음. 반박된 주장은 본문에 명시. 내부 검토용 자료.
+  </div>
+</footer>
+
+<script>
+  // scrollspy
+  (function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+    var map = {};
+    links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+    var sections = Array.prototype.slice.call(document.querySelectorAll('section.block'));
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          links.forEach(function (l) { l.classList.remove('active'); });
+          var a = map[e.target.id];
+          if (a) a.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
+    sections.forEach(function (s) { obs.observe(s); });
+
+    // mobile TOC toggle (scrolls to top nav)
+    var btn = document.getElementById('menuBtn');
+    if (btn) btn.addEventListener('click', function () {
+      document.getElementById('s0').scrollIntoView({ behavior: 'smooth' });
+    });
+  })();
+</script>
+</body>
+</html>

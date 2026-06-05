@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 88" width="320" height="88" role="img" aria-label="CREFLE">
+  <g transform="translate(0 12)">
+    <g fill="#E6494F">
+      <circle cx="10" cy="10" r="7"></circle><circle cx="32" cy="10" r="7"></circle><circle cx="54" cy="10" r="7"></circle>
+      <circle cx="10" cy="32" r="7"></circle><circle cx="32" cy="32" r="7"></circle><circle cx="54" cy="32" r="7"></circle>
+      <path d="M 14,32 C 17,29 25,29 28,32 C 25,35 17,35 14,32 Z"></path>
+      <path d="M 36,32 C 39,29 47,29 50,32 C 47,35 39,35 36,32 Z"></path>
+      <circle cx="10" cy="54" r="7"></circle><circle cx="32" cy="54" r="7"></circle><circle cx="54" cy="54" r="7"></circle>
+    </g></g>
+  <g font-family="Spoqa Han Sans Neo, Noto Sans KR, -apple-system, BlinkMacSystemFont, sans-serif" font-size="40" font-weight="300" letter-spacing="3" fill="#FFFFFF">
+    <text x="84" y="58">CREFLE</text>
+  </g>
+  <rect x="114" y="28" width="3.5" height="30" fill="#E6494F"></rect>
+</svg>
