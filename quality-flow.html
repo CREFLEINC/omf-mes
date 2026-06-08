@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>검사 → MES 품질 데이터 흐름 | CREFLE OMF</title>
+<meta name="description" content="QMS 없이도 품질이 강한 구조 — 비전검사(CREFLE) → MES → 생산/품질 성과 분석 데이터 흐름. CREFLE Inc." />
+<link rel="icon" href="assets/crefle-mark.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="assets/css/crefle.css" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; background: var(--surface); color: var(--on-surface);
+    font: var(--w-regular) var(--text-body)/var(--leading-body) var(--font-sans);
+    -webkit-font-smoothing: antialiased; }
+  a { color: var(--primary); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  h1,h2,h3 { margin: 0; letter-spacing: var(--tracking-tight); }
+
+  /* appbar */
+  .appbar { position: sticky; top: 0; z-index: 50; height: 64px; display: flex; align-items: center;
+    gap: var(--s-4); padding: 0 var(--s-6); background: rgba(251,248,253,0.86);
+    backdrop-filter: blur(12px); border-bottom: 1px solid var(--outline-variant); }
+  .appbar .mark { width: 30px; height: 30px; flex: none; }
+  .appbar .brand-txt { display: flex; flex-direction: column; line-height: 1.15; }
+  .appbar .brand-txt b { font-weight: var(--w-bold); font-size: 15px; }
+  .appbar .brand-txt span { font-size: 11px; color: var(--on-surface-muted); }
+  .appbar .spacer { flex: 1; }
+  .appbar .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px;
+    font-weight: var(--w-medium); color: var(--on-surface-variant);
+    border: 1px solid var(--outline-variant); border-radius: var(--radius-pill);
+    padding: 7px 14px; background: var(--surface-bright); }
+  .appbar .back .ms { font-size: 17px; }
+
+  /* header */
+  .head { background: var(--grad-dark); color: #fff; padding: clamp(40px,6vw,72px) var(--s-6) clamp(36px,5vw,60px);
+    position: relative; overflow: hidden; }
+  .head::before { content:""; position:absolute; inset:0;
+    background-image: linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.05) 1px,transparent 1px);
+    background-size: 40px 40px; opacity:.5; }
+  .head-in { max-width: 1080px; margin: 0 auto; position: relative; }
+  .eyebrow { font: var(--w-medium) 13px/1 var(--font-sans); text-transform: uppercase;
+    letter-spacing: var(--tracking-eyebrow); color: var(--brand-accent-1);
+    display: inline-flex; align-items: center; gap: 10px; margin-bottom: var(--s-4); }
+  .eyebrow::before { content:""; width: 28px; height: 3px; background: var(--brand-red); border-radius: 2px; }
+  .head h1 { font-weight: var(--w-bold); font-size: clamp(26px,4vw,42px); line-height: 1.14; margin-bottom: var(--s-4); }
+  .head h1 .accent { color: var(--brand-accent-1); }
+  .head .lead { font-weight: var(--w-light); font-size: clamp(15px,1.8vw,19px);
+    color: rgba(255,255,255,.88); max-width: 60ch; }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: var(--s-12) var(--s-6) var(--s-24); }
+
+  /* diagram bands */
+  .flow { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
+  .band { border-radius: var(--radius-lg); padding: var(--s-6); box-shadow: var(--elev-1);
+    border: 1px solid var(--outline-variant); }
+  .band .band-head { display: flex; align-items: center; gap: var(--s-3); margin-bottom: var(--s-5); flex-wrap: wrap; }
+  .band .lvl { font: var(--w-bold) 11.5px/1 var(--font-mono); padding: 6px 10px; border-radius: var(--radius-sm);
+    background: var(--brand-charcoal-deep); color: #fff; flex: none; letter-spacing: .02em; }
+  .band .band-title { font-weight: var(--w-bold); font-size: 17px; }
+  .band .band-note { font-size: 12.5px; color: var(--on-surface-muted); }
+  .band.site { background: var(--surface-container-low); }
+  .band.mes  { background: var(--primary-container); border-color: #b9c2f5; }
+  .band.mes .lvl { background: var(--primary); }
+  .band.ana  { background: var(--success-container); border-color: #bfe0c9; }
+  .band.ana .lvl { background: var(--semantic-success); }
+
+  .row { display: grid; gap: var(--s-3); }
+  .row.c3 { grid-template-columns: repeat(3, 1fr); }
+  .row.c2 { grid-template-columns: repeat(2, 1fr); }
+  .node { background: var(--surface-bright); border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-md); padding: var(--s-4); box-shadow: var(--elev-1); }
+  .node .nt { display: flex; align-items: center; gap: 8px; font-weight: var(--w-bold); font-size: 14px; }
+  .node .nt .ms { font-size: 19px; color: var(--primary); }
+  .node .nt .num { font: var(--w-bold) 11px/1 var(--font-mono); background: var(--brand-red); color:#fff;
+    border-radius: var(--radius-xs); padding: 4px 6px; }
+  .node .nd { font-size: 12.5px; color: var(--on-surface-variant); margin-top: 8px; line-height: 1.5; }
+  .node.crefle { border: 1.5px solid var(--brand-red); box-shadow: var(--elev-2); }
+  .node.crefle .nt .ms { color: var(--brand-red); }
+  .node .tag { display: inline-block; font: var(--w-bold) 10px/1 var(--font-sans); letter-spacing: .06em;
+    text-transform: uppercase; color: var(--brand-red-deep); background: var(--brand-red-soft);
+    padding: 4px 7px; border-radius: var(--radius-xs); margin-top: 10px; }
+
+  /* connector */
+  .conn { display: flex; flex-direction: column; align-items: center; padding: 6px 0; }
+  .conn .line { width: 2px; height: 18px; background: var(--outline); }
+  .conn .chev { width: 30px; height: 30px; border-radius: var(--radius-pill); background: var(--surface-bright);
+    border: 2px solid var(--outline); display: grid; place-items: center; color: var(--on-surface-variant); }
+  .conn .chev .ms { font-size: 20px; }
+  .conn .clbl { font-size: 11.5px; color: var(--on-surface-muted); margin-top: 6px; }
+
+  /* aside QMS */
+  .aside { margin-top: var(--s-8); border: 2px dashed var(--outline); border-radius: var(--radius-md);
+    padding: var(--s-5) var(--s-6); background: repeating-linear-gradient(45deg, var(--surface), var(--surface) 12px, var(--surface-container-low) 12px, var(--surface-container-low) 24px); }
+  .aside .at { display: flex; align-items: center; gap: 8px; font-weight: var(--w-bold); font-size: 14px; color: var(--on-surface-variant); }
+  .aside .at .ms { color: var(--semantic-idle); }
+  .aside .ad { font-size: 13px; color: var(--on-surface-variant); margin-top: 8px; line-height: 1.55; }
+  .aside .pill { display:inline-flex; align-items:center; gap:5px; font: var(--w-medium) 11.5px/1 var(--font-sans);
+    background: var(--surface-container-high); color: var(--on-surface-muted); padding: 5px 9px; border-radius: var(--radius-sm); margin-top: 8px; }
+
+  /* CREFLE highlight */
+  .hl { margin-top: var(--s-10); background: var(--surface-bright); border: 1px solid var(--brand-red-soft);
+    border-left: 5px solid var(--brand-red); border-radius: var(--radius-md); box-shadow: var(--elev-1);
+    padding: var(--s-6) var(--s-8); }
+  .hl .label { font: var(--w-bold) var(--text-small)/1 var(--font-sans); text-transform: uppercase;
+    letter-spacing: .1em; color: var(--brand-red); margin-bottom: var(--s-3); display: flex; align-items: center; gap: 8px; }
+  .hl .big { font-size: clamp(17px,2.2vw,21px); font-weight: var(--w-bold); line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-tight); }
+  .hl .big em { font-style: normal; color: var(--brand-red); }
+
+  /* read-notes */
+  .reads { margin-top: var(--s-10); }
+  .reads h2 { font-size: 20px; margin-bottom: var(--s-5); padding-bottom: var(--s-3);
+    border-bottom: 1px solid var(--outline-variant); }
+  .reads ul { margin: 0; padding-left: 20px; }
+  .reads li { font-size: 14px; color: var(--on-surface-variant); margin-bottom: 12px; line-height: 1.6; }
+  .reads li b { color: var(--on-surface); }
+
+  footer { background: var(--brand-charcoal-deep); color: rgba(255,255,255,.7); padding: var(--s-10) var(--s-6); margin-top: var(--s-16); }
+  .foot-in { max-width: 1080px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: var(--s-6); align-items: center; justify-content: space-between; }
+  footer .wm { height: 28px; }
+  footer .fm { font-size: 12.5px; line-height: 1.7; }
+  footer .fm b { color: #fff; font-weight: var(--w-medium); }
+
+  @media (max-width: 760px) {
+    .row.c3, .row.c2 { grid-template-columns: 1fr; }
+  }
+  @media print {
+    .appbar { display: none; }
+    .head { background:#fff; color:#000; } .head::before{display:none;}
+    .head h1,.head .lead{color:#000;} .head h1 .accent{color:var(--brand-red);}
+    .band,.node,.hl{ box-shadow:none; break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <svg class="mark" viewBox="0 0 64 64" role="img" aria-label="CREFLE">
+    <g fill="#C9252C">
+      <circle cx="10" cy="10" r="7"/><circle cx="32" cy="10" r="7"/><circle cx="54" cy="10" r="7"/>
+      <circle cx="10" cy="32" r="7"/><circle cx="32" cy="32" r="7"/><circle cx="54" cy="32" r="7"/>
+      <path d="M 14,32 C 17,29 25,29 28,32 C 25,35 17,35 14,32 Z"/>
+      <path d="M 36,32 C 39,29 47,29 50,32 C 47,35 39,35 36,32 Z"/>
+      <circle cx="10" cy="54" r="7"/><circle cx="32" cy="54" r="7"/><circle cx="54" cy="54" r="7"/>
+    </g>
+  </svg>
+  <div class="brand-txt"><b>CREFLE · OMF</b><span>품질 데이터 흐름도</span></div>
+  <div class="spacer"></div>
+  <a class="back" href="index.html"><span class="material-symbols-rounded">arrow_back</span>시장조사 리포트</a>
+</header>
+
+<div class="head">
+  <div class="head-in">
+    <div class="eyebrow">OMF Strategy · Quality Data Flow</div>
+    <h1>검사 → MES → 성과 분석<br><span class="accent">QMS 없이도 품질이 강한 구조</span></h1>
+    <p class="lead">생산 성과 분석(⑥)에 품질을 넣는 데 별도 QMS는 전제 조건이 아니다. 인라인 품질은 원래 MES의 기능이며,
+      CREFLE은 비전검사를 자사가 만들기 때문에 "검사 = 품질 데이터 소스"를 MES에 직접 통합한다.</p>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="flow">
+
+    <!-- BAND 1: 현장 -->
+    <div class="band site">
+      <div class="band-head">
+        <span class="lvl">ISA-95 · L0–L2</span>
+        <span class="band-title">현장 — 품질 데이터 발생원</span>
+        <span class="band-note">설비·계측기·검사장비에서 사실이 발생</span>
+      </div>
+      <div class="row c3">
+        <div class="node crefle">
+          <div class="nt"><span class="ms">visibility</span>비전 검사</div>
+          <div class="nd">합/부 판정, 불량 유형·좌표, 검사 이미지. 실시간 인라인 검사.</div>
+          <span class="tag">CREFLE 자사 제품</span>
+        </div>
+        <div class="node">
+          <div class="nt"><span class="ms">straighten</span>인라인 측정·게이지</div>
+          <div class="nd">치수·중량·전기특성 등 측정값. 규격 대비 합/부.</div>
+        </div>
+        <div class="node">
+          <div class="nt"><span class="ms">sensors</span>설비·공정 센서</div>
+          <div class="nd">온도·압력·속도 등 파라미터, FDC(설비 이상) 신호 — 품질의 선행지표.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="conn"><div class="line"></div><div class="chev"><span class="ms">arrow_downward</span></div>
+      <div class="clbl">실시간 수집 (④ 데이터 수집)</div></div>
+
+    <!-- BAND 2: MES -->
+    <div class="band mes">
+      <div class="band-head">
+        <span class="lvl">ISA-95 · L3</span>
+        <span class="band-title">MES — 인라인 품질은 MES의 기능</span>
+        <span class="band-note">QMS 없이 MES가 직접 수집·판정·추적</span>
+      </div>
+      <div class="row c3">
+        <div class="node">
+          <div class="nt"><span class="num">④</span>데이터 수집</div>
+          <div class="nd">검사 결과·측정값·불량 이벤트·설비 데이터를 수집해 한곳에 적재.</div>
+        </div>
+        <div class="node">
+          <div class="nt"><span class="ms">rule</span>품질관리 (QCM·SPC)</div>
+          <div class="nd">합/부 판정, 불량 코드·수량, 관리도(SPC) — MES 자체 품질 모듈.</div>
+        </div>
+        <div class="node">
+          <div class="nt"><span class="num">⑤</span>추적 (genealogy)</div>
+          <div class="nd">로트·시리얼 단위 이력 — "어느 로트가 어디서 불량인가" 추적.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="conn"><div class="line"></div><div class="chev"><span class="ms">arrow_downward</span></div>
+      <div class="clbl">품질 결과를 분석으로</div></div>
+
+    <!-- BAND 3: 분석 -->
+    <div class="band ana">
+      <div class="band-head">
+        <span class="lvl">ISA-95 · L3</span>
+        <span class="band-title">성과 분석</span>
+        <span class="band-note">품질이 반영된 생산 지표</span>
+      </div>
+      <div class="row c2">
+        <div class="node">
+          <div class="nt"><span class="num">⑥</span>생산 성과 분석</div>
+          <div class="nd">수율 · 직행률(FPY) · 스크랩률 · OEE — <b>품질 결과가 반영되어야 의미가 있는 지표.</b></div>
+        </div>
+        <div class="node">
+          <div class="nt"><span class="num">⑥</span>품질 성과 분석</div>
+          <div class="nd">불량 유형별 추이, 근본원인(RCA) 후보, 공정-품질 상관 분석.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- aside: QMS/LIMS -->
+  <div class="aside">
+    <div class="at"><span class="ms">lan</span>QMS / LIMS — 별도·선택 영역 (이 흐름에 필수 아님)</div>
+    <div class="ad">전사 품질경영(ISO 9001·부적합/CAPA·감사·공급사 품질)과 시험실 정밀분석(LIMS)은 위 흐름과 <b>별개</b>다.
+      공정 중 품질(검사·불량·SPC)은 MES가 담당하므로, 생산 성과 분석에 품질을 넣는 데 QMS가 선행될 필요가 없다.</div>
+    <span class="pill"><span class="material-symbols-rounded" style="font-size:14px">info</span>QMS는 "경영·시험실 차원" 품질일 때만 필요</span>
+  </div>
+
+  <!-- CREFLE highlight -->
+  <div class="hl">
+    <div class="label"><span class="ms">bolt</span>CREFLE 구조적 강점</div>
+    <div class="big"><em>검사(Inspection)를 자사가 만든다</em> → 비전검사 결과를 MES에 직접 태워,
+      별도 QMS 없이도 ⑥ 생산 성과 분석에 <em>양품·불량·불량유형·좌표</em>까지 넣을 수 있다.
+      대부분의 MES 벤더는 검사를 외부 연동으로 받지만, CREFLE은 <em>"검사 → MES" 수직 통합</em>으로
+      품질 데이터의 정밀도·실시간성·원인 연계에서 앞선다.</div>
+  </div>
+
+  <!-- read notes -->
+  <div class="reads">
+    <h2>읽는 법 — 핵심 4가지</h2>
+    <ul>
+      <li><b>1. "QMS 없으면 품질 없다"는 틀린 전제.</b> 인라인 품질(검사·불량·SPC)은 원래 MES의 기능이다.</li>
+      <li><b>2. 품질 데이터의 1차 소스는 현장 장비.</b> 비전검사·측정기·설비센서 → ④ 데이터 수집으로 직행.</li>
+      <li><b>3. QMS/LIMS는 별개 층.</b> 전사 품질경영·시험실 분석일 때만 필요하며, 생산 성과 분석의 전제가 아니다.</li>
+      <li><b>4. CREFLE은 검사를 자사가 만든다.</b> "검사 = 품질 소스"를 MES에 수직 통합 — 경쟁사가 따라오기 어려운 지점.</li>
+    </ul>
+  </div>
+
+</div>
+
+<footer>
+  <div class="foot-in">
+    <svg class="wm" viewBox="0 0 320 88" role="img" aria-label="CREFLE">
+      <g transform="translate(0 12)"><g fill="#E6494F">
+        <circle cx="10" cy="10" r="7"/><circle cx="32" cy="10" r="7"/><circle cx="54" cy="10" r="7"/>
+        <circle cx="10" cy="32" r="7"/><circle cx="32" cy="32" r="7"/><circle cx="54" cy="32" r="7"/>
+        <path d="M 14,32 C 17,29 25,29 28,32 C 25,35 17,35 14,32 Z"/>
+        <path d="M 36,32 C 39,29 47,29 50,32 C 47,35 39,35 36,32 Z"/>
+        <circle cx="10" cy="54" r="7"/><circle cx="32" cy="54" r="7"/><circle cx="54" cy="54" r="7"/>
+      </g></g>
+      <g font-family="Spoqa Han Sans Neo, sans-serif" font-size="40" font-weight="300" letter-spacing="3" fill="#FFFFFF"><text x="84" y="58">CREFLE</text></g>
+      <rect x="114" y="28" width="3.5" height="30" fill="#E6494F"/>
+    </svg>
+    <div class="fm"><b>OMF · 검사 → MES 품질 데이터 흐름</b><br>ISA-95 MOM 활동 ④⑤⑥ 기준 · © 2026 CREFLE Inc. (내부 검토용)</div>
+  </div>
+</footer>
+
+</body>
+</html>
