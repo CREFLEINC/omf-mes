@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MOM 기능 정의서 (ISA-95 Part 3) | CREFLE OMF</title>
+<meta name="description" content="ISA-95 Part 3 제조운영관리(MOM) 8개 활동의 기능 정의 — 정의·입출력·MES 대응 기능·AI Agent 적용·OMF 우선순위. CREFLE Inc." />
+<link rel="icon" href="assets/crefle-mark.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="assets/css/crefle.css" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+  body { margin: 0; background: var(--surface); color: var(--on-surface);
+    font: var(--w-regular) var(--text-body)/var(--leading-body) var(--font-sans); -webkit-font-smoothing: antialiased; }
+  a { color: var(--primary); text-decoration: none; } a:hover { text-decoration: underline; }
+  h1,h2,h3 { margin: 0; letter-spacing: var(--tracking-tight); }
+
+  .appbar { position: sticky; top: 0; z-index: 50; height: 64px; display: flex; align-items: center;
+    gap: var(--s-4); padding: 0 var(--s-6); background: rgba(251,248,253,.86);
+    backdrop-filter: blur(12px); border-bottom: 1px solid var(--outline-variant); }
+  .appbar .mark { width: 30px; height: 30px; flex: none; }
+  .appbar .brand-txt { display: flex; flex-direction: column; line-height: 1.15; }
+  .appbar .brand-txt b { font-weight: var(--w-bold); font-size: 15px; }
+  .appbar .brand-txt span { font-size: 11px; color: var(--on-surface-muted); }
+  .appbar .spacer { flex: 1; }
+  .appbar .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: var(--w-medium);
+    color: var(--on-surface-variant); border: 1px solid var(--outline-variant); border-radius: var(--radius-pill);
+    padding: 7px 14px; background: var(--surface-bright); }
+  .appbar .back .ms { font-size: 17px; }
+
+  .head { background: var(--grad-dark); color: #fff; padding: clamp(40px,6vw,72px) var(--s-6) clamp(36px,5vw,56px);
+    position: relative; overflow: hidden; }
+  .head::before { content:""; position:absolute; inset:0;
+    background-image: linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px,transparent 1px);
+    background-size: 40px 40px; opacity:.5; }
+  .head-in { max-width: 1120px; margin: 0 auto; position: relative; }
+  .eyebrow { font: var(--w-medium) 13px/1 var(--font-sans); text-transform: uppercase; letter-spacing: var(--tracking-eyebrow);
+    color: var(--brand-accent-1); display: inline-flex; align-items: center; gap: 10px; margin-bottom: var(--s-4); }
+  .eyebrow::before { content:""; width: 28px; height: 3px; background: var(--brand-red); border-radius: 2px; }
+  .head h1 { font-weight: var(--w-bold); font-size: clamp(26px,4vw,42px); line-height: 1.14; margin-bottom: var(--s-4); }
+  .head h1 .accent { color: var(--brand-accent-1); }
+  .head .lead { font-weight: var(--w-light); font-size: clamp(15px,1.8vw,19px); color: rgba(255,255,255,.88); max-width: 64ch; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: var(--s-12) var(--s-6) var(--s-24); }
+
+  /* intro + legend */
+  .intro { background: var(--surface-bright); border: 1px solid var(--outline-variant); border-radius: var(--radius-md);
+    box-shadow: var(--elev-1); padding: var(--s-6); margin-bottom: var(--s-8); }
+  .intro p { margin: 0 0 var(--s-3); color: var(--on-surface-variant); font-size: 14.5px; }
+  .intro p:last-child { margin-bottom: 0; }
+  .intro strong { color: var(--on-surface); font-weight: var(--w-bold); }
+  .legend { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-5); padding-top: var(--s-5); border-top: 1px solid var(--outline-variant); }
+  .legend .lg { font-size: 12px; color: var(--on-surface-variant); display: inline-flex; align-items: center; gap: 7px; }
+
+  .chip { display: inline-flex; align-items: center; gap: 5px; font: var(--w-medium) 11px/1 var(--font-sans);
+    padding: 5px 9px; border-radius: var(--radius-sm); white-space: nowrap; }
+  .chip .ms { font-size: 13px; }
+  .chip.ai-aux { background: var(--surface-container-high); color: var(--on-surface-muted); }
+  .chip.ai-copilot { background: var(--brand-red-soft); color: var(--brand-red-deep); }
+  .chip.ai-auto { background: var(--success-container); color: var(--semantic-success); }
+  .chip.v1 { background: var(--info-container); color: var(--semantic-info); }
+  .chip.v2 { background: var(--warning-container); color: #8a6000; }
+
+  .group-h { display: flex; align-items: baseline; gap: var(--s-3); margin: var(--s-10) 0 var(--s-5); }
+  .group-h .gt { font-size: 14px; font-weight: var(--w-bold); text-transform: uppercase; letter-spacing: .08em; color: var(--brand-red); }
+  .group-h .gd { font-size: 13px; color: var(--on-surface-muted); }
+  .group-h::after { content:""; flex: 1; height: 1px; background: var(--outline-variant); }
+
+  /* activity card */
+  .act { background: var(--surface-bright); border: 1px solid var(--outline-variant); border-radius: var(--radius-md);
+    box-shadow: var(--elev-1); padding: var(--s-6); margin-bottom: var(--s-4); }
+  .act-top { display: flex; align-items: flex-start; gap: var(--s-4); margin-bottom: var(--s-4); }
+  .act-num { font: var(--w-bold) 16px/1 var(--font-mono); color: #fff; background: var(--brand-red);
+    border-radius: var(--radius-sm); padding: 9px 11px; flex: none; }
+  .act-num.support { background: var(--brand-charcoal); }
+  .act-ttl { flex: 1; min-width: 0; }
+  .act-ttl h3 { font-size: 18px; font-weight: var(--w-bold); }
+  .act-ttl .en { font-family: var(--font-mono); font-size: 12.5px; color: var(--primary); margin-top: 3px; }
+  .act-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-start; }
+  .act-def { font-size: 14.5px; color: var(--on-surface-variant); margin: 0 0 var(--s-4); line-height: 1.6; }
+  .act-def b { color: var(--on-surface); }
+
+  .act-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); }
+  .blk { background: var(--surface-container-low); border-radius: var(--radius-sm); padding: var(--s-4); }
+  .blk .bh { font: var(--w-bold) 11px/1 var(--font-sans); text-transform: uppercase; letter-spacing: .07em;
+    color: var(--on-surface-muted); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .blk .bh .ms { font-size: 15px; color: var(--primary); }
+  .blk ul { margin: 0; padding-left: 16px; }
+  .blk li { font-size: 13px; color: var(--on-surface-variant); margin-bottom: 6px; line-height: 1.45; }
+  .blk li:last-child { margin-bottom: 0; }
+  .io { font-size: 13px; color: var(--on-surface-variant); line-height: 1.5; }
+  .io .io-row { display: flex; gap: 8px; margin-bottom: 6px; }
+  .io .io-row .k { font-weight: var(--w-bold); color: var(--on-surface); flex: none; width: 36px; }
+  .ai-note { font-size: 13px; color: var(--on-surface-variant); line-height: 1.5; margin-top: 8px; }
+  .ai-note b { color: var(--on-surface); }
+  .mesa { font-family: var(--font-mono); font-size: 11.5px; color: var(--on-surface-muted); }
+
+  .act.spotlight { border: 1.5px solid var(--brand-red); box-shadow: var(--elev-2); }
+  .act.spotlight .act-def b { color: var(--brand-red); }
+
+  footer { background: var(--brand-charcoal-deep); color: rgba(255,255,255,.7); padding: var(--s-10) var(--s-6); margin-top: var(--s-16); }
+  .foot-in { max-width: 1120px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: var(--s-6); align-items: center; justify-content: space-between; }
+  footer .wm { height: 28px; }
+  footer .fm { font-size: 12.5px; line-height: 1.7; }
+  footer .fm b { color: #fff; font-weight: var(--w-medium); }
+  footer .fm a { color: var(--brand-accent-1); }
+
+  @media (max-width: 720px) { .act-grid { grid-template-columns: 1fr; } .act-top { flex-wrap: wrap; } }
+  @media print { .appbar { display:none; } .head{background:#fff;color:#000;} .head::before{display:none;}
+    .head h1,.head .lead{color:#000;} .head h1 .accent{color:var(--brand-red);} .act,.intro{box-shadow:none;break-inside:avoid;} }
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <svg class="mark" viewBox="0 0 64 64" role="img" aria-label="CREFLE"><g fill="#C9252C">
+    <circle cx="10" cy="10" r="7"/><circle cx="32" cy="10" r="7"/><circle cx="54" cy="10" r="7"/>
+    <circle cx="10" cy="32" r="7"/><circle cx="32" cy="32" r="7"/><circle cx="54" cy="32" r="7"/>
+    <path d="M 14,32 C 17,29 25,29 28,32 C 25,35 17,35 14,32 Z"/><path d="M 36,32 C 39,29 47,29 50,32 C 47,35 39,35 36,32 Z"/>
+    <circle cx="10" cy="54" r="7"/><circle cx="32" cy="54" r="7"/><circle cx="54" cy="54" r="7"/></g></svg>
+  <div class="brand-txt"><b>CREFLE · OMF</b><span>MOM 기능 정의서</span></div>
+  <div class="spacer"></div>
+  <a class="back" href="index.html"><span class="material-symbols-rounded">arrow_back</span>시장조사 리포트</a>
+</header>
+
+<div class="head">
+  <div class="head-in">
+    <div class="eyebrow">OMF Spec · ISA-95 Part 3 MOM</div>
+    <h1>MOM 기능 정의서<br><span class="accent">8개 활동 × 기능 · AI 적용 · OMF 우선순위</span></h1>
+    <p class="lead">ISA-95 Part 3 제조운영관리(MOM)의 8개 활동을 기준으로, 각 활동의 정의·주요 기능·입출력·MES 제품 대응·AI Agent 적용 가능성·OMF 구현 우선순위를 정리한 기능 설계 기준 문서.</p>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="intro">
+    <p>본 문서는 <strong>생산(Production) 범주</strong>를 기준으로 8개 활동을 정의한다. ISA-95는 동일한 8개 활동 틀을 <strong>품질·설비/보전·재고</strong> 범주에도 그대로 적용하므로(범주명만 교체), 아래 정의는 4대 범주에 공통으로 확장된다.</p>
+    <p><strong>구조</strong> — 표준상 8개 활동은 동등하나, 정보 흐름상 <strong>지원 활동 2개(제품 정의 관리 · 자원 관리)</strong>가 실행 루프 ①~⑥(스케줄링 → 디스패칭 → 실행 → 수집 → 추적 → 분석)에 기준 정보를 공급한다(편의적 그룹핑).</p>
+    <div class="legend">
+      <span class="lg"><span class="chip ai-aux">AI 보조</span> ML·규칙 기반(분석·추천)</span>
+      <span class="lg"><span class="chip ai-copilot">AI 코파일럿</span> 생성형·자연어(NLQ)</span>
+      <span class="lg"><span class="chip ai-auto">AI 자율</span> agentic(자동 결정·실행)</span>
+      <span class="lg"><span class="chip v1">OMF v1</span> MES 코어</span>
+      <span class="lg"><span class="chip v2">OMF v2</span> MOM 확장</span>
+    </div>
+  </div>
+
+  <!-- 지원 활동 -->
+  <div class="group-h"><span class="gt">지원 활동</span><span class="gd">실행 루프에 기준 정보 공급 (상시)</span></div>
+
+  <div class="act">
+    <div class="act-top">
+      <div class="act-num support">정의</div>
+      <div class="act-ttl"><h3>제품 정의 관리</h3><div class="en">Product Definition Management (일반화: Operations Definition)</div></div>
+      <div class="act-chips"><span class="chip ai-aux">AI 보조</span><span class="chip v1">v1</span></div>
+    </div>
+    <p class="act-def">무엇을 어떻게 만들지에 대한 기준 정보(마스터 레시피·BOM·라우팅·작업표준)를 생성·버전관리·배포한다.</p>
+    <div class="act-grid">
+      <div class="blk"><div class="bh"><span class="ms">checklist</span>주요 기능</div>
+        <ul><li>제품 정의·레시피 관리</li><li>BOM·공정 라우팅 관리</li><li>작업표준·규격·문서</li><li>버전·변경이력(ECN) 관리·배포</li></ul></div>
+      <div class="blk"><div class="bh"><span class="ms">sync_alt</span>입력 · 출력 / 대응</div>
+        <div class="io"><div class="io-row"><span class="k">입력</span><span>제품 설계·공정 엔지니어링 정보</span></div>
+        <div class="io-row"><span class="k">출력</span><span>실행에 쓰일 제품 정의(레시피)</span></div></div>
+        <div class="ai-note"><b>MES 대응:</b> 레시피관리(미라콤 RMS), 사양·문서 관리 · <span class="mesa">MESA-11: Document Control</span></div>
+        <div class="ai-note"><b>AI:</b> 변경 영향 분석, 레시피 파라미터 추천(보조)</div></div>
+    </div>
+  </div>
+
+  <div class="act">
+    <div class="act-top">
+      <div class="act-num support">자원</div>
+      <div class="act-ttl"><h3>자원 관리</h3><div class="en">Production Resource Management (일반화: Resource Management)</div></div>
+      <div class="act-chips"><span class="chip ai-aux">AI 보조</span><span class="chip v1">v1</span></div>
+    </div>
+    <p class="act-def">인원·설비·자재·치공구의 가용성·능력(capability)·상태·예약을 관리해 스케줄링에 공급한다.</p>
+    <div class="act-grid">
+      <div class="blk"><div class="bh"><span class="ms">checklist</span>주요 기능</div>
+        <ul><li>자원 상태·가용성 관리</li><li>능력(스킬·인증·교정) 관리</li><li>예약·할당</li><li>설비 적격성(qualification)·교정 주기 관리</li></ul></div>
+      <div class="blk"><div class="bh"><span class="ms">sync_alt</span>입력 · 출력 / 대응</div>
+        <div class="io"><div class="io-row"><span class="k">입력</span><span>자원 마스터 + 실시간 상태</span></div>
+        <div class="io-row"><span class="k">출력</span><span>가용성·능력 정보(availability·capability) → 스케줄링</span></div></div>
+        <div class="ai-note"><b>MES 대응:</b> 설비관리(RAS)·인력관리·자재(INV) 일부 · <span class="mesa">MESA-11: Resource Allocation, Labor Mgmt</span></div>
+        <div class="ai-note"><b>AI:</b> 자원 가용성·소요 예측(보조)</div></div>
+    </div>
+  </div>
+
+  <!-- 실행 루프 -->
+  <div class="group-h"><span class="gt">실행 루프 ①~⑥</span><span class="gd">계획 → 실행 → 측정 → 피드백</span></div>
+
+  <div class="act">
+    <div class="act-top">
+      <div class="act-num">①</div>
+      <div class="act-ttl"><h3>상세 생산 스케줄링</h3><div class="en">Detailed Production Scheduling</div></div>
+      <div class="act-chips"><span class="chip ai-copilot">AI 자율(글로벌 일부)</span><span class="chip v1">v1</span><span class="chip v2">v2 최적화</span></div>
+    </div>
+    <p class="act-def">L4의 거친 생산계획을 현장 자원·제약에 맞춰 <b>분 단위로 순서화·최적화</b>한다.</p>
+    <div class="act-grid">
+      <div class="blk"><div class="bh"><span class="ms">checklist</span>주요 기능</div>
+        <ul><li>작업 순서화·시퀀싱</li><li>자원·제약 반영, 셋업 최소화</li><li>납기 기반 우선순위</li><li>변동 발생 시 재계획(re-scheduling)</li></ul></div>
+      <div class="blk"><div class="bh"><span class="ms">sync_alt</span>입력 · 출력 / 대응</div>
+        <div class="io"><div class="io-row"><span class="k">입력</span><span>생산계획(L4) + 자원 가용</span></div>
+        <div class="io-row"><span class="k">출력</span><span>상세 일정(작업 순서)</span></div></div>
+        <div class="ai-note"><b>MES 대응:</b> 삼성SDS Schedule&Dispatch / 전문 APS는 VMS MOZART · <span class="mesa">MESA-11: Operations Scheduling</span></div>
+        <div class="ai-note"><b>AI:</b> 자동 재계획·최적화(APS)는 성숙. 자율 에이전트는 <b>SAP Joule(생산계획·운영, 2026 Q1 GA 예정) 단일 사례로 초기</b>. <b>OMF:</b> v1=기본 순서화·재계획, v2=자율 최적화 에이전트</div></div>
+    </div>
+  </div>
+
+  <div class="act">
+    <div class="act-top">
+      <div class="act-num">②</div>
+      <div class="act-ttl"><h3>생산 디스패칭</h3><div class="en">Production Dispatching</div></div>
+      <div class="act-chips"><span class="chip ai-aux">AI 보조</span><span class="chip v1">v1</span></div>
+    </div>
+    <p class="act-def">상세 일정에서 도출된 작업을 설비·작업자에게 <b>배정·릴리스(디스패치)</b>한다("작업 하달"). 릴리스된 작업은 ③ 실행 관리에 Job Order로 전달된다.</p>
+    <div class="act-grid">
+      <div class="blk"><div class="bh"><span class="ms">checklist</span>주요 기능</div>
+        <ul><li>작업 배정·작업지시 발행</li><li>실시간 우선순위 조정</li><li>WIP 흐름 통제</li><li>디스패치 리스트 관리</li></ul></div>
+      <div class="blk"><div class="bh"><span class="ms">sync_alt</span>입력 · 출력 / 대응</div>
+        <div class="io"><div class="io-row"><span class="k">입력</span><span>상세 일정</span></div>
+        <div class="io-row"><span class="k">출력</span><span>디스패치 리스트(릴리스된 작업) → 실행</span></div></div>
+        <div class="ai-note"><b>MES 대응:</b> Schedule&Dispatch, 생산관리(WIP) · <span class="mesa">MESA-11: Dispatching Production Units</span></div>
+        <div class="ai-note"><b>AI:</b> 실시간 우선순위 재배정(보조~부분 자율)</div></div>
+    </div>
+  </div>
+
+  <div class="act">
+    <div class="act-top">
+      <div class="act-num">③</div>
+      <div class="act-ttl"><h3>생산 실행 관리</h3><div class="en">Production Execution Management</div></div>
+      <div class="act-chips"><span class="chip ai-aux">AI 보조(보수적)</span><span class="chip v1">v1</span></div>
+    </div>
+    <p class="act-def">하달된 작업(Job Order)이 <b>규격대로 실제 수행되도록 지휘·통제</b>한다. ②(배정·하달)와 ④(수집·기록) 사이의 '실행 통제' 계층.</p>
+    <div class="act-grid">
+      <div class="blk"><div class="bh"><span class="ms">checklist</span>주요 기능</div>
+        <ul><li>작업 수행 지시·레시피 적용</li><li>설비·인원 명령 조정(L2 연동)</li><li>자원 확인·투입, 공정 순서 보장</li><li>작업 상태 관리·실행 중 예외 처리(인터록·포카요케)</li></ul></div>
+      <div class="blk"><div class="bh"><span class="ms">sync_alt</span>입력 · 출력 / 대응</div>
+        <div class="io"><div class="io-row"><span class="k">입력</span><span>Job Order</span></div>
+        <div class="io-row"><span class="k">출력</span><span>실행 결과 → 데이터 수집</span></div></div>
+        <div class="ai-note"><b>MES 대응:</b> EWI(전자작업지시)·레시피 다운로드·Track-in/out·인터록·설비제어 연동 · <span class="mesa">MESA-11: Process Management</span></div>
+        <div class="ai-note"><b>AI:</b> 예외·대체 라우팅 제안 — 안전·품질 직결이라 <b>"제안 후 승인"</b> 권장(자율은 보수적)</div></div>
+    </div>
+  </div>
+
+  <div class="act">
+    <div class="act-top">
+      <div class="act-num">④</div>
+      <div class="act-ttl"><h3>생산 데이터 수집</h3><div class="en">Production Data Collection</div></div>
+      <div class="act-chips"><span class="chip ai-aux">AI 부분자율(FDC)</span><span class="chip v1">v1</span></div>
+    </div>
+    <p class="act-def">실행 중 발생한 실제 데이터·이벤트(설비·작업자·<b>검사장비</b>)를 수집·적재한다. (품질 검사 결과는 표준상 품질 범주에 1차 귀속되나, CREFLE 비전검사 수직통합 시 이 단계에서 함께 수집된다.)</p>
+    <div class="act-grid">
+      <div class="blk"><div class="bh"><span class="ms">checklist</span>주요 기능</div>
+        <ul><li>설비 데이터 수집(인터페이스)</li><li>수동/자동 입력</li><li>이벤트·알람 수집</li><li>품질 측정값·검사 결과 수집</li></ul></div>
+      <div class="blk"><div class="bh"><span class="ms">sync_alt</span>입력 · 출력 / 대응</div>
+        <div class="io"><div class="io-row"><span class="k">입력</span><span>현장 L1/L2·검사장비</span></div>
+        <div class="io-row"><span class="k">출력</span><span>수집 데이터 → 추적·분석</span></div></div>
+        <div class="ai-note"><b>MES 대응:</b> 설비연동(삼성SDS Machine Control/EE)·실시간 모니터링(LG CNS)·FDC/EPT · <span class="mesa">MESA-11: Data Collection</span></div>
+        <div class="ai-note"><b>AI:</b> 스트림 이상 자동 감지(FDC) — 부분 자율</div></div>
+    </div>
+  </div>
+
+  <div class="act">
+    <div class="act-top">
+      <div class="act-num">⑤</div>
+      <div class="act-ttl"><h3>생산 추적</h3><div class="en">Production Tracking</div></div>
+      <div class="act-chips"><span class="chip ai-copilot">AI 코파일럿(NLQ)</span><span class="chip v1">v1</span></div>
+    </div>
+    <p class="act-def">진척·실적을 집계하고 로트·시리얼 <b>이력(genealogy)</b>을 구성하며, L4 보고용 실적(Performance)을 준비한다.</p>
+    <div class="act-grid">
+      <div class="blk"><div class="bh"><span class="ms">checklist</span>주요 기능</div>
+        <ul><li>WIP 추적</li><li>정/역 추적성(genealogy)</li><li>실적 집계·L4 보고</li><li>라벨·시리얼 관리</li></ul></div>
+      <div class="blk"><div class="bh"><span class="ms">sync_alt</span>입력 · 출력 / 대응</div>
+        <div class="io"><div class="io-row"><span class="k">입력</span><span>수집 데이터</span></div>
+        <div class="io-row"><span class="k">출력</span><span>생산 실적·이력</span></div></div>
+        <div class="ai-note"><b>MES 대응:</b> 생산관리(WIP)·라벨(LG CNS)·추적성(CREFLE Flowtrack) · <span class="mesa">MESA-11: Product Tracking & Genealogy</span></div>
+        <div class="ai-note"><b>AI:</b> 자연어로 이력 질의("이 로트 어디 거쳤어?") — 코파일럿</div></div>
+    </div>
+  </div>
+
+  <div class="act spotlight">
+    <div class="act-top">
+      <div class="act-num">⑥</div>
+      <div class="act-ttl"><h3>생산 성과 분석</h3><div class="en">Production Performance Analysis</div></div>
+      <div class="act-chips"><span class="chip ai-copilot">AI 코파일럿/보조</span><span class="chip v2">v2 차별점</span></div>
+    </div>
+    <p class="act-def">KPI·수율·OEE·사이클타임을 분석해 개선 피드백을 만든다. <b>한국 벤더는 기본 리포트는 본체에 두되 심층 분석·예측(AI) 계층을 별도 제품으로 분리 — AI Agent 화이트 스페이스의 핵심 지점.</b></p>
+    <div class="act-grid">
+      <div class="blk"><div class="bh"><span class="ms">checklist</span>주요 기능</div>
+        <ul><li>OEE·수율·FPY·스크랩 분석</li><li>병목·손실 분석</li><li>근본원인 분석(RCA)</li><li>리포트·대시보드, 개선 피드백</li></ul></div>
+      <div class="blk"><div class="bh"><span class="ms">sync_alt</span>입력 · 출력 / 대응</div>
+        <div class="io"><div class="io-row"><span class="k">입력</span><span>실적·이력·품질 데이터</span></div>
+        <div class="io-row"><span class="k">출력</span><span>인사이트 → 스케줄링·정의 피드백</span></div></div>
+        <div class="ai-note"><b>MES 대응:</b> ※심층 분석은 대부분 별도 제품 — Brightics·Nexplant Analytics·BISTel eDataLyzer(ML 분석 플랫폼) · <span class="mesa">MESA-11: Performance Analysis</span></div>
+        <div class="ai-note"><b>AI:</b> 품질예측·RCA·NLQ — <b>OMF 차별화의 핵심</b>(글로벌 선도 벤더 도입 중: 생성형·LLM+RAG, 자율은 초기 / 한국 본체엔 부재)</div></div>
+    </div>
+  </div>
+
+  <div class="intro" style="margin-top:var(--s-10)">
+    <p><strong>OMF 적용 요약</strong> — 실행 루프 ①~⑤ + 지원 2개는 <span class="chip v1">v1</span> MES 코어로 먼저 구축(시장 진입), ⑥ 성과 분석과 ①의 고도 최적화는 <span class="chip v2">v2</span> AI Agent 확장으로 차별화. 특히 <strong>④ 데이터 수집 ↔ ⑥ 분석</strong> 구간에 CREFLE 비전검사를 수직 통합(검사 결과를 ④→⑥로 직결)하면, 별도 QMS 도입 부담을 낮추면서 품질 분석을 강화할 수 있다.</p>
+    <p style="font-size:13px;color:var(--on-surface-muted)">관련: <a href="quality-flow.html">검사 → MES 품질 데이터 흐름도 →</a> · <a href="index.html">MES 시장조사 리포트 →</a></p>
+  </div>
+
+</div>
+
+<footer>
+  <div class="foot-in">
+    <svg class="wm" viewBox="0 0 320 88" role="img" aria-label="CREFLE">
+      <g transform="translate(0 12)"><g fill="#E6494F">
+        <circle cx="10" cy="10" r="7"/><circle cx="32" cy="10" r="7"/><circle cx="54" cy="10" r="7"/>
+        <circle cx="10" cy="32" r="7"/><circle cx="32" cy="32" r="7"/><circle cx="54" cy="32" r="7"/>
+        <path d="M 14,32 C 17,29 25,29 28,32 C 25,35 17,35 14,32 Z"/><path d="M 36,32 C 39,29 47,29 50,32 C 47,35 39,35 36,32 Z"/>
+        <circle cx="10" cy="54" r="7"/><circle cx="32" cy="54" r="7"/><circle cx="54" cy="54" r="7"/>
+      </g></g>
+      <g font-family="Spoqa Han Sans Neo, sans-serif" font-size="40" font-weight="300" letter-spacing="3" fill="#FFFFFF"><text x="84" y="58">CREFLE</text></g>
+      <rect x="114" y="28" width="3.5" height="30" fill="#E6494F"/>
+    </svg>
+    <div class="fm"><b>OMF · MOM 기능 정의서 (ISA-95 Part 3)</b><br>생산 범주 기준 · 4범주 공통 확장 · © 2026 CREFLE Inc. (내부 검토용)</div>
+  </div>
+</footer>
+
+</body>
+</html>
