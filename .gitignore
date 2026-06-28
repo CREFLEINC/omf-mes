@@ -1,0 +1,15 @@
+# OS
+.DS_Store
+
+# 로컬 도구/하네스 상태
+.omc/
+**/settings.local.json
+
+# 대외비 외부 원본 — git 미포함 (현황은 docs/research/raw-자료-목록.md)
+docs/raw/
+
+# 대용량 바이너리 — 로컬 전용 / 추후 Git LFS 검토
+**/assets/fonts/
+*.otf
+*.ttf
+*.zip

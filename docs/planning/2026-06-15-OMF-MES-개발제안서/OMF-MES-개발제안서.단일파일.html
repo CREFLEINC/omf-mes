@@ -1,0 +1,1086 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OMF MES 개발 제안서 · 삼진엘앤디 베트남법인</title>
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkNSRUZMRSBtYXJrIj4KICAgIDxnIGZpbGw9IiNDOTI1MkMiPgogICAgICA8Y2lyY2xlIGN4PSIxMCIgY3k9IjEwIiByPSI3Ij48L2NpcmNsZT48Y2lyY2xlIGN4PSIzMiIgY3k9IjEwIiByPSI3Ij48L2NpcmNsZT48Y2lyY2xlIGN4PSI1NCIgY3k9IjEwIiByPSI3Ij48L2NpcmNsZT4KICAgICAgPGNpcmNsZSBjeD0iMTAiIGN5PSIzMiIgcj0iNyI+PC9jaXJjbGU+PGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iNyI+PC9jaXJjbGU+PGNpcmNsZSBjeD0iNTQiIGN5PSIzMiIgcj0iNyI+PC9jaXJjbGU+CiAgICAgIDxwYXRoIGQ9Ik0gMTQsMzIgQyAxNywyOSAyNSwyOSAyOCwzMiBDIDI1LDM1IDE3LDM1IDE0LDMyIFoiPjwvcGF0aD4KICAgICAgPHBhdGggZD0iTSAzNiwzMiBDIDM5LDI5IDQ3LDI5IDUwLDMyIEMgNDcsMzUgMzksMzUgMzYsMzIgWiI+PC9wYXRoPgogICAgICA8Y2lyY2xlIGN4PSIxMCIgY3k9IjU0IiByPSI3Ij48L2NpcmNsZT48Y2lyY2xlIGN4PSIzMiIgY3k9IjU0IiByPSI3Ij48L2NpcmNsZT48Y2lyY2xlIGN4PSI1NCIgY3k9IjU0IiByPSI3Ij48L2NpcmNsZT4KICAgIDwvZz48L3N2Zz4=">
+<style>
+@import url('https://spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css');
+/* ============================================================
+   CREFLE Presentation Design System
+   Foundation: Colors + Type + Shape + Elevation
+   Source: viskit_killer Figma DS (Material Design 3 token map)
+   ============================================================ */
+
+/* -------- Webfont (local OFL 1.1 OTFs in /fonts + JetBrains Mono CDN) -- */
+/* @import rules must precede @font-face per CSS spec */
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+
+
+
+
+
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap");
+
+/* Material Symbols requires ligatures enabled and the standard reset so
+   the ligature name (e.g. "photo_camera") resolves to the glyph instead of
+   rendering as plain text. Applied to both the canonical class and the
+   shorter `.ms` alias used inside components/buttons. */
+.material-symbols-rounded,
+.ms {
+  font-family: "Material Symbols Rounded";
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: "liga";
+  -webkit-font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+:root {
+  /* ────────────────────────────────────────────────────────
+     1. BRAND COLOR — extracted from the official logo JPG
+        Red dots + the "i" stroke = brand primary; charcoal = wordmark.
+        The M3 indigo below (--primary) is the *product UI* primary
+        from viskit_killer, derived from M3 seed #363740 — a separate
+        layer used only inside product mockups. Brand presentations
+        lead with RED.
+     ──────────────────────────────────────────────────────── */
+  --brand-red:       #C9252C;   /* primary brand identity */
+  --brand-red-dark:  #A81E24;   /* hover / depth */
+  --brand-red-deep:  #7D161B;   /* heavy hover, on-dark accent */
+  --brand-red-soft:  #F4DDDE;   /* container, subtle bg */
+
+  --brand-charcoal:        #3E4146;   /* wordmark, headings on light */
+  --brand-charcoal-soft:   #5C5F66;
+  --brand-charcoal-deep:   #1F2125;   /* full-bleed dark surface */
+
+  /* Brand-primary alias — use this in slides + presentation materials */
+  --brand-primary:        var(--brand-red);
+  --brand-primary-dark:   var(--brand-red-dark);
+  --brand-primary-deep:   var(--brand-charcoal-deep);
+
+  /* Light decorative accents on charcoal / dark surfaces */
+  --brand-accent-1:       #FFAFB1;   /* tint of red for highlight-on-dark */
+  --brand-accent-2:       #C9CACE;   /* light charcoal */
+  --brand-accent-3:       #EAEBEC;   /* whisper-on-dark */
+
+  /* ────────────────────────────────────────────────────────
+     2. M3 ROLE TOKENS (Light) — surfaces + foregrounds
+     ──────────────────────────────────────────────────────── */
+  --surface:                 #FBF8FD;
+  --surface-bright:          #FFFFFF;
+  --surface-container-low:   #F5F2F7;
+  --surface-container:       #EFEDF1;
+  --surface-container-high:  #E9E7EB;
+  --surface-container-highest:#E3E1E5;
+
+  --on-surface:              #1B1B1F;   /* body / primary text */
+  --on-surface-variant:      #2D2C33;   /* body de-emphasized */
+  --on-surface-muted:        #77767F;   /* tertiary text */
+
+  --primary:                 #4758A9;
+  --on-primary:              #FFFFFF;
+  --primary-container:       #DDE1FF;
+  --on-primary-container:    #001257;
+
+  --secondary-container:     #DFE1F9;
+  --on-secondary-container:  #171B2C;
+
+  --outline:                 #767680;
+  --outline-variant:         #C6C5D0;
+
+  /* ────────────────────────────────────────────────────────
+     3. SEMANTIC — fixed across Light/Dark (industrial safety)
+        Use for VERDICT / STATUS / DELTA, never decoratively.
+     ──────────────────────────────────────────────────────── */
+  --semantic-success:        #1F883D;   /* OK · 양품 · pass */
+  --semantic-error:          #B3261E;   /* NG · 불량 · fail */
+  --semantic-error-strong:   #93000A;
+  --semantic-warning:        #E8A100;   /* ERROR · 주의 · attention */
+  --semantic-info:           #0B57D0;   /* 정보 · INFO */
+  --semantic-idle:           #6E7781;   /* IDLE · 대기 */
+
+  --on-semantic:             #FFFFFF;
+  --success-container:       #DCEFE2;
+  --error-container:         #F9DEDC;
+  --warning-container:       #FDECC8;
+  --info-container:          #DCE5FA;
+
+  /* ────────────────────────────────────────────────────────
+     4. TYPE — Spoqa Han Sans Neo (KR/EN), JetBrains Mono (code)
+        Spec mandate: 제목 20 / 본문 16 / 본문 작은 12 (document scale)
+        Plus a slide scale (1920×1080) tuned for projection.
+     ──────────────────────────────────────────────────────── */
+  --font-sans: "Spoqa Han Sans Neo", "Noto Sans KR", -apple-system,
+               BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  --font-icon: "Material Symbols Rounded";
+
+  /* Document scale (per spec) */
+  --text-title:    20px;   /* 제목 */
+  --text-body:     16px;   /* 본문 기본 */
+  --text-small:    12px;   /* 본문 작은 */
+  --text-label:    14px;   /* 라벨/버튼 (M3 label-large) */
+
+  /* Slide scale — 1920×1080 projection, proportional to spec */
+  --slide-display: 96px;   /* hero / title slide */
+  --slide-h1:      64px;   /* slide title */
+  --slide-h2:      40px;   /* section header */
+  --slide-h3:      28px;   /* sub-section */
+  --slide-body:    24px;   /* body — minimum legible on projection */
+  --slide-small:   18px;   /* caption, footnote */
+  --slide-eyebrow: 16px;   /* uppercase tracking eyebrow */
+
+  /* Weights — Spoqa supplies 100/300/400/500/700 */
+  --w-thin: 100;
+  --w-light: 300;
+  --w-regular: 400;
+  --w-medium: 500;
+  --w-bold: 700;
+
+  /* Leading + tracking */
+  --leading-tight: 1.15;
+  --leading-snug:  1.35;
+  --leading-body:  1.55;
+  --leading-loose: 1.75;
+  --tracking-tight: -0.02em;
+  --tracking-eyebrow: 0.14em;
+
+  /* ────────────────────────────────────────────────────────
+     5. SHAPE — Material 3 corner system + per-component radii
+     ──────────────────────────────────────────────────────── */
+  --radius-none: 0;
+  --radius-xs:   4px;
+  --radius-sm:   8px;     /* badges, chips, small inputs */
+  --radius-md:   12px;    /* cards, dialogs, content blocks */
+  --radius-lg:   16px;    /* large media, illustrations */
+  --radius-xl:   28px;    /* hero cards, full sheets */
+  --radius-pill: 9999px;  /* M3 buttons, pill chips */
+
+  /* ────────────────────────────────────────────────────────
+     6. ELEVATION — M3 Level 0–5
+        Use shadow to lift content; never use shadow + heavy border together.
+     ──────────────────────────────────────────────────────── */
+  --elev-0: none;
+  --elev-1: 0 1px 2px 0 rgba(0,0,0,0.10), 0 1px 3px 1px rgba(0,0,0,0.06);
+  --elev-2: 0 1px 2px 0 rgba(0,0,0,0.10), 0 2px 6px 2px rgba(0,0,0,0.08);
+  --elev-3: 0 4px 8px 3px rgba(0,0,0,0.08), 0 1px 3px 0 rgba(0,0,0,0.12);
+  --elev-4: 0 6px 10px 4px rgba(0,0,0,0.10), 0 2px 3px 0 rgba(0,0,0,0.14);
+  --elev-5: 0 8px 12px 6px rgba(0,0,0,0.10), 0 4px 4px 0 rgba(0,0,0,0.16);
+
+  /* Inner shadow used for inset surfaces (image wells, code blocks) */
+  --inset-1: inset 0 1px 0 0 rgba(255,255,255,0.6),
+             inset 0 -1px 0 0 rgba(0,0,0,0.04);
+
+  /* ────────────────────────────────────────────────────────
+     7. SPACING — 4-pt grid; never compose by eye
+     ──────────────────────────────────────────────────────── */
+  --s-1: 4px;   --s-2: 8px;   --s-3: 12px;   --s-4: 16px;
+  --s-5: 20px;  --s-6: 24px;  --s-8: 32px;   --s-10: 40px;
+  --s-12: 48px; --s-16: 64px; --s-20: 80px;  --s-24: 96px;
+
+  /* Slide safe-area: gutters and minimum element spacing on 1920×1080 */
+  --slide-gutter: 80px;
+  --slide-min-gap: 24px;    /* never let meaningful elements get closer */
+
+  /* ────────────────────────────────────────────────────────
+     8. MOTION — Material 3 standard easings + durations
+     ──────────────────────────────────────────────────────── */
+  --ease-standard:   cubic-bezier(0.2, 0.0, 0, 1.0);
+  --ease-decelerate: cubic-bezier(0.0, 0.0, 0, 1.0);
+  --ease-accelerate: cubic-bezier(0.3, 0.0, 1.0, 1.0);
+  --ease-emphasized: cubic-bezier(0.2, 0.0, 0, 1.0);
+  --dur-short:  150ms;
+  --dur-medium: 250ms;
+  --dur-long:   400ms;
+  --dur-emph:   500ms;
+}
+
+/* ============================================================
+   SEMANTIC TYPE CLASSES — use these in markup, never raw px
+   ============================================================ */
+
+/* Document/UI scale */
+.t-title   { font: var(--w-bold) var(--text-title)/var(--leading-snug) var(--font-sans); letter-spacing: var(--tracking-tight); color: var(--on-surface); }
+.t-body    { font: var(--w-regular) var(--text-body)/var(--leading-body) var(--font-sans); color: var(--on-surface); }
+.t-small   { font: var(--w-regular) var(--text-small)/var(--leading-snug) var(--font-sans); color: var(--on-surface-variant); }
+.t-label   { font: var(--w-medium) var(--text-label)/1.4 var(--font-sans); color: var(--on-surface); }
+.t-mono    { font: var(--w-regular) var(--text-small)/var(--leading-snug) var(--font-mono); }
+
+/* Slide scale — apply to elements inside .slide */
+.s-display { font: var(--w-bold) var(--slide-display)/var(--leading-tight) var(--font-sans); letter-spacing: var(--tracking-tight); }
+.s-h1      { font: var(--w-bold) var(--slide-h1)/var(--leading-tight) var(--font-sans); letter-spacing: var(--tracking-tight); }
+.s-h2      { font: var(--w-medium) var(--slide-h2)/var(--leading-snug) var(--font-sans); }
+.s-h3      { font: var(--w-medium) var(--slide-h3)/var(--leading-snug) var(--font-sans); }
+.s-body    { font: var(--w-regular) var(--slide-body)/var(--leading-body) var(--font-sans); }
+.s-small   { font: var(--w-regular) var(--slide-small)/var(--leading-snug) var(--font-sans); }
+.s-eyebrow { font: var(--w-medium) var(--slide-eyebrow)/1 var(--font-sans);
+             text-transform: uppercase; letter-spacing: var(--tracking-eyebrow); color: var(--primary); }
+.s-mono    { font: var(--w-regular) var(--slide-small)/var(--leading-snug) var(--font-mono); }
+
+</style>
+<style>
+/* ============================================================
+   OMF MES 개발 제안서 — CREFLE Presentation Design System 적용
+   문서 스케일(본문 16 / 작은 12) 기반, 문서용 제목 계층 확장
+   색 의미: OMF MES = 브랜드 레드 / 외부 시스템(ERP·PP 제품 추적성 관리 시스템) = 인디고
+            상태/판정 = semantic(success·error·warning)
+   ============================================================ */
+:root{
+  --doc-max: 1180px;
+  --omf:        var(--brand-red);
+  --omf-dark:   var(--brand-red-dark);
+  --omf-deep:   var(--brand-red-deep);
+  --omf-soft:   var(--brand-red-soft);
+  --ext:        var(--primary);            /* 외부 시스템 = 인디고 */
+  --ext-soft:   var(--primary-container);
+  --ext-on:     var(--on-primary-container);
+
+  --doc-display: clamp(40px, 6vw, 68px);
+  --doc-h2: 30px;   /* 섹션 제목 */
+  --doc-h3: 21px;   /* 하위 제목 */
+  --doc-h4: 17px;   /* 카드/모듈 제목 */
+}
+*{ box-sizing: border-box; }
+html{ scroll-behavior: smooth; }
+body{
+  margin:0; background:var(--surface); color:var(--on-surface);
+  font-family:var(--font-sans);
+  font-size:var(--text-body); line-height:var(--leading-body);
+  font-weight:var(--w-regular);
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+a{ color:var(--omf); text-decoration:none; }
+strong{ font-weight:var(--w-bold); }
+
+/* ── Sticky nav ─────────────────────────────────────────── */
+.topnav{
+  position:sticky; top:0; z-index:50;
+  display:flex; align-items:center; gap:var(--s-6);
+  height:60px; padding:0 var(--s-8);
+  background:rgba(251,248,253,0.86); backdrop-filter:saturate(160%) blur(10px);
+  border-bottom:1px solid var(--outline-variant);
+}
+.topnav .brand{ display:flex; align-items:center; gap:10px; font-weight:var(--w-bold); font-size:15px; letter-spacing:-0.01em; }
+.topnav .brand img{ width:22px; height:22px; }
+.topnav .links{ display:flex; gap:4px; margin-left:auto; flex-wrap:wrap; }
+.topnav .links a{
+  font-size:13px; font-weight:var(--w-medium); color:var(--on-surface-variant);
+  padding:7px 13px; border-radius:var(--radius-pill); transition:background var(--dur-short) var(--ease-standard), color var(--dur-short) var(--ease-standard);
+}
+.topnav .links a:hover{ background:var(--omf-soft); color:var(--omf-dark); }
+
+/* ── Layout primitives ──────────────────────────────────── */
+.wrap{ max-width:var(--doc-max); margin:0 auto; padding:0 var(--s-8); }
+section[id]{ scroll-margin-top:80px; }
+.block{ padding:var(--s-20) 0; border-bottom:1px solid var(--outline-variant); }
+.block:last-of-type{ border-bottom:none; }
+
+.eyebrow{
+  display:inline-flex; align-items:center; gap:8px;
+  font-size:13px; font-weight:var(--w-bold); letter-spacing:var(--tracking-eyebrow);
+  text-transform:uppercase; color:var(--omf);
+}
+.eyebrow::before{ content:""; width:22px; height:2px; background:var(--omf); border-radius:2px; }
+
+.sec-head{ display:flex; align-items:flex-start; gap:var(--s-5); margin-bottom:var(--s-8); }
+.sec-num{
+  flex:0 0 auto; width:46px; height:46px; border-radius:var(--radius-md);
+  display:grid; place-items:center; background:var(--omf); color:#fff;
+  font-weight:var(--w-bold); font-size:20px; box-shadow:var(--elev-1);
+}
+h2.sec-title{ font-size:var(--doc-h2); font-weight:var(--w-bold); letter-spacing:var(--tracking-tight); line-height:1.2; margin:2px 0 6px; }
+.sec-head p.sec-sub{ margin:0; color:var(--on-surface-muted); font-size:15px; line-height:1.5; max-width:760px; }
+
+h3.sub-title{
+  font-size:var(--doc-h3); font-weight:var(--w-bold); letter-spacing:-0.01em;
+  margin:var(--s-12) 0 var(--s-5); display:flex; align-items:center; gap:12px;
+}
+h3.sub-title .tag{ font-size:12px; font-weight:var(--w-medium); }
+
+p{ margin:0 0 var(--s-4); }
+.muted{ color:var(--on-surface-muted); }
+.lead{ font-size:18px; line-height:1.6; color:var(--on-surface-variant); }
+
+/* ── Cards ──────────────────────────────────────────────── */
+.card{ background:var(--surface-bright); border:1px solid var(--outline-variant); border-radius:var(--radius-md); box-shadow:var(--elev-1); padding:var(--s-6); }
+.card-filled{ background:var(--surface-container-low); border-radius:var(--radius-md); padding:var(--s-6); }
+.grid{ display:grid; gap:var(--s-5); }
+.g2{ grid-template-columns:repeat(2,1fr); }
+.g3{ grid-template-columns:repeat(3,1fr); }
+.g4{ grid-template-columns:repeat(4,1fr); }
+
+/* ── Chips / badges ─────────────────────────────────────── */
+.chip{ display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:var(--radius-pill); font-size:12px; font-weight:var(--w-medium); line-height:1.3; }
+.chip-soft{ background:var(--surface-container); color:var(--on-surface-variant); }
+.chip-omf{ background:var(--omf-soft); color:var(--omf-dark); }
+.chip-ext{ background:var(--ext-soft); color:var(--ext-on); }
+.chip-ok{ background:var(--success-container); color:var(--semantic-success); }
+.chip-ng{ background:var(--error-container); color:var(--semantic-error); }
+.chip-warn{ background:var(--warning-container); color:#8a6100; }
+.badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:var(--radius-sm); font-size:11.5px; font-weight:var(--w-bold); letter-spacing:0.02em; }
+.dot{ width:7px; height:7px; border-radius:9999px; display:inline-block; }
+
+/* ── Callout ────────────────────────────────────────────── */
+.callout{ border-radius:var(--radius-md); padding:var(--s-5) var(--s-6); border:1px solid; display:flex; gap:14px; }
+.callout .ico{ flex:0 0 auto; width:30px; height:30px; border-radius:9999px; display:grid; place-items:center; font-weight:var(--w-bold); font-size:15px; color:#fff; }
+.callout h4{ margin:0 0 4px; font-size:15px; font-weight:var(--w-bold); }
+.callout p{ margin:0; font-size:14px; line-height:1.55; }
+.callout.warn{ background:var(--warning-container); border-color:#e8c879; }
+.callout.warn .ico{ background:var(--semantic-warning); }
+.callout.info{ background:var(--info-container); border-color:#b9cdf3; }
+.callout.info .ico{ background:var(--semantic-info); }
+.callout.omf{ background:var(--omf-soft); border-color:#e7b9bb; }
+.callout.omf .ico{ background:var(--omf); }
+
+/* ── Module list (개발 범위) ────────────────────────────── */
+.mods{ display:flex; flex-direction:column; gap:var(--s-4); }
+.mod{
+  display:grid; grid-template-columns:248px 1fr; gap:var(--s-6);
+  background:var(--surface-bright); border:1px solid var(--outline-variant);
+  border-left:4px solid var(--omf); border-radius:var(--radius-md);
+  box-shadow:var(--elev-1); padding:var(--s-5) var(--s-6);
+}
+.mod.ft{ border-left-color:var(--semantic-warning); }
+.mod .m-rail{ display:flex; flex-direction:column; gap:10px; }
+.mod .m-name{ font-size:var(--doc-h4); font-weight:var(--w-bold); letter-spacing:-0.01em; display:flex; align-items:baseline; gap:8px; }
+.mod .m-idx{ font:var(--w-bold) 13px/1 var(--font-mono); color:var(--omf); }
+.mod.ft .m-idx{ color:var(--semantic-warning); }
+.mod .m-badges{ display:flex; flex-wrap:wrap; gap:6px; }
+.mod .m-badges .badge,.mod .m-badges .chip{ white-space:normal; max-width:100%; line-height:1.35; align-items:flex-start; }
+.badge .dot,.chip .dot{ flex:0 0 auto; margin-top:3px; }
+.mod .m-body{ display:flex; flex-direction:column; gap:12px; }
+.mod .m-row{ display:flex; gap:10px; align-items:flex-start; }
+.mod .m-k{ flex:0 0 64px; font-size:12px; font-weight:var(--w-bold); color:var(--on-surface-muted); padding-top:2px; letter-spacing:0.02em; }
+.mod .m-v{ flex:1; font-size:14px; line-height:1.55; }
+.mod .m-v.impl{ color:var(--on-surface); }
+.mod .m-v.impl b{ color:var(--omf-dark); }
+.mod .m-funcs{ display:flex; flex-wrap:wrap; gap:5px; }
+.mod .m-funcs .chip{ font-size:11px; padding:3px 9px; background:var(--surface-container-low); color:var(--on-surface-variant); }
+.mod .m-ref{ font:var(--w-regular) 11.5px/1.4 var(--font-mono); color:var(--on-surface-muted); }
+
+.area-summary{ background:var(--surface-container-low); border-radius:var(--radius-md); padding:var(--s-5) var(--s-6); font-size:14.5px; line-height:1.6; color:var(--on-surface-variant); margin-bottom:var(--s-5); border-left:4px solid var(--omf); }
+
+/* ── Flow / pipeline diagrams ───────────────────────────── */
+.pipe{ display:flex; align-items:center; flex-wrap:wrap; gap:10px; padding:var(--s-6); background:var(--surface-bright); border:1px solid var(--outline-variant); border-radius:var(--radius-md); box-shadow:var(--elev-1); }
+.pnode{ display:flex; flex-direction:column; gap:3px; min-width:118px; padding:13px 16px; background:var(--surface-container-low); border:1px solid var(--outline-variant); border-radius:var(--radius-sm); }
+.pnode .pn-t{ font-size:15px; font-weight:var(--w-bold); }
+.pnode .pn-s{ font:var(--w-regular) 11px/1.3 var(--font-mono); color:var(--on-surface-muted); }
+.pnode.start{ border-color:var(--omf); border-width:1.5px; }
+.pnode.store{ background:var(--omf-soft); border-color:var(--omf); }
+.pnode.store .pn-t{ color:var(--omf-dark); }
+.pnode.ok{ background:var(--success-container); border-color:var(--semantic-success); }
+.pnode.ok .pn-t{ color:var(--semantic-success); }
+.pnode.ng{ background:var(--error-container); border-color:var(--semantic-error); }
+.pnode.ng .pn-t{ color:var(--semantic-error); }
+.parrow{ color:var(--outline); font-size:20px; font-weight:700; }
+.fork{ display:flex; flex-direction:column; gap:10px; }
+.prow{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.plabel{ font-size:11.5px; font-weight:var(--w-bold); padding:3px 9px; border-radius:var(--radius-pill); }
+.plabel.ok{ background:var(--success-container); color:var(--semantic-success); }
+.plabel.ng{ background:var(--error-container); color:var(--semantic-error); }
+
+/* ── Integration diagram ────────────────────────────────── */
+.intg{ display:grid; grid-template-columns:1fr 1.05fr 1fr; gap:var(--s-5); align-items:stretch; }
+.intg .col{ display:flex; flex-direction:column; gap:12px; }
+.intg .center-wrap{ display:flex; align-items:center; justify-content:center; }
+.intg .sys{ border-radius:var(--radius-md); padding:var(--s-5); text-align:center; box-shadow:var(--elev-1); }
+.intg .sys.center{ background:var(--omf); color:#fff; box-shadow:var(--elev-3); width:100%; padding:var(--s-10) var(--s-5); }
+.intg .sys.ext{ background:var(--surface-bright); border:1.5px solid var(--ext); }
+.intg .sys.ext.warn{ border-color:var(--semantic-warning); }
+.intg .sys h4{ margin:0 0 4px; font-size:18px; font-weight:var(--w-bold); }
+.intg .sys.center h4{ font-size:23px; }
+.intg .sys.center .role{ font-size:12.5px; color:rgba(255,255,255,0.85); line-height:1.5; }
+.intg .sys.ext .role{ font-size:12px; color:var(--ext); font-weight:var(--w-medium); line-height:1.45; }
+.intg .sys.ext.warn .role{ color:#8a6100; }
+.intg .omf-areas{ margin-top:14px; display:flex; flex-direction:column; gap:6px; }
+.intg .omf-areas span{ font-size:12.5px; font-weight:var(--w-medium); background:rgba(255,255,255,0.16); border-radius:var(--radius-pill); padding:6px 10px; }
+.intg .iflabel{ text-align:center; font-size:11.5px; font-weight:var(--w-bold); line-height:1.5; padding:4px; }
+.intg .iflabel.ext{ color:var(--ext); }
+.intg .iflabel.warn{ color:var(--semantic-warning); }
+.intg .iflabel small{ display:block; font-weight:var(--w-regular); color:var(--on-surface-muted); font-size:11px; margin-top:3px; }
+.intg .reflist{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px; }
+.intg .reflist li{ font-size:12px; line-height:1.4; padding:9px 12px; background:var(--surface-container-low); border-radius:var(--radius-sm); border-left:3px solid var(--ext); }
+.intg .reflist.warn li{ border-left-color:var(--semantic-warning); }
+
+/* ── Roadmap (향후 계획) ────────────────────────────────── */
+.road{ display:flex; align-items:stretch; gap:0; flex-wrap:wrap; }
+.rstep{ position:relative; flex:1 1 200px; background:var(--surface-bright); border:1px solid var(--outline-variant); border-top:4px solid var(--omf); border-radius:var(--radius-md); box-shadow:var(--elev-1); padding:var(--s-5); margin:0 6px; }
+.rstep .r-no{ font:var(--w-bold) 13px/1 var(--font-mono); color:var(--omf); }
+.rstep .r-t{ font-size:16px; font-weight:var(--w-bold); margin:8px 0 6px; letter-spacing:-0.01em; }
+.rstep .r-d{ font-size:13px; line-height:1.5; color:var(--on-surface-variant); }
+.rstep .r-date{ margin-top:12px; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:var(--w-bold); padding:5px 11px; border-radius:var(--radius-pill); background:var(--omf-soft); color:var(--omf-dark); }
+.rflow{ display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; }
+.rconn{ display:grid; place-items:center; align-self:center; padding:0 2px; }
+.rarrow{ position:relative; width:46px; height:3px; background:var(--outline-variant); border-radius:3px; overflow:hidden; }
+.rarrow::after{ content:""; position:absolute; right:-1px; top:-5px; border-left:10px solid var(--outline); border-top:6.5px solid transparent; border-bottom:6.5px solid transparent; }
+@keyframes flowPulse{ 0%{ transform:translateX(-130%);opacity:0 } 25%{opacity:1} 75%{opacity:1} 100%{ transform:translateX(180%);opacity:0 } }
+.rarrow .pulse{ position:absolute; top:0; left:0; width:18px; height:3px; background:var(--omf); border-radius:9999px; animation:flowPulse 2600ms var(--ease-standard) infinite; }
+
+/* ── Tables ─────────────────────────────────────────────── */
+table{ width:100%; border-collapse:collapse; font-size:13.5px; background:var(--surface-bright); border:1px solid var(--outline-variant); border-radius:var(--radius-md); overflow:hidden; box-shadow:var(--elev-1); }
+thead th{ background:var(--surface-container); text-align:left; font-weight:var(--w-bold); font-size:12.5px; letter-spacing:0.02em; padding:12px 14px; color:var(--on-surface-variant); border-bottom:1px solid var(--outline-variant); }
+tbody td{ padding:12px 14px; vertical-align:top; border-bottom:1px solid var(--outline-variant); line-height:1.5; }
+tbody tr:last-child td{ border-bottom:none; }
+tbody tr:nth-child(even){ background:var(--surface-container-low); }
+td .cat{ font-weight:var(--w-bold); color:var(--ext); }
+.itemchips{ display:flex; flex-wrap:wrap; gap:5px; }
+.itemchips .chip{ font-size:11px; padding:3px 8px; background:var(--ext-soft); color:var(--ext-on); }
+
+/* ── WBS Gantt ──────────────────────────────────────────── */
+.wbs{ font-size:13px; }
+.wbs th, .wbs td{ text-align:center; padding:10px 8px; }
+.wbs thead th{ font-size:12px; }
+.wbs .wk small{ display:block; font:var(--w-regular) 10.5px/1.3 var(--font-mono); color:var(--on-surface-muted); font-weight:var(--w-regular); margin-top:2px; }
+.wbs td.phase{ text-align:left; font-weight:var(--w-medium); }
+.wbs td.phase small{ display:block; font-size:11.5px; color:var(--on-surface-muted); font-weight:var(--w-regular); margin-top:2px; line-height:1.4; }
+.bar{ height:24px; border-radius:var(--radius-pill); background:var(--omf); display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:var(--w-bold); box-shadow:var(--elev-1); }
+.bar.soft{ background:var(--omf-soft); color:var(--omf-dark); box-shadow:none; }
+.bar.ext{ background:var(--ext); }
+.cellbar{ padding:6px 6px; }
+.mstone{ font-size:11px; font-weight:var(--w-bold); color:var(--semantic-success); }
+
+/* ── Hero ───────────────────────────────────────────────── */
+.hero{ position:relative; overflow:hidden; color:#fff; background:linear-gradient(135deg,#1A1C2E 0%,#2E4090 55%,#4758A9 100%); }
+.hero::before{ content:""; position:absolute; inset:0; background-image:linear-gradient(to right,rgba(255,255,255,0.05) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,0.05) 1px,transparent 1px); background-size:40px 40px; }
+.hero::after{ content:""; position:absolute; right:-120px; top:-120px; width:460px; height:460px; border-radius:9999px; background:radial-gradient(circle,rgba(201,37,44,0.42) 0%,rgba(201,37,44,0) 70%); }
+.hero .wrap{ position:relative; padding:var(--s-16) var(--s-8) var(--s-12); }
+.hero .conf{ display:inline-flex; align-items:center; gap:8px; padding:6px 14px; border:1px solid rgba(255,175,177,0.5); border-radius:var(--radius-pill); font-size:12px; font-weight:var(--w-bold); letter-spacing:0.06em; color:var(--brand-accent-1); margin-bottom:var(--s-8); }
+.hero .kicker{ font-size:14px; font-weight:var(--w-bold); letter-spacing:var(--tracking-eyebrow); text-transform:uppercase; color:var(--brand-accent-1); margin-bottom:var(--s-4); }
+.hero h1{ font-size:var(--doc-display); font-weight:var(--w-bold); letter-spacing:var(--tracking-tight); line-height:1.08; margin:0 0 var(--s-5); }
+.hero h1 .ko{ display:block; font-size:0.62em; font-weight:var(--w-medium); color:var(--brand-accent-3); margin-top:10px; letter-spacing:-0.01em; }
+.hero .sub{ font-size:18px; line-height:1.6; color:var(--brand-accent-3); max-width:720px; margin:0 0 var(--s-10); }
+.hero .meta{ display:flex; flex-wrap:wrap; gap:var(--s-8) var(--s-16); padding-top:var(--s-6); border-top:1px solid rgba(255,255,255,0.16); }
+.hero .meta .mi .l{ font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.55); margin-bottom:5px; }
+.hero .meta .mi .v{ font-size:15px; font-weight:var(--w-medium); color:#fff; }
+.hero .wm{ position:absolute; right:var(--s-16); bottom:var(--s-12); opacity:0.9; }
+
+/* ── Footer ─────────────────────────────────────────────── */
+.foot{ background:var(--brand-charcoal-deep); color:var(--brand-accent-3); }
+.foot .wrap{ padding:var(--s-12) var(--s-8); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--s-6); }
+.foot img{ height:26px; opacity:0.92; }
+.foot .fr{ text-align:right; font-size:12px; line-height:1.7; color:rgba(234,235,236,0.7); }
+
+/* ── Misc ───────────────────────────────────────────────── */
+.kpis{ display:grid; grid-template-columns:repeat(4,1fr); gap:var(--s-4); }
+.kpi{ background:var(--surface-bright); border:1px solid var(--outline-variant); border-radius:var(--radius-md); padding:var(--s-5); box-shadow:var(--elev-1); }
+.kpi .n{ font-size:34px; font-weight:var(--w-bold); letter-spacing:-0.02em; line-height:1; color:var(--omf); }
+.kpi .n small{ font-size:15px; font-weight:var(--w-medium); color:var(--on-surface-muted); }
+.kpi .l{ font-size:12.5px; color:var(--on-surface-variant); margin-top:8px; line-height:1.4; }
+.note{ font-size:12px; color:var(--on-surface-muted); margin-top:10px; line-height:1.5; }
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width:900px){
+  .g2,.g3,.g4,.kpis{ grid-template-columns:1fr; }
+  .mod{ grid-template-columns:1fr; }
+  .intg{ grid-template-columns:1fr; }
+  .topnav .links{ display:none; }
+}
+
+/* ── Print ──────────────────────────────────────────────── */
+@page{ size:210mm 297mm; margin:13mm 12mm; }  /* A4 세로 — 페이지 높이 충분히 확보해 카드·다이어그램 잘림 방지 */
+@media print{
+  .topnav{ display:none; }
+  html{ scroll-behavior:auto; }
+  body{ background:#fff; }
+  .block{ padding:20px 0; border-bottom:none; }
+  .hero{ break-after:page; }
+  .mod,.card,.callout,.pipe,table,.rstep{ box-shadow:none; }
+  .rarrow .pulse{ display:none; }
+  /* 카드·다이어그램·표가 페이지 경계에서 잘리지 않도록 (요소 단위로 페이지 분할) */
+  .mod,.card,.callout,.pipe,.intg,.rflow,.rstep,.kpi,.kpis,.grid,table,tr,.area-summary,.sec-head{ break-inside:avoid; page-break-inside:avoid; }
+  h2,h3,.sub-title,.eyebrow{ break-after:avoid; page-break-after:avoid; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════ NAV ════════ -->
+<nav class="topnav">
+  <span class="brand"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkNSRUZMRSBtYXJrIj4KICAgIDxnIGZpbGw9IiNDOTI1MkMiPgogICAgICA8Y2lyY2xlIGN4PSIxMCIgY3k9IjEwIiByPSI3Ij48L2NpcmNsZT48Y2lyY2xlIGN4PSIzMiIgY3k9IjEwIiByPSI3Ij48L2NpcmNsZT48Y2lyY2xlIGN4PSI1NCIgY3k9IjEwIiByPSI3Ij48L2NpcmNsZT4KICAgICAgPGNpcmNsZSBjeD0iMTAiIGN5PSIzMiIgcj0iNyI+PC9jaXJjbGU+PGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iNyI+PC9jaXJjbGU+PGNpcmNsZSBjeD0iNTQiIGN5PSIzMiIgcj0iNyI+PC9jaXJjbGU+CiAgICAgIDxwYXRoIGQ9Ik0gMTQsMzIgQyAxNywyOSAyNSwyOSAyOCwzMiBDIDI1LDM1IDE3LDM1IDE0LDMyIFoiPjwvcGF0aD4KICAgICAgPHBhdGggZD0iTSAzNiwzMiBDIDM5LDI5IDQ3LDI5IDUwLDMyIEMgNDcsMzUgMzksMzUgMzYsMzIgWiI+PC9wYXRoPgogICAgICA8Y2lyY2xlIGN4PSIxMCIgY3k9IjU0IiByPSI3Ij48L2NpcmNsZT48Y2lyY2xlIGN4PSIzMiIgY3k9IjU0IiByPSI3Ij48L2NpcmNsZT48Y2lyY2xlIGN4PSI1NCIgY3k9IjU0IiByPSI3Ij48L2NpcmNsZT4KICAgIDwvZz48L3N2Zz4=" alt="CREFLE">OMF MES 개발 제안서</span>
+  <span class="links">
+    <a href="#require">요구 사항</a>
+    <a href="#scope">개발 범위</a>
+    <a href="#integration">외부 연계</a>
+    <a href="#roadmap">향후 계획</a>
+  </span>
+</nav>
+
+<!-- ════════ HERO ════════ -->
+<header class="hero">
+  <div class="wrap">
+    <span class="conf"><span class="dot" style="background:var(--brand-accent-1)"></span>CONFIDENTIAL · 대외비</span>
+    <div class="kicker">OhMyFactory MES · 개발 제안서</div>
+    <h1>고객 요구 최적화 MES 구축 제안
+      <span class="ko">삼진엘앤디 베트남법인(SAMJINLND VINA) 생산현장 대상</span>
+    </h1>
+    <p class="sub">범용 MES 전부가 아니라 — 고객이 실제로 필요로 하는 영역에 최적화된 MES를 만든다. 정보 관리 · 자재 창고 관리 · 제품 출하 관리 3대 영역을 ERP·PP 제품 추적성 관리 시스템과 연계해 중복 없이 구축한다.</p>
+    <div class="meta">
+      <div class="mi"><div class="l">고객사</div><div class="v">삼진엘앤디 베트남법인</div></div>
+      <div class="mi"><div class="l">작성 주체</div><div class="v">CREFLE OMF 팀</div></div>
+      <div class="mi"><div class="l">작성일</div><div class="v">2026-06-15</div></div>
+      <div class="mi"><div class="l">버전</div><div class="v">v0.1 (검토용 초안)</div></div>
+    </div>
+    <img class="wm" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgODgiIHdpZHRoPSIzMjAiIGhlaWdodD0iODgiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iQ1JFRkxFIj4KICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDEyKSI+CiAgICA8ZyBmaWxsPSIjRTY0OTRGIj4KICAgICAgPGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iNyI+PC9jaXJjbGU+PGNpcmNsZSBjeD0iMzIiIGN5PSIxMCIgcj0iNyI+PC9jaXJjbGU+PGNpcmNsZSBjeD0iNTQiIGN5PSIxMCIgcj0iNyI+PC9jaXJjbGU+CiAgICAgIDxjaXJjbGUgY3g9IjEwIiBjeT0iMzIiIHI9IjciPjwvY2lyY2xlPjxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjciPjwvY2lyY2xlPjxjaXJjbGUgY3g9IjU0IiBjeT0iMzIiIHI9IjciPjwvY2lyY2xlPgogICAgICA8cGF0aCBkPSJNIDE0LDMyIEMgMTcsMjkgMjUsMjkgMjgsMzIgQyAyNSwzNSAxNywzNSAxNCwzMiBaIj48L3BhdGg+CiAgICAgIDxwYXRoIGQ9Ik0gMzYsMzIgQyAzOSwyOSA0NywyOSA1MCwzMiBDIDQ3LDM1IDM5LDM1IDM2LDMyIFoiPjwvcGF0aD4KICAgICAgPGNpcmNsZSBjeD0iMTAiIGN5PSI1NCIgcj0iNyI+PC9jaXJjbGU+PGNpcmNsZSBjeD0iMzIiIGN5PSI1NCIgcj0iNyI+PC9jaXJjbGU+PGNpcmNsZSBjeD0iNTQiIGN5PSI1NCIgcj0iNyI+PC9jaXJjbGU+CiAgICA8L2c+PC9nPgogIDxnIGZvbnQtZmFtaWx5PSJTcG9xYSBIYW4gU2FucyBOZW8sIE5vdG8gU2FucyBLUiwgLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQwIiBmb250LXdlaWdodD0iMzAwIiBsZXR0ZXItc3BhY2luZz0iMyIgZmlsbD0iI0ZGRkZGRiI+CiAgICA8dGV4dCB4PSI4NCIgeT0iNTgiPkNSRUZMRTwvdGV4dD4KICA8L2c+CiAgPHJlY3QgeD0iMTE0IiB5PSIyOCIgd2lkdGg9IjMuNSIgaGVpZ2h0PSIzMCIgZmlsbD0iI0U2NDk0RiI+PC9yZWN0Pgo8L3N2Zz4=" alt="CREFLE" width="150">
+  </div>
+</header>
+
+<!-- ════════ 요지 ════════ -->
+<section class="block" id="overview">
+  <div class="wrap">
+    <span class="eyebrow">제안 요지</span>
+    <h2 class="sec-title" style="margin-top:12px;">한 장 요약</h2>
+    <p class="lead" style="max-width:880px;">본 제안서는 개발사(비젠트로 · BIZENTRO)가 삼진엘앤디에 제출한 <strong>표준 사업 제안서 2종(ERP·MES)</strong>을 검토한 결과를 토대로, 고객 실요구 중심의 <strong>최적화 MES 개발 범위</strong>를 정의한다. 표준 제안의 모든 시스템을 구축하는 것을 전제로 하지 않는다.</p>
+    <div class="kpis" style="margin-top:var(--s-8);">
+      <div class="kpi"><div class="n">3<small> 대 영역</small></div><div class="l">정보 관리 · 자재 창고 관리 · 제품 출하 관리</div></div>
+      <div class="kpi"><div class="n">19<small> 항목</small></div><div class="l">3대 영역의 요구사항 항목 (정보 9 · 자재 5 · 출하 5)</div></div>
+      <div class="kpi"><div class="n">2<small> 시스템</small></div><div class="l">ERP · PP 제품 추적성 관리 시스템 연계로 중복 개발 배제</div></div>
+      <div class="kpi"><div class="n">4<small> 단계</small></div><div class="l">데이터 수집 → 모델링 → 워크플로우 정의 → 개발</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 2. 요구 사항 정의 ════════ -->
+<section class="block" id="require">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">1</div>
+      <div>
+        <h2 class="sec-title">요구 사항 정의</h2>
+        <p class="sec-sub">제공 자료의 MES 목표 시스템 구성을 OMF 관점에서 3대 영역으로 재정리한다. 각 영역은 성격이 다르며, 그에 맞는 구현 방식을 적용한다.</p>
+      </div>
+    </div>
+
+    <div class="grid g3">
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span class="sec-num" style="width:34px;height:34px;font-size:15px;border-radius:var(--radius-sm);">1</span>
+          <h4 style="margin:0;font-size:16px;">정보 관리</h4>
+        </div>
+        <span class="chip chip-omf" style="margin-bottom:12px;">정보 생성 · 단순 입력 방식</span>
+        <p class="muted" style="font-size:13px;line-height:1.5;margin:0 0 12px;">실제 생산 공정(Process)이 아닌 보조적 정보 관리 영역. 검사·공정 전 과정을 처리하지 않고 <strong>완료된 상태의 정보를 입력</strong>하는 기능으로 구현한다.</p>
+        <div class="itemchips" style="gap:5px;">
+          <span class="chip chip-soft">기준정보</span><span class="chip chip-soft">생산</span><span class="chip chip-soft">공정</span><span class="chip chip-soft">설비</span><span class="chip chip-soft">품질</span><span class="chip chip-soft">현장</span><span class="chip chip-soft">생산도구</span><span class="chip chip-soft">제조이력</span><span class="chip chip-soft">모니터링</span>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span class="sec-num" style="width:34px;height:34px;font-size:15px;border-radius:var(--radius-sm);">2</span>
+          <h4 style="margin:0;font-size:16px;">자재 창고 관리</h4>
+        </div>
+        <span class="chip chip-omf" style="margin-bottom:12px;">행동(Action) 기반 상태 관리</span>
+        <p class="muted" style="font-size:13px;line-height:1.5;margin:0 0 12px;">자재가 입고되는 시점부터 생산 투입까지의 자재 상태를 <strong>Action에 따라</strong> 관리한다. 자재 창고는 <strong>LOT 번호 기준</strong>으로 관리한다.</p>
+        <div class="itemchips" style="gap:5px;">
+          <span class="chip chip-soft">입하</span><span class="chip chip-soft">수입검사</span><span class="chip chip-soft">반품</span><span class="chip chip-soft">입고</span><span class="chip chip-soft">자재창고(LOT)</span>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span class="sec-num" style="width:34px;height:34px;font-size:15px;border-radius:var(--radius-sm);">3</span>
+          <h4 style="margin:0;font-size:16px;">제품 출하 관리</h4>
+        </div>
+        <span class="chip chip-omf" style="margin-bottom:12px;">공정(Process) 기반 상태 관리</span>
+        <p class="muted" style="font-size:13px;line-height:1.5;margin:0 0 12px;">생산·포장이 완료된 제품이 출하 창고로 입고되는 시점부터 실제 출하까지의 <strong>생산 공정(Process)에 따라</strong> 제품 상태를 관리한다.</p>
+        <div class="itemchips" style="gap:5px;">
+          <span class="chip chip-soft">제품입고</span><span class="chip chip-soft">제품창고</span><span class="chip chip-soft">출하작업</span><span class="chip chip-soft">출하검사</span><span class="chip chip-soft">출하</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout info" style="margin-top:var(--s-6);">
+      <div class="ico">i</div>
+      <div>
+        <h4>'단순 입력 방식'의 의미</h4>
+        <p>예) 품질 관리는 품질 검사 프로세스 전체를 처리하는 기능을 구현하지 않는다. <strong>검사가 완료된 상태에서 그 결과(합/불·측정값)를 입력</strong>하면, MES가 합·불 판정·불량율 누적·SPC 차트를 산출한다. 검사 장비·설비의 실시간 자동수집/제어는 OMF 범위에서 제외한다(PDF 자체도 향후 고도화로 명시).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 3. 개발 범위 ════════ -->
+<section class="block" id="scope">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">2</div>
+      <div>
+        <h2 class="sec-title">개발 범위</h2>
+        <p class="sec-sub">3대 영역의 요구사항 항목별로 <strong>구현 방법</strong>과 <strong>외부 시스템(ERP·PP 제품 추적성 관리 시스템) 연계</strong>를 정의한다. 각 항목의 근거 페이지는 UNIMES 제안서·창고관리 제안서 기준.</p>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:var(--s-6);font-size:12.5px;">
+      <span style="display:inline-flex;align-items:center;gap:7px;"><span class="dot" style="background:var(--omf);width:10px;height:10px;"></span>OMF MES 구현</span>
+      <span style="display:inline-flex;align-items:center;gap:7px;"><span class="dot" style="background:var(--ext);width:10px;height:10px;"></span>외부 연계(ERP·PP 제품 추적성 관리 시스템)</span>
+      <span style="display:inline-flex;align-items:center;gap:7px;"><span class="dot" style="background:var(--semantic-warning);width:10px;height:10px;"></span>PP 제품 추적성 관리 시스템 중복 → 연계(재개발 제외)</span>
+    </div>
+
+    <!-- 3.1 정보 관리 -->
+    <h3 class="sub-title"><span class="sec-num" style="width:28px;height:28px;font-size:13px;border-radius:8px;">2.1</span>정보 관리 <span class="tag chip chip-omf">단순 입력 방식</span></h3>
+    <div class="area-summary">MES 운영에 필요한 정보를 '완료 상태의 단순 입력' 방식으로 생성·축적한다. 기준정보·작업지시·4M·검사 마스터는 ERP가 원천이며, 제조이력 추적은 PP 제품 추적성 관리 시스템과 중복되어 연계로 처리한다. 설비·검사·공정의 실시간 자동수집/제어는 제외한다.</div>
+    <div class="mods">
+
+      <div class="mod">
+        <div class="m-rail">
+          <div class="m-name"><span class="m-idx">①</span>기준정보 관리</div>
+          <div class="m-badges"><span class="chip chip-ext">ERP 연계</span></div>
+        </div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">요구사항</div><div class="m-v">코드·품목·BOM·Routing·품질/설비/툴 기준정보를 ERP(Legacy)에서 연계받아 일관성을 유지. 연계 기준정보는 변질 방지를 위해 MES에서 수정·삭제 불가.</div></div>
+          <div class="m-row"><div class="m-k">구현 방법</div><div class="m-v impl">기준정보를 직접 마스터링하지 않고 <b>ERP 원천 마스터를 연계받아 '읽기 전용 참조 정보'로 보유</b>한다. MES 고유로 필요한 코드(세부공정·검사항목)만 단순 입력으로 등록. 코드 표준화(동일코드화)는 ERP 측 PI 과제로 OMF 범위 외 — 연계 수신만 담당.</div></div>
+          <div class="m-row"><div class="m-k">근거 기능</div><div class="m-v"><div class="m-funcs"><span class="chip">공통코드</span><span class="chip">품목/BOM</span><span class="chip">Routing</span><span class="chip">검사항목/불량코드</span><span class="chip">설비/툴 기준정보</span><span class="chip">Interface 규칙·Table 정의</span></div></div></div>
+          <div class="m-ref">UNIMES p.18·20·27·52~55 · 창고관리 p.4(BOM/품목대장)</div>
+        </div>
+      </div>
+
+      <div class="mod">
+        <div class="m-rail">
+          <div class="m-name"><span class="m-idx">②</span>생산 관리</div>
+          <div class="m-badges"><span class="chip chip-ext">ERP 연계</span></div>
+        </div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">요구사항</div><div class="m-v">ERP 생산계획(P/O)을 연계받아 세부 작업지시(W/O)를 편성·확정하고 작업실적·생산현황을 파악. 4M 투입(자재·설비·작업자·금형) 관리.</div></div>
+          <div class="m-row"><div class="m-k">구현 방법</div><div class="m-v impl">W/O를 스케줄링/MRP하지 않고 <b>ERP P/O를 받아 세부 W/O로 단순 편성</b>, 작업 결과(시작/완료/생산수량/LOT)를 작업자가 '완료 상태'로 단순 입력한다. 실시간 자동수집(IoT/설비)은 제외. 생산 LOT 발행·이력은 PP 제품 추적성 관리 시스템 연계 지점.</div></div>
+          <div class="m-row"><div class="m-k">근거 기능</div><div class="m-v"><div class="m-funcs"><span class="chip">W/O 편성(P/O 연계)</span><span class="chip">4M 배정 Validation Check</span><span class="chip">작업실적(시작~종료~마감)</span><span class="chip">생산 LOT 발행</span><span class="chip">생산현황</span></div></div></div>
+          <div class="m-ref">UNIMES p.18·19·30·31·56·58</div>
+        </div>
+      </div>
+
+      <div class="mod">
+        <div class="m-rail">
+          <div class="m-name"><span class="m-idx">③</span>공정 관리</div>
+          <div class="m-badges"><span class="chip chip-omf">MES 고유</span><span class="chip chip-ext">문서 원천 ERP/PLM</span></div>
+        </div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">요구사항</div><div class="m-v">작업문서(제조시방서·검사시방서·작업표준서·도면 PDF)를 등록·참조하고, 작업 전 점검·자원 투입·자주/초중종 검사 실적을 관리. <strong>작업문서 PDF 참조는 고객 실요구.</strong></div></div>
+          <div class="m-row"><div class="m-k">구현 방법</div><div class="m-v impl">공정 전체를 실시간 통제하지 않고 <b>작업문서를 참조용으로 제공</b>하고 작업 결과(점검완료·검사결과·투입자원)를 단순 입력으로 기록한다. 목표·일정·WIP·Job Change·계측기관리는 PDF상 '연한색=제외' 항목이므로 OMF도 제외.</div></div>
+          <div class="m-row"><div class="m-k">근거 기능</div><div class="m-v"><div class="m-funcs"><span class="chip">작업문서(PDF) 버전 관리</span><span class="chip">작업 전 점검 이력</span><span class="chip">투입 자원(4M)</span><span class="chip">자주/초중종 검사 실적</span><span class="chip">Validation Check</span></div></div></div>
+          <div class="m-ref">UNIMES p.18·24·34·35·59~60</div>
+        </div>
+      </div>
+
+      <div class="mod">
+        <div class="m-rail">
+          <div class="m-name"><span class="m-idx">④</span>설비 관리</div>
+          <div class="m-badges"><span class="chip chip-ext">마스터 ERP 연계</span></div>
+        </div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">요구사항</div><div class="m-v">점검·보전 항목/주기 기준으로 점검·보전 이력과 예비품(Spare Part) 사용 이력을 관리. 설비 가동율·고장 현황 제공.</div></div>
+          <div class="m-row"><div class="m-k">구현 방법</div><div class="m-v impl">설비 상태를 자동수집/제어하지 않고(SCADA/HMI/DCS 자동수집 제외), <b>점검·보전 '완료 결과'를 단순 입력</b>해 이력으로 축적한다. PDF상 연한색(점검 지시/Spare Part 일부)은 최소 범위로 한정. 설비 마스터는 ERP 기준정보 연계.</div></div>
+          <div class="m-row"><div class="m-k">근거 기능</div><div class="m-v"><div class="m-funcs"><span class="chip">점검/보전 이력</span><span class="chip">예비품 입출/재고</span><span class="chip">가동율/고장 현황</span></div></div></div>
+          <div class="m-ref">UNIMES p.24·37·52·65~66</div>
+        </div>
+      </div>
+
+      <div class="mod">
+        <div class="m-rail">
+          <div class="m-name"><span class="m-idx">⑤</span>품질 관리</div>
+          <div class="m-badges"><span class="chip chip-ext">ERP 연계</span><span class="chip chip-omf">실요구</span></div>
+        </div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">요구사항</div><div class="m-v">검사 기준값(UCL/LCL/Target)을 관리하고 검사결과를 합/불로 입력, <strong>공정불량율 누적 조회(현행 일단위→누적 개선)</strong>·SPC 트랜드 제공. — VOC 표의 고객 실요구.</div></div>
+          <div class="m-row"><div class="m-k">구현 방법</div><div class="m-v impl">검사 공정을 자동 수행하지 않고 <b>검사 '결과값'을 입력하면 합/불 판정·불량율 누적·SPC 차트를 산출</b>한다(검사장비 자동수집 제외). Lot Status(Hold/Release) 관리. 수입/제품검사 마스터·합불 수량은 ERP 품질관리 연계. 심화 SPC는 별도 전용 영역.</div></div>
+          <div class="m-row"><div class="m-k">근거 기능</div><div class="m-v"><div class="m-funcs"><span class="chip">검사 기준값 관리</span><span class="chip">합/불 결과 입력</span><span class="chip">공정불량율 누적 조회</span><span class="chip">SPC(Xbar-R·Cp-Cpk)</span><span class="chip">Lot Status(Hold/Release)</span></div></div></div>
+          <div class="m-ref">UNIMES p.18(VOC)·36·63~64</div>
+        </div>
+      </div>
+
+      <div class="mod">
+        <div class="m-rail">
+          <div class="m-name"><span class="m-idx">⑥</span>현장 관리</div>
+          <div class="m-badges"><span class="chip chip-ext">작업지시 연계</span><span class="chip chip-omf">MES 고유</span></div>
+        </div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">요구사항</div><div class="m-v">현장 작업자가 직접 사용하는 작업지시 수신·작업실적/불량/자주검사/비가동 입력·관리자 소통(공지/호출) 창구. 단순 반복 정보의 시스템화로 작업자 부하 경감.</div></div>
+          <div class="m-row"><div class="m-k">구현 방법</div><div class="m-v impl">작업자가 <b>터치/바코드로 실적·불량·비가동·검사 결과를 '완료 상태'로 단순 입력</b>하는 창구로 구현한다(POP 로그인). 설비 알람·경광등·SMS 다채널 에스컬레이션은 제외. 작업지시는 생산관리(ERP P/O→W/O) 연계 수신.</div></div>
+          <div class="m-row"><div class="m-k">근거 기능</div><div class="m-v"><div class="m-funcs"><span class="chip">POP 로그인</span><span class="chip">작업실적/불량/비가동 입력</span><span class="chip">검사실적 입력</span><span class="chip">소통관리(공지/호출)</span></div></div></div>
+          <div class="m-ref">UNIMES p.24·32·52·61~62</div>
+        </div>
+      </div>
+
+      <div class="mod">
+        <div class="m-rail">
+          <div class="m-name"><span class="m-idx">⑦</span>생산 도구 관리(툴)</div>
+          <div class="m-badges"><span class="chip chip-ext">마스터 ERP 연계</span></div>
+        </div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">요구사항</div><div class="m-v">툴(금형) 기준정보(사용한도·Cavity)와 사용 실적을 관리하여 사용한도 초과 시 교체·보전 지원. 툴 사용/보전 이력·입출재고 관리.</div></div>
+          <div class="m-row"><div class="m-k">구현 방법</div><div class="m-v impl">툴 사용량을 자동수집(Tool Loading/Unloading)하지 않고 <b>생산실적 기준으로 사용량을 단순 산정/입력</b>하고 보전 '완료 결과'를 기록한다. 점검/보전 항목·Spare Part는 연한색=최소 범위. 툴 마스터는 ERP 기준정보 연계.</div></div>
+          <div class="m-row"><div class="m-k">근거 기능</div><div class="m-v"><div class="m-funcs"><span class="chip">툴 기준정보(사용한도·Cavity)</span><span class="chip">사용 실적(생산량 기준)</span><span class="chip">입출/재고</span><span class="chip">보전(PM) 이력</span></div></div></div>
+          <div class="m-ref">UNIMES p.24·38·52·67~68</div>
+        </div>
+      </div>
+
+      <div class="mod ft">
+        <div class="m-rail">
+          <div class="m-name"><span class="m-idx">⑧</span>제조이력 관리</div>
+          <div class="m-badges"><span class="badge chip-warn"><span class="dot" style="background:var(--semantic-warning)"></span>PP 제품 추적성 관리 시스템 연계</span></div>
+        </div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">요구사항</div><div class="m-v">사용 자원(4M)·불량/비가동/검사 실적·작업조건 등 제조이력을 수집·축적하여 영업 응대·품질 부적합 원인 분석·Claim 대응에 활용.</div></div>
+          <div class="m-row"><div class="m-k">구현 방법</div><div class="m-v impl">제조이력을 '완료 상태 정보의 단순 입력'으로 축적하되, <b>이력추적의 원천 LOT 데이터·정/역추적은 이미 납품된 PP 제품 추적성 관리 시스템이 담당</b>한다. OMF는 PP 제품 추적성 관리 시스템을 참조·연계하고 재개발하지 않는다. ERP는 4M 변경점 원천.</div></div>
+          <div class="m-row"><div class="m-k">근거 기능</div><div class="m-v"><div class="m-funcs"><span class="chip">4M 이력</span><span class="chip">불량/비가동/검사 실적</span><span class="chip">작업조건</span><span class="chip">제조이력 자산화</span></div></div></div>
+          <div class="m-ref">UNIMES p.19·23·31 · <span style="color:var(--semantic-warning)">PP 제품 추적성 관리 시스템 중복</span></div>
+        </div>
+      </div>
+
+      <div class="mod ft">
+        <div class="m-rail">
+          <div class="m-name"><span class="m-idx">⑨</span>제조이력 추적 관리</div>
+          <div class="m-badges"><span class="badge chip-warn"><span class="dot" style="background:var(--semantic-warning)"></span>PP 제품 추적성 관리 시스템 연계</span></div>
+        </div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">요구사항</div><div class="m-v">LOT 단위로 자재→제품 정전개·제품→자재 역전개 추적. 클레임·부적합 발생 시 누가·언제·어디서·무엇을 만들었는지 확인. 공정 간 바코드·Label 추적.</div></div>
+          <div class="m-row"><div class="m-k">구현 방법</div><div class="m-v impl">이 항목은 <b>PP 제품 추적성 관리 시스템의 핵심 기능과 정면 중복</b>이다. LOT 정/역추적 엔진을 새로 만들지 않고 PP 제품 추적성 관리 시스템을 표준 연계로 사용한다. OMF는 추적에 필요한 작업지시·4M·실적을 단순 입력으로 공급하고, 추적 조회 화면은 PP 제품 추적성 관리 시스템을 호출/임베드한다.</div></div>
+          <div class="m-row"><div class="m-k">근거 기능</div><div class="m-v"><div class="m-funcs"><span class="chip">정전개(자재→제품)</span><span class="chip">역전개(제품→자재)</span><span class="chip">자재/생산/제품 LOT 3단계</span><span class="chip">공정 간 바코드·Label</span></div></div></div>
+          <div class="m-ref">UNIMES p.33·57·75(Option) · <span style="color:var(--semantic-warning)">PP 제품 추적성 관리 시스템 직접 중복</span></div>
+        </div>
+      </div>
+
+      <div class="mod">
+        <div class="m-rail">
+          <div class="m-name"><span class="m-idx">⑩</span>모니터링</div>
+          <div class="m-badges"><span class="chip chip-omf">MES 고유 · 읽기 전용</span></div>
+        </div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">요구사항</div><div class="m-v">물류·생산·품질·설비 4대 영역의 정보를 대시보드(작업진행·진척률·설비가동·KPI)로 가시화. '생산현장 시계Zero' 해소.</div></div>
+          <div class="m-row"><div class="m-k">구현 방법</div><div class="m-v impl">단순 입력으로 축적된 실적·검사·이력 데이터를 집계해 <b>대시보드로 보여주는 '읽기 전용 가시화'</b>로 구현한다. 실시간 자동수집·자동제어·AI Early Warning/Analytics(UNIAnalytics)는 Option/향후 고도화로 제외.</div></div>
+          <div class="m-row"><div class="m-k">근거 기능</div><div class="m-v"><div class="m-funcs"><span class="chip">생산 모니터링</span><span class="chip">설비 가동율</span><span class="chip">품질 KPI Trend</span><span class="chip">물류 모니터링</span></div></div></div>
+          <div class="m-ref">UNIMES p.6·19·22·40·52·69~70 (Option p.76~79 제외)</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 3.2 자재 창고 관리 -->
+    <h3 class="sub-title"><span class="sec-num" style="width:28px;height:28px;font-size:13px;border-radius:8px;">2.2</span>자재 창고 관리 <span class="tag chip chip-omf">Action 기반 상태 관리</span></h3>
+    <div class="area-summary">자재 입고~생산투입까지를 Action 기반 상태전이로 관리한다. 발주·구매입고·재고는 ERP 물류관리 연계 지점이며, 자재 LOT는 ERP가 아닌 <strong>MES 입고 시점에 발행</strong>한다(발행된 LOT 키는 PP 제품 추적성 관리 시스템 추적 기준).</div>
+
+    <div class="pipe" style="margin-bottom:var(--s-5);">
+      <div class="pnode start"><span class="pn-t">입하</span><span class="pn-s">입하대기→완료</span></div>
+      <span class="parrow">→</span>
+      <div class="pnode"><span class="pn-t">수입검사</span><span class="pn-s">IQC 결과 입력</span></div>
+      <div class="fork">
+        <div class="prow"><span class="plabel ok">합격</span><span class="parrow">→</span><div class="pnode"><span class="pn-t">입고</span><span class="pn-s">LOT 발행·적치</span></div><span class="parrow">→</span><div class="pnode store"><span class="pn-t">자재창고</span><span class="pn-s">LOT·Location</span></div></div>
+        <div class="prow"><span class="plabel ng">불합격</span><span class="parrow">→</span><div class="pnode ng"><span class="pn-t">반품</span><span class="pn-s">ERP 연계</span></div></div>
+      </div>
+    </div>
+
+    <div class="mods">
+      <div class="mod">
+        <div class="m-rail"><div class="m-name"><span class="m-idx">①</span>입하</div><div class="m-badges"><span class="chip chip-ext">ERP 연계</span></div></div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">요구사항</div><div class="m-v">거래처가 납품한 자재를 입하명세서·입고예정정보(ERP/고객사 연계) 기준으로 바코드 스캐닝해 입하 처리. 입고성적서(CoA·CoC) 관리.</div></div>
+          <div class="m-row"><div class="m-k">구현 방법</div><div class="m-v impl"><b>'입하대기→입하접수→입하완료' Action 상태전이</b>로 구현한다. ERP 발주·입고예정정보를 연계받아 도착 자재를 바코드로 입하 등록. 발주(P/O)·구매입고 원천은 ERP. 발주 시점에는 ERP가 정보 관리.</div></div>
+          <div class="m-row"><div class="m-k">근거 기능</div><div class="m-v"><div class="m-funcs"><span class="chip">입고예정정보 연계(G/R)</span><span class="chip">바코드 스캐닝 입하</span><span class="chip">입고성적서(CoA·CoC)</span><span class="chip">수량 check</span></div></div></div>
+          <div class="m-ref">UNIMES p.21·28·29 · 창고관리 p.4~6</div>
+        </div>
+      </div>
+
+      <div class="mod">
+        <div class="m-rail"><div class="m-name"><span class="m-idx">②</span>수입검사</div><div class="m-badges"><span class="chip chip-ext">ERP 품질 연계</span></div></div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">요구사항</div><div class="m-v">입하된 자재의 수입검사(IQC) 이력을 관리하고 결과(합격/불합격)에 따라 후속 Action을 분기. 합격품은 입고, 불합격품은 반품.</div></div>
+          <div class="m-row"><div class="m-k">구현 방법</div><div class="m-v impl">검사 공정 자체를 처리하지 않고 <b>검사 '결과(합격/불합격)'를 단순 입력하는 Action</b>으로 구현, 그 Action이 입고/반품 상태전이를 트리거한다(검사중→합격→입고 / →불합격→반품). 검사 마스터·합불 실적은 ERP 품질관리(수입검사) 연계.</div></div>
+          <div class="m-row"><div class="m-k">근거 기능</div><div class="m-v"><div class="m-funcs"><span class="chip">IQC 이력</span><span class="chip">합/불 결과 입력</span><span class="chip">합격 시 LOT·라벨 발행</span></div></div></div>
+          <div class="m-ref">UNIMES p.28·29·36 · 창고관리 p.6(IQC)</div>
+        </div>
+      </div>
+
+      <div class="mod">
+        <div class="m-rail"><div class="m-name"><span class="m-idx">③</span>반품</div><div class="m-badges"><span class="chip chip-ext">ERP 물류 연계</span></div></div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">요구사항</div><div class="m-v">수입검사 불합격 자재 또는 생산 잔량을 공급사로 반품 처리. 반품 상태전이 기록.</div></div>
+          <div class="m-row"><div class="m-k">구현 방법</div><div class="m-v impl"><b>'불합격/잔량→반품지시→반품완료' Action 상태전이</b>로 구현한다. 불합격 Action(수입검사) 또는 잔량 발생을 입력하면 반품 상태로 전이. 반품은 PDF 목표구성도상 ERP 담당 영역이므로 ERP 물류관리(반품/출하지시) 연계가 핵심.</div></div>
+          <div class="m-row"><div class="m-k">근거 기능</div><div class="m-v"><div class="m-funcs"><span class="chip">수입검사 부적합 반품</span><span class="chip">생산 잔량반품</span><span class="chip">ERP 반품 연계</span></div></div></div>
+          <div class="m-ref">UNIMES p.24(ERP 반품)·28·29</div>
+        </div>
+      </div>
+
+      <div class="mod">
+        <div class="m-rail"><div class="m-name"><span class="m-idx">④</span>입고</div><div class="m-badges"><span class="chip chip-omf">LOT 발행(MES)</span><span class="chip chip-ext">재고 ERP 연계</span></div></div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">요구사항</div><div class="m-v">수입검사 합격 자재를 자재창고로 입고(적치)하고 자재 LOT 발행·인식표 부착. 입고 상태전이 기록.</div></div>
+          <div class="m-row"><div class="m-k">구현 방법</div><div class="m-v impl"><b>'합격→입고처리(LOT 발행)→적치완료' Action 상태전이</b>로 구현한다. 자재 LOT는 ERP가 아닌 <b>MES 입고 시점에 발행</b>(PDF 명시)하여 인식표 부착. 발행 LOT는 PP 제품 추적성 관리 시스템 추적 기준 키. 재고 수량은 ERP 재고관리 연계.</div></div>
+          <div class="m-row"><div class="m-k">근거 기능</div><div class="m-v"><div class="m-funcs"><span class="chip">입고처리(자재 LOT 발행)</span><span class="chip">인식표 발행·적치</span><span class="chip">입고명세서 바코드 체크</span></div></div></div>
+          <div class="m-ref">UNIMES p.21·24·28 · 창고관리 p.6</div>
+        </div>
+      </div>
+
+      <div class="mod">
+        <div class="m-rail"><div class="m-name"><span class="m-idx">⑤</span>자재창고 (LOT·Location)</div><div class="m-badges"><span class="chip chip-ext">재고·창고이동 ERP</span><span class="badge chip-warn">LOT 추적 PP 제품 추적성 관리 시스템</span></div></div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">요구사항</div><div class="m-v">자재의 입/출/재고를 LOT·Location 기준으로 관리. 작업지시/출고요청에 따라 출고·생산 투입, 재고이동·실사·조정(차이 시 ERP 연계). 파렛 단위 이동·LOT 분할/합병.</div></div>
+          <div class="m-row"><div class="m-k">구현 방법</div><div class="m-v impl"><b>LOT 단위 Action 상태전이(입고완료→출고요청→출고완료→투입)</b>로 관리한다. 출고는 작업지시(생산관리) 연계 또는 출고요청 Action으로 트리거. 재고실사 차이 조정은 ERP 물류관리(재고)로 연계. LOT 흐름 추적은 PP 제품 추적성 관리 시스템 참조.</div></div>
+          <div class="m-row"><div class="m-k">근거 기능</div><div class="m-v"><div class="m-funcs"><span class="chip">입/출/재고(LOT·Location)</span><span class="chip">출고(LOT 분할/합병·스캔)</span><span class="chip">생산 투입</span><span class="chip">재고실사→조정</span><span class="chip">파렛단위 이동</span></div></div></div>
+          <div class="m-ref">UNIMES p.18·21·28·29 · 창고관리 p.4~6(Collecting/실사)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3.3 제품 출하 관리 -->
+    <h3 class="sub-title"><span class="sec-num" style="width:28px;height:28px;font-size:13px;border-radius:8px;">2.3</span>제품 출하 관리 <span class="tag chip chip-omf">Process 기반 상태 관리</span></h3>
+    <div class="area-summary">완성·포장 제품의 출하창고 입고~출하까지를 Process 기반 상태전이로 관리한다. 출하지시·제품출하·고객출하는 ERP 물류관리 연계, <strong>출하작업의 LOT Matching·납품라벨 추적은 PP 제품 추적성 관리 시스템과 중복</strong>되어 연계로 처리한다.</div>
+
+    <div class="pipe" style="margin-bottom:var(--s-5);">
+      <div class="pnode start"><span class="pn-t">제품입고</span><span class="pn-s">생산완료→적치</span></div>
+      <span class="parrow">→</span>
+      <div class="pnode store"><span class="pn-t">제품창고</span><span class="pn-s">LOT·Location</span></div>
+      <span class="parrow">→</span>
+      <div class="pnode"><span class="pn-t">출하작업</span><span class="pn-s">Picking·Packing</span></div>
+      <span class="parrow">→</span>
+      <div class="pnode"><span class="pn-t">출하검사</span><span class="pn-s">OQC 결과 입력</span></div>
+      <div class="fork">
+        <div class="prow"><span class="plabel ok">합격</span><span class="parrow">→</span><div class="pnode ok"><span class="pn-t">출하</span><span class="pn-s">납품·실적 연계</span></div></div>
+        <div class="prow"><span class="plabel ng">불합격</span><span class="parrow">→</span><div class="pnode ng"><span class="pn-t">부적합</span><span class="pn-s">부적합 처리</span></div></div>
+      </div>
+    </div>
+
+    <div class="mods">
+      <div class="mod">
+        <div class="m-rail"><div class="m-name"><span class="m-idx">①</span>제품입고</div><div class="m-badges"><span class="chip chip-ext">제품출하/재고 ERP</span></div></div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">요구사항</div><div class="m-v">생산 완료 제품을 제품창고로 입고. 생산 LOT Matching·포장라벨 발행·고객사 바코드 출력. 클레임 반품 시 제품창고 입고.</div></div>
+          <div class="m-row"><div class="m-k">구현 방법</div><div class="m-v impl"><b>Process 시작 상태('생산완료→제품입고→적치')</b>로 구현한다. 생산실적(생산관리) 완료가 제품입고 Process를 트리거하고 포장라벨·제품 LOT를 단순 입력으로 부착. 제품 LOT 추적은 PP 제품 추적성 관리 시스템 참조.</div></div>
+          <div class="m-row"><div class="m-k">근거 기능</div><div class="m-v"><div class="m-funcs"><span class="chip">생산실적→제품입고(G/R)</span><span class="chip">포장라벨 발행</span><span class="chip">고객사 바코드 출력</span><span class="chip">제품 LOT</span></div></div></div>
+          <div class="m-ref">UNIMES p.21·28 · 창고관리 p.4~6(생산입고)</div>
+        </div>
+      </div>
+
+      <div class="mod">
+        <div class="m-rail"><div class="m-name"><span class="m-idx">②</span>제품창고 (LOT·Location)</div><div class="m-badges"><span class="chip chip-ext">재고·실사 ERP</span></div></div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">요구사항</div><div class="m-v">제품의 입/출/재고를 LOT·Location 기준으로 관리. 재고이동·실사·조정(차이 시 ERP 연계), 포장 합병/분할, 재고현황·분석.</div></div>
+          <div class="m-row"><div class="m-k">구현 방법</div><div class="m-v impl"><b>LOT 단위 Process 상태전이(적치→출하지시 대기→Picking→출하)</b>로 관리한다. 재고실사 차이 조정은 ERP 물류관리(재고) 연계. 실사등록(엑셀 업로드)은 PDF상 ERP 단독 기능으로 OMF는 연계 수신만 담당.</div></div>
+          <div class="m-row"><div class="m-k">근거 기능</div><div class="m-v"><div class="m-funcs"><span class="chip">입/출/재고(LOT·Location)</span><span class="chip">재고실사→조정</span><span class="chip">포장 합병/분할</span><span class="chip">재고현황·분석</span></div></div></div>
+          <div class="m-ref">UNIMES p.28 · 창고관리 p.4·6(실사등록)</div>
+        </div>
+      </div>
+
+      <div class="mod ft">
+        <div class="m-rail"><div class="m-name"><span class="m-idx">③</span>출하작업</div><div class="m-badges"><span class="badge chip-warn"><span class="dot" style="background:var(--semantic-warning)"></span>PP 제품 추적성 관리 시스템 연계</span><span class="chip chip-ext">출하지시 ERP</span></div></div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">요구사항</div><div class="m-v">ERP 출하지시에 따라 출하품 Picking, 납품라벨 출력·생산 LOT Matching·부착, Packing. 출고명세서 기준 바코드 스캐닝 출고.</div></div>
+          <div class="m-row"><div class="m-k">구현 방법</div><div class="m-v impl"><b>Process 상태전이('출하지시→Picking→Packing→출하준비완료')</b>로 구현한다. 출하지시는 ERP 물류관리(출하지시) 연계 수신. 단 <b>출하작업은 PP 제품 추적성 관리 시스템 참조 대상으로 명시된 영역</b>으로, LOT Matching·납품라벨 추적은 PP 제품 추적성 관리 시스템 연계로 처리하고 재개발 제외.</div></div>
+          <div class="m-row"><div class="m-k">근거 기능</div><div class="m-v"><div class="m-funcs"><span class="chip">출하지시 Picking</span><span class="chip">납품라벨·LOT Matching</span><span class="chip">Packing</span><span class="chip">바코드 스캐닝 출고</span></div></div></div>
+          <div class="m-ref">UNIMES p.21·28·36 · 창고관리 p.4~6 · <span style="color:var(--semantic-warning)">PP 제품 추적성 관리 시스템 중복</span></div>
+        </div>
+      </div>
+
+      <div class="mod">
+        <div class="m-rail"><div class="m-name"><span class="m-idx">④</span>출하검사</div><div class="m-badges"><span class="chip chip-ext">ERP 품질 연계</span><span class="chip chip-omf">고객 양식</span></div></div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">요구사항</div><div class="m-v">출하 전 출하검사(OQC)를 수행하고 출하성적서(CoA·CoC)·<strong>납품성적서(삼진LND/VINA 표준 양식)</strong> 발행. 합격 시 출하, 부적합 시 부적합 처리.</div></div>
+          <div class="m-row"><div class="m-k">구현 방법</div><div class="m-v impl">검사 '결과 입력' Action이 Process 상태전이를 트리거하는 방식으로 구현한다(출하준비→출하검사→합격:출하/불합격:부적합). 출하검사 마스터·실적은 ERP 품질관리(제품검사) 연계. <b>납품성적서 양식은 고객 표준 양식으로 MES에서 발행</b>(고객 고유 요구).</div></div>
+          <div class="m-row"><div class="m-k">근거 기능</div><div class="m-v"><div class="m-funcs"><span class="chip">OQC 결과 입력</span><span class="chip">출하성적서(CoA·CoC)</span><span class="chip">납품성적서(고객 양식)</span><span class="chip">부적합 처리</span></div></div></div>
+          <div class="m-ref">UNIMES p.28·36</div>
+        </div>
+      </div>
+
+      <div class="mod">
+        <div class="m-rail"><div class="m-name"><span class="m-idx">⑤</span>출하</div><div class="m-badges"><span class="chip chip-ext">제품출하·고객출하 ERP</span></div></div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">요구사항</div><div class="m-v">출하검사 합격 제품을 고객사로 출하/납품. Invoice 생성/발행, 고객 바코드 연계. 출하 상태 확정.</div></div>
+          <div class="m-row"><div class="m-k">구현 방법</div><div class="m-v impl"><b>Process 종료 상태('출하검사 합격→출하확정→납품')</b>로 구현한다. 출하 확정 시 ERP 물류관리(제품출하/고객출하)로 실적 연계. Invoice·고객 바코드 연계는 ERP/고객 시스템 연계 지점. 출하 LOT 흐름 추적은 PP 제품 추적성 관리 시스템 참조.</div></div>
+          <div class="m-row"><div class="m-k">근거 기능</div><div class="m-v"><div class="m-funcs"><span class="chip">제품출하(포장라벨 스캔)</span><span class="chip">Invoice 생성/발행</span><span class="chip">고객 바코드 연계</span></div></div></div>
+          <div class="m-ref">UNIMES p.21·28·36 · 창고관리 p.4~6</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 4. 외부 시스템 연계 ════════ -->
+<section class="block" id="integration">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">3</div>
+      <div>
+        <h2 class="sec-title">외부 시스템 연계</h2>
+        <p class="sec-sub">ERP 시스템과 PP 제품 추적성 관리 시스템과의 연계를 통해 MES에서 필요로 하는 정보를 확보한다. ERP·PP 제품 추적성 관리 시스템이 담당하는 영역은 직접 구현하지 않고 연계로 처리한다.</p>
+      </div>
+    </div>
+
+    <div class="card" style="padding:var(--s-8) var(--s-6);margin-bottom:var(--s-6);">
+      <div class="intg">
+        <div class="col">
+          <div class="sys ext"><h4>ERP</h4><div class="role">마스터 · 발주 · 생산계획 · 물류 · 재고 · 회계의 원천</div></div>
+          <div class="iflabel ext">◀──　양방향 I/F　──▶<small>마스터·P/O·재고 받기 · 실적·조정 회신</small></div>
+          <ul class="reflist">
+            <li>기준정보(마스터·표준설정)</li>
+            <li>생산계획(작업지시·4M)</li>
+            <li>물류(구매입고·출하·재고·고객출하·창고이동)</li>
+            <li>품질(수입검사·제품검사)</li>
+          </ul>
+        </div>
+        <div class="center-wrap">
+          <div class="sys center">
+            <h4>OMF MES</h4>
+            <div class="role">완료 상태 단순 입력 · Action / Process 상태 관리</div>
+            <div class="omf-areas"><span>정보 관리</span><span>자재 창고 관리</span><span>제품 출하 관리</span></div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="sys ext warn"><h4>PP 제품 추적성 관리 시스템</h4><div class="role">이미 납품 · LOT 정/역추적 엔진</div></div>
+          <div class="iflabel warn">◀──　연계(호출/임베드)　──▶<small>작업지시·4M·실적 공급 · LOT 추적 결과 조회</small></div>
+          <ul class="reflist warn">
+            <li>출하 관리 — 출하작업</li>
+            <li>생산관리 — 제조이력 추적</li>
+            <li>제조이력 관리</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="sub-title">ERP — 참조 정보</h3>
+    <table>
+      <thead><tr><th style="width:24%">참조 영역</th><th style="width:44%">받는 정보</th><th>MES에서의 용도</th></tr></thead>
+      <tbody>
+        <tr><td><span class="cat">기준정보 관리</span><br><span class="muted" style="font-size:12px">마스터·표준설정</span></td><td><div class="itemchips"><span class="chip">공통코드</span><span class="chip">품목/BOM</span><span class="chip">공정/Routing</span><span class="chip">검사항목/불량코드</span><span class="chip">설비/툴 정보</span></div></td><td>직접 마스터링하지 않고 읽기 전용 참조로 사용. 연계 기준정보는 MES에서 수정·삭제 불가. 표준화(PI)는 ERP 과제.</td></tr>
+        <tr><td><span class="cat">생산 계획 관리</span><br><span class="muted" style="font-size:12px">작업지시·4M</span></td><td><div class="itemchips"><span class="chip">생산계획(P/O)</span><span class="chip">자재예약정보</span><span class="chip">작업지시</span><span class="chip">4M 변경점</span><span class="chip">부품소요량</span></div></td><td>ERP P/O를 세부 W/O로 편성하고 작업 결과를 단순 입력으로 ERP에 실적 회신. 4M 변경점 원천은 ERP.</td></tr>
+        <tr><td><span class="cat">물류 관리</span><br><span class="muted" style="font-size:12px">구매입고·출하·재고·고객출하·창고이동</span></td><td><div class="itemchips"><span class="chip">구매입고(발주·입고예정)</span><span class="chip">출하지시</span><span class="chip">재고(LOT)</span><span class="chip">고객출하</span><span class="chip">창고이동</span><span class="chip">반품</span></div></td><td>자재 입하~투입, 제품입고~출하 상태전이를 수행하고 발주·출하지시·재고수량·조정 결과를 양방향 연계. 자재 LOT는 MES 입고 시 발행.</td></tr>
+        <tr><td><span class="cat">품질 관리</span><br><span class="muted" style="font-size:12px">수입검사·제품검사</span></td><td><div class="itemchips"><span class="chip">수입검사(IQC) 마스터/실적</span><span class="chip">제품검사(OQC) 마스터/실적</span><span class="chip">합/불 수량</span></div></td><td>검사 결과(합/불)를 단순 입력하고 수량을 ERP로 연계. 공정불량율 누적 조회·SPC는 MES 고유. Lot Status(Hold/Release) 관리.</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub-title">PP 제품 추적성 관리 시스템 — 참조 정보</h3>
+    <table>
+      <thead><tr><th style="width:38%">참조 항목</th><th>MES에서의 처리 — 재개발 없이 연계</th></tr></thead>
+      <tbody>
+        <tr><td><span class="cat" style="color:#8a6100">출하 관리 — 출하작업</span></td><td>출하작업의 생산 LOT Matching·납품라벨·출하 LOT 추적은 PP 제품 추적성 관리 시스템 기능과 중복 → 재개발하지 않고 PP 제품 추적성 관리 시스템을 연계(호출/임베드)한다.</td></tr>
+        <tr><td><span class="cat" style="color:#8a6100">정보 관리 — 생산관리 — 제조이력 추적</span></td><td>자재→제품 정전개, 제품→자재 역전개 LOT 추적은 PP 제품 추적성 관리 시스템의 핵심 기능. OMF는 추적에 필요한 작업지시·4M·실적을 단순 입력으로 공급하고 추적 조회는 PP 제품 추적성 관리 시스템을 사용한다.</td></tr>
+        <tr><td><span class="cat" style="color:#8a6100">정보 관리 — 제조이력 관리</span></td><td>제조이력의 원천 LOT 데이터·이력 추적 엔진은 PP 제품 추적성 관리 시스템이 담당. OMF는 이력 정보를 완료 상태 단순 입력으로 축적·공급하되 추적 기능 자체는 PP 제품 추적성 관리 시스템 참조.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout omf" style="margin-top:var(--s-6);">
+      <div class="ico">✓</div>
+      <div>
+        <h4>연계의 핵심 — OMF는 '입력 데이터를 정확히 공급'한다</h4>
+        <p>OMF MES의 역할은 LOT 정/역추적 엔진을 새로 만드는 것이 아니라, 추적에 필요한 입력 데이터(작업지시·4M·검사/불량 실적·LOT 발행)를 <strong>'완료 상태 단순 입력'으로 정확히 공급</strong>하는 것이다. 추적 조회는 PP 제품 추적성 관리 시스템을 호출/임베드한다. 제품·자재 LOT 발행·입고 Action은 OMF 고유로 두되, 발행된 LOT 키는 PP 제품 추적성 관리 시스템 추적 기준으로 연계한다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 5. 향후 계획 ════════ -->
+<section class="block" id="roadmap">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">4</div>
+      <div>
+        <h2 class="sec-title">향후 계획</h2>
+        <p class="sec-sub">데이터를 확보·표준화하고, 요구사항별 워크플로우를 현장과 합의한 뒤 개발에 착수한다. 작업 순서와 주 단위 일정을 정리한다.</p>
+      </div>
+    </div>
+
+    <h3 class="sub-title">4.1 추진 단계</h3>
+    <div class="rflow" style="margin-bottom:var(--s-6);">
+      <div class="rstep">
+        <div class="r-no">STEP 1</div>
+        <div class="r-t">데이터 수집</div>
+        <div class="r-d">MES 요구사항별로 수집·관리되는 데이터 전체를 확보한다. 현장 보고서·서식·기존 시스템 데이터를 빠짐없이 모은다.</div>
+        <div class="r-date">목표 2026-06-19</div>
+      </div>
+      <div class="rconn"><div class="rarrow"><span class="pulse"></span></div></div>
+      <div class="rstep">
+        <div class="r-no">STEP 2</div>
+        <div class="r-t">데이터 분석 및 표준화<br><span class="muted" style="font-weight:400;font-size:12px;">Data Modeling</span></div>
+        <div class="r-d">수집 데이터를 분석해 키워드를 정리하고, 의미 단위로 묶어 식별자를 통일한다. 모든 정보를 디지털 관리용 데이터 모델로 변환한다.</div>
+        <div class="r-date">STEP 1 완료 후 1주</div>
+      </div>
+      <div class="rconn"><div class="rarrow"><span class="pulse" style="animation-delay:650ms"></span></div></div>
+      <div class="rstep">
+        <div class="r-no">STEP 3</div>
+        <div class="r-t">핵심 기능별 워크플로우 정의</div>
+        <div class="r-d">정의된 요구사항별 구현 방법이 현장 도입에 문제가 없는지 검증하고 최종 합의를 도출한다. <strong>비나 법인 현장 방문</strong> 필요.</div>
+        <div class="r-date">STEP 2 완료 후 2주</div>
+      </div>
+      <div class="rconn"><div class="rarrow"><span class="pulse" style="animation-delay:1300ms"></span></div></div>
+      <div class="rstep" style="border-top-color:var(--ext);">
+        <div class="r-no" style="color:var(--ext)">STEP 4</div>
+        <div class="r-t">개발</div>
+        <div class="r-d">합의된 워크플로우와 데이터 모델을 기준으로 3대 영역 MES와 ERP·PP 제품 추적성 관리 시스템 연계를 개발한다.</div>
+        <div class="r-date" style="background:var(--ext-soft);color:var(--ext-on)">STEP 3 완료 후 착수</div>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <div class="ico">i</div>
+      <div>
+        <h4>STEP 2 — 식별자 통일(표준화)의 예시</h4>
+        <p>동일한 설비가 서로 다른 보고서에서 <span class="chip chip-soft" style="font-size:11px">"1호기"</span> <span class="chip chip-soft" style="font-size:11px">"사출 1호기"</span> <span class="chip chip-soft" style="font-size:11px">"사출기 1호"</span> 등 서로 다른 단어로 기록된다. 이를 모두 <strong>단일 식별자</strong>로 정리해야 디지털 데이터 모델로 일관되게 관리할 수 있다.</p>
+      </div>
+    </div>
+
+    <h3 class="sub-title">4.2 주 단위 WBS</h3>
+    <table class="wbs">
+      <thead>
+        <tr>
+          <th style="width:30%;text-align:left;">단계</th>
+          <th class="wk">W1<small>06-15~06-19</small></th>
+          <th class="wk">W2<small>06-22~06-26</small></th>
+          <th class="wk">W3<small>06-29~07-03</small></th>
+          <th class="wk">W4<small>07-06~07-10</small></th>
+          <th class="wk">W5~<small>07-13~</small></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="phase">1. 데이터 수집<small>요구사항별 수집·관리 데이터 전체 확보</small></td>
+          <td class="cellbar"><div class="bar">목표 06-19</div></td><td></td><td></td><td></td><td></td>
+        </tr>
+        <tr>
+          <td class="phase">2. 데이터 분석·표준화<small>키워드 정리 · 식별자 통일 · 데이터 모델 변환</small></td>
+          <td></td><td class="cellbar"><div class="bar">Data Modeling</div></td><td></td><td></td><td></td>
+        </tr>
+        <tr>
+          <td class="phase">3. 워크플로우 정의<small>구현방법 현장 검증 · 최종 합의 · 비나 현장 방문</small></td>
+          <td></td><td></td><td class="cellbar" colspan="2"><div class="bar">현장 검증 · 합의 (비나 방문)</div></td><td></td>
+        </tr>
+        <tr>
+          <td class="phase">4. 개발<small>3대 영역 MES + ERP·PP 제품 추적성 관리 시스템 연계</small></td>
+          <td></td><td></td><td></td><td></td><td class="cellbar"><div class="bar ext">개발 착수 →</div></td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="note">일정은 각 단계의 선행 완료를 전제로 한 계획이다(STEP 2 = STEP 1 완료 후 1주, STEP 3 = STEP 2 완료 후 2주). STEP 3은 비나 법인 현장 방문을 포함하며, 현장 합의 결과에 따라 개발 착수일이 조정될 수 있다. 개발 단계의 상세 일정·리소스는 워크플로우 정의 완료 후 별도 수립한다.</p>
+  </div>
+</section>
+
+<!-- ════════ 변경 이력 ════════ -->
+<section class="block" id="history">
+  <div class="wrap">
+    <span class="eyebrow">변경 이력</span>
+    <table style="margin-top:var(--s-5);">
+      <thead><tr><th style="width:14%">버전</th><th style="width:18%">날짜</th><th>변경 요지</th></tr></thead>
+      <tbody>
+        <tr><td>v0.1</td><td>2026-06-15</td><td>최초 작성(검토용 초안). 자료 ①②(UNIMES·창고관리) 검토 결과, 3대 영역 19개 요구사항 항목별 구현 방법·외부 연계 정의, 향후 계획(추진 단계·주 단위 WBS) 정리.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ════════ FOOTER ════════ -->
+<footer class="foot">
+  <div class="wrap">
+    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgODgiIHdpZHRoPSIzMjAiIGhlaWdodD0iODgiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iQ1JFRkxFIj4KICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDEyKSI+CiAgICA8ZyBmaWxsPSIjRTY0OTRGIj4KICAgICAgPGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iNyI+PC9jaXJjbGU+PGNpcmNsZSBjeD0iMzIiIGN5PSIxMCIgcj0iNyI+PC9jaXJjbGU+PGNpcmNsZSBjeD0iNTQiIGN5PSIxMCIgcj0iNyI+PC9jaXJjbGU+CiAgICAgIDxjaXJjbGUgY3g9IjEwIiBjeT0iMzIiIHI9IjciPjwvY2lyY2xlPjxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjciPjwvY2lyY2xlPjxjaXJjbGUgY3g9IjU0IiBjeT0iMzIiIHI9IjciPjwvY2lyY2xlPgogICAgICA8cGF0aCBkPSJNIDE0LDMyIEMgMTcsMjkgMjUsMjkgMjgsMzIgQyAyNSwzNSAxNywzNSAxNCwzMiBaIj48L3BhdGg+CiAgICAgIDxwYXRoIGQ9Ik0gMzYsMzIgQyAzOSwyOSA0NywyOSA1MCwzMiBDIDQ3LDM1IDM5LDM1IDM2LDMyIFoiPjwvcGF0aD4KICAgICAgPGNpcmNsZSBjeD0iMTAiIGN5PSI1NCIgcj0iNyI+PC9jaXJjbGU+PGNpcmNsZSBjeD0iMzIiIGN5PSI1NCIgcj0iNyI+PC9jaXJjbGU+PGNpcmNsZSBjeD0iNTQiIGN5PSI1NCIgcj0iNyI+PC9jaXJjbGU+CiAgICA8L2c+PC9nPgogIDxnIGZvbnQtZmFtaWx5PSJTcG9xYSBIYW4gU2FucyBOZW8sIE5vdG8gU2FucyBLUiwgLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQwIiBmb250LXdlaWdodD0iMzAwIiBsZXR0ZXItc3BhY2luZz0iMyIgZmlsbD0iI0ZGRkZGRiI+CiAgICA8dGV4dCB4PSI4NCIgeT0iNTgiPkNSRUZMRTwvdGV4dD4KICA8L2c+CiAgPHJlY3QgeD0iMTE0IiB5PSIyOCIgd2lkdGg9IjMuNSIgaGVpZ2h0PSIzMCIgZmlsbD0iI0U2NDk0RiI+PC9yZWN0Pgo8L3N2Zz4=" alt="CREFLE">
+    <div class="fr">
+      OMF(OhMyFactory) MES 개발 제안서 · v0.1<br>
+      작성 주체: CREFLE OMF 팀 · 고객사: 삼진엘앤디 베트남법인<br>
+      <strong style="color:var(--brand-accent-1)">CONFIDENTIAL · 대외비</strong> — 외부 업로드·공유·게시 금지
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>OMF MES 기능·사용 안내 · 발표자료 · 삼진엘앤디 베트남법인</title>
+<link rel="icon" href="assets/crefle-mark.svg">
+<link rel="stylesheet" href="assets/colors_and_type.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<style>
+/* ============================================================
+   OMF MES 고객 발표자료 — CREFLE Presentation Design (슬라이드 스케일)
+   브랜드 = 레드(--omf=--brand-red), 외부/데이터 = 인디고(--primary)
+   1920×1080 캔버스 · deck-stage.js 가 뷰포트에 맞춰 스케일
+   ============================================================ */
+body{ margin:0; background:#0a0a0f; color:var(--on-surface); }
+:root{ --omf:var(--brand-red); --omf-dark:var(--brand-red-dark); --omf-soft:var(--brand-red-soft); --ext:var(--primary); }
+
+.slide{ width:1920px; height:1080px; background:var(--surface); color:var(--on-surface); font-family:var(--font-sans); position:relative; overflow:hidden; }
+.slide.dark{ background:linear-gradient(135deg,#1A1C2E 0%,#2E4090 55%,#4758A9 100%); color:#fff; }
+.slide.red{ background:linear-gradient(135deg,#7D161B 0%,#A81E24 40%,#C9252C 100%); color:#fff; }
+.slide.dark::before,.slide.red::before{ content:""; position:absolute; inset:0; background-image:linear-gradient(to right,rgba(255,255,255,0.06) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,0.06) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; }
+.slide.dark::after{ content:""; position:absolute; right:-140px; top:-140px; width:520px; height:520px; border-radius:9999px; background:radial-gradient(circle,rgba(201,37,44,0.40) 0%,rgba(201,37,44,0) 70%); pointer-events:none; }
+.slide.filled{ background:var(--surface-container-low); }
+
+.stage{ position:absolute; inset:84px 80px 104px 80px; display:flex; flex-direction:column; }
+.foot{ position:absolute; left:80px; right:80px; bottom:42px; display:flex; align-items:center; justify-content:space-between; font:400 16px/1 var(--font-mono); color:var(--on-surface-muted); }
+.slide.dark .foot,.slide.red .foot{ color:rgba(255,255,255,0.62); }
+.foot .pageno{ letter-spacing:0.08em; }
+.foot img{ width:26px; height:26px; opacity:0.7; }
+
+.eyebrow{ display:inline-flex; align-items:center; gap:13px; font:700 23px/1 var(--font-sans); letter-spacing:0.14em; text-transform:uppercase; color:var(--omf); }
+.eyebrow::before{ content:""; width:34px; height:3px; background:var(--omf); border-radius:3px; }
+.slide.dark .eyebrow,.slide.red .eyebrow{ color:var(--brand-accent-1); }
+.slide.dark .eyebrow::before,.slide.red .eyebrow::before{ background:var(--brand-accent-1); }
+h1.title{ font:700 90px/1.05 var(--font-sans); letter-spacing:-0.02em; margin:34px 0 0; }
+h2.section{ font:700 58px/1.1 var(--font-sans); letter-spacing:-0.02em; margin:18px 0 0; }
+h2.section small{ display:block; font:500 26px/1.3 var(--font-sans); color:var(--on-surface-muted); letter-spacing:0; margin-top:14px; }
+h3.sub{ font:700 34px/1.2 var(--font-sans); letter-spacing:-0.01em; margin:0; }
+.lede{ font:400 27px/1.5 var(--font-sans); color:var(--on-surface-variant); max-width:1560px; margin:22px 0 0; }
+.slide.dark .lede{ color:var(--brand-accent-3); }
+
+.card-outline{ background:var(--surface-bright); border:1px solid var(--outline-variant); border-radius:var(--radius-md); box-shadow:var(--elev-1); padding:28px 32px; }
+.card-filled{ background:var(--surface-container-low); border-radius:var(--radius-md); padding:26px 30px; }
+.capsule{ display:inline-flex; align-items:center; gap:11px; padding:13px 26px; background:rgba(15,15,26,0.38); border:1px solid rgba(255,255,255,0.24); border-radius:9999px; color:#fff; font:500 23px/1 var(--font-sans); }
+
+.chip{ display:inline-flex; align-items:center; gap:7px; padding:9px 18px; border-radius:9999px; font:500 19px/1.2 var(--font-sans); }
+.chip.soft{ background:var(--surface-container); color:var(--on-surface-variant); }
+.chip.omf{ background:var(--omf-soft); color:var(--omf-dark); }
+.chip.ext{ background:var(--primary-container); color:var(--on-primary-container); }
+.chip.ok{ background:var(--success-container); color:var(--semantic-success); }
+.chip.warn{ background:var(--warning-container); color:#8a6100; }
+.chip.sm{ padding:6px 13px; font-size:16px; }
+
+.kpi .n{ font:700 74px/1 var(--font-sans); letter-spacing:-0.02em; color:var(--omf); }
+.kpi .n small{ font:500 25px/1 var(--font-sans); color:var(--on-surface-muted); }
+.kpi .l{ font:400 20px/1.4 var(--font-sans); color:var(--on-surface-variant); margin-top:13px; }
+
+.node{ background:var(--surface-bright); border:1px solid var(--outline-variant); border-radius:var(--radius-md); box-shadow:var(--elev-1); padding:20px 24px; min-width:186px; display:flex; flex-direction:column; gap:6px; }
+.node .ne{ font:700 14px/1 var(--font-sans); letter-spacing:0.1em; text-transform:uppercase; color:var(--on-surface-muted); }
+.node .nt{ font:700 27px/1.12 var(--font-sans); }
+.node .ns{ font:400 16px/1.3 var(--font-mono); color:var(--on-surface-muted); }
+.node.store{ background:var(--omf-soft); border-color:var(--omf); }
+.node.store .nt{ color:var(--omf-dark); }
+.node.ok{ border-color:var(--semantic-success); border-width:2px; }
+.node.ok .nt{ color:var(--semantic-success); }
+.arrow{ display:inline-block; width:54px; height:3px; background:var(--outline); position:relative; flex:0 0 auto; }
+.arrow::after{ content:""; position:absolute; right:-2px; top:-7px; border-left:13px solid var(--outline); border-top:8px solid transparent; border-bottom:8px solid transparent; }
+@keyframes flowPulse{0%{transform:translateX(-100%);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translateX(130%);opacity:0}}
+.arrow .pulse{ position:absolute; top:-2px; left:0; width:22px; height:7px; background:var(--omf); border-radius:9999px; animation:flowPulse 2400ms var(--ease-standard) infinite; }
+
+.scn{ background:var(--surface-bright); border:1px solid var(--outline-variant); border-left:5px solid var(--omf); border-radius:var(--radius-md); box-shadow:var(--elev-1); padding:26px 30px; }
+.scn-actor{ display:inline-flex; align-items:center; gap:9px; padding:8px 17px; border-radius:9999px; background:var(--omf-soft); color:var(--omf-dark); font:700 19px/1 var(--font-sans); }
+.scn-actor .material-symbols-rounded{ font-size:23px; }
+.scn h4{ margin:14px 0 18px; font:700 27px/1.2 var(--font-sans); letter-spacing:-0.01em; }
+.scn-step{ display:grid; grid-template-columns:32px 1fr; gap:13px; align-items:start; margin-bottom:12px; }
+.scn-step .sn{ width:32px; height:32px; border-radius:9999px; background:var(--omf); color:#fff; font:700 16px/1 var(--font-sans); display:grid; place-items:center; }
+.scn-step .act{ font:500 20px/1.4 var(--font-sans); }
+.scn-step .act b{ color:var(--omf-dark); }
+.scn-step .sys{ font:400 17.5px/1.35 var(--font-sans); color:var(--on-surface-variant); margin-top:3px; }
+.scn-step .sys::before{ content:"→ "; color:var(--ext); font-weight:700; }
+.scn-out{ margin-top:8px; display:inline-flex; align-items:center; gap:8px; font:500 18px/1 var(--font-sans); padding:11px 19px; background:var(--success-container); color:var(--semantic-success); border-radius:9999px; }
+.scn-out .material-symbols-rounded{ font-size:20px; }
+
+table.s{ width:100%; border-collapse:collapse; background:var(--surface-bright); border:1px solid var(--outline-variant); border-radius:var(--radius-md); overflow:hidden; box-shadow:var(--elev-1); }
+table.s thead th{ background:var(--surface-container); text-align:left; font:700 19px/1.3 var(--font-sans); padding:17px 22px; color:var(--on-surface-variant); }
+table.s td{ padding:17px 22px; vertical-align:top; border-top:1px solid var(--outline-variant); font:400 20px/1.4 var(--font-sans); }
+table.s tbody tr:nth-child(even){ background:var(--surface-container-low); }
+.cat{ font-weight:700; color:var(--ext); }
+
+.callout{ border-radius:var(--radius-md); padding:24px 28px; border:1px solid; display:flex; gap:18px; align-items:flex-start; }
+.callout .ico{ flex:0 0 auto; width:46px; height:46px; border-radius:9999px; display:grid; place-items:center; color:#fff; overflow:hidden; }
+.callout .ico .material-symbols-rounded,.scn-actor .material-symbols-rounded,.scn-out .material-symbols-rounded{ font-family:"Material Symbols Rounded"; line-height:1; }
+.callout .ico .material-symbols-rounded{ font-size:26px; }
+.callout h4{ margin:0 0 6px; font:700 23px/1.2 var(--font-sans); }
+.callout p{ margin:0; font:400 19px/1.45 var(--font-sans); }
+.callout.omf{ background:var(--omf-soft); border-color:#e7b9bb; } .callout.omf .ico{ background:var(--omf); }
+.callout.info{ background:var(--info-container); border-color:#b9cdf3; } .callout.info .ico{ background:var(--semantic-info); }
+.callout.warn{ background:var(--warning-container); border-color:#e8c879; } .callout.warn .ico{ background:var(--semantic-warning); }
+
+.rstep{ background:var(--surface-bright); border:1px solid var(--outline-variant); border-top:5px solid var(--omf); border-radius:var(--radius-md); box-shadow:var(--elev-1); padding:24px 26px; flex:1; }
+.rstep .rno{ font:700 17px/1 var(--font-mono); color:var(--omf); }
+.rstep .rt{ font:700 25px/1.15 var(--font-sans); margin:10px 0 8px; }
+.rstep .rd{ font:400 18px/1.4 var(--font-sans); color:var(--on-surface-variant); }
+.rstep .rdate{ margin-top:14px; display:inline-block; font:700 16px/1 var(--font-sans); padding:7px 14px; border-radius:9999px; background:var(--omf-soft); color:var(--omf-dark); }
+.rstep .rdate.done{ background:var(--success-container); color:var(--semantic-success); }
+.bignum{ position:absolute; right:-30px; bottom:-110px; font:700 660px/1 var(--font-sans); letter-spacing:-0.04em; color:rgba(255,255,255,0.08); pointer-events:none; user-select:none; }
+
+/* ── 사용 시나리오 세로 화살표 절차형 ───────────────────── */
+.cols{ margin-top:34px; display:grid; grid-template-columns:1fr 1fr; gap:40px; flex:1; }
+.col .scn-actor{ display:inline-flex; align-items:center; gap:9px; padding:9px 18px; border-radius:9999px; background:var(--omf-soft); color:var(--omf-dark); font:700 20px/1 var(--font-sans); }
+.col .scn-actor .material-symbols-rounded{ font-size:24px; }
+.col h4{ margin:14px 0 18px; font:700 25px/1.2 var(--font-sans); letter-spacing:-0.01em; }
+.vflow{ display:flex; flex-direction:column; }
+.vstep{ background:var(--surface-bright); border:1px solid var(--outline-variant); border-left:4px solid var(--omf); border-radius:var(--radius-md); box-shadow:var(--elev-1); padding:13px 18px; display:flex; gap:14px; align-items:flex-start; }
+.vstep .vn{ width:30px; height:30px; border-radius:9999px; background:var(--omf); color:#fff; font:700 15px/1 var(--font-sans); display:grid; place-items:center; flex:0 0 auto; margin-top:1px; }
+.vstep .vc{ display:flex; flex-direction:column; gap:2px; }
+.vstep .vact{ font:700 20px/1.3 var(--font-sans); }
+.vstep .vsys{ font:400 16px/1.35 var(--font-sans); color:var(--on-surface-variant); }
+.vstep .vsys::before{ content:"\2192  "; color:var(--ext); font-weight:700; }
+.vdown{ text-align:center; color:var(--outline); font-size:20px; line-height:1; margin:5px 0; }
+.vlast .vstep{ border-left-color:var(--semantic-success); }
+.vlast .vstep .vn{ background:var(--semantic-success); }
+
+.leg{ margin-top:14px; font:400 17px/1.4 var(--font-sans); color:var(--on-surface-muted); }
+.leg b{ color:var(--on-surface); font-weight:700; }
+.leg .a{ color:var(--ext); font-weight:700; }
+.cols{ margin-top:22px; }
+.chip.usr{ background:#F7E7C0; color:#8A5B00; }
+
+/* ── 종합 흐름 (시나리오 종합 슬라이드) ─────────────────── */
+.flow{ margin-top:28px; display:flex; flex-direction:column; gap:20px; flex:1; justify-content:space-between; }
+.erp-band{ display:grid; grid-template-columns:1fr 64px 1fr 34px 1fr 34px 1fr; column-gap:6px; align-items:center; }
+.erp-badge{ display:inline-flex; align-items:center; gap:9px; padding:10px 18px; border-radius:9999px; background:var(--primary-container); color:var(--on-primary-container); font:700 16.5px/1 var(--font-sans); white-space:nowrap; justify-self:center; }
+.erp-badge .material-symbols-rounded{ font-size:20px; }
+.erp-badge.send{ background:var(--omf-soft); color:var(--omf-dark); }
+.stages{ display:grid; grid-template-columns:1fr 64px 1fr 34px 1fr 34px 1fr; column-gap:6px; align-items:stretch; }
+.fcard{ min-width:0; background:var(--surface-bright); border:1px solid var(--outline-variant); border-top:4px solid var(--omf); border-radius:var(--radius-md); box-shadow:var(--elev-1); padding:16px 18px 14px; display:flex; flex-direction:column; gap:9px; }
+.prep{ display:flex; flex-direction:column; gap:12px; min-width:0; }
+.prep .fcard{ flex:1 1 0; }
+.merge{ position:relative; min-width:0; }
+.merge .ml{ position:absolute; background:var(--outline); border-radius:2px; }
+.merge .ml.t{ top:24%; left:0; width:52%; height:3px; }
+.merge .ml.b{ top:76%; left:0; width:52%; height:3px; }
+.merge .ml.v{ top:24%; left:52%; width:3px; height:52%; }
+.merge .ml.o{ top:50%; left:52%; right:11px; height:3px; }
+.merge .mhead{ position:absolute; top:50%; right:0; transform:translateY(-50%); border-left:13px solid var(--outline); border-top:8px solid transparent; border-bottom:8px solid transparent; }
+.fhead{ display:flex; align-items:center; gap:8px; }
+.fnum{ width:26px; height:26px; border-radius:9999px; background:var(--omf); color:#fff; font:700 14px/1 var(--font-sans); display:grid; place-items:center; flex:0 0 auto; }
+.factor{ display:inline-flex; align-items:center; gap:6px; font:700 15.5px/1.1 var(--font-sans); color:var(--omf-dark); }
+.factor .material-symbols-rounded{ font-size:18px; }
+.ftitle{ font:700 24px/1.12 var(--font-sans); letter-spacing:-0.01em; }
+.fsteps{ display:flex; flex-wrap:wrap; gap:6px; }
+.fout{ margin-top:auto; padding-top:10px; border-top:1px dashed var(--outline-variant); font:600 16px/1.35 var(--font-sans); color:var(--on-surface-variant); display:flex; gap:6px; }
+.fout::before{ content:"\2192"; color:var(--ext); font-weight:800; flex:0 0 auto; }
+.fout b{ color:var(--omf-dark); }
+.farrow{ align-self:center; justify-self:center; width:30px; }
+.lotbar{ display:grid; grid-template-columns:1.15fr 0.85fr; gap:20px; }
+.panel{ border-radius:var(--radius-md); padding:16px 24px 18px; display:flex; flex-direction:column; gap:12px; }
+.panel.lot{ background:var(--omf-soft); border:1px solid #e7b9bb; }
+.panel.q{ background:var(--surface-bright); border:1px solid var(--outline-variant); box-shadow:var(--elev-1); }
+.panel h5{ margin:0; font:700 19px/1.1 var(--font-sans); display:flex; align-items:center; gap:8px; }
+.panel h5 .material-symbols-rounded{ font-size:22px; color:var(--omf); }
+.lotflow{ display:flex; align-items:center; gap:10px; margin-top:2px; }
+.lotnode{ background:#fff; border:1.5px solid var(--omf); border-radius:12px; padding:10px 16px; font:700 20px/1.1 var(--font-sans); color:var(--omf-dark); white-space:nowrap; }
+.lotnode.mid{ border-width:2.5px; }
+.lotflow .arrow{ flex:1; }
+.lotcap{ font:400 15px/1.45 var(--font-sans); color:var(--omf-dark); }
+.lotcap b{ font-weight:700; }
+.qlist{ margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:7px; font:500 16px/1.3 var(--font-sans); color:var(--on-surface-variant); }
+.qlist li{ display:flex; gap:8px; align-items:baseline; }
+.qlist .gk{ color:var(--ext); font-weight:800; flex:0 0 auto; }
+.qlist b{ color:var(--omf-dark); }
+</style>
+</head>
+<body>
+
+<deck-stage>
+
+  <!-- 01 · TITLE -->
+  <section data-screen-label="01 표지" class="slide dark">
+    <div class="stage" style="justify-content:center;">
+      <img src="assets/crefle-wordmark-inverse.svg" alt="CREFLE" style="height:64px; width:auto; margin-bottom:56px;">
+      <div class="eyebrow">OhMyFactory MES · 고객 기능·사용 안내</div>
+      <h1 class="title" style="color:#fff; max-width:1640px;">무엇을 만들고,<br>어떻게 쓰는가</h1>
+      <p class="lede" style="margin-top:36px; color:var(--brand-accent-3); max-width:1500px;">삼진엘앤디 베트남법인(SAMJINLND VINA) 생산현장 대상 OMF-MES — 어떤 기능이 만들어지고, 그 기능을 현장에서 어떻게 사용하는지.</p>
+      <div style="margin-top:60px; display:flex; gap:16px;">
+        <span class="capsule">삼진엘앤디 베트남법인</span>
+        <span class="capsule">CREFLE OMF 팀</span>
+        <span class="capsule">2026-06-23</span>
+      </div>
+    </div>
+    <div class="foot"><span>CONFIDENTIAL · 대외비</span><span class="pageno">01 / 18</span></div>
+  </section>
+
+  <!-- 02 · 한 장 요약 -->
+  <section data-screen-label="02 한 장 요약" class="slide">
+    <div class="stage">
+      <div class="eyebrow">한 장 요약</div>
+      <h2 class="section">고객이 받는 것</h2>
+      <p class="lede">현장이 실제로 쓰는 기능을 3대 영역으로 만든다. <strong>완료된 상태를 단순 입력</strong>하면 MES가 판정·집계·추적을 자동 산출하고, ERP·추적성 시스템 영역은 중복 없이 연계한다.</p>
+      <div style="margin-top:48px; display:grid; grid-template-columns:repeat(4,1fr); gap:26px;">
+        <div class="card-outline kpi"><div class="n">3<small> 대 영역</small></div><div class="l">정보 관리 · 자재 창고 · 제품 출하</div></div>
+        <div class="card-outline kpi"><div class="n">9<small> 기능 모듈</small></div><div class="l">기준정보·생산·공정·현장·품질·설비·툴·창고·모니터링</div></div>
+        <div class="card-outline kpi"><div class="n">6<small> 시나리오</small></div><div class="l">현장·생산관리·품질·자재·출하·관리자</div></div>
+        <div class="card-outline kpi"><div class="n" style="font-size:60px;">LOT<small> 추적</small></div><div class="l">자재 → 생산 → 제품 정·역추적</div></div>
+      </div>
+      <div style="margin-top:34px; display:grid; grid-template-columns:repeat(3,1fr); gap:26px;">
+        <div class="callout omf"><div class="ico"><span class="material-symbols-rounded">touch_app</span></div><div><h4>완료 상태 단순 입력</h4><p>스캔·터치로 완료 결과만 입력 → 판정·불량률·추적 자동 산출</p></div></div>
+        <div class="callout info"><div class="ico"><span class="material-symbols-rounded">sync_alt</span></div><div><h4>ERP · 추적성 연계</h4><p>발주·재고·LOT 추적은 중복 없이 연계. MES는 입력 데이터를 공급</p></div></div>
+        <div class="callout warn"><div class="ico"><span class="material-symbols-rounded">handshake</span></div><div><h4>현장 검증 후 확정</h4><p>LOT 발행·포장 정책 등은 현장 방문에서 함께 확정</p></div></div>
+      </div>
+    </div>
+    <div class="foot"><img src="assets/crefle-mark.svg" alt=""><span class="pageno">02 / 18</span></div>
+  </section>
+
+  <!-- 03 · DIVIDER 1 -->
+  <section data-screen-label="03 구분 · 만들어지는 기능" class="slide red">
+    <div class="bignum" aria-hidden="true">1</div>
+    <div class="stage" style="justify-content:center;">
+      <div class="eyebrow" style="color:rgba(255,255,255,0.9); font-size:30px;">SECTION · 01</div>
+      <h2 class="section" style="color:#fff; font-size:104px; line-height:1.05; margin-top:36px;">만들어지는 기능</h2>
+      <div style="display:flex; align-items:center; gap:24px; margin-top:42px;">
+        <span style="height:2px; width:180px; background:rgba(255,255,255,0.6);"></span>
+        <span style="color:rgba(255,255,255,0.9); font:500 26px/1 var(--font-sans);">What — 무엇이 만들어지는가</span>
+      </div>
+    </div>
+    <div class="foot"><img src="assets/crefle-mark-white.svg" alt=""><span class="pageno">03 / 18</span></div>
+  </section>
+
+  <!-- 04 · 3대 영역 -->
+  <section data-screen-label="04 3대 영역" class="slide">
+    <div class="stage">
+      <div class="eyebrow">3대 영역</div>
+      <h2 class="section">성격이 다른 세 영역</h2>
+      <div style="margin-top:56px; display:grid; grid-template-columns:repeat(3,1fr); gap:30px; flex:1;">
+        <div class="card-outline"><h3 class="sub">1 · 정보 관리</h3><span class="chip omf" style="margin:16px 0 18px;">완료 상태 단순 입력</span><p style="font:400 21px/1.5 var(--font-sans); color:var(--on-surface-variant); margin:0 0 20px;">운영 정보를 완료 상태로 입력해 축적·집계·추적. 검사·공정 전 과정을 통제하지는 않는다.</p><div style="display:flex; flex-wrap:wrap; gap:8px;"><span class="chip soft sm">기준정보</span><span class="chip soft sm">생산</span><span class="chip soft sm">공정</span><span class="chip soft sm">현장</span><span class="chip soft sm">품질</span><span class="chip soft sm">설비</span><span class="chip soft sm">툴</span><span class="chip soft sm">모니터링</span></div></div>
+        <div class="card-outline"><h3 class="sub">2 · 자재 창고 관리</h3><span class="chip omf" style="margin:16px 0 18px;">행동(Action) 기반</span><p style="font:400 21px/1.5 var(--font-sans); color:var(--on-surface-variant); margin:0 0 20px;">입고부터 생산 투입까지 자재 상태를 행동에 따라 관리. LOT 번호 기준으로 추적한다.</p><div style="display:flex; flex-wrap:wrap; gap:8px;"><span class="chip soft sm">입하</span><span class="chip soft sm">수입검사</span><span class="chip soft sm">입고(자재LOT)</span><span class="chip soft sm">자재창고</span><span class="chip soft sm">반품</span></div></div>
+        <div class="card-outline"><h3 class="sub">3 · 제품 출하 관리</h3><span class="chip omf" style="margin:16px 0 18px;">공정(Process) 기반</span><p style="font:400 21px/1.5 var(--font-sans); color:var(--on-surface-variant); margin:0 0 20px;">출하창고 입고부터 출하까지 공정에 따라 관리. 납품라벨을 생산LOT과 맞춰 추적한다.</p><div style="display:flex; flex-wrap:wrap; gap:8px;"><span class="chip soft sm">제품입고</span><span class="chip soft sm">제품창고</span><span class="chip soft sm">출하작업</span><span class="chip soft sm">출하검사</span><span class="chip soft sm">출하</span></div></div>
+      </div>
+    </div>
+    <div class="foot"><img src="assets/crefle-mark.svg" alt=""><span class="pageno">04 / 18</span></div>
+  </section>
+
+  <!-- 05 · 정보 관리 8모듈 -->
+  <section data-screen-label="05 정보 관리 모듈" class="slide">
+    <div class="stage">
+      <div class="eyebrow">정보 관리 — 8개 모듈</div>
+      <h2 class="section">모듈별 기능</h2>
+      <div style="margin-top:44px; display:grid; grid-template-columns:repeat(4,1fr); gap:22px;">
+        <div class="card-filled"><h3 style="margin:0 0 12px; font:700 23px/1.2 var(--font-sans);">기준정보관리</h3><div style="display:flex; flex-wrap:wrap; gap:7px;"><span class="chip soft sm">마스터·표준</span><span class="chip soft sm">모듈별 기준</span><span class="chip soft sm">ERP·Legacy 연계</span></div></div>
+        <div class="card-filled"><h3 style="margin:0 0 12px; font:700 23px/1.2 var(--font-sans);">생산관리</h3><div style="display:flex; flex-wrap:wrap; gap:7px;"><span class="chip soft sm">작업지시</span><span class="chip soft sm">작업실적</span><span class="chip soft sm">제조이력·추적</span><span class="chip soft sm">4M</span></div></div>
+        <div class="card-filled"><h3 style="margin:0 0 12px; font:700 23px/1.2 var(--font-sans);">공정관리</h3><div style="display:flex; flex-wrap:wrap; gap:7px;"><span class="chip soft sm">작업 진행·제조이력</span><span class="chip soft sm">작업문서·표준</span><span class="chip soft sm">WIP</span></div></div>
+        <div class="card-filled"><h3 style="margin:0 0 12px; font:700 23px/1.2 var(--font-sans);">현장관리 (POP)</h3><div style="display:flex; flex-wrap:wrap; gap:7px;"><span class="chip soft sm">POP 접속</span><span class="chip soft sm">작업 수행</span><span class="chip soft sm">품질·이상 수집</span><span class="chip soft sm">소통</span></div></div>
+        <div class="card-filled"><h3 style="margin:0 0 12px; font:700 23px/1.2 var(--font-sans);">품질관리</h3><div style="display:flex; flex-wrap:wrap; gap:7px;"><span class="chip soft sm">검사 IQC·PQC·OQC</span><span class="chip soft sm">Lot Status</span><span class="chip soft sm">불량률·SPC</span><span class="chip soft sm">계측기</span></div></div>
+        <div class="card-filled"><h3 style="margin:0 0 12px; font:700 23px/1.2 var(--font-sans);">설비관리</h3><div style="display:flex; flex-wrap:wrap; gap:7px;"><span class="chip soft sm">기준정보</span><span class="chip soft sm">보전·점검</span><span class="chip soft sm">가동률·OEE</span><span class="chip warn sm">자동수집(향후)</span></div></div>
+        <div class="card-filled"><h3 style="margin:0 0 12px; font:700 23px/1.2 var(--font-sans);">툴(생산도구)관리</h3><div style="display:flex; flex-wrap:wrap; gap:7px;"><span class="chip soft sm">기준정보</span><span class="chip soft sm">재고</span><span class="chip soft sm">사용한도·이력</span><span class="chip soft sm">예방보전</span></div></div>
+        <div class="card-filled"><h3 style="margin:0 0 12px; font:700 23px/1.2 var(--font-sans);">모니터링</h3><div style="display:flex; flex-wrap:wrap; gap:7px;"><span class="chip soft sm">실시간 생산·설비·품질·물류</span><span class="chip soft sm">관제</span></div></div>
+      </div>
+      <p style="margin-top:30px; font:400 19px/1.5 var(--font-sans); color:var(--on-surface-muted);">자재 창고 · 제품 출하는 다음 장의 상태 흐름으로.</p>
+    </div>
+    <div class="foot"><img src="assets/crefle-mark.svg" alt=""><span class="pageno">05 / 18</span></div>
+  </section>
+
+  <!-- 06 · 자재·제품 흐름 -->
+  <section data-screen-label="06 자재·제품 흐름" class="slide">
+    <div class="stage">
+      <div class="eyebrow">자재 창고 · 제품 출하</div>
+      <h2 class="section">상태로 흐른다</h2>
+      <div style="margin-top:60px;">
+        <h3 class="sub" style="font-size:27px; margin-bottom:24px;">자재 — 행동(Action) 기반</h3>
+        <div style="display:flex; align-items:center; gap:14px;">
+          <div class="node"><div class="ne">입하</div><div class="nt">입하</div><div class="ns">입하대기→완료</div></div>
+          <div class="arrow"><span class="pulse"></span></div>
+          <div class="node"><div class="ne">검사</div><div class="nt">수입검사</div><div class="ns">IQC 합/불</div></div>
+          <div class="arrow"><span class="pulse" style="animation-delay:400ms;"></span></div>
+          <div class="node store"><div class="ne">발행</div><div class="nt">입고</div><div class="ns">자재LOT 발행</div></div>
+          <div class="arrow"><span class="pulse" style="animation-delay:800ms;"></span></div>
+          <div class="node store"><div class="ne">보관</div><div class="nt">자재창고</div><div class="ns">LOT·Location</div></div>
+          <div class="arrow"><span class="pulse" style="animation-delay:1200ms;"></span></div>
+          <div class="node"><div class="ne">투입</div><div class="nt">출고</div><div class="ns">작업지시 기준</div></div>
+        </div>
+      </div>
+      <div style="margin-top:56px;">
+        <h3 class="sub" style="font-size:27px; margin-bottom:24px;">제품 — 공정(Process) 기반</h3>
+        <div style="display:flex; align-items:center; gap:14px;">
+          <div class="node"><div class="ne">완료</div><div class="nt">제품입고</div><div class="ns">생산완료→적치</div></div>
+          <div class="arrow"><span class="pulse"></span></div>
+          <div class="node store"><div class="ne">보관</div><div class="nt">제품창고</div><div class="ns">LOT·Location</div></div>
+          <div class="arrow"><span class="pulse" style="animation-delay:400ms;"></span></div>
+          <div class="node"><div class="ne">작업</div><div class="nt">출하작업</div><div class="ns">피킹·포장</div></div>
+          <div class="arrow"><span class="pulse" style="animation-delay:800ms;"></span></div>
+          <div class="node"><div class="ne">검사</div><div class="nt">출하검사</div><div class="ns">OQC 합/불</div></div>
+          <div class="arrow"><span class="pulse" style="animation-delay:1200ms;"></span></div>
+          <div class="node ok"><div class="ne">납품</div><div class="nt">출하</div><div class="ns">납품·실적 연계</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><img src="assets/crefle-mark.svg" alt=""><span class="pageno">06 / 18</span></div>
+  </section>
+
+  <!-- 07 · DIVIDER 2 -->
+  <section data-screen-label="07 구분 · 이렇게 사용합니다" class="slide red">
+    <div class="bignum" aria-hidden="true">2</div>
+    <div class="stage" style="justify-content:center;">
+      <div class="eyebrow" style="color:rgba(255,255,255,0.9); font-size:30px;">SECTION · 02</div>
+      <h2 class="section" style="color:#fff; font-size:104px; line-height:1.05; margin-top:36px;">이렇게 사용합니다</h2>
+      <div style="display:flex; align-items:center; gap:24px; margin-top:42px;">
+        <span style="height:2px; width:180px; background:rgba(255,255,255,0.6);"></span>
+        <span style="color:rgba(255,255,255,0.9); font:500 26px/1 var(--font-sans);">How — 단계 = (사용자) 행동 → (시스템) 반응</span>
+      </div>
+    </div>
+    <div class="foot"><img src="assets/crefle-mark-white.svg" alt=""><span class="pageno">07 / 18</span></div>
+  </section>
+
+  <!-- 08 · 시나리오 자재+생산관리 -->
+  <section data-screen-label="08 시나리오 · 자재/생산관리" class="slide">
+    <div class="stage">
+      <div class="eyebrow">사용 시나리오 · 1 / 3 · 입고·작업지시</div>
+      <div class="leg"><b>굵게</b> = 내가 하는 것 · <span class="a">→</span> = 시스템이 자동으로 하는 것</div>
+      <div class="cols">
+        <div class="col"><span class="scn-actor"><span class="material-symbols-rounded">inventory_2</span>자재창고 작업자</span><h4>자재를 입하·검사·입고한다</h4><div class="vflow">
+<div class="vstep"><span class="vn">1</span><div class="vc"><span class="vact">입하 자재 등록</span><span class="vsys">공급사·품목·검사 항목 표시</span></div></div>
+<div class="vdown">▼</div>
+<div class="vstep"><span class="vn">2</span><div class="vc"><span class="vact">수입검사 결과 입력</span><span class="vsys">합격→입고 / 불합격→반품 분기</span></div></div>
+<div class="vdown">▼</div>
+<div class="vstep"><span class="vn">3</span><div class="vc"><span class="vact">입고 확정</span><span class="vsys">자재LOT 발행</span></div></div>
+<div class="vdown">▼</div>
+<div class="vstep"><span class="vn">4</span><div class="vc"><span class="vact">바코드 라벨 부착</span><span class="vsys">LOT 인식 정보 연결</span></div></div>
+<div class="vdown">▼</div>
+<div class="vlast"><div class="vstep"><span class="vn">5</span><div class="vc"><span class="vact">적치 Location 스캔</span><span class="vsys">재고 LOT·Location 기록</span></div></div></div>
+</div></div>
+        <div class="col"><span class="scn-actor"><span class="material-symbols-rounded">assignment</span>생산관리자</span><h4>작업지시를 편성·배포한다</h4><div class="vflow">
+<div class="vstep"><span class="vn">1</span><div class="vc"><span class="vact">ERP 생산계획(P/O) 조회</span><span class="vsys">미편성 P/O 목록 표시</span></div></div>
+<div class="vdown">▼</div>
+<div class="vstep"><span class="vn">2</span><div class="vc"><span class="vact">세부 작업지시(W/O) 전개</span><span class="vsys">Routing 기준 세부공정 자동 편성</span></div></div>
+<div class="vdown">▼</div>
+<div class="vstep"><span class="vn">3</span><div class="vc"><span class="vact">자원 배정 (설비·작업자·자재·툴)</span><span class="vsys">자원 유효성 검증 OK/NG</span></div></div>
+<div class="vdown">▼</div>
+<div class="vstep"><span class="vn">4</span><div class="vc"><span class="vact">우선순위 조정</span><span class="vsys">변경 순위 반영·저장</span></div></div>
+<div class="vdown">▼</div>
+<div class="vlast"><div class="vstep"><span class="vn">5</span><div class="vc"><span class="vact">확정</span><span class="vsys">확정 W/O·생산LOT 라벨 선발행 후 현장 배포</span></div></div></div>
+</div></div>
+      </div>
+    </div>
+    <div class="foot"><img src="assets/crefle-mark.svg" alt=""><span class="pageno">08 / 18</span></div>
+  </section>
+
+  <!-- 09 · 시나리오 현장+제품출하 -->
+  <section data-screen-label="09 시나리오 · 현장/제품출하" class="slide">
+    <div class="stage">
+      <div class="eyebrow">사용 시나리오 · 2 / 3 · 생산·출하</div>
+      <div class="leg"><b>굵게</b> = 내가 하는 것 · <span class="a">→</span> = 시스템이 자동으로 하는 것</div>
+      <div class="cols">
+        <div class="col"><span class="scn-actor"><span class="material-symbols-rounded">precision_manufacturing</span>현장 작업자</span><h4>생산 실적과 LOT을 등록한다</h4><div class="vflow">
+<div class="vstep"><span class="vn">1</span><div class="vc"><span class="vact">현장관리 로그인 (공장·공정·설비 선택)</span><span class="vsys">작업 컨텍스트 설정·배정 작업지시 표시</span></div></div>
+<div class="vdown">▼</div>
+<div class="vstep"><span class="vn">2</span><div class="vc"><span class="vact">작업지시(W/O) 선택</span><span class="vsys">배정 작업·작업문서 표시</span></div></div>
+<div class="vdown">▼</div>
+<div class="vstep"><span class="vn">3</span><div class="vc"><span class="vact">작업 시작</span><span class="vsys">선발행 생산LOT으로 작업·LOT 개시</span></div></div>
+<div class="vdown">▼</div>
+<div class="vstep"><span class="vn">4</span><div class="vc"><span class="vact">투입 자재·금형 스캔</span><span class="vsys">오투입 검증 (적합/오투입)</span></div></div>
+<div class="vdown">▼</div>
+<div class="vstep"><span class="vn">5</span><div class="vc"><span class="vact">실적·불량·검사 입력</span><span class="vsys">실적 집계·선발행 생산LOT에 반영</span></div></div>
+<div class="vdown">▼</div>
+<div class="vlast"><div class="vstep"><span class="vn">6</span><div class="vc"><span class="vact">작업 종료</span><span class="vsys">제조이력 누적·실시간 현황 반영</span></div></div></div>
+</div></div>
+        <div class="col"><span class="scn-actor"><span class="material-symbols-rounded">local_shipping</span>제품창고 작업자</span><h4>피킹·검사·포장해 출하한다</h4><div class="vflow">
+<div class="vstep"><span class="vn">1</span><div class="vc"><span class="vact">출하지시 선택</span><span class="vsys">출하 대상 품목·수량·Location 안내</span></div></div>
+<div class="vdown">▼</div>
+<div class="vstep"><span class="vn">2</span><div class="vc"><span class="vact">제품 피킹 (스캔)</span><span class="vsys">대상 LOT 매칭·피킹 수량 확정</span></div></div>
+<div class="vdown">▼</div>
+<div class="vstep"><span class="vn">3</span><div class="vc"><span class="vact">출하검사(OQC) 입력</span><span class="vsys">합/불 판정 (합격 시 진행)</span></div></div>
+<div class="vdown">▼</div>
+<div class="vstep"><span class="vn">4</span><div class="vc"><span class="vact">납품라벨 출력·부착</span><span class="vsys">생산LOT Matching 검증(일치 확인)</span></div></div>
+<div class="vdown">▼</div>
+<div class="vstep"><span class="vn">5</span><div class="vc"><span class="vact">포장 (Pallet·바코드 사진)</span><span class="vsys">포장 단위·제품LOT 구성</span></div></div>
+<div class="vdown">▼</div>
+<div class="vlast"><div class="vstep"><span class="vn">6</span><div class="vc"><span class="vact">출하 확정</span><span class="vsys">재고 갱신·ERP 실적 연계</span></div></div></div>
+</div></div>
+      </div>
+    </div>
+    <div class="foot"><img src="assets/crefle-mark.svg" alt=""><span class="pageno">09 / 18</span></div>
+  </section>
+
+  <!-- 10 · 시나리오 품질+관리 -->
+  <section data-screen-label="10 시나리오 · 품질/관리" class="slide">
+    <div class="stage">
+      <div class="eyebrow">사용 시나리오 · 3 / 3 · 품질·관리</div>
+      <div class="leg"><b>굵게</b> = 내가 하는 것 · <span class="a">→</span> = 시스템이 자동으로 하는 것</div>
+      <div class="cols">
+        <div class="col"><span class="scn-actor"><span class="material-symbols-rounded">fact_check</span>품질담당</span><h4>검사하고, 역추적으로 원인을 찾는다</h4><div class="vflow">
+<div class="vstep"><span class="vn">1</span><div class="vc"><span class="vact">검사 결과값 입력</span><span class="vsys">합/불 판정·불량률·SPC 산출</span></div></div>
+<div class="vdown">▼</div>
+<div class="vstep"><span class="vn">2</span><div class="vc"><span class="vact">불합격 LOT Hold</span><span class="vsys">Lot Status로 출고·출하 차단</span></div></div>
+<div class="vdown">▼</div>
+<div class="vstep"><span class="vn">3</span><div class="vc"><span class="vact">생산품 인식표(QR) 스캔</span><span class="vsys">생산LOT 식별</span></div></div>
+<div class="vdown">▼</div>
+<div class="vstep"><span class="vn">4</span><div class="vc"><span class="vact">역추적(역전개) 조회</span><span class="vsys">자재LOT·검사·작업·설비 이력 표시</span></div></div>
+<div class="vdown">▼</div>
+<div class="vlast"><div class="vstep"><span class="vn">5</span><div class="vc"><span class="vact">원인·계보 확인</span><span class="vsys">원인 후보·전체 계보 제공</span></div></div></div>
+</div></div>
+        <div class="col"><span class="scn-actor"><span class="material-symbols-rounded">monitoring</span>관리자</span><h4>현장을 실시간으로 모니터링한다</h4><div class="vflow">
+<div class="vstep"><span class="vn">1</span><div class="vc"><span class="vact">모니터링 대시보드 열기</span><span class="vsys">생산진행·OEE·KPI 실시간 가시화</span></div></div>
+<div class="vdown">▼</div>
+<div class="vstep"><span class="vn">2</span><div class="vc"><span class="vact">영역별 관제 선택</span><span class="vsys">생산·설비·품질·물류 현황 표시</span></div></div>
+<div class="vdown">▼</div>
+<div class="vstep"><span class="vn">3</span><div class="vc"><span class="vact">공정 달성율·가동률 확인</span><span class="vsys">달성율·가동률·불량 지표 제공</span></div></div>
+<div class="vdown">▼</div>
+<div class="vlast"><div class="vstep"><span class="vn">4</span><div class="vc"><span class="vact">이상 감지·조치</span><span class="vsys">이상 영역 알림·드릴다운 제공</span></div></div></div>
+</div></div>
+      </div>
+    </div>
+    <div class="foot"><img src="assets/crefle-mark.svg" alt=""><span class="pageno">10 / 18</span></div>
+  </section>
+
+  <!-- 11 · 시나리오 종합 — P/O → 출하 한 흐름 -->
+  <section data-screen-label="11 시나리오 · 종합 흐름" class="slide">
+    <div class="stage">
+      <div class="eyebrow">사용 시나리오 · 한 흐름으로</div>
+      <h2 class="section">P/O 한 건이, 출하까지</h2>
+      <p class="lede" style="font-size:25px; max-width:1640px;">앞의 여섯 시나리오(자재·생산관리·현장·출하·품질·관리)는 실제로 <b>하나의 흐름</b>입니다 — 행동은 <b>완료 상태 단순 입력</b>, 추적은 <b style="color:var(--omf-dark);">LOT</b>이 전 구간을 관통합니다.</p>
+
+      <div class="flow">
+
+        <!-- ERP 경계 — 연계 지점을 각 단계 위에 정렬 -->
+        <div class="erp-band">
+          <span class="erp-badge" style="grid-column:1;"><span class="material-symbols-rounded">south</span>ERP 생산계획(P/O) 수신</span>
+          <span class="erp-badge send" style="grid-column:3;"><span class="material-symbols-rounded">north</span>ERP 투입 원부자재 송신</span>
+          <span class="erp-badge send" style="grid-column:7;"><span class="material-symbols-rounded">north</span>ERP 재고·생산실적 송신</span>
+        </div>
+
+        <!-- 메인 흐름: 1단계 준비(생산계획·지시 ∥ 자재 입고) → 합류 → 생산 실행 → 제품 입고 → 출하 -->
+        <div class="stages">
+          <!-- 1단계: 두 작업이 같은 수준에서 병렬, 합류해 생산으로 -->
+          <div class="prep">
+            <div class="fcard">
+              <div class="fhead"><span class="fnum">1</span><span class="factor"><span class="material-symbols-rounded">assignment</span>생산관리자</span></div>
+              <div class="ftitle">생산계획·지시</div>
+              <div class="fsteps"><span class="chip soft sm">P/O 조회</span><span class="chip soft sm">W/O 전개</span><span class="chip soft sm">자원 배정</span><span class="chip soft sm">확정</span></div>
+              <div class="fout"><span><b>생산LOT</b> 라벨 선발행 → 현장 배포</span></div>
+            </div>
+            <div class="fcard">
+              <div class="fhead"><span class="fnum">1</span><span class="factor"><span class="material-symbols-rounded">inventory_2</span>자재창고</span></div>
+              <div class="ftitle">자재 입고</div>
+              <div class="fsteps"><span class="chip soft sm">입하</span><span class="chip soft sm">수입검사</span><span class="chip soft sm">입고</span><span class="chip soft sm">적치</span></div>
+              <div class="fout"><span><b>자재LOT</b> 발행 · 재고(LOT·Location)</span></div>
+            </div>
+          </div>
+
+          <!-- 두 갈래 합류 -->
+          <div class="merge"><span class="ml t"></span><span class="ml b"></span><span class="ml v"></span><span class="ml o"></span><span class="mhead"></span></div>
+
+          <div class="fcard">
+            <div class="fhead"><span class="fnum">2</span><span class="factor"><span class="material-symbols-rounded">precision_manufacturing</span>현장 작업자</span></div>
+            <div class="ftitle">생산 실행</div>
+            <div class="fsteps"><span class="chip soft sm">작업 시작</span><span class="chip soft sm">자재·금형 투입</span><span class="chip soft sm">실적·검사</span><span class="chip soft sm">종료</span></div>
+            <div class="fout"><span><b>생산LOT</b> 제조이력 · 4M투입</span></div>
+          </div>
+          <div class="arrow farrow"><span class="pulse" style="animation-delay:600ms;"></span></div>
+
+          <div class="fcard">
+            <div class="fhead"><span class="fnum">3</span><span class="factor"><span class="material-symbols-rounded">warehouse</span>제품창고</span></div>
+            <div class="ftitle">제품 입고</div>
+            <div class="fsteps"><span class="chip soft sm">생산완료 입고</span><span class="chip soft sm">제품창고 적치</span></div>
+            <div class="fout"><span>제품 <b>재고</b>(LOT·Location)</span></div>
+          </div>
+          <div class="arrow farrow"><span class="pulse" style="animation-delay:900ms;"></span></div>
+
+          <div class="fcard">
+            <div class="fhead"><span class="fnum">4</span><span class="factor"><span class="material-symbols-rounded">local_shipping</span>제품창고</span></div>
+            <div class="ftitle">출하</div>
+            <div class="fsteps"><span class="chip soft sm">출하지시</span><span class="chip soft sm">피킹</span><span class="chip soft sm">출하검사</span><span class="chip soft sm">납품라벨</span><span class="chip soft sm">포장</span><span class="chip soft sm">출하 확정</span></div>
+            <div class="fout"><span><b>제품LOT</b> · 납품 · ERP 실적 연계</span></div>
+          </div>
+        </div>
+
+        <!-- LOT 승계 + 품질 게이트 -->
+        <div class="lotbar">
+          <div class="panel lot">
+            <h5><span class="material-symbols-rounded">link</span>추적은 LOT이 관통</h5>
+            <div class="lotflow">
+              <span class="lotnode">자재LOT</span>
+              <span class="arrow"><span class="pulse"></span></span>
+              <span class="lotnode mid">생산LOT</span>
+              <span class="arrow"><span class="pulse" style="animation-delay:700ms;"></span></span>
+              <span class="lotnode">제품LOT</span>
+            </div>
+            <p class="lotcap">자재→생산 <b>투입 계보(N:M)</b> · 생산→제품 <b>포장 승계</b> · 인식표 QR=LotNo+seq로 역추적</p>
+          </div>
+          <div class="panel q">
+            <h5><span class="material-symbols-rounded">verified</span>품질이 흐름을 통제</h5>
+            <ul class="qlist">
+              <li><span class="gk">IQC</span><span>수입검사 합격 → 입고</span></li>
+              <li><span class="gk">PQC</span><span>공정(자주·초중종) 검사</span></li>
+              <li><span class="gk">OQC</span><span>출하검사 합격 → 출하</span></li>
+              <li><span class="gk">!</span><span>불합격 LOT → <b>Lot Status Hold</b>로 출고·출하 차단</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="leg"><b>굵게</b> = 현장이 하는 행동(완료 단순 입력) · <span class="a">→</span> = MES가 자동으로 남기는 데이터 · <b style="color:var(--omf-dark);">빨강</b> = MES 발행 LOT · <span style="color:var(--ext);">┄</span> 점선 = ERP 연계</div>
+
+      </div>
+    </div>
+    <div class="foot"><img src="assets/crefle-mark.svg" alt=""><span class="pageno">11 / 18</span></div>
+  </section>
+
+  <!-- 12 · DIVIDER 3 -->
+  <section data-screen-label="11 구분 · 데이터로 남습니다" class="slide red">
+    <div class="bignum" aria-hidden="true">3</div>
+    <div class="stage" style="justify-content:center;">
+      <div class="eyebrow" style="color:rgba(255,255,255,0.9); font-size:30px;">SECTION · 03</div>
+      <h2 class="section" style="color:#fff; font-size:104px; line-height:1.05; margin-top:36px;">데이터로 남습니다</h2>
+      <div style="display:flex; align-items:center; gap:24px; margin-top:42px;">
+        <span style="height:2px; width:180px; background:rgba(255,255,255,0.6);"></span>
+        <span style="color:rgba(255,255,255,0.9); font:500 26px/1 var(--font-sans);">기능 ↔ 데이터 모델 · 화면의 한 행동 = 한 레코드</span>
+      </div>
+    </div>
+    <div class="foot"><img src="assets/crefle-mark-white.svg" alt=""><span class="pageno">12 / 18</span></div>
+  </section>
+
+  <!-- 13 · 데이터 모델 한눈에 (출처별) -->
+  <section data-screen-label="12 데이터 모델 한눈에" class="slide">
+    <div class="stage">
+      <div class="eyebrow">데이터 모델 한눈에 · 출처별 구분</div>
+      <h2 class="section">기능이 남기는 데이터</h2>
+      <div style="margin-top:20px; display:flex; gap:30px; flex-wrap:wrap; align-items:center;">
+        <span style="display:inline-flex;align-items:center;gap:9px;font:500 19px/1 var(--font-sans);color:var(--on-surface-variant);"><span class="chip ext sm">외부 연계</span> ERP·외부 시스템에서 읽어옴</span>
+        <span style="display:inline-flex;align-items:center;gap:9px;font:500 19px/1 var(--font-sans);color:var(--on-surface-variant);"><span class="chip usr sm">사용자 입력</span> 현장·담당자가 직접 입력</span>
+        <span style="display:inline-flex;align-items:center;gap:9px;font:500 19px/1 var(--font-sans);color:var(--on-surface-variant);"><span class="chip omf sm">MES 생성</span> 시스템이 자동 생성</span>
+      </div>
+      <div style="margin-top:20px; display:grid; grid-template-columns:repeat(3,1fr); gap:20px;">
+        <div class="card-outline"><h3 style="margin:0 0 6px; font:700 23px/1.2 var(--font-sans);">기준정보 <span style="color:var(--on-surface-muted); font-size:17px; font-weight:400;">16</span></h3><div style="display:flex; flex-wrap:wrap; gap:7px; margin-top:11px;"><span class="chip ext sm">품목</span><span class="chip ext sm">BOM</span><span class="chip ext sm">공정/Routing</span><span class="chip ext sm">설비</span><span class="chip ext sm">툴/금형</span><span class="chip ext sm">작업자</span><span class="chip ext sm">검사항목</span><span class="chip usr sm">창고/Location</span></div></div>
+        <div class="card-outline"><h3 style="margin:0 0 6px; font:700 23px/1.2 var(--font-sans);">생산 실행 <span style="color:var(--on-surface-muted); font-size:17px; font-weight:400;">7</span></h3><div style="display:flex; flex-wrap:wrap; gap:7px; margin-top:11px;"><span class="chip ext sm">생산계획(P/O)</span><span class="chip omf sm">작업지시(W/O)</span><span class="chip usr sm">작업실적</span><span class="chip usr sm">4M투입</span></div></div>
+        <div class="card-outline"><h3 style="margin:0 0 6px; font:700 23px/1.2 var(--font-sans);">LOT / 추적 <span style="color:var(--on-surface-muted); font-size:17px; font-weight:400;">5</span></h3><div style="display:flex; flex-wrap:wrap; gap:7px; margin-top:11px;"><span class="chip omf sm">자재LOT</span><span class="chip omf sm">생산LOT</span><span class="chip omf sm">인식표</span><span class="chip omf sm">제품LOT</span><span class="chip omf sm">포장단위</span></div></div>
+        <div class="card-outline"><h3 style="margin:0 0 6px; font:700 23px/1.2 var(--font-sans);">품질 <span style="color:var(--on-surface-muted); font-size:17px; font-weight:400;">6</span></h3><div style="display:flex; flex-wrap:wrap; gap:7px; margin-top:11px;"><span class="chip usr sm">검사 IQC/PQC/OQC</span><span class="chip usr sm">검사결과</span><span class="chip omf sm">Lot Status</span><span class="chip usr sm">SPC측정값</span><span class="chip usr sm">계측기</span></div></div>
+        <div class="card-outline"><h3 style="margin:0 0 6px; font:700 23px/1.2 var(--font-sans);">설비 / 툴 <span style="color:var(--on-surface-muted); font-size:17px; font-weight:400;">7</span></h3><div style="display:flex; flex-wrap:wrap; gap:7px; margin-top:11px;"><span class="chip usr sm">설비 보전·점검 이력</span><span class="chip usr sm">예비품</span><span class="chip omf sm">툴 사용실적</span><span class="chip usr sm">예방보전</span></div></div>
+        <div class="card-outline"><h3 style="margin:0 0 6px; font:700 23px/1.2 var(--font-sans);">물류 / 재고 <span style="color:var(--on-surface-muted); font-size:17px; font-weight:400;">10</span></h3><div style="display:flex; flex-wrap:wrap; gap:7px; margin-top:11px;"><span class="chip usr sm">입하</span><span class="chip omf sm">입고</span><span class="chip omf sm">재고(LOT·Location)</span><span class="chip omf sm">출고</span><span class="chip omf sm">출하</span><span class="chip usr sm">반품</span></div></div>
+      </div>
+      <p style="margin-top:18px; font:400 17px/1.45 var(--font-sans); color:var(--on-surface-muted);">기준정보(품목·BOM·공정·설비·툴·작업자·품질)는 <b>ERP→MES 연계 수신</b>(원본 p.54, MES 수정·삭제 불가) · 창고/Location은 MES 등록 · 자재·제품 입출고는 ERP 발주·출하지시와 연계하되 LOT 발번은 MES</p>
+    </div>
+    <div class="foot"><img src="assets/crefle-mark.svg" alt=""><span class="pageno">13 / 18</span></div>
+  </section>
+
+  <!-- 14 · 기능 → 데이터 매핑 -->
+  <section data-screen-label="13 기능→데이터 매핑" class="slide">
+    <div class="stage">
+      <div class="eyebrow">기능 → 데이터 매핑</div>
+      <h2 class="section">어떤 기능이 어떤 데이터를 만들고 쓰나</h2>
+      <table class="s" style="margin-top:40px;">
+        <thead><tr><th style="width:22%;">기능 (액터)</th><th style="width:42%;">만드는 · 쓰는 데이터</th><th>어떻게 표현되나</th></tr></thead>
+        <tbody>
+          <tr><td><strong>작업지시 편성</strong><br><span style="color:var(--on-surface-muted); font-size:16px;">생산관리자</span></td><td><span class="chip omf sm">만듦</span> <span class="cat">작업지시(W/O)</span> · 씀 P/O·품목·Routing·설비·작업자·툴</td><td>P/O를 세부공정 W/O로 전개, 자원 배정 OK/NG 기록</td></tr>
+          <tr><td><strong>작업 실적·LOT 등록</strong><br><span style="color:var(--on-surface-muted); font-size:16px;">현장 작업자</span></td><td><span class="chip omf sm">만듦</span> <span class="cat">작업실적·생산LOT·인식표·4M투입</span></td><td><strong>생산LOT No 발행</strong>, 인식표=LotNo+seq, 투입 4M 라인</td></tr>
+          <tr><td><strong>자재 입하·입고</strong><br><span style="color:var(--on-surface-muted); font-size:16px;">자재창고</span></td><td><span class="chip omf sm">만듦</span> <span class="cat">입하·입고·자재LOT·재고</span></td><td>수입검사 합/불 → <strong>자재LOT 발행</strong>, 재고=품목+LOT+Location</td></tr>
+          <tr><td><strong>검사·판정</strong><br><span style="color:var(--on-surface-muted); font-size:16px;">품질담당</span></td><td><span class="chip omf sm">만듦</span> <span class="cat">검사·검사결과·Lot Status·SPC</span></td><td>결과값→합/불·불량률·SPC, <strong>Lot Status(Hold/Release)</strong></td></tr>
+          <tr><td><strong>제품 출하</strong><br><span style="color:var(--on-surface-muted); font-size:16px;">제품창고</span></td><td><span class="chip omf sm">만듦</span> <span class="cat">제품LOT·포장·출하</span> · 씀 생산LOT</td><td>제품LOT No, <strong>납품라벨 ↔ 생산LOT Matching</strong></td></tr>
+          <tr><td><strong>역추적 조회</strong><br><span style="color:var(--on-surface-muted); font-size:16px;">품질·CS</span></td><td><span class="chip soft sm">읽음</span> 인식표→생산LOT→<span class="cat">자재투입이력</span>→자재LOT</td><td>정·역전개 <strong>LOT Traceability</strong>로 계보·제조이력 조회</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:24px; font:400 19px/1.4 var(--font-sans); color:var(--on-surface-muted);">§1 기능 · §2 사용 시나리오와 같은 데이터를 가리킨다 — 화면에서 한 행동이 곧 한 레코드.</p>
+    </div>
+    <div class="foot"><img src="assets/crefle-mark.svg" alt=""><span class="pageno">14 / 18</span></div>
+  </section>
+
+  <!-- 15 · LOT 추적 -->
+  <section data-screen-label="14 LOT 추적" class="slide">
+    <div class="stage">
+      <div class="eyebrow">LOT으로 이어지는 추적</div>
+      <h2 class="section">자재 → 생산 → 제품, 그리고 역추적</h2>
+      <div style="margin-top:84px; display:flex; align-items:center; justify-content:center; gap:18px;">
+        <div class="node store" style="min-width:220px;"><div class="ne">입고 시</div><div class="nt">자재LOT</div><div class="ns">자재LOT No</div></div>
+        <div class="arrow" style="width:90px;"><span class="pulse"></span></div>
+        <div class="node" style="min-width:280px; border:2px solid var(--omf);"><div class="ne" style="color:var(--omf);">생산 시</div><div class="nt" style="color:var(--omf-dark);">생산LOT</div><div class="ns">인식표 QR = LotNo+seq</div></div>
+        <div class="arrow" style="width:90px;"><span class="pulse" style="animation-delay:700ms;"></span></div>
+        <div class="node store" style="min-width:220px;"><div class="ne">포장 시</div><div class="nt">제품LOT</div><div class="ns">출하 단위</div></div>
+      </div>
+      <div style="margin-top:70px; display:grid; grid-template-columns:1fr 1fr; gap:28px;">
+        <div class="callout info"><div class="ico"><span class="material-symbols-rounded">qr_code_scanner</span></div><div><h4>역추적 — 인식표 하나로</h4><p>생산품 인식표(QR) 스캔 → 생산LOT 식별 → 투입 자재LOT·공정 검사·작업·설비 이력을 역전개로 한 번에 조회 (시나리오 ③)</p></div></div>
+        <div class="callout warn"><div class="ico"><span class="material-symbols-rounded">help</span></div><div><h4>현장에서 확정할 부분</h4><p>생산LOT ↔ 제품LOT 승계(포장 합병·분할 시 1:1 또는 N:M)와 LOT 발행 주체(MES/ERP)는 현장 포장 정책에 따라 확정</p></div></div>
+      </div>
+    </div>
+    <div class="foot"><img src="assets/crefle-mark.svg" alt=""><span class="pageno">15 / 18</span></div>
+  </section>
+
+  <!-- 16 · 고객사 확인 질문 -->
+  <section data-screen-label="15 고객사 확인 질문" class="slide">
+    <div class="stage">
+      <div class="eyebrow">고객사 확인이 필요한 사항</div>
+      <h2 class="section">현장 방문에서 함께 확정합니다 <small>답이 데이터 모델·개발 범위를 결정 — 핵심만 발췌 · 전체(일부 확정)는 현장 검증 질문지에 정리</small></h2>
+      <div style="margin-top:34px; display:grid; grid-template-columns:1fr 1fr; gap:22px;">
+        <div class="card-outline">
+          <div style="display:flex; align-items:center; gap:11px; margin-bottom:14px;"><span class="chip omf" style="font-weight:700;">A</span><h3 style="margin:0; font:700 24px/1.2 var(--font-sans);">ERP 연계 경계 <span style="color:var(--on-surface-muted); font-size:17px; font-weight:400;">최우선</span></h3></div>
+          <ul style="margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:11px; font:400 19px/1.4 var(--font-sans);">
+            <li>· 자재 · 제품 LOT <b style="color:var(--omf-dark);">발행 주체 — MES vs ERP?</b></li>
+            <li>· 입출고 · 트랜잭션 번호 <b style="color:var(--omf-dark);">발번 — MES vs ERP?</b></li>
+            <li>· ERP 수신 · 송신 범위 — P/O · 기준정보 · 실적?</li>
+          </ul>
+        </div>
+        <div class="card-outline">
+          <div style="display:flex; align-items:center; gap:11px; margin-bottom:14px;"><span class="chip omf" style="font-weight:700;">B</span><h3 style="margin:0; font:700 24px/1.2 var(--font-sans);">데이터 키 · 정규화</h3></div>
+          <ul style="margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:11px; font:400 19px/1.4 var(--font-sans);">
+            <li>· 재고 식별자 — <b style="color:var(--omf-dark);">품목 + LOT + Location 복합키?</b></li>
+            <li>· BOM Rev · Routing 공정Ver — 키 구성?</li>
+            <li>· 검사 실적 — 검사항목별 라인 분리?</li>
+          </ul>
+        </div>
+        <div class="card-outline">
+          <div style="display:flex; align-items:center; gap:11px; margin-bottom:14px;"><span class="chip omf" style="font-weight:700;">C</span><h3 style="margin:0; font:700 24px/1.2 var(--font-sans);">소유 경계 <span style="color:var(--on-surface-muted); font-size:17px; font-weight:400;">중복 제거</span></h3></div>
+          <ul style="margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:11px; font:400 19px/1.4 var(--font-sans);">
+            <li>· 전달사항 — 생산관리 vs 현장?</li>
+            <li>· 불량 실적 — 품질 검사 vs 현장?</li>
+            <li>· 수입검사 · 예비품 · SPC — 소유 모듈?</li>
+          </ul>
+        </div>
+        <div class="card-outline">
+          <div style="display:flex; align-items:center; gap:11px; margin-bottom:14px;"><span class="chip omf" style="font-weight:700;">D</span><h3 style="margin:0; font:700 24px/1.2 var(--font-sans);">운영 규칙 · 도입 범위</h3></div>
+          <ul style="margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:11px; font:400 19px/1.4 var(--font-sans);">
+            <li>· Lot Status 통제 · 작업 전 점검 통제 규칙?</li>
+            <li>· 포장 합병 / 분할 추적 승계 규칙?</li>
+            <li>· 옵션 기능군(IoT · Analytics · EWS) <b style="color:var(--omf-dark);">도입 범위?</b></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><img src="assets/crefle-mark.svg" alt=""><span class="pageno">16 / 18</span></div>
+  </section>
+
+  <!-- 17 · 진행 단계 -->
+  <section data-screen-label="16 진행 단계" class="slide">
+    <div class="stage">
+      <div class="eyebrow">진행 단계</div>
+      <h2 class="section">현장 검증 후, 개발로</h2>
+      <p class="lede">위 확인 사항을 비나 법인 현장 방문(STEP 3)에서 합의한 뒤, 데이터 모델 · 개발 범위를 확정해 개발에 착수한다.</p>
+      <div style="margin-top:90px; display:flex; align-items:stretch; gap:14px;">
+        <div class="rstep"><div class="rno">STEP 1</div><div class="rt">데이터 수집</div><div class="rd">현장 보고서 · 서식 · 기존 데이터</div><div class="rdate done">✓ 완료</div></div>
+        <div class="arrow" style="align-self:center; width:46px;"><span class="pulse"></span></div>
+        <div class="rstep"><div class="rno">STEP 2</div><div class="rt">데이터 분석 · 모델링</div><div class="rd">기능 분해 · 용어 표준화 · 데이터 모델</div><div class="rdate">진행 중</div></div>
+        <div class="arrow" style="align-self:center; width:46px;"><span class="pulse" style="animation-delay:600ms;"></span></div>
+        <div class="rstep"><div class="rno">STEP 3</div><div class="rt">현장 검증 · 합의</div><div class="rd">비나 법인 방문 — 위 확인 사항 합의</div><div class="rdate">예정</div></div>
+        <div class="arrow" style="align-self:center; width:46px;"><span class="pulse" style="animation-delay:1200ms;"></span></div>
+        <div class="rstep"><div class="rno">STEP 4</div><div class="rt">개발</div><div class="rd">합의된 모델로 3대 영역 + 연계 개발</div><div class="rdate">예정</div></div>
+      </div>
+    </div>
+    <div class="foot"><img src="assets/crefle-mark.svg" alt=""><span class="pageno">17 / 18</span></div>
+  </section>
+
+  <!-- 18 · CLOSING -->
+  <section data-screen-label="17 마무리" class="slide filled">
+    <div class="stage" style="justify-content:center;">
+      <div class="eyebrow">OMF · OhMyFactory MES</div>
+      <blockquote style="margin:38px 0 0; padding:0; font:700 76px/1.18 var(--font-sans); letter-spacing:-0.02em; max-width:1600px;">
+        무엇을 만들고, 어떻게 쓰는가 —<br>
+        <span style="color:var(--omf);">현장과 함께</span> 확정해 만든다.
+      </blockquote>
+      <p class="lede" style="margin-top:40px;">완료 상태 단순 입력 · LOT 단위 추적 · ERP 연계 — 고객 실요구에 최적화된 MES.</p>
+      <div style="margin-top:56px; display:flex; align-items:center; gap:18px;">
+        <img src="assets/crefle-wordmark.svg" alt="CREFLE" style="height:40px;">
+        <span style="font:400 20px/1.4 var(--font-sans); color:var(--on-surface-muted);">CREFLE OMF 팀 · 삼진엘앤디 베트남법인</span>
+      </div>
+    </div>
+    <div class="foot"><img src="assets/crefle-mark.svg" alt=""><span class="pageno">18 / 18</span></div>
+  </section>
+
+</deck-stage>
+
+<script src="deck-stage.js"></script>
+</body>
+</html>

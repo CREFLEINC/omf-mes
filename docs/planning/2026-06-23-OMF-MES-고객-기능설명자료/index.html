@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OMF MES 기능·사용 안내 · 삼진엘앤디 베트남법인</title>
+<link rel="icon" href="assets/crefle-mark.svg">
+<link rel="stylesheet" href="assets/colors_and_type.css">
+<link rel="stylesheet" href="assets/components.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+</head>
+<body>
+
+<!-- ════════ NAV ════════ -->
+<nav class="topnav">
+  <span class="brand"><img src="assets/crefle-mark.svg" alt="CREFLE">OMF MES 기능·사용 안내</span>
+  <span class="links">
+    <a href="#summary">한 장 요약</a>
+    <a href="#features">만들어지는 기능</a>
+    <a href="#usage">이렇게 사용합니다</a>
+    <a href="#data">데이터 모델</a>
+    <a href="#next">함께 확정 · 다음 단계</a>
+  </span>
+</nav>
+
+<!-- ════════ HERO ════════ -->
+<header class="hero">
+  <div class="wrap">
+    <span class="conf"><span class="dot" style="background:var(--brand-accent-1)"></span>CONFIDENTIAL · 대외비</span>
+    <div class="kicker">OhMyFactory MES · 고객 기능·사용 안내</div>
+    <h1>무엇을 만들고, 어떻게 쓰는가
+      <span class="ko">삼진엘앤디 베트남법인(SAMJINLND VINA) 생산현장 대상 OMF-MES</span>
+    </h1>
+    <p class="sub">두 가지를 설명한다 — <strong>어떤 기능이 만들어지는가</strong>, 그리고 <strong>그 기능을 현장에서 어떻게 사용하는가</strong>. 모든 내용은 정리된 기능 명세 · 기능 분해도 · 사용 시나리오와 1:1로 일치한다.</p>
+    <div class="meta">
+      <div class="mi"><div class="l">고객사</div><div class="v">삼진엘앤디 베트남법인</div></div>
+      <div class="mi"><div class="l">작성 주체</div><div class="v">CREFLE OMF 팀</div></div>
+      <div class="mi"><div class="l">작성일</div><div class="v">2026-06-23</div></div>
+      <div class="mi"><div class="l">근거</div><div class="v">기능 명세 · 분해도 · 사용 시나리오</div></div>
+    </div>
+    <img class="wm" src="assets/crefle-wordmark-inverse.svg" alt="CREFLE" width="150">
+  </div>
+</header>
+
+<!-- ════════ 한 장 요약 ════════ -->
+<section class="block" id="summary">
+  <div class="wrap">
+    <span class="eyebrow">한 장 요약</span>
+    <h2 class="sec-title" style="margin-top:12px;">고객이 받는 것</h2>
+    <p class="lead" style="max-width:920px;">현장이 실제로 쓰는 기능을 <strong>3대 영역</strong>으로 만든다. 검사·공정 전 과정을 시스템이 통제하는 것이 아니라, <strong>완료된 상태를 단순 입력</strong>하면 MES가 합·불 판정 · 불량률 · 추적을 자동으로 산출한다. 발주 · 재고 · LOT 추적 등 ERP · 추적성 시스템이 담당하는 영역은 중복 개발하지 않고 연계한다.</p>
+    <div class="kpis" style="margin-top:var(--s-8);">
+      <div class="kpi"><div class="n">3<small> 대 영역</small></div><div class="l">정보 관리 · 자재 창고 관리 · 제품 출하 관리</div></div>
+      <div class="kpi"><div class="n">9<small> 기능 모듈</small></div><div class="l">기준정보 · 생산 · 공정 · 현장 · 품질 · 설비 · 툴 · 창고 · 모니터링</div></div>
+      <div class="kpi"><div class="n">6<small> 대표 시나리오</small></div><div class="l">현장 · 생산관리 · 품질 · 자재 · 출하 · 관리자 관점</div></div>
+      <div class="kpi"><div class="n">LOT<small> 단위 추적</small></div><div class="l">자재 → 생산 → 제품 LOT으로 정 · 역방향 이력 추적</div></div>
+    </div>
+    <div class="grid g3" style="margin-top:var(--s-8);">
+      <div class="callout omf"><div class="ico"><span class="material-symbols-rounded">touch_app</span></div><div><h4>완료 상태 단순 입력</h4><p>스캔 · 터치로 완료된 결과만 입력하면, MES가 합 · 불 판정 · 불량률 · 추적을 자동 산출한다. 현장 입력 부하를 최소화한다.</p></div></div>
+      <div class="callout info"><div class="ico"><span class="material-symbols-rounded">sync_alt</span></div><div><h4>ERP · 추적성 연계</h4><p>발주 · 재고 · LOT 추적 등 ERP / 추적성 시스템 담당 영역은 중복 없이 연계한다. MES는 정확한 입력 데이터를 공급한다.</p></div></div>
+      <div class="callout warn"><div class="ico"><span class="material-symbols-rounded">handshake</span></div><div><h4>현장 검증 후 확정</h4><p>LOT 발번 주체 · ERP 연계 경계 등 일부 항목은 비나 법인 현장 방문에서 함께 확정한다. (본 문서 마지막 절)</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 1. 만들어지는 기능 (What) ════════ -->
+<section class="block" id="features">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">1</div>
+      <div>
+        <h2 class="sec-title">만들어지는 기능 <span style="font-size:15px;font-weight:500;color:var(--on-surface-muted);">What — 무엇이 만들어지는가</span></h2>
+        <p class="sec-sub">9개 기능 모듈을 성격에 따라 3대 영역으로 묶어 만든다. 각 영역은 입력 · 관리 방식이 다르다. (출처: 기능 분해도 · 기능 명세)</p>
+      </div>
+    </div>
+
+    <!-- 3대 영역 개요 -->
+    <div class="grid g3">
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span class="sec-num" style="width:34px;height:34px;font-size:15px;border-radius:var(--radius-sm);">1</span>
+          <h4 style="margin:0;font-size:16px;">정보 관리</h4>
+        </div>
+        <span class="chip chip-omf" style="margin-bottom:12px;">완료 상태 단순 입력</span>
+        <p class="muted" style="font-size:13px;line-height:1.5;margin:0 0 12px;">생산 · 공정 · 품질 · 설비 등 운영 정보를 <strong>완료된 상태로 입력</strong>해 축적 · 집계 · 추적한다. 검사 · 공정 전 과정을 시스템이 통제하지는 않는다.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;">
+          <span class="chip chip-soft">기준정보</span><span class="chip chip-soft">생산</span><span class="chip chip-soft">공정</span><span class="chip chip-soft">현장</span><span class="chip chip-soft">품질</span><span class="chip chip-soft">설비</span><span class="chip chip-soft">툴</span><span class="chip chip-soft">모니터링</span>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span class="sec-num" style="width:34px;height:34px;font-size:15px;border-radius:var(--radius-sm);">2</span>
+          <h4 style="margin:0;font-size:16px;">자재 창고 관리</h4>
+        </div>
+        <span class="chip chip-omf" style="margin-bottom:12px;">행동(Action) 기반 상태 관리</span>
+        <p class="muted" style="font-size:13px;line-height:1.5;margin:0 0 12px;">자재가 입고되는 시점부터 생산 투입까지의 상태를 <strong>행동(Action)에 따라</strong> 관리한다. 자재는 <strong>LOT 번호 기준</strong>으로 추적한다.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;">
+          <span class="chip chip-soft">입하</span><span class="chip chip-soft">수입검사</span><span class="chip chip-soft">입고(자재LOT)</span><span class="chip chip-soft">자재창고</span><span class="chip chip-soft">반품</span>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span class="sec-num" style="width:34px;height:34px;font-size:15px;border-radius:var(--radius-sm);">3</span>
+          <h4 style="margin:0;font-size:16px;">제품 출하 관리</h4>
+        </div>
+        <span class="chip chip-omf" style="margin-bottom:12px;">공정(Process) 기반 상태 관리</span>
+        <p class="muted" style="font-size:13px;line-height:1.5;margin:0 0 12px;">완성 · 포장 제품의 출하창고 입고부터 출하까지를 <strong>공정(Process)에 따라</strong> 관리한다. 납품라벨을 생산LOT과 맞춰 추적한다.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;">
+          <span class="chip chip-soft">제품입고</span><span class="chip chip-soft">제품창고</span><span class="chip chip-soft">출하작업</span><span class="chip chip-soft">출하검사</span><span class="chip chip-soft">출하</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 정보 관리 — 모듈별 기능 -->
+    <h3 class="sub-title"><span style="color:var(--omf);">1</span> 정보 관리 — 모듈별 기능 <span class="chip chip-soft tag">8개 모듈</span></h3>
+    <div class="grid g2">
+      <div class="card"><h4 style="margin:0 0 8px;font-size:15.5px;">기준정보관리</h4><div style="display:flex;flex-wrap:wrap;gap:5px;"><span class="chip chip-soft">마스터 · 표준 기준정보</span><span class="chip chip-soft">모듈별 기준정보</span><span class="chip chip-soft">ERP · Legacy 연계</span></div></div>
+      <div class="card"><h4 style="margin:0 0 8px;font-size:15.5px;">생산관리</h4><div style="display:flex;flex-wrap:wrap;gap:5px;"><span class="chip chip-soft">작업지시</span><span class="chip chip-soft">작업실적</span><span class="chip chip-soft">제조이력 · 추적</span><span class="chip chip-soft">4M 관리</span><span class="chip chip-soft">현황 · 분석</span></div></div>
+      <div class="card"><h4 style="margin:0 0 8px;font-size:15.5px;">공정관리</h4><div style="display:flex;flex-wrap:wrap;gap:5px;"><span class="chip chip-soft">작업 진행 · 제조이력</span><span class="chip chip-soft">작업문서 · 작업자 · 목표 · 일정</span><span class="chip chip-soft">WIP 관리</span><span class="chip chip-soft">현황 · 분석</span></div></div>
+      <div class="card"><h4 style="margin:0 0 8px;font-size:15.5px;">현장관리 (POP)</h4><div style="display:flex;flex-wrap:wrap;gap:5px;"><span class="chip chip-soft">POP 접속 · 환경</span><span class="chip chip-soft">현장 작업 수행</span><span class="chip chip-soft">현장 품질 · 이상 수집</span><span class="chip chip-soft">소통 관리</span></div></div>
+      <div class="card"><h4 style="margin:0 0 8px;font-size:15.5px;">품질관리</h4><div style="display:flex;flex-wrap:wrap;gap:5px;"><span class="chip chip-soft">품질 기준정보</span><span class="chip chip-soft">품질검사 (IQC · PQC · OQC)</span><span class="chip chip-soft">Lot Status</span><span class="chip chip-soft">불량률 · SPC</span><span class="chip chip-soft">계측기 · 현황</span></div></div>
+      <div class="card"><h4 style="margin:0 0 8px;font-size:15.5px;">설비관리</h4><div style="display:flex;flex-wrap:wrap;gap:5px;"><span class="chip chip-soft">설비 기준정보</span><span class="chip chip-soft">보전 · 점검</span><span class="chip chip-soft">가동률 · OEE 현황</span><span class="chip chip-warn">자동수집 · 제어 (향후)</span></div></div>
+      <div class="card"><h4 style="margin:0 0 8px;font-size:15.5px;">툴(생산도구)관리</h4><div style="display:flex;flex-wrap:wrap;gap:5px;"><span class="chip chip-soft">툴 기준정보</span><span class="chip chip-soft">재고</span><span class="chip chip-soft">사용한도 · 사용이력</span><span class="chip chip-soft">예방보전</span><span class="chip chip-soft">현황</span></div></div>
+      <div class="card"><h4 style="margin:0 0 8px;font-size:15.5px;">모니터링</h4><div style="display:flex;flex-wrap:wrap;gap:5px;"><span class="chip chip-soft">실시간 생산 · 설비 · 품질 · 물류</span><span class="chip chip-soft">관제 (생산 · 설비 · 품질)</span></div></div>
+    </div>
+
+    <!-- 자재 창고 관리 — 흐름 -->
+    <h3 class="sub-title"><span style="color:var(--omf);">2</span> 자재 창고 관리 — 행동 기반 상태 흐름</h3>
+    <div class="pipe">
+      <div class="pnode start"><span class="pn-t">입하</span><span class="pn-s">입하대기→완료</span></div>
+      <span class="parrow">→</span>
+      <div class="pnode"><span class="pn-t">수입검사</span><span class="pn-s">IQC 합/불</span></div>
+      <span class="parrow">→</span>
+      <div class="pnode store"><span class="pn-t">입고</span><span class="pn-s">자재LOT 발행</span></div>
+      <span class="parrow">→</span>
+      <div class="pnode store"><span class="pn-t">자재창고</span><span class="pn-s">LOT · Location</span></div>
+      <span class="parrow">→</span>
+      <div class="pnode"><span class="pn-t">출고</span><span class="pn-s">작업지시 기준 투입</span></div>
+    </div>
+    <p class="note">불합격 → <strong style="color:var(--semantic-error);">반품(공급사)</strong> · 합격품은 자재LOT · 바코드 발행 후 입고. 재고는 LOT · Location 단위로 관리한다.</p>
+
+    <!-- 제품 출하 관리 — 흐름 -->
+    <h3 class="sub-title"><span style="color:var(--omf);">3</span> 제품 출하 관리 — 공정 기반 상태 흐름</h3>
+    <div class="pipe">
+      <div class="pnode start"><span class="pn-t">제품입고</span><span class="pn-s">생산완료→적치</span></div>
+      <span class="parrow">→</span>
+      <div class="pnode store"><span class="pn-t">제품창고</span><span class="pn-s">LOT · Location</span></div>
+      <span class="parrow">→</span>
+      <div class="pnode"><span class="pn-t">출하작업</span><span class="pn-s">Picking · Packing</span></div>
+      <span class="parrow">→</span>
+      <div class="pnode"><span class="pn-t">출하검사</span><span class="pn-s">OQC 합/불</span></div>
+      <span class="parrow">→</span>
+      <div class="pnode ok"><span class="pn-t">출하</span><span class="pn-s">납품 · 실적 연계</span></div>
+    </div>
+    <p class="note">출하검사 합격 → 납품라벨 출력 · <strong>생산LOT Matching</strong> 후 부착 → Packing → 출하. 고객 클레임 · 부적합 → 반품입고 처리.</p>
+  </div>
+</section>
+
+<!-- ════════ 2. 이렇게 사용합니다 (How) ════════ -->
+<section class="block" id="usage">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">2</div>
+      <div>
+        <h2 class="sec-title">이렇게 사용합니다 <span style="font-size:15px;font-weight:500;color:var(--on-surface-muted);">How — 내가 어떻게 쓰는가</span></h2>
+        <p class="sec-sub">현장에서 누가 · 무엇을 입력하면 · 시스템이 어떻게 반응하는지를 대표 6개 시나리오로 보인다. 각 단계는 <strong>(사용자) 행동 → <span style="color:var(--ext);">(시스템) 반응</span></strong> 으로 읽는다. (출처: 사용 시나리오)</p>
+      </div>
+    </div>
+
+    <div class="scns">
+
+      <!-- 시나리오 1 -->
+      <div class="scn">
+        <div class="scn-head"><span class="scn-actor"><span class="material-symbols-rounded">precision_manufacturing</span>현장 작업자 · POP 단말</span><h4>생산 실적과 LOT을 등록한다</h4></div>
+        <p class="scn-pre"><b>사전조건</b> — 확정 작업지시(W/O)가 현장에 배포되고, 생산LOT 라벨이 미리 발행돼 있다.</p>
+        <div class="scn-steps">
+          <div class="scn-step"><span class="sn">1</span><div class="sc"><span class="act">POP에 로그인한다 <b>(공장 · 공정 · 설비 선택)</b></span><span class="sys"><span class="a">시스템</span>작업 컨텍스트를 설정하고 배정된 W/O를 표시한다</span></div></div>
+          <div class="scn-step"><span class="sn">2</span><div class="sc"><span class="act">투입 자재 LOT · 금형ID를 <b>바코드로 스캔</b>한다</span><span class="sys"><span class="a">시스템</span>오투입 여부를 검증한다 (적합 / 오투입)</span></div></div>
+          <div class="scn-step"><span class="sn">3</span><div class="sc"><span class="act">생산수량 · 불량 · 비가동 · 검사 결과를 입력한다</span><span class="sys"><span class="a">시스템</span>선발행 생산LOT에 실적·검사를 집계·반영한다</span></div></div>
+          <div class="scn-step"><span class="sn">4</span><div class="sc"><span class="act">작업을 종료한다</span><span class="sys"><span class="a">시스템</span>제조이력을 누적하고 실시간 현황에 반영한다</span></div></div>
+        </div>
+        <div class="scn-foot"><span class="scn-out"><span class="material-symbols-rounded">check_circle</span>생산LOT · 제조이력 자동 기록</span><span class="scn-br">분기 · 예외 — 오투입은 차단, 작업 전 점검 미실시면 작업 통제. <b>라벨 선발행 방식</b>.</span></div>
+        <div class="src-ref">출처: 사용 시나리오 · 생산관리 #2 (작업실적 · LOT 수집)</div>
+      </div>
+
+      <!-- 시나리오 2 -->
+      <div class="scn">
+        <div class="scn-head"><span class="scn-actor"><span class="material-symbols-rounded">assignment</span>생산관리자</span><h4>작업지시를 편성 · 배포한다</h4></div>
+        <p class="scn-pre"><b>사전조건</b> — ERP 생산계획(P/O)이 MES로 연계 수신된다.</p>
+        <div class="scn-steps">
+          <div class="scn-step"><span class="sn">1</span><div class="sc"><span class="act">연계된 P/O를 <b>세부공정 작업지시(W/O)로 전개</b>한다</span><span class="sys"><span class="a">시스템</span>Routing 기준으로 세부 W/O를 자동 편성한다</span></div></div>
+          <div class="scn-step"><span class="sn">2</span><div class="sc"><span class="act">설비 · 작업자 · 자재 · 툴을 배정한다</span><span class="sys"><span class="a">시스템</span>자원 유효성을 검증하고 OK / NG를 표기한다</span></div></div>
+          <div class="scn-step"><span class="sn">3</span><div class="sc"><span class="act">우선순위를 조정하고 <b>확정</b>한다</span><span class="sys"><span class="a">시스템</span>확정 W/O를 현장 단말에 자동 배포한다</span></div></div>
+        </div>
+        <div class="scn-foot"><span class="scn-out"><span class="material-symbols-rounded">check_circle</span>현장 배포된 확정 W/O</span><span class="scn-br">분기 · 예외 — 자원 NG(자재 부족 · 설비 비가동) 시 경고하고 재배정한다.</span></div>
+        <div class="src-ref">출처: 사용 시나리오 · 생산관리 #1 (W/O 편성 · 확정 · 배포)</div>
+      </div>
+
+      <!-- 시나리오 3 -->
+      <div class="scn">
+        <div class="scn-head"><span class="scn-actor"><span class="material-symbols-rounded">fact_check</span>품질담당</span><h4>검사 결과를 입력하고, 역추적으로 원인을 찾는다</h4></div>
+        <p class="scn-pre"><b>사전조건</b> — 검사 기준값(UCL · LCL · Target)이 기준정보로 등록돼 있다.</p>
+        <div class="scn-steps">
+          <div class="scn-step"><span class="sn">1</span><div class="sc"><span class="act">수입 · 공정 · 출하 검사의 <b>결과값을 입력</b>한다</span><span class="sys"><span class="a">시스템</span>합 · 불을 판정하고 불량률 누적 · SPC 차트를 산출한다</span></div></div>
+          <div class="scn-step"><span class="sn">2</span><div class="sc"><span class="act">불합격 LOT을 Hold 처리한다</span><span class="sys"><span class="a">시스템</span>Lot Status로 출고 · 출하를 차단한다</span></div></div>
+          <div class="scn-step"><span class="sn">3</span><div class="sc"><span class="act">생산품 <b>인식표(QR)를 스캔</b>해 역추적을 조회한다</span><span class="sys"><span class="a">시스템</span>생산LOT을 식별해 투입 자재LOT · 검사 · 작업 · 설비 이력을 역전개해 표시한다</span></div></div>
+        </div>
+        <div class="scn-foot"><span class="scn-out"><span class="material-symbols-rounded">check_circle</span>불량 원인 · 계보를 LOT 단위로 추적</span><span class="scn-br">분기 · 예외 — <b>출하 단계 제품LOT에서 시작하는 역추적은 생산LOT 승계 규칙 필요</b> (현장 확정).</span></div>
+        <div class="src-ref">출처: 사용 시나리오 · 품질관리 + 생산관리 #4 (역추적 조회)</div>
+      </div>
+
+      <!-- 시나리오 4 -->
+      <div class="scn">
+        <div class="scn-head"><span class="scn-actor"><span class="material-symbols-rounded">inventory_2</span>자재창고 작업자</span><h4>자재를 입하 · 검사 · 입고한다</h4></div>
+        <p class="scn-pre"><b>사전조건</b> — ERP 발주에 대한 공급사 입하분이 도착한다.</p>
+        <div class="scn-steps">
+          <div class="scn-step"><span class="sn">1</span><div class="sc"><span class="act">입하 자재를 <b>수입검사 대상으로 등록</b>한다</span><span class="sys"><span class="a">시스템</span>공급사 · 품목 정보와 검사 항목을 표시한다</span></div></div>
+          <div class="scn-step"><span class="sn">2</span><div class="sc"><span class="act">수입검사 결과(합격 / 불합격)를 입력한다</span><span class="sys"><span class="a">시스템</span>합격 → 입고 / 불합격 → 반품으로 분기한다</span></div></div>
+          <div class="scn-step"><span class="sn">3</span><div class="sc"><span class="act">합격품 입고를 확정한다</span><span class="sys"><span class="a">시스템</span><b>자재LOT을 발행</b>하고 바코드 라벨을 출력한다</span></div></div>
+          <div class="scn-step"><span class="sn">4</span><div class="sc"><span class="act">적치 Location을 스캔한다</span><span class="sys"><span class="a">시스템</span>입 · 출 · 재고를 LOT · Location 단위로 기록한다</span></div></div>
+        </div>
+        <div class="scn-foot"><span class="scn-out"><span class="material-symbols-rounded">check_circle</span>자재가 LOT · Location 기준으로 적치</span><span class="scn-br">분기 · 예외 — 불합격 → 공급사 반품. <b>자재LOT 발행 주체(MES / ERP)는 현장 확정</b>.</span></div>
+        <div class="src-ref">출처: 사용 시나리오 · 창고/물류 #1 (입하 · 수입검사 · 입고)</div>
+      </div>
+
+      <!-- 시나리오 5 -->
+      <div class="scn">
+        <div class="scn-head"><span class="scn-actor"><span class="material-symbols-rounded">local_shipping</span>제품창고 작업자</span><h4>제품을 Picking · 검사 · Packing해 출하한다</h4></div>
+        <p class="scn-pre"><b>사전조건</b> — ERP 출하지시가 수신되고 출하 대상이 제품창고에 적치돼 있다.</p>
+        <div class="scn-steps">
+          <div class="scn-step"><span class="sn">1</span><div class="sc"><span class="act">출하지시 기준으로 대상품을 <b>Picking</b>한다</span><span class="sys"><span class="a">시스템</span>출하지시 · 대상 LOT을 매칭해 Picking 목록을 제시한다</span></div></div>
+          <div class="scn-step"><span class="sn">2</span><div class="sc"><span class="act">출하검사(OQC) 결과를 입력한다</span><span class="sys"><span class="a">시스템</span>합격 시 납품라벨 출력 단계로 진행한다</span></div></div>
+          <div class="scn-step"><span class="sn">3</span><div class="sc"><span class="act">납품라벨과 <b>생산LOT을 Matching</b>한다</span><span class="sys"><span class="a">시스템</span>일치 여부를 판정하고 일치 시 부착을 허용한다</span></div></div>
+          <div class="scn-step"><span class="sn">4</span><div class="sc"><span class="act">Packing(Pallet · 바코드 사진) 후 출하를 확정한다</span><span class="sys"><span class="a">시스템</span>출하 · 재고를 갱신하고 ERP에 실적을 연계한다</span></div></div>
+        </div>
+        <div class="scn-foot"><span class="scn-out"><span class="material-symbols-rounded">check_circle</span>검증된 제품이 고객사로 출하</span><span class="scn-br">분기 · 예외 — 라벨 · 생산LOT 불일치 → 부착 차단. 고객 클레임 → 반품입고.</span></div>
+        <div class="src-ref">출처: 사용 시나리오 · 창고/물류 #2 (Picking · 출하검사 · Packing)</div>
+      </div>
+
+      <!-- 시나리오 6 -->
+      <div class="scn">
+        <div class="scn-head"><span class="scn-actor"><span class="material-symbols-rounded">monitoring</span>관리자 · 공장장</span><h4>현장을 실시간으로 모니터링한다</h4></div>
+        <p class="scn-pre"><b>사전조건</b> — 현장 · 설비 · 물류 · 품질 데이터가 실시간 수집된다.</p>
+        <div class="scn-steps">
+          <div class="scn-step"><span class="sn">1</span><div class="sc"><span class="act">모니터링 대시보드를 연다</span><span class="sys"><span class="a">시스템</span>생산진행 · 진척률 · OEE · KPI를 실시간으로 가시화한다</span></div></div>
+          <div class="scn-step"><span class="sn">2</span><div class="sc"><span class="act">영역별 관제(생산 · 설비 · 품질 · 물류)를 선택한다</span><span class="sys"><span class="a">시스템</span>공정 달성율 · 가동률 · 불량 KPI · 물류 현황을 표시한다</span></div></div>
+        </div>
+        <div class="scn-foot"><span class="scn-out"><span class="material-symbols-rounded">check_circle</span>현장 상황을 한눈에, 문제를 즉시 감지</span><span class="scn-br">분기 · 예외 — 설비 자동수집 · 자동제어는 향후 단계.</span></div>
+        <div class="src-ref">출처: 사용 시나리오 · 모니터링</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 3. 추적이 이렇게 됩니다 ════════ -->
+<section class="block" id="data">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">3</div>
+      <div>
+        <h2 class="sec-title">데이터로 이렇게 남습니다 <span style="font-size:15px;font-weight:500;color:var(--on-surface-muted);">기능 ↔ 데이터 모델</span></h2>
+        <p class="sec-sub">현장에서 입력한 행동은 정해진 데이터(엔티티)로 기록된다. 어떤 기능이 어떤 데이터를 만들고 쓰는지, 그리고 그것이 추적으로 어떻게 이어지는지. (출처: 개념 데이터 모델 · 49 엔티티)</p>
+      </div>
+    </div>
+
+    <!-- 3.1 데이터 모델 한눈에 -->
+    <h3 class="sub-title"><span style="color:var(--omf);">3.1</span> 데이터 모델 한눈에 <span class="chip chip-ext tag">49 엔티티 · 6 그룹</span></h3>
+    <div class="grid g3">
+      <div class="card"><h4 style="margin:0 0 4px;font-size:15px;">기준정보 <span class="muted" style="font-size:12px;font-weight:400;">16</span></h4><p class="muted" style="font-size:11.5px;margin:0 0 9px;">모든 트랜잭션이 참조하는 기준</p><div style="display:flex;flex-wrap:wrap;gap:5px;"><span class="chip chip-ext">품목</span><span class="chip chip-ext">BOM</span><span class="chip chip-ext">공정/Routing</span><span class="chip chip-ext">설비</span><span class="chip chip-ext">툴/금형</span><span class="chip chip-ext">작업자</span><span class="chip chip-ext">검사항목</span><span class="chip chip-ext">창고/Location</span></div></div>
+      <div class="card"><h4 style="margin:0 0 4px;font-size:15px;">생산 실행 <span class="muted" style="font-size:12px;font-weight:400;">7</span></h4><p class="muted" style="font-size:11.5px;margin:0 0 9px;">작업지시 → 실적</p><div style="display:flex;flex-wrap:wrap;gap:5px;"><span class="chip chip-ext">생산계획(P/O)</span><span class="chip chip-ext">작업지시(W/O)</span><span class="chip chip-ext">작업실적</span><span class="chip chip-ext">4M투입</span></div></div>
+      <div class="card" style="border-left:4px solid var(--omf);"><h4 style="margin:0 0 4px;font-size:15px;">LOT/추적 <span class="muted" style="font-size:12px;font-weight:400;">5</span></h4><p class="muted" style="font-size:11.5px;margin:0 0 9px;">추적의 중심</p><div style="display:flex;flex-wrap:wrap;gap:5px;"><span class="chip chip-omf">자재LOT</span><span class="chip chip-omf">생산LOT</span><span class="chip chip-omf">인식표</span><span class="chip chip-omf">제품LOT</span><span class="chip chip-omf">포장단위</span></div></div>
+      <div class="card"><h4 style="margin:0 0 4px;font-size:15px;">품질 <span class="muted" style="font-size:12px;font-weight:400;">6</span></h4><p class="muted" style="font-size:11.5px;margin:0 0 9px;">검사 → 판정</p><div style="display:flex;flex-wrap:wrap;gap:5px;"><span class="chip chip-ext">검사(IQC/PQC/OQC)</span><span class="chip chip-ext">검사결과</span><span class="chip chip-ext">Lot Status</span><span class="chip chip-ext">SPC측정값</span><span class="chip chip-ext">계측기</span></div></div>
+      <div class="card"><h4 style="margin:0 0 4px;font-size:15px;">설비/툴 <span class="muted" style="font-size:12px;font-weight:400;">7</span></h4><p class="muted" style="font-size:11.5px;margin:0 0 9px;">보전 · 사용 이력</p><div style="display:flex;flex-wrap:wrap;gap:5px;"><span class="chip chip-ext">설비 보전·점검 이력</span><span class="chip chip-ext">예비품</span><span class="chip chip-ext">툴 사용실적</span><span class="chip chip-ext">예방보전</span></div></div>
+      <div class="card"><h4 style="margin:0 0 4px;font-size:15px;">물류/재고 <span class="muted" style="font-size:12px;font-weight:400;">10</span></h4><p class="muted" style="font-size:11.5px;margin:0 0 9px;">입하 → 출하</p><div style="display:flex;flex-wrap:wrap;gap:5px;"><span class="chip chip-ext">입하</span><span class="chip chip-ext">입고</span><span class="chip chip-ext">재고(LOT·Location)</span><span class="chip chip-ext">출고</span><span class="chip chip-ext">출하</span><span class="chip chip-ext">반품</span></div></div>
+    </div>
+    <p class="note"><span class="chip chip-omf" style="font-size:10.5px;padding:2px 8px;">빨강</span> = 추적 중심 LOT 엔티티 · <span class="chip chip-ext" style="font-size:10.5px;padding:2px 8px;">파랑</span> = 일반 데이터. 공유 엔티티는 한 곳에서만 정의하고 나머지는 참조한다.</p>
+
+    <!-- 3.2 기능 → 데이터 매핑 -->
+    <h3 class="sub-title"><span style="color:var(--omf);">3.2</span> 기능 → 데이터 매핑 <span style="font-size:13px;font-weight:500;color:var(--on-surface-muted);">어떤 기능이 어떤 데이터를 만들고 쓰나</span></h3>
+    <table>
+      <thead><tr><th style="width:21%;">기능 (액터)</th><th style="width:41%;">만들어지는 · 쓰는 데이터</th><th>어떻게 표현되나</th></tr></thead>
+      <tbody>
+        <tr><td><strong>작업지시 편성</strong><br><span class="muted" style="font-size:12px;">생산관리자</span></td><td><span class="chip chip-omf">만듦</span> <span class="cat">작업지시(W/O)</span> · <span class="chip chip-soft">씀</span> 생산계획(P/O) · 품목 · Routing · 설비 · 작업자 · 툴</td><td>P/O를 세부공정 W/O로 전개 → W/O No 발행, 공정 · 자원 배정과 유효성 OK/NG를 W/O에 기록</td></tr>
+        <tr><td><strong>작업 실적 · LOT 등록</strong><br><span class="muted" style="font-size:12px;">현장 작업자</span></td><td><span class="chip chip-omf">만듦</span> <span class="cat">작업실적 · 생산LOT · 인식표 · 4M투입</span> · <span class="chip chip-soft">씀</span> W/O · 자재LOT</td><td>작업실적(생산 · 불량 · 비가동 수량 · 작업조건) → <strong>생산LOT No 발행</strong>, 인식표 = LotNo+seq, 투입 4M(자재 · 설비 · 작업자 · 금형) 라인</td></tr>
+        <tr><td><strong>자재 입하 · 입고</strong><br><span class="muted" style="font-size:12px;">자재창고</span></td><td><span class="chip chip-omf">만듦</span> <span class="cat">입하 · 입고 · 자재LOT · 재고</span> · <span class="chip chip-soft">씀</span> 품목 · 창고/Location</td><td>수입검사 합/불 → 합격 시 <strong>자재LOT No 발행</strong>, 재고 = 품목 + LOT + Location 단위로 기록</td></tr>
+        <tr><td><strong>검사 · 판정</strong><br><span class="muted" style="font-size:12px;">품질담당</span></td><td><span class="chip chip-omf">만듦</span> <span class="cat">검사 · 검사결과 · Lot Status · SPC측정값</span> · <span class="chip chip-soft">씀</span> 검사항목(기준값) · 대상 LOT</td><td>검사 결과값 → 합/불 판정 · 불량률 누적 · SPC 차트, <strong>Lot Status(Hold/Release)</strong>로 물류 통제</td></tr>
+        <tr><td><strong>제품 출하</strong><br><span class="muted" style="font-size:12px;">제품창고</span></td><td><span class="chip chip-omf">만듦</span> <span class="cat">제품입고 · 제품LOT · 포장단위 · 출하</span> · <span class="chip chip-soft">씀</span> 출하지시 · 생산LOT</td><td>제품LOT No 발행, <strong>납품라벨 ↔ 생산LOT Matching</strong>, 포장 구성(합병/분할)으로 출하 단위 구성</td></tr>
+        <tr><td><strong>역추적 조회</strong><br><span class="muted" style="font-size:12px;">품질 · CS</span></td><td><span class="chip chip-soft">읽음</span> 인식표 → 생산LOT → <span class="cat">자재투입이력</span> → 자재LOT + 검사 · 작업 · 설비 이력</td><td>인식표(QR) 스캔으로 생산LOT 식별 → 정 · 역전개 <strong>LOT Traceability</strong>로 계보 · 제조이력 조회</td></tr>
+        <tr><td><strong>설비 · 툴 보전</strong><br><span class="muted" style="font-size:12px;">설비담당</span></td><td><span class="chip chip-omf">만듦</span> <span class="cat">설비 보전 · 점검 이력 · 툴 사용실적 · 예방보전</span> · <span class="chip chip-soft">씀</span> 설비 · 툴 master</td><td>타발수 · 적정타수 집계, 보전 계획 → 지시 → 이력으로 누적</td></tr>
+        <tr><td><strong>모니터링</strong><br><span class="muted" style="font-size:12px;">관리자 · 공장장</span></td><td><span class="chip chip-soft">읽음</span> 작업실적 · 검사 · 설비 · 물류 데이터 집계</td><td>신규 데이터를 만들지 않고 — 수집된 데이터를 <strong>대시보드(생산 · 설비 · 품질 · 물류)</strong>로 집계 · 표현</td></tr>
+      </tbody>
+    </table>
+    <p class="note">위 매핑은 §1 기능 · §2 사용 시나리오와 같은 데이터를 가리킨다. 즉 <strong>화면에서 한 행동이 곧 위 엔티티의 한 레코드</strong>로 남는다.</p>
+
+    <!-- 3.3 LOT으로 이어지는 추적 -->
+    <h3 class="sub-title"><span style="color:var(--omf);">3.3</span> LOT으로 이어지는 추적 <span style="font-size:13px;font-weight:500;color:var(--on-surface-muted);">자재 → 생산 → 제품, 그리고 역추적</span></h3>
+    <div class="pipe" style="justify-content:center;">
+      <div class="pnode store"><span class="pn-t">자재LOT</span><span class="pn-s">입고 시 발행</span></div>
+      <span class="parrow">→ 투입 →</span>
+      <div class="pnode start" style="border-color:var(--omf);"><span class="pn-t">생산LOT</span><span class="pn-s">인식표 QR = LotNo+seq</span></div>
+      <span class="parrow">→ 포장 →</span>
+      <div class="pnode store"><span class="pn-t">제품LOT</span><span class="pn-s">출하 단위</span></div>
+    </div>
+
+    <div class="grid g2" style="margin-top:var(--s-6);">
+      <div class="callout info"><div class="ico"><span class="material-symbols-rounded">qr_code_scanner</span></div><div><h4>역추적 — 인식표 하나로</h4><p>생산품 인식표(QR)를 스캔하면 그 <strong>생산LOT</strong>이 식별되고, 투입 자재LOT · 공정 검사 · 작업 · 설비 이력이 역전개로 한 번에 조회된다. (사용 시나리오 3과 동일)</p></div></div>
+      <div class="callout warn"><div class="ico"><span class="material-symbols-rounded">help</span></div><div><h4>현장에서 확정할 부분</h4><p>자재 · 제품 LOT 발행 주체(MES / ERP)와 포장 합병 / 분할 시 추적 승계(genealogy) 규칙은 현장에서 함께 확정한다.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 4. 함께 확정 · 다음 단계 ════════ -->
+<section class="block" id="next">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">4</div>
+      <div>
+        <h2 class="sec-title">함께 확정할 사항 · 다음 단계</h2>
+        <p class="sec-sub">기능과 사용 방식은 위와 같이 정의됐다. 개발 착수 전, 현장에서 함께 확정할 항목과 진행 단계를 정리한다.</p>
+      </div>
+    </div>
+
+    <h3 class="sub-title">현장 방문에서 함께 확정합니다</h3>
+    <div class="grid g3">
+      <div class="card-filled"><h4 style="margin:0 0 6px;font-size:15px;display:flex;align-items:center;gap:8px;"><span class="material-symbols-rounded" style="font-size:20px;color:var(--omf);">label</span>LOT · 포장 정책</h4><p style="margin:0;font-size:13px;line-height:1.55;color:var(--on-surface-variant);">포장 합병 / 분할 시 추적 승계(genealogy) 규칙</p></div>
+      <div class="card-filled"><h4 style="margin:0 0 6px;font-size:15px;display:flex;align-items:center;gap:8px;"><span class="material-symbols-rounded" style="font-size:20px;color:var(--omf);">hub</span>ERP 연계 경계</h4><p style="margin:0;font-size:13px;line-height:1.55;color:var(--on-surface-variant);">LOT · 트랜잭션 발번 주체(MES / ERP), 기준정보 송수신 범위</p></div>
+      <div class="card-filled"><h4 style="margin:0 0 6px;font-size:15px;display:flex;align-items:center;gap:8px;"><span class="material-symbols-rounded" style="font-size:20px;color:var(--omf);">checklist</span>현장 운영 규칙</h4><p style="margin:0;font-size:13px;line-height:1.55;color:var(--on-surface-variant);">검사 · 불량 입력 주체, 재고 · 실사 방식, 옵션 기능군 도입 범위</p></div>
+    </div>
+    <p class="note">위 항목은 현장 검증 질문지로 정리돼 있으며, 비나 법인 방문에서 확인 후 데이터 모델 · 개발 범위를 확정한다.</p>
+
+    <h3 class="sub-title">진행 단계</h3>
+    <div class="road rflow">
+      <div class="rstep"><div class="r-no">STEP 1</div><div class="r-t">데이터 수집</div><div class="r-d">현장 보고서 · 서식 · 기존 시스템 데이터를 확보</div><div class="r-date"><span class="mstone">✓ 완료</span></div></div>
+      <div class="rconn"><div class="rarrow"><span class="pulse"></span></div></div>
+      <div class="rstep"><div class="r-no">STEP 2</div><div class="r-t">데이터 분석 · 모델링</div><div class="r-d">기능 분해 · 용어 표준화 · 개념 데이터 모델</div><div class="r-date">진행 중</div></div>
+      <div class="rconn"><div class="rarrow"><span class="pulse"></span></div></div>
+      <div class="rstep"><div class="r-no">STEP 3</div><div class="r-t">현장 검증 · 합의</div><div class="r-d">비나 법인 방문 — 위 확정 항목 합의</div><div class="r-date">예정</div></div>
+      <div class="rconn"><div class="rarrow"><span class="pulse"></span></div></div>
+      <div class="rstep"><div class="r-no">STEP 4</div><div class="r-t">개발</div><div class="r-d">합의된 모델 기준으로 3대 영역 + 연계 개발</div><div class="r-date">예정</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ FOOTER ════════ -->
+<footer class="foot">
+  <div class="wrap">
+    <img src="assets/crefle-wordmark-inverse.svg" alt="CREFLE">
+    <div class="fr">
+      OMF(OhMyFactory) MES · 고객 기능·사용 안내<br>
+      작성 주체: CREFLE OMF 팀 · 고객사: 삼진엘앤디 베트남법인<br>
+      CONFIDENTIAL · 대외비 — 외부 업로드 · 공유 · 게시 금지
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

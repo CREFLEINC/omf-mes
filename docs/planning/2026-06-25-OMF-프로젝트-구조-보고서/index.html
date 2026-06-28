@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OMF 프로젝트 구조 보고서 · OhMyFactory · 대외비</title>
+<link rel="icon" href="assets/crefle-mark.svg">
+<link rel="stylesheet" href="assets/colors_and_type.css">
+<link rel="stylesheet" href="assets/components.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<style>
+/* ============================================================
+   OMF 프로젝트 구조 보고서 — 보고서 전용 보강 스타일
+   색 의미(개념=색 일관): OMF/MES = 브랜드 레드 · 데이터(DX) = 인디고
+                          AI 계층 = 차콜/다크 · 상태 = semantic
+   관계도(.omap)는 본 문서 전용 인포그래픽.
+   ============================================================ */
+
+/* 단위 정체성 색 토큰 */
+:root{
+  --dx:      var(--primary);            /* 데이터 전환 = 인디고 */
+  --dx-soft: var(--primary-container);
+  --dx-on:   var(--on-primary-container);
+  --ai:      var(--brand-charcoal-deep);
+}
+
+/* 단위 배지 */
+.unitbadge{ display:inline-flex; align-items:center; gap:7px; padding:5px 12px; border-radius:var(--radius-pill); font-size:12px; font-weight:var(--w-bold); letter-spacing:0.01em; }
+.unitbadge .material-symbols-rounded{ font-size:17px; }
+.ub-dx{ background:var(--dx-soft); color:var(--dx-on); }
+.ub-mes{ background:var(--omf-soft); color:var(--omf-dark); }
+.ub-ai{ background:#23263c; color:#cfd3ee; }
+
+/* mod 좌측 레일 색 변형 */
+.mod.dx{ border-left-color:var(--dx); }
+.mod.dx .m-idx{ color:var(--dx); }
+.mod.ai{ border-left-color:var(--brand-charcoal); }
+.mod.ai .m-idx{ color:var(--brand-charcoal); }
+
+/* AI 역할 카드 */
+.airole{ background:var(--surface-bright); border:1px solid var(--outline-variant); border-top:4px solid var(--ai); border-radius:var(--radius-md); box-shadow:var(--elev-1); padding:var(--s-6); display:flex; flex-direction:column; gap:13px; }
+.airole.hold{ border-top-color:var(--semantic-warning); }
+.airole .ar-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+.airole .ar-no{ font:var(--w-bold) 12px/1 var(--font-mono); color:var(--on-surface-muted); letter-spacing:0.04em; }
+.airole h4{ margin:6px 0 0; font-size:var(--doc-h4); font-weight:var(--w-bold); letter-spacing:-0.01em; line-height:1.25; }
+.airole .ar-def{ font-size:13.5px; line-height:1.55; color:var(--on-surface-variant); margin:0; }
+.airole .ar-rows{ display:flex; flex-direction:column; gap:9px; margin-top:2px; }
+.airole .ar-row{ display:grid; grid-template-columns:78px 1fr; gap:10px; align-items:start; }
+.airole .ar-k{ font-size:11.5px; font-weight:var(--w-bold); color:var(--on-surface-muted); padding-top:2px; letter-spacing:0.02em; }
+.airole .ar-v{ font-size:13px; line-height:1.5; }
+.airole .ar-v b{ color:var(--omf-dark); }
+.airole .ar-goal{ margin-top:auto; padding-top:12px; border-top:1px dashed var(--outline-variant); font-size:12.5px; line-height:1.5; display:flex; gap:8px; }
+.airole .ar-goal .material-symbols-rounded{ font-size:18px; color:var(--ai); flex:0 0 auto; }
+.airole.hold .ar-goal .material-symbols-rounded{ color:var(--semantic-warning); }
+.airole .ar-goal b{ font-weight:var(--w-bold); }
+
+/* ============================================================
+   .omap — 구성요소 관계도 인포그래픽
+   ============================================================ */
+.omap-fig{ background:var(--surface-bright); border:1px solid var(--outline-variant); border-radius:var(--radius-lg); box-shadow:var(--elev-1); padding:var(--s-8) var(--s-8) var(--s-6); }
+.omap{ display:flex; flex-direction:column; align-items:stretch; gap:0; }
+.omap .band{ border-radius:var(--radius-md); position:relative; overflow:hidden; }
+
+/* 밴드: OMF 우산 */
+.omap .umbrella{ background:linear-gradient(135deg,#7D161B 0%,#A81E24 44%,#C9252C 100%); color:#fff; box-shadow:var(--elev-2); padding:18px 24px; display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; }
+.omap .umbrella::after{ content:""; position:absolute; inset:0; background-image:linear-gradient(to right,rgba(255,255,255,0.06) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,0.06) 1px,transparent 1px); background-size:32px 32px; pointer-events:none; }
+.omap .umbrella .u-id{ display:flex; align-items:center; gap:14px; position:relative; }
+.omap .umbrella .u-mark{ width:42px; height:42px; border-radius:12px; background:rgba(255,255,255,0.15); display:grid; place-items:center; }
+.omap .umbrella .u-mark .material-symbols-rounded{ font-size:26px; color:#fff; }
+.omap .umbrella h3{ margin:0; font-size:22px; font-weight:var(--w-bold); letter-spacing:-0.01em; }
+.omap .umbrella h3 small{ display:block; font-size:12px; font-weight:var(--w-medium); color:var(--brand-accent-3); letter-spacing:0.04em; margin-top:3px; }
+.omap .umbrella .u-goal{ position:relative; text-align:right; font-size:14px; font-weight:var(--w-medium); line-height:1.45; color:#fff; max-width:430px; }
+.omap .umbrella .u-goal b{ color:var(--brand-accent-1); font-weight:var(--w-bold); }
+
+/* 밴드: AI 계층 */
+.omap .ai-band{ background:linear-gradient(135deg,#16182a 0%,#222a55 65%,#2E4090 100%); color:#fff; box-shadow:var(--elev-2); padding:18px 22px 20px; }
+.omap .ai-band .b-head{ display:flex; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+.omap .ai-band .b-head .material-symbols-rounded{ font-size:22px; color:#aeb6f2; }
+.omap .ai-band .b-head h4{ margin:0; font-size:16px; font-weight:var(--w-bold); letter-spacing:-0.01em; }
+.omap .ai-band .b-head .b-note{ font-size:12px; color:rgba(255,255,255,0.72); font-weight:var(--w-medium); }
+.omap .ai-cards{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.omap .ai-card{ background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.18); border-radius:var(--radius-md); padding:13px 15px; display:flex; flex-direction:column; gap:6px; }
+.omap .ai-card.hold{ border-style:dashed; border-color:rgba(232,161,0,0.6); background:rgba(232,161,0,0.08); }
+.omap .ai-card .ac-no{ font:var(--w-bold) 11px/1 var(--font-mono); color:#9aa3e0; letter-spacing:0.04em; }
+.omap .ai-card .ac-t{ font-size:15px; font-weight:var(--w-bold); letter-spacing:-0.01em; display:flex; align-items:center; gap:7px; }
+.omap .ai-card .ac-t .material-symbols-rounded{ font-size:19px; color:#aeb6f2; }
+.omap .ai-card.hold .ac-t .material-symbols-rounded{ color:#f0c674; }
+.omap .ai-card .ac-d{ font-size:11.5px; line-height:1.45; color:rgba(255,255,255,0.78); }
+.omap .ai-card .ac-s{ align-self:flex-start; margin-top:2px; font-size:10.5px; font-weight:var(--w-bold); padding:3px 9px; border-radius:var(--radius-pill); letter-spacing:0.02em; }
+.omap .ai-card .ac-s.in{ background:rgba(174,182,242,0.22); color:#cfd3ee; }
+.omap .ai-card .ac-s.out{ background:rgba(232,161,0,0.18); color:#f0c674; }
+
+/* 밴드: 기반 서브 유닛 페어 */
+.omap .pair{ display:grid; grid-template-columns:1fr minmax(120px,150px) 1fr; align-items:stretch; gap:0; }
+.omap .unit{ border-radius:var(--radius-md); padding:16px 18px; box-shadow:var(--elev-1); background:var(--surface-bright); display:flex; flex-direction:column; gap:8px; }
+.omap .unit.dx{ border:1px solid var(--outline-variant); border-top:4px solid var(--dx); }
+.omap .unit.mes{ border:1px solid var(--outline-variant); border-top:4px solid var(--omf); }
+.omap .unit .un-tag{ align-self:flex-start; }
+.omap .unit h4{ margin:2px 0 0; font-size:18px; font-weight:var(--w-bold); letter-spacing:-0.01em; }
+.omap .unit h4 small{ font-size:12px; font-weight:var(--w-medium); color:var(--on-surface-muted); margin-left:7px; letter-spacing:0; }
+.omap .unit .un-role{ font-size:12.5px; line-height:1.5; color:var(--on-surface-variant); margin:0; }
+.omap .unit .un-chips{ display:flex; flex-wrap:wrap; gap:5px; margin-top:auto; padding-top:4px; }
+
+/* 밴드: 제조 현장 (소스) */
+.omap .floor{ background:var(--surface-container-high); border:1px dashed var(--outline); padding:15px 22px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.omap .floor .fl-id{ display:flex; align-items:center; gap:12px; }
+.omap .floor .fl-id .material-symbols-rounded{ font-size:24px; color:var(--on-surface-muted); }
+.omap .floor .fl-id h4{ margin:0; font-size:15px; font-weight:var(--w-bold); }
+.omap .floor .fl-id h4 small{ display:block; font-size:11.5px; font-weight:var(--w-medium); color:var(--semantic-error); margin-top:2px; }
+.omap .floor .fl-chips{ display:flex; flex-wrap:wrap; gap:6px; }
+.omap .floor .fl-chips .chip{ background:var(--surface-bright); color:var(--on-surface-variant); border:1px solid var(--outline-variant); }
+
+/* 커넥터 */
+.omap .conn{ display:flex; align-items:center; justify-content:center; gap:18px; padding:9px 0; }
+.omap .conn .leg{ display:flex; flex-direction:column; align-items:center; gap:5px; }
+.omap .vline{ position:relative; width:3px; height:30px; background:var(--outline-variant); border-radius:3px; overflow:hidden; }
+.omap .vline .pulse{ position:absolute; left:0; top:0; width:3px; height:13px; border-radius:9999px; background:var(--omf); animation:omapDown 2600ms var(--ease-standard) infinite; }
+.omap .vline.up .pulse{ animation-name:omapUp; background:var(--dx); }
+.omap .vline.data .pulse{ background:var(--dx); }
+.omap .clabel{ font-size:11.5px; font-weight:var(--w-bold); color:var(--on-surface-muted); text-align:center; line-height:1.4; max-width:230px; }
+.omap .clabel .ar{ color:var(--on-surface); }
+
+/* 페어 내부 수평 커넥터 */
+.omap .conn-h{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px; padding:0 6px; }
+.omap .hline{ position:relative; height:3px; width:100%; min-width:84px; background:var(--outline-variant); border-radius:3px; overflow:hidden; }
+.omap .hline .pulse{ position:absolute; top:0; left:0; width:16px; height:3px; border-radius:9999px; background:var(--dx); animation:flowPulse 2600ms var(--ease-standard) infinite; }
+.omap .hline.rev .pulse{ background:var(--omf); animation-name:flowPulseRev; animation-delay:1100ms; }
+.omap .hlabel{ font-size:11px; font-weight:var(--w-bold); line-height:1.35; text-align:center; }
+.omap .hlabel.dx{ color:var(--dx); }
+.omap .hlabel.mes{ color:var(--omf-dark); }
+.omap .hlabel small{ display:block; font-weight:var(--w-regular); color:var(--on-surface-muted); font-size:10.5px; margin-top:1px; }
+
+@keyframes omapDown{ 0%{ transform:translateY(-130%); opacity:0 } 25%{ opacity:1 } 75%{ opacity:1 } 100%{ transform:translateY(160%); opacity:0 } }
+@keyframes omapUp{ 0%{ transform:translateY(130%); opacity:0 } 25%{ opacity:1 } 75%{ opacity:1 } 100%{ transform:translateY(-160%); opacity:0 } }
+@keyframes flowPulseRev{ 0%{ transform:translateX(180%); opacity:0 } 25%{ opacity:1 } 75%{ opacity:1 } 100%{ transform:translateX(-130%); opacity:0 } }
+
+/* 범례 */
+.omap-legend{ display:flex; flex-wrap:wrap; gap:8px 18px; margin-top:18px; padding-top:14px; border-top:1px solid var(--outline-variant); font-size:11.5px; color:var(--on-surface-muted); }
+.omap-legend span{ display:inline-flex; align-items:center; gap:7px; }
+.omap-legend i{ width:13px; height:13px; border-radius:4px; display:inline-block; }
+.lg-mes{ background:var(--omf); }
+.lg-dx{ background:var(--dx); }
+.lg-ai{ background:var(--ai); }
+.lg-hold{ background:var(--semantic-warning); }
+
+@media (max-width:900px){
+  .omap .pair{ grid-template-columns:1fr; }
+  .omap .conn-h{ padding:9px 0; }
+  .omap .ai-cards{ grid-template-columns:1fr; }
+  .airoles{ grid-template-columns:1fr !important; }
+  .omap .umbrella,.omap .floor{ flex-direction:column; align-items:flex-start; }
+  .omap .umbrella .u-goal{ text-align:left; }
+}
+@media print{
+  .omap .vline .pulse,.omap .hline .pulse{ display:none; }
+  .omap-fig,.airole,.omap .unit,.omap .ai-card{ box-shadow:none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════ NAV ════════ -->
+<nav class="topnav">
+  <span class="brand"><img src="assets/crefle-mark.svg" alt="CREFLE">OMF 프로젝트 구조 보고서</span>
+  <span class="links">
+    <a href="#summary">한 장 요약</a>
+    <a href="#map">구성요소 관계도</a>
+    <a href="#units">구성 요소별 역할</a>
+    <a href="#ai">AI 3대 역할</a>
+    <a href="#plan">구축 계획 · 일정</a>
+  </span>
+</nav>
+
+<!-- ════════ HERO ════════ -->
+<header class="hero">
+  <div class="wrap">
+    <span class="conf"><span class="dot" style="background:var(--brand-accent-1)"></span>CONFIDENTIAL · 대외비</span>
+    <div class="kicker">OhMyFactory · 프로젝트 구조 보고서</div>
+    <h1>전면 AX 스마트 팩토리를 향한 OMF의 구성
+      <span class="ko">두 기반 서브 유닛(OMF-DX · OMF-MES) 위에, 3가지 AI 역할을 얹는다</span>
+    </h1>
+    <p class="sub">OMF(OhMyFactory)는 제조 공장의 전면 AX를 완성하는 <strong>최종 형태의 통합 솔루션</strong>이다. 본 보고서는 프로젝트가 어떤 구성요소로 이루어지는지, 그리고 그 사이의 <strong>역할과 관계</strong>가 어떻게 맞물리는지를 관계도 중심으로 정리한다.</p>
+    <div class="meta">
+      <div class="mi"><div class="l">작성 주체</div><div class="v">CREFLE OMF 팀</div></div>
+      <div class="mi"><div class="l">작성일</div><div class="v">2026-06-25</div></div>
+      <div class="mi"><div class="l">단계 · 버전</div><div class="v">기획 (v0.1 · 초안)</div></div>
+      <div class="mi"><div class="l">근거</div><div class="v">프로젝트 기획 요약 초안</div></div>
+    </div>
+    <img class="wm" src="assets/crefle-wordmark-inverse.svg" alt="CREFLE" width="150">
+  </div>
+</header>
+
+<!-- ════════ 한 장 요약 ════════ -->
+<section class="block" id="summary">
+  <div class="wrap">
+    <span class="eyebrow">한 장 요약</span>
+    <h2 class="sec-title" style="margin-top:12px;">OMF는 어떻게 구성되는가</h2>
+    <p class="lead" style="max-width:960px;">OMF는 2가지 핵심 서브 유닛에서 출발한다 — 갇힌 제조 데이터를 여는 <strong>OMF-DX</strong>, 생산 워크플로우를 운영하는 <strong>OMF-MES</strong>. 두 유닛이 만든 데이터 위에 <strong>3가지 AI 역할</strong>을 별도 솔루션으로 얹어, OMF 환경 안에서 모든 서브 유닛과 유기적으로 연결한다. 일반적인 스마트 팩토리가 아니라 <strong>AX(AI 전환)</strong> 스마트 팩토리가 목표인 만큼, AI의 도입과 역할이 구성의 중심에 놓인다.</p>
+
+    <div class="kpis" style="margin-top:var(--s-8);">
+      <div class="kpi"><div class="n">2<small> 기반 서브 유닛</small></div><div class="l">OMF-DX(데이터 전환) · OMF-MES(생산 워크플로우)</div></div>
+      <div class="kpi"><div class="n">3<small> AI 역할</small></div><div class="l">RAG 정보 조회 · APS 생산계획 Agent · 포괄적 이상 감시</div></div>
+      <div class="kpi"><div class="n">2<small> 단계 일정</small></div><div class="l">7월 0.5 핵심 기능 → 8월 1.0 MVP</div></div>
+      <div class="kpi"><div class="n">AX<small> 목표</small></div><div class="l">제조 공장 전면 AI 전환 스마트 팩토리</div></div>
+    </div>
+
+    <div class="grid g3" style="margin-top:var(--s-8);">
+      <div class="callout omf">
+        <div class="ico"><span class="material-symbols-rounded">lock_open</span></div>
+        <div><h4>데이터를 먼저 연다 — OMF-DX</h4><p>종이·엑셀에 보관만 되어 온 <strong>갇힌 종단 데이터</strong>를 분석 가능한 <strong>열린 데이터</strong>로 전환해 OMF 코어로 끌어온다. 다른 서브 유닛이 제 역할을 하도록 데이터 운영 환경을 만든다.</p></div>
+      </div>
+      <div class="callout info">
+        <div class="ico"><span class="material-symbols-rounded">account_tree</span></div>
+        <div><h4>워크플로우를 운영한다 — OMF-MES</h4><p>최종 제품 생산을 위한 현장 워크플로우(활동·절차)를 <strong>계획·실행·관리</strong>한다. 설비 상태·제품 품질·원자재 등 외부 정보는 OMF-DX 같은 외부 서비스에서 공급받는다.</p></div>
+      </div>
+      <div class="callout warn">
+        <div class="ico"><span class="material-symbols-rounded">smart_toy</span></div>
+        <div><h4>AI는 데이터 위에 자란다 — OMF-AI</h4><p>3가지 AI는 DX·MES 개발 중 확보한 제조 데이터를 기반으로 구축한다. 이 중 <strong>포괄적 이상 감시 Agent는 1단계 개발 범위에서 제외</strong>한다(기술 연구 기간 필요).</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 구성요소 관계도 (★ 인포그래픽) ════════ -->
+<section class="block" id="map">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">★</div>
+      <div>
+        <h2 class="sec-title">구성요소 관계도 <span style="font-size:15px;font-weight:500;color:var(--on-surface-muted);">데이터가 흐르고, AI가 그 위에 자란다</span></h2>
+        <p class="sec-sub">제조 현장의 갇힌 데이터를 OMF-DX가 열어 코어로 끌어오고, OMF-MES가 그 위에서 생산 워크플로우를 운영한다. 두 유닛이 쌓은 제조 데이터를 기반으로 3가지 AI 역할이 OMF 환경에 유기적으로 연결된다.</p>
+      </div>
+    </div>
+
+    <div class="omap-fig">
+      <div class="omap">
+
+        <!-- TIER A · OMF 우산 -->
+        <div class="band umbrella">
+          <div class="u-id">
+            <div class="u-mark"><span class="material-symbols-rounded">hub</span></div>
+            <h3>OMF · OhMyFactory<small>CREFLE 스마트 팩토리 통합 솔루션 — 현재 기획 단계</small></h3>
+          </div>
+          <div class="u-goal">목표 — 제조 공장의 <b>전면 AX 스마트 팩토리</b>를 완성하는 최종 형태의 통합 솔루션. 모든 서브 유닛은 하나의 OMF 환경 안에서 유기적으로 연결된다.</div>
+        </div>
+
+        <!-- conn A↔B -->
+        <div class="conn">
+          <div class="leg">
+            <div class="vline"><span class="pulse"></span></div>
+            <div class="clabel">하나의 OMF 환경 · 유기적 연결</div>
+          </div>
+        </div>
+
+        <!-- TIER B · AI 계층 -->
+        <div class="band ai-band">
+          <div class="b-head">
+            <span class="material-symbols-rounded">neurology</span>
+            <h4>AI 계층 · OMF-AI</h4>
+            <span class="b-note">확보된 제조 데이터 기반 · 각 기능은 별도 솔루션으로 개발, OMF 환경에 유기적 연결</span>
+          </div>
+          <div class="ai-cards">
+            <div class="ai-card">
+              <span class="ac-no">AI-1</span>
+              <span class="ac-t"><span class="material-symbols-rounded">search</span>RAG 정보 조회</span>
+              <span class="ac-d">제조 데이터를 Vector화해 빠르고 정확하게 조회</span>
+              <span class="ac-s in">1단계 포함</span>
+            </div>
+            <div class="ai-card">
+              <span class="ac-no">AI-2</span>
+              <span class="ac-t"><span class="material-symbols-rounded">precision_manufacturing</span>APS 생산계획 Agent</span>
+              <span class="ac-d">MES 생산 실적 평가로 점진적 학습하는 성장형 Agent</span>
+              <span class="ac-s in">1단계 포함</span>
+            </div>
+            <div class="ai-card hold">
+              <span class="ac-no">AI-3</span>
+              <span class="ac-t"><span class="material-symbols-rounded">monitor_heart</span>포괄적 이상 감시 Agent</span>
+              <span class="ac-d">Transformer 기반 이상 탐지 + LLM 소통 — 연구 기간 필요</span>
+              <span class="ac-s out">1단계 제외</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- conn B↔C (양방향) -->
+        <div class="conn">
+          <div class="leg">
+            <div class="vline up data"><span class="pulse"></span></div>
+            <div class="clabel">확보된 제조 데이터 <span class="ar">↑</span><br>조회 · 학습</div>
+          </div>
+          <div class="leg">
+            <div class="vline"><span class="pulse"></span></div>
+            <div class="clabel"><span class="ar">↓</span> 정보 조회 · 계획 제안 · 이상 알림</div>
+          </div>
+        </div>
+
+        <!-- TIER C · 기반 서브 유닛 페어 -->
+        <div class="band pair">
+          <div class="unit dx">
+            <span class="unitbadge ub-dx un-tag"><span class="material-symbols-rounded">database</span>OMF-DX · 데이터 기반</span>
+            <h4>OMF-DX<small>데이터 전환</small></h4>
+            <p class="un-role">갇힌 데이터 → <strong>열린 데이터</strong>로 전환. 가장 종단의 제조 데이터를 코어로 끌어와 데이터 운영 환경을 구축한다.</p>
+            <div class="un-chips"><span class="chip chip-ext">갇힌→열린 전환</span><span class="chip chip-ext">데이터 파이프라인</span><span class="chip chip-ext">데이터 운영 환경</span></div>
+          </div>
+
+          <div class="conn-h">
+            <div class="hlabel dx">설비·품질·자재 <small>외부 정보 공급 →</small></div>
+            <div class="hline"><span class="pulse"></span></div>
+            <div class="hline rev"><span class="pulse"></span></div>
+            <div class="hlabel mes">생산 실적·이력 <small>← 축적</small></div>
+          </div>
+
+          <div class="unit mes">
+            <span class="unitbadge ub-mes un-tag"><span class="material-symbols-rounded">conveyor_belt</span>OMF-MES · 워크플로우</span>
+            <h4>OMF-MES<small>생산 실행 관리</small></h4>
+            <p class="un-role">최종 제품 생산을 위한 현장 워크플로우(활동·절차)를 <strong>계획·실행·관리</strong>한다. 외부 정보는 OMF-DX 등에서 공급받는다.</p>
+            <div class="un-chips"><span class="chip chip-omf">계획</span><span class="chip chip-omf">실행</span><span class="chip chip-omf">관리</span><span class="chip chip-soft">생산 실적 평가</span></div>
+          </div>
+        </div>
+
+        <!-- conn C↔D -->
+        <div class="conn">
+          <div class="leg">
+            <div class="vline up data"><span class="pulse"></span></div>
+            <div class="clabel">갇힌 데이터 → 열린 데이터 <span class="ar">↑</span> 전환</div>
+          </div>
+        </div>
+
+        <!-- TIER D · 제조 현장 (소스) -->
+        <div class="band floor">
+          <div class="fl-id">
+            <span class="material-symbols-rounded">factory</span>
+            <h4>제조 현장<small>갇힌 데이터 — 종이·엑셀로 보관만 되어 온 종단 데이터</small></h4>
+          </div>
+          <div class="fl-chips">
+            <span class="chip">종이 기록</span><span class="chip">엑셀 파일</span><span class="chip">설비 상태</span><span class="chip">제품 품질</span><span class="chip">원자재 정보</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 범례 -->
+      <div class="omap-legend">
+        <span><i class="lg-mes"></i> OMF-MES · 워크플로우(레드)</span>
+        <span><i class="lg-dx"></i> OMF-DX · 데이터(인디고)</span>
+        <span><i class="lg-ai"></i> OMF-AI · AI 계층(차콜)</span>
+        <span><i class="lg-hold"></i> 1단계 제외</span>
+        <span style="margin-left:auto;">흐르는 점 = 데이터·연결 흐름 방향</span>
+      </div>
+    </div>
+
+    <p class="note">관계도는 기획 요약 초안의 구성·관계를 시각화한 것이다. 단위 간 데이터 계약·연계 경계(예: OMF-DX와 외부 서비스의 역할 분담)는 기획 단계에서 추가 확정한다.</p>
+  </div>
+</section>
+
+<!-- ════════ 구성 요소별 역할 ════════ -->
+<section class="block" id="units">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">1</div>
+      <div>
+        <h2 class="sec-title">구성 요소별 역할</h2>
+        <p class="sec-sub">각 서브 유닛이 무엇을 책임지고, 다른 유닛과 어떻게 맞물리는지 정리한다. OMF는 이 두 기반 유닛을 기점으로 진행되어 현재 기획 단계에 있다.</p>
+      </div>
+    </div>
+
+    <div class="mods">
+      <!-- OMF-DX -->
+      <div class="mod dx">
+        <div class="m-rail">
+          <div class="m-name"><span class="m-idx">UNIT · DX</span></div>
+          <div class="m-name">OMF-DX</div>
+          <div class="m-badges">
+            <span class="unitbadge ub-dx"><span class="material-symbols-rounded">database</span>데이터 전환 솔루션</span>
+          </div>
+        </div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">역할</div><div class="m-v">종이로 관리되거나 엑셀 등 단순 문서 파일로 <strong>보관만 되어 온 갇힌 제조 데이터</strong>를, 데이터 분석·AI 도입을 위한 <strong>분석 가능한 열린 데이터</strong>로 전환한다.</div></div>
+          <div class="m-row"><div class="m-k">위치</div><div class="m-v">OMF 프로젝트에서 <strong>가장 종단의 데이터</strong>를 핵심으로 끌고 들어오는 입구. 다른 서브 유닛이 제 역할을 다하도록 <strong>데이터 운영 환경</strong>을 만들어 준다.</div></div>
+          <div class="m-row"><div class="m-k">관계</div><div class="m-v">제조 현장(소스) → <strong style="color:var(--dx);">OMF-DX</strong> → OMF-MES에 설비·품질·자재 등 외부 정보 공급. 확보한 데이터는 AI 계층의 조회·학습 기반이 된다.</div></div>
+        </div>
+      </div>
+
+      <!-- OMF-MES -->
+      <div class="mod">
+        <div class="m-rail">
+          <div class="m-name"><span class="m-idx">UNIT · MES</span></div>
+          <div class="m-name">OMF-MES</div>
+          <div class="m-badges">
+            <span class="unitbadge ub-mes"><span class="material-symbols-rounded">conveyor_belt</span>AX-MES 솔루션</span>
+          </div>
+        </div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">역할</div><div class="m-v">최종 제품을 생산하기 위한 제조 현장의 <strong>워크플로우(활동·절차)</strong>를 계획·실행·관리하는 시스템. <strong>생산 워크플로우 자체</strong>에 중점을 둔다.</div></div>
+          <div class="m-row"><div class="m-k">경계</div><div class="m-v">워크플로우 관리에 필요한 외부 정보(설비 상태·제품 품질·원자재 정보 등)는 직접 만들지 않고 <strong style="color:var(--dx);">OMF-DX</strong> 같은 외부 서비스를 통해 <strong>공급받는다</strong>.</div></div>
+          <div class="m-row"><div class="m-k">관계</div><div class="m-v">DX가 연 데이터 위에서 운영되며, <strong>생산 실적·이력</strong>을 축적한다. 이 생산 실적 평가는 APS 생산계획 Agent의 성장(학습) 입력이 된다.</div></div>
+        </div>
+      </div>
+
+      <!-- OMF-AI -->
+      <div class="mod ai">
+        <div class="m-rail">
+          <div class="m-name"><span class="m-idx">UNIT · AI</span></div>
+          <div class="m-name">OMF-AI</div>
+          <div class="m-badges">
+            <span class="unitbadge ub-ai"><span class="material-symbols-rounded">neurology</span>3가지 AI 역할</span>
+          </div>
+        </div>
+        <div class="m-body">
+          <div class="m-row"><div class="m-k">역할</div><div class="m-v">AX 스마트 팩토리의 핵심. <strong>RAG 정보 조회 · APS 생산계획 자동화 · 포괄적 이상 감시</strong> 3가지 역할을 수행한다.</div></div>
+          <div class="m-row"><div class="m-k">구축 원칙</div><div class="m-v">3가지 기능은 각각 <strong>별도의 솔루션</strong>으로 개발되며, OMF 환경 내에서 모든 서브 유닛과 <strong>유기적으로 연결</strong>되어 동작하도록 설계된다.</div></div>
+          <div class="m-row"><div class="m-k">관계</div><div class="m-v">DX·MES 개발 중 확보한 제조 데이터를 기반으로 구축한다. 데이터가 먼저 쌓여야 AI가 성립하므로 <strong>기반 유닛 우선 구축 → AI</strong> 순서를 따른다.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ AI 3대 역할 ════════ -->
+<section class="block" id="ai">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">2</div>
+      <div>
+        <h2 class="sec-title">AI 3대 역할 <span style="font-size:15px;font-weight:500;color:var(--on-surface-muted);">각 역할의 핵심 기술과 1단계 목표</span></h2>
+        <p class="sec-sub">LLM의 등장으로 과거 로직·이미지 처리에 치중했던 제조 현장 AI의 역할이 다시 가시화됐다. OMF가 계획 중인 AI 역할은 크게 3가지다.</p>
+      </div>
+    </div>
+
+    <div class="grid g3 airoles">
+      <!-- RAG -->
+      <div class="airole">
+        <div class="ar-head">
+          <span class="ar-no">AI-1</span>
+          <span class="chip chip-soft"><span class="dot" style="background:var(--ai)"></span>1단계 포함</span>
+        </div>
+        <h4>RAG 기반 정보 조회</h4>
+        <p class="ar-def">제조 환경의 데이터를 모두 Vector화해, 필요한 정보를 빠르고 정확하게 조회한다.</p>
+        <div class="ar-rows">
+          <div class="ar-row"><div class="ar-k">핵심 기술</div><div class="ar-v">제조 환경의 데이터를 모두 <b>Vector화</b>하는 기술. 딥러닝 기반 Vector 모델과 다양한 기술을 접목해 빠르고 정확한 Vector 모델·데이터 파이프라인을 구축한다.</div></div>
+        </div>
+        <div class="ar-goal"><span class="material-symbols-rounded">flag</span><span><b>1단계 목표</b> — 제조 데이터에 최적화된 Vector 모델 확보</span></div>
+      </div>
+
+      <!-- APS -->
+      <div class="airole">
+        <div class="ar-head">
+          <span class="ar-no">AI-2</span>
+          <span class="chip chip-soft"><span class="dot" style="background:var(--ai)"></span>1단계 포함</span>
+        </div>
+        <h4>AI Agent 기반 생산계획 자동화 (APS)</h4>
+        <p class="ar-def">MES의 생산 실적 평가를 기반으로 점진적 학습을 거쳐, 고객에게 최적화되는 <b>성장형 Agent</b>가 된다.</p>
+        <div class="ar-rows">
+          <div class="ar-row"><div class="ar-k">핵심 기술</div><div class="ar-v">상황 판단을 위한 <b>Long Context 관리</b>와, 지속적 성장(학습)이 가능한 <b>sLM 모델</b> 구축이 핵심으로 판단된다.</div></div>
+        </div>
+        <div class="ar-goal"><span class="material-symbols-rounded">flag</span><span><b>1단계 목표</b> — 점진적 성장이 가능한 sLM 구축과 성장 파이프라인 구축</span></div>
+      </div>
+
+      <!-- 이상 감시 -->
+      <div class="airole hold">
+        <div class="ar-head">
+          <span class="ar-no">AI-3</span>
+          <span class="chip chip-warn"><span class="dot" style="background:var(--semantic-warning)"></span>1단계 제외</span>
+        </div>
+        <h4>포괄적 이상 감시 AI Agent</h4>
+        <p class="ar-def">LLM은 사용자와의 <b>소통 도구</b>가 되고, 이상 탐지는 <b>Transformer 기반 이상 탐지 딥러닝 모델</b>을 사용하는 방향으로 본다.</p>
+        <div class="ar-rows">
+          <div class="ar-row"><div class="ar-k">난이도</div><div class="ar-v">이상 탐지 영역은 난이도가 매우 높아 <b>기술 연구 기간</b>이 필요하다는 판단이다.</div></div>
+        </div>
+        <div class="ar-goal"><span class="material-symbols-rounded">schedule</span><span><b>1단계 제외</b> — 본 단계에서는 이상 감시 Agent 유닛을 개발 범위에서 제외</span></div>
+      </div>
+    </div>
+
+    <div class="callout info" style="margin-top:var(--s-6);">
+      <div class="ico"><span class="material-symbols-rounded">insights</span></div>
+      <div><h4>AI의 정의 — 넓게, 그러나 LLM이 다시 연 가능성</h4><p>어떤 방식·형태든 컴퓨터가 의사 결정을 할 수 있으면, 로직이든 통계든 AI가 될 수 있다. 다만 과거 딥러닝·이미지 처리에 치중해 한계를 보였던 제조 현장 AI 도입은 <strong>LLM(대형 언어 모델)</strong>의 등장으로 다시금 가능성과 역할이 가시화되고 있다.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 구축 계획 · 일정 ════════ -->
+<section class="block" id="plan">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">3</div>
+      <div>
+        <h2 class="sec-title">구축 계획 · 일정</h2>
+        <p class="sec-sub">OMF-DX와 OMF-MES를 우선 구축하고, DX·MES 개발 중 확보한 제조 데이터를 기반으로 3가지 AI 역할을 구축한다.</p>
+      </div>
+    </div>
+
+    <div class="rflow" style="margin-bottom:var(--s-8);">
+      <div class="rstep">
+        <div class="r-no">STEP 1</div>
+        <div class="r-t">기반 유닛 우선 구축</div>
+        <div class="r-d">OMF-DX · OMF-MES를 먼저 구축해 제조 데이터를 확보한다. 데이터 운영 환경이 AI의 전제다.</div>
+        <div class="r-date"><span class="material-symbols-rounded" style="font-size:15px;">layers</span>DX · MES</div>
+      </div>
+      <div class="rconn"><div class="rarrow"><span class="pulse"></span></div></div>
+      <div class="rstep">
+        <div class="r-no">STEP 2 · 7월</div>
+        <div class="r-t">0.5 단계 — 최소 핵심 기능</div>
+        <div class="r-d">확보한 데이터를 기반으로 AI 역할의 최소 핵심 기능을 개발한다.</div>
+        <div class="r-date"><span class="material-symbols-rounded" style="font-size:15px;">bolt</span>2026-07</div>
+      </div>
+      <div class="rconn"><div class="rarrow"><span class="pulse" style="animation-delay:600ms;"></span></div></div>
+      <div class="rstep">
+        <div class="r-no">STEP 3 · 8월</div>
+        <div class="r-t">1.0 단계 — MVP 개발 완료</div>
+        <div class="r-d">AI 역할의 MVP 개발을 완료한다. 포괄적 이상 감시 Agent는 본 단계 범위에서 제외한다.</div>
+        <div class="r-date"><span class="material-symbols-rounded" style="font-size:15px;">flag</span>2026-08</div>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th style="width:160px;">AI 역할</th><th>1단계(0.5→1.0) 목표</th><th style="width:120px;">1단계 포함</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="cat" style="color:var(--ai);">RAG 정보 조회</span></td>
+          <td>제조 데이터에 최적화된 Vector 모델 확보 — 딥러닝 Vector 모델 + 데이터 파이프라인</td>
+          <td><span class="chip chip-ok">포함</span></td>
+        </tr>
+        <tr>
+          <td><span class="cat" style="color:var(--ai);">APS 생산계획 Agent</span></td>
+          <td>점진적 성장이 가능한 sLM 구축 + 성장 파이프라인 — Long Context 관리 기반</td>
+          <td><span class="chip chip-ok">포함</span></td>
+        </tr>
+        <tr>
+          <td><span class="cat" style="color:#8a6100;">포괄적 이상 감시</span></td>
+          <td>Transformer 기반 이상 탐지 + LLM 소통 — 난이도 높아 기술 연구 기간 필요</td>
+          <td><span class="chip chip-warn">제외</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="note">일정·범위는 기획 요약 초안 기준이며, 기획 단계에서 협의·확정한다. 7월 0.5 / 8월 1.0은 AI 유닛 개발 일정이다.</p>
+  </div>
+</section>
+
+<!-- ════════ FOOTER ════════ -->
+<footer class="foot">
+  <div class="wrap">
+    <img src="assets/crefle-wordmark-inverse.svg" alt="CREFLE">
+    <div class="fr">
+      OMF 프로젝트 구조 보고서 · v0.1 (초안) · CREFLE OMF 팀 · 2026-06-25<br>
+      <strong style="color:var(--brand-accent-1);">CONFIDENTIAL · 대외비</strong> — 외부 서비스에 업로드·공유·게시 금지
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
