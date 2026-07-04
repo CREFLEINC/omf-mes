@@ -2,7 +2,7 @@
 import re, glob, html, os
 
 BASE = "/Users/rangkim/projects/crefle/ohmyfactory/apps/omf/docs/research"
-OUT  = os.path.join(BASE, "2026-06-28-현장점검-체크리스트.html")
+OUT  = os.path.join(BASE, "2026-07-03-현장점검-체크리스트.html")
 
 # (표시ID, 표시명, 그룹, 원본번호, slice)  — 처리 순서대로. 02는 계획/실행 분리.
 DOMAINS = [
@@ -39,7 +39,7 @@ def inline(t):
     return t
 
 def parse(num):
-    path=glob.glob(os.path.join(BASE,f"2026-06-28-현장점검-워크플로우-가설-{num}-*.md"))[0]
+    path=glob.glob(os.path.join(BASE,f"2026-07-03-워크플로우-요구사항반영-{num}-*.md"))[0]
     steps=[]; cur=None
     for ln in open(path,encoding="utf-8").read().splitlines():
         ms=re.match(r"^##\s+S(\d+)\.\s*(.+)$",ln)
@@ -145,10 +145,10 @@ P.append(f'<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name
 P.append(f'''
 <div><span class="badge-conf">CONFIDENTIAL · 대외비</span></div>
 <h1>OMF MES 현장 점검 체크리스트</h1>
-<div class="sub">삼진엘앤디 비나 법인 · STEP3 현장 검증 · 작성일 2026-06-28 · 작성 CREFLE OMF 팀</div>
-<div class="note"><b>사용법.</b> 각 단계는 <b>절차(현재 어떻게 도는가)</b>와 <b>현장 확인(3블록 체크박스)</b>으로 구성된다. 절차 6필드(Trigger·Actor·Action·Input·Result·Rule)는 단계의 정의, 체크박스는 현장에서 <b>관찰·질문·수집</b>할 항목이다. 도메인 머리의 흐름도와 각 단계의 위치표시로 진행 지점을 확인한다. ☐를 채우고 메모에 결과를 적는다.<br><b>전제.</b> 매체·Pain은 <em>현행 추정(가설)</em>이며 현장에서 반증(확인) 대상. 벤더 To-Be 기준 아님.</div>
+<div class="sub">삼진엘앤디 비나 법인 · STEP3 현장 검증 — 요구사항 명세서 v1.1(2026-07-01) 반영판 · 작성일 2026-07-03 · 작성 CREFLE OMF 팀</div>
+<div class="note"><b>사용법.</b> 각 단계는 <b>절차(현재 어떻게 도는가)</b>와 <b>현장 확인(3블록 체크박스)</b>으로 구성된다. 절차 6필드(Trigger·Actor·Action·Input·Result·Rule)는 단계의 정의, 체크박스는 현장에서 <b>관찰·질문·수집</b>할 항목이다. 도메인 머리의 흐름도와 각 단계의 위치표시로 진행 지점을 확인한다. ☐를 채우고 메모에 결과를 적는다.<br><b>전제.</b> ✅ 표시는 <em>요구사항 명세서(2026-07-01)로 검증·확정된 사실</em>, 🟡는 <em>현행 추정(가설)</em>으로 현장 반증(확인) 대상. 벤더 To-Be 기준 아님.</div>
 <div class="legend"><span>☐ <b>① 확인 포인트</b>=관찰·질문</span><span>☐ <b>② 미결</b>=질문지 확정</span><span>☐ <b>③ 예외</b>=선행조건 깨질 때</span><span>🔗 경계=시스템·부서 넘는 지점</span></div>
-<div class="note" style="font-size:9.3pt"><b>미결 코드 체계(②·🔗 참조).</b> <b>알파벳=질문지 섹션, 숫자=항목 순번</b> — <b>A</b> LOT·추적 · <b>B</b> 엔티티 키·정규화 · <b>C</b> 소유 경계 · <b>D</b> 범위·보완. (예: <b>A1</b>=자재LOT 발번 주체, <b>D8</b>=WorkCalendar 귀속)<br>※ <b>종합N</b>=데이터모델 §8 미결 종합 번호 · <b>C1~C6</b>=데이터모델 클러스터(C섹션 질문번호와 문맥으로 구분).</div>
+<div class="note" style="font-size:9.3pt"><b>미결 코드 체계(②·🔗 참조).</b> <b>알파벳=질문지 섹션, 숫자=항목 순번</b> — <b>A</b> LOT·추적 · <b>B</b> 엔티티 키·정규화 · <b>C</b> 소유 경계 · <b>D</b> 범위·보완 · <b>E</b> 요구사항 발 후속 확인(질문지 v2 신설). (예: <b>A1</b>=자재LOT 발번 주체, <b>D8</b>=WorkCalendar 귀속, <b>E5</b>=고객사 지시서 샘플)<br>※ <b>종합N</b>=데이터모델 §8 미결 종합 번호 · <b>C1~C6</b>=데이터모델 클러스터(C섹션 질문번호와 문맥으로 구분).</div>
 <div class="note"><b>처리 순서(권장 동선).</b> ⑥ 기준정보(전제) → ① 자재 입고 → ②A 생산계획 → ②B 생산실행 → ③ 품질 → ④ 제품 출하 → ⑤ 설비·툴(상시).
 <table class="mtx"><tr><th>도메인(단계 수)</th>{"".join(f"<th>{r}</th>" for r in ROLES)}<th>구분</th></tr>''')
 for did,name,grp,steps in data:
@@ -194,7 +194,7 @@ for did,name,grp,steps in data:
     P.append('</div>')
 
 tot=sum(len(s) for *_,s in data)
-P.append(f'<div class="foot">총 {len(DOMAINS)}개 도메인 · {tot}개 단계 · 대외비(외부 공유·게시 금지). 근거: research/2026-06-28-현장점검-워크플로우-가설-01~06.</div></div></body></html>')
+P.append(f'<div class="foot">총 {len(DOMAINS)}개 도메인 · {tot}개 단계 · 대외비(외부 공유·게시 금지). 근거: research/2026-07-03-워크플로우-요구사항반영-01~06 (요구사항 명세서 v1.1 통합) · 질문지 v2.</div></div></body></html>')
 open(OUT,"w",encoding="utf-8").write("\n".join(P))
 print("WROTE",OUT,"| domains",len(DOMAINS),"steps",tot)
 for did,name,grp,steps in data: print(" ",did,name,len(steps))
