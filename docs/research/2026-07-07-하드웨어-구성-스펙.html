@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OMF MES 하드웨어 구성 스펙</title>
+<style>
+/* CREFLE Presentation Design System — 토큰 내장(자체 완결형). 원본: crefle_designer/colors_and_type.css */
+:root{
+  --brand-red:#C9252C; --brand-charcoal:#3E4146; --brand-charcoal-deep:#1F2125;
+  --surface:#FBF8FD; --surface-bright:#FFFFFF; --surface-container-low:#F5F2F7;
+  --surface-container:#EFEDF1; --surface-container-high:#E9E7EB;
+  --on-surface:#1B1B1F; --on-surface-variant:#2D2C33; --on-surface-muted:#77767F;
+  --primary:#4758A9; --on-primary:#FFFFFF; --primary-container:#DDE1FF; --on-primary-container:#001257;
+  --outline:#767680; --outline-variant:#C6C5D0;
+  --semantic-success:#1F883D; --semantic-error:#B3261E; --semantic-warning:#E8A100;
+  --semantic-info:#0B57D0; --semantic-idle:#6E7781;
+  --success-container:#DCEFE2; --error-container:#F9DEDC; --warning-container:#FDECC8; --info-container:#DCE5FA;
+  --font-sans:"Spoqa Han Sans Neo","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --font-mono:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;
+  --text-title:20px; --text-body:16px; --text-small:12px; --text-table:13px;
+  --w-regular:400; --w-medium:500; --w-bold:700;
+  --leading-snug:1.35; --leading-body:1.55; --tracking-tight:-0.02em;
+  --radius-sm:8px; --radius-md:12px; --radius-pill:9999px;
+  --elev-1:0 1px 2px 0 rgba(0,0,0,.10),0 1px 3px 1px rgba(0,0,0,.06);
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:20px; --s-6:24px; --s-8:32px; --s-10:40px;
+}
+*{box-sizing:border-box}
+html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{margin:0;background:var(--surface);color:var(--on-surface);
+  font:var(--w-regular) var(--text-body)/var(--leading-body) var(--font-sans)}
+.wrap{max-width:960px;margin:0 auto;padding:var(--s-8) var(--s-6) var(--s-10)}
+
+/* ── 머리 ── */
+.badge-conf{display:inline-block;border:1.5px solid var(--brand-red);color:var(--brand-red);
+  font-weight:var(--w-bold);font-size:var(--text-small);padding:2px 10px;border-radius:var(--radius-sm);letter-spacing:.06em}
+h1{font-size:26px;font-weight:var(--w-bold);letter-spacing:var(--tracking-tight);line-height:var(--leading-snug);margin:var(--s-3) 0 var(--s-1)}
+.sub{color:var(--on-surface-muted);font-size:var(--text-small);margin:0 0 var(--s-4)}
+.note{background:var(--surface-container-low);border:1px solid var(--outline-variant);border-radius:var(--radius-md);
+  padding:var(--s-3) var(--s-4);margin:var(--s-3) 0;font-size:var(--text-table);line-height:var(--leading-body)}
+.note b{font-weight:var(--w-bold)}
+
+/* ── 섹션 ── */
+h2{font-size:var(--text-title);font-weight:var(--w-bold);letter-spacing:var(--tracking-tight);
+  margin:var(--s-10) 0 var(--s-3);padding-bottom:var(--s-2);border-bottom:2px solid var(--brand-charcoal)}
+h2 .no{color:var(--primary);margin-right:var(--s-2)}
+h3{font-size:var(--text-body);font-weight:var(--w-bold);margin:var(--s-6) 0 var(--s-2)}
+p{margin:var(--s-2) 0}
+.small{font-size:var(--text-small);color:var(--on-surface-variant)}
+.muted{color:var(--on-surface-muted)}
+code,.mono{font-family:var(--font-mono);font-size:.86em}
+
+/* ── 모듈 칩 (A/B/C — 카테고리 구분, 브랜드/프라이머리 팔레트만 사용) ── */
+.chip{display:inline-block;font-size:11px;font-weight:var(--w-bold);line-height:1;
+  padding:4px 9px;border-radius:var(--radius-pill);white-space:nowrap;vertical-align:1px}
+.chip-a{background:var(--primary);color:var(--on-primary)}
+.chip-b{background:var(--brand-charcoal);color:#fff}
+.chip-c{background:var(--primary-container);color:var(--on-primary-container)}
+.chip-d{background:var(--surface-bright);color:var(--brand-charcoal);border:1.5px solid var(--brand-charcoal);padding:2.5px 8px}
+.chip-reuse{background:transparent;color:var(--brand-red);border:1px solid var(--brand-red);font-weight:var(--w-medium)}
+
+/* ── 카드 ── */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--s-4);margin:var(--s-4) 0}
+.fig{background:var(--surface-container-low);border:1px solid var(--surface-container-high);border-radius:var(--radius-sm);
+  box-shadow:inset 0 1px 0 0 rgba(255,255,255,.6),inset 0 -1px 0 0 rgba(0,0,0,.04);
+  padding:var(--s-2) var(--s-3);margin:0 0 var(--s-1)}
+.fig svg{display:block;width:100%;height:auto;max-height:130px}
+.fig-cap{font-size:11px;color:var(--on-surface-muted);text-align:center;margin:0 0 var(--s-3)}
+.plink{display:inline-block;font-size:11px;font-weight:var(--w-medium);line-height:1;
+  color:var(--primary);border:1px solid var(--outline-variant);border-radius:var(--radius-pill);
+  padding:4px 10px;margin-top:4px;text-decoration:none;white-space:nowrap}
+.plink:hover{background:rgba(71,88,169,.08)}
+.plink .host{color:var(--on-surface-muted);font-weight:var(--w-regular)}
+.card{background:var(--surface-bright);border:1px solid var(--outline-variant);border-radius:var(--radius-md);
+  box-shadow:var(--elev-1);padding:var(--s-4) var(--s-4) var(--s-3)}
+.card .card-h{display:flex;align-items:center;gap:var(--s-2);margin-bottom:var(--s-2)}
+.card .card-t{font-weight:var(--w-bold);font-size:var(--text-body)}
+.card dl{margin:0;font-size:var(--text-table)}
+.card dt{font-weight:var(--w-bold);color:var(--on-surface-variant);margin-top:var(--s-2);font-size:var(--text-small)}
+.card dd{margin:2px 0 0}
+.card a{color:var(--primary);word-break:break-all}
+
+/* ── 표 공통 ── */
+table{border-collapse:collapse;width:100%;font-size:var(--text-table);margin:var(--s-3) 0;background:var(--surface-bright)}
+th,td{border:1px solid var(--outline-variant);padding:7px 10px;text-align:left;vertical-align:top;line-height:1.5}
+thead th{background:var(--brand-charcoal);color:#fff;font-weight:var(--w-medium);border-color:var(--brand-charcoal)}
+tbody tr:nth-child(even) td{background:var(--surface-container-low)}
+td.center,th.center{text-align:center}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.total td{font-weight:var(--w-bold);background:var(--primary-container)!important;color:var(--on-primary-container)}
+
+/* ── 구역 배치 지도 ── */
+.zonemap{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:var(--s-3);margin:var(--s-3) 0}
+.zone{background:var(--surface-bright);border:1px solid var(--outline-variant);border-radius:var(--radius-md);padding:var(--s-3)}
+.zone .z-name{font-weight:var(--w-bold);font-size:var(--text-table);margin-bottom:2px}
+.zone .z-sub{font-size:11px;color:var(--on-surface-muted);margin-bottom:var(--s-2);min-height:15px}
+.zone .z-chips{display:flex;flex-wrap:wrap;gap:var(--s-1)}
+.bu{margin:var(--s-4) 0 var(--s-6)}
+.bu-h{font-size:var(--text-small);font-weight:var(--w-bold);color:var(--primary);
+  letter-spacing:.12em;text-transform:uppercase;margin-bottom:var(--s-2)}
+
+/* ── 상태/마커 ── */
+.tag{display:inline-block;font-size:11px;font-weight:var(--w-medium);padding:2px 8px;border-radius:var(--radius-sm);line-height:1.5}
+.tag-est{background:var(--warning-container);color:#5c4300}
+.tag-ok{background:var(--success-container);color:#0b5223}
+.tag-open{background:var(--info-container);color:#0a3d91}
+.tag-hyp{background:var(--surface-container-high);color:var(--on-surface-variant)}
+
+/* ── 수량 타일 ── */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:var(--s-4);margin:var(--s-4) 0}
+.tile{background:var(--surface-bright);border:1px solid var(--outline-variant);border-radius:var(--radius-md);
+  box-shadow:var(--elev-1);padding:var(--s-4);text-align:center}
+.tile .v{font-size:34px;font-weight:var(--w-bold);letter-spacing:var(--tracking-tight);color:var(--primary);line-height:1.1}
+.tile .l{font-size:var(--text-small);color:var(--on-surface-variant);margin-top:var(--s-1)}
+
+/* ── 콜아웃 ── */
+.callout{border-left:3px solid var(--primary);background:var(--surface-container-low);
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:var(--s-3) var(--s-4);margin:var(--s-3) 0;font-size:var(--text-table)}
+.callout.warn{border-left-color:var(--semantic-warning);background:var(--warning-container)}
+.callout .ch{font-weight:var(--w-bold);font-size:var(--text-small);margin-bottom:var(--s-1)}
+
+.foot{margin-top:var(--s-10);padding-top:var(--s-4);border-top:1px solid var(--outline-variant);
+  color:var(--on-surface-muted);font-size:var(--text-small);line-height:1.7}
+
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0}
+  h2{page-break-after:avoid}
+  .card,.zone,.tile,table,.callout,.note{page-break-inside:avoid}
+  section.pb{page-break-before:always}
+}
+@page{size:A4;margin:14mm 12mm}
+</style>
+</head>
+<body><div class="wrap">
+
+<!-- ═══ 머리 ═══ -->
+<div><span class="badge-conf">CONFIDENTIAL · 대외비</span></div>
+<h1>OMF MES 하드웨어 구성 스펙 — 현장 스캔·라벨 장비 토폴로지</h1>
+<div class="sub">삼진엘앤디 비나 법인 · 작성일 2026-07-07 (v0.1) · 작성 CREFLE OMF 팀 · 원본: research/2026-07-07-하드웨어-구성-스펙.md</div>
+
+<div class="note"><b>표기 원칙.</b> 팀 메모의 계획 사항을 정본으로 옮기고, 문서 근거가 있는 항목은 <code>(REQ-…)</code>/<code>(QA #n)</code>을 병기한다.
+판매 페이지로 확인하지 못한 가격·스펙은 <span class="tag tag-est">웹 검색 추정</span>, 미확인 항목은 <span class="tag tag-open">확인 필요</span>, 내부 가설은 <span class="tag tag-hyp">[가설]</span>로 구분한다.</div>
+
+<!-- ═══ §1 ═══ -->
+<h2><span class="no">§1</span>개요</h2>
+<p>MES 현장 운영에 필요한 스캔·라벨 출력 하드웨어를 <b>표준 모듈 4종</b>(§2)과 <b>조합 3종</b>(§2.5)으로 정의하고, 사업부·구역별로 조합 배치(§4)한다.
+근거 요구사항은 <b>REQ-PR-0017</b>(현장 단말기 POP·바코드 스캐너·라벨 프린터 신규 설치)이며, 설치 공정·위치 목록은 고객 정리 대기 상태(요구사항 명세서 §4 대기항목 #2)다.
+본 배치안이 그 협의의 CREFLE 측 초안이 된다.</p>
+<p>현행(As-Is)은 스캔·라벨 인프라 부재 추정(엑셀·종이·수기 — 워크플로우 01·02·04 공통). 예외적으로 OA사업부는 <b>추적관리시스템</b>(고객사 CTO 개발·운용, QA #18) 장비를 보유하고 있어 일부 재사용한다.</p>
+<div class="callout"><div class="ch">용어 주의</div>
+팀 메모의 "PP추적 시스템" = 표준 표기 <b>추적관리시스템</b>(QA #18) · "입출고용 자재 분할 코드" = <b>출고 QR</b>(QA #16 — 이동 단위 관리 QR, 전량 출고 포함 예외 없이 항상 발행, REQ-OA-0010).
+입하(도착 등록, IQC 전) / 입고(IQC 합격·자재LOT 생성·재고 반영) / 출고(생산 투입용 반출) / 출하(고객 인도)는 용어표준사전 구분을 따른다.</div>
+
+<!-- ═══ §2 ═══ -->
+<h2><span class="no">§2</span>표준 하드웨어 모듈 4종</h2>
+<p class="small">각 카드의 그림은 제품 유형 이해를 돕는 모식도이며, 실제 제품 외형과 다를 수 있다.</p>
+
+<div class="cards">
+  <div class="card">
+    <div class="card-h"><span class="chip chip-a">A</span><span class="card-t">이동형 스캐너 모듈</span></div>
+    <div class="fig"><svg viewBox="0 0 280 128" role="img" aria-label="모바일 디바이스와 부착형 스캐너 모식도">
+      <path d="M20 34 h20 l8 8 v30 a3 3 0 0 1 -3 3 H23 a3 3 0 0 1 -3 -3 Z" fill="#fff" stroke="#3E4146" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M40 34 v8 h8" fill="none" stroke="#3E4146" stroke-width="2" stroke-linejoin="round"/>
+      <line x1="26" y1="50" x2="42" y2="50" stroke="#C6C5D0" stroke-width="2"/>
+      <line x1="26" y1="57" x2="42" y2="57" stroke="#C6C5D0" stroke-width="2"/>
+      <line x1="26" y1="64" x2="36" y2="64" stroke="#C6C5D0" stroke-width="2"/>
+      <path d="M52 54 h10 m0 0 l-4 -4 m4 4 l-4 4" stroke="#4758A9" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="72" y="12" width="54" height="88" rx="9" fill="#fff" stroke="#3E4146" stroke-width="2"/>
+      <rect x="78" y="20" width="42" height="64" rx="3" fill="#DDE1FF"/>
+      <line x1="84" y1="32" x2="114" y2="32" stroke="#4758A9" stroke-width="2"/>
+      <line x1="84" y1="42" x2="108" y2="42" stroke="#4758A9" stroke-width="2" opacity=".55"/>
+      <line x1="84" y1="52" x2="112" y2="52" stroke="#4758A9" stroke-width="2" opacity=".55"/>
+      <line x1="84" y1="62" x2="100" y2="62" stroke="#4758A9" stroke-width="2" opacity=".55"/>
+      <line x1="92" y1="93" x2="106" y2="93" stroke="#3E4146" stroke-width="2" stroke-linecap="round"/>
+      <rect x="66" y="100" width="66" height="15" rx="6" fill="#3E4146"/>
+      <path d="M132 107 L190 86 L190 126 Z" fill="#C9252C" opacity=".14"/>
+      <line x1="132" y1="107" x2="190" y2="106" stroke="#C9252C" stroke-width="2"/>
+      <rect x="198" y="84" width="42" height="42" rx="2" fill="none" stroke="#3E4146" stroke-width="2"/>
+      <g fill="#3E4146">
+        <rect x="204" y="90" width="10" height="10"/>
+        <rect x="228" y="90" width="6" height="6"/>
+        <rect x="204" y="114" width="6" height="6"/>
+        <rect x="218" y="99" width="5" height="5"/>
+        <rect x="226" y="106" width="6" height="6"/>
+        <rect x="214" y="112" width="5" height="5"/>
+      </g>
+    </svg></div>
+    <div class="fig-cap">모바일 디바이스 + 부착형 스캐너 — 문서 입력·이동 스캔</div>
+    <dl>
+      <dt>용도</dt><dd>입/출고 스캔, 자재 투입 스캔 — 입하 등록·적치·재고 실사(워크플로우 01 S2·S5·S9) 등 <b>이동 동선</b>의 스캔 전반</dd>
+      <dt>구성</dt><dd>모바일 디바이스 + 부착형 바코드 스캐너 세트</dd>
+      <dt>구성 이유</dt><dd>거래명세서 등 <b>문서 기반 정보 입력</b> 대응 — 입하 등록은 거래명세서 스캔·분석 자동 등록 방식(REQ-PR-0006, QA #29)</dd>
+      <dt>조달</dt><dd>모바일 디바이스 기종 미정 — <b>베트남 현지 구매</b>(통신 장비 수출입 제약)</dd>
+      <dt>스캐너 후보 1</dt><dd>소형 스캐너 <span class="tag tag-open">확인 필요</span> — 제품명·모델·가격 미확인(스마트스토어 자동 조회 차단, 카테고리상 무선 2D 추정)<br>
+        <a class="plink" href="https://smartstore.naver.com/doorsmall/products/12596550709" target="_blank" rel="noopener noreferrer">판매 페이지 · <span class="host">smartstore.naver.com</span> ↗</a></dd>
+      <dt>스캐너 후보 2</dt><dd>KOAMTAC KDC480 (메모 표기: PDA용) — 1D/2D, BLE 5.0 + USB-C, 스마트폰 부착형(SmartSled), IP65 · <b>629,000원</b> <span class="tag tag-ok">판매 페이지 확인</span><br>
+        <a class="plink" href="https://rftown.com/product/koamtac-%EC%BD%94%EC%95%94%ED%85%8D-kdc480-2d-%EB%AC%B4%EC%84%A0-%EB%B0%94%EC%BD%94%EB%93%9C-%EC%8A%A4%EC%BA%90%EB%84%88/14954/category/420/display/1/" target="_blank" rel="noopener noreferrer">판매 페이지 · <span class="host">rftown.com</span> ↗</a></dd>
+    </dl>
+  </div>
+  <div class="card">
+    <div class="card-h"><span class="chip chip-b">B</span><span class="card-t">라벨 프린터</span></div>
+    <div class="fig"><svg viewBox="0 0 280 128" role="img" aria-label="라벨 프린터 모식도">
+      <rect x="90" y="16" width="72" height="20" rx="10" fill="#EFEDF1" stroke="#3E4146" stroke-width="2"/>
+      <rect x="76" y="30" width="128" height="54" rx="10" fill="#fff" stroke="#3E4146" stroke-width="2"/>
+      <circle cx="186" cy="46" r="4" fill="#4758A9"/>
+      <rect x="92" y="68" width="80" height="6" rx="2" fill="#3E4146"/>
+      <rect x="100" y="74" width="64" height="30" rx="2" fill="#fff" stroke="#3E4146" stroke-width="2"/>
+      <g stroke="#3E4146" stroke-width="2">
+        <line x1="108" y1="81" x2="108" y2="93"/>
+        <line x1="114" y1="81" x2="114" y2="93"/>
+        <line x1="122" y1="81" x2="122" y2="93"/>
+        <line x1="127" y1="81" x2="127" y2="93"/>
+        <line x1="135" y1="81" x2="135" y2="93"/>
+        <line x1="143" y1="81" x2="143" y2="93"/>
+        <line x1="150" y1="81" x2="150" y2="93"/>
+        <line x1="156" y1="81" x2="156" y2="93"/>
+      </g>
+      <line x1="108" y1="98" x2="145" y2="98" stroke="#C6C5D0" stroke-width="2"/>
+    </svg></div>
+    <div class="fig-cap">라벨 프린터 — 라벨 발행 (모듈 D와 조합해 발행 거점 구성)</div>
+    <dl>
+      <dt>용도</dt><dd>자재LOT 라벨·출고 QR·인식표·포장/납품 라벨 등 <b>라벨 발행</b> (라벨 종류는 §3) — 모듈 D(PC·모니터)와 조합해 발행 거점 구성</dd>
+      <dt>구성</dt><dd>라벨 프린터 단독</dd>
+      <dt>프린터 모델</dt><dd><b>TSC TTP-247</b> — 삼진엘앤디 한국 본사와 동일 모델. 예상 36만원(팀 메모) <span class="tag tag-est">웹 검색 추정</span> 관측가 42.9만원 · 열전사/감열 겸용, 203dpi, 최대 폭 4인치 · <b>일부 판매처 단종(EoL) 표기 — 장기 조달 확인 필요</b><br>
+        <a class="plink" href="https://smartstore.naver.com/woojuoa/products/100153864" target="_blank" rel="noopener noreferrer">판매 페이지 · <span class="host">smartstore.naver.com</span> ↗</a></dd>
+      <dt>소프트웨어</dt><dd>라벨 셋팅 프로그램 별도 설치 — <b>크레플 제작, MES 연동 동작</b>. 조합되는 모듈 D의 PC에 설치</dd>
+    </dl>
+  </div>
+  <div class="card">
+    <div class="card-h"><span class="chip chip-c">C</span><span class="card-t">근거리 스캐너 모듈</span></div>
+    <div class="fig"><svg viewBox="0 0 280 128" role="img" aria-label="핸드헬드 무선 스캐너와 크래들 모식도">
+      <path d="M54 30 a14 14 0 0 0 0 26" fill="none" stroke="#4758A9" stroke-width="2" stroke-linecap="round"/>
+      <path d="M44 24 a22 22 0 0 0 0 38" fill="none" stroke="#4758A9" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+      <rect x="64" y="28" width="62" height="28" rx="12" fill="#fff" stroke="#3E4146" stroke-width="2"/>
+      <rect x="120" y="35" width="8" height="14" rx="2" fill="#DDE1FF" stroke="#3E4146" stroke-width="2"/>
+      <rect x="76" y="52" width="20" height="46" rx="9" transform="rotate(10 86 52)" fill="#fff" stroke="#3E4146" stroke-width="2"/>
+      <rect x="56" y="100" width="72" height="14" rx="6" fill="#3E4146"/>
+      <path d="M128 42 L198 22 L198 62 Z" fill="#C9252C" opacity=".14"/>
+      <line x1="128" y1="42" x2="198" y2="42" stroke="#C9252C" stroke-width="2"/>
+      <g fill="#3E4146">
+        <rect x="206" y="22" width="3" height="40"/>
+        <rect x="212" y="22" width="5" height="40"/>
+        <rect x="220" y="22" width="3" height="40"/>
+        <rect x="226" y="22" width="7" height="40"/>
+        <rect x="236" y="22" width="3" height="40"/>
+        <rect x="242" y="22" width="5" height="40"/>
+        <rect x="250" y="22" width="3" height="40"/>
+      </g>
+    </svg></div>
+    <div class="fig-cap">핸드헬드 무선 스캐너 + 충전 크래들 — 정위치 작업 (스테이션 조합용)</div>
+    <dl>
+      <dt>용도</dt><dd>모듈 B·D와 조합해 무선으로 작업 편의성 확보 — 생산 계획 확인, 자재 투입 스캔, 생산 실적 입력, LOT 발행 등 <b>정위치 작업</b></dd>
+      <dt>운용 특성</dt><dd>무선이지만 구성된 스테이션(페어링 호스트·크래들)과 정해진 거리를 벗어나면 작업 불가 → <b>반고정</b>(완전 이동형 아님)</dd>
+      <dt>제품</dt><dd><b>Honeywell 1952g</b> — 추적관리시스템 사용 중인 것과 동일 제품 · <span class="tag tag-est">웹 검색 추정</span> Xenon XP 무선 2D 이미저, BT 4.2(약 10m) + 충전 크래들, 배터리 약 14h · 국내가 SR 약 52.8만~71.5만원대 관측<br>
+        <a class="plink" href="https://smartstore.naver.com/vitamincnc/products/11741470896" target="_blank" rel="noopener noreferrer">판매 페이지 · <span class="host">smartstore.naver.com</span> ↗</a></dd>
+    </dl>
+  </div>
+  <div class="card">
+    <div class="card-h"><span class="chip chip-d">D</span><span class="card-t">PC·모니터 구성</span></div>
+    <div class="fig"><svg viewBox="0 0 280 128" role="img" aria-label="PC와 모니터 모식도">
+      <rect x="60" y="14" width="100" height="64" rx="6" fill="#fff" stroke="#3E4146" stroke-width="2"/>
+      <rect x="66" y="20" width="88" height="52" rx="3" fill="#DDE1FF"/>
+      <line x1="74" y1="32" x2="126" y2="32" stroke="#4758A9" stroke-width="2"/>
+      <line x1="74" y1="44" x2="144" y2="44" stroke="#4758A9" stroke-width="2" opacity=".55"/>
+      <line x1="74" y1="56" x2="134" y2="56" stroke="#4758A9" stroke-width="2" opacity=".55"/>
+      <path d="M100 78 h20 l4 14 h-28 Z" fill="#3E4146"/>
+      <rect x="84" y="92" width="52" height="6" rx="3" fill="#3E4146"/>
+      <rect x="184" y="22" width="40" height="76" rx="6" fill="#fff" stroke="#3E4146" stroke-width="2"/>
+      <line x1="192" y1="34" x2="216" y2="34" stroke="#3E4146" stroke-width="2"/>
+      <line x1="192" y1="42" x2="216" y2="42" stroke="#C6C5D0" stroke-width="2"/>
+      <circle cx="204" cy="86" r="3" fill="#4758A9"/>
+      <rect x="34" y="106" width="120" height="12" rx="4" fill="#EFEDF1" stroke="#3E4146" stroke-width="2"/>
+    </svg></div>
+    <div class="fig-cap">일반 PC + 모니터 — 현장 단말·라벨 셋팅 프로그램 구동</div>
+    <dl>
+      <dt>용도</dt><dd>현장 정보 확인·입력용 단말 + 라벨 셋팅 프로그램 구동 기반 — <b>모듈 B·C와 조합해 스테이션 구성</b></dd>
+      <dt>구성</dt><dd>일반 PC + 모니터</dd>
+      <dt>예상 비용</dt><dd><b>50만원 이내</b> (팀 메모)</dd>
+      <dt>대체 구성</dt><dd>노트북 PC(§2.5 구성 제안-1 이동식 트레이) — 채택 시 단가 재산정 필요 <span class="tag tag-open">확인 필요</span></dd>
+    </dl>
+  </div>
+</div>
+
+<h3>2.5 조합 구성 — 스테이션 3종 (모듈 B·C·D 조합)</h3>
+<p class="small">정위치 작업 지점은 아래 3개 조합 유형으로 구성한다. 예상 가격은 팀 메모 예상가 기준(모듈 단가: B 36만 + C 50만 + D 50만).</p>
+<table>
+  <thead><tr><th style="width:12%">조합</th><th style="width:34%">구성</th><th>용도</th><th style="width:20%" class="center">예상 가격 (1식)</th></tr></thead>
+  <tbody>
+    <tr><td><b>조합 1</b></td><td><span class="chip chip-b">B</span> 라벨 프린터 + <span class="chip chip-c">C</span> 근거리 스캐너 + <span class="chip chip-d">D</span> PC·모니터</td>
+        <td>생산 실적 입력 + 라벨 출력 스테이션</td><td class="num"><b>136만원</b> (36+50+50)</td></tr>
+    <tr><td><b>조합 2</b></td><td><span class="chip chip-c">C</span> 근거리 스캐너 + <span class="chip chip-d">D</span> PC·모니터</td>
+        <td>생산 계획 확인·자재 투입 스캔·생산 일지 등 스캔/입력 전용</td><td class="num"><b>100만원</b> (50+50)</td></tr>
+    <tr><td><b>조합 3</b></td><td><span class="chip chip-b">B</span> 라벨 프린터 + <span class="chip chip-d">D</span> PC·모니터</td>
+        <td>라벨 출력 전용 — 현 배치안(§4) 미사용, 예비 유형</td><td class="num"><b>86만원</b> (36+50)</td></tr>
+  </tbody>
+</table>
+<p class="small">주의: 스캐너·프린터 예상가는 팀 메모 값이며, 웹 관측가(1952g 52.8만~ / TTP-247 42.9만) 기준으로는 하한 미만 — §5 총액 단서 참조.</p>
+
+<div class="callout"><div class="ch">구성 제안-1 — 이동식 트레이</div>
+노트북 PC를 이용해 이동식 트레이에 장비 일체를 구성.<br>
+<b>장점</b> — 레이아웃 변경 대응 유연성 확보 · 비(非)생산 시설에 비가용 상태로 배치되는 것 방지 &nbsp;/&nbsp; <b>단점</b> — 일정 시간마다 충전 필요.<br>
+<span class="small">노트북 채택 시 모듈 D("PC+모니터 50만원") 단가는 재산정 필요 <span class="tag tag-open">확인 필요</span></span></div>
+
+<div class="callout warn"><div class="ch">체크포인트 — 필요 수량 산정용 확인 정보</div>
+① 평균 사출 작업 인원이 몇 명인지 &nbsp; ② 모든 작업 인원이 라벨 출력·생산 실적 입력을 수행하는지</div>
+
+<!-- ═══ §3 ═══ -->
+<section class="pb">
+<h2><span class="no">§3</span>라벨·스캔 대상 체계</h2>
+<p class="small">이 하드웨어들이 발행·스캔하는 라벨/코드 종류. 라벨 프린터와 라벨 셋팅 프로그램은 아래 전 종류의 포맷을 지원해야 한다.</p>
+<table>
+  <thead><tr><th style="width:17%">라벨/코드</th><th>발행 지점</th><th style="width:21%">주요 스캔 지점</th><th style="width:24%">근거</th></tr></thead>
+  <tbody>
+    <tr><td><b>자재LOT 라벨</b><br><span class="small muted">보관 단위</span></td>
+        <td>자재창고 — IQC 합격 시 발행(1입고 N라벨 혼적 실재). 협력사 <b>사전발행</b> 부착 납품 경로 병존</td>
+        <td>입하 도착 등록, 적치, 출고, 4M 투입</td><td>REQ-PR-0001·0007, QA #14</td></tr>
+    <tr><td><b>출고 QR</b><br><span class="small muted">이동 단위 — 메모의 "자재 분할 코드"</span></td>
+        <td>자재창고 출고 지점 — 전량 출고 포함 <b>항상 발행</b></td>
+        <td>출고 시 + 생산창고 도착 시 양방향 스캔</td><td>REQ-OA-0010·REQ-PR-0004, QA #16</td></tr>
+    <tr><td><b>인식표</b><br><span class="small muted">생산LOT QR</span></td>
+        <td>생산 라인 — 생산LOT 완료 시 양품 개체별 1:1 발행(키=생산LOT No+seq)</td>
+        <td>제품입고, Picking 등 후속 추적</td><td>워크플로우 02 S10(A4 확정), 용어표준사전 · 발번=MES(QA #1)</td></tr>
+    <tr><td><b>포장라벨</b><br><span class="small muted">포장단위</span></td>
+        <td>생산 말단 공정(생산 포장 품목)·출하 포장 라인 — <b>사전발행</b>(placeholder) 후 Packing 확정 시 활성, 미사용분 폐번</td>
+        <td>포장 합병/분할, 출하</td><td>설계결정서 결정 05·13</td></tr>
+    <tr><td><b>납품라벨</b></td>
+        <td>출하 포장 라인 — OQC 합격 트리거로 출력, 생산LOT Matching 스캔 후 부착(불일치 시 차단). 형식은 고객 회신 대기(REQ-PR-0036 비고, 대기항목 #6)</td>
+        <td>Matching 스캔</td><td>QA #2, 워크플로우 04 S6, 도식스펙 04 A9~A10</td></tr>
+    <tr><td><b>고객 바코드</b></td>
+        <td>출하 포장 라인 — 고객사 지정 외부 식별 체계. 고객별 양식 상이는 <span class="tag tag-hyp">[가설]</span></td>
+        <td>(고객 측)</td><td>워크플로우 04 S6</td></tr>
+    <tr><td><b>Location 코드</b><br><span class="small muted">보관 위치</span></td>
+        <td>창고 선반/구역 부착 (고정 표지)</td>
+        <td>적치 위치 검증 스캔</td><td>REQ-OA-0001·REQ-PR-0005</td></tr>
+    <tr><td><b>금형·툴 QR</b></td>
+        <td>기준정보 등록 시 발급 (내구성 라벨 스톡 필요)</td>
+        <td>4M 투입 시 금형 QR 스캔</td><td>REQ-PR-0003</td></tr>
+  </tbody>
+</table>
+<p class="small">라벨 운영 공통 규칙 — 신규 생성분=신규 발번+새 라벨, 분할 잔량=원 ID 유지·수량 갱신(라벨 재출력은 사용자 선택), <b>스캔 시 정본은 시스템 수량</b>이며 라벨 표기 수량은 참고값(설계결정서 결정 13).</p>
+</section>
+
+<!-- ═══ §4 ═══ -->
+<section class="pb">
+<h2><span class="no">§4</span>구역별 배치 계획</h2>
+<p class="small">모듈 — <span class="chip chip-a">A</span> 이동형 스캐너 · <span class="chip chip-b">B</span> 라벨 프린터 · <span class="chip chip-c">C</span> 근거리 스캐너 · <span class="chip chip-d">D</span> PC·모니터 &nbsp;/&nbsp; 배치 유형 — <span class="chip chip-a">A</span> 이동형 단독 · <span class="chip chip-b">조합 1</span> = B+C+D · <span class="chip chip-c">조합 2</span> = C+D (§2.5) · <span class="chip chip-reuse">✱ 재사용</span> 추적관리시스템 보유 장비 재사용 대상 구역</p>
+
+<div class="bu">
+  <div class="bu-h">부품사업부 배치 지도</div>
+  <div class="zonemap">
+    <div class="zone"><div class="z-name">사출공정</div><div class="z-sub">생산 라인</div>
+      <div class="z-chips"><span class="chip chip-b">조합 1</span></div></div>
+    <div class="zone"><div class="z-name">조립공정</div><div class="z-sub">생산 라인</div>
+      <div class="z-chips"><span class="chip chip-c">조합 2</span><span class="chip chip-c">조합 2</span><span class="chip chip-b">조합 1</span></div></div>
+    <div class="zone"><div class="z-name">자재 창고</div><div class="z-sub"></div>
+      <div class="z-chips"><span class="chip chip-a">A</span><span class="chip chip-b">조합 1</span></div></div>
+    <div class="zone"><div class="z-name">생산 창고</div><div class="z-sub"></div>
+      <div class="z-chips"><span class="chip chip-a">A</span></div></div>
+    <div class="zone"><div class="z-name">제품 창고</div><div class="z-sub"></div>
+      <div class="z-chips"><span class="chip chip-a">A</span></div></div>
+    <div class="zone"><div class="z-name">출하 포장 라인</div><div class="z-sub"></div>
+      <div class="z-chips"><span class="chip chip-a">A</span><span class="chip chip-b">조합 1</span></div></div>
+  </div>
+</div>
+
+<div class="bu">
+  <div class="bu-h">OA사업부 배치 지도</div>
+  <div class="zonemap">
+    <div class="zone"><div class="z-name">생산 라인 <span class="chip chip-reuse">✱</span></div><div class="z-sub">I/O 공정 포함</div>
+      <div class="z-chips"><span class="chip chip-c">조합 2</span><span class="chip chip-c">조합 2</span></div></div>
+    <div class="zone"><div class="z-name">자재 창고</div><div class="z-sub"></div>
+      <div class="z-chips"><span class="chip chip-a">A</span><span class="chip chip-b">조합 1</span></div></div>
+    <div class="zone"><div class="z-name">생산 창고</div><div class="z-sub">3층 엘리베이터 앞 — 공정 투입 전 보관</div>
+      <div class="z-chips"><span class="chip chip-a">A</span></div></div>
+    <div class="zone"><div class="z-name">제품 창고</div><div class="z-sub"></div>
+      <div class="z-chips"><span class="chip chip-a">A</span></div></div>
+    <div class="zone"><div class="z-name">출하 포장 라인 <span class="chip chip-reuse">✱</span></div><div class="z-sub"></div>
+      <div class="z-chips"><span class="chip chip-a">A</span><span class="chip chip-b">조합 1</span></div></div>
+  </div>
+</div>
+
+<h3>4.1 부품사업부 — 상세</h3>
+<table>
+  <thead><tr><th style="width:16%">구역</th><th style="width:30%">용도</th><th class="center" style="width:9%">구성</th><th>워크플로우 근거</th></tr></thead>
+  <tbody>
+    <tr><td rowspan="1"><b>생산 라인 — 사출공정</b></td><td>생산 계획 확인, 자재 투입 스캔, 생산 실적 및 LOT 발행</td><td class="center">조합 1</td>
+        <td>4M 투입 자재LOT·금형 QR 스캔(REQ-OA-0002·REQ-PR-0003), 실적 입력(REQ-PR-0002), 인식표 발행(워크플로우 02 S10)</td></tr>
+    <tr><td rowspan="3"><b>생산 라인 — 조립공정</b></td><td>① 생산 계획 확인 및 자재 투입 스캔</td><td class="center">조합 2</td>
+        <td>라인 자재 수령 검증·오투입 Validation(REQ-OA-0002)</td></tr>
+    <tr><td>② 세부 공정 생산 일지 기록 (공정별 자재 투입 스캔 필요)</td><td class="center">조합 2</td>
+        <td>단일 제품에 세분화 공정 다수 실재(REQ-PR-0002 현행) — 수량은 공정 수에 연동</td></tr>
+    <tr><td>③ 최종 생산 실적 및 LOT 발행</td><td class="center">조합 1</td>
+        <td>인식표 발행(워크플로우 02 S10)</td></tr>
+    <tr><td rowspan="2"><b>자재 창고</b></td><td>① 입하 정보 등록, 자재 적치</td><td class="center">A</td>
+        <td>거래명세서 스캔 등록(REQ-PR-0006), 사전발행 라벨 도착 스캔(REQ-PR-0001), 적치 위치 검증(REQ-OA-0001)</td></tr>
+    <tr><td>② 자재 LOT 라벨 출력</td><td class="center">조합 1</td>
+        <td>IQC 합격 시 LOT 생성·라벨 발행(REQ-PR-0007), 출고 QR 발행(REQ-OA-0010)</td></tr>
+    <tr><td><b>생산 창고</b></td><td>입고/출고 확인</td><td class="center">A</td>
+        <td>출고 QR 양방향 스캔(REQ-OA-0010), 라인 입고 검증(REQ-OA-0002), 생산창고 재고 계층(REQ-PR-0034)</td></tr>
+    <tr><td><b>제품 창고</b></td><td>입고/출고 확인</td><td class="center">A</td>
+        <td>제품입고·제품LOT 형성(워크플로우 04 S1, 발번=MES QA #1), 바코드 스캔 피킹(REQ-PR-0017, 도식스펙 04 A5), 선입선출(REQ-PR-0010)</td></tr>
+    <tr><td rowspan="2"><b>출하 포장 라인</b></td><td>① 입고 확인</td><td class="center">A</td>
+        <td>Picking 인계 확인</td></tr>
+    <tr><td>② 제품 LOT 라벨 출력</td><td class="center">조합 1</td>
+        <td>납품라벨 출력·Matching 스캔(QA #2, 워크플로우 04 S6), 포장라벨(설계결정서 결정 05)</td></tr>
+  </tbody>
+</table>
+
+<h3>4.2 OA사업부 — 상세</h3>
+<table>
+  <thead><tr><th style="width:16%">구역</th><th style="width:30%">용도</th><th class="center" style="width:9%">구성</th><th>워크플로우 근거</th></tr></thead>
+  <tbody>
+    <tr><td rowspan="2"><b>생산 라인</b> <span class="chip chip-reuse">✱</span></td><td>① I/O 공정</td><td class="center">조합 2</td>
+        <td>수리 왕복 후 재투입 시 I/O 검사부터 추적 재시작(REQ-OA-0004)</td></tr>
+    <tr><td>② 생산 계획 및 자재 투입 확인</td><td class="center">조합 2</td>
+        <td>라인 자재 수령 검증(REQ-OA-0002)</td></tr>
+    <tr><td rowspan="2"><b>자재 창고</b></td><td>① 입하 정보 등록, 자재 적치</td><td class="center">A</td>
+        <td>부품사업부와 동일 + P/O 초과 입고 시 초과분 별도 입하 분리 생성(REQ-OA-0011, QA #36)</td></tr>
+    <tr><td>② 자재 LOT 라벨·출고 QR(입출고용 자재 분할 코드) 출력</td><td class="center">조합 1</td>
+        <td>REQ-PR-0007, REQ-OA-0010(출고 QR 항상 발행, QA #16)</td></tr>
+    <tr><td><b>생산 창고</b><br><span class="small muted">3층 엘리베이터 앞 — 공정 투입 전 보관 장소</span></td><td>입고 확인</td><td class="center">A</td>
+        <td>출고 QR 입측 스캔(REQ-OA-0010), 사내 이동 출/입 전수 기록(REQ-OA-0008)</td></tr>
+    <tr><td><b>제품 창고</b></td><td>입고/출고 확인</td><td class="center">A</td>
+        <td>제품입고·Picking</td></tr>
+    <tr><td rowspan="2"><b>출하 포장 라인</b> <span class="chip chip-reuse">✱</span></td><td>① 입고 확인</td><td class="center">A</td>
+        <td>Picking 인계 확인</td></tr>
+    <tr><td>② 제품 LOT 라벨 출력</td><td class="center">조합 1</td>
+        <td>납품라벨 Matching(QA #2, 워크플로우 04 S6)·포장라벨(설계결정서 결정 05)·고객 바코드(워크플로우 04 S6)</td></tr>
+  </tbody>
+</table>
+<p class="small"><span class="chip chip-reuse">✱</span> 재사용이 어느 장비까지인지는 확인 필요 — §7 #9.</p>
+</section>
+
+<!-- ═══ §5 ═══ -->
+<section class="pb">
+<h2><span class="no">§5</span>수량·비용 개산</h2>
+
+<h3>5.1 최소 수량 집계 <span class="tag tag-hyp">[가설]</span></h3>
+<p class="small">배치 지점당 1식 전제의 <b>최소 수량</b>. 실제 수량은 라인 수·세부 공정 수·작업 인원(§2.5 체크포인트)·레이아웃(고객 회수 대기)에 따라 증가할 수 있다. 검증 방법 — 고객의 설치 공정·위치 정리(REQ-PR-0017 비고)와 공장 레이아웃 배치도 회수 후 재산정.</p>
+
+<div class="tiles">
+  <div class="tile"><div class="v">8</div><div class="l"><span class="chip chip-a">A</span> 이동형 스캐너 모듈</div></div>
+  <div class="tile"><div class="v">6</div><div class="l"><span class="chip chip-b">B</span> 라벨 프린터</div></div>
+  <div class="tile"><div class="v">10</div><div class="l"><span class="chip chip-c">C</span> 근거리 스캐너 모듈</div></div>
+  <div class="tile"><div class="v">10</div><div class="l"><span class="chip chip-d">D</span> PC·모니터 구성</div></div>
+</div>
+
+<table>
+  <thead><tr><th>사업부</th><th class="center">A 이동형</th><th class="center">조합 1 (B+C+D)</th><th class="center">조합 2 (C+D)</th><th>비고</th></tr></thead>
+  <tbody>
+    <tr><td>부품사업부</td><td class="center">4</td><td class="center">4</td><td class="center">2</td>
+        <td>조합 2 = 조립공정 ①·② — ②는 세부 공정 수에 따라 증가 가능</td></tr>
+    <tr><td>OA사업부</td><td class="center">4</td><td class="center">2</td><td class="center">2</td>
+        <td>조합 2 = 생산 라인 2식, 재사용 대상(✱) — 출하 포장 라인 일부도 재사용 가능</td></tr>
+    <tr class="total"><td>합계 (최소)</td><td class="center">8</td><td class="center">6</td><td class="center">4</td>
+        <td>조합 3 = 0식(현 배치안 미사용). 재사용분 제외 시 신규 구매 수량 감소</td></tr>
+  </tbody>
+</table>
+<p class="small">모듈 환산(조달 단위) — <b>B 라벨 프린터 6 · C 근거리 스캐너 10 · D PC·모니터 10</b> (+ A 이동형 8).</p>
+
+<h3>5.2 모듈·조합 단가 개산</h3>
+<table>
+  <thead><tr><th style="width:24%">모듈/조합</th><th>단가 개산</th><th style="width:12%">근거</th></tr></thead>
+  <tbody>
+    <tr><td><span class="chip chip-a">A</span> 이동형 스캐너 모듈</td>
+        <td>미정 — 모바일 디바이스 기종 미정(베트남 현지 구매) + 스캐너 후보 간 가격 차 큼(후보 1 확인 필요 / 후보 2 KDC480 62.9만원)</td><td>§2.1</td></tr>
+    <tr><td><span class="chip chip-b">B</span> 라벨 프린터</td>
+        <td><b>36만원</b> (팀 메모 예상 — 웹 관측가 42.9만원)</td><td>§2.2</td></tr>
+    <tr><td><span class="chip chip-c">C</span> 근거리 스캐너</td>
+        <td><b>50만원</b> (팀 메모 예상 — 웹 관측가 52.8만~71.5만원)</td><td>§2.3</td></tr>
+    <tr><td><span class="chip chip-d">D</span> PC·모니터</td>
+        <td><b>50만원 이내</b> (노트북 대체 시 재산정)</td><td>§2.4</td></tr>
+    <tr><td><b>조합 1</b> (B+C+D)</td>
+        <td><b>136만원/식</b></td><td>§2.5</td></tr>
+    <tr><td><b>조합 2</b> (C+D)</td>
+        <td><b>100만원/식</b></td><td>§2.5</td></tr>
+    <tr><td><b>조합 3</b> (B+D)</td>
+        <td><b>86만원/식</b> — 현 배치안(§4) 미사용, 예비 유형</td><td>§2.5</td></tr>
+  </tbody>
+</table>
+
+<div class="callout warn"><div class="ch">총액 개산 — 신규 구매 전액 가정 (모듈 A 제외) <span class="tag tag-hyp">[가설]</span></div>
+조합 1 6식 × 136만 = 816만원 · 조합 2 4식 × 100만 = 400만원 → <b>약 1,216만원 + 모듈 A 8식분</b>. OA 재사용 확정 시 차감.<br>
+이 총액은 <b>두 겹의 하한</b>이다 — ① 수량이 지점당 1식 최소치 전제, ② 단가가 팀 메모 예상가로 웹 관측가 하한보다 낮음(1952g 관측 하한 52.8만 적용 시 조합 1 ≈ 138.8만/식·조합 2 ≈ 102.8만/식, 총액 ≈ 약 1,244만원). 검증 방법 — 견적 접수 후 실단가로 재산정.</div>
+</section>
+
+<!-- ═══ §6 ═══ -->
+<section class="pb">
+<h2><span class="no">§6</span>공통 운용 요구</h2>
+<table>
+  <thead><tr><th style="width:20%">항목</th><th>내용</th><th style="width:18%">근거</th></tr></thead>
+  <tbody>
+    <tr><td><b>네트워크 두절 내성</b></td>
+        <td>현장 단말은 로컬 버퍼링 + 통신 복구 시 자동 동기화 지원 필요 — 현행 추적관리시스템은 네트워크 불안정으로 생산 중단 빈번. 네트워크 인프라 자체는 고객 책임</td>
+        <td>QA #32, REQ-OA-0005</td></tr>
+    <tr><td><b>다국어 라벨</b></td>
+        <td>라벨 출력물도 한국어/베트남어 언어 선택 대상 (UI·마스터 포함 전범위 다국어)</td>
+        <td>QA #33</td></tr>
+    <tr><td><b>현장 인증 방식</b></td>
+        <td>로그인 없이 작업 시작 전 <b>사번 입력</b> — 단말에 별도 인증 하드웨어 불요</td>
+        <td>REQ-PR-0023</td></tr>
+    <tr><td><b>라벨 셋팅 프로그램</b></td>
+        <td>크레플 제작, MES 연동 동작. 라벨 프린터(B)와 조합되는 모듈 D의 PC에 별도 설치</td>
+        <td>팀 메모</td></tr>
+    <tr><td><b>조달 제약</b></td>
+        <td>모바일 디바이스(통신 장비)는 수출입이 어려워 <b>베트남 현지 구매</b></td>
+        <td>팀 메모</td></tr>
+    <tr><td><b>라벨 발행 규칙</b></td>
+        <td>사전발행(placeholder)→확정 활성, 미사용·취소분 폐번(재사용 금지) — 프린터 운영 절차에 반영</td>
+        <td>설계결정서 결정 05, 패턴 P3</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══ §7 ═══ -->
+<h2><span class="no">§7</span>미확정 사항 · 체크포인트</h2>
+<table>
+  <thead><tr><th class="center" style="width:5%">#</th><th style="width:27%">항목</th><th>상태</th><th style="width:28%">다음 액션</th></tr></thead>
+  <tbody>
+    <tr><td class="center">1</td><td>설치 공정·위치 목록</td><td><span class="tag tag-open">고객 정리 대기</span> REQ-PR-0017 비고, 대기항목 #2</td><td>고객 회신 수령 후 §4 배치표와 대조</td></tr>
+    <tr><td class="center">2</td><td>공장·창고 레이아웃 배치도</td><td><span class="tag tag-open">고객 회수 대기</span> 대기항목 #7 / E7</td><td>수령 후 §5.1 수량 재산정</td></tr>
+    <tr><td class="center">3</td><td>평균 사출 작업 인원 수 / 전 인원 수행 여부</td><td><span class="tag tag-open">미확인</span> §2.5 체크포인트</td><td>현장 확인 — 조합 1 스테이션 수량 결정 입력값</td></tr>
+    <tr><td class="center">4</td><td>모바일 디바이스 기종</td><td><span class="tag tag-open">미정</span> 베트남 현지 구매</td><td>현지 조달 가능 기종 조사 (부착형 스캐너 호환성 포함)</td></tr>
+    <tr><td class="center">5</td><td>이동형 스캐너 후보 1 제품명·가격</td><td><span class="tag tag-open">확인 필요</span> 판매 페이지 자동 조회 차단</td><td>브라우저 직접 확인, 후보 2(KDC480 62.9만)와 비교 결정</td></tr>
+    <tr><td class="center">6</td><td>TTP-247 단종(EoL) 여부</td><td><span class="tag tag-est">웹 검색 추정</span> 일부 해외 판매처 EoL 표기</td><td>국내 조달 물량·후속 모델 확인</td></tr>
+    <tr><td class="center">7</td><td>납품라벨 형식</td><td><span class="tag tag-open">고객 회신 대기</span> REQ-PR-0036 비고, 대기항목 #6 / E6</td><td>라벨 규격·프린터 폭(4인치) 적합성 검증</td></tr>
+    <tr><td class="center">8</td><td>협력사 사전발행 라벨 규격·적용 협력사 범위</td><td><span class="tag tag-open">미확정</span> 워크플로우 01 S2 Check</td><td>확정 시 라벨 스톡·프린터 설정 반영</td></tr>
+    <tr><td class="center">9</td><td>OA 재사용 장비의 정확한 범위</td><td><span class="tag tag-open">미확인</span> 메모상 생산 라인·출하 포장 라인에 ✱ 표기만 존재</td><td>추적관리시스템 보유 장비 실사(모델·수량·상태), 1952g 외 기종 포함 여부</td></tr>
+    <tr><td class="center">10</td><td>조립 세부 공정 이동 스캔 여부</td><td><span class="tag tag-open">미정의</span> 도식스펙 02 U4 — WIP 이동 단위·기록 방식</td><td>확정 시 조립공정 조합 2 수량 재산정</td></tr>
+    <tr><td class="center">11</td><td>관리자 알람 매체</td><td><span class="tag tag-ok">확정</span> 카카오톡/Zalo 선택형 채널 어댑터(QA #24, E12 종결) — 잔여: Zalo 기업 API 기술 검토(CREFLE)</td><td>Zalo 채택 시 모바일 디바이스 정책(메신저 설치)에 반영</td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ═══ 꼬리 ═══ -->
+<div class="foot">
+<b>근거 자료</b> — OMF 팀 하드웨어 토폴로지 메모(2026-07-07, 정본 원천) · MES-요구사항-명세서-v1-정리 · 워크플로우-요구사항반영 01/02/04 · 도식스펙 01/02/04 · 현장검증-QA-확정기록 · 용어표준사전 · 설계결정서-14건 · 제품 판매 페이지(접근일 2026-07-07, 스마트스토어는 자동 조회 차단으로 웹 검색 보완)<br>
+v0.2 (2026-07-07) — 모듈 4종 재편(라벨 프린터 셋팅에서 PC·모니터를 모듈 D로 분리) + 조합 구성 3종 정의(조합 1 B+C+D · 조합 2 C+D · 조합 3 B+D), 수량·총액 재산정.<br>
+v0.1 (2026-07-07) — 최초 작성. 팀 하드웨어 토폴로지 메모를 표준 모듈 + 구역별 배치 + 수량·비용 개산으로 정리, 워크플로우·REQ·QA 근거 매핑.<br>
+© 2026 CREFLE Inc. · <span style="color:var(--brand-red);font-weight:700">CONFIDENTIAL · 대외비</span> — 외부 공유·게시 금지
+</div>
+
+</div></body>
+</html>

@@ -1,0 +1,240 @@
+/* ============================================================
+   CREFLE Presentation Design System
+   Foundation: Colors + Type + Shape + Elevation
+   Source: viskit_killer Figma DS (Material Design 3 token map)
+   ============================================================ */
+
+/* -------- Webfont (local OFL 1.1 OTFs in /fonts + JetBrains Mono CDN) -- */
+/* @import rules must precede @font-face per CSS spec */
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+@font-face {
+  font-family: "Spoqa Han Sans Neo";
+  src: url("fonts/SpoqaHanSansNeo-Thin.otf") format("opentype");
+  font-weight: 100; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Spoqa Han Sans Neo";
+  src: url("fonts/SpoqaHanSansNeo-Light.otf") format("opentype");
+  font-weight: 300; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Spoqa Han Sans Neo";
+  src: url("fonts/SpoqaHanSansNeo-Regular.otf") format("opentype");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Spoqa Han Sans Neo";
+  src: url("fonts/SpoqaHanSansNeo-Medium.otf") format("opentype");
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Spoqa Han Sans Neo";
+  src: url("fonts/SpoqaHanSansNeo-Bold.otf") format("opentype");
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap");
+
+/* Material Symbols requires ligatures enabled and the standard reset so
+   the ligature name (e.g. "photo_camera") resolves to the glyph instead of
+   rendering as plain text. Applied to both the canonical class and the
+   shorter `.ms` alias used inside components/buttons. */
+.material-symbols-rounded,
+.ms {
+  font-family: "Material Symbols Rounded";
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: "liga";
+  -webkit-font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+:root {
+  /* ────────────────────────────────────────────────────────
+     1. BRAND COLOR — extracted from the official logo JPG
+        Red dots + the "i" stroke = brand primary; charcoal = wordmark.
+        The M3 indigo below (--primary) is the *product UI* primary
+        from viskit_killer, derived from M3 seed #363740 — a separate
+        layer used only inside product mockups. Brand presentations
+        lead with RED.
+     ──────────────────────────────────────────────────────── */
+  --brand-red:       #C9252C;   /* primary brand identity */
+  --brand-red-dark:  #A81E24;   /* hover / depth */
+  --brand-red-deep:  #7D161B;   /* heavy hover, on-dark accent */
+  --brand-red-soft:  #F4DDDE;   /* container, subtle bg */
+
+  --brand-charcoal:        #3E4146;   /* wordmark, headings on light */
+  --brand-charcoal-soft:   #5C5F66;
+  --brand-charcoal-deep:   #1F2125;   /* full-bleed dark surface */
+
+  /* Brand-primary alias — use this in slides + presentation materials */
+  --brand-primary:        var(--brand-red);
+  --brand-primary-dark:   var(--brand-red-dark);
+  --brand-primary-deep:   var(--brand-charcoal-deep);
+
+  /* Light decorative accents on charcoal / dark surfaces */
+  --brand-accent-1:       #FFAFB1;   /* tint of red for highlight-on-dark */
+  --brand-accent-2:       #C9CACE;   /* light charcoal */
+  --brand-accent-3:       #EAEBEC;   /* whisper-on-dark */
+
+  /* ────────────────────────────────────────────────────────
+     2. M3 ROLE TOKENS (Light) — surfaces + foregrounds
+     ──────────────────────────────────────────────────────── */
+  --surface:                 #FBF8FD;
+  --surface-bright:          #FFFFFF;
+  --surface-container-low:   #F5F2F7;
+  --surface-container:       #EFEDF1;
+  --surface-container-high:  #E9E7EB;
+  --surface-container-highest:#E3E1E5;
+
+  --on-surface:              #1B1B1F;   /* body / primary text */
+  --on-surface-variant:      #2D2C33;   /* body de-emphasized */
+  --on-surface-muted:        #77767F;   /* tertiary text */
+
+  --primary:                 #4758A9;
+  --on-primary:              #FFFFFF;
+  --primary-container:       #DDE1FF;
+  --on-primary-container:    #001257;
+
+  --secondary-container:     #DFE1F9;
+  --on-secondary-container:  #171B2C;
+
+  --outline:                 #767680;
+  --outline-variant:         #C6C5D0;
+
+  /* ────────────────────────────────────────────────────────
+     3. SEMANTIC — fixed across Light/Dark (industrial safety)
+        Use for VERDICT / STATUS / DELTA, never decoratively.
+     ──────────────────────────────────────────────────────── */
+  --semantic-success:        #1F883D;   /* OK · 양품 · pass */
+  --semantic-error:          #B3261E;   /* NG · 불량 · fail */
+  --semantic-error-strong:   #93000A;
+  --semantic-warning:        #E8A100;   /* ERROR · 주의 · attention */
+  --semantic-info:           #0B57D0;   /* 정보 · INFO */
+  --semantic-idle:           #6E7781;   /* IDLE · 대기 */
+
+  --on-semantic:             #FFFFFF;
+  --success-container:       #DCEFE2;
+  --error-container:         #F9DEDC;
+  --warning-container:       #FDECC8;
+  --info-container:          #DCE5FA;
+
+  /* ────────────────────────────────────────────────────────
+     4. TYPE — Spoqa Han Sans Neo (KR/EN), JetBrains Mono (code)
+        Spec mandate: 제목 20 / 본문 16 / 본문 작은 12 (document scale)
+        Plus a slide scale (1920×1080) tuned for projection.
+     ──────────────────────────────────────────────────────── */
+  --font-sans: "Spoqa Han Sans Neo", "Noto Sans KR", -apple-system,
+               BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  --font-icon: "Material Symbols Rounded";
+
+  /* Document scale (per spec) */
+  --text-title:    20px;   /* 제목 */
+  --text-body:     16px;   /* 본문 기본 */
+  --text-small:    12px;   /* 본문 작은 */
+  --text-label:    14px;   /* 라벨/버튼 (M3 label-large) */
+
+  /* Slide scale — 1920×1080 projection, proportional to spec */
+  --slide-display: 96px;   /* hero / title slide */
+  --slide-h1:      64px;   /* slide title */
+  --slide-h2:      40px;   /* section header */
+  --slide-h3:      28px;   /* sub-section */
+  --slide-body:    24px;   /* body — minimum legible on projection */
+  --slide-small:   18px;   /* caption, footnote */
+  --slide-eyebrow: 16px;   /* uppercase tracking eyebrow */
+
+  /* Weights — Spoqa supplies 100/300/400/500/700 */
+  --w-thin: 100;
+  --w-light: 300;
+  --w-regular: 400;
+  --w-medium: 500;
+  --w-bold: 700;
+
+  /* Leading + tracking */
+  --leading-tight: 1.15;
+  --leading-snug:  1.35;
+  --leading-body:  1.55;
+  --leading-loose: 1.75;
+  --tracking-tight: -0.02em;
+  --tracking-eyebrow: 0.14em;
+
+  /* ────────────────────────────────────────────────────────
+     5. SHAPE — Material 3 corner system + per-component radii
+     ──────────────────────────────────────────────────────── */
+  --radius-none: 0;
+  --radius-xs:   4px;
+  --radius-sm:   8px;     /* badges, chips, small inputs */
+  --radius-md:   12px;    /* cards, dialogs, content blocks */
+  --radius-lg:   16px;    /* large media, illustrations */
+  --radius-xl:   28px;    /* hero cards, full sheets */
+  --radius-pill: 9999px;  /* M3 buttons, pill chips */
+
+  /* ────────────────────────────────────────────────────────
+     6. ELEVATION — M3 Level 0–5
+        Use shadow to lift content; never use shadow + heavy border together.
+     ──────────────────────────────────────────────────────── */
+  --elev-0: none;
+  --elev-1: 0 1px 2px 0 rgba(0,0,0,0.10), 0 1px 3px 1px rgba(0,0,0,0.06);
+  --elev-2: 0 1px 2px 0 rgba(0,0,0,0.10), 0 2px 6px 2px rgba(0,0,0,0.08);
+  --elev-3: 0 4px 8px 3px rgba(0,0,0,0.08), 0 1px 3px 0 rgba(0,0,0,0.12);
+  --elev-4: 0 6px 10px 4px rgba(0,0,0,0.10), 0 2px 3px 0 rgba(0,0,0,0.14);
+  --elev-5: 0 8px 12px 6px rgba(0,0,0,0.10), 0 4px 4px 0 rgba(0,0,0,0.16);
+
+  /* Inner shadow used for inset surfaces (image wells, code blocks) */
+  --inset-1: inset 0 1px 0 0 rgba(255,255,255,0.6),
+             inset 0 -1px 0 0 rgba(0,0,0,0.04);
+
+  /* ────────────────────────────────────────────────────────
+     7. SPACING — 4-pt grid; never compose by eye
+     ──────────────────────────────────────────────────────── */
+  --s-1: 4px;   --s-2: 8px;   --s-3: 12px;   --s-4: 16px;
+  --s-5: 20px;  --s-6: 24px;  --s-8: 32px;   --s-10: 40px;
+  --s-12: 48px; --s-16: 64px; --s-20: 80px;  --s-24: 96px;
+
+  /* Slide safe-area: gutters and minimum element spacing on 1920×1080 */
+  --slide-gutter: 80px;
+  --slide-min-gap: 24px;    /* never let meaningful elements get closer */
+
+  /* ────────────────────────────────────────────────────────
+     8. MOTION — Material 3 standard easings + durations
+     ──────────────────────────────────────────────────────── */
+  --ease-standard:   cubic-bezier(0.2, 0.0, 0, 1.0);
+  --ease-decelerate: cubic-bezier(0.0, 0.0, 0, 1.0);
+  --ease-accelerate: cubic-bezier(0.3, 0.0, 1.0, 1.0);
+  --ease-emphasized: cubic-bezier(0.2, 0.0, 0, 1.0);
+  --dur-short:  150ms;
+  --dur-medium: 250ms;
+  --dur-long:   400ms;
+  --dur-emph:   500ms;
+}
+
+/* ============================================================
+   SEMANTIC TYPE CLASSES — use these in markup, never raw px
+   ============================================================ */
+
+/* Document/UI scale */
+.t-title   { font: var(--w-bold) var(--text-title)/var(--leading-snug) var(--font-sans); letter-spacing: var(--tracking-tight); color: var(--on-surface); }
+.t-body    { font: var(--w-regular) var(--text-body)/var(--leading-body) var(--font-sans); color: var(--on-surface); }
+.t-small   { font: var(--w-regular) var(--text-small)/var(--leading-snug) var(--font-sans); color: var(--on-surface-variant); }
+.t-label   { font: var(--w-medium) var(--text-label)/1.4 var(--font-sans); color: var(--on-surface); }
+.t-mono    { font: var(--w-regular) var(--text-small)/var(--leading-snug) var(--font-mono); }
+
+/* Slide scale — apply to elements inside .slide */
+.s-display { font: var(--w-bold) var(--slide-display)/var(--leading-tight) var(--font-sans); letter-spacing: var(--tracking-tight); }
+.s-h1      { font: var(--w-bold) var(--slide-h1)/var(--leading-tight) var(--font-sans); letter-spacing: var(--tracking-tight); }
+.s-h2      { font: var(--w-medium) var(--slide-h2)/var(--leading-snug) var(--font-sans); }
+.s-h3      { font: var(--w-medium) var(--slide-h3)/var(--leading-snug) var(--font-sans); }
+.s-body    { font: var(--w-regular) var(--slide-body)/var(--leading-body) var(--font-sans); }
+.s-small   { font: var(--w-regular) var(--slide-small)/var(--leading-snug) var(--font-sans); }
+.s-eyebrow { font: var(--w-medium) var(--slide-eyebrow)/1 var(--font-sans);
+             text-transform: uppercase; letter-spacing: var(--tracking-eyebrow); color: var(--primary); }
+.s-mono    { font: var(--w-regular) var(--slide-small)/var(--leading-snug) var(--font-mono); }
