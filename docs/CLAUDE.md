@@ -86,3 +86,4 @@ planning/
 | --- | --- | --- | --- |
 | 2026-07-13 | 초기 구성 — 에이전트 3종(workflow-designer/drawer/reviewer) + 스킬 3종(figjam-workflow-team/workflow-plan-brief/workflow-review-checklist). 작업자 모델 Opus 4.8 고정 | 전체 | 사용자 하네스 구성 지시 |
 | 2026-07-13 | 경량 경로 추가 — 소규모 수정(변경 요소 ≤5·스펙 해석 불요)은 리더 직접 수정 + 검토자 1회 검증(미니 지시서 필수), r2 FAIL 시 표준 경로 전환 | skills/figjam-workflow-team | 파일럿(01-S-I 재배선) 피드백: 에이전트 3왕복이 소규모 수정에 과잉, 검토자 검증은 실효 입증되어 유지 |
+| 2026-07-13 | 작업 페이지 v2 고정 — 모든 도식 작업은 "system workflow v2"(219:4509), v1은 명시 지정 시에만(동결 구판). 매 콜 setCurrentPageAsync 필수 규칙 병기 | skills/figjam-workflow-team·figjam-workflow-diagram | 사용자 지시: 명시적으로 v1을 명명하지 않으면 v2만 작업 |
