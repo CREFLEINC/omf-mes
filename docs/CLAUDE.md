@@ -74,3 +74,15 @@ planning/
   - `/new-plan <주제>` — 새 기획안 작업본 스캐폴딩
   - `/snapshot [주제] [버전]` — 작업본을 버전 스냅샷으로 확정
   - `/raw-index` — raw/ 자료 목록 갱신
+
+### 팀 하네스: FigJam 워크플로우 도식 제작
+
+**목표:** 워크플로우 스펙(md) → FigJam 도식 작화를 설계자·작업자·검토자 3인 에이전트 팀으로 수행한다.
+
+**트리거:** FigJam 도식의 신규 작화·수정·재작업 요청 시 `figjam-workflow-team` 스킬을 사용하라. 도식에 대한 단순 조회·질문·의견은 직접 응답 가능. (`figjam-workflow-diagram`은 공통 지식 베이스 — 팀 스킬과 에이전트들이 참조)
+
+**변경 이력:**
+| 날짜 | 변경 내용 | 대상 | 사유 |
+| --- | --- | --- | --- |
+| 2026-07-13 | 초기 구성 — 에이전트 3종(workflow-designer/drawer/reviewer) + 스킬 3종(figjam-workflow-team/workflow-plan-brief/workflow-review-checklist). 작업자 모델 Opus 4.8 고정 | 전체 | 사용자 하네스 구성 지시 |
+| 2026-07-13 | 경량 경로 추가 — 소규모 수정(변경 요소 ≤5·스펙 해석 불요)은 리더 직접 수정 + 검토자 1회 검증(미니 지시서 필수), r2 FAIL 시 표준 경로 전환 | skills/figjam-workflow-team | 파일럿(01-S-I 재배선) 피드백: 에이전트 3왕복이 소규모 수정에 과잉, 검토자 검증은 실효 입증되어 유지 |
