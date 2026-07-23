@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>물리적 모델링 · MES 데이터 모델링 v3</title>
+<style>:root{
+  --bg:#F4F5F6; --surface:#FFFFFF; --surface-2:#EDEFF1; --surface-3:#E4E7EA;
+  --ink:#14181B; --ink-2:#5A6570; --ink-3:#8B959D;
+  --rule:#DCE0E4; --rule-strong:#C3CAD0;
+  --accent:#A9660A; --tint-accent:#F7ECD9;
+  --blue:#28558F; --green:#1D7043; --red:#B93E28;
+  --start:#B93E28; --flow:#1D7043; --done:#28558F; --warn:#9B3427;
+  --tint-start:#F6E5E1; --tint-flow:#E2F0E7; --tint-done:#E2EAF5;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Pretendard","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+  --side:264px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#101315; --surface:#171B1E; --surface-2:#1D2226; --surface-3:#242A2F;
+    --ink:#E7EBEE; --ink-2:#9AA5AE; --ink-3:#6E7A83;
+    --rule:#2A3035; --rule-strong:#3A4249;
+    --accent:#DFA149; --tint-accent:#2B2317;
+    --blue:#83ACE4; --green:#5FC68B; --red:#E4816C;
+  --start:#E4816C; --flow:#5FC68B; --done:#83ACE4; --warn:#E0806E;
+  --tint-start:#2A1D1A; --tint-flow:#16281F; --tint-done:#182432;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101315; --surface:#171B1E; --surface-2:#1D2226; --surface-3:#242A2F;
+  --ink:#E7EBEE; --ink-2:#9AA5AE; --ink-3:#6E7A83;
+  --rule:#2A3035; --rule-strong:#3A4249;
+  --accent:#DFA149; --tint-accent:#2B2317;
+  --blue:#83ACE4; --green:#5FC68B; --red:#E4816C;
+  --start:#E4816C; --flow:#5FC68B; --done:#83ACE4; --warn:#E0806E;
+  --tint-start:#2A1D1A; --tint-flow:#16281F; --tint-done:#182432;
+}
+:root[data-theme="light"]{
+  --bg:#F4F5F6; --surface:#FFFFFF; --surface-2:#EDEFF1; --surface-3:#E4E7EA;
+  --ink:#14181B; --ink-2:#5A6570; --ink-3:#8B959D;
+  --rule:#DCE0E4; --rule-strong:#C3CAD0;
+  --accent:#A9660A; --tint-accent:#F7ECD9;
+  --blue:#28558F; --green:#1D7043; --red:#B93E28;
+  --start:#B93E28; --flow:#1D7043; --done:#28558F; --warn:#9B3427;
+  --tint-start:#F6E5E1; --tint-flow:#E2F0E7; --tint-done:#E2EAF5;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans);
+     font-size:15px; line-height:1.75; letter-spacing:-0.003em}
+
+/* ── 사이드바 ───────────────────────────── */
+nav.side{position:sticky; top:0; z-index:20; background:var(--surface);
+         border-bottom:1px solid var(--rule); max-height:none}
+.nav-brand{padding:16px 22px 12px; border-bottom:1px solid var(--rule)}
+.nav-brand a{text-decoration:none; display:block}
+.nav-brand .bt{display:block; font-size:14px; font-weight:700; color:var(--ink); letter-spacing:-0.02em}
+.nav-brand .bs{display:block; font-family:var(--mono); font-size:10px; color:var(--ink-3);
+               letter-spacing:.1em; text-transform:uppercase; margin-top:4px}
+.nav-docs{display:flex; gap:2px; overflow-x:auto; padding:0 14px; scrollbar-width:thin}
+.nav-docs .grp{flex:none; align-self:center; font-family:var(--mono); font-size:10px;
+               letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); padding:0 8px 0 4px}
+.nav-docs a{flex:none; padding:11px 10px; font-size:12.5px; color:var(--ink-2);
+            text-decoration:none; white-space:nowrap; border-bottom:2px solid transparent}
+.nav-docs a:hover{color:var(--ink)}
+.nav-docs a.on{color:var(--ink); font-weight:600; border-bottom-color:var(--accent)}
+.ontop{display:none}
+
+main{max-width:940px; margin:0 auto; padding:0 26px 100px}
+
+@media (min-width:1120px){
+  body{padding-left:var(--side)}
+  nav.side{position:fixed; inset:0 auto 0 0; width:var(--side); height:100vh;
+           overflow-y:auto; border-bottom:0; border-right:1px solid var(--rule);
+           display:flex; flex-direction:column; padding-bottom:28px}
+  .nav-brand{padding:24px 22px 18px}
+  .nav-docs{flex-direction:column; overflow:visible; padding:14px 12px 0; gap:0}
+  .nav-docs .grp{align-self:stretch; padding:14px 10px 5px}
+  .nav-docs .grp:first-child{padding-top:0}
+  .nav-docs a{padding:6px 10px; border-bottom:0; border-left:2px solid transparent;
+              white-space:normal; line-height:1.45; border-radius:0 3px 3px 0}
+  .nav-docs a:hover{background:var(--surface-2)}
+  .nav-docs a.on{background:var(--surface-2); border-left-color:var(--accent)}
+  .ontop{display:flex; flex-direction:column; margin-top:20px; padding:14px 12px 0;
+         border-top:1px solid var(--rule)}
+  .ontop .grp{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+              color:var(--ink-3); padding:0 10px 6px}
+  .ontop a{padding:3px 10px; font-size:11.5px; color:var(--ink-2); text-decoration:none;
+           line-height:1.5; border-left:2px solid transparent}
+  .ontop a:hover{color:var(--accent); border-left-color:var(--rule-strong)}
+  .ontop a.l1{font-weight:600; color:var(--ink); margin-top:6px}
+  .ontop a.l2{padding-left:20px}
+  .ontop a.l3{padding-left:32px; color:var(--ink-3); font-size:11px}
+  main{margin:0; padding:0 56px 120px}
+}
+
+/* ── 문서 헤더 ──────────────────────────── */
+.dochead{padding:44px 0 26px; border-bottom:2px solid var(--ink); margin-bottom:8px}
+.eyebrow{font-family:var(--mono); font-size:10.5px; letter-spacing:.13em; text-transform:uppercase;
+         color:var(--ink-3)}
+.doctitle{font-size:clamp(24px,3.2vw,32px); line-height:1.22; margin:10px 0 0; font-weight:700;
+          letter-spacing:-0.025em; text-wrap:balance}
+.docsub{margin:10px 0 0; color:var(--ink-2); font-size:14px; max-width:64ch}
+
+/* ── 본문 ──────────────────────────────── */
+.md{padding-top:12px}
+.md h1,.md h2,.md h3,.md h4,.md h5,.md h6{letter-spacing:-0.02em; text-wrap:balance; scroll-margin-top:80px}
+.md h1{font-size:23px; font-weight:700; margin:52px 0 14px; padding-bottom:9px;
+       border-bottom:1px solid var(--rule-strong)}
+.md h2{font-size:18.5px; font-weight:700; margin:38px 0 10px}
+.md h3{font-size:15.5px; font-weight:700; margin:28px 0 8px; color:var(--ink)}
+.md h4,.md h5,.md h6{font-size:14px; font-weight:700; margin:22px 0 6px; color:var(--ink-2)}
+.md > :first-child{margin-top:0}
+.md p{margin:0 0 13px; max-width:76ch}
+.md a{color:var(--blue)}
+.md strong{font-weight:700}
+.md hr{border:0; border-top:1px solid var(--rule); margin:34px 0}
+.md ul,.md ol{margin:0 0 14px; padding-left:22px; max-width:76ch}
+.md li{margin:3px 0}
+.md li > ul,.md li > ol{margin:3px 0}
+.md blockquote{margin:0 0 16px; padding:12px 18px; border-left:3px solid var(--accent);
+               background:var(--tint-accent); border-radius:0 3px 3px 0; max-width:76ch}
+.md blockquote p{margin:0}
+.md blockquote p + p{margin-top:8px}
+code{font-family:var(--mono); font-size:.87em; background:var(--surface-2); padding:1.5px 5px;
+     border-radius:2px; color:var(--ink); word-break:break-word}
+.codewrap{margin:0 0 16px; border:1px solid var(--rule); border-radius:3px; background:var(--surface);
+          overflow-x:auto}
+.codewrap pre{margin:0; padding:14px 18px}
+.codewrap code{background:none; padding:0; font-size:12.5px; line-height:1.65; white-space:pre;
+               display:block}
+.codewrap code.lang-sql{color:var(--ink)}
+
+/* ── 표 ────────────────────────────────── */
+.tablewrap{overflow-x:auto; margin:0 0 18px; border:1px solid var(--rule); border-radius:3px;
+           background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-size:13.5px; min-width:480px}
+th,td{text-align:left; padding:9px 14px; border-bottom:1px solid var(--rule); vertical-align:top;
+      line-height:1.6}
+thead th{font-family:var(--mono); font-size:11px; letter-spacing:.06em; color:var(--ink-3);
+         font-weight:600; background:var(--surface-2); white-space:nowrap; text-transform:uppercase}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--surface-2)}
+td code{font-size:12px; white-space:nowrap}
+
+/* ── 페이저 ────────────────────────────── */
+.pager{display:flex; justify-content:space-between; gap:16px; margin-top:56px; padding-top:22px;
+       border-top:1px solid var(--rule)}
+.pager a{flex:0 1 auto; max-width:46%; text-decoration:none; color:var(--ink); font-size:13.5px;
+         font-weight:600; padding:12px 16px; border:1px solid var(--rule); border-radius:3px;
+         background:var(--surface); line-height:1.4}
+.pager a:hover{border-color:var(--accent); color:var(--accent)}
+.pager a span{display:block; font-family:var(--mono); font-size:10px; letter-spacing:.1em;
+              text-transform:uppercase; color:var(--ink-3); font-weight:500; margin-bottom:3px}
+.pager a.nx{text-align:right}
+a:focus-visible,.nav-docs a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+/* ── 인덱스 전용 ───────────────────────── */
+.hero{padding:56px 0 34px; border-bottom:2px solid var(--ink)}
+.hero h1{font-size:clamp(27px,4vw,40px); line-height:1.15; margin:12px 0 0; font-weight:700;
+         letter-spacing:-0.03em}
+.hero .lede{margin:14px 0 0; color:var(--ink-2); font-size:15px; max-width:68ch}
+.statbar{display:flex; flex-wrap:wrap; gap:0; margin:30px 0 0; border:1px solid var(--rule);
+         border-radius:3px; background:var(--surface); overflow:hidden}
+.statbar div{flex:1 1 130px; padding:14px 18px; border-right:1px solid var(--rule)}
+.statbar div:last-child{border-right:0}
+.statbar .v{font-family:var(--mono); font-size:21px; font-weight:600; letter-spacing:-0.02em;
+            font-variant-numeric:tabular-nums; display:block}
+.statbar .k{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+            color:var(--ink-3); margin-top:3px; display:block}
+.secgrp{margin:52px 0 0}
+.secgrp > h2{font-size:13px; font-family:var(--mono); letter-spacing:.12em; text-transform:uppercase;
+             color:var(--accent); margin:0 0 4px; font-weight:600}
+.secgrp > p{margin:0 0 18px; color:var(--ink-2); font-size:13.5px; max-width:70ch}
+.cards{display:grid; gap:12px}
+@media(min-width:720px){.cards{grid-template-columns:1fr 1fr}}
+.card{display:block; text-decoration:none; color:inherit; background:var(--surface);
+      border:1px solid var(--rule); border-radius:3px; padding:17px 19px; transition:border-color .12s}
+.card:hover{border-color:var(--accent)}
+.card .num{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; color:var(--accent);
+           font-weight:600}
+.card h3{margin:6px 0 5px; font-size:16px; font-weight:700; letter-spacing:-0.02em}
+.card p{margin:0; font-size:13px; color:var(--ink-2); line-height:1.6}
+.card .facts{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px}
+.card .facts span{font-family:var(--mono); font-size:10.5px; color:var(--ink-3);
+                  background:var(--surface-2); padding:2px 7px; border-radius:2px;
+                  font-variant-numeric:tabular-nums}
+.card .facts span.hi{background:var(--tint-accent); color:var(--accent); font-weight:600}
+.card.ext .num{color:var(--blue)}
+.card.ext:hover{border-color:var(--blue)}
+.note{margin:44px 0 0; padding:16px 20px; border:1px solid var(--rule); border-left:3px solid var(--blue);
+      border-radius:0 3px 3px 0; background:var(--surface); font-size:13.5px; color:var(--ink-2)}
+.note b{color:var(--ink)}
+footer{margin-top:64px; padding-top:22px; border-top:1px solid var(--rule);
+        font-size:12.5px; color:var(--ink-3); display:flex; flex-wrap:wrap; gap:14px;
+        justify-content:space-between}
+@media (prefers-reduced-motion:reduce){*{transition:none!important; scroll-behavior:auto!important}}
+
+/* ── 워크플로우 페이지: 넓은 본문 ── */
+body.wide main{max-width:1180px}
+</style>
+</head>
+<body>
+<nav class="side"><div class="nav-brand"><a href="index.html"><span class="bt">MES 데이터 모델링</span><span class="bs">v3 · 문서 인덱스</span></a></div>
+<div class="nav-docs">
+<span class="grp">업무 흐름 정본</span>
+<a href="workflow-v2.html">OMF MES 시스템 워크플로우 v2</a>
+<span class="grp">1. 도메인 이해</span>
+<a href="1-1.html">비즈니스 도메인의 이해</a>
+<a href="1-2.html">MES의 핵심 필수 기능</a>
+<a href="1-3.html">사용자 시나리오</a>
+<span class="grp">2. 기능 요구사항</span>
+<a href="2-1.html">작업지시</a>
+<a href="2-2.html">자재투입</a>
+<a href="2-3.html">생산 실적 관리</a>
+<a href="2-4.html">품질관리</a>
+<a href="2-5.html">LOT 추적성</a>
+<a href="2-6.html">요구사항 누락분 보충</a>
+<a href="2-7.html">물류 재고 실행 관리</a>
+<span class="grp">3. 데이터 모델링</span>
+<a href="3-1.html">개념적 모델링</a>
+<a href="3-2.html">논리적 모델링</a>
+<a href="3-3.html" class="on">물리적 모델링</a>
+<a href="mes_erd.html">ERD — 도메인별 다이어그램</a>
+<a href="mes_scenarios_workflows.html">업무 시나리오 &amp; 워크플로우</a>
+<a href="mes_workflows_detailed.html">상세 워크플로우</a>
+<span class="grp">참고</span>
+<a href="changelog.html">변경 이력</a>
+</div><aside class="ontop"><span class="grp">이 문서</span><a class="l2" href="#s1">산출물</a><a class="l2" href="#s2">v3 변경 반영 요약</a><a class="l2" href="#s3">v2 변경 반영 요약</a><a class="l2" href="#s4">적용한 핵심 설계</a><a class="l3" href="#s5">업무 스키마 분리</a><a class="l3" href="#s6">식별자와 자료형</a><a class="l3" href="#s7">재고 원장과 현재 잔액 분리</a><a class="l3" href="#s8">LOT와 재고 분리</a><a class="l3" href="#s9">생산출고와 자재투입 분리</a><a class="l3" href="#s10">생산실적과 생산 LOT 분리</a><a class="l3" href="#s11">LOT 정방향·역방향 추적</a><a class="l3" href="#s12">대용량 데이터 파티셔닝</a><a class="l3" href="#s13">상태별 부분 인덱스</a><a class="l3" href="#s14">동시성 제어</a><a class="l3" href="#s15">사업부·공장별 데이터 접근</a><a class="l2" href="#s16">1. 애플리케이션 서비스에서 구현할 로직</a><a class="l2" href="#s17">2. PostgreSQL 제약조건으로 구현할 로직</a><a class="l2" href="#s18">3. PostgreSQL Posting 함수로 구현할 로직</a><a class="l2" href="#s19">4. DB 트리거로만 제한적으로 구현할 로직</a><a class="l2" href="#s20">5. 비동기 Worker에서 구현할 로직</a><a class="l2" href="#s21">6. 운영 배치로 구현할 로직</a><a class="l2" href="#s22">7. 애플리케이션과 DB 양쪽에서 중복 검증할 항목</a><a class="l2" href="#s23">8. 1차 구축에서 우선 구현할 최소 목록</a><a class="l3" href="#s24">애플리케이션</a><a class="l3" href="#s25">DB Posting</a><a class="l3" href="#s26">DB 제약</a><a class="l3" href="#s27">운영 배치</a><a class="l2" href="#s28">9. 명시적 범위 이연</a></aside></nav>
+<main>
+  <header class="dochead">
+    <div class="eyebrow">3. 데이터 모델링 · 3-3 물리적 모델링</div>
+    <h1 class="doctitle">물리적 모델링</h1>
+    <p class="docsub">PostgreSQL 구현 결정 — 파티션·인덱스·트리거·RLS</p>
+  </header>
+  <article class="md">
+<p>PostgreSQL 기준 물리 모델입니다.</p>
+<blockquote><p><strong>v3</strong>: ERPNext 벤치마킹 반영본(E-1~E-7). 변경 내역은 <code>CHANGELOG.md</code> 참조.</p><p><strong>v2</strong>: 요구사항 검토 반영본.</p><p>전체 DDL은 PostgreSQL 16에서 실행 검증했고, 신규 무결성 트리거는 스모크 테스트를 통과했습니다.</p></blockquote>
+<h2 id="s1">산출물</h2>
+<ul><li>PostgreSQL 물리 모델 DDL: <code>mes_postgresql_physical_model.sql</code> (본 디렉터리)</li></ul>
+<p>DDL에는 <strong>129개 테이블(논리 127 + 기본 파티션 2), 60개 인덱스, 10개 업무 스키마</strong>와 <strong>참조 시드 데이터</strong>(운영정책 코드 14종, 재고상태 코드 4종)가 포함되어 있습니다.</p>
+<h2 id="s2">v3 변경 반영 요약</h2>
+<p>ERPNext(frappe/erpnext) manufacturing·stock·subcontracting 모듈과 대조 검토 후 선별 채택한 7개 항목입니다.</p>
+<div class="tablewrap"><table><thead><tr><th>#</th><th>항목</th><th>변경</th></tr></thead><tbody><tr><td>E-1</td><td>적치 규칙 마스터</td><td>신규 <code>logistics.putaway_rule</code>(품목×창고×위치, 수용량·우선순위) + <code>putaway_task.applied_putaway_rule_id</code> 역참조</td></tr><tr><td>E-2</td><td>반제품 계획 계층 연결</td><td><code>production_order.parent_production_order_id</code>(자기참조) + <code>bom_level</code></td></tr><tr><td>E-3</td><td>작업지시 기본 로케이션</td><td><code>work_order.default_wip/fg/scrap_location_id</code> (기본값 제시·오입고 검증용)</td></tr><tr><td>E-4</td><td>운영정책 코드 시드</td><td><code>OPERATION_POLICY</code> 코드그룹 + 14종 시드 (ERPNext manufacturing_settings 대응 10 + 자체 4)</td></tr><tr><td>E-5</td><td>원장 잔액 스냅샷</td><td><code>inventory_transaction_line.from/to_qty_after_transaction</code> — 시점 조회·감사 대사 O(1)화</td></tr><tr><td>E-6</td><td>기본 BOM 지정</td><td><code>bom.is_default</code> + 품목당 1개 부분 유니크(<code>uq_bom_default</code>)</td></tr><tr><td>E-7</td><td>IN_TRANSIT 재고상태</td><td><code>INVENTORY_STATUS</code> 코드그룹 시드(AVAILABLE/IN_TRANSIT/ON_HOLD/BLOCKED) — 구조 변경 없음</td></tr></tbody></table></div>
+<p>ERPNext 대비 구조 유지를 확정한 부분(불변 원장, 행 단위 검사 측정, <code>lot_relation</code> 계보, 다차원 <code>inventory_balance</code> 등)은 CHANGELOG의 v3 절을 참조하십시오.</p>
+<h2 id="s3">v2 변경 반영 요약</h2>
+<p>요구사항 검토(높음 6건, 중간 24건, 낮음 다수)를 반영해 25개 테이블을 신설했습니다.</p>
+<div class="codewrap"><pre><code class="lang-text">기준정보   production_line, department, app_user, role, role_permission,
+          user_role, user_data_scope, item_bu_item_map, worker_qualification
+물류      asn, asn_line, putaway_task, subcontract_reconciliation
+품질      cause_code, sorting_result, concession, equipment_calibration
+추적      lot_hold, impact_analysis
+공통      approval_route, approval_route_step, operation_policy,
+          numbering_rule, numbering_counter, document_issue_log</code></pre></div>
+<p>주요 구조 변경: 음수재고 조건부 허용(signed 도메인 + 트리거), 재고원장 취소 복합 self FK(<code>reversal_of_business_date</code>), 작업지시 분할·재작업 계보 컬럼, 생산실적·자재투입 정정 원본 참조, <code>required_completion_rate</code> 삭제(근거 없는 선행 구현).</p>
+<h2 id="s4">적용한 핵심 설계</h2>
+<h3 id="s5">업무 스키마 분리</h3>
+<div class="codewrap"><pre><code class="lang-text">mdm          조직·부서·생산라인·창고·품목·공정·설비·작업자 자격
+planning     BOM·라우팅·생산계획
+production   작업지시·자재투입·생산실적
+inventory    재고원장·잔액·예약·실사
+quality      검사·불량·원인·부적합·특채·선별·교정
+trace        LOT·계보·보류·영향분석·일련번호
+logistics    입하예정·입하·입고·적치·출고·이동·외주·정산·출하
+integration  ERP 연계
+audit        감사이력
+app          사용자·권한·승인·정책·채번·발행이력·예외·첨부·공통 함수</code></pre></div>
+<p>PostgreSQL 스키마는 테이블·함수·타입 등의 이름공간과 권한 경계를 구분할 수 있으므로 업무 영역 분리에 적합합니다. ([PostgreSQL][1])</p>
+<h3 id="s6">식별자와 자료형</h3>
+<div class="codewrap"><pre><code class="lang-text">PK            bigint generated always as identity
+업무번호       varchar(100) + UNIQUE
+수량           numeric(20,6)
+비율           numeric(18,8)
+실제 시각      timestamptz
+업무일자       date
+상세 변경값    jsonb
+낙관적 잠금    version_no</code></pre></div>
+<p>금액·수량 계산에서 부동소수점 오차가 발생하지 않도록 생산·재고수량은 <code>numeric</code>으로 정의했습니다.</p>
+<h3 id="s7">재고 원장과 현재 잔액 분리</h3>
+<div class="codewrap"><pre><code class="lang-text">inventory_transaction
+inventory_transaction_line
+        ↓
+inventory_balance</code></pre></div>
+<ul><li><code>inventory_transaction</code>: 변경 불가능한 재고 원장</li><li><code>inventory_balance</code>: 현재 재고 조회 및 동시성 잠금 대상</li><li>모든 입고·출고·이동·투입·반납·출하는 재고 원장을 생성</li><li>재고조정도 기존 이력을 수정하지 않고 별도 조정 트랜잭션으로 처리</li></ul>
+<p><code>inventory_balance.available_qty</code>는 다음 생성 컬럼으로 구성했습니다.</p>
+<div class="codewrap"><pre><code class="lang-sql">on_hand_qty
+- reserved_qty
+- picked_qty
+- blocked_qty</code></pre></div>
+<p>PostgreSQL 생성 컬럼은 다른 컬럼에서 계산되는 값을 DB가 일관되게 유지하는 기능입니다. ([PostgreSQL][2])</p>
+<h3 id="s8">LOT와 재고 분리</h3>
+<div class="codewrap"><pre><code class="lang-text">trace.lot
+    1
+    │
+    N
+inventory.inventory_balance</code></pre></div>
+<p>하나의 LOT가 다음처럼 여러 위치와 상태로 분리될 수 있습니다.</p>
+<div class="codewrap"><pre><code class="lang-text">LOT M001
+├─ 자재창고 A01 / 합격 / 가용 300kg
+├─ 자재창고 A02 / 합격 / 가용 200kg
+├─ 생산현장 / 합격 / 현장재고 100kg
+└─ 보류창고 / 보류 / 격리 20kg</code></pre></div>
+<h3 id="s9">생산출고와 자재투입 분리</h3>
+<div class="codewrap"><pre><code class="lang-text">material_issue_request
+→ picking_order
+→ goods_issue
+→ shopfloor_receipt
+→ material_consumption</code></pre></div>
+<p>따라서 다음 수량이 구분됩니다.</p>
+<div class="codewrap"><pre><code class="lang-text">창고 출고수량
+생산현장 인수수량
+작업지시 투입수량
+실제 소비수량
+현장 잔량
+창고 반납수량
+자재 손실수량</code></pre></div>
+<h3 id="s10">생산실적과 생산 LOT 분리</h3>
+<div class="codewrap"><pre><code class="lang-text">production_result
+        N
+        │
+production_result_lot_allocation
+        │
+        N
+trace.lot</code></pre></div>
+<p>다음 두 경우를 모두 지원합니다.</p>
+<ul><li>여러 부분 생산실적을 하나의 생산 LOT에 누적</li><li>하나의 생산실적을 여러 박스·생산 LOT로 분할</li></ul>
+<h3 id="s11">LOT 정방향·역방향 추적</h3>
+<div class="codewrap"><pre><code class="lang-text">material_consumption
+→ material_usage_allocation
+→ production_result
+→ production_result_lot_allocation
+→ lot
+→ shipment_lot_allocation
+→ shipment</code></pre></div>
+<p>LOT 계보는 <code>trace.lot_relation</code>에서 자기참조 다대다 관계로 관리합니다.</p>
+<div class="codewrap"><pre><code class="lang-text">source_lot_id
+target_lot_id
+relation_type_code
+relation_qty
+source_event_type_code
+source_event_id
+allocation_method_code
+trace_accuracy_code</code></pre></div>
+<p>관계유형은 다음을 수용할 수 있습니다 (2-5 FR-LT-053의 12유형 기준으로 시드 통일).</p>
+<div class="codewrap"><pre><code class="lang-text">CONSUMED_INTO
+PRODUCED_FROM
+SPLIT_FROM
+MERGED_INTO
+REWORKED_FROM
+PACKED_INTO
+SUBCONTRACTED_INTO
+SHIPPED_AS
+TRANSFERRED_TO      (공정 인계)
+RELABELED_AS        (라벨 재부여)
+REMAINDER_FROM      (잔량 분리)
+RETURNED_FROM       (반품 회수)</code></pre></div>
+<p><code>lot.parent_lot_id</code>는 표시용 비정규화이며 계보의 원천은 <code>lot_relation</code>입니다. 동일 이벤트 기준 중복 관계는 UNIQUE 제약으로 차단합니다.</p>
+<h3 id="s12">대용량 데이터 파티셔닝</h3>
+<p>초기 DDL에서 다음 원장성 테이블을 범위 파티셔닝했습니다.</p>
+<div class="codewrap"><pre><code class="lang-text">inventory.inventory_transaction
+    PARTITION BY RANGE (business_date)
+
+audit.audit_event
+    PARTITION BY RANGE (occurred_at)</code></pre></div>
+<p>PostgreSQL 선언적 파티셔닝은 Range·List·Hash 방식을 지원하며, 시간순으로 누적되는 원장과 감사이력에는 날짜 기준 Range 파티셔닝이 적합합니다. ([PostgreSQL][3])</p>
+<p>현재는 누락 방지를 위해 기본 파티션을 포함했고, 운영 시에는 월별 파티션을 사전에 생성해야 합니다.</p>
+<h3 id="s13">상태별 부분 인덱스</h3>
+<p>전체 이력보다 현재 처리대기 건을 자주 조회하는 테이블에는 부분 인덱스를 적용했습니다.</p>
+<p>예:</p>
+<div class="codewrap"><pre><code class="lang-sql">CREATE INDEX ix_work_order_dispatch
+ON production.work_order (
+    status_code,
+    planned_start_at,
+    priority_no
+)
+WHERE status_code IN (
+    'RELEASED',
+    'WAITING',
+    'IN_PROGRESS',
+    'PAUSED',
+    'ON_HOLD'
+);</code></pre></div>
+<p>적용 대상:</p>
+<ul><li>실행 가능한 작업지시</li><li>진행 중 작업 세션</li><li>미완료 피킹</li><li>검사 대기 건</li><li>미종결 부적합</li><li>미처리 예외</li><li>ERP 재전송 대상</li><li>미완료 적치작업 (v2)</li><li>해제되지 않은 LOT 보류 (v2)</li><li>분할·재작업·라인 배정 작업지시 (v2)</li></ul>
+<p>부분 인덱스는 조건에 맞는 일부 행만 인덱싱하는 PostgreSQL 기능입니다. ([PostgreSQL][4])</p>
+<h3 id="s14">동시성 제어</h3>
+<p>재고 처리 흐름은 다음을 전제로 설계했습니다.</p>
+<div class="codewrap"><pre><code class="lang-text">1. idempotency_key 중복 확인
+2. inventory_balance SELECT ... FOR UPDATE
+3. 가용수량 재검증
+4. 재고원장 Header·Line 생성
+5. inventory_balance 변경
+6. 업무문서 상태 변경
+7. 감사이력 생성
+8. ERP Outbox 생성
+9. Commit</code></pre></div>
+<p>문서 변경은 <code>version_no</code>를 이용한 낙관적 잠금 방식으로 처리할 수 있습니다.</p>
+<h3 id="s15">사업부·공장별 데이터 접근</h3>
+<p>DDL 하단에 RLS 적용 예시를 포함했습니다.</p>
+<div class="codewrap"><pre><code class="lang-sql">SET LOCAL app.business_unit_id = '10';</code></pre></div>
+<div class="codewrap"><pre><code class="lang-sql">CREATE POLICY inventory_balance_bu_policy
+ON inventory.inventory_balance
+USING (
+    business_unit_id
+    = current_setting('app.business_unit_id', true)::bigint
+);</code></pre></div>
+<p>PostgreSQL Row-Level Security는 사용자 또는 세션 조건에 따라 조회·수정 가능한 행을 제한할 수 있습니다. ([PostgreSQL][5])</p>
+<h2 id="s16">1. 애플리케이션 서비스에서 구현할 로직</h2>
+<div class="tablewrap"><table><thead><tr><th style="text-align:right">번호</th><th>업무 로직</th><th>주요 책임</th></tr></thead><tbody><tr><td style="text-align:right">APP-01</td><td>작업지시 상태전이</td><td>발행·시작·중지·완료·마감 가능 여부 판단</td></tr><tr><td style="text-align:right">APP-02</td><td>작업지시 생성</td><td>생산계획과 라우팅을 기준으로 관리 공정별 작업지시 생성</td></tr><tr><td style="text-align:right">APP-03</td><td>BOM·라우팅 버전 선택</td><td>계획 확정 시 적용 버전 결정 및 고정</td></tr><tr><td style="text-align:right">APP-04</td><td>자재 소요량 계산</td><td>BOM, 생산수량, 손실률을 기준으로 필요수량 계산</td></tr><tr><td style="text-align:right">APP-05</td><td>자재 LOT 추천</td><td>FIFO·FEFO·유효기간·위치 기준 추천</td></tr><tr><td style="text-align:right">APP-06</td><td>재고 자동할당</td><td>작업지시·출하요청별 적정 LOT와 로케이션 선정</td></tr><tr><td style="text-align:right">APP-07</td><td>대체자재 판단</td><td>대체 가능 품목, 적용기간, 승인 필요 여부 판단</td></tr><tr><td style="text-align:right">APP-08</td><td>자재사용량 배분</td><td>생산량 비례·시간구간·LOT 전환시점 등 배분방식 계산</td></tr><tr><td style="text-align:right">APP-09</td><td>생산 LOT 생성정책</td><td>작업지시·근무조·박스·자재 LOT 변경 기준으로 LOT 생성</td></tr><tr><td style="text-align:right">APP-10</td><td>공정 인계정책</td><td>선행 공정 완료분 중 후속 공정에 인계할 수량 계산</td></tr><tr><td style="text-align:right">APP-11</td><td>검사대상 생성</td><td>초품·공정·최종·수입·출하검사 대상 생성</td></tr><tr><td style="text-align:right">APP-12</td><td>품질판정 업무흐름</td><td>합격·보류·불합격·특채·재검사·재작업 처리 — 특채조건 검증 근거: <code>quality.concession</code> (v2)</td></tr><tr><td style="text-align:right">APP-13</td><td>승인 워크플로</td><td>초과입하·대체자재·특채·정정·재고조정 승인</td></tr><tr><td style="text-align:right">APP-14</td><td>출하조건 판단</td><td>고객별 LOT, 유효기간, 특채, 포장·라벨 조건 판단</td></tr><tr><td style="text-align:right">APP-15</td><td>사업부 간 이동정책</td><td>내부이동과 고객출하 구분, 품목코드 매핑 — 매핑 근거: <code>mdm.item_bu_item_map</code> (v2)</td></tr><tr><td style="text-align:right">APP-16</td><td>외주업무 관리</td><td>외주 출고·입고·잔량·불량·분실 업무처리</td></tr><tr><td style="text-align:right">APP-17</td><td>사용자 권한검증</td><td>역할·사업부·공장·공정·단말기별 권한 적용 — 근거: <code>app.app_user/role/user_data_scope</code>, <code>mdm.worker_qualification</code> (v2)</td></tr><tr><td style="text-align:right">APP-18</td><td>예외업무 생성</td><td>수량차이·검사누락·연계실패·추적단절 건 등록</td></tr><tr><td style="text-align:right">APP-19</td><td>사용자 오류 메시지</td><td>오류 원인과 현장 조치방법 안내</td></tr><tr><td style="text-align:right">APP-20</td><td>화면·스캔 흐름</td><td>문서→로케이션→LOT→수량→확정 순서 제어</td></tr><tr><td style="text-align:right">APP-21</td><td>오프라인 동기화 정책</td><td>허용 업무, 충돌 감지, 재처리 또는 예외 전환</td></tr><tr><td style="text-align:right">APP-22</td><td>업무번호 생성</td><td>작업지시·LOT·입하·출고·출하 번호 발급 — 규칙·시퀀스: <code>app.numbering_rule/counter</code> (v2)</td></tr><tr><td style="text-align:right">APP-23</td><td>라벨 출력 요청</td><td>라벨 데이터 생성 및 Print Worker 요청 — 발행·재발행 기록: <code>app.document_issue_log</code> (v2)</td></tr><tr><td style="text-align:right">APP-24</td><td>ERP 전송대상 생성</td><td>확정된 업무 결과를 Outbox에 등록</td></tr><tr><td style="text-align:right">APP-25</td><td>취소·정정 절차 판단</td><td>후속 사용 여부에 따른 취소·역처리 순서 결정</td></tr></tbody></table></div>
+<hr>
+<h2 id="s17">2. PostgreSQL 제약조건으로 구현할 로직</h2>
+<div class="tablewrap"><table><thead><tr><th style="text-align:right">번호</th><th>무결성 규칙</th><th>권장 구현</th></tr></thead><tbody><tr><td style="text-align:right">DB-C01</td><td>PK 중복 방지</td><td><code>PRIMARY KEY</code></td></tr><tr><td style="text-align:right">DB-C02</td><td>업무번호 중복 방지</td><td><code>UNIQUE</code></td></tr><tr><td style="text-align:right">DB-C03</td><td>참조 대상 존재 보장</td><td><code>FOREIGN KEY</code></td></tr><tr><td style="text-align:right">DB-C04</td><td>음수 수량 방지</td><td><code>CHECK (qty &gt;= 0)</code> — 단, <code>inventory_balance.on_hand_qty</code>는 signed 도메인 + 트리거로 품목 정책(<code>negative_stock_allowed</code>)에 따라 조건부 허용 (v2)</td></tr><tr><td style="text-align:right">DB-C05</td><td>종료일이 시작일보다 빠르지 않음</td><td><code>CHECK</code></td></tr><tr><td style="text-align:right">DB-C06</td><td>자기 LOT 관계 방지</td><td><code>CHECK (source_lot_id &lt;&gt; target_lot_id)</code></td></tr><tr><td style="text-align:right">DB-C07</td><td>자기 공정·작업지시 의존관계 방지</td><td><code>CHECK</code></td></tr><tr><td style="text-align:right">DB-C08</td><td>검사 판정수량 합계 일치</td><td><code>CHECK</code></td></tr><tr><td style="text-align:right">DB-C09</td><td>피킹수량이 계획수량을 초과하지 않음</td><td><code>CHECK</code></td></tr><tr><td style="text-align:right">DB-C10</td><td>인수수량이 출고수량을 초과하지 않음</td><td><code>CHECK</code></td></tr><tr><td style="text-align:right">DB-C11</td><td>예약 해제·소비합계가 예약수량을 초과하지 않음</td><td><code>CHECK</code></td></tr><tr><td style="text-align:right">DB-C12</td><td>가용재고 계산</td><td>Generated Column</td></tr><tr><td style="text-align:right">DB-C13</td><td>동일 요청 중복 Posting 방지</td><td><code>UNIQUE(idempotency_key)</code></td></tr><tr><td style="text-align:right">DB-C14</td><td>동일 문서 Line 중복 방지</td><td>복합 <code>UNIQUE</code></td></tr><tr><td style="text-align:right">DB-C15</td><td>동일 재고 차원 중복행 방지</td><td>복합 Unique Index</td></tr><tr><td style="text-align:right">DB-C16</td><td>필수 LOT 품목의 LOT 누락 방지</td><td>서비스 검증 + DB Trigger/제약 보조</td></tr><tr><td style="text-align:right">DB-C17</td><td>LOT 계보 순환 방지</td><td><strong>구현 완료(v2)</strong>: <code>trace.check_lot_relation_cycle()</code> — Recursive CTE 트리거</td></tr><tr><td style="text-align:right">DB-C18</td><td>생산실적 LOT 배분 초과 방지</td><td><strong>구현 완료(v2)</strong>: <code>production.check_result_lot_allocation()</code> — Deferred Constraint Trigger</td></tr><tr><td style="text-align:right">DB-C19</td><td>자재사용 배분 초과 방지</td><td><strong>구현 완료(v2)</strong>: <code>production.check_material_usage_allocation()</code> — Deferred Constraint Trigger</td></tr><tr><td style="text-align:right">DB-C20</td><td>역트랜잭션 원본 참조 보존</td><td><strong>구현 완료(v2)</strong>: <code>reversal_of_business_date</code> 추가로 복합 self FK 성립 + 쌍 CHECK</td></tr></tbody></table></div>
+<p>일반적인 상태전이나 고객별 정책을 <code>CHECK</code> 제약에 과도하게 넣지는 않는 것이 좋습니다.</p>
+<hr>
+<h2 id="s18">3. PostgreSQL Posting 함수로 구현할 로직</h2>
+<div class="tablewrap"><table><thead><tr><th style="text-align:right">번호</th><th>Posting 함수</th><th>한 트랜잭션에서 처리할 내용</th></tr></thead><tbody><tr><td style="text-align:right">DB-P01</td><td><code>reserve_stock()</code></td><td>잔액 잠금, 가용수량 검증, 예약 생성, 예약수량 증가</td></tr><tr><td style="text-align:right">DB-P02</td><td><code>release_reservation()</code></td><td>예약 잔량 검증, 예약해제, 가용수량 복원</td></tr><tr><td style="text-align:right">DB-P03</td><td><code>confirm_picking()</code></td><td>예약 검증, 피킹수량 반영, 중복 피킹 차단</td></tr><tr><td style="text-align:right">DB-P04</td><td><code>post_goods_receipt()</code></td><td>입고원장 생성, 재고잔액 증가, 문서 확정</td></tr><tr><td style="text-align:right">DB-P05</td><td><code>post_goods_issue()</code></td><td>품질·수량 검증, 출고원장 생성, 재고 차감</td></tr><tr><td style="text-align:right">DB-P06</td><td><code>post_shopfloor_receipt()</code></td><td>이동중재고 차감, 현장재고 증가, 차이수량 기록</td></tr><tr><td style="text-align:right">DB-P07</td><td><code>post_material_consumption()</code></td><td>현장재고 잠금·차감, 자재투입 원장 생성</td></tr><tr><td style="text-align:right">DB-P08</td><td><code>post_material_return()</code></td><td>현장재고 차감, 창고 또는 보류재고 증가</td></tr><tr><td style="text-align:right">DB-P09</td><td><code>post_production_receipt()</code></td><td>생산 LOT 입고 가능수량 검증, 창고재고 증가</td></tr><tr><td style="text-align:right">DB-P10</td><td><code>post_stock_transfer_issue()</code></td><td>출발재고 차감, 이동중재고 생성</td></tr><tr><td style="text-align:right">DB-P11</td><td><code>post_stock_transfer_receipt()</code></td><td>이동중재고 차감, 도착재고 증가</td></tr><tr><td style="text-align:right">DB-P12</td><td><code>post_subcontract_issue()</code></td><td>자사재고 차감, 외주처 보유재고 증가</td></tr><tr><td style="text-align:right">DB-P13</td><td><code>post_subcontract_receipt()</code></td><td>외주처 재고 차감, 입고재고 증가, LOT 관계 생성</td></tr><tr><td style="text-align:right">DB-P14</td><td><code>post_shipment()</code></td><td>고객조건 최종검증, 재고 차감, 출하 LOT 확정</td></tr><tr><td style="text-align:right">DB-P15</td><td><code>post_inventory_adjustment()</code></td><td>승인 검증, 조정원장 생성, 잔액 보정</td></tr><tr><td style="text-align:right">DB-P16</td><td><code>change_inventory_quality_status()</code></td><td>기존 상태재고 차감, 변경 상태재고 증가</td></tr><tr><td style="text-align:right">DB-P17</td><td><code>reverse_inventory_transaction()</code></td><td>원본 확인, 반대 트랜잭션 생성, 잔액 복구</td></tr><tr><td style="text-align:right">DB-P18</td><td><code>split_lot()</code></td><td>원본수량 검증, 파생 LOT 생성, 계보 생성</td></tr><tr><td style="text-align:right">DB-P19</td><td><code>merge_lots()</code></td><td>입력 LOT 수량 검증, 병합 LOT 생성, 계보 생성</td></tr><tr><td style="text-align:right">DB-P20</td><td><code>post_operation_handover()</code></td><td>선행 가용수량 잠금·차감, 후속 공정 인계 생성</td></tr></tbody></table></div>
+<p>Posting 함수 내부 공통 처리 순서는 다음과 같이 통일하는 것이 좋습니다.</p>
+<div class="codewrap"><pre><code class="lang-text">멱등성 검증
+→ 대상 재고행 정렬
+→ SELECT FOR UPDATE
+→ 최신 상태·수량 검증
+→ 업무원장 생성 (잔액 스냅샷 기록 포함)
+→ 재고잔액 변경
+→ 문서 상태 변경
+→ 감사이력·Outbox 생성
+→ Commit</code></pre></div>
+<p>원장 Line의 <code>from/to_qty_after_transaction</code>(E-5)은 Posting 함수(DB-P 계열)가 재고잔액 변경과 <strong>같은 트랜잭션에서</strong> 기록할 책임을 진다. 이 스냅샷으로 시점 기준 재고 조회와 감사 대사를 원장 재합산 없이 수행한다.</p>
+<hr>
+<h2 id="s19">4. DB 트리거로만 제한적으로 구현할 로직</h2>
+<div class="tablewrap"><table><thead><tr><th style="text-align:right">번호</th><th>트리거</th><th>비고</th></tr></thead><tbody><tr><td style="text-align:right">TRG-01</td><td><code>updated_at</code> 자동 갱신</td><td>단순 공통 처리 — 구현 완료</td></tr><tr><td style="text-align:right">TRG-02</td><td>LOT 계보 순환 최종 차단</td><td><strong>구현 완료(v2)</strong> — 애플리케이션 사전검증과 병행</td></tr><tr><td style="text-align:right">TRG-03</td><td>배분합계 Commit 시 검증</td><td><strong>구현 완료(v2)</strong> — Deferred Constraint Trigger 2종</td></tr><tr><td style="text-align:right">TRG-04</td><td>감사이력 보조 기록</td><td>핵심 변경만 선별 적용 (구현 예정)</td></tr><tr><td style="text-align:right">TRG-05</td><td>원장 UPDATE·DELETE 차단</td><td><strong>구현 완료(v2)</strong> — Line은 전면 금지, Header는 <code>status_code</code> 전이만 허용 (파티션 실행 특성상 header/line 함수 분리)</td></tr><tr><td style="text-align:right">TRG-06</td><td>마감 문서 직접수정 차단</td><td><strong>구현 완료(v2)</strong> — 마감(<code>closed_at</code>) 작업지시 UPDATE 차단</td></tr><tr><td style="text-align:right">TRG-07</td><td>음수재고 조건부 검증 (v2)</td><td><strong>구현 완료</strong>: <code>inventory.check_balance_qty()</code> — 품목 정책 허용 시에만 음수, 음수 상태에서 예약·피킹·차단 수량 금지</td></tr><tr><td style="text-align:right">TRG-08</td><td>작업지시 분할 합계 검증 (v2)</td><td><strong>구현 완료</strong>: <code>production.check_work_order_split()</code> — 자식 지시수량 합 ≤ 원본 지시수량 (잔여수량 기준 정밀 검증은 APP 책임)</td></tr></tbody></table></div>
+<p>다음 업무는 트리거로 자동 수행하지 않는 것이 좋습니다.</p>
+<div class="codewrap"><pre><code class="lang-text">자동 입고
+자동 출고
+자동 LOT 생성
+자동 품질판정
+자동 ERP 호출
+다단계 상태전파</code></pre></div>
+<hr>
+<h2 id="s20">5. 비동기 Worker에서 구현할 로직</h2>
+<div class="tablewrap"><table><thead><tr><th style="text-align:right">번호</th><th>Worker</th><th>역할</th></tr></thead><tbody><tr><td style="text-align:right">WRK-01</td><td>ERP Interface Worker</td><td>P/O·판매오더 수신, 입출고·실적 전송</td></tr><tr><td style="text-align:right">WRK-02</td><td>ERP Retry Worker</td><td>실패 연계 재전송 및 오류 기록</td></tr><tr><td style="text-align:right">WRK-03</td><td>Print Worker</td><td>LOT·잔량·출하·고객라벨 출력</td></tr><tr><td style="text-align:right">WRK-04</td><td>Notification Worker</td><td>예외·승인·지연업무 알림</td></tr><tr><td style="text-align:right">WRK-05</td><td>File Import Worker</td><td>외부창고·3PL·ERP 파일 반영</td></tr><tr><td style="text-align:right">WRK-06</td><td>Offline Sync Worker</td><td>단말기 오프라인 이벤트 검증·반영</td></tr><tr><td style="text-align:right">WRK-07</td><td>Evidence Export Worker</td><td>LOT 추적 증빙 및 대량 보고서 생성</td></tr><tr><td style="text-align:right">WRK-08</td><td>Archive Worker</td><td>오래된 이력 아카이브</td></tr><tr><td style="text-align:right">WRK-09</td><td>Recall Analysis Worker</td><td>대규모 영향범위 분석</td></tr><tr><td style="text-align:right">WRK-10</td><td>Data Rebuild Worker</td><td>LOT 계보·재고잔액 재계산 지원</td></tr></tbody></table></div>
+<p>ERP API 호출이나 프린터 응답을 DB 트랜잭션 안에서 기다리면 안 됩니다.</p>
+<hr>
+<h2 id="s21">6. 운영 배치로 구현할 로직</h2>
+<div class="tablewrap"><table><thead><tr><th style="text-align:right">번호</th><th>배치</th><th>권장 주기</th></tr></thead><tbody><tr><td style="text-align:right">BAT-01</td><td>음수재고·가용수량 오류 점검</td><td>5~10분</td></tr><tr><td style="text-align:right">BAT-02</td><td>최근 재고원장과 잔액 비교</td><td>매시간</td></tr><tr><td style="text-align:right">BAT-03</td><td>생산실적과 생산 LOT 배분 점검</td><td>일 1회</td></tr><tr><td style="text-align:right">BAT-04</td><td>자재소비와 사용배분 점검</td><td>일 1회</td></tr><tr><td style="text-align:right">BAT-05</td><td>공정 인계수량 정합성 점검</td><td>일 1회</td></tr><tr><td style="text-align:right">BAT-06</td><td>미검사·보류·격리 상태 점검</td><td>일 1회</td></tr><tr><td style="text-align:right">BAT-07</td><td>외주출고·입고·잔량 정합성</td><td>일 1회</td></tr><tr><td style="text-align:right">BAT-08</td><td>외부창고 수량·확인일 점검</td><td>일 1회</td></tr><tr><td style="text-align:right">BAT-09</td><td>LOT 계보 단절·순환 점검</td><td>주 1회</td></tr><tr><td style="text-align:right">BAT-10</td><td>전체 재고원장 재계산 검증</td><td>주간 또는 월간</td></tr><tr><td style="text-align:right">BAT-11</td><td>장기 미처리 예외 탐지</td><td>매시간 또는 일 1회</td></tr><tr><td style="text-align:right">BAT-12</td><td>유효기간 임박재고 탐지</td><td>일 1회</td></tr><tr><td style="text-align:right">BAT-13</td><td>미래 월별 파티션 생성</td><td>월 1회</td></tr><tr><td style="text-align:right">BAT-14</td><td>Default 파티션 유입 점검</td><td>일 1회</td></tr><tr><td style="text-align:right">BAT-15</td><td>오래된 데이터 아카이브</td><td>월 1회</td></tr><tr><td style="text-align:right">BAT-16</td><td>DB 백업 복구 검증</td><td>월 또는 분기</td></tr><tr><td style="text-align:right">BAT-17</td><td>ERP 미전송·실패 건 점검</td><td>5~10분</td></tr><tr><td style="text-align:right">BAT-18</td><td>감사로그 보존·파티션 점검</td><td>월 1회</td></tr></tbody></table></div>
+<hr>
+<h2 id="s22">7. 애플리케이션과 DB 양쪽에서 중복 검증할 항목</h2>
+<div class="tablewrap"><table><thead><tr><th>검증</th><th>애플리케이션</th><th>DB</th></tr></thead><tbody><tr><td>가용수량</td><td>사용자 입력 전 사전 확인</td><td>Posting 시 행 잠금 후 최종 확인</td></tr><tr><td>품질상태</td><td>화면·피킹 시 확인</td><td>출고·투입·출하 확정 시 재확인</td></tr><tr><td>LOT 순환</td><td>관계 생성 전 경로 표시</td><td>Commit 시 최종 차단</td></tr><tr><td>LOT 배분합계</td><td>잔여 배분량 표시</td><td>초과 Commit 차단</td></tr><tr><td>자재사용 배분합계</td><td>배분 계산·표시</td><td>실제 소비량 초과 차단</td></tr><tr><td>유효기간</td><td>후보 LOT 추천 시 확인</td><td>출하·투입 Posting 시 재확인</td></tr><tr><td>고객 지정 LOT</td><td>할당 시 안내</td><td>출하 확정 시 재확인</td></tr><tr><td>특채조건</td><td>승인과 대상 선택</td><td>사용·출하 시 유효조건 확인</td></tr><tr><td>중복요청</td><td>버튼 비활성화</td><td>멱등성 Unique 제약</td></tr><tr><td>후속 공정 가용수량</td><td>인계 가능량 표시</td><td>인계 Posting 시 잠금 후 재검증</td></tr></tbody></table></div>
+<p>중복 구현은 낭비가 아니라 목적이 다릅니다.</p>
+<div class="codewrap"><pre><code class="lang-text">애플리케이션 검증 = 빠른 안내와 좋은 사용자 경험
+DB 검증 = 동시성 상황에서도 최종 무결성 보장</code></pre></div>
+<hr>
+<h2 id="s23">8. 1차 구축에서 우선 구현할 최소 목록</h2>
+<h3 id="s24">애플리케이션</h3>
+<ol><li>작업지시 상태전이</li><li>BOM 자재 소요량 계산</li><li>FIFO 기반 LOT 추천</li><li>자재투입 및 부분 생산실적</li><li>품질판정과 보류</li><li>출하조건 검증</li><li>승인·예외 처리</li><li>ERP Outbox 생성</li></ol>
+<h3 id="s25">DB Posting</h3>
+<ol><li>입고</li><li>예약·예약해제</li><li>피킹</li><li>생산출고</li><li>현장 인수</li><li>자재투입</li><li>자재반납</li><li>생산품 입고</li><li>창고이동</li><li>출하</li><li>재고조정</li><li>역트랜잭션</li></ol>
+<h3 id="s26">DB 제약</h3>
+<ol><li>수량 음수 방지</li><li>가용수량 초과 방지</li><li>보류·불합격 재고 사용 차단</li><li>멱등성</li><li>생산 LOT 배분 초과 차단</li><li>자재사용 배분 초과 차단</li><li>LOT 자기참조·순환 방지</li><li>원장 수정·삭제 제한</li></ol>
+<h3 id="s27">운영 배치</h3>
+<ol><li>ERP 실패 재처리</li><li>최근 재고 정합성 점검</li><li>LOT 배분 누락 점검</li><li>파티션 생성</li><li>백업</li><li>예외업무 알림</li></ol>
+<p>이 정도로 제한하면 기능은 충분히 안전하면서도 DB 로직이 과도하게 비대해지는 것을 방지할 수 있습니다.</p>
+<hr>
+<h2 id="s28">9. 명시적 범위 이연 (v2)</h2>
+<p>다음 항목은 요구사항 문서에서 우선순위가 낮게 분류되었거나 차기 확장으로 정의된 것으로, <strong>누락이 아니라 의도적 이연</strong>입니다.</p>
+<div class="tablewrap"><table><thead><tr><th>항목</th><th>근거</th><th>비고</th></tr></thead><tbody><tr><td>대규모 리콜 사건관리 (회수수량·고객통지 추적)</td><td>2-6 §11 P2</td><td>분석 스냅샷까지는 <code>trace.impact_analysis</code>로 커버</td></tr><tr><td>설비 가동/비가동 이력·OEE</td><td>1-2 차기 확장 분류</td><td>작업 세션 기반 중지·재개는 <code>work_session_event</code>로 커버</td></tr><tr><td>도크 스케줄, 팔레트 개체 추적, 3PL API 연동</td><td>2-7 §9 P2</td><td>입하장 위치(<code>dock_location_id</code>)·취급단위까지는 v2 반영</td></tr><tr><td>정식 CAPA</td><td>2-6 §7.4 2차 범위</td><td>최소 조치사항은 <code>nonconformance</code> 컬럼으로 반영</td></tr><tr><td>원가·평가 (재고 평가액, 가공비, 원가 배부)</td><td>MES-ERP 역할 분담</td><td><strong>원가·평가는 ERP 소관</strong> — MES 원장은 원가 계산의 원천(수량×시점×LOT)만 제공 (v3)</td></tr></tbody></table></div>
+<p>또한 <code>serial_number</code>/<code>serial_component_relation</code>은 요구 근거가 명시적으로 확인되지 않았으나 <code>item.serial_control_type_code</code> 체계와 정합하므로 유지하며, 1차 구축 범위 포함 여부는 확인이 필요합니다.</p>
+  </article>
+  <div class="pager"><a class="pv" href="3-2.html"><span>이전</span>논리적 모델링</a><a class="nx" href="changelog.html"><span>다음</span>변경 이력</a></div>
+</main>
+</body>
+</html>
