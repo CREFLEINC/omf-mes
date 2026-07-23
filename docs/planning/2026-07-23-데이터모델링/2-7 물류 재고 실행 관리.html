@@ -1,0 +1,1033 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>물류 재고 실행 관리 · MES 데이터 모델링 v3</title>
+<style>:root{
+  --bg:#F4F5F6; --surface:#FFFFFF; --surface-2:#EDEFF1; --surface-3:#E4E7EA;
+  --ink:#14181B; --ink-2:#5A6570; --ink-3:#8B959D;
+  --rule:#DCE0E4; --rule-strong:#C3CAD0;
+  --accent:#A9660A; --tint-accent:#F7ECD9;
+  --blue:#28558F; --green:#1D7043; --red:#B93E28;
+  --start:#B93E28; --flow:#1D7043; --done:#28558F; --warn:#9B3427;
+  --tint-start:#F6E5E1; --tint-flow:#E2F0E7; --tint-done:#E2EAF5;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Pretendard","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+  --side:264px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#101315; --surface:#171B1E; --surface-2:#1D2226; --surface-3:#242A2F;
+    --ink:#E7EBEE; --ink-2:#9AA5AE; --ink-3:#6E7A83;
+    --rule:#2A3035; --rule-strong:#3A4249;
+    --accent:#DFA149; --tint-accent:#2B2317;
+    --blue:#83ACE4; --green:#5FC68B; --red:#E4816C;
+  --start:#E4816C; --flow:#5FC68B; --done:#83ACE4; --warn:#E0806E;
+  --tint-start:#2A1D1A; --tint-flow:#16281F; --tint-done:#182432;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101315; --surface:#171B1E; --surface-2:#1D2226; --surface-3:#242A2F;
+  --ink:#E7EBEE; --ink-2:#9AA5AE; --ink-3:#6E7A83;
+  --rule:#2A3035; --rule-strong:#3A4249;
+  --accent:#DFA149; --tint-accent:#2B2317;
+  --blue:#83ACE4; --green:#5FC68B; --red:#E4816C;
+  --start:#E4816C; --flow:#5FC68B; --done:#83ACE4; --warn:#E0806E;
+  --tint-start:#2A1D1A; --tint-flow:#16281F; --tint-done:#182432;
+}
+:root[data-theme="light"]{
+  --bg:#F4F5F6; --surface:#FFFFFF; --surface-2:#EDEFF1; --surface-3:#E4E7EA;
+  --ink:#14181B; --ink-2:#5A6570; --ink-3:#8B959D;
+  --rule:#DCE0E4; --rule-strong:#C3CAD0;
+  --accent:#A9660A; --tint-accent:#F7ECD9;
+  --blue:#28558F; --green:#1D7043; --red:#B93E28;
+  --start:#B93E28; --flow:#1D7043; --done:#28558F; --warn:#9B3427;
+  --tint-start:#F6E5E1; --tint-flow:#E2F0E7; --tint-done:#E2EAF5;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans);
+     font-size:15px; line-height:1.75; letter-spacing:-0.003em}
+
+/* ── 사이드바 ───────────────────────────── */
+nav.side{position:sticky; top:0; z-index:20; background:var(--surface);
+         border-bottom:1px solid var(--rule); max-height:none}
+.nav-brand{padding:16px 22px 12px; border-bottom:1px solid var(--rule)}
+.nav-brand a{text-decoration:none; display:block}
+.nav-brand .bt{display:block; font-size:14px; font-weight:700; color:var(--ink); letter-spacing:-0.02em}
+.nav-brand .bs{display:block; font-family:var(--mono); font-size:10px; color:var(--ink-3);
+               letter-spacing:.1em; text-transform:uppercase; margin-top:4px}
+.nav-docs{display:flex; gap:2px; overflow-x:auto; padding:0 14px; scrollbar-width:thin}
+.nav-docs .grp{flex:none; align-self:center; font-family:var(--mono); font-size:10px;
+               letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); padding:0 8px 0 4px}
+.nav-docs a{flex:none; padding:11px 10px; font-size:12.5px; color:var(--ink-2);
+            text-decoration:none; white-space:nowrap; border-bottom:2px solid transparent}
+.nav-docs a:hover{color:var(--ink)}
+.nav-docs a.on{color:var(--ink); font-weight:600; border-bottom-color:var(--accent)}
+.ontop{display:none}
+
+main{max-width:940px; margin:0 auto; padding:0 26px 100px}
+
+@media (min-width:1120px){
+  body{padding-left:var(--side)}
+  nav.side{position:fixed; inset:0 auto 0 0; width:var(--side); height:100vh;
+           overflow-y:auto; border-bottom:0; border-right:1px solid var(--rule);
+           display:flex; flex-direction:column; padding-bottom:28px}
+  .nav-brand{padding:24px 22px 18px}
+  .nav-docs{flex-direction:column; overflow:visible; padding:14px 12px 0; gap:0}
+  .nav-docs .grp{align-self:stretch; padding:14px 10px 5px}
+  .nav-docs .grp:first-child{padding-top:0}
+  .nav-docs a{padding:6px 10px; border-bottom:0; border-left:2px solid transparent;
+              white-space:normal; line-height:1.45; border-radius:0 3px 3px 0}
+  .nav-docs a:hover{background:var(--surface-2)}
+  .nav-docs a.on{background:var(--surface-2); border-left-color:var(--accent)}
+  .ontop{display:flex; flex-direction:column; margin-top:20px; padding:14px 12px 0;
+         border-top:1px solid var(--rule)}
+  .ontop .grp{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+              color:var(--ink-3); padding:0 10px 6px}
+  .ontop a{padding:3px 10px; font-size:11.5px; color:var(--ink-2); text-decoration:none;
+           line-height:1.5; border-left:2px solid transparent}
+  .ontop a:hover{color:var(--accent); border-left-color:var(--rule-strong)}
+  .ontop a.l1{font-weight:600; color:var(--ink); margin-top:6px}
+  .ontop a.l2{padding-left:20px}
+  .ontop a.l3{padding-left:32px; color:var(--ink-3); font-size:11px}
+  main{margin:0; padding:0 56px 120px}
+}
+
+/* ── 문서 헤더 ──────────────────────────── */
+.dochead{padding:44px 0 26px; border-bottom:2px solid var(--ink); margin-bottom:8px}
+.eyebrow{font-family:var(--mono); font-size:10.5px; letter-spacing:.13em; text-transform:uppercase;
+         color:var(--ink-3)}
+.doctitle{font-size:clamp(24px,3.2vw,32px); line-height:1.22; margin:10px 0 0; font-weight:700;
+          letter-spacing:-0.025em; text-wrap:balance}
+.docsub{margin:10px 0 0; color:var(--ink-2); font-size:14px; max-width:64ch}
+
+/* ── 본문 ──────────────────────────────── */
+.md{padding-top:12px}
+.md h1,.md h2,.md h3,.md h4,.md h5,.md h6{letter-spacing:-0.02em; text-wrap:balance; scroll-margin-top:80px}
+.md h1{font-size:23px; font-weight:700; margin:52px 0 14px; padding-bottom:9px;
+       border-bottom:1px solid var(--rule-strong)}
+.md h2{font-size:18.5px; font-weight:700; margin:38px 0 10px}
+.md h3{font-size:15.5px; font-weight:700; margin:28px 0 8px; color:var(--ink)}
+.md h4,.md h5,.md h6{font-size:14px; font-weight:700; margin:22px 0 6px; color:var(--ink-2)}
+.md > :first-child{margin-top:0}
+.md p{margin:0 0 13px; max-width:76ch}
+.md a{color:var(--blue)}
+.md strong{font-weight:700}
+.md hr{border:0; border-top:1px solid var(--rule); margin:34px 0}
+.md ul,.md ol{margin:0 0 14px; padding-left:22px; max-width:76ch}
+.md li{margin:3px 0}
+.md li > ul,.md li > ol{margin:3px 0}
+.md blockquote{margin:0 0 16px; padding:12px 18px; border-left:3px solid var(--accent);
+               background:var(--tint-accent); border-radius:0 3px 3px 0; max-width:76ch}
+.md blockquote p{margin:0}
+.md blockquote p + p{margin-top:8px}
+code{font-family:var(--mono); font-size:.87em; background:var(--surface-2); padding:1.5px 5px;
+     border-radius:2px; color:var(--ink); word-break:break-word}
+.codewrap{margin:0 0 16px; border:1px solid var(--rule); border-radius:3px; background:var(--surface);
+          overflow-x:auto}
+.codewrap pre{margin:0; padding:14px 18px}
+.codewrap code{background:none; padding:0; font-size:12.5px; line-height:1.65; white-space:pre;
+               display:block}
+.codewrap code.lang-sql{color:var(--ink)}
+
+/* ── 표 ────────────────────────────────── */
+.tablewrap{overflow-x:auto; margin:0 0 18px; border:1px solid var(--rule); border-radius:3px;
+           background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-size:13.5px; min-width:480px}
+th,td{text-align:left; padding:9px 14px; border-bottom:1px solid var(--rule); vertical-align:top;
+      line-height:1.6}
+thead th{font-family:var(--mono); font-size:11px; letter-spacing:.06em; color:var(--ink-3);
+         font-weight:600; background:var(--surface-2); white-space:nowrap; text-transform:uppercase}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--surface-2)}
+td code{font-size:12px; white-space:nowrap}
+
+/* ── 페이저 ────────────────────────────── */
+.pager{display:flex; justify-content:space-between; gap:16px; margin-top:56px; padding-top:22px;
+       border-top:1px solid var(--rule)}
+.pager a{flex:0 1 auto; max-width:46%; text-decoration:none; color:var(--ink); font-size:13.5px;
+         font-weight:600; padding:12px 16px; border:1px solid var(--rule); border-radius:3px;
+         background:var(--surface); line-height:1.4}
+.pager a:hover{border-color:var(--accent); color:var(--accent)}
+.pager a span{display:block; font-family:var(--mono); font-size:10px; letter-spacing:.1em;
+              text-transform:uppercase; color:var(--ink-3); font-weight:500; margin-bottom:3px}
+.pager a.nx{text-align:right}
+a:focus-visible,.nav-docs a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+/* ── 인덱스 전용 ───────────────────────── */
+.hero{padding:56px 0 34px; border-bottom:2px solid var(--ink)}
+.hero h1{font-size:clamp(27px,4vw,40px); line-height:1.15; margin:12px 0 0; font-weight:700;
+         letter-spacing:-0.03em}
+.hero .lede{margin:14px 0 0; color:var(--ink-2); font-size:15px; max-width:68ch}
+.statbar{display:flex; flex-wrap:wrap; gap:0; margin:30px 0 0; border:1px solid var(--rule);
+         border-radius:3px; background:var(--surface); overflow:hidden}
+.statbar div{flex:1 1 130px; padding:14px 18px; border-right:1px solid var(--rule)}
+.statbar div:last-child{border-right:0}
+.statbar .v{font-family:var(--mono); font-size:21px; font-weight:600; letter-spacing:-0.02em;
+            font-variant-numeric:tabular-nums; display:block}
+.statbar .k{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+            color:var(--ink-3); margin-top:3px; display:block}
+.secgrp{margin:52px 0 0}
+.secgrp > h2{font-size:13px; font-family:var(--mono); letter-spacing:.12em; text-transform:uppercase;
+             color:var(--accent); margin:0 0 4px; font-weight:600}
+.secgrp > p{margin:0 0 18px; color:var(--ink-2); font-size:13.5px; max-width:70ch}
+.cards{display:grid; gap:12px}
+@media(min-width:720px){.cards{grid-template-columns:1fr 1fr}}
+.card{display:block; text-decoration:none; color:inherit; background:var(--surface);
+      border:1px solid var(--rule); border-radius:3px; padding:17px 19px; transition:border-color .12s}
+.card:hover{border-color:var(--accent)}
+.card .num{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; color:var(--accent);
+           font-weight:600}
+.card h3{margin:6px 0 5px; font-size:16px; font-weight:700; letter-spacing:-0.02em}
+.card p{margin:0; font-size:13px; color:var(--ink-2); line-height:1.6}
+.card .facts{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px}
+.card .facts span{font-family:var(--mono); font-size:10.5px; color:var(--ink-3);
+                  background:var(--surface-2); padding:2px 7px; border-radius:2px;
+                  font-variant-numeric:tabular-nums}
+.card .facts span.hi{background:var(--tint-accent); color:var(--accent); font-weight:600}
+.card.ext .num{color:var(--blue)}
+.card.ext:hover{border-color:var(--blue)}
+.note{margin:44px 0 0; padding:16px 20px; border:1px solid var(--rule); border-left:3px solid var(--blue);
+      border-radius:0 3px 3px 0; background:var(--surface); font-size:13.5px; color:var(--ink-2)}
+.note b{color:var(--ink)}
+footer{margin-top:64px; padding-top:22px; border-top:1px solid var(--rule);
+        font-size:12.5px; color:var(--ink-3); display:flex; flex-wrap:wrap; gap:14px;
+        justify-content:space-between}
+@media (prefers-reduced-motion:reduce){*{transition:none!important; scroll-behavior:auto!important}}
+
+/* ── 워크플로우 페이지: 넓은 본문 ── */
+body.wide main{max-width:1180px}
+</style>
+</head>
+<body>
+<nav class="side"><div class="nav-brand"><a href="index.html"><span class="bt">MES 데이터 모델링</span><span class="bs">v3 · 문서 인덱스</span></a></div>
+<div class="nav-docs">
+<span class="grp">업무 흐름 정본</span>
+<a href="workflow-v2.html">OMF MES 시스템 워크플로우 v2</a>
+<span class="grp">1. 도메인 이해</span>
+<a href="1-1.html">비즈니스 도메인의 이해</a>
+<a href="1-2.html">MES의 핵심 필수 기능</a>
+<a href="1-3.html">사용자 시나리오</a>
+<span class="grp">2. 기능 요구사항</span>
+<a href="2-1.html">작업지시</a>
+<a href="2-2.html">자재투입</a>
+<a href="2-3.html">생산 실적 관리</a>
+<a href="2-4.html">품질관리</a>
+<a href="2-5.html">LOT 추적성</a>
+<a href="2-6.html">요구사항 누락분 보충</a>
+<a href="2-7.html" class="on">물류 재고 실행 관리</a>
+<span class="grp">3. 데이터 모델링</span>
+<a href="3-1.html">개념적 모델링</a>
+<a href="3-2.html">논리적 모델링</a>
+<a href="3-3.html">물리적 모델링</a>
+<a href="mes_erd.html">ERD — 도메인별 다이어그램</a>
+<a href="mes_scenarios_workflows.html">업무 시나리오 &amp; 워크플로우</a>
+<a href="mes_workflows_detailed.html">상세 워크플로우</a>
+<span class="grp">참고</span>
+<a href="changelog.html">변경 이력</a>
+</div><aside class="ontop"><span class="grp">이 문서</span><a class="l1" href="#s1">MES 물류·재고 실행관리 기능·비기능 요구사항</a><a class="l2" href="#s2">1. 기능 목적</a><a class="l1" href="#s3">2. 적용 범위</a><a class="l1" href="#s4">3. 용어 정의</a><a class="l2" href="#s5">3.1 입하</a><a class="l2" href="#s6">3.2 입고</a><a class="l2" href="#s7">3.3 적치</a><a class="l2" href="#s8">3.4 출고</a><a class="l2" href="#s9">3.5 출하</a><a class="l2" href="#s10">3.6 예약</a><a class="l2" href="#s11">3.7 할당</a><a class="l2" href="#s12">3.8 피킹</a><a class="l2" href="#s13">3.9 현장 인계</a><a class="l2" href="#s14">3.10 생산품 입고</a><a class="l2" href="#s15">3.11 재고상태</a><a class="l2" href="#s16">3.12 품질상태</a><a class="l1" href="#s17">4. 전체 업무 구조</a><a class="l1" href="#s18">5. 기능적 요구사항</a><a class="l2" href="#s19">5.1 입하관리</a><a class="l3" href="#s20">FR-IM-001 입하예정 조회</a><a class="l3" href="#s21">FR-IM-002 입하등록</a><a class="l3" href="#s22">FR-IM-003 입하 Header·Line 구조</a><a class="l3" href="#s23">FR-IM-004 P/O 분할입하</a><a class="l3" href="#s24">FR-IM-005 하나의 입하에 복수 P/O 연결</a><a class="l3" href="#s25">FR-IM-006 초과·미달입하 통제</a><a class="l3" href="#s26">FR-IM-007 P/O 없는 입하 통제</a><a class="l3" href="#s27">FR-IM-008 공급사 LOT 처리</a><a class="l3" href="#s28">FR-IM-009 입하상태 관리</a><a class="l3" href="#s29">FR-IM-010 입하검수</a><a class="l2" href="#s30">5.2 수입검사 및 입고관리</a><a class="l3" href="#s31">FR-IM-011 수입검사 대상 생성</a><a class="l3" href="#s32">FR-IM-012 무검사 입고</a><a class="l3" href="#s33">FR-IM-013 입고등록</a><a class="l3" href="#s34">FR-IM-014 내부 자재 LOT 생성</a><a class="l3" href="#s35">FR-IM-015 부분 합격·불합격 입고</a><a class="l3" href="#s36">FR-IM-016 입하수량과 입고수량 정합성</a><a class="l3" href="#s37">FR-IM-017 입고보류</a><a class="l3" href="#s38">FR-IM-018 입고라벨 발행</a><a class="l2" href="#s39">5.3 적치관리</a><a class="l3" href="#s40">FR-IM-019 적치지시 생성</a><a class="l3" href="#s41">FR-IM-020 권장 로케이션 안내</a><a class="l3" href="#s42">FR-IM-021 적치확정</a><a class="l3" href="#s43">FR-IM-022 분산적치</a><a class="l3" href="#s44">FR-IM-023 혼재적치 통제</a><a class="l2" href="#s45">5.4 재고 예약 및 할당</a><a class="l3" href="#s46">FR-IM-024 재고예약</a><a class="l3" href="#s47">FR-IM-025 재고할당</a><a class="l3" href="#s48">FR-IM-026 예약해제</a><a class="l3" href="#s49">FR-IM-027 중복예약 통제</a><a class="l2" href="#s50">5.5 피킹 및 생산출고</a><a class="l3" href="#s51">FR-IM-028 생산출고 요청</a><a class="l3" href="#s52">FR-IM-029 출고요청 자동 생성</a><a class="l3" href="#s53">FR-IM-030 피킹지시</a><a class="l3" href="#s54">FR-IM-031 피킹확정</a><a class="l3" href="#s55">FR-IM-032 대체 LOT 피킹</a><a class="l3" href="#s56">FR-IM-033 생산출고 확정</a><a class="l3" href="#s57">FR-IM-034 생산현장 인수</a><a class="l3" href="#s58">FR-IM-035 출고와 자재투입 구분</a><a class="l2" href="#s59">5.6 자재 반납 및 현장재고</a><a class="l3" href="#s60">FR-IM-036 현장재고 조회</a><a class="l3" href="#s61">FR-IM-037 자재 반납요청</a><a class="l3" href="#s62">FR-IM-038 반납검수</a><a class="l3" href="#s63">FR-IM-039 반납입고</a><a class="l3" href="#s64">FR-IM-040 반납불가 처리</a><a class="l2" href="#s65">5.7 생산품 입고</a><a class="l3" href="#s66">FR-IM-041 생산품 입고대상 생성</a><a class="l3" href="#s67">FR-IM-042 부분 생산품 입고</a><a class="l3" href="#s68">FR-IM-043 생산현장 출고·창고 인수</a><a class="l3" href="#s69">FR-IM-044 생산품 품질상태 반영</a><a class="l3" href="#s70">FR-IM-045 생산품 입고수량 검증</a><a class="l2" href="#s71">5.8 창고 및 로케이션 이동</a><a class="l3" href="#s72">FR-IM-046 내부 재고이동</a><a class="l3" href="#s73">FR-IM-047 이동요청·출고·입고 구분</a><a class="l3" href="#s74">FR-IM-048 이동중 재고 관리</a><a class="l3" href="#s75">FR-IM-049 부분 이동</a><a class="l3" href="#s76">FR-IM-050 사업부 간 이동</a><a class="l3" href="#s77">FR-IM-051 공장 간 이동</a><a class="l2" href="#s78">5.9 외주 및 외부창고</a><a class="l3" href="#s79">FR-IM-052 외주출고</a><a class="l3" href="#s80">FR-IM-053 외주입하·입고</a><a class="l3" href="#s81">FR-IM-054 외주수량 정합성</a><a class="l3" href="#s82">FR-IM-055 외부·위탁창고 이동</a><a class="l3" href="#s83">FR-IM-056 외부창고 재고조회</a><a class="l2" href="#s84">5.10 출하관리</a><a class="l3" href="#s85">FR-IM-057 출하요청 수신</a><a class="l3" href="#s86">FR-IM-058 출하재고 할당</a><a class="l3" href="#s87">FR-IM-059 출하피킹</a><a class="l3" href="#s88">FR-IM-060 출하검수</a><a class="l3" href="#s89">FR-IM-061 출하 LOT 구성</a><a class="l3" href="#s90">FR-IM-062 출하검사 연계</a><a class="l3" href="#s91">FR-IM-063 상차처리</a><a class="l3" href="#s92">FR-IM-064 출하확정</a><a class="l3" href="#s93">FR-IM-065 부분출하</a><a class="l3" href="#s94">FR-IM-066 초과·미달출하 통제</a><a class="l2" href="#s95">5.11 반품·반송·폐기</a><a class="l3" href="#s96">FR-IM-067 공급사 반품</a><a class="l3" href="#s97">FR-IM-068 고객 반품</a><a class="l3" href="#s98">FR-IM-069 폐기출고</a><a class="l2" href="#s99">5.12 재고실사 및 조정</a><a class="l3" href="#s100">FR-IM-070 재고현황 조회</a><a class="l3" href="#s101">FR-IM-071 가용·예약·보류수량 구분</a><a class="l3" href="#s102">FR-IM-072 재고실사 계획</a><a class="l3" href="#s103">FR-IM-073 재고실사 입력</a><a class="l3" href="#s104">FR-IM-074 재고차이 확인</a><a class="l3" href="#s105">FR-IM-075 재고조정 승인</a><a class="l2" href="#s106">5.13 취소·정정·역처리</a><a class="l3" href="#s107">FR-IM-076 입하취소</a><a class="l3" href="#s108">FR-IM-077 입고취소</a><a class="l3" href="#s109">FR-IM-078 출고취소</a><a class="l3" href="#s110">FR-IM-079 출하취소</a><a class="l3" href="#s111">FR-IM-080 정정 및 역처리 이력</a><a class="l2" href="#s112">5.14 바코드 및 라벨</a><a class="l3" href="#s113">FR-IM-081 바코드 기반 처리</a><a class="l3" href="#s114">FR-IM-082 로케이션 바코드</a><a class="l3" href="#s115">FR-IM-083 물류라벨 발행</a><a class="l3" href="#s116">FR-IM-084 라벨 재발행</a><a class="l2" href="#s117">5.15 현황 및 이력조회</a><a class="l3" href="#s118">FR-IM-085 재고이동 이력조회</a><a class="l3" href="#s119">FR-IM-086 문서별 진행현황</a><a class="l3" href="#s120">FR-IM-087 재고 Aging 조회</a><a class="l3" href="#s121">FR-IM-088 유효기간 임박재고 조회</a><a class="l3" href="#s122">FR-IM-089 물류 예외목록</a><a class="l2" href="#s123">5.16 ERP 및 외부연계</a><a class="l3" href="#s124">FR-IM-090 ERP 기준정보 수신</a><a class="l3" href="#s125">FR-IM-091 ERP 실적 전송</a><a class="l3" href="#s126">FR-IM-092 연계상태 관리</a><a class="l3" href="#s127">FR-IM-093 연계 재처리</a><a class="l1" href="#s128">6. 비기능 요구사항</a><a class="l2" href="#s129">NFR-IM-001 응답성</a><a class="l2" href="#s130">NFR-IM-002 가용성</a><a class="l2" href="#s131">NFR-IM-003 데이터 정합성</a><a class="l2" href="#s132">NFR-IM-004 수량 보존</a><a class="l2" href="#s133">NFR-IM-005 중복처리 방지</a><a class="l2" href="#s134">NFR-IM-006 동시성 통제</a><a class="l2" href="#s135">NFR-IM-007 LOT 추적성</a><a class="l2" href="#s136">NFR-IM-008 위치 정확성</a><a class="l2" href="#s137">NFR-IM-009 오프라인 운영</a><a class="l2" href="#s138">NFR-IM-010 권한관리</a><a class="l2" href="#s139">NFR-IM-011 감사 가능성</a><a class="l2" href="#s140">NFR-IM-012 사용성</a><a class="l2" href="#s141">NFR-IM-013 오류 예방</a><a class="l2" href="#s142">NFR-IM-014 확장성</a><a class="l2" href="#s143">NFR-IM-015 성능 및 처리용량</a><a class="l2" href="#s144">NFR-IM-016 설정 가능성</a><a class="l2" href="#s145">NFR-IM-017 연계 신뢰성</a><a class="l2" href="#s146">NFR-IM-018 모니터링</a><a class="l2" href="#s147">NFR-IM-019 시간 정확성</a><a class="l2" href="#s148">NFR-IM-020 데이터 보존</a><a class="l2" href="#s149">NFR-IM-021 백업 및 복구</a><a class="l2" href="#s150">NFR-IM-022 유지보수성</a><a class="l1" href="#s151">7. 핵심 업무 규칙</a><a class="l2" href="#s152">BR-IM-001</a><a class="l2" href="#s153">BR-IM-002</a><a class="l2" href="#s154">BR-IM-003</a><a class="l2" href="#s155">BR-IM-004</a><a class="l2" href="#s156">BR-IM-005</a><a class="l2" href="#s157">BR-IM-006</a><a class="l2" href="#s158">BR-IM-007</a><a class="l2" href="#s159">BR-IM-008</a><a class="l2" href="#s160">BR-IM-009</a><a class="l2" href="#s161">BR-IM-010</a><a class="l2" href="#s162">BR-IM-011</a><a class="l2" href="#s163">BR-IM-012</a><a class="l2" href="#s164">BR-IM-013</a><a class="l2" href="#s165">BR-IM-014</a><a class="l2" href="#s166">BR-IM-015</a><a class="l2" href="#s167">BR-IM-016</a><a class="l2" href="#s168">BR-IM-017</a><a class="l2" href="#s169">BR-IM-018</a><a class="l1" href="#s170">8. 기본 상태 흐름</a><a class="l2" href="#s171">8.1 입하·입고</a><a class="l2" href="#s172">8.2 생산출고</a><a class="l2" href="#s173">8.3 생산품 입고</a><a class="l2" href="#s174">8.4 창고이동</a><a class="l2" href="#s175">8.5 고객 출하</a><a class="l1" href="#s176">9. 1차 구축 우선순위</a><a class="l2" href="#s177">P0: 반드시 포함</a><a class="l2" href="#s178">P1: 운영 안정화</a><a class="l2" href="#s179">P2: 고도화</a><a class="l1" href="#s180">10. 최종 업무 구조</a></aside></nav>
+<main>
+  <header class="dochead">
+    <div class="eyebrow">2. 기능 요구사항 · 2-7 물류 재고 실행 관리</div>
+    <h1 class="doctitle">물류 재고 실행 관리</h1>
+    <p class="docsub">입하·적치·재고이동·실사·조정·출하, 재고 원장 무결성</p>
+  </header>
+  <article class="md">
+<p>물류·재고 실행관리는 기존 5대 생산 핵심 기능의 앞뒤를 연결하는 <strong>여섯 번째 핵심 업무 영역</strong>으로 정의하는 것이 적절합니다.</p>
+<h1 id="s1">MES 물류·재고 실행관리 기능·비기능 요구사항</h1>
+<h2 id="s2">1. 기능 목적</h2>
+<p>물류·재고 실행관리 기능은 자재와 생산품이 공장에 도착한 시점부터 창고 입고, 생산현장 출고, 공정 간 이동, 완제품 입고 및 고객 출하에 이르기까지 실제 물류 흐름과 재고 상태를 관리하는 기능이다.</p>
+<p>본 기능의 주요 목적은 다음과 같다.</p>
+<ul><li>자재의 물리적 도착과 재고 입고 구분</li><li>자재·반제품·완제품의 실제 위치와 수량 관리</li><li>품질상태에 따른 가용재고 통제</li><li>작업지시별 자재 불출과 현장 인계 관리</li><li>생산실적과 생산품 입고 분리</li><li>공장·사업부·창고·로케이션 간 이동 관리</li><li>외주처·외부창고 재고 추적</li><li>고객 출하 실행 및 LOT 추적성 확보</li><li>ERP 재고와 MES 현장재고 간 정합성 유지</li><li>모든 재고 증감의 근거 트랜잭션 보존</li></ul>
+<hr>
+<h1 id="s3">2. 적용 범위</h1>
+<p>물류·재고 실행관리는 다음 업무를 포함한다.</p>
+<ol><li>구매자재 입하</li><li>수입검사 대기</li><li>자재 입고</li><li>창고 적치</li><li>자재 예약</li><li>피킹 및 생산출고</li><li>생산현장 인계</li><li>작업지시 자재투입</li><li>자재 잔량 반납</li><li>생산품 입고</li><li>창고·로케이션 이동</li><li>사업부 간 이동</li><li>외주 출고·입고</li><li>외부·위탁창고 이동</li><li>출하요청·피킹·검수·출하</li><li>공급사 반품 및 고객 반품</li><li>재고실사 및 재고조정</li><li>입출고 취소·정정</li><li>물류·재고 현황 및 이력조회</li><li>ERP 및 외부시스템 연계</li></ol>
+<hr>
+<h1 id="s4">3. 용어 정의</h1>
+<h2 id="s5">3.1 입하</h2>
+<p>공급업체 또는 외부 사업장에서 물품이 공장에 물리적으로 도착한 사실을 등록하는 업무이다.</p>
+<p>입하는 재고 증가를 의미하지 않는다.</p>
+<div class="codewrap"><pre><code class="lang-text">입하
+= 물품 도착 및 인수 확인</code></pre></div>
+<h2 id="s6">3.2 입고</h2>
+<p>입하된 물품 또는 생산 완료품을 검사·인수하여 MES 재고로 등록하는 업무이다.</p>
+<div class="codewrap"><pre><code class="lang-text">입고
+= 재고수량 증가</code></pre></div>
+<h2 id="s7">3.3 적치</h2>
+<p>입고된 물품을 실제 창고 로케이션에 배치하는 업무이다.</p>
+<h2 id="s8">3.4 출고</h2>
+<p>자재나 제품을 현재 창고 또는 로케이션에서 생산현장, 다른 창고, 사업부, 외주처 등으로 내보내는 업무이다.</p>
+<h2 id="s9">3.5 출하</h2>
+<p>완제품을 고객에게 납품하기 위해 공장 또는 위탁창고 밖으로 반출하는 업무이다.</p>
+<h2 id="s10">3.6 예약</h2>
+<p>특정 작업지시, 출하요청 또는 이동요청에 사용할 재고수량을 미리 확보하는 처리이다.</p>
+<h2 id="s11">3.7 할당</h2>
+<p>출고·출하할 품목에 대해 실제 사용할 재고 LOT와 로케이션을 지정하는 처리이다.</p>
+<h2 id="s12">3.8 피킹</h2>
+<p>출고·출하 대상 자재나 제품을 실제 로케이션에서 꺼내는 작업이다.</p>
+<h2 id="s13">3.9 현장 인계</h2>
+<p>창고에서 출고한 자재를 생산현장 담당자가 실제로 인수하는 처리이다.</p>
+<h2 id="s14">3.10 생산품 입고</h2>
+<p>생산실적을 통해 생성된 반제품·완제품 LOT를 생산현장에서 창고재고로 인수하는 처리이다.</p>
+<h2 id="s15">3.11 재고상태</h2>
+<p>재고가 현재 어떤 업무 상태에 있는지를 나타낸다.</p>
+<p>예:</p>
+<ul><li>가용</li><li>예약</li><li>피킹중</li><li>이동중</li><li>생산현장</li><li>검사대기</li><li>보류</li><li>격리</li><li>출하대기</li><li>출하완료</li><li>소진</li><li>폐기</li></ul>
+<h2 id="s16">3.12 품질상태</h2>
+<p>재고 또는 LOT의 품질판정 상태를 나타낸다.</p>
+<p>예:</p>
+<ul><li>미검사</li><li>검사대기</li><li>합격</li><li>불합격</li><li>보류</li><li>특채</li><li>재검사대기</li></ul>
+<p>재고상태와 품질상태는 구분하여 관리한다.</p>
+<hr>
+<h1 id="s17">4. 전체 업무 구조</h1>
+<div class="codewrap"><pre><code class="lang-text">ERP 구매 P/O
+   ↓
+자재 입하
+   ↓
+수입검사
+   ├─ 합격
+   ├─ 보류
+   ├─ 불합격
+   └─ 특채
+   ↓
+자재 입고
+   ↓
+창고 적치
+   ↓
+작업지시별 자재 예약
+   ↓
+피킹·생산출고
+   ↓
+생산현장 인계
+   ↓
+자재투입
+   ↓
+생산실적
+   ↓
+반제품·완제품 LOT 생성
+   ↓
+생산품 입고
+   ↓
+창고 적치·이동
+   ↓
+출하요청
+   ↓
+재고 할당·피킹·검수
+   ↓
+출하검사
+   ↓
+출하 확정
+   ↓
+ERP 출고실적 전송</code></pre></div>
+<hr>
+<h1 id="s18">5. 기능적 요구사항</h1>
+<h2 id="s19">5.1 입하관리</h2>
+<h3 id="s20">FR-IM-001 입하예정 조회</h3>
+<p>시스템은 ERP 구매 P/O, 납품계획 또는 사전입하정보를 기준으로 입하예정 목록을 조회할 수 있어야 한다.</p>
+<p>조회정보는 다음을 포함한다.</p>
+<ul><li>P/O 번호</li><li>공급업체</li><li>품목</li><li>발주수량</li><li>기입하수량</li><li>미입하수량</li><li>예정 입하일</li><li>납품처</li><li>공급사 LOT 제공 여부</li><li>검사 대상 여부</li></ul>
+<hr>
+<h3 id="s21">FR-IM-002 입하등록</h3>
+<p>사용자는 공장에 도착한 자재를 입하 등록할 수 있어야 한다.</p>
+<p>입하에는 최소한 다음 정보가 포함되어야 한다.</p>
+<ul><li>입하번호</li><li>입하일시</li><li>공급업체</li><li>P/O 번호</li><li>납품서 또는 거래명세서 번호</li><li>차량 또는 운송정보</li><li>품목</li><li>입하수량</li><li>단위</li><li>공급사 LOT</li><li>제조일자</li><li>유효기간</li><li>포장수량</li><li>입하장</li><li>입하 담당자</li></ul>
+<hr>
+<h3 id="s22">FR-IM-003 입하 Header·Line 구조</h3>
+<p>하나의 입하 건에 여러 품목을 등록할 수 있어야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">입하 Header
+├─ 입하 Line 1: 품목 A
+├─ 입하 Line 2: 품목 B
+└─ 입하 Line 3: 품목 C</code></pre></div>
+<p>입하 Header에는 공급업체, 차량, 입하일시 등의 공통정보를 저장하고, 입하 Line에는 품목·수량·LOT 정보를 저장해야 한다.</p>
+<hr>
+<h3 id="s23">FR-IM-004 P/O 분할입하</h3>
+<p>하나의 P/O Line을 여러 차례 나누어 입하할 수 있어야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">P/O 수량: 10,000개
+
+1차 입하: 4,000개
+2차 입하: 3,000개
+3차 입하: 3,000개</code></pre></div>
+<p>시스템은 기입하수량과 미입하수량을 자동 계산해야 한다.</p>
+<hr>
+<h3 id="s24">FR-IM-005 하나의 입하에 복수 P/O 연결</h3>
+<p>동일 공급업체의 한 차량 또는 한 거래명세서에 여러 P/O가 포함되는 경우 하나의 입하 Header에 여러 P/O Line을 연결할 수 있어야 한다.</p>
+<hr>
+<h3 id="s25">FR-IM-006 초과·미달입하 통제</h3>
+<p>입하수량이 P/O 잔량을 초과하거나 미달하는 경우 정책에 따라 다음 처리를 적용할 수 있어야 한다.</p>
+<ul><li>경고</li><li>허용범위 내 자동 허용</li><li>관리자 승인 후 허용</li><li>입하 차단</li></ul>
+<p>초과·미달 발생 시 사유와 승인자를 기록해야 한다.</p>
+<hr>
+<h3 id="s26">FR-IM-007 P/O 없는 입하 통제</h3>
+<p>구매자재는 원칙적으로 ERP P/O를 근거로 입하해야 한다.</p>
+<p>P/O 없이 입하하는 경우 다음 예외유형만 권한에 따라 허용할 수 있어야 한다.</p>
+<ul><li>고객사급 자재</li><li>무상샘플</li><li>대체납품</li><li>긴급입하</li><li>반품회수</li><li>외주입고</li><li>기타 승인입하</li></ul>
+<p>예외입하 시 사유와 승인정보를 필수로 기록해야 한다.</p>
+<hr>
+<h3 id="s27">FR-IM-008 공급사 LOT 처리</h3>
+<p>LOT 추적 대상 자재는 공급사 LOT를 등록해야 한다.</p>
+<p>공급사 LOT가 없는 경우 내부 대체 LOT를 생성하고 다음을 기록해야 한다.</p>
+<ul><li>공급사 LOT 미제공 여부</li><li>대체 LOT 생성규칙</li><li>생성사유</li><li>생성자</li></ul>
+<hr>
+<h3 id="s28">FR-IM-009 입하상태 관리</h3>
+<p>입하 건은 최소한 다음 상태를 지원해야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">입하예정
+→ 도착
+→ 입하등록
+→ 검사대기
+→ 입하완료</code></pre></div>
+<p>예외 상태:</p>
+<ul><li>보류</li><li>취소</li><li>반송</li><li>입하오류</li></ul>
+<hr>
+<h3 id="s29">FR-IM-010 입하검수</h3>
+<p>입하 담당자는 실물과 납품정보를 비교하여 다음 항목을 검수할 수 있어야 한다.</p>
+<ul><li>품목</li><li>수량</li><li>포장상태</li><li>공급사 LOT</li><li>제조일자</li><li>유효기간</li><li>라벨 상태</li><li>운송 중 파손 여부</li><li>거래명세서 일치 여부</li></ul>
+<p>검수차이가 발생하면 차이수량과 사유를 등록해야 한다.</p>
+<hr>
+<h2 id="s30">5.2 수입검사 및 입고관리</h2>
+<h3 id="s31">FR-IM-011 수입검사 대상 생성</h3>
+<p>입하등록 시 품목별 검사정책에 따라 수입검사 대상을 자동 생성할 수 있어야 한다.</p>
+<p>검사대상 품목은 검사완료 전까지 검사대기 또는 보류 상태로 관리해야 한다.</p>
+<hr>
+<h3 id="s32">FR-IM-012 무검사 입고</h3>
+<p>수입검사 면제 품목은 입하검수 완료 후 자동 또는 수동으로 입고 처리할 수 있어야 한다.</p>
+<p>무검사 적용 근거와 품목별 정책을 관리해야 한다.</p>
+<hr>
+<h3 id="s33">FR-IM-013 입고등록</h3>
+<p>입하 및 검사결과를 기준으로 입고를 등록할 수 있어야 한다.</p>
+<p>입고에는 다음 정보가 포함되어야 한다.</p>
+<ul><li>입고번호</li><li>입하번호</li><li>품목</li><li>내부 LOT</li><li>공급사 LOT</li><li>입고수량</li><li>품질상태</li><li>재고상태</li><li>입고창고</li><li>임시 로케이션</li><li>입고일시</li><li>입고 담당자</li></ul>
+<hr>
+<h3 id="s34">FR-IM-014 내부 자재 LOT 생성</h3>
+<p>입고 시 품목정책에 따라 내부 자재 LOT를 자동 생성해야 한다.</p>
+<p>내부 LOT는 다음 정보와 연결되어야 한다.</p>
+<ul><li>공급업체</li><li>P/O</li><li>입하</li><li>공급사 LOT</li><li>수입검사</li><li>입고수량</li><li>최초 로케이션</li></ul>
+<hr>
+<h3 id="s35">FR-IM-015 부분 합격·불합격 입고</h3>
+<p>입하수량의 일부가 합격하고 일부가 보류 또는 불합격인 경우 상태별로 분리 입고할 수 있어야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">입하수량: 1,000kg
+
+합격: 800kg → 가용재고
+보류: 150kg → 보류재고
+불합격: 50kg → 격리재고</code></pre></div>
+<p>수량별 LOT를 분리하거나 동일 LOT 내 상태별 수량으로 관리할 수 있어야 한다.</p>
+<hr>
+<h3 id="s36">FR-IM-016 입하수량과 입고수량 정합성</h3>
+<p>다음 수량 관계를 검증해야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">입하수량
+= 입고수량
++ 검사대기수량
++ 반송수량
++ 부족수량
++ 파손수량
++ 조정수량</code></pre></div>
+<hr>
+<h3 id="s37">FR-IM-017 입고보류</h3>
+<p>검사결과가 확정되지 않았거나 문서가 누락된 경우 입고를 보류할 수 있어야 한다.</p>
+<p>보류 시 다음 정보를 기록해야 한다.</p>
+<ul><li>보류사유</li><li>보류수량</li><li>보류위치</li><li>담당부서</li><li>해제조건</li><li>처리기한</li></ul>
+<hr>
+<h3 id="s38">FR-IM-018 입고라벨 발행</h3>
+<p>입고 시 자재 LOT 라벨을 발행할 수 있어야 한다.</p>
+<p>라벨에는 다음 내용을 포함할 수 있어야 한다.</p>
+<ul><li>품목코드</li><li>품목명</li><li>내부 LOT</li><li>공급사 LOT</li><li>입고수량</li><li>단위</li><li>입고일자</li><li>공급업체</li><li>품질상태</li><li>바코드 또는 QR 코드</li></ul>
+<hr>
+<h2 id="s39">5.3 적치관리</h2>
+<h3 id="s40">FR-IM-019 적치지시 생성</h3>
+<p>입고된 재고에 대해 창고·로케이션 적치지시를 생성할 수 있어야 한다.</p>
+<p>적치지시에는 다음 정보가 포함되어야 한다.</p>
+<ul><li>입고번호</li><li>LOT</li><li>품목</li><li>적치수량</li><li>출발위치</li><li>권장 도착위치</li><li>적치 우선순위</li><li>담당자</li></ul>
+<hr>
+<h3 id="s41">FR-IM-020 권장 로케이션 안내</h3>
+<p>품목속성, 창고정책 및 현재 공간을 기준으로 적치 로케이션을 추천할 수 있어야 한다.</p>
+<p>고려조건은 다음과 같다.</p>
+<ul><li>품목군</li><li>위험물 여부</li><li>온도·습도 조건</li><li>중량</li><li>포장크기</li><li>동일 품목·LOT 집적</li><li>빈 로케이션</li><li>FIFO·FEFO 운영</li><li>창고별 관리수준</li></ul>
+<hr>
+<h3 id="s42">FR-IM-021 적치확정</h3>
+<p>창고 담당자는 입고 LOT와 로케이션 바코드를 스캔하여 적치를 확정할 수 있어야 한다.</p>
+<p>적치확정 시 LOT의 현재 위치와 로케이션별 수량을 갱신해야 한다.</p>
+<hr>
+<h3 id="s43">FR-IM-022 분산적치</h3>
+<p>하나의 LOT를 여러 로케이션에 나누어 적치할 수 있어야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">LOT M001: 1,000개
+
+RACK-A01: 400개
+RACK-A02: 300개
+RACK-B01: 300개</code></pre></div>
+<hr>
+<h3 id="s44">FR-IM-023 혼재적치 통제</h3>
+<p>하나의 로케이션에 여러 품목 또는 여러 LOT를 적치할 수 있는지 창고·로케이션별로 설정할 수 있어야 한다.</p>
+<p>혼재가 금지된 로케이션에는 다른 품목 또는 LOT의 적치를 차단해야 한다.</p>
+<hr>
+<h2 id="s45">5.4 재고 예약 및 할당</h2>
+<h3 id="s46">FR-IM-024 재고예약</h3>
+<p>작업지시, 출하요청, 외주출고 또는 이동요청을 기준으로 재고를 예약할 수 있어야 한다.</p>
+<p>예약된 수량은 가용수량과 별도로 표시해야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">현재수량
+= 가용수량
++ 예약수량
++ 보류수량
++ 이동중수량</code></pre></div>
+<hr>
+<h3 id="s47">FR-IM-025 재고할당</h3>
+<p>출고 또는 출하 시 사용할 실제 LOT와 로케이션을 할당할 수 있어야 한다.</p>
+<p>할당방식은 다음을 지원할 수 있어야 한다.</p>
+<ul><li>FIFO</li><li>FEFO</li><li>지정 LOT</li><li>지정 로케이션</li><li>고객 지정 LOT</li><li>품질등급 우선</li><li>포장단위 우선</li><li>수동 선택</li></ul>
+<hr>
+<h3 id="s48">FR-IM-026 예약해제</h3>
+<p>작업지시 취소, 계획변경 또는 출하취소 시 사용하지 않은 예약재고를 해제할 수 있어야 한다.</p>
+<p>예약해제 이력을 저장해야 한다.</p>
+<hr>
+<h3 id="s49">FR-IM-027 중복예약 통제</h3>
+<p>동일 재고수량을 여러 작업지시나 출하요청에 중복 예약할 수 없어야 한다.</p>
+<hr>
+<h2 id="s50">5.5 피킹 및 생산출고</h2>
+<h3 id="s51">FR-IM-028 생산출고 요청</h3>
+<p>작업지시의 소요자재를 기준으로 생산출고 요청을 생성할 수 있어야 한다.</p>
+<p>출고요청에는 다음 정보가 포함되어야 한다.</p>
+<ul><li>출고요청번호</li><li>작업지시</li><li>대상 공정</li><li>요청 품목</li><li>요청수량</li><li>요청일시</li><li>필요일시</li><li>도착 생산구역</li><li>요청자</li></ul>
+<hr>
+<h3 id="s52">FR-IM-029 출고요청 자동 생성</h3>
+<p>작업지시 발행, 생산일정 또는 자재준비 일정에 따라 출고요청을 자동 생성할 수 있어야 한다.</p>
+<p>자동 생성 여부는 공장·공정별로 설정할 수 있어야 한다.</p>
+<hr>
+<h3 id="s53">FR-IM-030 피킹지시</h3>
+<p>예약·할당된 재고를 기준으로 피킹지시를 생성할 수 있어야 한다.</p>
+<p>피킹지시에는 다음 정보가 포함되어야 한다.</p>
+<ul><li>피킹번호</li><li>출고요청</li><li>LOT</li><li>출발 로케이션</li><li>피킹수량</li><li>도착구역</li><li>피킹순서</li><li>담당자</li></ul>
+<hr>
+<h3 id="s54">FR-IM-031 피킹확정</h3>
+<p>창고 담당자는 로케이션과 자재 LOT를 스캔하여 피킹을 확정할 수 있어야 한다.</p>
+<p>시스템은 다음을 검증해야 한다.</p>
+<ul><li>지정 품목</li><li>지정 LOT</li><li>지정 로케이션</li><li>가용수량</li><li>품질상태</li><li>유효기간</li><li>피킹수량</li></ul>
+<hr>
+<h3 id="s55">FR-IM-032 대체 LOT 피킹</h3>
+<p>지정 LOT를 사용할 수 없는 경우 권장 대체 LOT를 조회하고 권한에 따라 변경할 수 있어야 한다.</p>
+<p>대체 LOT 사용 시 변경사유를 기록해야 한다.</p>
+<hr>
+<h3 id="s56">FR-IM-033 생산출고 확정</h3>
+<p>피킹 완료된 자재를 생산현장으로 출고할 수 있어야 한다.</p>
+<p>출고확정 시 다음 처리를 수행해야 한다.</p>
+<ul><li>창고 가용수량 차감</li><li>생산현장 재고 증가</li><li>재고상태를 이동중 또는 생산현장으로 변경</li><li>LOT 이동이력 생성</li><li>작업지시와 출고이력 연결</li></ul>
+<hr>
+<h3 id="s57">FR-IM-034 생산현장 인수</h3>
+<p>생산현장 담당자는 출고된 자재를 스캔하여 인수할 수 있어야 한다.</p>
+<p>인수 시 다음을 확인해야 한다.</p>
+<ul><li>품목</li><li>LOT</li><li>출고수량</li><li>실물수량</li><li>포장상태</li><li>도착 생산구역</li></ul>
+<p>출고수량과 인수수량이 다르면 차이사유를 등록해야 한다.</p>
+<hr>
+<h3 id="s58">FR-IM-035 출고와 자재투입 구분</h3>
+<p>생산출고와 작업지시 자재투입은 별도의 이벤트로 관리해야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">생산출고
+= 창고 → 생산현장
+
+자재투입
+= 생산현장 → 특정 작업지시 사용</code></pre></div>
+<p>생산현장에 출고된 자재라도 작업지시에 투입되지 않은 수량은 현장재고로 유지해야 한다.</p>
+<hr>
+<h2 id="s59">5.6 자재 반납 및 현장재고</h2>
+<h3 id="s60">FR-IM-036 현장재고 조회</h3>
+<p>생산구역별로 다음 현장재고를 조회할 수 있어야 한다.</p>
+<ul><li>품목</li><li>LOT</li><li>출고수량</li><li>투입수량</li><li>잔량</li><li>보류수량</li><li>반납대기수량</li><li>현재 위치</li></ul>
+<hr>
+<h3 id="s61">FR-IM-037 자재 반납요청</h3>
+<p>작업종료 또는 자재교체 후 미사용 잔량에 대해 창고 반납을 요청할 수 있어야 한다.</p>
+<p>반납요청에는 다음 정보가 포함되어야 한다.</p>
+<ul><li>품목</li><li>LOT</li><li>반납수량</li><li>발생 작업지시</li><li>발생공정</li><li>출발 생산구역</li><li>반납창고</li><li>반납사유</li><li>개봉 여부</li><li>품질확인 필요 여부</li></ul>
+<hr>
+<h3 id="s62">FR-IM-038 반납검수</h3>
+<p>창고 담당자는 반납자재의 LOT, 수량, 포장상태 및 품질상태를 확인할 수 있어야 한다.</p>
+<p>필요한 경우 품질검사를 요청하고 검사완료 전까지 보류재고로 관리해야 한다.</p>
+<hr>
+<h3 id="s63">FR-IM-039 반납입고</h3>
+<p>반납 검수 완료 후 자재를 창고재고로 복귀할 수 있어야 한다.</p>
+<p>원본 LOT 관계를 유지하고 새로운 LOT 생성 여부는 품목정책에 따라 결정해야 한다.</p>
+<hr>
+<h3 id="s64">FR-IM-040 반납불가 처리</h3>
+<p>오염, 혼합, 유효기간 경과 등의 사유로 반납할 수 없는 자재는 다음으로 처리할 수 있어야 한다.</p>
+<ul><li>현장 계속 사용</li><li>품질확인 대기</li><li>폐기</li><li>재고조정</li><li>별도 격리</li></ul>
+<hr>
+<h2 id="s65">5.7 생산품 입고</h2>
+<h3 id="s66">FR-IM-041 생산품 입고대상 생성</h3>
+<p>생산실적과 생산 LOT를 기준으로 반제품·완제품 입고대상을 생성할 수 있어야 한다.</p>
+<p>생산실적 등록과 창고 입고는 별도 단계로 관리해야 한다.</p>
+<hr>
+<h3 id="s67">FR-IM-042 부분 생산품 입고</h3>
+<p>작업지시가 완료되지 않아도 생산 완료된 수량만큼 부분 입고할 수 있어야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">작업지시 수량: 10,000개
+현재 양품: 5,000개
+
+→ 5,000개 먼저 입고
+→ 나머지 생산 계속</code></pre></div>
+<hr>
+<h3 id="s68">FR-IM-043 생산현장 출고·창고 인수</h3>
+<p>생산 작업자는 생산 LOT를 창고로 이동 처리하고, 창고 담당자는 실제 LOT와 수량을 확인하여 입고를 확정할 수 있어야 한다.</p>
+<hr>
+<h3 id="s69">FR-IM-044 생산품 품질상태 반영</h3>
+<p>생산품 입고 시 품질결과에 따라 다음 상태로 입고할 수 있어야 한다.</p>
+<ul><li>가용</li><li>검사대기</li><li>보류</li><li>격리</li><li>특채</li><li>불량</li></ul>
+<p>검사대기·보류 상태 생산품은 일반 출고·출하에 사용할 수 없어야 한다.</p>
+<hr>
+<h3 id="s70">FR-IM-045 생산품 입고수량 검증</h3>
+<p>입고수량은 생산 LOT의 입고 가능수량을 초과할 수 없어야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">생산 LOT 입고 가능수량
+= 생산 LOT 양품수량
+- 기입고수량
+- 후속 공정 투입수량
+- 폐기수량
+- 기타 이동수량</code></pre></div>
+<hr>
+<h2 id="s71">5.8 창고 및 로케이션 이동</h2>
+<h3 id="s72">FR-IM-046 내부 재고이동</h3>
+<p>동일 창고 내 로케이션 간 또는 창고 간 재고이동을 등록할 수 있어야 한다.</p>
+<hr>
+<h3 id="s73">FR-IM-047 이동요청·출고·입고 구분</h3>
+<p>창고 간 이동은 다음 단계로 관리할 수 있어야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">이동요청
+→ 이동출고
+→ 이동중
+→ 도착확인
+→ 이동입고</code></pre></div>
+<p>즉시 이동하는 소규모 창고는 출고·입고를 한 번에 확정하는 단순방식을 사용할 수 있어야 한다.</p>
+<hr>
+<h3 id="s74">FR-IM-048 이동중 재고 관리</h3>
+<p>출발창고에서 출고되었지만 도착창고에서 인수되지 않은 재고는 이동중 상태로 관리해야 한다.</p>
+<hr>
+<h3 id="s75">FR-IM-049 부분 이동</h3>
+<p>하나의 LOT 중 일부 수량만 이동할 수 있어야 한다.</p>
+<hr>
+<h3 id="s76">FR-IM-050 사업부 간 이동</h3>
+<p>사업부 B에서 생산한 제품을 사업부 A의 자재로 사용하는 경우 사업부 간 출고·입고를 지원해야 한다.</p>
+<p>다음 관계를 유지해야 한다.</p>
+<ul><li>송신 사업부 LOT</li><li>송신 사업부 출고</li><li>이동문서</li><li>수신 사업부 입고</li><li>수신 사업부 창고</li><li>내부 공급·수요 관계</li></ul>
+<hr>
+<h3 id="s77">FR-IM-051 공장 간 이동</h3>
+<p>공장 간 재고이동을 지원해야 하며 출발공장, 도착공장, 이동중 재고 및 운송정보를 관리해야 한다.</p>
+<hr>
+<h2 id="s78">5.9 외주 및 외부창고</h2>
+<h3 id="s79">FR-IM-052 외주출고</h3>
+<p>외주공정 수행을 위해 자재 또는 반제품 LOT를 외주처에 출고할 수 있어야 한다.</p>
+<p>외주출고에는 다음 정보가 포함되어야 한다.</p>
+<ul><li>외주 작업지시</li><li>외주처</li><li>외주공정</li><li>출고 품목</li><li>출고 LOT</li><li>출고수량</li><li>출고일시</li><li>예상 입고일</li></ul>
+<hr>
+<h3 id="s80">FR-IM-053 외주입하·입고</h3>
+<p>외주처에서 가공 완료품이 도착하면 외주입하를 등록하고 검사 후 입고할 수 있어야 한다.</p>
+<p>원 외주출고 LOT와 외주입고 LOT의 관계를 유지해야 한다.</p>
+<hr>
+<h3 id="s81">FR-IM-054 외주수량 정합성</h3>
+<p>다음 수량 관계를 검증해야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">외주출고수량
+= 외주입고수량
++ 외주처 잔량
++ 불량수량
++ 분실수량
++ 폐기수량
++ 조정수량</code></pre></div>
+<hr>
+<h3 id="s82">FR-IM-055 외부·위탁창고 이동</h3>
+<p>외부창고 또는 위탁창고로 재고를 이동하고 회수할 수 있어야 한다.</p>
+<p>외부창고에 MES 단말기가 없는 경우 다음 방식을 지원할 수 있어야 한다.</p>
+<ul><li>담당자 수동등록</li><li>출고·회수 문서 등록</li><li>파일 업로드</li><li>ERP 연계</li><li>API 연계</li></ul>
+<hr>
+<h3 id="s83">FR-IM-056 외부창고 재고조회</h3>
+<p>외부창고의 LOT별 재고, 품질상태, 소유구분 및 마지막 확인일자를 조회할 수 있어야 한다.</p>
+<hr>
+<h2 id="s84">5.10 출하관리</h2>
+<h3 id="s85">FR-IM-057 출하요청 수신</h3>
+<p>ERP 판매오더, 납품계획 또는 출하계획을 기준으로 출하요청을 생성하거나 수신할 수 있어야 한다.</p>
+<p>출하요청에는 다음 정보가 포함되어야 한다.</p>
+<ul><li>출하요청번호</li><li>고객</li><li>납품처</li><li>품목</li><li>요청수량</li><li>요청일자</li><li>납품예정일</li><li>고객 P/O</li><li>고객 라벨 요구사항</li><li>출하검사 필요 여부</li></ul>
+<hr>
+<h3 id="s86">FR-IM-058 출하재고 할당</h3>
+<p>출하요청에 대해 출하 가능한 생산 LOT와 포장단위를 할당할 수 있어야 한다.</p>
+<p>할당 시 다음을 검증해야 한다.</p>
+<ul><li>품목 일치</li><li>가용수량</li><li>품질상태</li><li>고객별 특채조건</li><li>유효기간</li><li>고객 지정 LOT</li><li>선입선출 정책</li><li>출하검사 상태</li></ul>
+<hr>
+<h3 id="s87">FR-IM-059 출하피킹</h3>
+<p>출하할 제품의 LOT와 로케이션을 기준으로 피킹지시를 생성하고 피킹결과를 등록할 수 있어야 한다.</p>
+<hr>
+<h3 id="s88">FR-IM-060 출하검수</h3>
+<p>피킹 완료 후 다음 내용을 검수할 수 있어야 한다.</p>
+<ul><li>품목</li><li>LOT</li><li>수량</li><li>포장상태</li><li>고객 라벨</li><li>출하문서</li><li>품질상태</li><li>유효기간</li><li>출하검사 결과</li></ul>
+<hr>
+<h3 id="s89">FR-IM-061 출하 LOT 구성</h3>
+<p>하나 이상의 생산 LOT 또는 포장 LOT를 출하 LOT로 구성할 수 있어야 한다.</p>
+<p>출하 LOT는 고객과 출하문서에 연결되어야 한다.</p>
+<hr>
+<h3 id="s90">FR-IM-062 출하검사 연계</h3>
+<p>출하검사가 필수인 경우 합격 전까지 출하확정을 차단해야 한다.</p>
+<hr>
+<h3 id="s91">FR-IM-063 상차처리</h3>
+<p>출하대상 제품을 차량에 상차하고 다음 정보를 등록할 수 있어야 한다.</p>
+<ul><li>차량번호</li><li>운송업체</li><li>운전자</li><li>상차일시</li><li>상차담당자</li><li>봉인번호</li><li>운송문서</li></ul>
+<hr>
+<h3 id="s92">FR-IM-064 출하확정</h3>
+<p>출하확정 시 다음 처리를 수행해야 한다.</p>
+<ul><li>출하수량 재고 차감</li><li>LOT 재고상태 출하완료 변경</li><li>고객 출하이력 생성</li><li>출하 LOT 계보 연결</li><li>ERP 출고실적 생성</li><li>출하문서 및 라벨 발행</li></ul>
+<hr>
+<h3 id="s93">FR-IM-065 부분출하</h3>
+<p>하나의 출하요청을 여러 차례 나누어 출하할 수 있어야 한다.</p>
+<p>기출하수량과 미출하수량을 자동 계산해야 한다.</p>
+<hr>
+<h3 id="s94">FR-IM-066 초과·미달출하 통제</h3>
+<p>출하요청수량과 실제 출하수량 차이를 검증하고 정책에 따라 경고·승인·차단할 수 있어야 한다.</p>
+<hr>
+<h2 id="s95">5.11 반품·반송·폐기</h2>
+<h3 id="s96">FR-IM-067 공급사 반품</h3>
+<p>불합격 자재를 공급업체에 반품할 수 있어야 한다.</p>
+<p>반품 시 다음 정보를 기록해야 한다.</p>
+<ul><li>원 입하·입고</li><li>자재 LOT</li><li>반품수량</li><li>반품사유</li><li>공급업체</li><li>반품일시</li><li>대체입고 여부</li><li>ERP 반품번호</li></ul>
+<hr>
+<h3 id="s97">FR-IM-068 고객 반품</h3>
+<p>고객이 반품한 제품을 입하하고 원 출하 LOT와 연결할 수 있어야 한다.</p>
+<p>반품품은 검사 전까지 별도 반품·보류 재고로 관리해야 한다.</p>
+<hr>
+<h3 id="s98">FR-IM-069 폐기출고</h3>
+<p>폐기 승인된 자재·반제품·완제품을 재고에서 폐기출고할 수 있어야 한다.</p>
+<p>폐기 시 품질 부적합, 폐기승인 및 폐기증빙과 연결해야 한다.</p>
+<hr>
+<h2 id="s99">5.12 재고실사 및 조정</h2>
+<h3 id="s100">FR-IM-070 재고현황 조회</h3>
+<p>사용자는 다음 기준으로 재고를 조회할 수 있어야 한다.</p>
+<ul><li>사업부</li><li>공장</li><li>창고</li><li>로케이션</li><li>품목</li><li>LOT</li><li>품질상태</li><li>재고상태</li><li>공급업체</li><li>작업지시</li><li>유효기간</li><li>장기재고 여부</li></ul>
+<hr>
+<h3 id="s101">FR-IM-071 가용·예약·보류수량 구분</h3>
+<p>재고조회 시 최소한 다음 수량을 구분해야 한다.</p>
+<ul><li>현재수량</li><li>가용수량</li><li>예약수량</li><li>피킹수량</li><li>이동중수량</li><li>생산현장수량</li><li>검사대기수량</li><li>보류수량</li><li>격리수량</li><li>출하대기수량</li></ul>
+<hr>
+<h3 id="s102">FR-IM-072 재고실사 계획</h3>
+<p>창고, 로케이션, 품목 또는 LOT를 기준으로 재고실사 계획을 생성할 수 있어야 한다.</p>
+<p>실사방식은 다음을 지원할 수 있어야 한다.</p>
+<ul><li>전수실사</li><li>순환실사</li><li>지정 품목 실사</li><li>지정 로케이션 실사</li><li>고가·중요품목 실사</li><li>장기재고 실사</li></ul>
+<hr>
+<h3 id="s103">FR-IM-073 재고실사 입력</h3>
+<p>실사자는 로케이션과 LOT를 스캔하여 실물수량을 입력할 수 있어야 한다.</p>
+<p>필요한 경우 전산수량을 숨긴 블라인드 실사를 지원해야 한다.</p>
+<hr>
+<h3 id="s104">FR-IM-074 재고차이 확인</h3>
+<p>시스템은 전산수량과 실사수량의 차이를 계산하고 차이사유를 등록할 수 있어야 한다.</p>
+<hr>
+<h3 id="s105">FR-IM-075 재고조정 승인</h3>
+<p>재고차이는 승인절차를 거쳐 재고조정할 수 있어야 한다.</p>
+<p>조정 시 다음 정보를 기록해야 한다.</p>
+<ul><li>조정 전 수량</li><li>실사수량</li><li>차이수량</li><li>조정사유</li><li>요청자</li><li>승인자</li><li>조정일시</li></ul>
+<p>재고조정이 과거 입출고·생산이력을 임의 변경해서는 안 된다.</p>
+<hr>
+<h2 id="s106">5.13 취소·정정·역처리</h2>
+<h3 id="s107">FR-IM-076 입하취소</h3>
+<p>후속 입고·검사 이력이 없는 입하 건은 취소할 수 있어야 한다.</p>
+<p>후속처리가 있는 경우 먼저 관련 처리를 역순으로 취소해야 한다.</p>
+<hr>
+<h3 id="s108">FR-IM-077 입고취소</h3>
+<p>입고재고가 이동·출고·투입되지 않은 경우 입고를 취소할 수 있어야 한다.</p>
+<p>후속 사용이 존재하면 단순 취소를 차단해야 한다.</p>
+<hr>
+<h3 id="s109">FR-IM-078 출고취소</h3>
+<p>생산현장에서 아직 인수하지 않았거나 사용하지 않은 출고 건은 취소할 수 있어야 한다.</p>
+<p>이미 자재투입에 사용된 출고는 단순 취소할 수 없다.</p>
+<hr>
+<h3 id="s110">FR-IM-079 출하취소</h3>
+<p>출하확정 후 ERP, 운송 및 고객납품 상태에 따라 취소 가능 여부를 통제해야 한다.</p>
+<p>실제 고객에게 반출된 경우 출하취소가 아니라 고객 반품 절차를 사용해야 한다.</p>
+<hr>
+<h3 id="s111">FR-IM-080 정정 및 역처리 이력</h3>
+<p>입하·입고·출고·이동·출하를 정정할 때 기존 이력을 삭제하거나 덮어쓰지 않아야 한다.</p>
+<p>다음 정보를 보존해야 한다.</p>
+<ul><li>정정 전 값</li><li>정정 후 값</li><li>정정사유</li><li>요청자</li><li>승인자</li><li>정정일시</li><li>관련 재고·LOT 영향</li></ul>
+<hr>
+<h2 id="s112">5.14 바코드 및 라벨</h2>
+<h3 id="s113">FR-IM-081 바코드 기반 처리</h3>
+<p>다음 업무는 바코드 또는 QR 스캔으로 처리할 수 있어야 한다.</p>
+<ul><li>입하</li><li>입고</li><li>적치</li><li>피킹</li><li>출고</li><li>현장 인수</li><li>반납</li><li>생산품 입고</li><li>재고이동</li><li>재고실사</li><li>출하</li></ul>
+<hr>
+<h3 id="s114">FR-IM-082 로케이션 바코드</h3>
+<p>창고·구역·랙·셀 등의 로케이션에 바코드를 부여하고 이동·적치·피킹 시 스캔할 수 있어야 한다.</p>
+<hr>
+<h3 id="s115">FR-IM-083 물류라벨 발행</h3>
+<p>다음 라벨을 발행할 수 있어야 한다.</p>
+<ul><li>자재 LOT 라벨</li><li>잔량 라벨</li><li>생산 LOT 라벨</li><li>반제품·완제품 라벨</li><li>박스 라벨</li><li>팔레트 라벨</li><li>출하 라벨</li><li>고객 지정 라벨</li></ul>
+<hr>
+<h3 id="s116">FR-IM-084 라벨 재발행</h3>
+<p>라벨 분실·훼손 시 동일 LOT의 라벨을 재발행할 수 있어야 한다.</p>
+<p>재발행 사유, 작업자, 단말기, 프린터 및 횟수를 기록해야 한다.</p>
+<hr>
+<h2 id="s117">5.15 현황 및 이력조회</h2>
+<h3 id="s118">FR-IM-085 재고이동 이력조회</h3>
+<p>LOT별 입하·입고·출고·이동·투입·반납·출하 이력을 시간순으로 조회할 수 있어야 한다.</p>
+<hr>
+<h3 id="s119">FR-IM-086 문서별 진행현황</h3>
+<p>다음 문서별 처리상태와 수량을 조회할 수 있어야 한다.</p>
+<ul><li>P/O</li><li>입하</li><li>입고</li><li>출고요청</li><li>피킹</li><li>이동요청</li><li>생산품 입고</li><li>외주출고·입고</li><li>출하요청</li><li>출하</li></ul>
+<hr>
+<h3 id="s120">FR-IM-087 재고 Aging 조회</h3>
+<p>입고일자, 제조일자, 최종이동일자를 기준으로 장기재고와 체류재고를 조회할 수 있어야 한다.</p>
+<hr>
+<h3 id="s121">FR-IM-088 유효기간 임박재고 조회</h3>
+<p>유효기간 임박 또는 경과 재고를 조회하고 사용·출하를 통제할 수 있어야 한다.</p>
+<hr>
+<h3 id="s122">FR-IM-089 물류 예외목록</h3>
+<p>다음 예외를 통합 조회할 수 있어야 한다.</p>
+<ul><li>미검사 입하</li><li>미적치 입고</li><li>피킹 지연</li><li>출고·인수 수량차이</li><li>이동중 장기체류</li><li>미반납 현장재고</li><li>입고대기 생산품</li><li>외주수량 불일치</li><li>출하검사 미완료</li><li>ERP 연계 실패</li><li>재고수량 불일치</li><li>음수재고</li></ul>
+<hr>
+<h2 id="s123">5.16 ERP 및 외부연계</h2>
+<h3 id="s124">FR-IM-090 ERP 기준정보 수신</h3>
+<p>ERP에서 다음 기준정보를 수신할 수 있어야 한다.</p>
+<ul><li>P/O</li><li>판매오더</li><li>공급업체</li><li>고객</li><li>품목</li><li>단위</li><li>창고</li><li>사업부</li><li>출하계획</li></ul>
+<hr>
+<h3 id="s125">FR-IM-091 ERP 실적 전송</h3>
+<p>MES에서 확정된 다음 실적을 ERP에 전송할 수 있어야 한다.</p>
+<ul><li>구매입고실적</li><li>공급사 반품</li><li>생산출고</li><li>생산품 입고</li><li>사업부 간 이동</li><li>외주 출고·입고</li><li>판매출하</li><li>고객 반품</li><li>폐기</li><li>재고조정</li></ul>
+<hr>
+<h3 id="s126">FR-IM-092 연계상태 관리</h3>
+<p>ERP 연계 건은 다음 상태로 관리해야 한다.</p>
+<ul><li>전송대기</li><li>전송중</li><li>전송완료</li><li>전송실패</li><li>재처리대기</li><li>취소전송대기</li></ul>
+<hr>
+<h3 id="s127">FR-IM-093 연계 재처리</h3>
+<p>ERP 또는 외부창고 연계 실패 시 실패사유를 확인하고 재처리할 수 있어야 한다.</p>
+<p>동일 실적이 중복 반영되지 않도록 고유 연계번호를 사용해야 한다.</p>
+<hr>
+<h1 id="s128">6. 비기능 요구사항</h1>
+<h2 id="s129">NFR-IM-001 응답성</h2>
+<p>정상적인 사내 네트워크 환경에서 다음 응답시간을 목표로 해야 한다.</p>
+<ul><li>바코드 스캔 후 재고조회: 2초 이내</li><li>입고·출고·이동 저장: 2초 이내</li><li>일반 재고조회: 3초 이내</li><li>LOT 이동이력 조회: 5초 이내</li><li>대량 재고현황 조회: 10초 이내</li></ul>
+<hr>
+<h2 id="s130">NFR-IM-002 가용성</h2>
+<p>물류·재고 기능은 공장 생산 및 출하시간 동안 지속적으로 사용할 수 있어야 한다.</p>
+<p>서버 재기동 후 미완료 입출고, 이동중 재고, ERP 전송대상을 식별하고 재처리할 수 있어야 한다.</p>
+<hr>
+<h2 id="s131">NFR-IM-003 데이터 정합성</h2>
+<p>입고·출고·이동·출하와 재고수량 갱신은 동일한 논리적 트랜잭션으로 처리해야 한다.</p>
+<p>다음과 같은 상태가 발생해서는 안 된다.</p>
+<ul><li>입고문서는 존재하지만 재고가 증가하지 않음</li><li>출고문서는 없지만 재고가 감소함</li><li>출발창고는 감소했지만 도착창고는 증가하지 않음</li><li>출하완료됐지만 출하 LOT가 연결되지 않음</li><li>반납처리됐지만 현장재고가 감소하지 않음</li></ul>
+<hr>
+<h2 id="s132">NFR-IM-004 수량 보존</h2>
+<p>모든 재고수량 증감은 근거 트랜잭션을 가져야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">입고
++ 생산입고
++ 이동입고
++ 반납입고
++ 고객반품
+- 생산출고
+- 이동출고
+- 외주출고
+- 판매출하
+- 공급사반품
+- 폐기
+± 재고조정
+= 현재재고</code></pre></div>
+<hr>
+<h2 id="s133">NFR-IM-005 중복처리 방지</h2>
+<p>버튼 중복 클릭, 바코드 중복 스캔, 네트워크 재전송이 발생해도 동일 입출고 이벤트가 중복 반영되지 않아야 한다.</p>
+<p>모든 주요 트랜잭션은 요청 고유번호와 멱등성을 지원해야 한다.</p>
+<hr>
+<h2 id="s134">NFR-IM-006 동시성 통제</h2>
+<p>여러 사용자가 동일 LOT 또는 로케이션 재고를 동시에 예약·피킹·출고·출하하는 경우 가용수량을 정확히 통제해야 한다.</p>
+<p>동시처리로 다음 상황이 발생해서는 안 된다.</p>
+<ul><li>중복예약</li><li>가용수량 초과출고</li><li>동일 LOT 중복출하</li><li>음수재고</li><li>동일 로케이션 수량 중복차감</li></ul>
+<hr>
+<h2 id="s135">NFR-IM-007 LOT 추적성</h2>
+<p>모든 입하·입고·출고·이동·출하 이벤트는 LOT 추적성 기능과 연결되어야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">공급사 LOT
+→ 입하
+→ 입고
+→ 창고
+→ 생산출고
+→ 자재투입
+→ 생산 LOT
+→ 완제품 입고
+→ 출하
+→ 고객</code></pre></div>
+<hr>
+<h2 id="s136">NFR-IM-008 위치 정확성</h2>
+<p>재고의 현재 위치는 마지막 유효 이동 이벤트와 일치해야 한다.</p>
+<p>한 재고단위가 동일 시점에 둘 이상의 위치에 중복 존재해서는 안 된다. 분산 보관 시에는 위치별 수량을 분리해야 한다.</p>
+<hr>
+<h2 id="s137">NFR-IM-009 오프라인 운영</h2>
+<p>네트워크 장애 시 허용 가능한 업무를 구분해야 한다.</p>
+<div class="tablewrap"><table><thead><tr><th>업무</th><th>권장 정책</th></tr></thead><tbody><tr><td>재고조회</td><td>최근 동기화 데이터 조회 가능</td></tr><tr><td>피킹 스캔</td><td>임시저장 가능</td></tr><tr><td>생산현장 인수</td><td>임시저장 가능</td></tr><tr><td>재고이동</td><td>제한적 허용</td></tr><tr><td>입고확정</td><td>온라인 권장</td></tr><tr><td>재고조정</td><td>온라인 필수</td></tr><tr><td>출하확정</td><td>온라인 필수</td></tr></tbody></table></div>
+<p>오프라인 이벤트 동기화 시 중복·수량·상태·순서 충돌을 검증해야 한다.</p>
+<hr>
+<h2 id="s138">NFR-IM-010 권한관리</h2>
+<p>역할별로 다음 권한을 통제해야 한다.</p>
+<div class="tablewrap"><table><thead><tr><th>역할</th><th>주요 권한</th></tr></thead><tbody><tr><td>입하 담당자</td><td>입하등록·검수</td></tr><tr><td>품질 담당자</td><td>수입검사·품질상태 변경</td></tr><tr><td>창고 담당자</td><td>입고·적치·피킹·출고·이동</td></tr><tr><td>생산 작업자</td><td>현장인수·반납요청</td></tr><tr><td>생산관리자</td><td>생산출고 승인·예외처리</td></tr><tr><td>출하 담당자</td><td>출하피킹·상차·출하확정</td></tr><tr><td>관리자</td><td>취소·정정·재고조정 승인</td></tr></tbody></table></div>
+<p>모든 권한은 화면과 서버 양쪽에서 검증해야 한다.</p>
+<hr>
+<h2 id="s139">NFR-IM-011 감사 가능성</h2>
+<p>입하·입고·출고·이동·반납·출하·조정 이력은 감사 가능한 형태로 보존해야 한다.</p>
+<p>이력에는 다음 정보가 포함되어야 한다.</p>
+<ul><li>처리자</li><li>실제 작업자</li><li>입력 단말기</li><li>실제 발생일시</li><li>MES 입력일시</li><li>처리 전 수량</li><li>처리 후 수량</li><li>출발위치</li><li>도착위치</li><li>처리사유</li><li>승인자</li></ul>
+<hr>
+<h2 id="s140">NFR-IM-012 사용성</h2>
+<p>현장 물류처리는 바코드 스캔 중심으로 수행할 수 있어야 한다.</p>
+<p>권장 흐름:</p>
+<div class="codewrap"><pre><code class="lang-text">업무문서 스캔
+→ 로케이션 스캔
+→ LOT 스캔
+→ 수량 확인
+→ 저장</code></pre></div>
+<p>화면에는 항상 다음 정보를 명확히 표시해야 한다.</p>
+<ul><li>현재 업무유형</li><li>품목</li><li>LOT</li><li>처리수량</li><li>출발위치</li><li>도착위치</li><li>품질상태</li><li>재고상태</li></ul>
+<hr>
+<h2 id="s141">NFR-IM-013 오류 예방</h2>
+<p>시스템은 다음 오류를 차단하거나 경고해야 한다.</p>
+<ul><li>다른 품목 피킹</li><li>다른 로케이션 피킹</li><li>보류·불량 LOT 출고</li><li>가용수량 초과처리</li><li>동일 LOT 중복스캔</li><li>출고되지 않은 재고 인수</li><li>이동중 재고 재출고</li><li>출하검사 미완료 출하</li><li>고객 요구와 다른 LOT 출하</li><li>유효기간 경과 재고 사용</li></ul>
+<p>오류 메시지는 원인과 조치방법을 함께 표시해야 한다.</p>
+<hr>
+<h2 id="s142">NFR-IM-014 확장성</h2>
+<p>물류·재고 데이터 모델은 다음 운영형태를 지원할 수 있어야 한다.</p>
+<ul><li>단순 구역 단위 창고</li><li>랙·셀 단위 창고</li><li>사업부별 독립 창고</li><li>외부·위탁창고</li><li>외주처 재고</li><li>생산현장 재고</li><li>다수 공장</li><li>다수 법인</li></ul>
+<p>창고별 관리수준 차이는 기준정보로 설정해야 한다.</p>
+<hr>
+<h2 id="s143">NFR-IM-015 성능 및 처리용량</h2>
+<p>시스템은 다음 규모에서 안정적으로 운영할 수 있어야 한다.</p>
+<ul><li>단말기 1,000대 이하</li><li>동시 사용자 300명 이상</li><li>일 수만 건의 입출고·이동 이벤트</li><li>수백만 건 이상의 LOT 재고이력</li><li>다수 사업부·공장·창고·로케이션</li><li>장기간 재고 및 출하이력 보관</li></ul>
+<hr>
+<h2 id="s144">NFR-IM-016 설정 가능성</h2>
+<p>다음 정책은 프로그램 수정 없이 설정할 수 있어야 한다.</p>
+<ul><li>P/O 없는 입하 허용 여부</li><li>초과·미달입하 허용범위</li><li>수입검사 필수 여부</li><li>자동 입고 여부</li><li>적치 로케이션 추천방식</li><li>FIFO·FEFO 정책</li><li>음수재고 허용 여부</li><li>출고·인수 분리 여부</li><li>이동출고·입고 분리 여부</li><li>출하검사 필수 여부</li><li>재고조정 승인단계</li><li>외부창고 관리방식</li></ul>
+<hr>
+<h2 id="s145">NFR-IM-017 연계 신뢰성</h2>
+<p>ERP 또는 외부창고 연계가 실패해도 MES 현장업무가 불필요하게 중단되지 않아야 한다.</p>
+<p>확정된 MES 실적은 전송대기열에 저장하고, 연계 복구 후 재전송할 수 있어야 한다.</p>
+<hr>
+<h2 id="s146">NFR-IM-018 모니터링</h2>
+<p>다음 항목을 운영자가 모니터링할 수 있어야 한다.</p>
+<ul><li>입하·입고 처리실패</li><li>미적치 재고</li><li>장기 이동중 재고</li><li>피킹 지연</li><li>출고·인수 불일치</li><li>외주수량 불일치</li><li>외부창고 미확인 재고</li><li>음수재고</li><li>실사 차이</li><li>ERP 연계 실패</li><li>바코드 처리오류</li><li>평균 응답시간</li></ul>
+<hr>
+<h2 id="s147">NFR-IM-019 시간 정확성</h2>
+<p>모든 물류 이벤트는 서버시간을 기준으로 기록해야 한다.</p>
+<p>다음 시간을 구분해야 한다.</p>
+<ul><li>실제 발생일시</li><li>MES 입력일시</li><li>출고일시</li><li>인수일시</li><li>이동출발일시</li><li>이동도착일시</li><li>출하일시</li><li>ERP 전송일시</li></ul>
+<hr>
+<h2 id="s148">NFR-IM-020 데이터 보존</h2>
+<p>입하·입고·출고·재고이동·실사·출하 이력은 품질보증기간, 제품수명 및 회계·감사 요구기간을 고려하여 보존해야 한다.</p>
+<p>품목, 창고, 로케이션, 공급업체, 고객이 비활성화되어도 과거이력은 유지해야 한다.</p>
+<hr>
+<h2 id="s149">NFR-IM-021 백업 및 복구</h2>
+<p>백업 복구 후 다음 항목의 정합성을 검증해야 한다.</p>
+<ul><li>LOT별 현재수량</li><li>창고·로케이션별 수량</li><li>예약·피킹·이동중 수량</li><li>생산현장 재고</li><li>출하대기 재고</li><li>입출고 문서와 재고 이벤트</li><li>LOT 추적관계</li><li>ERP 전송상태</li></ul>
+<hr>
+<h2 id="s150">NFR-IM-022 유지보수성</h2>
+<p>입하·입고·출고·이동·출하 업무규칙은 공통 재고 트랜잭션 서비스를 기반으로 구현해야 한다.</p>
+<p>각 화면이나 연계 프로그램에서 재고수량 계산규칙을 중복 구현해서는 안 된다.</p>
+<hr>
+<h1 id="s151">7. 핵심 업무 규칙</h1>
+<h2 id="s152">BR-IM-001</h2>
+<p>입하는 물리적 도착이며 입고는 재고 증가이다.</p>
+<h2 id="s153">BR-IM-002</h2>
+<p>출고와 출하는 별도의 업무로 관리한다.</p>
+<h2 id="s154">BR-IM-003</h2>
+<p>모든 재고수량 변경은 근거 트랜잭션을 가져야 한다.</p>
+<h2 id="s155">BR-IM-004</h2>
+<p>LOT 관리대상 품목은 LOT 없이 입고·출고·이동·출하할 수 없다.</p>
+<h2 id="s156">BR-IM-005</h2>
+<p>보류·격리·불합격 재고는 일반 생산출고와 출하에 사용할 수 없다.</p>
+<h2 id="s157">BR-IM-006</h2>
+<p>생산출고된 자재가 자동으로 작업지시에 투입된 것으로 처리되어서는 안 된다.</p>
+<h2 id="s158">BR-IM-007</h2>
+<p>생산실적이 등록되어도 자동으로 창고입고된 것으로 처리되어서는 안 된다.</p>
+<h2 id="s159">BR-IM-008</h2>
+<p>출고수량과 현장 인수수량의 차이는 반드시 사유를 가져야 한다.</p>
+<h2 id="s160">BR-IM-009</h2>
+<p>이동출고 후 도착확정 전 재고는 이동중 상태로 관리한다.</p>
+<h2 id="s161">BR-IM-010</h2>
+<p>재고수량은 품목·LOT·창고·로케이션·품질상태·재고상태 단위로 관리할 수 있어야 한다.</p>
+<h2 id="s162">BR-IM-011</h2>
+<p>동일 재고를 가용수량 이상으로 예약·피킹·출고할 수 없다.</p>
+<h2 id="s163">BR-IM-012</h2>
+<p>재고조정은 과거 업무이력을 변경하지 않고 별도 조정 이벤트로 처리한다.</p>
+<h2 id="s164">BR-IM-013</h2>
+<p>생산·출하에 사용된 입출고 이력은 물리적으로 삭제할 수 없다.</p>
+<h2 id="s165">BR-IM-014</h2>
+<p>사업부 간 이동은 외부 고객 출하와 구분한다.</p>
+<h2 id="s166">BR-IM-015</h2>
+<p>외주출고와 외주입고는 원본 LOT 계보를 유지해야 한다.</p>
+<h2 id="s167">BR-IM-016</h2>
+<p>출하완료된 재고는 다시 가용재고로 사용할 수 없다.</p>
+<h2 id="s168">BR-IM-017</h2>
+<p>실제 고객에게 반출된 출하는 단순 취소하지 않고 고객 반품으로 처리한다.</p>
+<h2 id="s169">BR-IM-018</h2>
+<p>입출고 취소·정정 시 관련 LOT, 재고, ERP 연계상태를 함께 검증해야 한다.</p>
+<hr>
+<h1 id="s170">8. 기본 상태 흐름</h1>
+<h2 id="s171">8.1 입하·입고</h2>
+<div class="codewrap"><pre><code class="lang-text">입하예정
+→ 도착
+→ 입하등록
+→ 검사대기
+→ 검사완료
+→ 입고
+→ 적치대기
+→ 적치완료</code></pre></div>
+<h2 id="s172">8.2 생산출고</h2>
+<div class="codewrap"><pre><code class="lang-text">출고요청
+→ 재고예약
+→ LOT 할당
+→ 피킹중
+→ 피킹완료
+→ 출고
+→ 이동중
+→ 현장인수
+→ 출고완료</code></pre></div>
+<h2 id="s173">8.3 생산품 입고</h2>
+<div class="codewrap"><pre><code class="lang-text">생산완료
+→ 입고대기
+→ 생산현장 출고
+→ 창고 인수
+→ 입고
+→ 적치완료</code></pre></div>
+<h2 id="s174">8.4 창고이동</h2>
+<div class="codewrap"><pre><code class="lang-text">이동요청
+→ 이동출고
+→ 이동중
+→ 도착확인
+→ 이동입고
+→ 이동완료</code></pre></div>
+<h2 id="s175">8.5 고객 출하</h2>
+<div class="codewrap"><pre><code class="lang-text">출하요청
+→ 재고할당
+→ 피킹중
+→ 피킹완료
+→ 검수대기
+→ 출하검사
+→ 출하대기
+→ 상차
+→ 출하완료</code></pre></div>
+<hr>
+<h1 id="s176">9. 1차 구축 우선순위</h1>
+<h2 id="s177">P0: 반드시 포함</h2>
+<ul><li>P/O 기반 자재 입하</li><li>부분·초과·미달입하</li><li>수입검사 연계</li><li>내부 LOT 생성 및 입고</li><li>창고·로케이션 적치</li><li>생산출고와 자재투입 분리</li><li>생산현장 인수</li><li>잔량 반납</li><li>생산품 부분 입고</li><li>창고·사업부 간 이동</li><li>출하요청·피킹·검수·출하</li><li>LOT별 현재재고 조회</li><li>입출고 취소·정정</li><li>ERP 실적 전송 및 재처리</li><li>재고수량 정합성 통제</li></ul>
+<h2 id="s178">P1: 운영 안정화</h2>
+<ul><li>재고예약·자동할당</li><li>FIFO·FEFO 권장</li><li>외주 출고·입고</li><li>외부·위탁창고 관리</li><li>재고실사</li><li>장기재고·유효기간 관리</li><li>공급사·고객 반품</li><li>물류 예외업무 목록</li><li>오프라인 피킹·인수</li></ul>
+<h2 id="s179">P2: 고도화</h2>
+<ul><li>PDA 기반 최적 피킹경로</li><li>자동창고·WMS 연계</li><li>차량·도크 스케줄</li><li>팔레트·용기 추적</li><li>3PL 실시간 API</li><li>자동 재고보충</li><li>창고 작업 생산성 분석</li></ul>
+<hr>
+<h1 id="s180">10. 최종 업무 구조</h1>
+<div class="codewrap"><pre><code class="lang-text">물류·재고 실행관리
+├─ 구매자재 입하·입고
+├─ 수입검사·적치
+├─ 자재 예약·피킹·생산출고
+├─ 현장 인계·잔량 반납
+├─ 생산품 입고
+├─ 창고·사업부·공장 이동
+├─ 외주·외부창고
+├─ 고객 출하
+├─ 반품·폐기
+├─ 재고실사·조정
+└─ ERP 연계
+
+작업지시
+├─ 자재투입
+├─ 생산실적
+├─ 품질관리
+└─ LOT 추적성</code></pre></div>
+<p>물류·재고 실행관리는 5대 생산기능의 앞뒤에서 재고의 물리적 흐름을 담당하고, LOT 추적성은 그 흐름과 생산이력을 연결하는 구조로 설계해야 한다.</p>
+<p>이 요구사항에서 가장 먼저 확정해야 할 운영정책은 <strong>생산출고 시 창고재고를 생산현장 재고로 이동시킬지, 곧바로 작업지시 투입으로 처리할지</strong>입니다. 현재 고객사에는 출고와 투입을 분리하는 방식이 적합합니다.</p>
+  </article>
+  <div class="pager"><a class="pv" href="2-6.html"><span>이전</span>요구사항 누락분 보충</a><a class="nx" href="3-1.html"><span>다음</span>개념적 모델링</a></div>
+</main>
+</body>
+</html>

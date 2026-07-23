@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>생산 실적 관리 · MES 데이터 모델링 v3</title>
+<style>:root{
+  --bg:#F4F5F6; --surface:#FFFFFF; --surface-2:#EDEFF1; --surface-3:#E4E7EA;
+  --ink:#14181B; --ink-2:#5A6570; --ink-3:#8B959D;
+  --rule:#DCE0E4; --rule-strong:#C3CAD0;
+  --accent:#A9660A; --tint-accent:#F7ECD9;
+  --blue:#28558F; --green:#1D7043; --red:#B93E28;
+  --start:#B93E28; --flow:#1D7043; --done:#28558F; --warn:#9B3427;
+  --tint-start:#F6E5E1; --tint-flow:#E2F0E7; --tint-done:#E2EAF5;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Pretendard","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+  --side:264px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#101315; --surface:#171B1E; --surface-2:#1D2226; --surface-3:#242A2F;
+    --ink:#E7EBEE; --ink-2:#9AA5AE; --ink-3:#6E7A83;
+    --rule:#2A3035; --rule-strong:#3A4249;
+    --accent:#DFA149; --tint-accent:#2B2317;
+    --blue:#83ACE4; --green:#5FC68B; --red:#E4816C;
+  --start:#E4816C; --flow:#5FC68B; --done:#83ACE4; --warn:#E0806E;
+  --tint-start:#2A1D1A; --tint-flow:#16281F; --tint-done:#182432;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101315; --surface:#171B1E; --surface-2:#1D2226; --surface-3:#242A2F;
+  --ink:#E7EBEE; --ink-2:#9AA5AE; --ink-3:#6E7A83;
+  --rule:#2A3035; --rule-strong:#3A4249;
+  --accent:#DFA149; --tint-accent:#2B2317;
+  --blue:#83ACE4; --green:#5FC68B; --red:#E4816C;
+  --start:#E4816C; --flow:#5FC68B; --done:#83ACE4; --warn:#E0806E;
+  --tint-start:#2A1D1A; --tint-flow:#16281F; --tint-done:#182432;
+}
+:root[data-theme="light"]{
+  --bg:#F4F5F6; --surface:#FFFFFF; --surface-2:#EDEFF1; --surface-3:#E4E7EA;
+  --ink:#14181B; --ink-2:#5A6570; --ink-3:#8B959D;
+  --rule:#DCE0E4; --rule-strong:#C3CAD0;
+  --accent:#A9660A; --tint-accent:#F7ECD9;
+  --blue:#28558F; --green:#1D7043; --red:#B93E28;
+  --start:#B93E28; --flow:#1D7043; --done:#28558F; --warn:#9B3427;
+  --tint-start:#F6E5E1; --tint-flow:#E2F0E7; --tint-done:#E2EAF5;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans);
+     font-size:15px; line-height:1.75; letter-spacing:-0.003em}
+
+/* ── 사이드바 ───────────────────────────── */
+nav.side{position:sticky; top:0; z-index:20; background:var(--surface);
+         border-bottom:1px solid var(--rule); max-height:none}
+.nav-brand{padding:16px 22px 12px; border-bottom:1px solid var(--rule)}
+.nav-brand a{text-decoration:none; display:block}
+.nav-brand .bt{display:block; font-size:14px; font-weight:700; color:var(--ink); letter-spacing:-0.02em}
+.nav-brand .bs{display:block; font-family:var(--mono); font-size:10px; color:var(--ink-3);
+               letter-spacing:.1em; text-transform:uppercase; margin-top:4px}
+.nav-docs{display:flex; gap:2px; overflow-x:auto; padding:0 14px; scrollbar-width:thin}
+.nav-docs .grp{flex:none; align-self:center; font-family:var(--mono); font-size:10px;
+               letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); padding:0 8px 0 4px}
+.nav-docs a{flex:none; padding:11px 10px; font-size:12.5px; color:var(--ink-2);
+            text-decoration:none; white-space:nowrap; border-bottom:2px solid transparent}
+.nav-docs a:hover{color:var(--ink)}
+.nav-docs a.on{color:var(--ink); font-weight:600; border-bottom-color:var(--accent)}
+.ontop{display:none}
+
+main{max-width:940px; margin:0 auto; padding:0 26px 100px}
+
+@media (min-width:1120px){
+  body{padding-left:var(--side)}
+  nav.side{position:fixed; inset:0 auto 0 0; width:var(--side); height:100vh;
+           overflow-y:auto; border-bottom:0; border-right:1px solid var(--rule);
+           display:flex; flex-direction:column; padding-bottom:28px}
+  .nav-brand{padding:24px 22px 18px}
+  .nav-docs{flex-direction:column; overflow:visible; padding:14px 12px 0; gap:0}
+  .nav-docs .grp{align-self:stretch; padding:14px 10px 5px}
+  .nav-docs .grp:first-child{padding-top:0}
+  .nav-docs a{padding:6px 10px; border-bottom:0; border-left:2px solid transparent;
+              white-space:normal; line-height:1.45; border-radius:0 3px 3px 0}
+  .nav-docs a:hover{background:var(--surface-2)}
+  .nav-docs a.on{background:var(--surface-2); border-left-color:var(--accent)}
+  .ontop{display:flex; flex-direction:column; margin-top:20px; padding:14px 12px 0;
+         border-top:1px solid var(--rule)}
+  .ontop .grp{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+              color:var(--ink-3); padding:0 10px 6px}
+  .ontop a{padding:3px 10px; font-size:11.5px; color:var(--ink-2); text-decoration:none;
+           line-height:1.5; border-left:2px solid transparent}
+  .ontop a:hover{color:var(--accent); border-left-color:var(--rule-strong)}
+  .ontop a.l1{font-weight:600; color:var(--ink); margin-top:6px}
+  .ontop a.l2{padding-left:20px}
+  .ontop a.l3{padding-left:32px; color:var(--ink-3); font-size:11px}
+  main{margin:0; padding:0 56px 120px}
+}
+
+/* ── 문서 헤더 ──────────────────────────── */
+.dochead{padding:44px 0 26px; border-bottom:2px solid var(--ink); margin-bottom:8px}
+.eyebrow{font-family:var(--mono); font-size:10.5px; letter-spacing:.13em; text-transform:uppercase;
+         color:var(--ink-3)}
+.doctitle{font-size:clamp(24px,3.2vw,32px); line-height:1.22; margin:10px 0 0; font-weight:700;
+          letter-spacing:-0.025em; text-wrap:balance}
+.docsub{margin:10px 0 0; color:var(--ink-2); font-size:14px; max-width:64ch}
+
+/* ── 본문 ──────────────────────────────── */
+.md{padding-top:12px}
+.md h1,.md h2,.md h3,.md h4,.md h5,.md h6{letter-spacing:-0.02em; text-wrap:balance; scroll-margin-top:80px}
+.md h1{font-size:23px; font-weight:700; margin:52px 0 14px; padding-bottom:9px;
+       border-bottom:1px solid var(--rule-strong)}
+.md h2{font-size:18.5px; font-weight:700; margin:38px 0 10px}
+.md h3{font-size:15.5px; font-weight:700; margin:28px 0 8px; color:var(--ink)}
+.md h4,.md h5,.md h6{font-size:14px; font-weight:700; margin:22px 0 6px; color:var(--ink-2)}
+.md > :first-child{margin-top:0}
+.md p{margin:0 0 13px; max-width:76ch}
+.md a{color:var(--blue)}
+.md strong{font-weight:700}
+.md hr{border:0; border-top:1px solid var(--rule); margin:34px 0}
+.md ul,.md ol{margin:0 0 14px; padding-left:22px; max-width:76ch}
+.md li{margin:3px 0}
+.md li > ul,.md li > ol{margin:3px 0}
+.md blockquote{margin:0 0 16px; padding:12px 18px; border-left:3px solid var(--accent);
+               background:var(--tint-accent); border-radius:0 3px 3px 0; max-width:76ch}
+.md blockquote p{margin:0}
+.md blockquote p + p{margin-top:8px}
+code{font-family:var(--mono); font-size:.87em; background:var(--surface-2); padding:1.5px 5px;
+     border-radius:2px; color:var(--ink); word-break:break-word}
+.codewrap{margin:0 0 16px; border:1px solid var(--rule); border-radius:3px; background:var(--surface);
+          overflow-x:auto}
+.codewrap pre{margin:0; padding:14px 18px}
+.codewrap code{background:none; padding:0; font-size:12.5px; line-height:1.65; white-space:pre;
+               display:block}
+.codewrap code.lang-sql{color:var(--ink)}
+
+/* ── 표 ────────────────────────────────── */
+.tablewrap{overflow-x:auto; margin:0 0 18px; border:1px solid var(--rule); border-radius:3px;
+           background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-size:13.5px; min-width:480px}
+th,td{text-align:left; padding:9px 14px; border-bottom:1px solid var(--rule); vertical-align:top;
+      line-height:1.6}
+thead th{font-family:var(--mono); font-size:11px; letter-spacing:.06em; color:var(--ink-3);
+         font-weight:600; background:var(--surface-2); white-space:nowrap; text-transform:uppercase}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--surface-2)}
+td code{font-size:12px; white-space:nowrap}
+
+/* ── 페이저 ────────────────────────────── */
+.pager{display:flex; justify-content:space-between; gap:16px; margin-top:56px; padding-top:22px;
+       border-top:1px solid var(--rule)}
+.pager a{flex:0 1 auto; max-width:46%; text-decoration:none; color:var(--ink); font-size:13.5px;
+         font-weight:600; padding:12px 16px; border:1px solid var(--rule); border-radius:3px;
+         background:var(--surface); line-height:1.4}
+.pager a:hover{border-color:var(--accent); color:var(--accent)}
+.pager a span{display:block; font-family:var(--mono); font-size:10px; letter-spacing:.1em;
+              text-transform:uppercase; color:var(--ink-3); font-weight:500; margin-bottom:3px}
+.pager a.nx{text-align:right}
+a:focus-visible,.nav-docs a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+/* ── 인덱스 전용 ───────────────────────── */
+.hero{padding:56px 0 34px; border-bottom:2px solid var(--ink)}
+.hero h1{font-size:clamp(27px,4vw,40px); line-height:1.15; margin:12px 0 0; font-weight:700;
+         letter-spacing:-0.03em}
+.hero .lede{margin:14px 0 0; color:var(--ink-2); font-size:15px; max-width:68ch}
+.statbar{display:flex; flex-wrap:wrap; gap:0; margin:30px 0 0; border:1px solid var(--rule);
+         border-radius:3px; background:var(--surface); overflow:hidden}
+.statbar div{flex:1 1 130px; padding:14px 18px; border-right:1px solid var(--rule)}
+.statbar div:last-child{border-right:0}
+.statbar .v{font-family:var(--mono); font-size:21px; font-weight:600; letter-spacing:-0.02em;
+            font-variant-numeric:tabular-nums; display:block}
+.statbar .k{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+            color:var(--ink-3); margin-top:3px; display:block}
+.secgrp{margin:52px 0 0}
+.secgrp > h2{font-size:13px; font-family:var(--mono); letter-spacing:.12em; text-transform:uppercase;
+             color:var(--accent); margin:0 0 4px; font-weight:600}
+.secgrp > p{margin:0 0 18px; color:var(--ink-2); font-size:13.5px; max-width:70ch}
+.cards{display:grid; gap:12px}
+@media(min-width:720px){.cards{grid-template-columns:1fr 1fr}}
+.card{display:block; text-decoration:none; color:inherit; background:var(--surface);
+      border:1px solid var(--rule); border-radius:3px; padding:17px 19px; transition:border-color .12s}
+.card:hover{border-color:var(--accent)}
+.card .num{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; color:var(--accent);
+           font-weight:600}
+.card h3{margin:6px 0 5px; font-size:16px; font-weight:700; letter-spacing:-0.02em}
+.card p{margin:0; font-size:13px; color:var(--ink-2); line-height:1.6}
+.card .facts{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px}
+.card .facts span{font-family:var(--mono); font-size:10.5px; color:var(--ink-3);
+                  background:var(--surface-2); padding:2px 7px; border-radius:2px;
+                  font-variant-numeric:tabular-nums}
+.card .facts span.hi{background:var(--tint-accent); color:var(--accent); font-weight:600}
+.card.ext .num{color:var(--blue)}
+.card.ext:hover{border-color:var(--blue)}
+.note{margin:44px 0 0; padding:16px 20px; border:1px solid var(--rule); border-left:3px solid var(--blue);
+      border-radius:0 3px 3px 0; background:var(--surface); font-size:13.5px; color:var(--ink-2)}
+.note b{color:var(--ink)}
+footer{margin-top:64px; padding-top:22px; border-top:1px solid var(--rule);
+        font-size:12.5px; color:var(--ink-3); display:flex; flex-wrap:wrap; gap:14px;
+        justify-content:space-between}
+@media (prefers-reduced-motion:reduce){*{transition:none!important; scroll-behavior:auto!important}}
+
+/* ── 워크플로우 페이지: 넓은 본문 ── */
+body.wide main{max-width:1180px}
+</style>
+</head>
+<body>
+<nav class="side"><div class="nav-brand"><a href="index.html"><span class="bt">MES 데이터 모델링</span><span class="bs">v3 · 문서 인덱스</span></a></div>
+<div class="nav-docs">
+<span class="grp">업무 흐름 정본</span>
+<a href="workflow-v2.html">OMF MES 시스템 워크플로우 v2</a>
+<span class="grp">1. 도메인 이해</span>
+<a href="1-1.html">비즈니스 도메인의 이해</a>
+<a href="1-2.html">MES의 핵심 필수 기능</a>
+<a href="1-3.html">사용자 시나리오</a>
+<span class="grp">2. 기능 요구사항</span>
+<a href="2-1.html">작업지시</a>
+<a href="2-2.html">자재투입</a>
+<a href="2-3.html" class="on">생산 실적 관리</a>
+<a href="2-4.html">품질관리</a>
+<a href="2-5.html">LOT 추적성</a>
+<a href="2-6.html">요구사항 누락분 보충</a>
+<a href="2-7.html">물류 재고 실행 관리</a>
+<span class="grp">3. 데이터 모델링</span>
+<a href="3-1.html">개념적 모델링</a>
+<a href="3-2.html">논리적 모델링</a>
+<a href="3-3.html">물리적 모델링</a>
+<a href="mes_erd.html">ERD — 도메인별 다이어그램</a>
+<a href="mes_scenarios_workflows.html">업무 시나리오 &amp; 워크플로우</a>
+<a href="mes_workflows_detailed.html">상세 워크플로우</a>
+<span class="grp">참고</span>
+<a href="changelog.html">변경 이력</a>
+</div><aside class="ontop"><span class="grp">이 문서</span><a class="l1" href="#s1">MES 핵심 기능 요구사항 ③ 생산실적 관리</a><a class="l2" href="#s2">1. 기능 목적</a><a class="l1" href="#s3">2. 용어 정의</a><a class="l2" href="#s4">2.1 생산실적</a><a class="l2" href="#s5">2.2 양품수량</a><a class="l2" href="#s6">2.3 불량수량</a><a class="l2" href="#s7">2.4 생산완료수량</a><a class="l2" href="#s8">2.5 공정투입수량</a><a class="l2" href="#s9">2.6 후속 공정 가용수량</a><a class="l2" href="#s10">2.7 실적 발생일시</a><a class="l2" href="#s11">2.8 실적 입력일시</a><a class="l2" href="#s12">2.9 부분실적</a><a class="l2" href="#s13">2.10 실적 취소</a><a class="l2" href="#s14">2.11 실적 정정</a><a class="l1" href="#s15">3. 기본 처리 구조</a><a class="l1" href="#s16">4. 생산실적 관리 단위</a><a class="l1" href="#s17">5. 기능적 요구사항</a><a class="l2" href="#s18">FR-PR-001 생산실적 등록 대상 작업지시 조회</a><a class="l2" href="#s19">FR-PR-002 작업지시 바코드를 이용한 실적등록</a><a class="l2" href="#s20">FR-PR-003 공용 단말기 실적등록</a><a class="l2" href="#s21">FR-PR-004 생산실적 기본정보 등록</a><a class="l2" href="#s22">FR-PR-005 부분 생산실적 등록</a><a class="l2" href="#s23">FR-PR-006 양품수량 등록</a><a class="l2" href="#s24">FR-PR-007 불량수량 등록</a><a class="l2" href="#s25">FR-PR-008 양품·불량 수량 정합성 검증</a><a class="l2" href="#s26">FR-PR-009 공정투입수량 검증</a><a class="l2" href="#s27">FR-PR-010 작업지시 지시수량 초과 통제</a><a class="l2" href="#s28">FR-PR-011 미달 생산 관리</a><a class="l2" href="#s29">FR-PR-012 실제 발생일시 등록</a><a class="l2" href="#s30">FR-PR-013 근무조 및 작업자 등록</a><a class="l2" href="#s31">FR-PR-014 설비 및 금형 등록</a><a class="l2" href="#s32">FR-PR-015 설비·금형 변경 구간 관리</a><a class="l2" href="#s33">FR-PR-016 자재투입 연계</a><a class="l2" href="#s34">FR-PR-017 자재 LOT별 생산구간 연결</a><a class="l2" href="#s35">FR-PR-018 생산 LOT 생성</a><a class="l2" href="#s36">FR-PR-019 기존 생산 LOT에 실적 추가</a><a class="l2" href="#s37">FR-PR-020 복수 생산 LOT 생성</a><a class="l2" href="#s38">FR-PR-021 생산실적과 품질검사 연계</a><a class="l2" href="#s39">FR-PR-022 실적 등록과 재고 생성 분리</a><a class="l2" href="#s40">FR-PR-023 후속 공정 가용수량 반영</a><a class="l2" href="#s41">FR-PR-024 부분완료 및 후속 공정 병행</a><a class="l2" href="#s42">FR-PR-025 생산실적 자동집계</a><a class="l2" href="#s43">FR-PR-026 작업시간 관리</a><a class="l2" href="#s44">FR-PR-027 Cycle Time 및 생산속도 계산</a><a class="l2" href="#s45">FR-PR-028 실적 일괄등록</a><a class="l2" href="#s46">FR-PR-029 사후 실적등록</a><a class="l2" href="#s47">FR-PR-030 실적 임시저장</a><a class="l2" href="#s48">FR-PR-031 생산실적 확정</a><a class="l2" href="#s49">FR-PR-032 생산실적 취소</a><a class="l2" href="#s50">FR-PR-033 생산실적 정정</a><a class="l2" href="#s51">FR-PR-034 취소·정정에 따른 수량 재계산</a><a class="l2" href="#s52">FR-PR-035 재작업 실적 관리</a><a class="l2" href="#s53">FR-PR-036 폐기실적 관리</a><a class="l2" href="#s54">FR-PR-037 생산실적 작업완료 연계</a><a class="l2" href="#s55">FR-PR-038 작업지시 마감 연계</a><a class="l2" href="#s56">FR-PR-039 생산오더·생산계획 실적 집계</a><a class="l2" href="#s57">FR-PR-040 전체 라우팅 진행현황 조회</a><a class="l2" href="#s58">FR-PR-041 생산실적 상세조회</a><a class="l2" href="#s59">FR-PR-042 생산실적 검색</a><a class="l2" href="#s60">FR-PR-043 실적 현황 및 보고서</a><a class="l2" href="#s61">FR-PR-044 ERP 생산실적 연계</a><a class="l2" href="#s62">FR-PR-045 ERP 연계 실패 재처리</a><a class="l2" href="#s63">FR-PR-046 생산실적 이력 관리</a><a class="l1" href="#s64">6. 비기능 요구사항</a><a class="l2" href="#s65">NFR-PR-001 응답성</a><a class="l2" href="#s66">NFR-PR-002 중복등록 방지</a><a class="l2" href="#s67">NFR-PR-003 동시성 통제</a><a class="l2" href="#s68">NFR-PR-004 트랜잭션 정합성</a><a class="l2" href="#s69">NFR-PR-005 수량 정합성</a><a class="l2" href="#s70">NFR-PR-006 추적성</a><a class="l2" href="#s71">NFR-PR-007 감사 가능성</a><a class="l2" href="#s72">NFR-PR-008 권한 및 보안</a><a class="l2" href="#s73">NFR-PR-009 사용성</a><a class="l2" href="#s74">NFR-PR-010 오류 예방</a><a class="l2" href="#s75">NFR-PR-011 장애 복구</a><a class="l2" href="#s76">NFR-PR-012 가용성</a><a class="l2" href="#s77">NFR-PR-013 성능 및 처리용량</a><a class="l2" href="#s78">NFR-PR-014 확장성</a><a class="l2" href="#s79">NFR-PR-015 설정 가능성</a><a class="l2" href="#s80">NFR-PR-016 시간 정확성</a><a class="l2" href="#s81">NFR-PR-017 데이터 보존</a><a class="l2" href="#s82">NFR-PR-018 유지보수성</a><a class="l1" href="#s83">7. 핵심 업무 규칙</a><a class="l2" href="#s84">BR-PR-001</a><a class="l2" href="#s85">BR-PR-002</a><a class="l2" href="#s86">BR-PR-003</a><a class="l2" href="#s87">BR-PR-004</a><a class="l2" href="#s88">BR-PR-005</a><a class="l2" href="#s89">BR-PR-006</a><a class="l2" href="#s90">BR-PR-007</a><a class="l2" href="#s91">BR-PR-008</a><a class="l2" href="#s92">BR-PR-009</a><a class="l2" href="#s93">BR-PR-010</a><a class="l2" href="#s94">BR-PR-011</a><a class="l2" href="#s95">BR-PR-012</a><a class="l2" href="#s96">BR-PR-013</a><a class="l2" href="#s97">BR-PR-014</a><a class="l2" href="#s98">BR-PR-015</a><a class="l1" href="#s99">8. 기본 생산실적 흐름</a></aside></nav>
+<main>
+  <header class="dochead">
+    <div class="eyebrow">2. 기능 요구사항 · 2-3 생산 실적 관리</div>
+    <h1 class="doctitle">생산 실적 관리</h1>
+    <p class="docsub">작업 세션, 양품·불량·손실 실적, LOT 배분, 공정 인계</p>
+  </header>
+  <article class="md">
+<p>핵심 5대 기능 중 순서상 <strong>세 번째인 생산실적 관리</strong>에 대한 요구사항입니다.</p>
+<p>앞서 확정한 다음 구조를 전제로 합니다.</p>
+<ul><li>생산계획 확정 시 MES 관리 대상 공정별 작업지시를 전체 일괄 생성</li><li>작업지시 1건은 하나의 MES 관리 대상 공정을 담당</li><li>MES 미관리 공정은 라우팅에는 포함되지만 별도 실적입력을 요구하지 않음</li><li>단말기 한 대에서 여러 공정의 작업지시 처리 가능</li><li>선행 공정의 부분 완료수량만큼 후속 공정 진행 가능</li><li>실제 작업 발생시각과 MES 입력시각을 구분</li><li>자재투입, 품질실적, 생산 LOT와 생산실적을 연결</li></ul>
+<h1 id="s1">MES 핵심 기능 요구사항 ③ 생산실적 관리</h1>
+<h2 id="s2">1. 기능 목적</h2>
+<p>생산실적 관리 기능은 공정별 작업지시를 기준으로 실제 생산된 양품·불량·재작업·폐기 수량과 작업시간, 작업자, 설비, 금형 등의 실행 결과를 등록하고 관리하는 기능이다.</p>
+<p>생산실적은 다음 데이터의 연결 중심이 되어야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">작업지시
+→ 자재투입
+→ 생산실적
+→ 품질실적
+→ 생산 LOT
+→ 재고 및 후속 공정</code></pre></div>
+<p>생산실적 관리의 주요 목적은 다음과 같다.</p>
+<ul><li>계획 대비 실제 생산수량 파악</li><li>공정별 양품·불량·잔여수량 관리</li><li>후속 공정 투입 가능수량 산정</li><li>자재 LOT와 생산 LOT 간 추적성 확보</li><li>작업자·설비·금형별 생산이력 확보</li><li>실제 작업시간과 비가동시간 관리</li><li>생산완료 및 작업지시 마감 판단</li><li>ERP 생산실적 전송 및 재처리</li></ul>
+<hr>
+<h1 id="s3">2. 용어 정의</h1>
+<h2 id="s4">2.1 생산실적</h2>
+<p>작업지시를 수행하여 특정 시점 또는 특정 생산 구간에서 발생한 생산 결과이다.</p>
+<p>생산실적은 작업지시 전체를 한 번에 등록할 수도 있고, 생산 중 여러 차례 부분 등록할 수도 있다.</p>
+<h2 id="s5">2.2 양품수량</h2>
+<p>해당 공정의 작업 기준을 충족하여 다음 공정 또는 재고로 인계할 수 있는 수량이다.</p>
+<h2 id="s6">2.3 불량수량</h2>
+<p>해당 공정에서 불량으로 판정된 수량이다.</p>
+<p>불량수량은 재작업, 선별, 폐기, 특채 등의 후속처리를 가질 수 있다.</p>
+<h2 id="s7">2.4 생산완료수량</h2>
+<p>해당 공정에서 처리가 완료된 전체 수량이다.</p>
+<p>기본적으로 다음과 같이 계산한다.</p>
+<div class="codewrap"><pre><code class="lang-text">생산완료수량
+= 양품수량 + 불량수량</code></pre></div>
+<p>공정 특성에 따라 검사대기, 보류수량 등을 별도로 관리할 수 있다.</p>
+<h2 id="s8">2.5 공정투입수량</h2>
+<p>해당 공정에 실제로 투입된 반제품 또는 생산대상 수량이다.</p>
+<h2 id="s9">2.6 후속 공정 가용수량</h2>
+<p>현재 공정에서 양품으로 완료되어 다음 MES 관리 대상 공정에서 사용할 수 있는 수량이다.</p>
+<div class="codewrap"><pre><code class="lang-text">후속 공정 가용수량
+= 현재 공정 양품수량
+- 후속 공정 기투입수량
+- 보류수량</code></pre></div>
+<h2 id="s10">2.7 실적 발생일시</h2>
+<p>현장에서 실제 생산실적이 발생한 시각이다.</p>
+<h2 id="s11">2.8 실적 입력일시</h2>
+<p>생산실적이 MES에 등록된 시각이다.</p>
+<h2 id="s12">2.9 부분실적</h2>
+<p>하나의 작업지시에 대해 작업 완료 이전에 여러 차례 등록되는 생산실적이다.</p>
+<h2 id="s13">2.10 실적 취소</h2>
+<p>잘못 등록된 실적의 효력을 무효화하는 처리이다. 기존 데이터를 물리적으로 삭제하지 않고 취소이력을 보존한다.</p>
+<h2 id="s14">2.11 실적 정정</h2>
+<p>등록된 생산실적의 수량, 발생일시, 작업자 등의 잘못된 내용을 승인된 절차에 따라 수정하는 처리이다.</p>
+<hr>
+<h1 id="s15">3. 기본 처리 구조</h1>
+<div class="codewrap"><pre><code class="lang-text">작업지시 선택
+   ↓
+작업 시작
+   ↓
+생산 진행
+   ↓
+부분실적 등록
+   ├─ 양품
+   ├─ 불량
+   ├─ 작업자
+   ├─ 설비·금형
+   └─ 실제 발생일시
+   ↓
+자재투입 및 품질정보 연결
+   ↓
+생산 LOT 생성 또는 기존 LOT에 추가
+   ↓
+후속 공정 가용수량 반영
+   ↓
+작업완료
+   ↓
+실적 확정 및 마감</code></pre></div>
+<hr>
+<h1 id="s16">4. 생산실적 관리 단위</h1>
+<p>생산실적은 다음 단위 중 하나 이상으로 등록할 수 있어야 한다.</p>
+<ul><li>일정 수량 완료 시</li><li>박스 단위 완료 시</li><li>팔레트 단위 완료 시</li><li>생산 LOT 완료 시</li><li>근무조 종료 시</li><li>작업자 교대 시</li><li>자재 LOT 변경 시</li><li>설비 또는 금형 변경 시</li><li>작업지시 완료 시</li></ul>
+<p>개별 제품마다 실적을 등록하도록 고정하지 않고, 품목·공정별 운영정책에 따라 실적등록 단위를 설정할 수 있어야 한다.</p>
+<hr>
+<h1 id="s17">5. 기능적 요구사항</h1>
+<h2 id="s18">FR-PR-001 생산실적 등록 대상 작업지시 조회</h2>
+<p>시스템은 생산실적을 등록할 수 있는 작업지시를 조회할 수 있어야 한다.</p>
+<p>생산실적 등록 대상은 원칙적으로 다음 상태의 작업지시로 제한한다.</p>
+<ul><li>작업중</li><li>일시중지 상태 중 실적등록 허용 정책이 적용된 경우</li><li>작업완료 전 실적보정이 허용된 경우</li></ul>
+<p>다음 상태에서는 일반 사용자의 신규 생산실적 등록을 제한해야 한다.</p>
+<ul><li>작성</li><li>발행</li><li>작업대기</li><li>보류</li><li>작업완료</li><li>마감</li><li>취소</li></ul>
+<p>관리자 예외처리 시 사유와 승인정보를 기록해야 한다.</p>
+<hr>
+<h2 id="s19">FR-PR-002 작업지시 바코드를 이용한 실적등록</h2>
+<p>작업자는 공용 단말기에서 작업지시 바코드를 스캔하여 생산실적 등록화면을 열 수 있어야 한다.</p>
+<p>처리 흐름은 다음과 같다.</p>
+<div class="codewrap"><pre><code class="lang-text">작업자 인증
+→ 작업지시 바코드 스캔
+→ 작업지시 및 공정 확인
+→ 단말기 허용 공정 검증
+→ 생산실적 입력
+→ 저장</code></pre></div>
+<p>작업지시 바코드를 통해 다음 정보를 자동으로 결정해야 한다.</p>
+<ul><li>생산오더</li><li>생산계획</li><li>작업지시</li><li>품목</li><li>대상 공정</li><li>설비</li><li>금형</li><li>지시수량</li><li>현재 누적실적</li></ul>
+<hr>
+<h2 id="s20">FR-PR-003 공용 단말기 실적등록</h2>
+<p>단말기 한 대에서 여러 공정의 생산실적을 등록할 수 있어야 한다.</p>
+<p>단말기별로 다음 항목을 설정할 수 있어야 한다.</p>
+<ul><li>실적등록 가능 공정</li><li>실적등록 기능 사용 여부</li><li>불량등록 권한</li><li>실적 취소·정정 권한</li><li>품질입력 권한</li><li>LOT 라벨 출력 권한</li></ul>
+<p>허용되지 않은 공정의 생산실적을 등록하려는 경우 시스템은 입력을 차단해야 한다.</p>
+<hr>
+<h2 id="s21">FR-PR-004 생산실적 기본정보 등록</h2>
+<p>생산실적에는 최소한 다음 정보가 포함되어야 한다.</p>
+<ul><li>생산실적번호</li><li>생산오더번호</li><li>생산계획번호</li><li>작업지시번호</li><li>대상 품목</li><li>대상 공정</li><li>양품수량</li><li>불량수량</li><li>보류수량</li><li>재작업수량</li><li>폐기수량</li><li>실제 작업 발생일시</li><li>MES 입력일시</li><li>실제 근무조</li><li>실제 작업자</li><li>MES 입력자</li><li>실제 설비</li><li>실제 금형</li><li>입력 단말기</li><li>생산 LOT</li><li>비고</li></ul>
+<hr>
+<h2 id="s22">FR-PR-005 부분 생산실적 등록</h2>
+<p>하나의 작업지시에 대해 생산실적을 여러 번 나누어 등록할 수 있어야 한다.</p>
+<p>예시:</p>
+<div class="codewrap"><pre><code class="lang-text">작업지시 수량: 10,000개
+
+1차 실적: 양품 2,000개, 불량 20개
+2차 실적: 양품 3,000개, 불량 30개
+3차 실적: 양품 2,500개, 불량 10개
+4차 실적: 양품 2,500개, 불량 15개</code></pre></div>
+<p>각 부분실적은 독립된 실적이력으로 저장하고 작업지시 누적실적에 반영해야 한다.</p>
+<hr>
+<h2 id="s23">FR-PR-006 양품수량 등록</h2>
+<p>생산실적 등록 시 해당 공정에서 양품으로 완료된 수량을 등록할 수 있어야 한다.</p>
+<p>양품수량은 다음 처리에 사용해야 한다.</p>
+<ul><li>작업지시 누적 양품수량 갱신</li><li>후속 공정 가용수량 증가</li><li>생산 LOT 수량 반영</li><li>반제품 또는 완제품 재고 생성</li><li>작업지시 달성률 계산</li></ul>
+<hr>
+<h2 id="s24">FR-PR-007 불량수량 등록</h2>
+<p>생산실적 등록 시 발생한 불량수량을 등록할 수 있어야 한다.</p>
+<p>불량수량 등록 시 최소한 다음 정보를 입력하거나 연결할 수 있어야 한다.</p>
+<ul><li>불량수량</li><li>불량유형</li><li>불량 발생공정</li><li>불량 발생시각</li><li>발생 설비</li><li>발생 금형</li><li>작업자</li><li>자재 LOT</li><li>처리예정 방식</li><li>불량 상세설명</li></ul>
+<p>불량유형이 확정되지 않은 경우 임시 불량으로 등록한 후 품질관리 기능에서 상세 판정할 수 있어야 한다.</p>
+<hr>
+<h2 id="s25">FR-PR-008 양품·불량 수량 정합성 검증</h2>
+<p>생산실적 등록 시 양품수량, 불량수량 및 기타 수량은 0 이상이어야 한다.</p>
+<p>생산완료수량은 공정투입 가능수량 또는 작업지시 허용수량을 초과할 수 없어야 한다.</p>
+<p>기본적으로 다음 관계를 검증해야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">생산완료수량
+= 양품수량
++ 불량수량
++ 보류수량</code></pre></div>
+<p>공정 특성에 따라 재작업수량, 검사대기수량 등을 별도로 포함할 수 있다.</p>
+<hr>
+<h2 id="s26">FR-PR-009 공정투입수량 검증</h2>
+<p>첫 번째 MES 관리 대상 공정을 제외한 후속 공정의 생산실적은 이전 관리 공정에서 인계된 가용수량을 초과할 수 없어야 한다.</p>
+<p>예시:</p>
+<div class="codewrap"><pre><code class="lang-text">사출 공정 양품 완료: 4,000개
+조립 공정 기생산: 2,500개
+
+조립 공정 추가 생산 가능수량: 1,500개</code></pre></div>
+<p>관리자 승인 없이 1,500개를 초과한 생산실적을 등록할 수 없어야 한다.</p>
+<hr>
+<h2 id="s27">FR-PR-010 작업지시 지시수량 초과 통제</h2>
+<p>작업지시 누적 생산실적이 지시수량을 초과하는 경우 경고 또는 차단해야 한다.</p>
+<p>품목 또는 공정별로 다음 정책을 설정할 수 있어야 한다.</p>
+<ul><li>초과 생산 금지</li><li>허용비율 이내 초과 허용</li><li>관리자 승인 후 허용</li><li>경고 후 허용</li></ul>
+<p>초과 생산 승인 시 다음 정보를 기록해야 한다.</p>
+<ul><li>지시수량</li><li>누적 생산수량</li><li>초과수량</li><li>승인자</li><li>승인일시</li><li>승인사유</li></ul>
+<hr>
+<h2 id="s28">FR-PR-011 미달 생산 관리</h2>
+<p>작업지시 완료 시 누적 양품수량이 지시수량보다 적은 경우 미달수량과 미달사유를 등록할 수 있어야 한다.</p>
+<p>미달사유 예시는 다음과 같다.</p>
+<ul><li>자재 부족</li><li>설비 고장</li><li>금형 이상</li><li>작업시간 부족</li><li>계획 변경</li><li>품질 문제</li><li>긴급 작업 전환</li><li>인원 부족</li><li>기타</li></ul>
+<p>미달수량은 다음 중 하나로 처리할 수 있어야 한다.</p>
+<ul><li>신규 작업지시 생성</li><li>다음 근무조로 이관</li><li>기존 작업지시 잔여수량 유지</li><li>생산계획으로 반환</li><li>생산 취소</li></ul>
+<hr>
+<h2 id="s29">FR-PR-012 실제 발생일시 등록</h2>
+<p>생산실적에는 실제 생산이 발생한 일시를 등록할 수 있어야 한다.</p>
+<p>공용 단말기 또는 사후입력 운영을 고려하여 실제 발생일시와 MES 입력일시를 구분해야 한다.</p>
+<p>실제 발생일시가 입력일시보다 설정된 허용시간 이상 과거인 경우 지연입력 사유를 요구할 수 있어야 한다.</p>
+<hr>
+<h2 id="s30">FR-PR-013 근무조 및 작업자 등록</h2>
+<p>생산실적에는 실제 생산을 수행한 근무조와 작업자를 등록할 수 있어야 한다.</p>
+<p>다음 정보를 구분하여 저장해야 한다.</p>
+<ul><li>예정 근무조</li><li>실제 근무조</li><li>책임 작업자</li><li>실제 작업자</li><li>실적 입력자</li></ul>
+<p>한 생산실적에 여러 작업자가 참여한 경우 복수 작업자를 연결할 수 있어야 한다.</p>
+<hr>
+<h2 id="s31">FR-PR-014 설비 및 금형 등록</h2>
+<p>생산실적에는 실제 사용한 설비와 금형을 등록할 수 있어야 한다.</p>
+<p>작업지시에 예정된 설비·금형과 실제 설비·금형이 다른 경우 다음을 기록해야 한다.</p>
+<ul><li>예정 설비·금형</li><li>실제 설비·금형</li><li>변경사유</li><li>변경자</li><li>승인자</li><li>변경일시</li></ul>
+<p>사출 공정 등 설비와 금형이 필수인 공정에서는 해당 정보가 없으면 생산실적 등록을 제한할 수 있어야 한다.</p>
+<hr>
+<h2 id="s32">FR-PR-015 설비·금형 변경 구간 관리</h2>
+<p>하나의 작업지시를 수행하는 중 설비 또는 금형이 변경되는 경우 변경 전후 생산실적을 구분할 수 있어야 한다.</p>
+<p>예시:</p>
+<div class="codewrap"><pre><code class="lang-text">작업지시 WO-001
+
+1~3,000개: 사출기 1호기, 금형 M-01
+3,001~5,000개: 사출기 2호기, 금형 M-01</code></pre></div>
+<p>설비·금형 변경시점은 다음 기준 중 하나 이상으로 기록할 수 있어야 한다.</p>
+<ul><li>변경시각</li><li>생산실적 순번</li><li>생산수량 구간</li><li>생산 LOT</li></ul>
+<hr>
+<h2 id="s33">FR-PR-016 자재투입 연계</h2>
+<p>생산실적은 해당 작업지시에 등록된 자재투입 이력과 연결되어야 한다.</p>
+<p>LOT 추적 대상 자재가 있는 경우 생산실적 등록 시 다음을 확인해야 한다.</p>
+<ul><li>필수 자재가 등록되었는지</li><li>자재 LOT가 유효한지</li><li>실제 생산 구간에 적용된 자재 LOT가 무엇인지</li><li>자재 LOT 전환이 발생했는지</li><li>Running Change가 반영되었는지</li></ul>
+<hr>
+<h2 id="s34">FR-PR-017 자재 LOT별 생산구간 연결</h2>
+<p>동일 작업지시에서 자재 LOT가 변경된 경우 각 생산실적과 사용 자재 LOT의 관계를 저장해야 한다.</p>
+<p>예시:</p>
+<div class="codewrap"><pre><code class="lang-text">생산실적 PR-001
+- 양품수량: 2,000개
+- 사용 Resin LOT: R001
+
+생산실적 PR-002
+- 양품수량: 3,000개
+- 사용 Resin LOT: R002</code></pre></div>
+<p>정확한 수량 구간을 알 수 없는 경우 작업시간 또는 생산실적 순서를 기준으로 연결할 수 있어야 한다.</p>
+<hr>
+<h2 id="s35">FR-PR-018 생산 LOT 생성</h2>
+<p>품목 또는 공정 정책에 따라 생산실적 등록 시 반제품 또는 완제품 생산 LOT를 생성할 수 있어야 한다.</p>
+<p>생산 LOT 생성시점은 다음 중 하나로 설정할 수 있어야 한다.</p>
+<ul><li>작업 시작 시</li><li>최초 생산실적 등록 시</li><li>박스 또는 포장단위 완료 시</li><li>작업지시 완료 시</li><li>사용자가 명시적으로 LOT 생성 시</li></ul>
+<p>생산 LOT에는 다음 정보를 연결해야 한다.</p>
+<ul><li>작업지시</li><li>생산실적</li><li>품목</li><li>생산공정</li><li>생산수량</li><li>생산일시</li><li>설비</li><li>금형</li><li>작업자</li><li>자재 LOT</li><li>품질상태</li></ul>
+<hr>
+<h2 id="s36">FR-PR-019 기존 생산 LOT에 실적 추가</h2>
+<p>작업 중인 생산 LOT가 존재하는 경우 신규 생산실적을 기존 생산 LOT에 추가할 수 있어야 한다.</p>
+<p>생산 LOT의 누적수량은 연결된 유효 생산실적의 합계와 일치해야 한다.</p>
+<p>하나의 생산실적을 여러 생산 LOT로 분할하는 경우 분할수량의 합계가 생산실적 양품수량과 일치해야 한다.</p>
+<hr>
+<h2 id="s37">FR-PR-020 복수 생산 LOT 생성</h2>
+<p>하나의 작업지시에서 여러 생산 LOT를 생성할 수 있어야 한다.</p>
+<p>예시:</p>
+<div class="codewrap"><pre><code class="lang-text">작업지시 WO-001: 10,000개
+
+생산 LOT P001: 3,000개
+생산 LOT P002: 3,000개
+생산 LOT P003: 4,000개</code></pre></div>
+<p>생산 LOT 분할 기준은 다음 중 하나 이상을 적용할 수 있어야 한다.</p>
+<ul><li>생산일자</li><li>근무조</li><li>설비</li><li>금형</li><li>자재 LOT 변경</li><li>포장단위</li><li>고객 요구</li><li>품질판정 구분</li></ul>
+<hr>
+<h2 id="s38">FR-PR-021 생산실적과 품질검사 연계</h2>
+<p>생산실적은 해당 생산구간 또는 생산 LOT의 품질검사 결과와 연결될 수 있어야 한다.</p>
+<p>품질검사가 필수인 공정은 검사결과가 확정되기 전까지 생산실적을 다음 상태로 관리할 수 있어야 한다.</p>
+<ul><li>검사대기</li><li>보류</li><li>조건부 양품</li><li>최종 양품</li><li>불량</li></ul>
+<p>품질검사 결과에 따라 생산실적 또는 생산 LOT의 가용상태를 변경할 수 있어야 한다.</p>
+<hr>
+<h2 id="s39">FR-PR-022 실적 등록과 재고 생성 분리</h2>
+<p>생산실적 등록과 반제품·완제품 재고입고는 필요에 따라 별도 단계로 처리할 수 있어야 한다.</p>
+<p>예시:</p>
+<div class="codewrap"><pre><code class="lang-text">생산실적 등록
+→ 생산 LOT 생성
+→ 생산현장 임시보관
+→ 창고 이동
+→ 재고입고</code></pre></div>
+<p>생산실적이 등록되었다고 즉시 창고 가용재고로 처리하도록 고정해서는 안 된다.</p>
+<hr>
+<h2 id="s40">FR-PR-023 후속 공정 가용수량 반영</h2>
+<p>현재 공정의 양품실적이 등록되면 해당 수량을 후속 MES 관리 대상 공정의 투입 가능수량에 반영해야 한다.</p>
+<p>다음 수량은 후속 공정 가용수량에서 제외할 수 있어야 한다.</p>
+<ul><li>불량수량</li><li>검사대기수량</li><li>보류수량</li><li>폐기수량</li><li>이미 후속 공정에 투입된 수량</li><li>창고 또는 다른 작업으로 이동된 수량</li></ul>
+<hr>
+<h2 id="s41">FR-PR-024 부분완료 및 후속 공정 병행</h2>
+<p>선행 공정 작업지시가 전체 완료되지 않았더라도 부분 양품실적이 등록되면 후속 공정에서 해당 수량만큼 작업할 수 있어야 한다.</p>
+<p>예시:</p>
+<div class="codewrap"><pre><code class="lang-text">사출 작업지시: 10,000개
+사출 누적 양품: 5,000개
+
+조립 공정
+→ 5,000개 범위에서 작업 가능</code></pre></div>
+<hr>
+<h2 id="s42">FR-PR-025 생산실적 자동집계</h2>
+<p>시스템은 작업지시별 생산실적을 자동 집계해야 한다.</p>
+<p>최소한 다음 값을 제공해야 한다.</p>
+<ul><li>누적 양품수량</li><li>누적 불량수량</li><li>누적 보류수량</li><li>누적 재작업수량</li><li>누적 폐기수량</li><li>잔여수량</li><li>달성률</li><li>불량률</li><li>공정수율</li></ul>
+<p>기본 계산식은 다음과 같다.</p>
+<div class="codewrap"><pre><code class="lang-text">잔여수량
+= 지시수량 - 누적 양품수량</code></pre></div>
+<div class="codewrap"><pre><code class="lang-text">달성률
+= 누적 양품수량 ÷ 지시수량 × 100</code></pre></div>
+<div class="codewrap"><pre><code class="lang-text">불량률
+= 누적 불량수량
+÷ (누적 양품수량 + 누적 불량수량)
+× 100</code></pre></div>
+<p>공정 특성에 따라 계산기준을 설정할 수 있어야 한다.</p>
+<hr>
+<h2 id="s43">FR-PR-026 작업시간 관리</h2>
+<p>생산실적과 작업지시 상태이력을 기준으로 작업시간을 관리할 수 있어야 한다.</p>
+<p>다음 시간을 구분하여 조회할 수 있어야 한다.</p>
+<ul><li>계획 작업시간</li><li>실제 작업시간</li><li>순수 생산시간</li><li>일시중지시간</li><li>비가동시간</li><li>교대시간</li><li>품질대기시간</li><li>전체 경과시간</li></ul>
+<p>실적입력 시점만으로 작업시간을 추정하지 않고 작업 시작·중지·재개·완료 이력을 우선 사용해야 한다.</p>
+<hr>
+<h2 id="s44">FR-PR-027 Cycle Time 및 생산속도 계산</h2>
+<p>공정별 생산실적과 작업시간을 기준으로 실제 Cycle Time 또는 생산속도를 계산할 수 있어야 한다.</p>
+<p>기본 계산식 예시는 다음과 같다.</p>
+<div class="codewrap"><pre><code class="lang-text">실제 Cycle Time
+= 순수 생산시간 ÷ 생산완료수량</code></pre></div>
+<p>다수 Cavity 금형을 사용하는 경우 Cavity 수를 고려한 계산방식을 적용할 수 있어야 한다.</p>
+<p>자동수집 데이터가 없는 경우 계산값은 수동실적 기반의 참고값으로 구분해야 한다.</p>
+<hr>
+<h2 id="s45">FR-PR-028 실적 일괄등록</h2>
+<p>단말기 부족 또는 업무 특성상 개별 발생시점마다 입력하기 어려운 경우 여러 생산실적을 일괄 등록할 수 있어야 한다.</p>
+<p>일괄등록 시 각 항목에 다음 정보가 포함되어야 한다.</p>
+<ul><li>작업지시</li><li>실적 발생일시</li><li>양품수량</li><li>불량수량</li><li>작업자</li><li>설비</li><li>금형</li><li>자재 LOT</li><li>입력사유</li></ul>
+<p>일괄등록된 실적도 개별 이력으로 관리해야 한다.</p>
+<hr>
+<h2 id="s46">FR-PR-029 사후 실적등록</h2>
+<p>현장 상황 또는 단말기 부족으로 실제 생산 후 실적을 사후 등록할 수 있어야 한다.</p>
+<p>사후등록 시 다음 정보를 저장해야 한다.</p>
+<ul><li>실제 실적 발생일시</li><li>MES 입력일시</li><li>실제 작업자</li><li>입력자</li><li>지연입력 사유</li><li>승인자</li></ul>
+<p>설정된 허용시간을 초과한 사후등록은 관리자 승인을 요구할 수 있어야 한다.</p>
+<hr>
+<h2 id="s47">FR-PR-030 실적 임시저장</h2>
+<p>생산실적 입력 중 작업자가 내용을 완전히 확정하지 못한 경우 임시저장할 수 있어야 한다.</p>
+<p>임시저장 실적은 다음 처리에 반영하지 않는 것을 원칙으로 한다.</p>
+<ul><li>작업지시 누적실적</li><li>후속 공정 가용수량</li><li>생산 LOT 수량</li><li>재고수량</li><li>ERP 전송</li></ul>
+<p>사용자가 확정한 후에만 유효실적으로 반영해야 한다.</p>
+<hr>
+<h2 id="s48">FR-PR-031 생산실적 확정</h2>
+<p>등록된 생산실적은 입력 즉시 확정하거나 별도 검토 후 확정할 수 있어야 한다.</p>
+<p>공정별로 다음 정책을 설정할 수 있어야 한다.</p>
+<ul><li>입력 즉시 자동 확정</li><li>근무조 종료 후 일괄 확정</li><li>현장 관리자 확인 후 확정</li><li>품질판정 후 확정</li></ul>
+<p>확정된 생산실적만 공식 실적과 후속 공정 가용수량에 반영하는 정책을 적용할 수 있어야 한다.</p>
+<hr>
+<h2 id="s49">FR-PR-032 생산실적 취소</h2>
+<p>잘못 등록된 생산실적을 취소할 수 있어야 한다.</p>
+<p>취소 전 다음 내용을 검증해야 한다.</p>
+<ul><li>생산 LOT에 연결되었는지</li><li>후속 공정에 이미 투입되었는지</li><li>창고 재고가 생성되었는지</li><li>품질검사가 등록되었는지</li><li>ERP에 전송되었는지</li><li>작업지시가 마감되었는지</li></ul>
+<p>후속처리가 존재하는 경우 단순 취소하지 않고 관련 데이터의 역처리 또는 승인된 정정 절차를 적용해야 한다.</p>
+<hr>
+<h2 id="s50">FR-PR-033 생산실적 정정</h2>
+<p>생산실적의 수량, 발생일시, 작업자, 설비, 금형 등의 정보가 잘못된 경우 승인된 절차에 따라 정정할 수 있어야 한다.</p>
+<p>정정 시 다음 정보를 보존해야 한다.</p>
+<ul><li>정정 전 값</li><li>정정 후 값</li><li>정정사유</li><li>정정 요청자</li><li>승인자</li><li>정정일시</li><li>관련 재고·LOT·자재·품질 데이터의 영향</li></ul>
+<p>기존 생산실적을 물리적으로 덮어쓰거나 삭제하지 않아야 한다.</p>
+<hr>
+<h2 id="s51">FR-PR-034 취소·정정에 따른 수량 재계산</h2>
+<p>생산실적이 취소 또는 정정되면 시스템은 다음 값을 재계산해야 한다.</p>
+<ul><li>작업지시 누적실적</li><li>양품·불량·잔여수량</li><li>생산 LOT 수량</li><li>후속 공정 가용수량</li><li>반제품·완제품 재고</li><li>자재 사용수량</li><li>계획 대비 달성률</li><li>ERP 전송대상 실적</li></ul>
+<p>재계산 결과 수량이 음수가 되거나 후속 공정 실적보다 작아지는 경우 정정을 차단해야 한다.</p>
+<hr>
+<h2 id="s52">FR-PR-035 재작업 실적 관리</h2>
+<p>재작업 작업지시에 대한 생산실적을 별도로 등록할 수 있어야 한다.</p>
+<p>재작업 실적에는 다음 정보를 포함해야 한다.</p>
+<ul><li>원본 생산실적</li><li>원본 생산 LOT</li><li>원본 불량정보</li><li>재작업 작업지시</li><li>재작업 투입수량</li><li>재작업 양품수량</li><li>재작업 불량수량</li><li>재작업 공정</li><li>재작업 횟수</li><li>최종 처리결과</li></ul>
+<p>재작업 후 양품으로 전환된 수량은 원래 불량이력과의 연결을 유지해야 한다.</p>
+<hr>
+<h2 id="s53">FR-PR-036 폐기실적 관리</h2>
+<p>생산 또는 재작업 과정에서 폐기된 수량을 등록할 수 있어야 한다.</p>
+<p>폐기실적에는 다음 정보가 포함되어야 한다.</p>
+<ul><li>폐기수량</li><li>폐기품목</li><li>생산 LOT</li><li>발생 작업지시</li><li>발생 공정</li><li>폐기사유</li><li>귀책구분</li><li>승인자</li><li>폐기일시</li></ul>
+<p>폐기수량은 양품수량 및 가용재고에 포함되지 않아야 한다.</p>
+<hr>
+<h2 id="s54">FR-PR-037 생산실적 작업완료 연계</h2>
+<p>작업지시 완료 처리 시 다음 생산실적 관련 항목을 검증해야 한다.</p>
+<ul><li>누적 양품수량</li><li>누적 불량수량</li><li>보류수량</li><li>미확정 실적</li><li>미처리 불량</li><li>미처리 재작업</li><li>미생성 생산 LOT</li><li>지시수량 대비 미달·초과수량</li><li>후속 공정 인계수량</li><li>실제 작업 종료일시</li></ul>
+<p>필수 항목이 누락된 경우 작업완료를 차단하거나 경고해야 한다.</p>
+<hr>
+<h2 id="s55">FR-PR-038 작업지시 마감 연계</h2>
+<p>작업지시 마감 시 생산실적이 최종 확정되어야 한다.</p>
+<p>마감 조건은 다음과 같다.</p>
+<ul><li>모든 생산실적이 확정되었을 것</li><li>양품·불량수량이 확정되었을 것</li><li>불량 후속처리가 완료되었을 것</li><li>필수 품질검사가 완료되었을 것</li><li>생산 LOT가 확정되었을 것</li><li>자재 사용수량과 잔량이 확정되었을 것</li><li>ERP 전송대상 실적이 생성되었을 것</li><li>취소·정정 대기 건이 없을 것</li></ul>
+<hr>
+<h2 id="s56">FR-PR-039 생산오더·생산계획 실적 집계</h2>
+<p>시스템은 공정별 작업지시 생산실적을 상위 생산계획과 생산오더 기준으로 집계할 수 있어야 한다.</p>
+<p>생산계획별로 다음 정보를 조회할 수 있어야 한다.</p>
+<ul><li>계획수량</li><li>공정별 지시수량</li><li>공정별 양품수량</li><li>공정별 불량수량</li><li>최종 완료수량</li><li>진행률</li><li>미달수량</li><li>예상 완료일시</li></ul>
+<hr>
+<h2 id="s57">FR-PR-040 전체 라우팅 진행현황 조회</h2>
+<p>전체 라우팅을 기준으로 MES 관리 공정과 미관리 공정을 함께 표시할 수 있어야 한다.</p>
+<p>예시:</p>
+<p>| 순서 | 공정 | MES 관리 |   양품실적 | 상태     | | -: | -- | ------ | -----: | ------ | | 10 | 사출 | 관리     | 10,000 | 완료     | | 20 | 사상 | 미관리    |      - | 전산 미관리 | | 30 | 조립 | 관리     |  6,000 | 작업중    | | 40 | 융착 | 미관리    |      - | 전산 미관리 | | 50 | 검사 | 관리     |  4,000 | 작업중    | | 60 | 포장 | 관리     |  2,000 | 작업중    |</p>
+<p>미관리 공정에 임의의 생산실적을 생성하거나 추정 실적을 공식실적으로 표시해서는 안 된다.</p>
+<hr>
+<h2 id="s58">FR-PR-041 생산실적 상세조회</h2>
+<p>생산실적 상세화면에서는 최소한 다음 내용을 조회할 수 있어야 한다.</p>
+<ul><li>생산실적 기본정보</li><li>생산오더</li><li>생산계획</li><li>작업지시</li><li>품목</li><li>공정</li><li>양품·불량·보류수량</li><li>실제 발생일시와 입력일시</li><li>근무조와 작업자</li><li>설비와 금형</li><li>투입 자재 및 자재 LOT</li><li>생산 LOT</li><li>품질검사 결과</li><li>불량 및 재작업 정보</li><li>후속 공정 인계정보</li><li>재고입고 여부</li><li>ERP 전송상태</li><li>취소·정정 이력</li></ul>
+<hr>
+<h2 id="s59">FR-PR-042 생산실적 검색</h2>
+<p>사용자는 다음 조건으로 생산실적을 검색할 수 있어야 한다.</p>
+<ul><li>생산실적번호</li><li>생산오더번호</li><li>생산계획번호</li><li>작업지시번호</li><li>품목</li><li>공정</li><li>생산 LOT</li><li>자재 LOT</li><li>설비</li><li>금형</li><li>근무조</li><li>작업자</li><li>생산일자</li><li>실적 입력일자</li><li>품질상태</li><li>ERP 전송상태</li><li>사용 단말기</li></ul>
+<hr>
+<h2 id="s60">FR-PR-043 실적 현황 및 보고서</h2>
+<p>시스템은 다음 기준으로 생산실적 현황을 조회하거나 출력할 수 있어야 한다.</p>
+<ul><li>일별</li><li>근무조별</li><li>품목별</li><li>공정별</li><li>설비별</li><li>금형별</li><li>작업자별</li><li>생산라인별</li><li>작업지시별</li><li>생산오더별</li></ul>
+<p>최소한 다음 지표를 제공할 수 있어야 한다.</p>
+<ul><li>계획수량</li><li>양품수량</li><li>불량수량</li><li>달성률</li><li>불량률</li><li>공정수율</li><li>작업시간</li><li>시간당 생산량</li><li>미달수량</li></ul>
+<hr>
+<h2 id="s61">FR-PR-044 ERP 생산실적 연계</h2>
+<p>확정된 생산실적을 ERP에 전송할 수 있어야 한다.</p>
+<p>ERP 전송정보에는 최소한 다음 항목이 포함될 수 있어야 한다.</p>
+<ul><li>ERP 생산오더번호</li><li>MES 작업지시번호</li><li>품목</li><li>공정</li><li>양품수량</li><li>불량수량</li><li>생산일자</li><li>근무조</li><li>생산 LOT</li><li>자재 사용량</li><li>완료 여부</li></ul>
+<p>ERP 전송결과는 다음 상태로 관리해야 한다.</p>
+<ul><li>전송대기</li><li>전송중</li><li>전송완료</li><li>전송실패</li><li>재처리대기</li></ul>
+<hr>
+<h2 id="s62">FR-PR-045 ERP 연계 실패 재처리</h2>
+<p>ERP 생산실적 전송에 실패한 경우 실패사유를 기록하고 재처리할 수 있어야 한다.</p>
+<p>재처리 시 동일 생산실적이 ERP에 중복 반영되지 않도록 연계 식별자를 사용해야 한다.</p>
+<p>ERP 전송 후 MES 실적이 취소 또는 정정되면 취소·정정 실적을 별도 연계해야 한다.</p>
+<hr>
+<h2 id="s63">FR-PR-046 생산실적 이력 관리</h2>
+<p>시스템은 생산실적과 관련된 다음 이벤트를 시간순으로 기록해야 한다.</p>
+<ul><li>임시저장</li><li>신규 등록</li><li>확정</li><li>양품 등록</li><li>불량 등록</li><li>생산 LOT 연결</li><li>자재 LOT 연결</li><li>실적 취소</li><li>실적 정정</li><li>재작업 등록</li><li>폐기 등록</li><li>관리자 승인</li><li>작업완료 반영</li><li>마감</li><li>ERP 전송</li><li>ERP 재처리</li></ul>
+<p>각 이력에는 최소한 다음 정보가 포함되어야 한다.</p>
+<ul><li>생산실적번호</li><li>작업지시번호</li><li>이벤트 유형</li><li>실제 발생일시</li><li>MES 처리일시</li><li>처리자</li><li>실제 작업자</li><li>사용 단말기</li><li>변경 전 값</li><li>변경 후 값</li><li>처리사유</li><li>승인자</li></ul>
+<hr>
+<h1 id="s64">6. 비기능 요구사항</h1>
+<h2 id="s65">NFR-PR-001 응답성</h2>
+<p>생산실적 등록 및 조회 요청은 정상적인 사내 네트워크 환경에서 다음 응답시간을 목표로 해야 한다.</p>
+<ul><li>작업지시 스캔 및 정보조회: 2초 이내</li><li>생산실적 저장: 2초 이내</li><li>작업지시 누적실적 조회: 2초 이내</li><li>일반 현황조회: 3초 이내</li><li>대량 통계조회: 5초 이내</li></ul>
+<hr>
+<h2 id="s66">NFR-PR-002 중복등록 방지</h2>
+<p>버튼 중복 클릭, 바코드 중복 스캔, 네트워크 재전송 등이 발생하더라도 동일 생산실적이 중복 등록되지 않아야 한다.</p>
+<p>시스템은 다음 방법을 적용해야 한다.</p>
+<ul><li>요청 고유 식별키</li><li>멱등성 처리</li><li>중복 요청 검증</li><li>처리 중 버튼 비활성화</li><li>데이터베이스 고유 제약조건</li></ul>
+<hr>
+<h2 id="s67">NFR-PR-003 동시성 통제</h2>
+<p>여러 작업자 또는 단말기가 동일 작업지시에 동시에 생산실적을 등록하는 경우 수량 정합성을 보장해야 한다.</p>
+<p>동시 등록으로 인해 다음 상황이 발생해서는 안 된다.</p>
+<ul><li>지시수량 초과</li><li>선행 공정 가용수량 초과</li><li>동일 생산 LOT 중복수량 반영</li><li>동일 생산실적 중복등록</li><li>누적실적 계산 오류</li></ul>
+<hr>
+<h2 id="s68">NFR-PR-004 트랜잭션 정합성</h2>
+<p>생산실적 등록과 다음 처리는 하나의 논리적 트랜잭션으로 처리해야 한다.</p>
+<ul><li>작업지시 누적수량 갱신</li><li>생산 LOT 수량 반영</li><li>후속 공정 가용수량 반영</li><li>자재 사용정보 연결</li><li>이력 생성</li><li>ERP 전송대상 생성</li></ul>
+<p>일부 처리만 성공하는 상태가 발생해서는 안 된다.</p>
+<hr>
+<h2 id="s69">NFR-PR-005 수량 정합성</h2>
+<p>다음 데이터 간 수량이 일관성을 유지해야 한다.</p>
+<ul><li>작업지시 지시수량</li><li>공정투입수량</li><li>생산실적 양품수량</li><li>불량수량</li><li>생산 LOT 수량</li><li>후속 공정 투입수량</li><li>반제품·완제품 재고수량</li><li>ERP 전송수량</li></ul>
+<p>수량 불일치가 발생한 경우 자동검증 또는 정합성 점검 기능을 제공해야 한다.</p>
+<hr>
+<h2 id="s70">NFR-PR-006 추적성</h2>
+<p>생산실적은 다음 데이터와 끊김 없이 연결되어야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">생산오더
+→ 생산계획
+→ 작업지시
+→ 자재투입
+→ 생산실적
+→ 품질실적
+→ 생산 LOT
+→ 재고
+→ 출하</code></pre></div>
+<p>생산실적이 취소되거나 정정되어도 기존 연결관계와 변경이력을 조회할 수 있어야 한다.</p>
+<hr>
+<h2 id="s71">NFR-PR-007 감사 가능성</h2>
+<p>생산실적 등록·확정·취소·정정·승인 내역은 감사 가능한 형태로 보존해야 한다.</p>
+<p>감사이력에는 최소한 다음 정보가 포함되어야 한다.</p>
+<ul><li>처리자</li><li>실제 작업자</li><li>처리 단말기</li><li>실제 발생일시</li><li>MES 입력일시</li><li>변경 전 값</li><li>변경 후 값</li><li>처리사유</li><li>승인자</li></ul>
+<p>감사이력은 일반 사용자가 수정하거나 삭제할 수 없어야 한다.</p>
+<hr>
+<h2 id="s72">NFR-PR-008 권한 및 보안</h2>
+<p>역할에 따라 생산실적 기능을 제한해야 한다.</p>
+<div class="tablewrap"><table><thead><tr><th>역할</th><th>주요 권한</th></tr></thead><tbody><tr><td>작업자</td><td>생산실적 등록, 부분실적 등록</td></tr><tr><td>현장 관리자</td><td>실적확정, 지연실적 승인 요청</td></tr><tr><td>생산관리자</td><td>미달·초과 승인, 실적정정 승인</td></tr><tr><td>품질 담당자</td><td>불량판정, 보류·특채 처리</td></tr><tr><td>자재 담당자</td><td>자재 사용 및 잔량 확인</td></tr><tr><td>시스템 관리자</td><td>실적 정책 및 권한 설정</td></tr></tbody></table></div>
+<p>모든 권한 검증은 화면뿐 아니라 서버에서도 수행해야 한다.</p>
+<hr>
+<h2 id="s73">NFR-PR-009 사용성</h2>
+<p>공용 단말기에서 생산실적은 최소한의 조작으로 등록할 수 있어야 한다.</p>
+<p>권장 흐름은 다음과 같다.</p>
+<div class="codewrap"><pre><code class="lang-text">작업지시 스캔
+→ 양품·불량수량 입력
+→ 필요 시 불량유형 선택
+→ 저장</code></pre></div>
+<p>화면에는 다음 정보를 항상 명확하게 표시해야 한다.</p>
+<ul><li>현재 작업지시</li><li>현재 공정</li><li>품목</li><li>지시수량</li><li>누적 양품수량</li><li>누적 불량수량</li><li>잔여수량</li><li>입력 중인 실적수량</li><li>실제 설비·금형</li></ul>
+<hr>
+<h2 id="s74">NFR-PR-010 오류 예방</h2>
+<p>시스템은 다음과 같은 오류를 사전에 차단하거나 명확히 경고해야 한다.</p>
+<ul><li>다른 품목의 작업지시 실적등록</li><li>허용되지 않은 공정 입력</li><li>선행 공정 가용수량 초과</li><li>지시수량 초과</li><li>음수 또는 0 이하 수량</li><li>마감 작업지시 입력</li><li>필수 자재 미등록</li><li>보류 생산 LOT 사용</li><li>중복 실적등록</li></ul>
+<p>오류 메시지는 문제 원인과 필요한 조치를 함께 표시해야 한다.</p>
+<hr>
+<h2 id="s75">NFR-PR-011 장애 복구</h2>
+<p>네트워크 또는 서버 장애 시 사용자는 생산실적 저장 성공 여부를 명확히 확인할 수 있어야 한다.</p>
+<p>처리결과가 불확실한 경우 동일 실적을 다시 저장하기 전에 서버의 기존 처리 여부를 조회해야 한다.</p>
+<p>장애 복구 후 실패한 후속처리를 재실행할 수 있어야 한다.</p>
+<ul><li>생산 LOT 반영</li><li>후속 공정 가용수량 반영</li><li>ERP 전송</li><li>통계 집계</li></ul>
+<hr>
+<h2 id="s76">NFR-PR-012 가용성</h2>
+<p>생산실적 기능은 공장 생산시간 동안 지속적으로 사용할 수 있어야 한다.</p>
+<p>서버, DB, 네트워크 장애가 발생해도 이미 확정된 생산실적이 유실되어서는 안 된다.</p>
+<p>시스템 재기동 후 미완료 처리 또는 전송대상 실적을 식별하고 재처리할 수 있어야 한다.</p>
+<hr>
+<h2 id="s77">NFR-PR-013 성능 및 처리용량</h2>
+<p>시스템은 다음 규모에서 생산실적을 안정적으로 처리할 수 있어야 한다.</p>
+<ul><li>현장 단말기 1,000대 이하</li><li>동시 사용자 300명 이상</li><li>일 수만 건 이상의 부분 생산실적</li><li>다수 사업부·공장 운영</li><li>장기간 생산이력 보존</li><li>생산 LOT 및 자재 LOT 역추적 조회</li></ul>
+<p>작업지시번호, 생산일자, 품목, 공정, 생산 LOT, 설비 등에 적절한 인덱스를 적용해야 한다.</p>
+<hr>
+<h2 id="s78">NFR-PR-014 확장성</h2>
+<p>생산실적 모델은 다음 생산형태에서 공통으로 사용할 수 있어야 한다.</p>
+<ul><li>사출</li><li>수동조립</li><li>자동조립</li><li>검사</li><li>포장</li><li>외주공정</li><li>재작업</li></ul>
+<p>공정별 차이는 프로그램 코드에 고정하지 않고 기준정보와 정책 설정으로 처리해야 한다.</p>
+<hr>
+<h2 id="s79">NFR-PR-015 설정 가능성</h2>
+<p>다음 정책은 프로그램 소스 수정 없이 설정할 수 있어야 한다.</p>
+<ul><li>실적등록 단위</li><li>부분실적 허용 여부</li><li>초과생산 허용범위</li><li>사후입력 허용시간</li><li>실적확정 방식</li><li>생산 LOT 생성시점</li><li>설비·금형 필수 여부</li><li>작업자 필수 여부</li><li>품질검사 선행조건</li><li>작업완료 및 마감조건</li></ul>
+<hr>
+<h2 id="s80">NFR-PR-016 시간 정확성</h2>
+<p>생산실적의 기준시간은 서버 시간을 사용해야 한다.</p>
+<p>단말기 시간이 서버 시간과 크게 다른 경우 경고해야 한다.</p>
+<p>다음 시간을 구분하여 저장해야 한다.</p>
+<ul><li>실제 생산 발생일시</li><li>MES 입력일시</li><li>실적 확정일시</li><li>수정·취소일시</li><li>ERP 전송일시</li></ul>
+<hr>
+<h2 id="s81">NFR-PR-017 데이터 보존</h2>
+<p>생산실적과 관련 이력은 고객사의 품질보증기간, 제품수명 및 법적 보존기간을 고려하여 장기간 보존할 수 있어야 한다.</p>
+<p>다음 정보가 비활성화되거나 변경되어도 기존 생산실적은 유지되어야 한다.</p>
+<ul><li>품목</li><li>공정</li><li>설비</li><li>금형</li><li>작업자</li><li>라우팅</li><li>작업지시</li></ul>
+<hr>
+<h2 id="s82">NFR-PR-018 유지보수성</h2>
+<p>생산실적 등록, 취소, 정정, 집계 및 후속처리 규칙은 공통 서비스로 구현해야 한다.</p>
+<p>화면, API, 배치, ERP 인터페이스에서 동일한 업무규칙을 중복 구현하지 않아야 한다.</p>
+<p>실적 집계값은 원본 생산실적으로 재계산할 수 있어야 한다.</p>
+<hr>
+<h1 id="s83">7. 핵심 업무 규칙</h1>
+<h2 id="s84">BR-PR-001</h2>
+<p>생산실적은 반드시 하나의 작업지시와 연결되어야 한다.</p>
+<h2 id="s85">BR-PR-002</h2>
+<p>하나의 생산실적은 하나의 MES 관리 대상 공정을 대상으로 한다.</p>
+<h2 id="s86">BR-PR-003</h2>
+<p>MES 미관리 공정에는 별도의 공식 생산실적을 등록하지 않는다.</p>
+<h2 id="s87">BR-PR-004</h2>
+<p>하나의 작업지시에 여러 부분 생산실적을 등록할 수 있다.</p>
+<h2 id="s88">BR-PR-005</h2>
+<p>후속 공정 생산실적은 선행 공정의 가용수량을 초과할 수 없다.</p>
+<h2 id="s89">BR-PR-006</h2>
+<p>양품수량만 후속 공정의 기본 가용수량으로 반영한다.</p>
+<h2 id="s90">BR-PR-007</h2>
+<p>품질검사 대기·보류수량은 판정이 완료되기 전까지 가용수량에서 제외할 수 있다.</p>
+<h2 id="s91">BR-PR-008</h2>
+<p>생산실적의 양품·불량·보류수량은 0 이상이어야 한다.</p>
+<h2 id="s92">BR-PR-009</h2>
+<p>생산실적 취소 또는 정정 시 관련 생산 LOT, 재고, 후속 공정 가용수량을 함께 검증해야 한다.</p>
+<h2 id="s93">BR-PR-010</h2>
+<p>생산 LOT에 연결되거나 후속 공정에서 사용된 생산실적은 단순 삭제할 수 없다.</p>
+<h2 id="s94">BR-PR-011</h2>
+<p>마감된 작업지시의 생산실적은 마감 취소 또는 승인된 정정 절차 없이 변경할 수 없다.</p>
+<h2 id="s95">BR-PR-012</h2>
+<p>실제 생산 발생일시와 MES 입력일시는 구분하여 보존한다.</p>
+<h2 id="s96">BR-PR-013</h2>
+<p>생산실적과 자재 LOT, 설비, 금형, 작업자, 생산 LOT의 관계를 보존해야 한다.</p>
+<h2 id="s97">BR-PR-014</h2>
+<p>생산실적 등록과 누적수량 갱신은 동일한 트랜잭션으로 처리한다.</p>
+<h2 id="s98">BR-PR-015</h2>
+<p>생산실적은 물리적으로 삭제하지 않고 취소·정정 이력을 보존한다.</p>
+<hr>
+<h1 id="s99">8. 기본 생산실적 흐름</h1>
+<div class="codewrap"><pre><code class="lang-text">작업지시 선택 또는 스캔
+   ↓
+작업지시·공정·잔여수량 확인
+   ↓
+선행 공정 가용수량 확인
+   ↓
+자재투입 및 설비·금형 확인
+   ↓
+양품·불량수량 입력
+   ↓
+실제 작업시각·작업자 등록
+   ↓
+생산실적 저장
+   ↓
+작업지시 누적실적 갱신
+   ↓
+생산 LOT 생성 또는 수량 반영
+   ↓
+후속 공정 가용수량 반영
+   ↓
+필요 시 품질검사·재고입고
+   ↓
+작업완료 및 마감</code></pre></div>
+<p>다음 검토 쟁점은 <strong>생산실적을 등록하는 즉시 후속 공정 가용수량으로 반영할지, 품질검사 합격 후 반영할지</strong>입니다. 이는 품목·공정별 정책으로 분리하는 것이 적절합니다.</p>
+  </article>
+  <div class="pager"><a class="pv" href="2-2.html"><span>이전</span>자재투입</a><a class="nx" href="2-4.html"><span>다음</span>품질관리</a></div>
+</main>
+</body>
+</html>

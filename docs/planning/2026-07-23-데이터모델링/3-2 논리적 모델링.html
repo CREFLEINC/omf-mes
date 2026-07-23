@@ -1,0 +1,1284 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>논리적 모델링 · MES 데이터 모델링 v3</title>
+<style>:root{
+  --bg:#F4F5F6; --surface:#FFFFFF; --surface-2:#EDEFF1; --surface-3:#E4E7EA;
+  --ink:#14181B; --ink-2:#5A6570; --ink-3:#8B959D;
+  --rule:#DCE0E4; --rule-strong:#C3CAD0;
+  --accent:#A9660A; --tint-accent:#F7ECD9;
+  --blue:#28558F; --green:#1D7043; --red:#B93E28;
+  --start:#B93E28; --flow:#1D7043; --done:#28558F; --warn:#9B3427;
+  --tint-start:#F6E5E1; --tint-flow:#E2F0E7; --tint-done:#E2EAF5;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Pretendard","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+  --side:264px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#101315; --surface:#171B1E; --surface-2:#1D2226; --surface-3:#242A2F;
+    --ink:#E7EBEE; --ink-2:#9AA5AE; --ink-3:#6E7A83;
+    --rule:#2A3035; --rule-strong:#3A4249;
+    --accent:#DFA149; --tint-accent:#2B2317;
+    --blue:#83ACE4; --green:#5FC68B; --red:#E4816C;
+  --start:#E4816C; --flow:#5FC68B; --done:#83ACE4; --warn:#E0806E;
+  --tint-start:#2A1D1A; --tint-flow:#16281F; --tint-done:#182432;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101315; --surface:#171B1E; --surface-2:#1D2226; --surface-3:#242A2F;
+  --ink:#E7EBEE; --ink-2:#9AA5AE; --ink-3:#6E7A83;
+  --rule:#2A3035; --rule-strong:#3A4249;
+  --accent:#DFA149; --tint-accent:#2B2317;
+  --blue:#83ACE4; --green:#5FC68B; --red:#E4816C;
+  --start:#E4816C; --flow:#5FC68B; --done:#83ACE4; --warn:#E0806E;
+  --tint-start:#2A1D1A; --tint-flow:#16281F; --tint-done:#182432;
+}
+:root[data-theme="light"]{
+  --bg:#F4F5F6; --surface:#FFFFFF; --surface-2:#EDEFF1; --surface-3:#E4E7EA;
+  --ink:#14181B; --ink-2:#5A6570; --ink-3:#8B959D;
+  --rule:#DCE0E4; --rule-strong:#C3CAD0;
+  --accent:#A9660A; --tint-accent:#F7ECD9;
+  --blue:#28558F; --green:#1D7043; --red:#B93E28;
+  --start:#B93E28; --flow:#1D7043; --done:#28558F; --warn:#9B3427;
+  --tint-start:#F6E5E1; --tint-flow:#E2F0E7; --tint-done:#E2EAF5;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans);
+     font-size:15px; line-height:1.75; letter-spacing:-0.003em}
+
+/* ── 사이드바 ───────────────────────────── */
+nav.side{position:sticky; top:0; z-index:20; background:var(--surface);
+         border-bottom:1px solid var(--rule); max-height:none}
+.nav-brand{padding:16px 22px 12px; border-bottom:1px solid var(--rule)}
+.nav-brand a{text-decoration:none; display:block}
+.nav-brand .bt{display:block; font-size:14px; font-weight:700; color:var(--ink); letter-spacing:-0.02em}
+.nav-brand .bs{display:block; font-family:var(--mono); font-size:10px; color:var(--ink-3);
+               letter-spacing:.1em; text-transform:uppercase; margin-top:4px}
+.nav-docs{display:flex; gap:2px; overflow-x:auto; padding:0 14px; scrollbar-width:thin}
+.nav-docs .grp{flex:none; align-self:center; font-family:var(--mono); font-size:10px;
+               letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); padding:0 8px 0 4px}
+.nav-docs a{flex:none; padding:11px 10px; font-size:12.5px; color:var(--ink-2);
+            text-decoration:none; white-space:nowrap; border-bottom:2px solid transparent}
+.nav-docs a:hover{color:var(--ink)}
+.nav-docs a.on{color:var(--ink); font-weight:600; border-bottom-color:var(--accent)}
+.ontop{display:none}
+
+main{max-width:940px; margin:0 auto; padding:0 26px 100px}
+
+@media (min-width:1120px){
+  body{padding-left:var(--side)}
+  nav.side{position:fixed; inset:0 auto 0 0; width:var(--side); height:100vh;
+           overflow-y:auto; border-bottom:0; border-right:1px solid var(--rule);
+           display:flex; flex-direction:column; padding-bottom:28px}
+  .nav-brand{padding:24px 22px 18px}
+  .nav-docs{flex-direction:column; overflow:visible; padding:14px 12px 0; gap:0}
+  .nav-docs .grp{align-self:stretch; padding:14px 10px 5px}
+  .nav-docs .grp:first-child{padding-top:0}
+  .nav-docs a{padding:6px 10px; border-bottom:0; border-left:2px solid transparent;
+              white-space:normal; line-height:1.45; border-radius:0 3px 3px 0}
+  .nav-docs a:hover{background:var(--surface-2)}
+  .nav-docs a.on{background:var(--surface-2); border-left-color:var(--accent)}
+  .ontop{display:flex; flex-direction:column; margin-top:20px; padding:14px 12px 0;
+         border-top:1px solid var(--rule)}
+  .ontop .grp{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+              color:var(--ink-3); padding:0 10px 6px}
+  .ontop a{padding:3px 10px; font-size:11.5px; color:var(--ink-2); text-decoration:none;
+           line-height:1.5; border-left:2px solid transparent}
+  .ontop a:hover{color:var(--accent); border-left-color:var(--rule-strong)}
+  .ontop a.l1{font-weight:600; color:var(--ink); margin-top:6px}
+  .ontop a.l2{padding-left:20px}
+  .ontop a.l3{padding-left:32px; color:var(--ink-3); font-size:11px}
+  main{margin:0; padding:0 56px 120px}
+}
+
+/* ── 문서 헤더 ──────────────────────────── */
+.dochead{padding:44px 0 26px; border-bottom:2px solid var(--ink); margin-bottom:8px}
+.eyebrow{font-family:var(--mono); font-size:10.5px; letter-spacing:.13em; text-transform:uppercase;
+         color:var(--ink-3)}
+.doctitle{font-size:clamp(24px,3.2vw,32px); line-height:1.22; margin:10px 0 0; font-weight:700;
+          letter-spacing:-0.025em; text-wrap:balance}
+.docsub{margin:10px 0 0; color:var(--ink-2); font-size:14px; max-width:64ch}
+
+/* ── 본문 ──────────────────────────────── */
+.md{padding-top:12px}
+.md h1,.md h2,.md h3,.md h4,.md h5,.md h6{letter-spacing:-0.02em; text-wrap:balance; scroll-margin-top:80px}
+.md h1{font-size:23px; font-weight:700; margin:52px 0 14px; padding-bottom:9px;
+       border-bottom:1px solid var(--rule-strong)}
+.md h2{font-size:18.5px; font-weight:700; margin:38px 0 10px}
+.md h3{font-size:15.5px; font-weight:700; margin:28px 0 8px; color:var(--ink)}
+.md h4,.md h5,.md h6{font-size:14px; font-weight:700; margin:22px 0 6px; color:var(--ink-2)}
+.md > :first-child{margin-top:0}
+.md p{margin:0 0 13px; max-width:76ch}
+.md a{color:var(--blue)}
+.md strong{font-weight:700}
+.md hr{border:0; border-top:1px solid var(--rule); margin:34px 0}
+.md ul,.md ol{margin:0 0 14px; padding-left:22px; max-width:76ch}
+.md li{margin:3px 0}
+.md li > ul,.md li > ol{margin:3px 0}
+.md blockquote{margin:0 0 16px; padding:12px 18px; border-left:3px solid var(--accent);
+               background:var(--tint-accent); border-radius:0 3px 3px 0; max-width:76ch}
+.md blockquote p{margin:0}
+.md blockquote p + p{margin-top:8px}
+code{font-family:var(--mono); font-size:.87em; background:var(--surface-2); padding:1.5px 5px;
+     border-radius:2px; color:var(--ink); word-break:break-word}
+.codewrap{margin:0 0 16px; border:1px solid var(--rule); border-radius:3px; background:var(--surface);
+          overflow-x:auto}
+.codewrap pre{margin:0; padding:14px 18px}
+.codewrap code{background:none; padding:0; font-size:12.5px; line-height:1.65; white-space:pre;
+               display:block}
+.codewrap code.lang-sql{color:var(--ink)}
+
+/* ── 표 ────────────────────────────────── */
+.tablewrap{overflow-x:auto; margin:0 0 18px; border:1px solid var(--rule); border-radius:3px;
+           background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-size:13.5px; min-width:480px}
+th,td{text-align:left; padding:9px 14px; border-bottom:1px solid var(--rule); vertical-align:top;
+      line-height:1.6}
+thead th{font-family:var(--mono); font-size:11px; letter-spacing:.06em; color:var(--ink-3);
+         font-weight:600; background:var(--surface-2); white-space:nowrap; text-transform:uppercase}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--surface-2)}
+td code{font-size:12px; white-space:nowrap}
+
+/* ── 페이저 ────────────────────────────── */
+.pager{display:flex; justify-content:space-between; gap:16px; margin-top:56px; padding-top:22px;
+       border-top:1px solid var(--rule)}
+.pager a{flex:0 1 auto; max-width:46%; text-decoration:none; color:var(--ink); font-size:13.5px;
+         font-weight:600; padding:12px 16px; border:1px solid var(--rule); border-radius:3px;
+         background:var(--surface); line-height:1.4}
+.pager a:hover{border-color:var(--accent); color:var(--accent)}
+.pager a span{display:block; font-family:var(--mono); font-size:10px; letter-spacing:.1em;
+              text-transform:uppercase; color:var(--ink-3); font-weight:500; margin-bottom:3px}
+.pager a.nx{text-align:right}
+a:focus-visible,.nav-docs a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+/* ── 인덱스 전용 ───────────────────────── */
+.hero{padding:56px 0 34px; border-bottom:2px solid var(--ink)}
+.hero h1{font-size:clamp(27px,4vw,40px); line-height:1.15; margin:12px 0 0; font-weight:700;
+         letter-spacing:-0.03em}
+.hero .lede{margin:14px 0 0; color:var(--ink-2); font-size:15px; max-width:68ch}
+.statbar{display:flex; flex-wrap:wrap; gap:0; margin:30px 0 0; border:1px solid var(--rule);
+         border-radius:3px; background:var(--surface); overflow:hidden}
+.statbar div{flex:1 1 130px; padding:14px 18px; border-right:1px solid var(--rule)}
+.statbar div:last-child{border-right:0}
+.statbar .v{font-family:var(--mono); font-size:21px; font-weight:600; letter-spacing:-0.02em;
+            font-variant-numeric:tabular-nums; display:block}
+.statbar .k{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+            color:var(--ink-3); margin-top:3px; display:block}
+.secgrp{margin:52px 0 0}
+.secgrp > h2{font-size:13px; font-family:var(--mono); letter-spacing:.12em; text-transform:uppercase;
+             color:var(--accent); margin:0 0 4px; font-weight:600}
+.secgrp > p{margin:0 0 18px; color:var(--ink-2); font-size:13.5px; max-width:70ch}
+.cards{display:grid; gap:12px}
+@media(min-width:720px){.cards{grid-template-columns:1fr 1fr}}
+.card{display:block; text-decoration:none; color:inherit; background:var(--surface);
+      border:1px solid var(--rule); border-radius:3px; padding:17px 19px; transition:border-color .12s}
+.card:hover{border-color:var(--accent)}
+.card .num{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; color:var(--accent);
+           font-weight:600}
+.card h3{margin:6px 0 5px; font-size:16px; font-weight:700; letter-spacing:-0.02em}
+.card p{margin:0; font-size:13px; color:var(--ink-2); line-height:1.6}
+.card .facts{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px}
+.card .facts span{font-family:var(--mono); font-size:10.5px; color:var(--ink-3);
+                  background:var(--surface-2); padding:2px 7px; border-radius:2px;
+                  font-variant-numeric:tabular-nums}
+.card .facts span.hi{background:var(--tint-accent); color:var(--accent); font-weight:600}
+.card.ext .num{color:var(--blue)}
+.card.ext:hover{border-color:var(--blue)}
+.note{margin:44px 0 0; padding:16px 20px; border:1px solid var(--rule); border-left:3px solid var(--blue);
+      border-radius:0 3px 3px 0; background:var(--surface); font-size:13.5px; color:var(--ink-2)}
+.note b{color:var(--ink)}
+footer{margin-top:64px; padding-top:22px; border-top:1px solid var(--rule);
+        font-size:12.5px; color:var(--ink-3); display:flex; flex-wrap:wrap; gap:14px;
+        justify-content:space-between}
+@media (prefers-reduced-motion:reduce){*{transition:none!important; scroll-behavior:auto!important}}
+
+/* ── 워크플로우 페이지: 넓은 본문 ── */
+body.wide main{max-width:1180px}
+</style>
+</head>
+<body>
+<nav class="side"><div class="nav-brand"><a href="index.html"><span class="bt">MES 데이터 모델링</span><span class="bs">v3 · 문서 인덱스</span></a></div>
+<div class="nav-docs">
+<span class="grp">업무 흐름 정본</span>
+<a href="workflow-v2.html">OMF MES 시스템 워크플로우 v2</a>
+<span class="grp">1. 도메인 이해</span>
+<a href="1-1.html">비즈니스 도메인의 이해</a>
+<a href="1-2.html">MES의 핵심 필수 기능</a>
+<a href="1-3.html">사용자 시나리오</a>
+<span class="grp">2. 기능 요구사항</span>
+<a href="2-1.html">작업지시</a>
+<a href="2-2.html">자재투입</a>
+<a href="2-3.html">생산 실적 관리</a>
+<a href="2-4.html">품질관리</a>
+<a href="2-5.html">LOT 추적성</a>
+<a href="2-6.html">요구사항 누락분 보충</a>
+<a href="2-7.html">물류 재고 실행 관리</a>
+<span class="grp">3. 데이터 모델링</span>
+<a href="3-1.html">개념적 모델링</a>
+<a href="3-2.html" class="on">논리적 모델링</a>
+<a href="3-3.html">물리적 모델링</a>
+<a href="mes_erd.html">ERD — 도메인별 다이어그램</a>
+<a href="mes_scenarios_workflows.html">업무 시나리오 &amp; 워크플로우</a>
+<a href="mes_workflows_detailed.html">상세 워크플로우</a>
+<span class="grp">참고</span>
+<a href="changelog.html">변경 이력</a>
+</div><aside class="ontop"><span class="grp">이 문서</span><a class="l1" href="#s1">MES 논리적 데이터 모델</a><a class="l2" href="#s2">1. 논리 모델링 범위</a><a class="l1" href="#s3">2. 논리 모델링 기본 원칙</a><a class="l2" href="#s4">2.1 식별자</a><a class="l2" href="#s5">2.2 공통 컬럼</a><a class="l2" href="#s6">2.3 상태코드</a><a class="l2" href="#s7">2.4 원장과 현재값 분리</a><a class="l2" href="#s8">2.5 LOT와 재고 분리</a><a class="l1" href="#s9">3. 전체 논리 모델 구조</a><a class="l1" href="#s10">4. 공통 코드 및 조직 기준정보</a><a class="l2" href="#s11">4.1 code_group</a><a class="l2" href="#s12">4.2 code_value</a><a class="l2" href="#s13">4.3 legal_entity</a><a class="l2" href="#s14">4.4 business_unit</a><a class="l2" href="#s15">4.5 plant</a><a class="l2" href="#s16">4.6 warehouse</a><a class="l2" href="#s17">4.7 location</a><a class="l2" href="#s18">4.8 partner</a><a class="l2" href="#s19">4.9 partner_role</a><a class="l2" href="#s20">4.10 production_line</a><a class="l2" href="#s21">4.11 department</a><a class="l2" href="#s22">4.12 app_user</a><a class="l2" href="#s23">4.13 role</a><a class="l2" href="#s24">4.14 role_permission</a><a class="l2" href="#s25">4.15 user_role</a><a class="l2" href="#s26">4.16 user_data_scope</a><a class="l1" href="#s27">5. 품목·단위 기준정보</a><a class="l2" href="#s28">5.1 uom</a><a class="l2" href="#s29">5.2 item</a><a class="l2" href="#s30">5.3 item_uom_conversion</a><a class="l2" href="#s31">5.4 item_external_code</a><a class="l2" href="#s32">5.5 item_bu_item_map</a><a class="l1" href="#s33">6. BOM 논리 모델</a><a class="l2" href="#s34">6.1 bom</a><a class="l2" href="#s35">6.2 bom_component</a><a class="l2" href="#s36">6.3 material_substitution_rule</a><a class="l1" href="#s37">7. 라우팅·공정 기준정보</a><a class="l2" href="#s38">7.1 process</a><a class="l2" href="#s39">7.2 routing</a><a class="l2" href="#s40">7.3 routing_operation</a><a class="l2" href="#s41">7.4 routing_operation_dependency</a><a class="l2" href="#s42">7.5 equipment</a><a class="l2" href="#s43">7.6 mold</a><a class="l1" href="#s44">8. 작업자·근무조·단말기</a><a class="l2" href="#s45">8.1 worker</a><a class="l2" href="#s46">8.2 shift</a><a class="l2" href="#s47">8.3 terminal</a><a class="l2" href="#s48">8.4 terminal_process</a><a class="l2" href="#s49">8.5 worker_qualification</a><a class="l1" href="#s50">9. 생산계획·작업지시</a><a class="l2" href="#s51">9.1 production_order</a><a class="l2" href="#s52">9.2 production_plan</a><a class="l2" href="#s53">9.3 work_order</a><a class="l2" href="#s54">9.4 work_order_dependency</a><a class="l2" href="#s55">9.5 work_session</a><a class="l2" href="#s56">9.6 work_session_worker</a><a class="l2" href="#s57">9.7 work_session_event</a><a class="l1" href="#s58">10. 구매 P/O·입하예정·입하·입고·적치</a><a class="l2" href="#s59">10.1 purchase_order</a><a class="l2" href="#s60">10.2 purchase_order_line</a><a class="l2" href="#s61">10.3 asn</a><a class="l2" href="#s62">10.4 asn_line</a><a class="l2" href="#s63">10.5 inbound_receipt</a><a class="l2" href="#s64">10.6 inbound_receipt_line</a><a class="l2" href="#s65">10.7 inbound_variance</a><a class="l2" href="#s66">10.8 goods_receipt</a><a class="l2" href="#s67">10.9 goods_receipt_line</a><a class="l2" href="#s68">10.10 putaway_task</a><a class="l2" href="#s69">10.11 putaway_rule</a><a class="l1" href="#s70">11. LOT 및 재고 논리 모델</a><a class="l2" href="#s71">11.1 lot</a><a class="l2" href="#s72">11.2 lot_external_identifier</a><a class="l2" href="#s73">11.3 inventory_balance</a><a class="l2" href="#s74">11.4 inventory_transaction</a><a class="l2" href="#s75">11.5 inventory_transaction_line</a><a class="l2" href="#s76">11.6 inventory_reservation</a><a class="l1" href="#s77">12. 취급단위</a><a class="l2" href="#s78">12.1 handling_unit</a><a class="l2" href="#s79">12.2 handling_unit_content</a><a class="l1" href="#s80">13. 생산출고·피킹·현장 인수</a><a class="l2" href="#s81">13.1 material_issue_request</a><a class="l2" href="#s82">13.2 material_issue_request_line</a><a class="l2" href="#s83">13.3 picking_order</a><a class="l2" href="#s84">13.4 picking_line</a><a class="l2" href="#s85">13.5 goods_issue</a><a class="l2" href="#s86">13.6 goods_issue_line</a><a class="l2" href="#s87">13.7 shopfloor_receipt</a><a class="l2" href="#s88">13.8 shopfloor_receipt_line</a><a class="l1" href="#s89">14. 자재투입·사용·반납</a><a class="l2" href="#s90">14.1 material_consumption</a><a class="l2" href="#s91">14.2 material_usage_allocation</a><a class="l2" href="#s92">14.3 material_return</a><a class="l2" href="#s93">14.4 material_return_line</a><a class="l2" href="#s94">14.5 material_loss</a><a class="l1" href="#s95">15. 생산실적·생산 LOT</a><a class="l2" href="#s96">15.1 production_result</a><a class="l2" href="#s97">15.2 production_result_lot_allocation</a><a class="l2" href="#s98">15.3 operation_handover</a><a class="l2" href="#s99">15.4 operation_handover_line</a><a class="l2" href="#s100">15.5 생산품 입고</a><a class="l1" href="#s101">16. 품질관리 논리 모델</a><a class="l2" href="#s102">16.1 inspection_plan</a><a class="l2" href="#s103">16.2 inspection_plan_version</a><a class="l2" href="#s104">16.3 inspection_item_spec</a><a class="l2" href="#s105">16.4 inspection_request</a><a class="l2" href="#s106">16.5 inspection_result</a><a class="l2" href="#s107">16.6 inspection_measurement</a><a class="l2" href="#s108">16.7 defect_record</a><a class="l2" href="#s109">16.8 defect_code</a><a class="l2" href="#s110">16.9 nonconformance</a><a class="l2" href="#s111">16.10 nonconformance_lot</a><a class="l2" href="#s112">16.11 disposition_decision</a><a class="l2" href="#s113">16.12 concession</a><a class="l2" href="#s114">16.13 cause_code</a><a class="l2" href="#s115">16.14 sorting_result</a><a class="l2" href="#s116">16.15 equipment_calibration</a><a class="l1" href="#s117">17. LOT 계보 및 추적성</a><a class="l2" href="#s118">17.1 lot_relation</a><a class="l2" href="#s119">17.2 LOT 관계 생성 원칙</a><a class="l2" href="#s120">17.3 serial_number</a><a class="l2" href="#s121">17.4 serial_component_relation</a><a class="l2" href="#s122">17.5 lot_hold</a><a class="l2" href="#s123">17.6 impact_analysis</a><a class="l1" href="#s124">18. 재고이동·사업부·외부창고</a><a class="l2" href="#s125">18.1 stock_transfer</a><a class="l2" href="#s126">18.2 stock_transfer_line</a><a class="l1" href="#s127">19. 외주관리</a><a class="l2" href="#s128">19.1 subcontract_order</a><a class="l2" href="#s129">19.2 subcontract_issue</a><a class="l2" href="#s130">19.3 subcontract_receipt</a><a class="l2" href="#s131">19.4 subcontract_reconciliation</a><a class="l1" href="#s132">20. 출하관리</a><a class="l2" href="#s133">20.1 sales_order</a><a class="l2" href="#s134">20.2 sales_order_line</a><a class="l2" href="#s135">20.3 shipment_request</a><a class="l2" href="#s136">20.4 shipment_request_line</a><a class="l2" href="#s137">20.5 shipment</a><a class="l2" href="#s138">20.6 shipment_line</a><a class="l2" href="#s139">20.7 shipment_lot_allocation</a><a class="l1" href="#s140">21. 재고실사·조정</a><a class="l2" href="#s141">21.1 inventory_count</a><a class="l2" href="#s142">21.2 inventory_count_line</a><a class="l2" href="#s143">21.3 inventory_adjustment</a><a class="l1" href="#s144">22. 승인·예외·첨부·감사·공통 지원</a><a class="l2" href="#s145">22.1 approval_request</a><a class="l2" href="#s146">22.2 approval_step</a><a class="l2" href="#s147">22.3 exception_case</a><a class="l2" href="#s148">22.4 attachment</a><a class="l2" href="#s149">22.5 audit_event</a><a class="l2" href="#s150">22.6 approval_route</a><a class="l2" href="#s151">22.7 approval_route_step</a><a class="l2" href="#s152">22.8 document_issue_log</a><a class="l2" href="#s153">22.9 operation_policy</a><a class="l2" href="#s154">22.10 numbering_rule</a><a class="l2" href="#s155">22.11 numbering_counter</a><a class="l1" href="#s156">23. ERP·외부시스템 연계</a><a class="l2" href="#s157">23.1 integration_message</a><a class="l2" href="#s158">23.2 external_document_reference</a><a class="l1" href="#s159">24. 핵심 관계 요약</a><a class="l2" href="#s160">24.1 생산 관계</a><a class="l2" href="#s161">24.2 자재사용 관계</a><a class="l2" href="#s162">24.3 품질 관계</a><a class="l2" href="#s163">24.4 LOT 계보 관계</a><a class="l2" href="#s164">24.5 출하 관계</a><a class="l1" href="#s165">25. 핵심 무결성 규칙</a><a class="l2" href="#s166">25.1 작업지시</a><a class="l2" href="#s167">25.2 자재투입</a><a class="l2" href="#s168">25.3 생산실적</a><a class="l2" href="#s169">25.4 생산 LOT</a><a class="l2" href="#s170">25.5 품질</a><a class="l2" href="#s171">25.6 재고</a><a class="l2" href="#s172">25.7 LOT 계보</a><a class="l1" href="#s173">26. 논리적 수량 책임</a><a class="l1" href="#s174">27. 주요 상태코드</a><a class="l2" href="#s175">27.1 작업지시 상태</a><a class="l2" href="#s176">27.2 품질상태</a><a class="l2" href="#s177">27.3 재고상태</a><a class="l2" href="#s178">27.4 입하·입고 상태</a><a class="l2" href="#s179">27.5 출하 상태</a><a class="l1" href="#s180">28. 정규화 검토</a><a class="l2" href="#s181">28.1 제1정규형</a><a class="l2" href="#s182">28.2 제2정규형</a><a class="l2" href="#s183">28.3 제3정규형</a><a class="l1" href="#s184">29. 다형 참조 사용 주의</a><a class="l1" href="#s185">30. 주요 트랜잭션 경계</a><a class="l2" href="#s186">작업지시 생성</a><a class="l2" href="#s187">자재투입</a><a class="l2" href="#s188">생산실적</a><a class="l2" href="#s189">품질판정</a><a class="l2" href="#s190">재고이동</a><a class="l2" href="#s191">출하</a><a class="l1" href="#s192">31. 논리 모델 핵심 테이블 목록</a><a class="l2" href="#s193">기준정보</a><a class="l2" href="#s194">사용자·권한</a><a class="l2" href="#s195">제품·공정</a><a class="l2" href="#s196">생산계획·실행</a><a class="l2" href="#s197">구매·입하·입고·적치</a><a class="l2" href="#s198">재고·물류</a><a class="l2" href="#s199">자재투입</a><a class="l2" href="#s200">품질</a><a class="l2" href="#s201">LOT 추적</a><a class="l2" href="#s202">외주·출하</a><a class="l2" href="#s203">공통관리</a><a class="l1" href="#s204">32. 논리 모델 최종 구조</a></aside></nav>
+<main>
+  <header class="dochead">
+    <div class="eyebrow">3. 데이터 모델링 · 3-2 논리적 모델링</div>
+    <h1 class="doctitle">논리적 모델링</h1>
+    <p class="docsub">테이블·컬럼·키·제약 정의 (최대 문서, 3,587줄)</p>
+  </header>
+  <article class="md">
+<h1 id="s1">MES 논리적 데이터 모델</h1>
+<blockquote><p>v3: ERPNext 벤치마킹 반영본(E-1~E-7). 변경 내역은 CHANGELOG.md 참조.</p><p>v2: 요구사항 검토 반영본.</p></blockquote>
+<h2 id="s2">1. 논리 모델링 범위</h2>
+<p>본 논리 모델은 다음 업무 영역을 대상으로 한다.</p>
+<ol><li>조직·창고·사용자 기준정보</li><li>품목·BOM·라우팅</li><li>생산오더·생산계획·작업지시</li><li>작업 세션</li><li>구매자재 입하·수입검사·입고</li><li>재고·로케이션·취급단위</li><li>생산출고·현장 인수·자재투입·반납</li><li>생산실적·생산 LOT·공정 인계</li><li>품질검사·불량·부적합·특채·재작업</li><li>LOT 계보 및 추적성</li><li>사업부·공장·외주·외부창고 이동</li><li>출하</li><li>승인·예외·첨부·감사·ERP 연계</li><li>사용자·부서·권한, 운영정책·채번규칙·발행이력</li></ol>
+<p>본 단계에서는 테이블 구조, 논리 식별자, 주요 속성, 관계와 무결성 규칙을 정의한다. 실제 DB 자료형, 인덱스 방식, 파티셔닝 등은 물리적 모델링에서 확정한다.</p>
+<hr>
+<h1 id="s3">2. 논리 모델링 기본 원칙</h1>
+<h2 id="s4">2.1 식별자</h2>
+<p>모든 핵심 엔터티는 시스템 내부 식별자와 업무 식별자를 분리한다.</p>
+<p>예:</p>
+<div class="codewrap"><pre><code class="lang-text">work_order_id       시스템 내부 PK
+work_order_no       사용자가 확인하는 작업지시번호</code></pre></div>
+<ul><li>내부 식별자: 변경 불가</li><li>업무번호: 업무규칙에 따라 생성</li><li>외부 시스템 번호: 별도 컬럼 또는 외부 식별번호 테이블로 관리</li></ul>
+<hr>
+<h2 id="s5">2.2 공통 컬럼</h2>
+<p>대부분의 업무 테이블은 다음 공통 속성을 가진다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>의미</th></tr></thead><tbody><tr><td><code>created_at</code></td><td>생성일시</td></tr><tr><td><code>created_by</code></td><td>생성 사용자</td></tr><tr><td><code>updated_at</code></td><td>최종 수정일시</td></tr><tr><td><code>updated_by</code></td><td>최종 수정 사용자</td></tr><tr><td><code>version_no</code></td><td>낙관적 잠금용 버전</td></tr><tr><td><code>is_active</code></td><td>기준정보 사용 여부</td></tr><tr><td><code>remarks</code></td><td>비고</td></tr></tbody></table></div>
+<p>업무이력 테이블은 가능한 한 수정하지 않고 신규 이벤트를 추가한다.</p>
+<hr>
+<h2 id="s6">2.3 상태코드</h2>
+<p>상태값을 프로그램 문자열로 직접 관리하지 않고 코드 기준정보를 사용한다.</p>
+<div class="codewrap"><pre><code class="lang-text">code_group
+ └─ code_value</code></pre></div>
+<p>예:</p>
+<ul><li>작업지시 상태</li><li>품질상태</li><li>재고상태</li><li>입하상태</li><li>출하상태</li><li>승인상태</li><li>LOT 관계유형</li></ul>
+<hr>
+<h2 id="s7">2.4 원장과 현재값 분리</h2>
+<p>재고는 다음 두 구조를 분리한다.</p>
+<div class="codewrap"><pre><code class="lang-text">inventory_transaction
+= 재고가 변한 원본 사건
+
+inventory_balance
+= 현재 시점의 재고 잔액</code></pre></div>
+<p><code>inventory_balance</code>는 조회 성능을 위한 현재값이며, 원칙적으로 <code>inventory_transaction</code>을 통해서만 변경한다.</p>
+<hr>
+<h2 id="s8">2.5 LOT와 재고 분리</h2>
+<p>LOT는 추적 식별자이고 재고는 특정 위치와 상태에 존재하는 수량이다.</p>
+<div class="codewrap"><pre><code class="lang-text">LOT M001
+├─ 자재창고 A01 / 합격 / 가용: 300kg
+├─ 자재창고 A02 / 합격 / 가용: 200kg
+└─ 생산현장 / 합격 / 생산현장: 100kg</code></pre></div>
+<p>하나의 LOT에 여러 재고잔액이 존재할 수 있다.</p>
+<hr>
+<h1 id="s9">3. 전체 논리 모델 구조</h1>
+<div class="codewrap"><pre><code class="lang-text">조직·기준정보
+ ├─ 부서·사용자·권한
+ ├─ 생산라인·작업구역
+ ├─ 품목·단위
+ ├─ BOM
+ ├─ 라우팅·공정
+ ├─ 창고·로케이션
+ └─ 작업자·설비·금형
+
+생산계획
+ └─ 작업지시
+     ├─ 작업세션
+     ├─ 자재투입
+     ├─ 생산실적
+     ├─ 검사대상
+     └─ 생산 LOT
+
+구매 P/O
+ └─ 입하예정·입하
+     └─ 수입검사
+         └─ 입고·적치
+             └─ 자재 LOT·재고
+
+재고
+ ├─ 예약
+ ├─ 피킹
+ ├─ 출고
+ ├─ 이동
+ ├─ 반납
+ ├─ 생산품 입고
+ ├─ 외주
+ └─ 출하
+
+LOT
+ ├─ 자재투입
+ ├─ 생산실적
+ ├─ LOT 관계
+ ├─ 품질검사
+ ├─ 포장
+ └─ 출하</code></pre></div>
+<hr>
+<h1 id="s10">4. 공통 코드 및 조직 기준정보</h1>
+<h2 id="s11">4.1 <code>code_group</code></h2>
+<p>코드 분류를 관리한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th><th>설명</th></tr></thead><tbody><tr><td><code>code_group_id</code></td><td>PK</td><td>코드그룹 식별자</td></tr><tr><td><code>group_code</code></td><td>UK</td><td>코드그룹 코드</td></tr><tr><td><code>group_name</code></td><td></td><td>코드그룹명</td></tr><tr><td><code>description</code></td><td></td><td>설명</td></tr></tbody></table></div>
+<hr>
+<h2 id="s12">4.2 <code>code_value</code></h2>
+<p>개별 코드값을 관리한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th><th>설명</th></tr></thead><tbody><tr><td><code>code_value_id</code></td><td>PK</td><td>코드값 식별자</td></tr><tr><td><code>code_group_id</code></td><td>FK</td><td>코드그룹</td></tr><tr><td><code>code</code></td><td>UK1</td><td>코드</td></tr><tr><td><code>code_name</code></td><td></td><td>코드명</td></tr><tr><td><code>display_order</code></td><td></td><td>표시순서</td></tr><tr><td><code>effective_from</code></td><td></td><td>적용 시작일</td></tr><tr><td><code>effective_to</code></td><td></td><td>적용 종료일</td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(code_group_id, code)</code></pre></div>
+<hr>
+<h2 id="s13">4.3 <code>legal_entity</code></h2>
+<p>법인을 관리한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>legal_entity_id</code></td><td>PK</td></tr><tr><td><code>legal_entity_code</code></td><td>UK</td></tr><tr><td><code>legal_entity_name</code></td><td></td></tr><tr><td><code>country_code</code></td><td></td></tr><tr><td><code>timezone_code</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s14">4.4 <code>business_unit</code></h2>
+<p>사업부를 관리한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>business_unit_id</code></td><td>PK</td></tr><tr><td><code>legal_entity_id</code></td><td>FK</td></tr><tr><td><code>business_unit_code</code></td><td>UK1</td></tr><tr><td><code>business_unit_name</code></td><td></td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(legal_entity_id, business_unit_code)</code></pre></div>
+<hr>
+<h2 id="s15">4.5 <code>plant</code></h2>
+<p>공장을 관리한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>plant_id</code></td><td>PK</td></tr><tr><td><code>legal_entity_id</code></td><td>FK</td></tr><tr><td><code>business_unit_id</code></td><td>FK, Nullable</td></tr><tr><td><code>plant_code</code></td><td>UK1</td></tr><tr><td><code>plant_name</code></td><td></td></tr><tr><td><code>timezone_code</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s16">4.6 <code>warehouse</code></h2>
+<p>창고를 관리한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th><th>설명</th></tr></thead><tbody><tr><td><code>warehouse_id</code></td><td>PK</td><td>창고 식별자</td></tr><tr><td><code>plant_id</code></td><td>FK</td><td>소속 공장</td></tr><tr><td><code>business_unit_id</code></td><td>FK</td><td>소속 사업부</td></tr><tr><td><code>warehouse_code</code></td><td>UK1</td><td>창고코드</td></tr><tr><td><code>warehouse_name</code></td><td></td><td>창고명</td></tr><tr><td><code>warehouse_type_code</code></td><td>FK</td><td>자재·반제품·완제품·외부·외주 등</td></tr><tr><td><code>management_level_code</code></td><td>FK</td><td>창고·구역·랙·셀 관리수준</td></tr><tr><td><code>is_external</code></td><td></td><td>외부창고 여부</td></tr><tr><td><code>partner_id</code></td><td>FK, Nullable</td><td>외부창고·외주처</td></tr></tbody></table></div>
+<hr>
+<h2 id="s17">4.7 <code>location</code></h2>
+<p>창고 내부 위치를 관리한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th><th>설명</th></tr></thead><tbody><tr><td><code>location_id</code></td><td>PK</td><td>로케이션 식별자</td></tr><tr><td><code>warehouse_id</code></td><td>FK</td><td>창고</td></tr><tr><td><code>parent_location_id</code></td><td>FK, Nullable</td><td>상위 로케이션</td></tr><tr><td><code>location_code</code></td><td>UK1</td><td>위치코드</td></tr><tr><td><code>location_name</code></td><td></td><td>위치명</td></tr><tr><td><code>location_type_code</code></td><td>FK</td><td>구역·랙·셀·입하장 등</td></tr><tr><td><code>quality_zone_code</code></td><td>FK</td><td>가용·검사대기·보류·격리</td></tr><tr><td><code>storage_condition_code</code></td><td>FK, Nullable</td><td>보관조건(온도·습도·위험물)</td></tr><tr><td><code>allow_mixed_item</code></td><td></td><td>복수 품목 혼재 허용</td></tr><tr><td><code>allow_mixed_lot</code></td><td></td><td>복수 LOT 혼재 허용</td></tr><tr><td><code>capacity_qty</code></td><td></td><td>수용량</td></tr><tr><td><code>capacity_uom_id</code></td><td>FK</td><td>수용량 단위</td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(warehouse_id, location_code)</code></pre></div>
+<hr>
+<h2 id="s18">4.8 <code>partner</code></h2>
+<p>공급사·고객·외주처·운송업체를 통합 관리한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>partner_id</code></td><td>PK</td></tr><tr><td><code>partner_code</code></td><td>UK</td></tr><tr><td><code>partner_name</code></td><td></td></tr><tr><td><code>country_code</code></td><td></td></tr><tr><td><code>erp_partner_code</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s19">4.9 <code>partner_role</code></h2>
+<p>거래처 역할을 관리한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>partner_role_id</code></td><td>PK</td></tr><tr><td><code>partner_id</code></td><td>FK</td></tr><tr><td><code>role_type_code</code></td><td>FK</td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(partner_id, role_type_code)</code></pre></div>
+<hr>
+<h2 id="s20">4.10 <code>production_line</code></h2>
+<p>생산라인과 작업구역을 관리한다. 작업지시 배정, 라인별 계획·보고서의 기준이 된다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th><th>설명</th></tr></thead><tbody><tr><td><code>production_line_id</code></td><td>PK</td><td>라인 식별자</td></tr><tr><td><code>plant_id</code></td><td>FK</td><td>소속 공장</td></tr><tr><td><code>parent_line_id</code></td><td>FK, Nullable</td><td>상위 라인(작업구역 계층 구성)</td></tr><tr><td><code>line_code</code></td><td>UK1</td><td>라인코드</td></tr><tr><td><code>line_name</code></td><td></td><td>라인명</td></tr><tr><td><code>line_type_code</code></td><td>FK</td><td>LINE·WORK_AREA</td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(plant_id, line_code)</code></pre></div>
+<p>작업구역은 <code>parent_line_id</code>로 라인 하위에 계층 구성한다.</p>
+<hr>
+<h2 id="s21">4.11 <code>department</code></h2>
+<p>부서를 관리한다. 부적합 귀책부서, 예외 담당부서, 승인경로의 참조 대상이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>department_id</code></td><td>PK</td></tr><tr><td><code>department_code</code></td><td>UK</td></tr><tr><td><code>department_name</code></td><td></td></tr><tr><td><code>parent_department_id</code></td><td>FK, Nullable</td></tr><tr><td><code>business_unit_id</code></td><td>FK, Nullable</td></tr></tbody></table></div>
+<hr>
+<h2 id="s22">4.12 <code>app_user</code></h2>
+<p>MES 시스템 사용자를 관리한다. 승인자·처리자·입력자 등 모든 사용자 참조 컬럼의 대상이다. 현장 작업자(<code>worker</code>)와는 분리하며, <code>worker.app_user_id</code>로 연결한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>app_user_id</code></td><td>PK</td></tr><tr><td><code>login_id</code></td><td>UK</td></tr><tr><td><code>user_name</code></td><td></td></tr><tr><td><code>department_id</code></td><td>FK, Nullable</td></tr><tr><td><code>email</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h2 id="s23">4.13 <code>role</code></h2>
+<p>역할(권한 묶음)을 관리한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>role_id</code></td><td>PK</td></tr><tr><td><code>role_code</code></td><td>UK</td></tr><tr><td><code>role_name</code></td><td></td></tr><tr><td><code>description</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s24">4.14 <code>role_permission</code></h2>
+<p>역할별 기능 권한이다. 조회·등록·수정·마감 등을 <code>permission_code</code> 단위로 부여한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>role_permission_id</code></td><td>PK</td></tr><tr><td><code>role_id</code></td><td>FK</td></tr><tr><td><code>permission_code</code></td><td>UK1</td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(role_id, permission_code)</code></pre></div>
+<hr>
+<h2 id="s25">4.15 <code>user_role</code></h2>
+<p>사용자와 역할을 연결한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>user_role_id</code></td><td>PK</td></tr><tr><td><code>app_user_id</code></td><td>FK</td></tr><tr><td><code>role_id</code></td><td>UK1</td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(app_user_id, role_id)</code></pre></div>
+<hr>
+<h2 id="s26">4.16 <code>user_data_scope</code></h2>
+<p>사용자별 데이터 접근범위(사업부·공장)를 관리한다. RLS 정책과 연동한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>user_data_scope_id</code></td><td>PK</td></tr><tr><td><code>app_user_id</code></td><td>FK</td></tr><tr><td><code>business_unit_id</code></td><td>FK, Nullable</td></tr><tr><td><code>plant_id</code></td><td>FK, Nullable</td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(app_user_id, business_unit_id, plant_id)</code></pre></div>
+<p>사업부·공장 중 최소 하나는 지정해야 한다.</p>
+<hr>
+<h1 id="s27">5. 품목·단위 기준정보</h1>
+<h2 id="s28">5.1 <code>uom</code></h2>
+<p>수량 단위를 관리한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>uom_id</code></td><td>PK</td></tr><tr><td><code>uom_code</code></td><td>UK</td></tr><tr><td><code>uom_name</code></td><td></td></tr><tr><td><code>decimal_scale</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s29">5.2 <code>item</code></h2>
+<p>자재·반제품·완제품 품목을 관리한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th><th>설명</th></tr></thead><tbody><tr><td><code>item_id</code></td><td>PK</td><td>품목 식별자</td></tr><tr><td><code>item_code</code></td><td>UK</td><td>품목코드</td></tr><tr><td><code>item_name</code></td><td></td><td>품목명</td></tr><tr><td><code>item_type_code</code></td><td>FK</td><td>원재료·부품·반제품·완제품 등</td></tr><tr><td><code>base_uom_id</code></td><td>FK</td><td>기본 재고단위</td></tr><tr><td><code>lot_control_type_code</code></td><td>FK</td><td>LOT 관리 방식</td></tr><tr><td><code>serial_control_type_code</code></td><td>FK</td><td>일련번호 관리 방식</td></tr><tr><td><code>shelf_life_days</code></td><td></td><td>유효기간</td></tr><tr><td><code>inspection_required</code></td><td></td><td>수입검사 기본 여부</td></tr><tr><td><code>fifo_policy_code</code></td><td>FK</td><td>FIFO·FEFO 등</td></tr><tr><td><code>negative_stock_allowed</code></td><td></td><td>음수재고 허용 여부</td></tr><tr><td><code>storage_condition_code</code></td><td>FK</td><td>보관조건</td></tr><tr><td><code>opened_shelf_life_hours</code></td><td></td><td>개봉 후 사용 가능시간</td></tr></tbody></table></div>
+<hr>
+<h2 id="s30">5.3 <code>item_uom_conversion</code></h2>
+<p>품목별 단위환산을 관리한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>item_uom_conversion_id</code></td><td>PK</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>from_uom_id</code></td><td>FK</td></tr><tr><td><code>to_uom_id</code></td><td>FK</td></tr><tr><td><code>conversion_rate</code></td><td></td></tr><tr><td><code>effective_from</code></td><td></td></tr><tr><td><code>effective_to</code></td><td></td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(item_id, from_uom_id, to_uom_id, effective_from)</code></pre></div>
+<hr>
+<h2 id="s31">5.4 <code>item_external_code</code></h2>
+<p>ERP·고객·공급사별 품목코드를 연결한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>item_external_code_id</code></td><td>PK</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>external_system_code</code></td><td></td></tr><tr><td><code>partner_id</code></td><td>FK, Nullable</td></tr><tr><td><code>external_item_code</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s32">5.5 <code>item_bu_item_map</code></h2>
+<p>사업부 간 품목코드 매핑이다. 같은 실물품목을 사업부마다 다른 품목코드로 관리하는 경우 사업부 간 이동 시 매핑을 조회하며, 매핑이 없으면 입고를 차단한다. <code>item_external_code</code>는 외부 시스템·거래처용이므로 내부 사업부 간 매핑은 본 테이블로 관리한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>item_bu_item_map_id</code></td><td>PK</td></tr><tr><td><code>from_business_unit_id</code></td><td>FK</td></tr><tr><td><code>from_item_id</code></td><td>FK</td></tr><tr><td><code>to_business_unit_id</code></td><td>FK</td></tr><tr><td><code>to_item_id</code></td><td>FK</td></tr><tr><td><code>effective_from</code></td><td></td></tr><tr><td><code>effective_to</code></td><td></td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(from_business_unit_id, from_item_id, to_business_unit_id, effective_from)</code></pre></div>
+<hr>
+<h1 id="s33">6. BOM 논리 모델</h1>
+<h2 id="s34">6.1 <code>bom</code></h2>
+<p>BOM Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th><th>설명</th></tr></thead><tbody><tr><td><code>bom_id</code></td><td>PK</td><td></td></tr><tr><td><code>parent_item_id</code></td><td>FK</td><td></td></tr><tr><td><code>bom_code</code></td><td>UK1</td><td></td></tr><tr><td><code>version_no</code></td><td>UK1</td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td><td></td></tr><tr><td><code>is_default</code></td><td></td><td>계획 생성 시 기본 BOM 여부</td></tr><tr><td><code>effective_from</code></td><td></td><td></td></tr><tr><td><code>effective_to</code></td><td></td><td></td></tr><tr><td><code>base_qty</code></td><td></td><td></td></tr><tr><td><code>base_uom_id</code></td><td>FK</td><td></td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(parent_item_id, bom_code, version_no)
+품목당 is_default = true 는 1개만 허용</code></pre></div>
+<p>같은 기간에 활성 BOM이 복수일 때 계획 생성의 기본값은 <code>is_default</code>로 정한다.</p>
+<hr>
+<h2 id="s35">6.2 <code>bom_component</code></h2>
+<p>BOM 구성자재이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th><th>설명</th></tr></thead><tbody><tr><td><code>bom_component_id</code></td><td>PK</td><td>구성 식별자</td></tr><tr><td><code>bom_id</code></td><td>FK</td><td>BOM</td></tr><tr><td><code>component_item_id</code></td><td>FK</td><td>소요자재</td></tr><tr><td><code>routing_operation_id</code></td><td>FK, Nullable</td><td>MES 투입등록(관리) 공정</td></tr><tr><td><code>actual_use_process_id</code></td><td>FK, Nullable</td><td>실물이 사용되는 공정</td></tr><tr><td><code>required_qty</code></td><td></td><td>기준 소요량</td></tr><tr><td><code>uom_id</code></td><td>FK</td><td>단위</td></tr><tr><td><code>scrap_rate</code></td><td></td><td>표준 손실률</td></tr><tr><td><code>is_mandatory</code></td><td></td><td>필수 여부</td></tr><tr><td><code>lot_trace_required</code></td><td></td><td>LOT 추적 여부</td></tr><tr><td><code>backflush_allowed</code></td><td></td><td>자동소비 가능 여부</td></tr><tr><td><code>sequence_no</code></td><td></td><td>표시순서</td></tr></tbody></table></div>
+<hr>
+<h2 id="s36">6.3 <code>material_substitution_rule</code></h2>
+<p>대체자재 규칙이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>substitution_rule_id</code></td><td>PK</td></tr><tr><td><code>bom_component_id</code></td><td>FK</td></tr><tr><td><code>substitute_item_id</code></td><td>FK</td></tr><tr><td><code>priority_no</code></td><td></td></tr><tr><td><code>max_substitute_qty</code></td><td></td></tr><tr><td><code>approval_required</code></td><td></td></tr><tr><td><code>customer_restriction_id</code></td><td>FK, Nullable</td></tr><tr><td><code>effective_from</code></td><td></td></tr><tr><td><code>effective_to</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h1 id="s37">7. 라우팅·공정 기준정보</h1>
+<h2 id="s38">7.1 <code>process</code></h2>
+<p>표준 공정을 관리한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>process_id</code></td><td>PK</td></tr><tr><td><code>process_code</code></td><td>UK</td></tr><tr><td><code>process_name</code></td><td></td></tr><tr><td><code>process_type_code</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h2 id="s39">7.2 <code>routing</code></h2>
+<p>품목별 라우팅 Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>routing_id</code></td><td>PK</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>routing_code</code></td><td>UK1</td></tr><tr><td><code>version_no</code></td><td>UK1</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>effective_from</code></td><td></td></tr><tr><td><code>effective_to</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s40">7.3 <code>routing_operation</code></h2>
+<p>라우팅의 개별 공정단계이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th><th>설명</th></tr></thead><tbody><tr><td><code>routing_operation_id</code></td><td>PK</td><td>공정단계 식별자</td></tr><tr><td><code>routing_id</code></td><td>FK</td><td>라우팅</td></tr><tr><td><code>operation_seq</code></td><td>UK1</td><td>공정순서</td></tr><tr><td><code>process_id</code></td><td>FK</td><td>표준 공정</td></tr><tr><td><code>operation_name</code></td><td></td><td>공정단계명</td></tr><tr><td><code>mes_managed</code></td><td></td><td>MES 관리 여부</td></tr><tr><td><code>material_input_managed</code></td><td></td><td>자재투입 관리</td></tr><tr><td><code>production_result_managed</code></td><td></td><td>생산실적 관리</td></tr><tr><td><code>inspection_managed</code></td><td></td><td>품질검사 관리</td></tr><tr><td><code>output_lot_required</code></td><td></td><td>생산 LOT 생성 여부</td></tr><tr><td><code>equipment_required</code></td><td></td><td>설비 필수</td></tr><tr><td><code>mold_required</code></td><td></td><td>금형 필수</td></tr><tr><td><code>standard_cycle_time_sec</code></td><td></td><td>표준 C/T(초 단위)</td></tr><tr><td><code>standard_yield_rate</code></td><td></td><td>공정 수율(0~1)</td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(routing_id, operation_seq)</code></pre></div>
+<hr>
+<h2 id="s41">7.4 <code>routing_operation_dependency</code></h2>
+<p>분기·병렬 라우팅을 지원하기 위한 공정 의존관계이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>routing_operation_dependency_id</code></td><td>PK</td></tr><tr><td><code>predecessor_operation_id</code></td><td>FK</td></tr><tr><td><code>successor_operation_id</code></td><td>FK</td></tr><tr><td><code>dependency_type_code</code></td><td>FK</td></tr></tbody></table></div>
+<p>단순 직렬 라우팅에서는 순서값으로 계산할 수 있지만, 병렬·합류 공정을 고려하여 별도 관계를 둔다.</p>
+<p>부분 진행 통제는 수량 기준(선행 공정 완료수량 − 기투입수량)으로 관리하므로 완료율 속성은 두지 않는다.</p>
+<hr>
+<h2 id="s42">7.5 <code>equipment</code></h2>
+<p>설비 기준정보이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>equipment_id</code></td><td>PK</td></tr><tr><td><code>plant_id</code></td><td>FK</td></tr><tr><td><code>equipment_code</code></td><td>UK1</td></tr><tr><td><code>equipment_name</code></td><td></td></tr><tr><td><code>equipment_type_code</code></td><td>FK</td></tr><tr><td><code>process_id</code></td><td>FK, Nullable</td></tr><tr><td><code>production_line_id</code></td><td>FK, Nullable</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>calibration_required</code></td><td></td></tr><tr><td><code>last_calibration_date</code></td><td></td></tr><tr><td><code>calibration_due_date</code></td><td></td></tr></tbody></table></div>
+<p>검사장비는 교정 유효기간이 지난 상태로 검사결과를 확정할 수 없다. 교정 이력은 <code>equipment_calibration</code>으로 관리한다.</p>
+<hr>
+<h2 id="s43">7.6 <code>mold</code></h2>
+<p>금형 기준정보이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>mold_id</code></td><td>PK</td></tr><tr><td><code>plant_id</code></td><td>FK</td></tr><tr><td><code>mold_code</code></td><td>UK1</td></tr><tr><td><code>mold_name</code></td><td></td></tr><tr><td><code>cavity_count</code></td><td></td></tr><tr><td><code>guaranteed_shot_count</code></td><td></td></tr><tr><td><code>current_shot_count</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h1 id="s44">8. 작업자·근무조·단말기</h1>
+<h2 id="s45">8.1 <code>worker</code></h2>
+<p>현장 작업자이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>worker_id</code></td><td>PK</td></tr><tr><td><code>worker_no</code></td><td>UK</td></tr><tr><td><code>worker_name</code></td><td></td></tr><tr><td><code>business_unit_id</code></td><td>FK</td></tr><tr><td><code>plant_id</code></td><td>FK</td></tr><tr><td><code>department_id</code></td><td>FK, Nullable</td></tr><tr><td><code>app_user_id</code></td><td>FK, Nullable</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr></tbody></table></div>
+<p><code>app_user_id</code>로 시스템 사용자와 연결하여 실제 작업자와 MES 입력자를 구분한다.</p>
+<hr>
+<h2 id="s46">8.2 <code>shift</code></h2>
+<p>근무조 기준정보이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>shift_id</code></td><td>PK</td></tr><tr><td><code>plant_id</code></td><td>FK</td></tr><tr><td><code>shift_code</code></td><td>UK1</td></tr><tr><td><code>shift_name</code></td><td></td></tr><tr><td><code>start_time</code></td><td></td></tr><tr><td><code>end_time</code></td><td></td></tr><tr><td><code>crosses_midnight</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s47">8.3 <code>terminal</code></h2>
+<p>현장 단말기이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>terminal_id</code></td><td>PK</td></tr><tr><td><code>terminal_code</code></td><td>UK</td></tr><tr><td><code>plant_id</code></td><td>FK</td></tr><tr><td><code>location_id</code></td><td>FK, Nullable</td></tr><tr><td><code>terminal_type_code</code></td><td>FK</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h2 id="s48">8.4 <code>terminal_process</code></h2>
+<p>단말기와 처리 가능 공정을 연결한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>terminal_process_id</code></td><td>PK</td></tr><tr><td><code>terminal_id</code></td><td>FK</td></tr><tr><td><code>process_id</code></td><td>FK</td></tr><tr><td><code>can_input_material</code></td><td></td></tr><tr><td><code>can_input_result</code></td><td></td></tr><tr><td><code>can_input_inspection</code></td><td></td></tr><tr><td><code>can_print_label</code></td><td></td></tr><tr><td><code>can_start_work</code></td><td></td></tr><tr><td><code>can_complete_work</code></td><td></td></tr><tr><td><code>can_cancel_input</code></td><td></td></tr><tr><td><code>can_return_material</code></td><td></td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(terminal_id, process_id)</code></pre></div>
+<hr>
+<h2 id="s49">8.5 <code>worker_qualification</code></h2>
+<p>작업자 자격·인증이다. 공정 수행 자격과 검사자 자격을 관리하며, 자격이 없거나 만료된 작업자의 해당 작업·검사 입력을 제한하는 근거가 된다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>worker_qualification_id</code></td><td>PK</td></tr><tr><td><code>worker_id</code></td><td>FK</td></tr><tr><td><code>qualification_type_code</code></td><td>FK</td></tr><tr><td><code>process_id</code></td><td>FK, Nullable</td></tr><tr><td><code>certificate_no</code></td><td></td></tr><tr><td><code>valid_from</code></td><td></td></tr><tr><td><code>valid_to</code></td><td></td></tr><tr><td><code>certified_by</code></td><td></td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(worker_id, qualification_type_code, process_id, valid_from)</code></pre></div>
+<hr>
+<h1 id="s50">9. 생산계획·작업지시</h1>
+<h2 id="s51">9.1 <code>production_order</code></h2>
+<p>상위 생산오더이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th><th>설명</th></tr></thead><tbody><tr><td><code>production_order_id</code></td><td>PK</td><td></td></tr><tr><td><code>production_order_no</code></td><td>UK</td><td></td></tr><tr><td><code>erp_order_no</code></td><td></td><td></td></tr><tr><td><code>parent_production_order_id</code></td><td>FK, Nullable</td><td>상위(완제품) 생산오더</td></tr><tr><td><code>bom_level</code></td><td></td><td>BOM 전개 단계 (0 = 최상위)</td></tr><tr><td><code>business_unit_id</code></td><td>FK</td><td></td></tr><tr><td><code>plant_id</code></td><td>FK</td><td></td></tr><tr><td><code>item_id</code></td><td>FK</td><td></td></tr><tr><td><code>order_qty</code></td><td></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td><td></td></tr><tr><td><code>due_date</code></td><td></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td><td></td></tr></tbody></table></div>
+<p>반제품 전개 규칙: 완제품 오더에서 다단계 BOM을 전개해 생성한 반제품 오더는 <code>parent_production_order_id</code>로 상위 오더에 연결하고 <code>bom_level</code>에 전개 단계를 기록한다. 완제품 오더의 취소·수량 변경 시 이 연결로 연동 대상 반제품 오더를 식별한다.</p>
+<hr>
+<h2 id="s52">9.2 <code>production_plan</code></h2>
+<p>일자·수량별 생산계획이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>production_plan_id</code></td><td>PK</td></tr><tr><td><code>production_order_id</code></td><td>FK</td></tr><tr><td><code>plan_no</code></td><td>UK</td></tr><tr><td><code>plan_date</code></td><td></td></tr><tr><td><code>planned_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>bom_id</code></td><td>FK</td></tr><tr><td><code>routing_id</code></td><td>FK</td></tr><tr><td><code>planned_line_id</code></td><td>FK, Nullable</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>confirmed_at</code></td><td></td></tr><tr><td><code>confirmed_by</code></td><td>FK</td></tr></tbody></table></div>
+<p>작업지시 생성 이후 BOM·라우팅 버전을 변경하지 않는다.</p>
+<p><code>planned_line_id</code>는 <code>production_line</code>(생산라인·작업구역)을, <code>confirmed_by</code>는 <code>app_user</code>를 참조한다.</p>
+<hr>
+<h2 id="s53">9.3 <code>work_order</code></h2>
+<p>공정별 작업지시이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th><th>설명</th></tr></thead><tbody><tr><td><code>work_order_id</code></td><td>PK</td><td>작업지시 ID</td></tr><tr><td><code>work_order_no</code></td><td>UK</td><td>작업지시번호</td></tr><tr><td><code>production_plan_id</code></td><td>FK</td><td>생산계획</td></tr><tr><td><code>routing_operation_id</code></td><td>FK</td><td>대상 라우팅 공정</td></tr><tr><td><code>item_id</code></td><td>FK</td><td>생산품목</td></tr><tr><td><code>order_qty</code></td><td></td><td>지시수량</td></tr><tr><td><code>uom_id</code></td><td>FK</td><td>단위</td></tr><tr><td><code>work_order_type_code</code></td><td>FK</td><td>일반·재작업·시험생산</td></tr><tr><td><code>parent_work_order_id</code></td><td>FK, Nullable</td><td>분할 원본 작업지시</td></tr><tr><td><code>rework_source_work_order_id</code></td><td>FK, Nullable</td><td>재작업 원본 작업지시</td></tr><tr><td><code>rework_source_lot_id</code></td><td>FK, Nullable</td><td>재작업 원본 생산 LOT</td></tr><tr><td><code>rework_source_nonconformance_id</code></td><td>FK, Nullable</td><td>재작업 근거 부적합</td></tr><tr><td><code>production_line_id</code></td><td>FK, Nullable</td><td>배정 라인·작업구역</td></tr><tr><td><code>responsible_worker_id</code></td><td>FK, Nullable</td><td>책임 작업자</td></tr><tr><td><code>planned_start_at</code></td><td></td><td>계획 시작</td></tr><tr><td><code>planned_end_at</code></td><td></td><td>계획 종료</td></tr><tr><td><code>planned_equipment_id</code></td><td>FK, Nullable</td><td>예정 설비</td></tr><tr><td><code>planned_mold_id</code></td><td>FK, Nullable</td><td>예정 금형</td></tr><tr><td><code>planned_shift_id</code></td><td>FK, Nullable</td><td>예정 근무조</td></tr><tr><td><code>priority_no</code></td><td></td><td>우선순위</td></tr><tr><td><code>default_wip_location_id</code></td><td>FK, Nullable</td><td>재공품 기본 위치</td></tr><tr><td><code>default_fg_location_id</code></td><td>FK, Nullable</td><td>완성품 기본 위치</td></tr><tr><td><code>default_scrap_location_id</code></td><td>FK, Nullable</td><td>스크랩 기본 위치</td></tr><tr><td><code>operation_settings_snapshot</code></td><td></td><td>생성 당시 공정설정 스냅샷</td></tr><tr><td><code>status_code</code></td><td>FK</td><td>작업지시 상태</td></tr><tr><td><code>released_at</code></td><td></td><td>발행일시</td></tr><tr><td><code>completed_at</code></td><td></td><td>작업완료일시</td></tr><tr><td><code>completion_variance_reason_code</code></td><td>FK, Nullable</td><td>미달·초과 완료 사유</td></tr><tr><td><code>closed_at</code></td><td></td><td>마감일시</td></tr></tbody></table></div>
+<p>분할·재작업 규칙:</p>
+<div class="codewrap"><pre><code class="lang-text">분할 자식 작업지시의 order_qty 합계 &lt;= 원본 작업지시 order_qty
+(미작업 잔여수량 기준의 정밀 검증은 애플리케이션 계층에서 수행)
+재작업 지시(work_order_type_code = REWORK)만 rework_source_*를 가질 수 있다.</code></pre></div>
+<p><code>operation_settings_snapshot</code>은 생성 당시 라우팅 공정 설정을 고정하여 기준정보 변경이 기존 지시에 소급되지 않도록 한다.</p>
+<p>기본 위치 3컬럼은 강제가 아니라 현장 단말의 기본값 제시와 오입고 검증에 사용한다.</p>
+<hr>
+<h2 id="s54">9.4 <code>work_order_dependency</code></h2>
+<p>작업지시 선후관계이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>work_order_dependency_id</code></td><td>PK</td></tr><tr><td><code>predecessor_work_order_id</code></td><td>FK</td></tr><tr><td><code>successor_work_order_id</code></td><td>FK</td></tr><tr><td><code>dependency_type_code</code></td><td>FK</td></tr><tr><td><code>required_qty_rule_code</code></td><td>FK</td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(predecessor_work_order_id, successor_work_order_id)</code></pre></div>
+<hr>
+<h2 id="s55">9.5 <code>work_session</code></h2>
+<p>실제 작업 세션이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>work_session_id</code></td><td>PK</td></tr><tr><td><code>work_order_id</code></td><td>FK</td></tr><tr><td><code>session_no</code></td><td>UK1</td></tr><tr><td><code>shift_id</code></td><td>FK</td></tr><tr><td><code>equipment_id</code></td><td>FK, Nullable</td></tr><tr><td><code>mold_id</code></td><td>FK, Nullable</td></tr><tr><td><code>terminal_id</code></td><td>FK</td></tr><tr><td><code>started_at</code></td><td></td></tr><tr><td><code>ended_at</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>stop_reason_code</code></td><td>FK, Nullable</td></tr></tbody></table></div>
+<hr>
+<h2 id="s56">9.6 <code>work_session_worker</code></h2>
+<p>작업 세션 참여 작업자이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>work_session_worker_id</code></td><td>PK</td></tr><tr><td><code>work_session_id</code></td><td>FK</td></tr><tr><td><code>worker_id</code></td><td>FK</td></tr><tr><td><code>worker_role_code</code></td><td>FK</td></tr><tr><td><code>joined_at</code></td><td></td></tr><tr><td><code>left_at</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s57">9.7 <code>work_session_event</code></h2>
+<p>작업 시작·중지·재개·종료 이력이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>work_session_event_id</code></td><td>PK</td></tr><tr><td><code>work_session_id</code></td><td>FK</td></tr><tr><td><code>event_type_code</code></td><td>FK</td></tr><tr><td><code>occurred_at</code></td><td></td></tr><tr><td><code>reason_code</code></td><td>FK, Nullable</td></tr><tr><td><code>performed_by</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h1 id="s58">10. 구매 P/O·입하예정·입하·입고·적치</h1>
+<h2 id="s59">10.1 <code>purchase_order</code></h2>
+<p>구매 P/O Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>purchase_order_id</code></td><td>PK</td></tr><tr><td><code>purchase_order_no</code></td><td>UK</td></tr><tr><td><code>erp_purchase_order_no</code></td><td></td></tr><tr><td><code>supplier_id</code></td><td>FK</td></tr><tr><td><code>business_unit_id</code></td><td>FK</td></tr><tr><td><code>plant_id</code></td><td>FK</td></tr><tr><td><code>order_date</code></td><td></td></tr><tr><td><code>expected_receipt_date</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h2 id="s60">10.2 <code>purchase_order_line</code></h2>
+<p>P/O 품목 Line이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>purchase_order_line_id</code></td><td>PK</td></tr><tr><td><code>purchase_order_id</code></td><td>FK</td></tr><tr><td><code>line_no</code></td><td>UK1</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>ordered_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>received_qty</code></td><td></td></tr><tr><td><code>tolerance_over_qty</code></td><td></td></tr><tr><td><code>tolerance_under_qty</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s61">10.3 <code>asn</code></h2>
+<p>입하예정(ASN) Header이다. 건 단위 납품예정을 관리하며 상태흐름의 "입하예정" 단계를 담당한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>asn_id</code></td><td>PK</td></tr><tr><td><code>asn_no</code></td><td>UK</td></tr><tr><td><code>supplier_id</code></td><td>FK</td></tr><tr><td><code>plant_id</code></td><td>FK</td></tr><tr><td><code>expected_arrival_date</code></td><td></td></tr><tr><td><code>delivery_note_no</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h2 id="s62">10.4 <code>asn_line</code></h2>
+<p>입하예정 품목 Line이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>asn_line_id</code></td><td>PK</td></tr><tr><td><code>asn_id</code></td><td>FK</td></tr><tr><td><code>line_no</code></td><td>UK1</td></tr><tr><td><code>purchase_order_line_id</code></td><td>FK, Nullable</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>expected_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>supplier_lot_no</code></td><td></td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(asn_id, line_no)</code></pre></div>
+<hr>
+<h2 id="s63">10.5 <code>inbound_receipt</code></h2>
+<p>입하 Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>inbound_receipt_id</code></td><td>PK</td></tr><tr><td><code>inbound_receipt_no</code></td><td>UK</td></tr><tr><td><code>supplier_id</code></td><td>FK</td></tr><tr><td><code>plant_id</code></td><td>FK</td></tr><tr><td><code>receipt_datetime</code></td><td></td></tr><tr><td><code>delivery_note_no</code></td><td></td></tr><tr><td><code>vehicle_no</code></td><td></td></tr><tr><td><code>dock_location_id</code></td><td>FK, Nullable</td></tr><tr><td><code>exception_type_code</code></td><td>FK, Nullable</td></tr><tr><td><code>exception_reason</code></td><td></td></tr><tr><td><code>approval_request_id</code></td><td>FK, Nullable</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>received_by</code></td><td>FK</td></tr></tbody></table></div>
+<p>P/O 없는 예외입하(고객사급·무상샘플·긴급입하 등)는 <code>exception_type_code</code>와 사유, 승인 참조를 기록한다. <code>received_by</code>는 <code>app_user</code>를 참조한다.</p>
+<hr>
+<h2 id="s64">10.6 <code>inbound_receipt_line</code></h2>
+<p>입하 품목 Line이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>inbound_receipt_line_id</code></td><td>PK</td></tr><tr><td><code>inbound_receipt_id</code></td><td>FK</td></tr><tr><td><code>line_no</code></td><td>UK1</td></tr><tr><td><code>purchase_order_line_id</code></td><td>FK, Nullable</td></tr><tr><td><code>asn_line_id</code></td><td>FK, Nullable</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>received_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>package_count</code></td><td></td></tr><tr><td><code>supplier_lot_no</code></td><td></td></tr><tr><td><code>supplier_lot_missing</code></td><td></td></tr><tr><td><code>substitute_lot_reason_code</code></td><td>FK, Nullable</td></tr><tr><td><code>manufactured_date</code></td><td></td></tr><tr><td><code>expiry_date</code></td><td></td></tr><tr><td><code>inspection_required</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr></tbody></table></div>
+<p>공급사 LOT가 제공되지 않아 내부 규칙으로 대체 LOT를 생성한 경우 <code>supplier_lot_missing</code>과 생성 사유를 기록한다.</p>
+<hr>
+<h2 id="s65">10.7 <code>inbound_variance</code></h2>
+<p>입하 차이를 기록한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>inbound_variance_id</code></td><td>PK</td></tr><tr><td><code>inbound_receipt_line_id</code></td><td>FK</td></tr><tr><td><code>variance_type_code</code></td><td>FK</td></tr><tr><td><code>variance_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>reason_code</code></td><td>FK</td></tr><tr><td><code>approval_request_id</code></td><td>FK, Nullable</td></tr></tbody></table></div>
+<hr>
+<h2 id="s66">10.8 <code>goods_receipt</code></h2>
+<p>입고 Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>goods_receipt_id</code></td><td>PK</td></tr><tr><td><code>goods_receipt_no</code></td><td>UK</td></tr><tr><td><code>receipt_type_code</code></td><td>FK</td></tr><tr><td><code>plant_id</code></td><td>FK</td></tr><tr><td><code>warehouse_id</code></td><td>FK</td></tr><tr><td><code>receipt_datetime</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>source_document_type_code</code></td><td>FK</td></tr><tr><td><code>source_document_id</code></td><td></td></tr><tr><td><code>reason_code</code></td><td>FK, Nullable</td></tr></tbody></table></div>
+<p>입고 유형:</p>
+<ul><li>구매입고</li><li>생산품입고</li><li>반납입고</li><li>외주입고</li><li>사업부이동입고</li><li>고객반품입고</li></ul>
+<hr>
+<h2 id="s67">10.9 <code>goods_receipt_line</code></h2>
+<p>입고 Line이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>goods_receipt_line_id</code></td><td>PK</td></tr><tr><td><code>goods_receipt_id</code></td><td>FK</td></tr><tr><td><code>line_no</code></td><td>UK1</td></tr><tr><td><code>inbound_receipt_line_id</code></td><td>FK, Nullable</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>lot_id</code></td><td>FK</td></tr><tr><td><code>receipt_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>quality_status_code</code></td><td>FK</td></tr><tr><td><code>inventory_status_code</code></td><td>FK</td></tr><tr><td><code>destination_location_id</code></td><td>FK</td></tr><tr><td><code>original_shipment_lot_allocation_id</code></td><td>FK, Nullable</td></tr><tr><td><code>inventory_transaction_line_id</code></td><td>FK</td></tr></tbody></table></div>
+<p>고객반품 입고 시 <code>original_shipment_lot_allocation_id</code>로 원 출하 LOT를 연결한다.</p>
+<hr>
+<h2 id="s68">10.10 <code>putaway_task</code></h2>
+<p>적치 지시이다. 입고 후 임시 위치(입하장 등)에서 실제 보관 로케이션으로 옮기는 작업을 관리하며, 상태흐름의 "적치대기 → 적치완료" 단계와 미적치 재고 예외조회의 근거가 된다. 분산적치(하나의 입고 Line을 여러 위치에 적치)는 여러 행으로 표현한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th><th>설명</th></tr></thead><tbody><tr><td><code>putaway_task_id</code></td><td>PK</td><td>적치작업 식별자</td></tr><tr><td><code>putaway_task_no</code></td><td>UK</td><td>적치작업번호</td></tr><tr><td><code>goods_receipt_line_id</code></td><td>FK</td><td>입고 근거</td></tr><tr><td><code>item_id</code></td><td>FK</td><td>품목</td></tr><tr><td><code>lot_id</code></td><td>FK</td><td>LOT</td></tr><tr><td><code>task_qty</code></td><td></td><td>적치수량</td></tr><tr><td><code>uom_id</code></td><td>FK</td><td>단위</td></tr><tr><td><code>from_location_id</code></td><td>FK</td><td>출발 위치</td></tr><tr><td><code>recommended_location_id</code></td><td>FK, Nullable</td><td>권장 도착위치</td></tr><tr><td><code>applied_putaway_rule_id</code></td><td>FK, Nullable</td><td>권장 위치 산출에 적용된 규칙</td></tr><tr><td><code>actual_location_id</code></td><td>FK, Nullable</td><td>실제 적치위치(확정 시)</td></tr><tr><td><code>priority_no</code></td><td></td><td>우선순위</td></tr><tr><td><code>assigned_worker_id</code></td><td>FK, Nullable</td><td>담당 작업자</td></tr><tr><td><code>status_code</code></td><td>FK</td><td>상태</td></tr><tr><td><code>completed_at</code></td><td></td><td>적치확정일시</td></tr><tr><td><code>inventory_transaction_line_id</code></td><td>FK, Nullable</td><td>재고 트랜잭션 연결</td></tr></tbody></table></div>
+<hr>
+<h2 id="s69">10.11 <code>putaway_rule</code></h2>
+<p>적치 규칙 기준정보이다. 권장 도착위치 산출의 근거 데이터로, 품목 × 창고(또는 세부 위치) 단위의 수용량과 우선순위를 관리한다. 적치 지시(<code>putaway_task</code>)가 실행이라면 본 테이블은 판단 기준이며, 규칙 변경은 데이터 수정으로 처리되어 로직 하드코딩을 피한다. <code>location</code>의 보관조건·혼재 허용 속성과 조합하여 적용한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th><th>설명</th></tr></thead><tbody><tr><td><code>putaway_rule_id</code></td><td>PK</td><td>규칙 식별자</td></tr><tr><td><code>item_id</code></td><td>FK</td><td>품목</td></tr><tr><td><code>warehouse_id</code></td><td>FK</td><td>창고</td></tr><tr><td><code>location_id</code></td><td>FK, Nullable</td><td>세부 위치(NULL = 창고 수준 규칙)</td></tr><tr><td><code>capacity_qty</code></td><td></td><td>수용량</td></tr><tr><td><code>uom_id</code></td><td>FK</td><td>단위</td></tr><tr><td><code>priority_no</code></td><td></td><td>우선순위</td></tr><tr><td><code>is_active</code></td><td></td><td>사용 여부</td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(item_id, warehouse_id, location_id)</code></pre></div>
+<hr>
+<h1 id="s70">11. LOT 및 재고 논리 모델</h1>
+<h2 id="s71">11.1 <code>lot</code></h2>
+<p>통합 LOT 엔터티이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th><th>설명</th></tr></thead><tbody><tr><td><code>lot_id</code></td><td>PK</td><td>LOT 식별자</td></tr><tr><td><code>lot_no</code></td><td>UK1</td><td>내부 LOT 번호</td></tr><tr><td><code>item_id</code></td><td>FK</td><td>품목</td></tr><tr><td><code>lot_type_code</code></td><td>FK</td><td>자재·반제품·완제품·재작업 등</td></tr><tr><td><code>plant_id</code></td><td>FK</td><td>생성 공장</td></tr><tr><td><code>initial_qty</code></td><td></td><td>최초수량</td></tr><tr><td><code>uom_id</code></td><td>FK</td><td>단위</td></tr><tr><td><code>manufactured_at</code></td><td></td><td>제조·생산일시</td></tr><tr><td><code>expiry_date</code></td><td></td><td>유효기간</td></tr><tr><td><code>source_type_code</code></td><td>FK</td><td>입고·생산·분할·재작업 등</td></tr><tr><td><code>source_id</code></td><td></td><td>생성 근거 식별자</td></tr><tr><td><code>status_code</code></td><td>FK</td><td>LOT 활성·무효 등</td></tr><tr><td><code>parent_lot_id</code></td><td>FK, Nullable</td><td>표시용 비정규화 상위 LOT</td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(plant_id, lot_no)</code></pre></div>
+<p>품질상태와 현재 위치는 <code>lot</code>에 직접 고정하지 않고 재고잔액을 기준으로 관리한다.</p>
+<p><code>parent_lot_id</code>는 단순 분할 조회 편의를 위한 표시용 비정규화 컬럼이며, 계보의 원천은 <code>lot_relation</code>이다.</p>
+<hr>
+<h2 id="s72">11.2 <code>lot_external_identifier</code></h2>
+<p>공급사·ERP·고객·외주처 LOT를 연결한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>lot_external_identifier_id</code></td><td>PK</td></tr><tr><td><code>lot_id</code></td><td>FK</td></tr><tr><td><code>identifier_type_code</code></td><td>FK</td></tr><tr><td><code>external_identifier</code></td><td></td></tr><tr><td><code>partner_id</code></td><td>FK, Nullable</td></tr><tr><td><code>external_system_code</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s73">11.3 <code>inventory_balance</code></h2>
+<p>현재 재고잔액이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th><th>설명</th></tr></thead><tbody><tr><td><code>inventory_balance_id</code></td><td>PK</td><td>잔액 식별자</td></tr><tr><td><code>legal_entity_id</code></td><td>FK</td><td>법인</td></tr><tr><td><code>business_unit_id</code></td><td>FK</td><td>사업부</td></tr><tr><td><code>plant_id</code></td><td>FK</td><td>공장</td></tr><tr><td><code>warehouse_id</code></td><td>FK</td><td>창고</td></tr><tr><td><code>location_id</code></td><td>FK</td><td>로케이션</td></tr><tr><td><code>item_id</code></td><td>FK</td><td>품목</td></tr><tr><td><code>lot_id</code></td><td>FK, Nullable</td><td>LOT</td></tr><tr><td><code>quality_status_code</code></td><td>FK</td><td>품질상태</td></tr><tr><td><code>inventory_status_code</code></td><td>FK</td><td>재고상태</td></tr><tr><td><code>ownership_type_code</code></td><td>FK</td><td>소유구분</td></tr><tr><td><code>owner_partner_id</code></td><td>FK, Nullable</td><td>외부 소유자</td></tr><tr><td><code>on_hand_qty</code></td><td></td><td>현재수량</td></tr><tr><td><code>reserved_qty</code></td><td></td><td>예약수량</td></tr><tr><td><code>picked_qty</code></td><td></td><td>피킹수량</td></tr><tr><td><code>blocked_qty</code></td><td></td><td>사용제한수량</td></tr><tr><td><code>available_qty</code></td><td></td><td>가용수량</td></tr><tr><td><code>uom_id</code></td><td>FK</td><td>단위</td></tr><tr><td><code>last_transaction_at</code></td><td></td><td>최종변경일시</td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(
+  business_unit_id,
+  plant_id,
+  warehouse_id,
+  location_id,
+  item_id,
+  lot_id,
+  quality_status_code,
+  inventory_status_code,
+  ownership_type_code,
+  owner_partner_id
+)</code></pre></div>
+<p><code>on_hand_qty</code>는 품목 정책(<code>item.negative_stock_allowed</code>)이 허용하는 경우에만 음수가 될 수 있다. 음수 상태에서는 예약·피킹·사용제한 수량을 가질 수 없으며, 양수 상태에서는 <code>on_hand_qty &gt;= reserved_qty + picked_qty + blocked_qty</code>를 유지한다.</p>
+<hr>
+<h2 id="s74">11.4 <code>inventory_transaction</code></h2>
+<p>재고 트랜잭션 Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>inventory_transaction_id</code></td><td>PK</td></tr><tr><td><code>transaction_no</code></td><td>UK</td></tr><tr><td><code>transaction_type_code</code></td><td>FK</td></tr><tr><td><code>plant_id</code></td><td>FK</td></tr><tr><td><code>business_date</code></td><td></td></tr><tr><td><code>occurred_at</code></td><td></td></tr><tr><td><code>recorded_at</code></td><td></td></tr><tr><td><code>source_document_type_code</code></td><td>FK</td></tr><tr><td><code>source_document_id</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>idempotency_key</code></td><td>UK</td></tr><tr><td><code>reversal_of_transaction_id</code></td><td>FK, Nullable</td></tr><tr><td><code>reversal_of_business_date</code></td><td>FK, Nullable</td></tr></tbody></table></div>
+<p>취소(역처리) 원본 참조는 <code>(reversal_of_transaction_id, reversal_of_business_date)</code> 복합 참조로 성립한다. 두 컬럼은 함께 NULL이거나 함께 값을 가진다.</p>
+<hr>
+<h2 id="s75">11.5 <code>inventory_transaction_line</code></h2>
+<p>실제 재고 증감 Line이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>inventory_transaction_line_id</code></td><td>PK</td></tr><tr><td><code>inventory_transaction_id</code></td><td>FK</td></tr><tr><td><code>line_no</code></td><td>UK1</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>lot_id</code></td><td>FK, Nullable</td></tr><tr><td><code>qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>from_warehouse_id</code></td><td>FK, Nullable</td></tr><tr><td><code>from_location_id</code></td><td>FK, Nullable</td></tr><tr><td><code>from_quality_status_code</code></td><td>FK, Nullable</td></tr><tr><td><code>from_inventory_status_code</code></td><td>FK, Nullable</td></tr><tr><td><code>to_warehouse_id</code></td><td>FK, Nullable</td></tr><tr><td><code>to_location_id</code></td><td>FK, Nullable</td></tr><tr><td><code>to_quality_status_code</code></td><td>FK, Nullable</td></tr><tr><td><code>to_inventory_status_code</code></td><td>FK, Nullable</td></tr><tr><td><code>ownership_type_code</code></td><td>FK</td></tr><tr><td><code>handling_unit_id</code></td><td>FK, Nullable</td></tr><tr><td><code>from_qty_after_transaction</code></td><td></td></tr><tr><td><code>to_qty_after_transaction</code></td><td></td></tr></tbody></table></div>
+<p>수량은 양수로 저장하고 출발·도착 방향으로 증감을 판정한다.</p>
+<p><code>from/to_qty_after_transaction</code>은 트랜잭션 직후 해당 잔액 차원의 현재수량 스냅샷이다. posting 처리에서 잔액 갱신과 동시에 기록하며, 시점 기준 재고 조회와 감사 대사를 원장 재합산 없이 수행할 수 있게 한다.</p>
+<hr>
+<h2 id="s76">11.6 <code>inventory_reservation</code></h2>
+<p>재고예약이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>inventory_reservation_id</code></td><td>PK</td></tr><tr><td><code>reservation_no</code></td><td>UK</td></tr><tr><td><code>reservation_type_code</code></td><td>FK</td></tr><tr><td><code>source_document_type_code</code></td><td>FK</td></tr><tr><td><code>source_document_id</code></td><td></td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>lot_id</code></td><td>FK, Nullable</td></tr><tr><td><code>warehouse_id</code></td><td>FK</td></tr><tr><td><code>location_id</code></td><td>FK, Nullable</td></tr><tr><td><code>reserved_qty</code></td><td></td></tr><tr><td><code>released_qty</code></td><td></td></tr><tr><td><code>consumed_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h1 id="s77">12. 취급단위</h1>
+<h2 id="s78">12.1 <code>handling_unit</code></h2>
+<p>박스·대차·팔레트를 관리한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>handling_unit_id</code></td><td>PK</td></tr><tr><td><code>handling_unit_no</code></td><td>UK</td></tr><tr><td><code>handling_unit_type_code</code></td><td>FK</td></tr><tr><td><code>parent_handling_unit_id</code></td><td>FK, Nullable</td></tr><tr><td><code>warehouse_id</code></td><td>FK, Nullable</td></tr><tr><td><code>location_id</code></td><td>FK, Nullable</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h2 id="s79">12.2 <code>handling_unit_content</code></h2>
+<p>취급단위에 포함된 LOT와 수량이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>handling_unit_content_id</code></td><td>PK</td></tr><tr><td><code>handling_unit_id</code></td><td>FK</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>lot_id</code></td><td>FK</td></tr><tr><td><code>qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr></tbody></table></div>
+<p>하나의 LOT가 여러 취급단위에 포함될 수 있으므로 다대다 관계를 해소한다.</p>
+<hr>
+<h1 id="s80">13. 생산출고·피킹·현장 인수</h1>
+<h2 id="s81">13.1 <code>material_issue_request</code></h2>
+<p>생산출고 요청 Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>material_issue_request_id</code></td><td>PK</td></tr><tr><td><code>issue_request_no</code></td><td>UK</td></tr><tr><td><code>work_order_id</code></td><td>FK</td></tr><tr><td><code>destination_location_id</code></td><td>FK</td></tr><tr><td><code>required_at</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>requested_by</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h2 id="s82">13.2 <code>material_issue_request_line</code></h2>
+<p>출고 요청 품목이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>material_issue_request_line_id</code></td><td>PK</td></tr><tr><td><code>material_issue_request_id</code></td><td>FK</td></tr><tr><td><code>line_no</code></td><td>UK1</td></tr><tr><td><code>bom_component_id</code></td><td>FK, Nullable</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>requested_qty</code></td><td></td></tr><tr><td><code>issued_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h2 id="s83">13.3 <code>picking_order</code></h2>
+<p>피킹 작업 Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>picking_order_id</code></td><td>PK</td></tr><tr><td><code>picking_order_no</code></td><td>UK</td></tr><tr><td><code>picking_type_code</code></td><td>FK</td></tr><tr><td><code>source_document_type_code</code></td><td>FK</td></tr><tr><td><code>source_document_id</code></td><td></td></tr><tr><td><code>warehouse_id</code></td><td>FK</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>assigned_worker_id</code></td><td>FK, Nullable</td></tr></tbody></table></div>
+<hr>
+<h2 id="s84">13.4 <code>picking_line</code></h2>
+<p>피킹 품목·LOT·로케이션이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>picking_line_id</code></td><td>PK</td></tr><tr><td><code>picking_order_id</code></td><td>FK</td></tr><tr><td><code>line_no</code></td><td>UK1</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>lot_id</code></td><td>FK</td></tr><tr><td><code>location_id</code></td><td>FK</td></tr><tr><td><code>planned_qty</code></td><td></td></tr><tr><td><code>picked_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>inventory_reservation_id</code></td><td>FK, Nullable</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h2 id="s85">13.5 <code>goods_issue</code></h2>
+<p>출고 Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>goods_issue_id</code></td><td>PK</td></tr><tr><td><code>goods_issue_no</code></td><td>UK</td></tr><tr><td><code>issue_type_code</code></td><td>FK</td></tr><tr><td><code>source_document_type_code</code></td><td>FK</td></tr><tr><td><code>source_document_id</code></td><td></td></tr><tr><td><code>source_warehouse_id</code></td><td>FK</td></tr><tr><td><code>destination_type_code</code></td><td>FK</td></tr><tr><td><code>destination_id</code></td><td></td></tr><tr><td><code>issued_at</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>reason_code</code></td><td>FK, Nullable</td></tr><tr><td><code>replacement_expected</code></td><td></td></tr></tbody></table></div>
+<p>출고 유형:</p>
+<ul><li>생산출고</li><li>이동출고</li><li>사업부이동출고</li><li>외주출고</li><li>판매출하</li><li>공급사반품</li><li>폐기출고</li></ul>
+<p>공급사반품 시 반품사유(<code>reason_code</code>)와 대체입고 예정 여부(<code>replacement_expected</code>)를 기록한다.</p>
+<hr>
+<h2 id="s86">13.6 <code>goods_issue_line</code></h2>
+<p>출고 Line이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>goods_issue_line_id</code></td><td>PK</td></tr><tr><td><code>goods_issue_id</code></td><td>FK</td></tr><tr><td><code>line_no</code></td><td>UK1</td></tr><tr><td><code>picking_line_id</code></td><td>FK, Nullable</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>lot_id</code></td><td>FK</td></tr><tr><td><code>issue_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>source_location_id</code></td><td>FK</td></tr><tr><td><code>inventory_transaction_line_id</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h2 id="s87">13.7 <code>shopfloor_receipt</code></h2>
+<p>생산현장 인수 Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>shopfloor_receipt_id</code></td><td>PK</td></tr><tr><td><code>shopfloor_receipt_no</code></td><td>UK</td></tr><tr><td><code>goods_issue_id</code></td><td>FK</td></tr><tr><td><code>work_order_id</code></td><td>FK</td></tr><tr><td><code>destination_location_id</code></td><td>FK</td></tr><tr><td><code>received_at</code></td><td></td></tr><tr><td><code>received_by</code></td><td>FK</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h2 id="s88">13.8 <code>shopfloor_receipt_line</code></h2>
+<p>현장 인수 Line이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>shopfloor_receipt_line_id</code></td><td>PK</td></tr><tr><td><code>shopfloor_receipt_id</code></td><td>FK</td></tr><tr><td><code>goods_issue_line_id</code></td><td>FK</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>lot_id</code></td><td>FK</td></tr><tr><td><code>issued_qty</code></td><td></td></tr><tr><td><code>received_qty</code></td><td></td></tr><tr><td><code>variance_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>variance_reason_code</code></td><td>FK, Nullable</td></tr></tbody></table></div>
+<hr>
+<h1 id="s89">14. 자재투입·사용·반납</h1>
+<h2 id="s90">14.1 <code>material_consumption</code></h2>
+<p>작업지시 자재투입·소비 이벤트이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>material_consumption_id</code></td><td>PK</td></tr><tr><td><code>consumption_no</code></td><td>UK</td></tr><tr><td><code>work_order_id</code></td><td>FK</td></tr><tr><td><code>work_session_id</code></td><td>FK, Nullable</td></tr><tr><td><code>shopfloor_receipt_line_id</code></td><td>FK, Nullable</td></tr><tr><td><code>bom_component_id</code></td><td>FK, Nullable</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>lot_id</code></td><td>FK</td></tr><tr><td><code>consumption_type_code</code></td><td>FK</td></tr><tr><td><code>corrects_consumption_id</code></td><td>FK, Nullable</td></tr><tr><td><code>replaced_consumption_id</code></td><td>FK, Nullable</td></tr><tr><td><code>change_reason_code</code></td><td>FK, Nullable</td></tr><tr><td><code>actual_use_process_id</code></td><td>FK, Nullable</td></tr><tr><td><code>input_qty</code></td><td></td></tr><tr><td><code>actual_consumed_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>entered_qty</code></td><td></td></tr><tr><td><code>entered_uom_id</code></td><td>FK, Nullable</td></tr><tr><td><code>occurred_at</code></td><td></td></tr><tr><td><code>recorded_at</code></td><td></td></tr><tr><td><code>late_entry_reason_code</code></td><td>FK, Nullable</td></tr><tr><td><code>worker_id</code></td><td>FK</td></tr><tr><td><code>terminal_id</code></td><td>FK</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr></tbody></table></div>
+<p><code>consumption_type_code</code>:</p>
+<ul><li>예정투입</li><li>실제투입</li><li>추가투입</li><li>자동소비</li><li>정정</li><li>취소</li></ul>
+<p>정정·취소 레코드는 <code>corrects_consumption_id</code>로 원본 투입을 참조한다. Running Change(생산 중 자재 교체)는 <code>replaced_consumption_id</code>로 교체된 이전 투입을 참조하고 사유를 기록한다. <code>entered_qty</code>/<code>entered_uom_id</code>는 사용자가 입력한 원단위 수량이며, <code>input_qty</code>는 재고단위로 환산한 수량이다. <code>actual_use_process_id</code>는 실물이 사용되는 공정으로, MES 등록 공정(작업지시의 공정)과 구분한다.</p>
+<hr>
+<h2 id="s91">14.2 <code>material_usage_allocation</code></h2>
+<p>자재사용량을 생산실적·생산 LOT에 배분한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>material_usage_allocation_id</code></td><td>PK</td></tr><tr><td><code>material_consumption_id</code></td><td>FK</td></tr><tr><td><code>production_result_id</code></td><td>FK, Nullable</td></tr><tr><td><code>output_lot_id</code></td><td>FK, Nullable</td></tr><tr><td><code>allocated_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>allocation_method_code</code></td><td>FK</td></tr><tr><td><code>trace_accuracy_code</code></td><td>FK</td></tr><tr><td><code>effective_from_at</code></td><td></td></tr><tr><td><code>effective_to_at</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s92">14.3 <code>material_return</code></h2>
+<p>자재 반납 Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>material_return_id</code></td><td>PK</td></tr><tr><td><code>material_return_no</code></td><td>UK</td></tr><tr><td><code>work_order_id</code></td><td>FK</td></tr><tr><td><code>source_location_id</code></td><td>FK</td></tr><tr><td><code>destination_warehouse_id</code></td><td>FK</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>requested_at</code></td><td></td></tr><tr><td><code>received_at</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s93">14.4 <code>material_return_line</code></h2>
+<p>반납 LOT와 수량이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>material_return_line_id</code></td><td>PK</td></tr><tr><td><code>material_return_id</code></td><td>FK</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>lot_id</code></td><td>FK</td></tr><tr><td><code>return_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>package_opened</code></td><td></td></tr><tr><td><code>quality_check_required</code></td><td></td></tr><tr><td><code>return_quality_status_code</code></td><td>FK</td></tr><tr><td><code>inventory_transaction_line_id</code></td><td>FK, Nullable</td></tr></tbody></table></div>
+<hr>
+<h2 id="s94">14.5 <code>material_loss</code></h2>
+<p>자재 폐기·손실이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>material_loss_id</code></td><td>PK</td></tr><tr><td><code>work_order_id</code></td><td>FK</td></tr><tr><td><code>material_consumption_id</code></td><td>FK</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>lot_id</code></td><td>FK</td></tr><tr><td><code>loss_type_code</code></td><td>FK</td></tr><tr><td><code>loss_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>reason_code</code></td><td>FK</td></tr><tr><td><code>occurred_at</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h1 id="s95">15. 생산실적·생산 LOT</h1>
+<h2 id="s96">15.1 <code>production_result</code></h2>
+<p>부분 생산실적이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>production_result_id</code></td><td>PK</td></tr><tr><td><code>production_result_no</code></td><td>UK</td></tr><tr><td><code>work_order_id</code></td><td>FK</td></tr><tr><td><code>work_session_id</code></td><td>FK, Nullable</td></tr><tr><td><code>result_sequence</code></td><td>UK1</td></tr><tr><td><code>corrects_production_result_id</code></td><td>FK, Nullable</td></tr><tr><td><code>good_qty</code></td><td></td></tr><tr><td><code>defect_qty</code></td><td></td></tr><tr><td><code>hold_qty</code></td><td></td></tr><tr><td><code>scrap_qty</code></td><td></td></tr><tr><td><code>rework_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>result_source_code</code></td><td>FK</td></tr><tr><td><code>occurred_at</code></td><td></td></tr><tr><td><code>recorded_at</code></td><td></td></tr><tr><td><code>late_entry_reason_code</code></td><td>FK, Nullable</td></tr><tr><td><code>worker_id</code></td><td>FK</td></tr><tr><td><code>equipment_id</code></td><td>FK, Nullable</td></tr><tr><td><code>mold_id</code></td><td>FK, Nullable</td></tr><tr><td><code>shift_id</code></td><td>FK</td></tr><tr><td><code>terminal_id</code></td><td>FK, Nullable</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>idempotency_key</code></td><td>UK</td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(work_order_id, result_sequence)</code></pre></div>
+<p>정정·취소 실적은 기존 레코드를 덮어쓰지 않고 새 레코드로 생성하며 <code>corrects_production_result_id</code>로 원본 실적을 참조한다.</p>
+<hr>
+<h2 id="s97">15.2 <code>production_result_lot_allocation</code></h2>
+<p>생산실적 양품수량을 생산 LOT에 배분한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>production_result_lot_allocation_id</code></td><td>PK</td></tr><tr><td><code>production_result_id</code></td><td>FK</td></tr><tr><td><code>lot_id</code></td><td>FK</td></tr><tr><td><code>allocated_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr></tbody></table></div>
+<p>수량 제약:</p>
+<div class="codewrap"><pre><code class="lang-text">생산실적별 allocated_qty 합계 ≤ production_result.good_qty</code></pre></div>
+<hr>
+<h2 id="s98">15.3 <code>operation_handover</code></h2>
+<p>선행 공정에서 후속 공정으로 LOT를 인계하는 Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>operation_handover_id</code></td><td>PK</td></tr><tr><td><code>handover_no</code></td><td>UK</td></tr><tr><td><code>from_work_order_id</code></td><td>FK</td></tr><tr><td><code>to_work_order_id</code></td><td>FK</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>handed_over_at</code></td><td></td></tr><tr><td><code>received_at</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s99">15.4 <code>operation_handover_line</code></h2>
+<p>인계 LOT·수량이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>operation_handover_line_id</code></td><td>PK</td></tr><tr><td><code>operation_handover_id</code></td><td>FK</td></tr><tr><td><code>source_lot_id</code></td><td>FK</td></tr><tr><td><code>handover_qty</code></td><td></td></tr><tr><td><code>received_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>source_location_id</code></td><td>FK</td></tr><tr><td><code>destination_location_id</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h2 id="s100">15.5 생산품 입고</h2>
+<p>생산품 입고는 별도 테이블을 만들기보다 다음 구조를 사용한다.</p>
+<div class="codewrap"><pre><code class="lang-text">goods_receipt.receipt_type_code = PRODUCTION
+goods_receipt.source_document_id = work_order_id 또는 production_result_id
+goods_receipt_line.lot_id = 생산 LOT</code></pre></div>
+<p>이를 통해 구매입고·생산입고·반납입고의 재고처리 규칙을 공통화한다.</p>
+<hr>
+<h1 id="s101">16. 품질관리 논리 모델</h1>
+<h2 id="s102">16.1 <code>inspection_plan</code></h2>
+<p>검사계획의 논리적 식별자이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>inspection_plan_id</code></td><td>PK</td></tr><tr><td><code>inspection_plan_code</code></td><td>UK</td></tr><tr><td><code>inspection_plan_name</code></td><td></td></tr><tr><td><code>item_id</code></td><td>FK, Nullable</td></tr><tr><td><code>process_id</code></td><td>FK, Nullable</td></tr><tr><td><code>routing_id</code></td><td>FK, Nullable</td></tr><tr><td><code>inspection_type_code</code></td><td>FK</td></tr><tr><td><code>approved_by</code></td><td>FK, Nullable</td></tr><tr><td><code>approved_at</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s103">16.2 <code>inspection_plan_version</code></h2>
+<p>검사계획 버전이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>inspection_plan_version_id</code></td><td>PK</td></tr><tr><td><code>inspection_plan_id</code></td><td>FK</td></tr><tr><td><code>version_no</code></td><td>UK1</td></tr><tr><td><code>effective_from</code></td><td></td></tr><tr><td><code>effective_to</code></td><td></td></tr><tr><td><code>sampling_method_code</code></td><td>FK</td></tr><tr><td><code>sampling_qty</code></td><td></td></tr><tr><td><code>aql_value</code></td><td></td></tr><tr><td><code>acceptance_number</code></td><td></td></tr><tr><td><code>rejection_number</code></td><td></td></tr><tr><td><code>inspection_frequency_code</code></td><td>FK</td></tr><tr><td><code>frequency_interval_value</code></td><td></td></tr><tr><td><code>frequency_interval_uom_code</code></td><td>FK, Nullable</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr></tbody></table></div>
+<p>AQL·허용 불량수(Ac/Re)로 전체 판정을 자동 계산하고, 시간·수량 주기 검사는 <code>frequency_interval_value</code>와 단위로 주기 파라미터를 관리한다.</p>
+<hr>
+<h2 id="s104">16.3 <code>inspection_item_spec</code></h2>
+<p>검사항목과 규격이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>inspection_item_spec_id</code></td><td>PK</td></tr><tr><td><code>inspection_plan_version_id</code></td><td>FK</td></tr><tr><td><code>sequence_no</code></td><td>UK1</td></tr><tr><td><code>inspection_item_code</code></td><td></td></tr><tr><td><code>inspection_item_name</code></td><td></td></tr><tr><td><code>data_type_code</code></td><td>FK</td></tr><tr><td><code>uom_id</code></td><td>FK, Nullable</td></tr><tr><td><code>target_value</code></td><td></td></tr><tr><td><code>lower_limit</code></td><td></td></tr><tr><td><code>upper_limit</code></td><td></td></tr><tr><td><code>measurement_count</code></td><td></td></tr><tr><td><code>inspection_method_code</code></td><td>FK, Nullable</td></tr><tr><td><code>default_inspection_equipment_id</code></td><td>FK, Nullable</td></tr><tr><td><code>required_flag</code></td><td></td></tr><tr><td><code>automatic_judgment</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s105">16.4 <code>inspection_request</code></h2>
+<p>검사대상이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>inspection_request_id</code></td><td>PK</td></tr><tr><td><code>inspection_request_no</code></td><td>UK</td></tr><tr><td><code>inspection_type_code</code></td><td>FK</td></tr><tr><td><code>inspection_plan_version_id</code></td><td>FK</td></tr><tr><td><code>target_type_code</code></td><td>FK</td></tr><tr><td><code>target_id</code></td><td></td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>lot_id</code></td><td>FK, Nullable</td></tr><tr><td><code>work_order_id</code></td><td>FK, Nullable</td></tr><tr><td><code>production_result_id</code></td><td>FK, Nullable</td></tr><tr><td><code>target_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>coverage_from_at</code></td><td></td></tr><tr><td><code>coverage_to_at</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>requested_at</code></td><td></td></tr></tbody></table></div>
+<p><code>coverage_from_at</code>/<code>coverage_to_at</code>은 검사결과가 적용되는 생산 시간구간을 지정한다(주기검사).</p>
+<p><code>target_type_code + target_id</code>는 입하 Line, LOT, 작업지시, 생산실적, 출하 등을 참조한다.</p>
+<p>물리적 모델링 단계에서 다형 FK를 유지할지 대상별 연결 테이블로 분리할지 결정한다.</p>
+<hr>
+<h2 id="s106">16.5 <code>inspection_result</code></h2>
+<p>검사 실행 Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>inspection_result_id</code></td><td>PK</td></tr><tr><td><code>inspection_result_no</code></td><td>UK</td></tr><tr><td><code>inspection_request_id</code></td><td>FK</td></tr><tr><td><code>inspection_round</code></td><td></td></tr><tr><td><code>inspected_qty</code></td><td></td></tr><tr><td><code>accepted_qty</code></td><td></td></tr><tr><td><code>rejected_qty</code></td><td></td></tr><tr><td><code>held_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>overall_judgment_code</code></td><td>FK</td></tr><tr><td><code>inspector_id</code></td><td>FK</td></tr><tr><td><code>inspected_at</code></td><td></td></tr><tr><td><code>confirmed_at</code></td><td></td></tr><tr><td><code>terminal_id</code></td><td>FK, Nullable</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>previous_result_id</code></td><td>FK, Nullable</td></tr><tr><td><code>reinspection_reason_code</code></td><td>FK, Nullable</td></tr><tr><td><code>idempotency_key</code></td><td>UK</td></tr></tbody></table></div>
+<p>검사실적도 생산실적·자재투입과 동일하게 멱등키를 갖는다. 재검사는 <code>previous_result_id</code>로 이전 결과를 참조하고 사유를 기록한다.</p>
+<hr>
+<h2 id="s107">16.6 <code>inspection_measurement</code></h2>
+<p>검사항목별 측정값이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>inspection_measurement_id</code></td><td>PK</td></tr><tr><td><code>inspection_result_id</code></td><td>FK</td></tr><tr><td><code>inspection_item_spec_id</code></td><td>FK</td></tr><tr><td><code>sample_no</code></td><td></td></tr><tr><td><code>numeric_value</code></td><td></td></tr><tr><td><code>text_value</code></td><td></td></tr><tr><td><code>boolean_value</code></td><td></td></tr><tr><td><code>judgment_code</code></td><td>FK</td></tr><tr><td><code>measured_at</code></td><td></td></tr><tr><td><code>inspection_equipment_id</code></td><td>FK, Nullable</td></tr></tbody></table></div>
+<hr>
+<h2 id="s108">16.7 <code>defect_record</code></h2>
+<p>불량현상을 기록한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>defect_record_id</code></td><td>PK</td></tr><tr><td><code>production_result_id</code></td><td>FK, Nullable</td></tr><tr><td><code>inspection_result_id</code></td><td>FK, Nullable</td></tr><tr><td><code>work_order_id</code></td><td>FK</td></tr><tr><td><code>lot_id</code></td><td>FK, Nullable</td></tr><tr><td><code>defect_code_id</code></td><td>FK</td></tr><tr><td><code>suspected_cause_code_id</code></td><td>FK, Nullable</td></tr><tr><td><code>confirmed_cause_code_id</code></td><td>FK, Nullable</td></tr><tr><td><code>responsibility_type_code</code></td><td>FK, Nullable</td></tr><tr><td><code>responsible_department_id</code></td><td>FK, Nullable</td></tr><tr><td><code>worker_id</code></td><td>FK, Nullable</td></tr><tr><td><code>defect_description</code></td><td></td></tr><tr><td><code>defect_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>occurrence_process_id</code></td><td>FK</td></tr><tr><td><code>detection_process_id</code></td><td>FK</td></tr><tr><td><code>equipment_id</code></td><td>FK, Nullable</td></tr><tr><td><code>mold_id</code></td><td>FK, Nullable</td></tr><tr><td><code>occurred_at</code></td><td></td></tr><tr><td><code>detected_at</code></td><td></td></tr></tbody></table></div>
+<p>불량현상(<code>defect_code</code>)과 원인(<code>cause_code</code>)은 분리 관리하며, 추정원인과 확정원인을 구분하여 기록한다.</p>
+<hr>
+<h2 id="s109">16.8 <code>defect_code</code></h2>
+<p>불량현상 기준정보이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>defect_code_id</code></td><td>PK</td></tr><tr><td><code>defect_code</code></td><td>UK</td></tr><tr><td><code>defect_name</code></td><td></td></tr><tr><td><code>parent_defect_code_id</code></td><td>FK, Nullable</td></tr><tr><td><code>process_id</code></td><td>FK, Nullable</td></tr></tbody></table></div>
+<hr>
+<h2 id="s110">16.9 <code>nonconformance</code></h2>
+<p>부적합 관리 Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>nonconformance_id</code></td><td>PK</td></tr><tr><td><code>nonconformance_no</code></td><td>UK</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>work_order_id</code></td><td>FK, Nullable</td></tr><tr><td><code>inspection_result_id</code></td><td>FK, Nullable</td></tr><tr><td><code>severity_code</code></td><td>FK</td></tr><tr><td><code>description</code></td><td></td></tr><tr><td><code>responsible_department_id</code></td><td>FK, Nullable</td></tr><tr><td><code>action_description</code></td><td></td></tr><tr><td><code>action_owner_id</code></td><td>FK, Nullable</td></tr><tr><td><code>action_due_date</code></td><td></td></tr><tr><td><code>action_completed_at</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>opened_at</code></td><td></td></tr><tr><td><code>closed_at</code></td><td></td></tr></tbody></table></div>
+<p>정식 CAPA는 2차 범위이나 조치내용·담당자·기한·완료 여부는 부적합 건에 최소한으로 기록한다.</p>
+<hr>
+<h2 id="s111">16.10 <code>nonconformance_lot</code></h2>
+<p>부적합과 LOT·수량을 연결한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>nonconformance_lot_id</code></td><td>PK</td></tr><tr><td><code>nonconformance_id</code></td><td>FK</td></tr><tr><td><code>lot_id</code></td><td>FK</td></tr><tr><td><code>affected_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>quality_status_before_code</code></td><td>FK</td></tr><tr><td><code>quality_status_after_code</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h2 id="s112">16.11 <code>disposition_decision</code></h2>
+<p>부적합 처리결정이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>disposition_decision_id</code></td><td>PK</td></tr><tr><td><code>nonconformance_id</code></td><td>FK</td></tr><tr><td><code>disposition_type_code</code></td><td>FK</td></tr><tr><td><code>decision_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>reason</code></td><td></td></tr><tr><td><code>decided_by</code></td><td>FK</td></tr><tr><td><code>decided_at</code></td><td></td></tr><tr><td><code>approval_request_id</code></td><td>FK, Nullable</td></tr></tbody></table></div>
+<hr>
+<h2 id="s113">16.12 <code>concession</code></h2>
+<p>특채정보이다. 단순 판정이 아니라 사용범위 통제 데이터로, 허용 작업지시·공정·고객·수량·기간에 한정하여 투입·출하 시 검증한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>concession_id</code></td><td>PK</td></tr><tr><td><code>concession_no</code></td><td>UK</td></tr><tr><td><code>nonconformance_id</code></td><td>FK</td></tr><tr><td><code>lot_id</code></td><td>FK</td></tr><tr><td><code>approved_qty</code></td><td></td></tr><tr><td><code>consumed_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>valid_from</code></td><td></td></tr><tr><td><code>valid_to</code></td><td></td></tr><tr><td><code>allowed_work_order_id</code></td><td>FK, Nullable</td></tr><tr><td><code>allowed_process_id</code></td><td>FK, Nullable</td></tr><tr><td><code>allowed_customer_id</code></td><td>FK, Nullable</td></tr><tr><td><code>approval_request_id</code></td><td>FK</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr></tbody></table></div>
+<p>수량 제약:</p>
+<div class="codewrap"><pre><code class="lang-text">consumed_qty &lt;= approved_qty</code></pre></div>
+<p>승인(<code>approval_request_id</code>)은 필수이다. 유효기간 만료 임박 시 알림 대상이 된다.</p>
+<hr>
+<h2 id="s114">16.13 <code>cause_code</code></h2>
+<p>불량 원인 기준정보이다. 불량현상(<code>defect_code</code>)과 분리하여 관리한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>cause_code_id</code></td><td>PK</td></tr><tr><td><code>cause_code</code></td><td>UK</td></tr><tr><td><code>cause_name</code></td><td></td></tr><tr><td><code>parent_cause_code_id</code></td><td>FK, Nullable</td></tr><tr><td><code>process_id</code></td><td>FK, Nullable</td></tr></tbody></table></div>
+<hr>
+<h2 id="s115">16.14 <code>sorting_result</code></h2>
+<p>선별 실행 결과이다. 처리결정(선별)의 실제 수행 내역과 수량 분해, 결과 LOT를 기록한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>sorting_result_id</code></td><td>PK</td></tr><tr><td><code>disposition_decision_id</code></td><td>FK</td></tr><tr><td><code>sorted_qty</code></td><td></td></tr><tr><td><code>good_qty</code></td><td></td></tr><tr><td><code>defect_qty</code></td><td></td></tr><tr><td><code>hold_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>sorting_criteria</code></td><td></td></tr><tr><td><code>worker_id</code></td><td>FK</td></tr><tr><td><code>started_at</code></td><td></td></tr><tr><td><code>ended_at</code></td><td></td></tr><tr><td><code>good_lot_id</code></td><td>FK, Nullable</td></tr><tr><td><code>defect_lot_id</code></td><td>FK, Nullable</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr></tbody></table></div>
+<p>수량 제약:</p>
+<div class="codewrap"><pre><code class="lang-text">good_qty + defect_qty + hold_qty &lt;= sorted_qty</code></pre></div>
+<hr>
+<h2 id="s116">16.15 <code>equipment_calibration</code></h2>
+<p>검사장비 교정 이력이다. 교정 유효기간이 지난 장비로 검사결과를 확정하려는 경우 경고 또는 차단하는 근거 데이터가 된다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>equipment_calibration_id</code></td><td>PK</td></tr><tr><td><code>equipment_id</code></td><td>FK</td></tr><tr><td><code>calibration_date</code></td><td>UK1</td></tr><tr><td><code>result_code</code></td><td>FK</td></tr><tr><td><code>valid_until</code></td><td></td></tr><tr><td><code>certificate_no</code></td><td></td></tr><tr><td><code>calibrated_by</code></td><td>FK, Nullable</td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(equipment_id, calibration_date)</code></pre></div>
+<hr>
+<h1 id="s117">17. LOT 계보 및 추적성</h1>
+<h2 id="s118">17.1 <code>lot_relation</code></h2>
+<p>LOT 간 다대다 계보관계이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th><th>설명</th></tr></thead><tbody><tr><td><code>lot_relation_id</code></td><td>PK</td><td>관계 식별자</td></tr><tr><td><code>source_lot_id</code></td><td>FK</td><td>원본 LOT</td></tr><tr><td><code>target_lot_id</code></td><td>FK</td><td>파생 LOT</td></tr><tr><td><code>relation_type_code</code></td><td>FK</td><td>투입·분할·병합·재작업 등</td></tr><tr><td><code>relation_qty</code></td><td></td><td>관계수량</td></tr><tr><td><code>uom_id</code></td><td>FK</td><td>단위</td></tr><tr><td><code>source_event_type_code</code></td><td>FK</td><td>관계 생성 근거</td></tr><tr><td><code>source_event_id</code></td><td></td><td>원본 이벤트 ID</td></tr><tr><td><code>allocation_method_code</code></td><td>FK</td><td>직접·비례·시간기준 등</td></tr><tr><td><code>trace_accuracy_code</code></td><td>FK</td><td>정확·추정·미확정</td></tr><tr><td><code>occurred_at</code></td><td></td><td>발생일시</td></tr></tbody></table></div>
+<p>제약조건:</p>
+<div class="codewrap"><pre><code class="lang-text">source_lot_id != target_lot_id</code></pre></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(source_lot_id, target_lot_id, relation_type_code,
+       source_event_type_code, source_event_id)</code></pre></div>
+<p>LOT 관계 생성 시 순환관계를 검증한다(DB constraint trigger).</p>
+<hr>
+<h2 id="s119">17.2 LOT 관계 생성 원칙</h2>
+<p>LOT 관계는 다음 원본 이벤트에서 생성한다. 관계유형은 최소 12종을 지원한다.</p>
+<div class="tablewrap"><table><thead><tr><th>원본 이벤트</th><th>관계 유형</th></tr></thead><tbody><tr><td>자재투입</td><td>투입됨 <code>CONSUMED_INTO</code></td></tr><tr><td>생산실적</td><td>생산됨 <code>PRODUCED_FROM</code></td></tr><tr><td>공정 인계</td><td>공정 인계됨 <code>TRANSFERRED_TO</code></td></tr><tr><td>LOT 분할</td><td>분할됨 <code>SPLIT_FROM</code></td></tr><tr><td>LOT 병합</td><td>병합됨 <code>MERGED_INTO</code></td></tr><tr><td>재작업</td><td>재작업됨 <code>REWORKED_FROM</code></td></tr><tr><td>포장</td><td>포장됨 <code>PACKED_INTO</code></td></tr><tr><td>출하 LOT 구성</td><td>출하구성됨 <code>SHIPPED_AS</code></td></tr><tr><td>라벨 재부여</td><td>라벨 재부여됨 <code>RELABELED_AS</code></td></tr><tr><td>잔량 분리</td><td>잔량 분리됨 <code>REMAINDER_FROM</code></td></tr><tr><td>외주 출고</td><td>외주 출고됨 <code>SENT_TO_SUBCONTRACTOR</code></td></tr><tr><td>외주 입고</td><td>외주 입고됨 <code>RETURNED_FROM_SUBCONTRACTOR</code></td></tr></tbody></table></div>
+<p>사용자가 근거 이벤트 없이 임의로 관계를 생성하는 것은 제한한다.</p>
+<hr>
+<h2 id="s120">17.3 <code>serial_number</code></h2>
+<p>개별 일련번호를 관리한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>serial_number_id</code></td><td>PK</td></tr><tr><td><code>serial_no</code></td><td>UK</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>lot_id</code></td><td>FK</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>produced_at</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s121">17.4 <code>serial_component_relation</code></h2>
+<p>부품과 완제품 일련번호 관계이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>serial_component_relation_id</code></td><td>PK</td></tr><tr><td><code>parent_serial_number_id</code></td><td>FK</td></tr><tr><td><code>component_serial_number_id</code></td><td>FK</td></tr><tr><td><code>work_order_id</code></td><td>FK</td></tr><tr><td><code>assembled_at</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s122">17.5 <code>lot_hold</code></h2>
+<p>LOT 보류이다. 특정 LOT의 전량 또는 일부 수량을 사용 중지하고, 사유·해제조건과 해제 이력을 보존한다. <code>lot.status_code</code>만으로는 부분수량 보류와 이력을 표현할 수 없어 별도 관리한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th><th>설명</th></tr></thead><tbody><tr><td><code>lot_hold_id</code></td><td>PK</td><td>보류 식별자</td></tr><tr><td><code>lot_id</code></td><td>FK</td><td>대상 LOT</td></tr><tr><td><code>hold_qty</code></td><td></td><td>보류수량(NULL=전량)</td></tr><tr><td><code>uom_id</code></td><td>FK, Nullable</td><td>단위</td></tr><tr><td><code>reason_code</code></td><td>FK</td><td>보류 사유</td></tr><tr><td><code>release_condition</code></td><td></td><td>해제 조건</td></tr><tr><td><code>status_code</code></td><td>FK</td><td>상태</td></tr><tr><td><code>held_by</code></td><td>FK, Nullable</td><td>보류 처리자</td></tr><tr><td><code>held_at</code></td><td></td><td>보류일시</td></tr><tr><td><code>released_by</code></td><td>FK, Nullable</td><td>해제 처리자</td></tr><tr><td><code>released_at</code></td><td></td><td>해제일시</td></tr></tbody></table></div>
+<hr>
+<h2 id="s123">17.6 <code>impact_analysis</code></h2>
+<p>영향범위 분석 스냅샷이다. 리콜·품질사고 시 정·역방향 추적 분석의 시점, 조건, 결과를 보존한다. 대규모 리콜 사건관리(회수수량·고객통지)는 2차 범위이며, 본 테이블은 분석 스냅샷까지 담당한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th><th>설명</th></tr></thead><tbody><tr><td><code>impact_analysis_id</code></td><td>PK</td><td>분석 식별자</td></tr><tr><td><code>analysis_no</code></td><td>UK</td><td>분석번호</td></tr><tr><td><code>source_lot_id</code></td><td>FK</td><td>기준 LOT</td></tr><tr><td><code>direction_code</code></td><td>FK</td><td>FORWARD·BACKWARD·BOTH</td></tr><tr><td><code>analysis_condition</code></td><td></td><td>분석 조건</td></tr><tr><td><code>analyzed_at</code></td><td></td><td>분석일시</td></tr><tr><td><code>analyzed_by</code></td><td>FK, Nullable</td><td>분석자</td></tr><tr><td><code>affected_lot_count</code></td><td></td><td>영향 LOT 수</td></tr><tr><td><code>result_summary</code></td><td></td><td>분석결과 스냅샷</td></tr><tr><td><code>status_code</code></td><td>FK</td><td>상태</td></tr></tbody></table></div>
+<hr>
+<h1 id="s124">18. 재고이동·사업부·외부창고</h1>
+<h2 id="s125">18.1 <code>stock_transfer</code></h2>
+<p>재고이동 Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>stock_transfer_id</code></td><td>PK</td></tr><tr><td><code>stock_transfer_no</code></td><td>UK</td></tr><tr><td><code>transfer_type_code</code></td><td>FK</td></tr><tr><td><code>from_business_unit_id</code></td><td>FK</td></tr><tr><td><code>to_business_unit_id</code></td><td>FK</td></tr><tr><td><code>from_warehouse_id</code></td><td>FK</td></tr><tr><td><code>to_warehouse_id</code></td><td>FK</td></tr><tr><td><code>requested_at</code></td><td></td></tr><tr><td><code>shipped_at</code></td><td></td></tr><tr><td><code>received_at</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr></tbody></table></div>
+<p>이동 유형:</p>
+<ul><li>로케이션 이동</li><li>창고 간 이동</li><li>사업부 간 이동</li><li>공장 간 이동</li><li>외부창고 이동</li><li>외부창고 회수</li></ul>
+<hr>
+<h2 id="s126">18.2 <code>stock_transfer_line</code></h2>
+<p>재고이동 Line이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>stock_transfer_line_id</code></td><td>PK</td></tr><tr><td><code>stock_transfer_id</code></td><td>FK</td></tr><tr><td><code>line_no</code></td><td>UK1</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>lot_id</code></td><td>FK</td></tr><tr><td><code>requested_qty</code></td><td></td></tr><tr><td><code>shipped_qty</code></td><td></td></tr><tr><td><code>received_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>from_location_id</code></td><td>FK</td></tr><tr><td><code>to_location_id</code></td><td>FK</td></tr><tr><td><code>issue_transaction_line_id</code></td><td>FK, Nullable</td></tr><tr><td><code>receipt_transaction_line_id</code></td><td>FK, Nullable</td></tr></tbody></table></div>
+<hr>
+<h1 id="s127">19. 외주관리</h1>
+<h2 id="s128">19.1 <code>subcontract_order</code></h2>
+<p>외주 작업지시이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>subcontract_order_id</code></td><td>PK</td></tr><tr><td><code>subcontract_order_no</code></td><td>UK</td></tr><tr><td><code>work_order_id</code></td><td>FK, Nullable</td></tr><tr><td><code>partner_id</code></td><td>FK</td></tr><tr><td><code>process_id</code></td><td>FK</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>order_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>expected_return_date</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h2 id="s129">19.2 <code>subcontract_issue</code></h2>
+<p>외주출고와 외주오더를 연결한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>subcontract_issue_id</code></td><td>PK</td></tr><tr><td><code>subcontract_order_id</code></td><td>FK</td></tr><tr><td><code>goods_issue_id</code></td><td>FK</td></tr><tr><td><code>issued_at</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s130">19.3 <code>subcontract_receipt</code></h2>
+<p>외주입고와 원 출고 LOT를 연결한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>subcontract_receipt_id</code></td><td>PK</td></tr><tr><td><code>subcontract_order_id</code></td><td>FK</td></tr><tr><td><code>goods_receipt_id</code></td><td>FK</td></tr><tr><td><code>supplier_lot_no</code></td><td></td></tr><tr><td><code>received_at</code></td><td></td></tr></tbody></table></div>
+<p>외주 입고 LOT와 원본 출고 LOT 사이에는 <code>lot_relation</code>을 생성한다.</p>
+<hr>
+<h2 id="s131">19.4 <code>subcontract_reconciliation</code></h2>
+<p>외주 수량 정산이다. 다음 관계식의 유형별 차이수량과 정산확정을 기록한다.</p>
+<div class="codewrap"><pre><code class="lang-text">출고수량 = 입고수량 + 잔량 + 불량 + 폐기 + 분실 + 조정</code></pre></div>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>subcontract_reconciliation_id</code></td><td>PK</td></tr><tr><td><code>subcontract_order_id</code></td><td>FK</td></tr><tr><td><code>settlement_seq</code></td><td>UK1</td></tr><tr><td><code>reconciled_at</code></td><td></td></tr><tr><td><code>issued_qty</code></td><td></td></tr><tr><td><code>received_good_qty</code></td><td></td></tr><tr><td><code>received_defect_qty</code></td><td></td></tr><tr><td><code>scrap_qty</code></td><td></td></tr><tr><td><code>lost_qty</code></td><td></td></tr><tr><td><code>adjusted_qty</code></td><td></td></tr><tr><td><code>remaining_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>confirmed_by</code></td><td>FK, Nullable</td></tr><tr><td><code>confirmed_at</code></td><td></td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(subcontract_order_id, settlement_seq)</code></pre></div>
+<hr>
+<h1 id="s132">20. 출하관리</h1>
+<h2 id="s133">20.1 <code>sales_order</code></h2>
+<p>판매오더 Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>sales_order_id</code></td><td>PK</td></tr><tr><td><code>sales_order_no</code></td><td>UK</td></tr><tr><td><code>erp_sales_order_no</code></td><td></td></tr><tr><td><code>customer_id</code></td><td>FK</td></tr><tr><td><code>ship_to_partner_id</code></td><td>FK</td></tr><tr><td><code>order_date</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h2 id="s134">20.2 <code>sales_order_line</code></h2>
+<p>판매오더 Line이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>sales_order_line_id</code></td><td>PK</td></tr><tr><td><code>sales_order_id</code></td><td>FK</td></tr><tr><td><code>line_no</code></td><td>UK1</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>ordered_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>requested_delivery_date</code></td><td></td></tr><tr><td><code>shipped_qty</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s135">20.3 <code>shipment_request</code></h2>
+<p>출하요청 Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>shipment_request_id</code></td><td>PK</td></tr><tr><td><code>shipment_request_no</code></td><td>UK</td></tr><tr><td><code>customer_id</code></td><td>FK</td></tr><tr><td><code>ship_to_partner_id</code></td><td>FK</td></tr><tr><td><code>requested_ship_date</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h2 id="s136">20.4 <code>shipment_request_line</code></h2>
+<p>출하요청 Line이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>shipment_request_line_id</code></td><td>PK</td></tr><tr><td><code>shipment_request_id</code></td><td>FK</td></tr><tr><td><code>sales_order_line_id</code></td><td>FK, Nullable</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>requested_qty</code></td><td></td></tr><tr><td><code>allocated_qty</code></td><td></td></tr><tr><td><code>shipped_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>customer_lot_requirement</code></td><td></td></tr><tr><td><code>shipping_inspection_required</code></td><td></td></tr><tr><td><code>minimum_remaining_shelf_life_days</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s137">20.5 <code>shipment</code></h2>
+<p>실제 출하 Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>shipment_id</code></td><td>PK</td></tr><tr><td><code>shipment_no</code></td><td>UK</td></tr><tr><td><code>shipment_request_id</code></td><td>FK</td></tr><tr><td><code>warehouse_id</code></td><td>FK</td></tr><tr><td><code>vehicle_no</code></td><td></td></tr><tr><td><code>driver_name</code></td><td></td></tr><tr><td><code>seal_no</code></td><td></td></tr><tr><td><code>transport_document_no</code></td><td></td></tr><tr><td><code>loading_worker_id</code></td><td>FK, Nullable</td></tr><tr><td><code>carrier_id</code></td><td>FK, Nullable</td></tr><tr><td><code>loaded_at</code></td><td></td></tr><tr><td><code>shipped_at</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>erp_delivery_no</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s138">20.6 <code>shipment_line</code></h2>
+<p>출하 품목 Line이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>shipment_line_id</code></td><td>PK</td></tr><tr><td><code>shipment_id</code></td><td>FK</td></tr><tr><td><code>shipment_request_line_id</code></td><td>FK</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>shipped_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>goods_issue_line_id</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h2 id="s139">20.7 <code>shipment_lot_allocation</code></h2>
+<p>출하 Line과 생산 LOT를 연결한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>shipment_lot_allocation_id</code></td><td>PK</td></tr><tr><td><code>shipment_line_id</code></td><td>FK</td></tr><tr><td><code>lot_id</code></td><td>FK</td></tr><tr><td><code>handling_unit_id</code></td><td>FK, Nullable</td></tr><tr><td><code>allocated_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr></tbody></table></div>
+<p>이를 통해 하나의 출하 Line에 여러 생산 LOT를 연결할 수 있다.</p>
+<hr>
+<h1 id="s140">21. 재고실사·조정</h1>
+<h2 id="s141">21.1 <code>inventory_count</code></h2>
+<p>재고실사 Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>inventory_count_id</code></td><td>PK</td></tr><tr><td><code>inventory_count_no</code></td><td>UK</td></tr><tr><td><code>count_type_code</code></td><td>FK</td></tr><tr><td><code>warehouse_id</code></td><td>FK</td></tr><tr><td><code>planned_date</code></td><td></td></tr><tr><td><code>blind_count</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr></tbody></table></div>
+<hr>
+<h2 id="s142">21.2 <code>inventory_count_line</code></h2>
+<p>실사 대상 및 결과이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>inventory_count_line_id</code></td><td>PK</td></tr><tr><td><code>inventory_count_id</code></td><td>FK</td></tr><tr><td><code>location_id</code></td><td>FK</td></tr><tr><td><code>item_id</code></td><td>FK</td></tr><tr><td><code>lot_id</code></td><td>FK, Nullable</td></tr><tr><td><code>system_qty</code></td><td></td></tr><tr><td><code>counted_qty</code></td><td></td></tr><tr><td><code>variance_qty</code></td><td></td></tr><tr><td><code>uom_id</code></td><td>FK</td></tr><tr><td><code>variance_reason_code</code></td><td>FK</td></tr><tr><td><code>counted_by</code></td><td>FK</td></tr><tr><td><code>counted_at</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s143">21.3 <code>inventory_adjustment</code></h2>
+<p>재고조정 Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>inventory_adjustment_id</code></td><td>PK</td></tr><tr><td><code>inventory_adjustment_no</code></td><td>UK</td></tr><tr><td><code>inventory_count_id</code></td><td>FK, Nullable</td></tr><tr><td><code>reason_code</code></td><td>FK</td></tr><tr><td><code>approval_request_id</code></td><td>FK, Nullable</td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>adjusted_at</code></td><td></td></tr></tbody></table></div>
+<p>실제 수량변경은 <code>inventory_transaction</code>의 조정 트랜잭션으로 생성한다.</p>
+<hr>
+<h1 id="s144">22. 승인·예외·첨부·감사·공통 지원</h1>
+<h2 id="s145">22.1 <code>approval_request</code></h2>
+<p>공통 승인요청 Header이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>approval_request_id</code></td><td>PK</td></tr><tr><td><code>approval_request_no</code></td><td>UK</td></tr><tr><td><code>approval_type_code</code></td><td>FK</td></tr><tr><td><code>target_type_code</code></td><td>FK</td></tr><tr><td><code>target_id</code></td><td></td></tr><tr><td><code>requested_by</code></td><td>FK</td></tr><tr><td><code>requested_at</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>reason</code></td><td></td></tr></tbody></table></div>
+<p><code>requested_by</code>는 <code>app_user</code>를 참조한다.</p>
+<hr>
+<h2 id="s146">22.2 <code>approval_step</code></h2>
+<p>승인단계이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>approval_step_id</code></td><td>PK</td></tr><tr><td><code>approval_request_id</code></td><td>FK</td></tr><tr><td><code>step_no</code></td><td>UK1</td></tr><tr><td><code>approver_id</code></td><td>FK</td></tr><tr><td><code>decision_code</code></td><td>FK</td></tr><tr><td><code>decision_at</code></td><td></td></tr><tr><td><code>decision_comment</code></td><td></td></tr></tbody></table></div>
+<p><code>approver_id</code>는 <code>app_user</code>를 참조한다. 승인단계 구성은 <code>approval_route</code> 기준정보에서 생성한다.</p>
+<hr>
+<h2 id="s147">22.3 <code>exception_case</code></h2>
+<p>통합 예외업무이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>exception_case_id</code></td><td>PK</td></tr><tr><td><code>exception_case_no</code></td><td>UK</td></tr><tr><td><code>exception_type_code</code></td><td>FK</td></tr><tr><td><code>severity_code</code></td><td>FK</td></tr><tr><td><code>target_type_code</code></td><td>FK</td></tr><tr><td><code>target_id</code></td><td></td></tr><tr><td><code>assigned_department_id</code></td><td>FK, Nullable</td></tr><tr><td><code>assigned_user_id</code></td><td>FK, Nullable</td></tr><tr><td><code>due_at</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>resolution</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s148">22.4 <code>attachment</code></h2>
+<p>업무 첨부파일이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>attachment_id</code></td><td>PK</td></tr><tr><td><code>target_type_code</code></td><td>FK</td></tr><tr><td><code>target_id</code></td><td></td></tr><tr><td><code>file_name</code></td><td></td></tr><tr><td><code>storage_key</code></td><td></td></tr><tr><td><code>mime_type</code></td><td></td></tr><tr><td><code>file_size</code></td><td></td></tr><tr><td><code>checksum_sha256</code></td><td></td></tr><tr><td><code>uploaded_by</code></td><td>FK</td></tr><tr><td><code>uploaded_at</code></td><td></td></tr></tbody></table></div>
+<p><code>uploaded_by</code>는 <code>app_user</code>를 참조한다.</p>
+<hr>
+<h2 id="s149">22.5 <code>audit_event</code></h2>
+<p>감사이력이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>audit_event_id</code></td><td>PK</td></tr><tr><td><code>target_type_code</code></td><td>FK</td></tr><tr><td><code>target_id</code></td><td></td></tr><tr><td><code>event_type_code</code></td><td>FK</td></tr><tr><td><code>before_value</code></td><td></td></tr><tr><td><code>after_value</code></td><td></td></tr><tr><td><code>reason</code></td><td></td></tr><tr><td><code>performed_by</code></td><td>FK</td></tr><tr><td><code>terminal_id</code></td><td>FK, Nullable</td></tr><tr><td><code>occurred_at</code></td><td></td></tr></tbody></table></div>
+<p><code>performed_by</code>는 <code>app_user</code>를 참조한다(적재량 특성상 물리 FK는 선언하지 않고 애플리케이션에서 검증).</p>
+<hr>
+<h2 id="s150">22.6 <code>approval_route</code></h2>
+<p>승인경로 기준정보이다. 업무유형·사업부·수량(금액) 구간별로 승인단계를 설정한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>approval_route_id</code></td><td>PK</td></tr><tr><td><code>approval_type_code</code></td><td>FK</td></tr><tr><td><code>business_unit_id</code></td><td>FK, Nullable</td></tr><tr><td><code>min_value</code></td><td></td></tr><tr><td><code>max_value</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h2 id="s151">22.7 <code>approval_route_step</code></h2>
+<p>승인경로 단계이다. 승인자는 사용자·역할·부서 중 하나로 지정한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>approval_route_step_id</code></td><td>PK</td></tr><tr><td><code>approval_route_id</code></td><td>FK</td></tr><tr><td><code>step_no</code></td><td>UK1</td></tr><tr><td><code>approver_type_code</code></td><td>FK</td></tr><tr><td><code>approver_user_id</code></td><td>FK, Nullable</td></tr><tr><td><code>approver_role_id</code></td><td>FK, Nullable</td></tr><tr><td><code>approver_department_id</code></td><td>FK, Nullable</td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(approval_route_id, step_no)</code></pre></div>
+<hr>
+<h2 id="s152">22.8 <code>document_issue_log</code></h2>
+<p>라벨·검사성적서(COA)·추적성 증빙의 발행/재발행 이력이다. 재발행은 같은 대상에 <code>issue_seq</code>를 증가시켜 기록하며 새로운 LOT를 생성하지 않는다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th><th>설명</th></tr></thead><tbody><tr><td><code>document_issue_log_id</code></td><td>PK</td><td>발행이력 식별자</td></tr><tr><td><code>document_type_code</code></td><td>FK</td><td>LABEL·COA·TRACE_REPORT</td></tr><tr><td><code>target_type_code</code></td><td>FK</td><td>발행 대상 유형</td></tr><tr><td><code>target_id</code></td><td></td><td>발행 대상</td></tr><tr><td><code>lot_id</code></td><td>FK, Nullable</td><td>관련 LOT</td></tr><tr><td><code>issue_seq</code></td><td>UK1</td><td>발행 회차(1=최초, 2+=재발행)</td></tr><tr><td><code>reissue_reason_code</code></td><td>FK, Nullable</td><td>재발행 사유(재발행 시 필수)</td></tr><tr><td><code>issued_by</code></td><td>FK</td><td>발행자</td></tr><tr><td><code>issued_at</code></td><td></td><td>발행일시</td></tr><tr><td><code>terminal_id</code></td><td>FK, Nullable</td><td>발행 단말기</td></tr><tr><td><code>printer_name</code></td><td></td><td>프린터</td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(document_type_code, target_type_code, target_id, issue_seq)</code></pre></div>
+<hr>
+<h2 id="s153">22.9 <code>operation_policy</code></h2>
+<p>운영정책 파라미터이다. 초과생산 정책, FIFO 위반 정책, 초과투입 허용범위, 사후입력 허용시간, 생산 LOT 생성시점, 품목별 LOT 정책 등을 프로그램 수정 없이 설정으로 관리한다. 적용범위는 사업부·공장·품목·공정 조합으로 지정하며, 구체 범위가 상위 범위에 우선한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>operation_policy_id</code></td><td>PK</td></tr><tr><td><code>policy_code</code></td><td>FK</td></tr><tr><td><code>business_unit_id</code></td><td>FK, Nullable</td></tr><tr><td><code>plant_id</code></td><td>FK, Nullable</td></tr><tr><td><code>item_id</code></td><td>FK, Nullable</td></tr><tr><td><code>process_id</code></td><td>FK, Nullable</td></tr><tr><td><code>value_text</code></td><td></td></tr><tr><td><code>value_numeric</code></td><td></td></tr><tr><td><code>value_boolean</code></td><td></td></tr><tr><td><code>effective_from</code></td><td></td></tr><tr><td><code>effective_to</code></td><td></td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(policy_code, business_unit_id, plant_id, item_id, process_id, effective_from)</code></pre></div>
+<p><code>policy_code</code>는 <code>OPERATION_POLICY</code> 코드그룹으로 시드가 확정되었다(총 14종). ERPNext manufacturing_settings 대응 10종(초과생산 허용율, 초과불출 허용, 여유자재 이송율, 자동소비 기준, 실소비 직접입력 허용, BOM 기준 투입수량 검증, 공정 간 최소 간격, 세션 시간기록 강제, 작업지시 수정 허용, 휴일 생산 허용)과 자체 요구 4종 (사후입력 허용시간, 생산 LOT 생성시점, FIFO 위반 처리, 실적 확정 방식)이다.</p>
+<hr>
+<h2 id="s154">22.10 <code>numbering_rule</code></h2>
+<p>채번규칙이다. LOT 번호와 업무번호(<code>*_no</code>)의 생성규칙을 문서유형·공장·LOT 유형별로 설정한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th><th>설명</th></tr></thead><tbody><tr><td><code>numbering_rule_id</code></td><td>PK</td><td>규칙 식별자</td></tr><tr><td><code>document_type_code</code></td><td>FK</td><td>문서유형</td></tr><tr><td><code>plant_id</code></td><td>FK, Nullable</td><td>공장</td></tr><tr><td><code>lot_type_code</code></td><td>FK, Nullable</td><td>LOT 유형(LOT 채번 시)</td></tr><tr><td><code>pattern</code></td><td></td><td>예: WO-{PLANT}-{YYMMDD}-{SEQ4}</td></tr><tr><td><code>reset_cycle_code</code></td><td>FK</td><td>시퀀스 리셋 주기</td></tr></tbody></table></div>
+<hr>
+<h2 id="s155">22.11 <code>numbering_counter</code></h2>
+<p>채번 시퀀스 상태이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>numbering_counter_id</code></td><td>PK</td></tr><tr><td><code>numbering_rule_id</code></td><td>FK</td></tr><tr><td><code>period_key</code></td><td>UK1</td></tr><tr><td><code>last_value</code></td><td></td></tr></tbody></table></div>
+<p>유일조건:</p>
+<div class="codewrap"><pre><code class="lang-text">UNIQUE(numbering_rule_id, period_key)</code></pre></div>
+<hr>
+<h1 id="s156">23. ERP·외부시스템 연계</h1>
+<h2 id="s157">23.1 <code>integration_message</code></h2>
+<p>연계 송수신 메시지이다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>integration_message_id</code></td><td>PK</td></tr><tr><td><code>message_key</code></td><td>UK</td></tr><tr><td><code>interface_code</code></td><td>FK</td></tr><tr><td><code>direction_code</code></td><td>FK</td></tr><tr><td><code>target_type_code</code></td><td>FK</td></tr><tr><td><code>target_id</code></td><td></td></tr><tr><td><code>payload</code></td><td></td></tr><tr><td><code>status_code</code></td><td>FK</td></tr><tr><td><code>retry_count</code></td><td></td></tr><tr><td><code>last_error_message</code></td><td></td></tr><tr><td><code>created_at</code></td><td></td></tr><tr><td><code>available_at</code></td><td></td></tr><tr><td><code>sent_at</code></td><td></td></tr><tr><td><code>completed_at</code></td><td></td></tr><tr><td><code>locked_at</code></td><td></td></tr><tr><td><code>locked_by</code></td><td></td></tr></tbody></table></div>
+<p>Outbox 패턴으로 동작한다. <code>payload</code>는 전송 본문을 직접 보관하고, <code>available_at</code>·<code>locked_at</code>·<code>locked_by</code>로 재시도와 워커 간 경합을 제어한다.</p>
+<hr>
+<h2 id="s158">23.2 <code>external_document_reference</code></h2>
+<p>MES 문서와 ERP 문서를 연결한다.</p>
+<div class="tablewrap"><table><thead><tr><th>컬럼</th><th>키</th></tr></thead><tbody><tr><td><code>external_document_reference_id</code></td><td>PK</td></tr><tr><td><code>target_type_code</code></td><td>FK</td></tr><tr><td><code>target_id</code></td><td></td></tr><tr><td><code>external_system_code</code></td><td></td></tr><tr><td><code>external_document_type_code</code></td><td>FK</td></tr><tr><td><code>external_document_no</code></td><td></td></tr></tbody></table></div>
+<hr>
+<h1 id="s159">24. 핵심 관계 요약</h1>
+<h2 id="s160">24.1 생산 관계</h2>
+<div class="codewrap"><pre><code class="lang-text">production_order 1 ── N production_plan
+production_plan 1 ── N work_order
+routing_operation 1 ── N work_order
+work_order 1 ── N work_session
+work_order 1 ── N production_result
+production_result N ── M lot</code></pre></div>
+<p>다대다 해소:</p>
+<div class="codewrap"><pre><code class="lang-text">production_result_lot_allocation</code></pre></div>
+<hr>
+<h2 id="s161">24.2 자재사용 관계</h2>
+<div class="codewrap"><pre><code class="lang-text">work_order 1 ── N material_consumption
+lot 1 ── N material_consumption
+
+material_consumption N ── M production_result
+material_consumption N ── M output lot</code></pre></div>
+<p>다대다 해소:</p>
+<div class="codewrap"><pre><code class="lang-text">material_usage_allocation</code></pre></div>
+<hr>
+<h2 id="s162">24.3 품질 관계</h2>
+<div class="codewrap"><pre><code class="lang-text">inspection_plan 1 ── N inspection_plan_version
+inspection_plan_version 1 ── N inspection_item_spec
+inspection_request 1 ── N inspection_result
+inspection_result 1 ── N inspection_measurement
+inspection_result 1 ── N defect_record
+nonconformance N ── M lot</code></pre></div>
+<p>다대다 해소:</p>
+<div class="codewrap"><pre><code class="lang-text">nonconformance_lot</code></pre></div>
+<hr>
+<h2 id="s163">24.4 LOT 계보 관계</h2>
+<div class="codewrap"><pre><code class="lang-text">lot N ── M lot</code></pre></div>
+<p>자기참조 다대다 해소:</p>
+<div class="codewrap"><pre><code class="lang-text">lot_relation</code></pre></div>
+<hr>
+<h2 id="s164">24.5 출하 관계</h2>
+<div class="codewrap"><pre><code class="lang-text">shipment 1 ── N shipment_line
+shipment_line N ── M lot</code></pre></div>
+<p>다대다 해소:</p>
+<div class="codewrap"><pre><code class="lang-text">shipment_lot_allocation</code></pre></div>
+<hr>
+<h1 id="s165">25. 핵심 무결성 규칙</h1>
+<h2 id="s166">25.1 작업지시</h2>
+<div class="codewrap"><pre><code class="lang-text">한 작업지시는 하나의 routing_operation만 참조한다.
+MES 미관리 routing_operation에는 일반 작업지시를 생성하지 않는다.
+마감된 작업지시는 일반 사용자가 변경할 수 없다.
+분할 자식 작업지시의 지시수량 합계는 원본 지시수량을 초과할 수 없다.
+재작업 지시만 rework_source_*를 가질 수 있다.</code></pre></div>
+<hr>
+<h2 id="s167">25.2 자재투입</h2>
+<div class="codewrap"><pre><code class="lang-text">material_consumption.input_qty &gt; 0
+material_consumption.lot.item_id = material_consumption.item_id
+실제 투입량은 생산현장 가용수량을 초과할 수 없다.
+필수 LOT 자재는 lot_id 없이 투입할 수 없다.</code></pre></div>
+<hr>
+<h2 id="s168">25.3 생산실적</h2>
+<div class="codewrap"><pre><code class="lang-text">good_qty, defect_qty, hold_qty, scrap_qty, rework_qty &gt;= 0
+생산실적은 하나의 work_order에 속한다.
+후속 공정 실적은 선행 공정 가용수량을 초과할 수 없다.</code></pre></div>
+<hr>
+<h2 id="s169">25.4 생산 LOT</h2>
+<div class="codewrap"><pre><code class="lang-text">생산실적 LOT 배분수량 합계는 양품수량을 초과할 수 없다.
+생산 LOT 최초수량은 연결된 유효 생산실적 배분수량과 일치해야 한다.</code></pre></div>
+<hr>
+<h2 id="s170">25.5 품질</h2>
+<div class="codewrap"><pre><code class="lang-text">accepted_qty + rejected_qty + held_qty = inspected_qty
+필수 검사항목 미입력 시 검사결과 확정 불가
+불합격·보류재고는 일반 출고·투입·출하 불가</code></pre></div>
+<hr>
+<h2 id="s171">25.6 재고</h2>
+<div class="codewrap"><pre><code class="lang-text">가용수량 = 현재수량 - 예약수량 - 피킹수량 - 사용제한수량
+가용수량 이상 예약 불가
+가용수량 이상 출고 불가
+모든 재고변경은 inventory_transaction을 가져야 한다.
+원장(inventory_transaction)은 수정·삭제하지 않고 역트랜잭션으로 정정한다.
+음수재고는 품목 정책이 허용하는 경우에만 발생할 수 있다.</code></pre></div>
+<hr>
+<h2 id="s172">25.7 LOT 계보</h2>
+<div class="codewrap"><pre><code class="lang-text">source_lot_id와 target_lot_id는 같을 수 없다.
+LOT 관계는 순환할 수 없다.
+분할된 LOT 수량 합계는 원본 분할수량과 일치해야 한다.</code></pre></div>
+<hr>
+<h1 id="s173">26. 논리적 수량 책임</h1>
+<div class="tablewrap"><table><thead><tr><th>수량</th><th>원본 테이블</th></tr></thead><tbody><tr><td>생산 지시수량</td><td><code>work_order.order_qty</code></td></tr><tr><td>양품·불량·보류 생산수량</td><td><code>production_result</code></td></tr><tr><td>생산 LOT 구성수량</td><td><code>production_result_lot_allocation</code></td></tr><tr><td>실제 자재투입량</td><td><code>material_consumption</code></td></tr><tr><td>생산 LOT별 자재사용량</td><td><code>material_usage_allocation</code></td></tr><tr><td>현재 창고재고</td><td><code>inventory_balance</code></td></tr><tr><td>재고 증감원장</td><td><code>inventory_transaction_line</code></td></tr><tr><td>후속 공정 인계수량</td><td><code>operation_handover_line</code></td></tr><tr><td>품질 합격·불합격수량</td><td><code>inspection_result</code></td></tr><tr><td>출하 LOT 수량</td><td><code>shipment_lot_allocation</code></td></tr></tbody></table></div>
+<p>같은 수량을 여러 테이블에서 원본값으로 중복 관리하지 않는다.</p>
+<hr>
+<h1 id="s174">27. 주요 상태코드</h1>
+<h2 id="s175">27.1 작업지시 상태</h2>
+<div class="codewrap"><pre><code class="lang-text">DRAFT
+RELEASED
+WAITING
+IN_PROGRESS
+PAUSED
+ON_HOLD
+WORK_COMPLETED
+CLOSED
+CANCELLED
+FORCE_TERMINATED</code></pre></div>
+<hr>
+<h2 id="s176">27.2 품질상태</h2>
+<div class="codewrap"><pre><code class="lang-text">UNINSPECTED
+PENDING_INSPECTION
+ACCEPTED
+REJECTED
+ON_HOLD
+CONCESSION
+PENDING_REINSPECTION
+SCRAPPED</code></pre></div>
+<hr>
+<h2 id="s177">27.3 재고상태</h2>
+<div class="codewrap"><pre><code class="lang-text">AVAILABLE
+RESERVED
+PICKING
+IN_TRANSIT
+SHOPFLOOR
+PENDING_PUTAWAY
+QUARANTINE
+SHIPPING_STAGED
+CONSUMED
+SHIPPED
+SCRAPPED</code></pre></div>
+<p>v3 물리 DDL은 이 중 핵심 4종(AVAILABLE, IN_TRANSIT, ON_HOLD, BLOCKED)을 <code>INVENTORY_STATUS</code> 코드그룹 시드로 포함한다. <code>IN_TRANSIT</code>은 창고 간 이동의 출고(shipped)~입고(received) 구간 재고를 표현한다. 전체 목록은 시드 설계에서 확정한다.</p>
+<hr>
+<h2 id="s178">27.4 입하·입고 상태</h2>
+<div class="codewrap"><pre><code class="lang-text">EXPECTED
+ARRIVED
+REGISTERED
+PENDING_INSPECTION
+RECEIPT_PENDING
+RECEIVED
+PUTAWAY_PENDING
+COMPLETED
+CANCELLED</code></pre></div>
+<hr>
+<h2 id="s179">27.5 출하 상태</h2>
+<div class="codewrap"><pre><code class="lang-text">REQUESTED
+ALLOCATED
+PICKING
+PICKED
+PENDING_INSPECTION
+STAGED
+LOADED
+SHIPPED
+CANCELLED</code></pre></div>
+<hr>
+<h1 id="s180">28. 정규화 검토</h1>
+<h2 id="s181">28.1 제1정규형</h2>
+<p>반복 컬럼을 사용하지 않는다.</p>
+<p>잘못된 예:</p>
+<div class="codewrap"><pre><code class="lang-text">material_lot_1
+material_lot_2
+material_lot_3</code></pre></div>
+<p>적절한 구조:</p>
+<div class="codewrap"><pre><code class="lang-text">material_consumption</code></pre></div>
+<hr>
+<h2 id="s182">28.2 제2정규형</h2>
+<p>Line 테이블의 속성은 전체 키에 종속되도록 한다.</p>
+<p>예:</p>
+<ul><li>입하 Header: 공급사, 차량, 입하일시</li><li>입하 Line: 품목, LOT, 수량</li></ul>
+<hr>
+<h2 id="s183">28.3 제3정규형</h2>
+<p>품목명·공급사명·창고명 등을 업무 트랜잭션마다 중복 저장하지 않는다.</p>
+<p>다만 감사·증빙을 위해 당시 값을 보존해야 하는 경우 스냅샷 컬럼 또는 문서 출력 스냅샷을 별도로 둘 수 있다.</p>
+<hr>
+<h1 id="s184">29. 다형 참조 사용 주의</h1>
+<p>다음 공통 테이블은 여러 업무대상을 참조한다.</p>
+<ul><li><code>approval_request</code></li><li><code>attachment</code></li><li><code>audit_event</code></li><li><code>exception_case</code></li><li><code>integration_message</code></li><li><code>inspection_request</code></li><li><code>document_issue_log</code></li></ul>
+<p>논리적으로는 다음 구조를 가진다.</p>
+<div class="codewrap"><pre><code class="lang-text">target_type_code
+target_id</code></pre></div>
+<p>장점:</p>
+<ul><li>공통 기능 구현이 단순하다.</li></ul>
+<p>단점:</p>
+<ul><li>일반 FK 제약조건을 직접 적용하기 어렵다.</li></ul>
+<p>물리 모델링 시 다음 중 하나를 선택한다.</p>
+<ol><li>다형 참조 유지 및 애플리케이션 검증</li><li>업무 영역별 연결 테이블 추가</li><li>공통 <code>business_object</code> 식별자 체계 도입</li></ol>
+<p>핵심 품질·재고·생산 관계에는 다형 참조를 최소화하고 명시적 FK를 사용하는 것이 적절하다.</p>
+<hr>
+<h1 id="s185">30. 주요 트랜잭션 경계</h1>
+<h2 id="s186">작업지시 생성</h2>
+<div class="codewrap"><pre><code class="lang-text">production_plan 확정
++ work_order 전체 생성
++ work_order_dependency 생성</code></pre></div>
+<p>하나의 논리적 트랜잭션으로 처리한다.</p>
+<hr>
+<h2 id="s187">자재투입</h2>
+<div class="codewrap"><pre><code class="lang-text">material_consumption 생성
++ inventory_transaction 생성
++ inventory_balance 차감
++ audit_event 생성</code></pre></div>
+<p>하나의 논리적 트랜잭션으로 처리한다.</p>
+<hr>
+<h2 id="s188">생산실적</h2>
+<div class="codewrap"><pre><code class="lang-text">production_result 생성
++ work_order 누적실적 갱신
++ production_result_lot_allocation 생성
++ lot 생성 또는 수량연결
++ 후속 공정 가용수량 반영</code></pre></div>
+<hr>
+<h2 id="s189">품질판정</h2>
+<div class="codewrap"><pre><code class="lang-text">inspection_result 확정
++ 품질상태 변경
++ inventory_transaction 상태변경
++ inventory_balance 품질구분 이동
++ 필요 시 nonconformance 생성</code></pre></div>
+<hr>
+<h2 id="s190">재고이동</h2>
+<div class="codewrap"><pre><code class="lang-text">stock_transfer 상태변경
++ inventory_transaction 생성
++ 출발 재고 차감
++ 이동중 또는 도착 재고 증가</code></pre></div>
+<hr>
+<h2 id="s191">출하</h2>
+<div class="codewrap"><pre><code class="lang-text">shipment 확정
++ shipment_lot_allocation 확정
++ goods_issue 생성
++ inventory_transaction 생성
++ 재고 차감
++ ERP 연계 메시지 생성</code></pre></div>
+<hr>
+<h1 id="s192">31. 논리 모델 핵심 테이블 목록</h1>
+<h2 id="s193">기준정보</h2>
+<ul><li><code>code_group</code></li><li><code>code_value</code></li><li><code>legal_entity</code></li><li><code>business_unit</code></li><li><code>plant</code></li><li><code>production_line</code></li><li><code>department</code></li><li><code>warehouse</code></li><li><code>location</code></li><li><code>partner</code></li><li><code>partner_role</code></li><li><code>uom</code></li><li><code>item</code></li><li><code>item_uom_conversion</code></li><li><code>item_external_code</code></li><li><code>item_bu_item_map</code></li><li><code>process</code></li><li><code>equipment</code></li><li><code>mold</code></li><li><code>worker</code></li><li><code>worker_qualification</code></li><li><code>shift</code></li><li><code>terminal</code></li><li><code>terminal_process</code></li></ul>
+<h2 id="s194">사용자·권한</h2>
+<ul><li><code>app_user</code></li><li><code>role</code></li><li><code>role_permission</code></li><li><code>user_role</code></li><li><code>user_data_scope</code></li></ul>
+<h2 id="s195">제품·공정</h2>
+<ul><li><code>bom</code></li><li><code>bom_component</code></li><li><code>material_substitution_rule</code></li><li><code>routing</code></li><li><code>routing_operation</code></li><li><code>routing_operation_dependency</code></li></ul>
+<h2 id="s196">생산계획·실행</h2>
+<ul><li><code>production_order</code></li><li><code>production_plan</code></li><li><code>work_order</code></li><li><code>work_order_dependency</code></li><li><code>work_session</code></li><li><code>work_session_worker</code></li><li><code>work_session_event</code></li><li><code>production_result</code></li><li><code>production_result_lot_allocation</code></li><li><code>operation_handover</code></li><li><code>operation_handover_line</code></li></ul>
+<h2 id="s197">구매·입하·입고·적치</h2>
+<ul><li><code>purchase_order</code></li><li><code>purchase_order_line</code></li><li><code>asn</code></li><li><code>asn_line</code></li><li><code>inbound_receipt</code></li><li><code>inbound_receipt_line</code></li><li><code>inbound_variance</code></li><li><code>goods_receipt</code></li><li><code>goods_receipt_line</code></li><li><code>putaway_rule</code></li><li><code>putaway_task</code></li></ul>
+<h2 id="s198">재고·물류</h2>
+<ul><li><code>lot</code></li><li><code>lot_external_identifier</code></li><li><code>inventory_balance</code></li><li><code>inventory_transaction</code></li><li><code>inventory_transaction_line</code></li><li><code>inventory_reservation</code></li><li><code>handling_unit</code></li><li><code>handling_unit_content</code></li><li><code>material_issue_request</code></li><li><code>material_issue_request_line</code></li><li><code>picking_order</code></li><li><code>picking_line</code></li><li><code>goods_issue</code></li><li><code>goods_issue_line</code></li><li><code>shopfloor_receipt</code></li><li><code>shopfloor_receipt_line</code></li><li><code>stock_transfer</code></li><li><code>stock_transfer_line</code></li><li><code>inventory_count</code></li><li><code>inventory_count_line</code></li><li><code>inventory_adjustment</code></li></ul>
+<h2 id="s199">자재투입</h2>
+<ul><li><code>material_consumption</code></li><li><code>material_usage_allocation</code></li><li><code>material_return</code></li><li><code>material_return_line</code></li><li><code>material_loss</code></li></ul>
+<h2 id="s200">품질</h2>
+<ul><li><code>inspection_plan</code></li><li><code>inspection_plan_version</code></li><li><code>inspection_item_spec</code></li><li><code>inspection_request</code></li><li><code>inspection_result</code></li><li><code>inspection_measurement</code></li><li><code>defect_code</code></li><li><code>cause_code</code></li><li><code>defect_record</code></li><li><code>nonconformance</code></li><li><code>nonconformance_lot</code></li><li><code>disposition_decision</code></li><li><code>sorting_result</code></li><li><code>concession</code></li><li><code>equipment_calibration</code></li></ul>
+<h2 id="s201">LOT 추적</h2>
+<ul><li><code>lot_relation</code></li><li><code>lot_hold</code></li><li><code>impact_analysis</code></li><li><code>serial_number</code></li><li><code>serial_component_relation</code></li></ul>
+<h2 id="s202">외주·출하</h2>
+<ul><li><code>subcontract_order</code></li><li><code>subcontract_issue</code></li><li><code>subcontract_receipt</code></li><li><code>subcontract_reconciliation</code></li><li><code>sales_order</code></li><li><code>sales_order_line</code></li><li><code>shipment_request</code></li><li><code>shipment_request_line</code></li><li><code>shipment</code></li><li><code>shipment_line</code></li><li><code>shipment_lot_allocation</code></li></ul>
+<h2 id="s203">공통관리</h2>
+<ul><li><code>approval_request</code></li><li><code>approval_step</code></li><li><code>approval_route</code></li><li><code>approval_route_step</code></li><li><code>exception_case</code></li><li><code>attachment</code></li><li><code>document_issue_log</code></li><li><code>operation_policy</code></li><li><code>numbering_rule</code></li><li><code>numbering_counter</code></li><li><code>audit_event</code></li><li><code>integration_message</code></li><li><code>external_document_reference</code></li></ul>
+<hr>
+<h1 id="s204">32. 논리 모델 최종 구조</h1>
+<div class="codewrap"><pre><code class="lang-text">구매 P/O
+→ 입하예정
+→ 입하
+→ 수입검사
+→ 입고
+→ 적치
+→ 자재 LOT
+→ 재고잔액
+→ 생산출고 요청
+→ 예약·피킹
+→ 생산출고
+→ 현장 인수
+→ 자재투입
+→ 생산실적
+→ 생산 LOT
+→ 공정 인계
+→ 품질검사
+→ 생산품 입고
+→ 창고·사업부·외주 이동
+→ 출하요청
+→ 피킹·출하검사
+→ 출하
+→ 고객</code></pre></div>
+<p>LOT 추적 핵심 연결은 다음과 같다.</p>
+<div class="codewrap"><pre><code class="lang-text">공급사 LOT
+→ 내부 자재 LOT
+→ material_consumption
+→ material_usage_allocation
+→ production_result
+→ production_result_lot_allocation
+→ 생산 LOT
+→ shipment_lot_allocation
+→ 고객 출하</code></pre></div>
+<p>재고 핵심 연결은 다음과 같다.</p>
+<div class="codewrap"><pre><code class="lang-text">업무문서
+→ inventory_transaction
+→ inventory_transaction_line
+→ inventory_balance</code></pre></div>
+<p>이 논리 모델을 기반으로 물리적 모델링에서는 PostgreSQL 기준 자료형, PK 생성방식, FK, 인덱스, 파티셔닝, 이력보관, 동시성 잠금 및 DDL을 구체화한다.</p>
+  </article>
+  <div class="pager"><a class="pv" href="3-1.html"><span>이전</span>개념적 모델링</a><a class="nx" href="3-3.html"><span>다음</span>물리적 모델링</a></div>
+</main>
+</body>
+</html>
