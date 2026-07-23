@@ -1,0 +1,1048 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>개념적 모델링 · MES 데이터 모델링 v3</title>
+<style>:root{
+  --bg:#F4F5F6; --surface:#FFFFFF; --surface-2:#EDEFF1; --surface-3:#E4E7EA;
+  --ink:#14181B; --ink-2:#5A6570; --ink-3:#8B959D;
+  --rule:#DCE0E4; --rule-strong:#C3CAD0;
+  --accent:#A9660A; --tint-accent:#F7ECD9;
+  --blue:#28558F; --green:#1D7043; --red:#B93E28;
+  --start:#B93E28; --flow:#1D7043; --done:#28558F; --warn:#9B3427;
+  --tint-start:#F6E5E1; --tint-flow:#E2F0E7; --tint-done:#E2EAF5;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Pretendard","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+  --side:264px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#101315; --surface:#171B1E; --surface-2:#1D2226; --surface-3:#242A2F;
+    --ink:#E7EBEE; --ink-2:#9AA5AE; --ink-3:#6E7A83;
+    --rule:#2A3035; --rule-strong:#3A4249;
+    --accent:#DFA149; --tint-accent:#2B2317;
+    --blue:#83ACE4; --green:#5FC68B; --red:#E4816C;
+  --start:#E4816C; --flow:#5FC68B; --done:#83ACE4; --warn:#E0806E;
+  --tint-start:#2A1D1A; --tint-flow:#16281F; --tint-done:#182432;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101315; --surface:#171B1E; --surface-2:#1D2226; --surface-3:#242A2F;
+  --ink:#E7EBEE; --ink-2:#9AA5AE; --ink-3:#6E7A83;
+  --rule:#2A3035; --rule-strong:#3A4249;
+  --accent:#DFA149; --tint-accent:#2B2317;
+  --blue:#83ACE4; --green:#5FC68B; --red:#E4816C;
+  --start:#E4816C; --flow:#5FC68B; --done:#83ACE4; --warn:#E0806E;
+  --tint-start:#2A1D1A; --tint-flow:#16281F; --tint-done:#182432;
+}
+:root[data-theme="light"]{
+  --bg:#F4F5F6; --surface:#FFFFFF; --surface-2:#EDEFF1; --surface-3:#E4E7EA;
+  --ink:#14181B; --ink-2:#5A6570; --ink-3:#8B959D;
+  --rule:#DCE0E4; --rule-strong:#C3CAD0;
+  --accent:#A9660A; --tint-accent:#F7ECD9;
+  --blue:#28558F; --green:#1D7043; --red:#B93E28;
+  --start:#B93E28; --flow:#1D7043; --done:#28558F; --warn:#9B3427;
+  --tint-start:#F6E5E1; --tint-flow:#E2F0E7; --tint-done:#E2EAF5;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans);
+     font-size:15px; line-height:1.75; letter-spacing:-0.003em}
+
+/* ── 사이드바 ───────────────────────────── */
+nav.side{position:sticky; top:0; z-index:20; background:var(--surface);
+         border-bottom:1px solid var(--rule); max-height:none}
+.nav-brand{padding:16px 22px 12px; border-bottom:1px solid var(--rule)}
+.nav-brand a{text-decoration:none; display:block}
+.nav-brand .bt{display:block; font-size:14px; font-weight:700; color:var(--ink); letter-spacing:-0.02em}
+.nav-brand .bs{display:block; font-family:var(--mono); font-size:10px; color:var(--ink-3);
+               letter-spacing:.1em; text-transform:uppercase; margin-top:4px}
+.nav-docs{display:flex; gap:2px; overflow-x:auto; padding:0 14px; scrollbar-width:thin}
+.nav-docs .grp{flex:none; align-self:center; font-family:var(--mono); font-size:10px;
+               letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); padding:0 8px 0 4px}
+.nav-docs a{flex:none; padding:11px 10px; font-size:12.5px; color:var(--ink-2);
+            text-decoration:none; white-space:nowrap; border-bottom:2px solid transparent}
+.nav-docs a:hover{color:var(--ink)}
+.nav-docs a.on{color:var(--ink); font-weight:600; border-bottom-color:var(--accent)}
+.ontop{display:none}
+
+main{max-width:940px; margin:0 auto; padding:0 26px 100px}
+
+@media (min-width:1120px){
+  body{padding-left:var(--side)}
+  nav.side{position:fixed; inset:0 auto 0 0; width:var(--side); height:100vh;
+           overflow-y:auto; border-bottom:0; border-right:1px solid var(--rule);
+           display:flex; flex-direction:column; padding-bottom:28px}
+  .nav-brand{padding:24px 22px 18px}
+  .nav-docs{flex-direction:column; overflow:visible; padding:14px 12px 0; gap:0}
+  .nav-docs .grp{align-self:stretch; padding:14px 10px 5px}
+  .nav-docs .grp:first-child{padding-top:0}
+  .nav-docs a{padding:6px 10px; border-bottom:0; border-left:2px solid transparent;
+              white-space:normal; line-height:1.45; border-radius:0 3px 3px 0}
+  .nav-docs a:hover{background:var(--surface-2)}
+  .nav-docs a.on{background:var(--surface-2); border-left-color:var(--accent)}
+  .ontop{display:flex; flex-direction:column; margin-top:20px; padding:14px 12px 0;
+         border-top:1px solid var(--rule)}
+  .ontop .grp{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+              color:var(--ink-3); padding:0 10px 6px}
+  .ontop a{padding:3px 10px; font-size:11.5px; color:var(--ink-2); text-decoration:none;
+           line-height:1.5; border-left:2px solid transparent}
+  .ontop a:hover{color:var(--accent); border-left-color:var(--rule-strong)}
+  .ontop a.l1{font-weight:600; color:var(--ink); margin-top:6px}
+  .ontop a.l2{padding-left:20px}
+  .ontop a.l3{padding-left:32px; color:var(--ink-3); font-size:11px}
+  main{margin:0; padding:0 56px 120px}
+}
+
+/* ── 문서 헤더 ──────────────────────────── */
+.dochead{padding:44px 0 26px; border-bottom:2px solid var(--ink); margin-bottom:8px}
+.eyebrow{font-family:var(--mono); font-size:10.5px; letter-spacing:.13em; text-transform:uppercase;
+         color:var(--ink-3)}
+.doctitle{font-size:clamp(24px,3.2vw,32px); line-height:1.22; margin:10px 0 0; font-weight:700;
+          letter-spacing:-0.025em; text-wrap:balance}
+.docsub{margin:10px 0 0; color:var(--ink-2); font-size:14px; max-width:64ch}
+
+/* ── 본문 ──────────────────────────────── */
+.md{padding-top:12px}
+.md h1,.md h2,.md h3,.md h4,.md h5,.md h6{letter-spacing:-0.02em; text-wrap:balance; scroll-margin-top:80px}
+.md h1{font-size:23px; font-weight:700; margin:52px 0 14px; padding-bottom:9px;
+       border-bottom:1px solid var(--rule-strong)}
+.md h2{font-size:18.5px; font-weight:700; margin:38px 0 10px}
+.md h3{font-size:15.5px; font-weight:700; margin:28px 0 8px; color:var(--ink)}
+.md h4,.md h5,.md h6{font-size:14px; font-weight:700; margin:22px 0 6px; color:var(--ink-2)}
+.md > :first-child{margin-top:0}
+.md p{margin:0 0 13px; max-width:76ch}
+.md a{color:var(--blue)}
+.md strong{font-weight:700}
+.md hr{border:0; border-top:1px solid var(--rule); margin:34px 0}
+.md ul,.md ol{margin:0 0 14px; padding-left:22px; max-width:76ch}
+.md li{margin:3px 0}
+.md li > ul,.md li > ol{margin:3px 0}
+.md blockquote{margin:0 0 16px; padding:12px 18px; border-left:3px solid var(--accent);
+               background:var(--tint-accent); border-radius:0 3px 3px 0; max-width:76ch}
+.md blockquote p{margin:0}
+.md blockquote p + p{margin-top:8px}
+code{font-family:var(--mono); font-size:.87em; background:var(--surface-2); padding:1.5px 5px;
+     border-radius:2px; color:var(--ink); word-break:break-word}
+.codewrap{margin:0 0 16px; border:1px solid var(--rule); border-radius:3px; background:var(--surface);
+          overflow-x:auto}
+.codewrap pre{margin:0; padding:14px 18px}
+.codewrap code{background:none; padding:0; font-size:12.5px; line-height:1.65; white-space:pre;
+               display:block}
+.codewrap code.lang-sql{color:var(--ink)}
+
+/* ── 표 ────────────────────────────────── */
+.tablewrap{overflow-x:auto; margin:0 0 18px; border:1px solid var(--rule); border-radius:3px;
+           background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-size:13.5px; min-width:480px}
+th,td{text-align:left; padding:9px 14px; border-bottom:1px solid var(--rule); vertical-align:top;
+      line-height:1.6}
+thead th{font-family:var(--mono); font-size:11px; letter-spacing:.06em; color:var(--ink-3);
+         font-weight:600; background:var(--surface-2); white-space:nowrap; text-transform:uppercase}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--surface-2)}
+td code{font-size:12px; white-space:nowrap}
+
+/* ── 페이저 ────────────────────────────── */
+.pager{display:flex; justify-content:space-between; gap:16px; margin-top:56px; padding-top:22px;
+       border-top:1px solid var(--rule)}
+.pager a{flex:0 1 auto; max-width:46%; text-decoration:none; color:var(--ink); font-size:13.5px;
+         font-weight:600; padding:12px 16px; border:1px solid var(--rule); border-radius:3px;
+         background:var(--surface); line-height:1.4}
+.pager a:hover{border-color:var(--accent); color:var(--accent)}
+.pager a span{display:block; font-family:var(--mono); font-size:10px; letter-spacing:.1em;
+              text-transform:uppercase; color:var(--ink-3); font-weight:500; margin-bottom:3px}
+.pager a.nx{text-align:right}
+a:focus-visible,.nav-docs a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+/* ── 인덱스 전용 ───────────────────────── */
+.hero{padding:56px 0 34px; border-bottom:2px solid var(--ink)}
+.hero h1{font-size:clamp(27px,4vw,40px); line-height:1.15; margin:12px 0 0; font-weight:700;
+         letter-spacing:-0.03em}
+.hero .lede{margin:14px 0 0; color:var(--ink-2); font-size:15px; max-width:68ch}
+.statbar{display:flex; flex-wrap:wrap; gap:0; margin:30px 0 0; border:1px solid var(--rule);
+         border-radius:3px; background:var(--surface); overflow:hidden}
+.statbar div{flex:1 1 130px; padding:14px 18px; border-right:1px solid var(--rule)}
+.statbar div:last-child{border-right:0}
+.statbar .v{font-family:var(--mono); font-size:21px; font-weight:600; letter-spacing:-0.02em;
+            font-variant-numeric:tabular-nums; display:block}
+.statbar .k{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+            color:var(--ink-3); margin-top:3px; display:block}
+.secgrp{margin:52px 0 0}
+.secgrp > h2{font-size:13px; font-family:var(--mono); letter-spacing:.12em; text-transform:uppercase;
+             color:var(--accent); margin:0 0 4px; font-weight:600}
+.secgrp > p{margin:0 0 18px; color:var(--ink-2); font-size:13.5px; max-width:70ch}
+.cards{display:grid; gap:12px}
+@media(min-width:720px){.cards{grid-template-columns:1fr 1fr}}
+.card{display:block; text-decoration:none; color:inherit; background:var(--surface);
+      border:1px solid var(--rule); border-radius:3px; padding:17px 19px; transition:border-color .12s}
+.card:hover{border-color:var(--accent)}
+.card .num{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; color:var(--accent);
+           font-weight:600}
+.card h3{margin:6px 0 5px; font-size:16px; font-weight:700; letter-spacing:-0.02em}
+.card p{margin:0; font-size:13px; color:var(--ink-2); line-height:1.6}
+.card .facts{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px}
+.card .facts span{font-family:var(--mono); font-size:10.5px; color:var(--ink-3);
+                  background:var(--surface-2); padding:2px 7px; border-radius:2px;
+                  font-variant-numeric:tabular-nums}
+.card .facts span.hi{background:var(--tint-accent); color:var(--accent); font-weight:600}
+.card.ext .num{color:var(--blue)}
+.card.ext:hover{border-color:var(--blue)}
+.note{margin:44px 0 0; padding:16px 20px; border:1px solid var(--rule); border-left:3px solid var(--blue);
+      border-radius:0 3px 3px 0; background:var(--surface); font-size:13.5px; color:var(--ink-2)}
+.note b{color:var(--ink)}
+footer{margin-top:64px; padding-top:22px; border-top:1px solid var(--rule);
+        font-size:12.5px; color:var(--ink-3); display:flex; flex-wrap:wrap; gap:14px;
+        justify-content:space-between}
+@media (prefers-reduced-motion:reduce){*{transition:none!important; scroll-behavior:auto!important}}
+
+/* ── 워크플로우 페이지: 넓은 본문 ── */
+body.wide main{max-width:1180px}
+</style>
+</head>
+<body>
+<nav class="side"><div class="nav-brand"><a href="index.html"><span class="bt">MES 데이터 모델링</span><span class="bs">v3 · 문서 인덱스</span></a></div>
+<div class="nav-docs">
+<span class="grp">업무 흐름 정본</span>
+<a href="workflow-v2.html">OMF MES 시스템 워크플로우 v2</a>
+<span class="grp">1. 도메인 이해</span>
+<a href="1-1.html">비즈니스 도메인의 이해</a>
+<a href="1-2.html">MES의 핵심 필수 기능</a>
+<a href="1-3.html">사용자 시나리오</a>
+<span class="grp">2. 기능 요구사항</span>
+<a href="2-1.html">작업지시</a>
+<a href="2-2.html">자재투입</a>
+<a href="2-3.html">생산 실적 관리</a>
+<a href="2-4.html">품질관리</a>
+<a href="2-5.html">LOT 추적성</a>
+<a href="2-6.html">요구사항 누락분 보충</a>
+<a href="2-7.html">물류 재고 실행 관리</a>
+<span class="grp">3. 데이터 모델링</span>
+<a href="3-1.html" class="on">개념적 모델링</a>
+<a href="3-2.html">논리적 모델링</a>
+<a href="3-3.html">물리적 모델링</a>
+<a href="mes_erd.html">ERD — 도메인별 다이어그램</a>
+<a href="mes_scenarios_workflows.html">업무 시나리오 &amp; 워크플로우</a>
+<a href="mes_workflows_detailed.html">상세 워크플로우</a>
+<span class="grp">참고</span>
+<a href="changelog.html">변경 이력</a>
+</div><aside class="ontop"><span class="grp">이 문서</span><a class="l1" href="#s1">MES 개념적 데이터 모델</a><a class="l2" href="#s2">1. 모델링 목적</a><a class="l1" href="#s3">2. 핵심 모델링 원칙</a><a class="l2" href="#s4">2.1 작업지시와 공정을 분리한다</a><a class="l2" href="#s5">2.2 자재 출고와 자재 투입을 분리한다</a><a class="l2" href="#s6">2.3 생산실적과 생산품 입고를 분리한다</a><a class="l2" href="#s7">2.4 품질상태와 재고상태를 분리한다</a><a class="l2" href="#s8">2.5 LOT와 물리적 취급단위를 분리한다</a><a class="l2" href="#s9">2.6 현재수량은 재고 이벤트를 근거로 계산한다</a><a class="l2" href="#s10">2.7 취소와 정정은 원본을 삭제하지 않는다</a><a class="l1" href="#s11">3. 업무 영역 구성</a><a class="l1" href="#s12">4. 상위 개념 관계도</a><a class="l1" href="#s13">5. A. 조직·기준정보 영역</a><a class="l2" href="#s14">5.1 법인</a><a class="l2" href="#s15">5.2 사업부</a><a class="l2" href="#s16">5.3 공장</a><a class="l2" href="#s17">5.4 창고</a><a class="l2" href="#s18">5.5 로케이션</a><a class="l2" href="#s19">5.6 거래처</a><a class="l2" href="#s20">5.7 품목</a><a class="l2" href="#s21">5.8 단위</a><a class="l2" href="#s22">5.9 단위환산</a><a class="l2" href="#s23">5.10 작업자</a><a class="l2" href="#s24">5.11 근무조</a><a class="l2" href="#s25">5.12 단말기</a><a class="l2" href="#s26">5.13 설비</a><a class="l2" href="#s27">5.14 금형</a><a class="l2" href="#s28">5.15 부서·사용자·역할</a><a class="l2" href="#s29">5.16 생산라인·작업구역</a><a class="l1" href="#s30">6. B. 제품·공정 기준 영역</a><a class="l2" href="#s31">6.1 BOM</a><a class="l2" href="#s32">6.2 BOM 구성자재</a><a class="l2" href="#s33">6.3 공정</a><a class="l2" href="#s34">6.4 라우팅</a><a class="l2" href="#s35">6.5 라우팅 공정</a><a class="l2" href="#s36">6.6 대체자재 규칙</a><a class="l1" href="#s37">7. C. 생산계획·작업지시 영역</a><a class="l2" href="#s38">7.1 생산오더</a><a class="l2" href="#s39">7.2 생산계획</a><a class="l2" href="#s40">7.3 작업지시</a><a class="l2" href="#s41">7.4 작업지시 선후관계</a><a class="l2" href="#s42">7.5 작업 세션</a><a class="l1" href="#s43">8. D. 구매입하·입고 영역</a><a class="l2" href="#s44">8.1 구매 P/O</a><a class="l2" href="#s45">8.2 구매 P/O Line</a><a class="l2" href="#s46">8.3 입하</a><a class="l2" href="#s47">8.4 입하 Line</a><a class="l2" href="#s48">8.5 입하 차이</a><a class="l2" href="#s49">8.6 입고</a><a class="l2" href="#s50">8.7 적치작업</a><a class="l2" href="#s51">8.8 입하예정</a><a class="l1" href="#s52">9. E. 재고·물류 영역</a><a class="l2" href="#s53">9.1 LOT</a><a class="l2" href="#s54">9.2 재고단위</a><a class="l2" href="#s55">9.3 재고 트랜잭션</a><a class="l2" href="#s56">9.4 재고현황</a><a class="l2" href="#s57">9.5 재고예약</a><a class="l2" href="#s58">9.6 재고할당</a><a class="l2" href="#s59">9.7 피킹작업</a><a class="l2" href="#s60">9.8 출고</a><a class="l2" href="#s61">9.9 재고이동</a><a class="l2" href="#s62">9.10 재고이동 Line</a><a class="l2" href="#s63">9.11 취급단위</a><a class="l2" href="#s64">9.12 취급단위 구성</a><a class="l2" href="#s65">9.13 재고실사</a><a class="l2" href="#s66">9.14 재고조정</a><a class="l1" href="#s67">10. F. 자재투입 영역</a><a class="l2" href="#s68">10.1 생산출고 요청</a><a class="l2" href="#s69">10.2 생산현장 인수</a><a class="l2" href="#s70">10.3 자재투입</a><a class="l2" href="#s71">10.4 자재사용 배분</a><a class="l2" href="#s72">10.5 자재반납</a><a class="l2" href="#s73">10.6 자재폐기</a><a class="l1" href="#s74">11. G. 생산실적 영역</a><a class="l2" href="#s75">11.1 생산실적</a><a class="l2" href="#s76">11.2 생산실적 출처</a><a class="l2" href="#s77">11.3 생산 LOT 배분</a><a class="l2" href="#s78">11.4 공정 인계</a><a class="l2" href="#s79">11.5 생산품 입고</a><a class="l1" href="#s80">12. H. 품질관리 영역</a><a class="l2" href="#s81">12.1 검사계획</a><a class="l2" href="#s82">12.2 검사항목</a><a class="l2" href="#s83">12.3 검사대상</a><a class="l2" href="#s84">12.4 검사실적</a><a class="l2" href="#s85">12.5 검사측정값</a><a class="l2" href="#s86">12.6 품질판정</a><a class="l2" href="#s87">12.7 불량</a><a class="l2" href="#s88">12.8 부적합</a><a class="l2" href="#s89">12.9 부적합 처리결정</a><a class="l2" href="#s90">12.10 특채</a><a class="l2" href="#s91">12.11 재작업 작업지시</a><a class="l1" href="#s92">13. I. LOT 추적성 영역</a><a class="l2" href="#s93">13.1 LOT 관계</a><a class="l2" href="#s94">13.2 LOT 외부 식별번호</a><a class="l2" href="#s95">13.3 일련번호</a><a class="l2" href="#s96">13.4 일련번호 조립관계</a><a class="l2" href="#s97">13.5 LOT 보류</a><a class="l2" href="#s98">13.6 LOT 영향범위</a><a class="l1" href="#s99">14. J. 출하·외주·공통관리 영역</a><a class="l2" href="#s100">14.1 판매오더</a><a class="l2" href="#s101">14.2 출하요청</a><a class="l2" href="#s102">14.3 출하</a><a class="l2" href="#s103">14.4 출하 Line</a><a class="l2" href="#s104">14.5 출하 LOT 배분</a><a class="l2" href="#s105">14.6 외주 작업지시</a><a class="l2" href="#s106">14.7 외주출고</a><a class="l2" href="#s107">14.8 외주입고</a><a class="l2" href="#s108">14.9 승인요청</a><a class="l2" href="#s109">14.10 예외업무</a><a class="l2" href="#s110">14.11 첨부파일</a><a class="l2" href="#s111">14.12 감사이력</a><a class="l2" href="#s112">14.13 연계 메시지</a><a class="l2" href="#s113">14.14 발행이력</a><a class="l2" href="#s114">14.15 운영정책·채번규칙</a><a class="l1" href="#s115">15. 핵심 엔터티 관계 및 카디널리티</a><a class="l2" href="#s116">15.1 조직·위치</a><a class="l2" href="#s117">15.2 품목·제품구조</a><a class="l2" href="#s118">15.3 생산계획·작업지시</a><a class="l2" href="#s119">15.4 구매입하·입고</a><a class="l2" href="#s120">15.5 재고</a><a class="l2" href="#s121">15.6 작업지시·자재투입</a><a class="l2" href="#s122">15.7 생산실적·생산 LOT</a><a class="l2" href="#s123">15.8 자재와 생산 LOT 추적</a><a class="l2" href="#s124">15.9 품질</a><a class="l2" href="#s125">15.10 출하</a><a class="l2" href="#s126">15.11 취급단위</a><a class="l1" href="#s127">16. 핵심 데이터 책임</a><a class="l1" href="#s128">17. 주요 수량 보존 규칙</a><a class="l2" href="#s129">17.1 입하·입고</a><a class="l2" href="#s130">17.2 자재 출고·투입</a><a class="l2" href="#s131">17.3 공정 생산</a><a class="l2" href="#s132">17.4 생산 LOT</a><a class="l2" href="#s133">17.5 외주</a><a class="l1" href="#s134">18. 주요 상태 책임</a><a class="l2" href="#s135">18.1 작업지시 상태</a><a class="l2" href="#s136">18.2 재고상태</a><a class="l2" href="#s137">18.3 품질상태</a><a class="l2" href="#s138">18.4 입하·입고 상태</a><a class="l2" href="#s139">18.5 이동 상태</a><a class="l2" href="#s140">18.6 출하 상태</a><a class="l1" href="#s141">19. 권장 애그리게이트 경계</a><a class="l1" href="#s142">20. 모델링 시 확정된 주요 의사결정</a><a class="l1" href="#s143">21. 논리 모델링 전 추가 확정사항</a><a class="l2" href="#s144">21.1 LOT 생성 단위</a><a class="l2" href="#s145">21.2 재고 관리 최소 단위</a><a class="l2" href="#s146">21.3 부분 품질판정 처리</a><a class="l2" href="#s147">21.4 ERP 재고 책임</a><a class="l1" href="#s148">22. 개념 모델 최종 요약</a></aside></nav>
+<main>
+  <header class="dochead">
+    <div class="eyebrow">3. 데이터 모델링 · 3-1 개념적 모델링</div>
+    <h1 class="doctitle">개념적 모델링</h1>
+    <p class="docsub">핵심 엔티티와 관계 — 업무 개념 수준의 모델</p>
+  </header>
+  <article class="md">
+<p>아래 모델은 지금까지 도출한 <strong>작업지시·자재투입·생산실적·품질관리·LOT 추적성·물류재고 실행관리</strong>를 하나의 데이터 구조로 통합한 개념적 모델입니다.</p>
+<blockquote><p><strong>v3</strong>: ERPNext 벤치마킹 반영본(E-1~E-7). 변경 내역은 <code>CHANGELOG.md</code> 참조.</p><p><strong>v2</strong>: 요구사항 검토 반영본.</p></blockquote>
+<h1 id="s1">MES 개념적 데이터 모델</h1>
+<h2 id="s2">1. 모델링 목적</h2>
+<p>본 개념 모델은 다음 업무를 하나의 일관된 데이터 구조로 연결하는 것을 목적으로 한다.</p>
+<ul><li>구매자재 입하·검사·입고</li><li>창고 적치·예약·피킹·출고</li><li>생산계획 및 공정별 작업지시</li><li>생산현장 자재 인수·투입·반납</li><li>부분 생산실적 및 생산 LOT 생성</li><li>공정검사·불량·부적합·재작업</li><li>반제품·완제품 입고</li><li>창고·사업부·외주·외부창고 이동</li><li>고객 출하</li><li>LOT 정방향·역방향 추적</li></ul>
+<p>본 단계는 개념적 모델링이므로 물리 테이블 구조, 인덱스, 데이터 타입까지 확정하지 않는다. 핵심 업무 엔터티와 엔터티 간 관계 및 책임을 정의한다.</p>
+<hr>
+<h1 id="s3">2. 핵심 모델링 원칙</h1>
+<h2 id="s4">2.1 작업지시와 공정을 분리한다</h2>
+<p>품목의 전체 제조 흐름은 라우팅과 라우팅 공정으로 관리한다.</p>
+<p>MES 관리 대상 공정에 대해서만 공정별 작업지시를 생성한다.</p>
+<div class="codewrap"><pre><code class="lang-text">라우팅
+ ├─ 라우팅 공정 10: 사출, MES 관리
+ ├─ 라우팅 공정 20: 사상, MES 미관리
+ ├─ 라우팅 공정 30: 조립, MES 관리
+ └─ 라우팅 공정 40: 검사, MES 관리</code></pre></div>
+<p>작업지시 한 건은 하나의 MES 관리 대상 라우팅 공정을 대상으로 한다.</p>
+<hr>
+<h2 id="s5">2.2 자재 출고와 자재 투입을 분리한다</h2>
+<div class="codewrap"><pre><code class="lang-text">자재 출고
+= 창고에서 생산현장으로 재고 이동
+
+자재 투입
+= 특정 작업지시에 실제 사용</code></pre></div>
+<p>출고된 자재가 모두 즉시 소비되는 것은 아니므로 두 이벤트를 동일하게 처리하지 않는다.</p>
+<hr>
+<h2 id="s6">2.3 생산실적과 생산품 입고를 분리한다</h2>
+<div class="codewrap"><pre><code class="lang-text">생산실적
+= 제품이 생산되었다는 실행 결과
+
+생산품 입고
+= 생산된 제품이 창고재고로 인수됨</code></pre></div>
+<p>생산이 완료되더라도 제품이 생산현장이나 공정대기구역에 있을 수 있으므로 생산실적 등록만으로 창고재고를 자동 증가시키지 않는다.</p>
+<hr>
+<h2 id="s7">2.4 품질상태와 재고상태를 분리한다</h2>
+<p>예:</p>
+<div class="codewrap"><pre><code class="lang-text">품질상태: 합격
+재고상태: 이동중</code></pre></div>
+<div class="codewrap"><pre><code class="lang-text">품질상태: 보류
+재고상태: 격리</code></pre></div>
+<p>품질판정과 물류상태는 서로 다른 의미를 가지므로 별도 개념으로 관리한다.</p>
+<hr>
+<h2 id="s8">2.5 LOT와 물리적 취급단위를 분리한다</h2>
+<p>LOT는 추적 단위이고, 박스·트레이·대차·팔레트는 물리적 취급단위이다.</p>
+<div class="codewrap"><pre><code class="lang-text">생산 LOT P001: 1,000개
+├─ 박스 B001: 300개
+├─ 박스 B002: 300개
+└─ 박스 B003: 400개</code></pre></div>
+<p>하나의 LOT가 여러 박스에 나뉠 수 있고 하나의 팔레트에 여러 LOT가 포함될 수도 있다.</p>
+<hr>
+<h2 id="s9">2.6 현재수량은 재고 이벤트를 근거로 계산한다</h2>
+<p>모든 재고 증감은 입고·출고·이동·투입·반납·출하·폐기·조정 등의 근거 이벤트를 가져야 한다.</p>
+<p>현재 재고를 근거 없이 직접 수정하지 않는다.</p>
+<hr>
+<h2 id="s10">2.7 취소와 정정은 원본을 삭제하지 않는다</h2>
+<p>잘못된 이벤트는 원본 데이터를 삭제하는 대신 취소 또는 반대 방향의 보정 이벤트를 생성한다.</p>
+<p>이를 통해 과거 수량과 LOT 계보를 재현할 수 있어야 한다.</p>
+<hr>
+<h1 id="s11">3. 업무 영역 구성</h1>
+<p>개념 모델을 다음 10개 업무 영역으로 구분한다.</p>
+<div class="tablewrap"><table><thead><tr><th>영역</th><th>주요 내용</th></tr></thead><tbody><tr><td>A. 조직·기준정보</td><td>사업부, 공장, 부서·사용자·역할, 생산라인, 창고, 품목, 공정, 설비</td></tr><tr><td>B. 제품·공정 기준</td><td>BOM, 라우팅, 라우팅 공정</td></tr><tr><td>C. 생산계획·작업지시</td><td>생산오더, 생산계획, 작업지시</td></tr><tr><td>D. 구매입하·입고</td><td>P/O, 입하예정, 입하, 수입검사, 입고, 적치</td></tr><tr><td>E. 재고·물류</td><td>재고, 이동, 예약, 피킹, 출고, 반납</td></tr><tr><td>F. 자재투입</td><td>작업지시별 자재 LOT 사용</td></tr><tr><td>G. 생산실적</td><td>양품·불량·보류수량, 생산 LOT</td></tr><tr><td>H. 품질관리</td><td>검사, 불량, 부적합, 특채, 선별, 재작업</td></tr><tr><td>I. LOT 추적성</td><td>LOT 계보, 분할·병합, 보류, 영향범위, 일련번호</td></tr><tr><td>J. 출하·외주·연계</td><td>고객출하, 외주, ERP, 승인·감사, 발행이력, 운영정책</td></tr></tbody></table></div>
+<hr>
+<h1 id="s12">4. 상위 개념 관계도</h1>
+<div class="codewrap"><pre><code class="lang-text">[품목]
+  ├──────── [BOM] ──────── [BOM 구성자재]
+  │
+  └──────── [라우팅] ───── [라우팅 공정]
+                                │
+                                ▼
+[생산오더] ── [생산계획] ── [작업지시]
+                                │
+              ┌─────────────────┼──────────────────┐
+              ▼                 ▼                  ▼
+       [자재투입]          [생산실적]          [검사대상]
+              │                 │                  │
+              │                 ▼                  ▼
+              │             [생산 LOT]        [검사실적]
+              │                 │                  │
+              └───────── [LOT 관계] ──────────────┘
+                                │
+                                ▼
+                         [재고 트랜잭션]
+                                │
+              ┌─────────────────┼─────────────────┐
+              ▼                 ▼                 ▼
+          [재고현황]        [재고이동]         [출하]</code></pre></div>
+<p>구매자재 유입 관계는 다음과 같다.</p>
+<div class="codewrap"><pre><code class="lang-text">[구매 P/O]
+    │
+    ▼
+[입하]
+    │
+    ▼
+[수입검사]
+    │
+    ▼
+[입고]
+    │
+    ▼
+[자재 LOT]
+    │
+    ▼
+[재고현황]</code></pre></div>
+<hr>
+<h1 id="s13">5. A. 조직·기준정보 영역</h1>
+<h2 id="s14">5.1 법인</h2>
+<p>회계·법적 책임의 최상위 조직이다.</p>
+<p>주요 관계:</p>
+<ul><li>하나의 법인은 여러 사업부를 가진다.</li><li>하나의 법인은 여러 공장을 운영할 수 있다.</li><li>구매 P/O, 판매오더 및 재고소유권의 기준이 된다.</li></ul>
+<hr>
+<h2 id="s15">5.2 사업부</h2>
+<p>독립적인 생산·재고 책임을 갖는 조직단위이다.</p>
+<p>예:</p>
+<ul><li>OA 사업부</li><li>부품 사업부</li></ul>
+<p>주요 관계:</p>
+<ul><li>하나의 법인에 여러 사업부가 속한다.</li><li>사업부는 여러 공장·창고·생산오더를 가질 수 있다.</li><li>사업부 간 이동은 고객 출하가 아닌 내부 재고이동으로 처리한다.</li></ul>
+<hr>
+<h2 id="s16">5.3 공장</h2>
+<p>생산 및 물류가 수행되는 물리적 사업장이다.</p>
+<p>주요 관계:</p>
+<ul><li>하나의 공장에 여러 생산구역과 창고가 존재한다.</li><li>작업지시, 생산실적, 재고 이벤트는 공장에 귀속된다.</li></ul>
+<hr>
+<h2 id="s17">5.4 창고</h2>
+<p>재고를 관리하는 업무단위이다.</p>
+<p>창고 유형 예:</p>
+<ul><li>입하대기창고</li><li>검사대기창고</li><li>자재창고</li><li>생산현장창고</li><li>반제품창고</li><li>완제품창고</li><li>보류창고</li><li>격리창고</li><li>외부·위탁창고</li><li>외주처창고</li></ul>
+<p>외부창고도 별도 시스템 개념으로 분리하기보다는 창고의 운영유형으로 관리하는 것을 기본으로 한다.</p>
+<hr>
+<h2 id="s18">5.5 로케이션</h2>
+<p>창고 내부의 실제 재고 보관위치이다.</p>
+<p>계층구조를 지원한다.</p>
+<div class="codewrap"><pre><code class="lang-text">창고
+ └─ 구역
+     └─ 랙
+         └─ 셀</code></pre></div>
+<p>부품사업부는 구역 단위까지만 관리하고, OA 사업부는 랙·셀 단위까지 관리할 수 있다.</p>
+<hr>
+<h2 id="s19">5.6 거래처</h2>
+<p>공급사, 고객, 외주처, 운송업체 등의 외부 업무주체이다.</p>
+<p>거래처는 하나 이상의 역할을 가질 수 있다.</p>
+<div class="codewrap"><pre><code class="lang-text">거래처
+├─ 공급사
+├─ 고객
+├─ 외주처
+└─ 운송업체</code></pre></div>
+<hr>
+<h2 id="s20">5.7 품목</h2>
+<p>자재·반제품·완제품·포장재 등 재고와 생산의 기본 대상이다.</p>
+<p>품목 유형 예:</p>
+<ul><li>원재료</li><li>구매부품</li><li>반제품</li><li>완제품</li><li>포장재</li><li>소모품</li><li>부산물</li></ul>
+<p>품목에는 LOT 관리 여부, 일련번호 관리 여부, 품질검사 정책, 유효기간 정책 등이 연결된다.</p>
+<hr>
+<h2 id="s21">5.8 단위</h2>
+<p>수량의 측정단위이다.</p>
+<p>예:</p>
+<ul><li>EA</li><li>kg</li><li>BAG</li><li>BOX</li><li>ROLL</li></ul>
+<p>하나의 품목은 기본 재고단위와 입고·출고·투입 단위를 다르게 가질 수 있다.</p>
+<hr>
+<h2 id="s22">5.9 단위환산</h2>
+<p>입고단위와 재고단위 또는 투입단위 사이의 환산관계이다.</p>
+<p>예:</p>
+<div class="codewrap"><pre><code class="lang-text">1 BAG = 25kg
+1 BOX = 1,000EA</code></pre></div>
+<hr>
+<h2 id="s23">5.10 작업자</h2>
+<p>MES 업무를 실제 수행한 사람이다.</p>
+<p>작업자와 MES 입력자는 구분할 수 있어야 한다. 작업자는 시스템 사용자(§5.15)와 선택적으로 연결되어, "실제 작업자"와 "입력·처리한 사용자"를 분리 기록한다.</p>
+<p>작업자는 공정 수행 자격과 검사자 자격을 가질 수 있다. 자격은 유형·대상 공정·유효기간을 가지며, 자격이 없거나 만료된 작업자의 해당 업무 입력·확정은 제한한다.</p>
+<hr>
+<h2 id="s24">5.11 근무조</h2>
+<p>생산이 수행되는 근무 시간대이다.</p>
+<p>예:</p>
+<ul><li>주간조</li><li>야간조</li><li>1근</li><li>2근</li></ul>
+<p>작업지시 생성 시 예정 근무조는 미지정할 수 있고, 작업 세션에서 실제 근무조를 확정한다.</p>
+<hr>
+<h2 id="s25">5.12 단말기</h2>
+<p>현장 MES 화면을 사용하는 물리적 장치이다.</p>
+<p>단말기와 공정은 다대다 관계이다.</p>
+<div class="codewrap"><pre><code class="lang-text">단말기 T-01
+├─ 사출 공정
+└─ 조립 공정</code></pre></div>
+<hr>
+<h2 id="s26">5.13 설비</h2>
+<p>생산 또는 검사에 사용되는 장비이다.</p>
+<p>예:</p>
+<ul><li>사출기</li><li>조립설비</li><li>검사설비</li><li>라벨 프린터</li></ul>
+<p>검사에 사용되는 설비(계측기)는 교정 대상 여부, 최근 교정일, 교정 유효기간과 교정 이력을 관리한다. 교정 유효기간이 지난 장비로 검사결과를 확정하는 것은 제한한다.</p>
+<hr>
+<h2 id="s27">5.14 금형</h2>
+<p>사출 생산에 사용되는 금형이다.</p>
+<p>금형은 작업지시, 작업 세션, 생산실적, 품질이력과 연결된다.</p>
+<hr>
+<h2 id="s28">5.15 부서·사용자·역할</h2>
+<p>MES에 로그인하여 업무를 처리하는 주체와 권한의 기준정보이다.</p>
+<ul><li>부서: 조직단위이다. 부적합 귀책부서, 예외업무 담당부서 등의 참조 대상이 된다.</li><li>사용자: 시스템 계정이다. 승인자, 처리자, 확정자 등 모든 "입력 주체" 참조의 원본이다.</li><li>역할: 조회·등록·수정·마감 등 기능 권한의 묶음이다. 사용자는 여러 역할을 가질 수 있다.</li><li>데이터 접근범위: 사용자별로 접근 가능한 사업부·공장을 제한한다.</li></ul>
+<p>작업자(§5.10)는 현장 수행 주체, 사용자는 시스템 입력 주체로 역할이 다르며 두 개념은 1:1로 강제하지 않는다.</p>
+<hr>
+<h2 id="s29">5.16 생산라인·작업구역</h2>
+<p>작업지시가 배정되는 생산 실행 위치이다.</p>
+<div class="codewrap"><pre><code class="lang-text">공장
+ └─ 생산라인
+     └─ 작업구역</code></pre></div>
+<ul><li>생산계획·작업지시는 예정 라인 또는 작업구역을 배정받을 수 있다.</li><li>설비는 소속 생산라인을 가질 수 있다 (예: "3번 라인의 2번 설비").</li><li>라인별 작업순서 관리와 라인별 실적 집계의 기준이 된다.</li></ul>
+<hr>
+<h1 id="s30">6. B. 제품·공정 기준 영역</h1>
+<h2 id="s31">6.1 BOM</h2>
+<p>특정 제품을 생산하는 데 필요한 표준 자재구성이다.</p>
+<p>주요 관계:</p>
+<ul><li>하나의 품목은 여러 BOM 버전을 가질 수 있다.</li><li>하나의 BOM은 여러 BOM 구성자재를 가진다.</li><li>작업지시 생성 시 적용 BOM 버전을 고정한다.</li><li>같은 기간에 활성 BOM이 복수이면 품목당 하나를 기본 BOM으로 지정해 계획 생성 기본값으로 쓴다.</li></ul>
+<hr>
+<h2 id="s32">6.2 BOM 구성자재</h2>
+<p>제품 생산에 필요한 개별 자재와 표준 소요량을 정의한다.</p>
+<p>주요 정보:</p>
+<ul><li>상위 생산품목</li><li>하위 자재품목</li><li>단위당 소요량</li><li>투입 공정</li><li>LOT 추적 여부</li><li>필수 여부</li><li>대체 가능 여부</li></ul>
+<hr>
+<h2 id="s33">6.3 공정</h2>
+<p>재사용 가능한 표준 작업유형이다.</p>
+<p>예:</p>
+<ul><li>사출</li><li>사상</li><li>조립</li><li>융착</li><li>검사</li><li>포장</li></ul>
+<p>공정 자체는 품목의 순서를 정의하지 않는다.</p>
+<hr>
+<h2 id="s34">6.4 라우팅</h2>
+<p>특정 품목을 생산하는 전체 공정 흐름이다.</p>
+<p>하나의 품목은 여러 라우팅 버전을 가질 수 있다.</p>
+<hr>
+<h2 id="s35">6.5 라우팅 공정</h2>
+<p>라우팅에 배치된 개별 공정단계이다.</p>
+<p>주요 개념 정보:</p>
+<ul><li>공정순서</li><li>적용 공정</li><li>MES 관리 여부</li><li>표준 Cycle Time</li><li>설비·금형 필수 여부</li><li>자재투입 관리 여부</li><li>생산실적 관리 여부</li><li>품질검사 여부</li><li>생산 LOT 생성 여부</li></ul>
+<hr>
+<h2 id="s36">6.6 대체자재 규칙</h2>
+<p>기본 BOM 자재 대신 사용할 수 있는 대체품목 및 적용조건을 정의한다.</p>
+<p>주요 조건:</p>
+<ul><li>대상 품목</li><li>적용 공정</li><li>적용기간</li><li>사용 가능수량</li><li>고객 제한</li><li>승인 필요 여부</li></ul>
+<hr>
+<h1 id="s37">7. C. 생산계획·작업지시 영역</h1>
+<h2 id="s38">7.1 생산오더</h2>
+<p>특정 품목을 특정 수량만큼 생산하라는 상위 생산명령이다.</p>
+<p>주요 관계:</p>
+<ul><li>하나의 생산오더는 여러 생산계획으로 분할될 수 있다.</li><li>ERP 생산오더와 연결될 수 있다.</li><li>다단계 BOM 전개로 생성된 반제품 생산오더는 상위(완제품) 생산오더에 연결된다. 완제품 오더의 취소·수량 변경 시 이 계층으로 연동 대상 반제품 오더를 식별한다.</li></ul>
+<hr>
+<h2 id="s39">7.2 생산계획</h2>
+<p>생산오더를 일자·라인·설비·수량 등의 기준으로 실행 가능하게 편성한 계획이다.</p>
+<p>주요 관계:</p>
+<ul><li>하나의 생산계획은 하나의 적용 라우팅·BOM 버전을 가진다.</li><li>생산계획이 확정되면 MES 관리 대상 공정의 작업지시가 전체 생성된다.</li></ul>
+<hr>
+<h2 id="s40">7.3 작업지시</h2>
+<p>특정 MES 관리 대상 공정을 실행하는 명령이다.</p>
+<p>주요 관계:</p>
+<ul><li>하나의 생산계획은 여러 작업지시를 가진다.</li><li>하나의 작업지시는 하나의 라우팅 공정을 대상으로 한다.</li><li>하나의 작업지시는 여러 작업 세션을 가진다.</li><li>하나의 작업지시는 여러 자재투입과 생산실적을 가진다.</li><li>하나의 작업지시는 여러 검사대상 및 생산 LOT와 연결될 수 있다.</li></ul>
+<hr>
+<h2 id="s41">7.4 작업지시 선후관계</h2>
+<p>MES 관리 대상 작업지시 간의 선행·후행 관계이다.</p>
+<p>예:</p>
+<div class="codewrap"><pre><code class="lang-text">사출 작업지시
+→ 조립 작업지시
+→ 검사 작업지시
+→ 포장 작업지시</code></pre></div>
+<p>중간 MES 미관리 공정이 존재해도 관리 대상 작업지시 간 관계를 유지한다.</p>
+<hr>
+<h2 id="s42">7.5 작업 세션</h2>
+<p>작업지시의 실제 실행구간이다.</p>
+<p>하나의 작업지시가 여러 근무조나 작업자에 걸쳐 수행될 수 있으므로 작업지시 자체와 분리한다.</p>
+<p>주요 정보:</p>
+<ul><li>실제 시작·종료시각</li><li>중지·재개이력</li><li>실제 근무조</li><li>실제 작업자</li><li>실제 설비</li><li>실제 금형</li><li>사용 단말기</li></ul>
+<hr>
+<h1 id="s43">8. D. 구매입하·입고 영역</h1>
+<h2 id="s44">8.1 구매 P/O</h2>
+<p>공급사에게 자재를 구매하는 상위 주문이다.</p>
+<hr>
+<h2 id="s45">8.2 구매 P/O Line</h2>
+<p>구매 P/O의 개별 품목·수량이다.</p>
+<p>관계:</p>
+<ul><li>하나의 P/O Line은 여러 번 나누어 입하될 수 있다.</li><li>하나의 입하 Line은 원칙적으로 하나의 P/O Line을 참조한다.</li></ul>
+<hr>
+<h2 id="s46">8.3 입하</h2>
+<p>차량·거래명세서·공급사 단위의 물리적 도착 문서이다.</p>
+<p>입하 Header에 해당한다.</p>
+<hr>
+<h2 id="s47">8.4 입하 Line</h2>
+<p>입하된 개별 품목·수량·공급사 LOT 정보이다.</p>
+<p>하나의 입하 Line에서 여러 내부 자재 LOT가 생성될 수 있다.</p>
+<hr>
+<h2 id="s48">8.5 입하 차이</h2>
+<p>P/O·거래명세서·실물 사이의 수량 또는 상태 차이를 기록한다.</p>
+<p>예:</p>
+<ul><li>부족</li><li>초과</li><li>파손</li><li>오품</li><li>LOT 불일치</li></ul>
+<hr>
+<h2 id="s49">8.6 입고</h2>
+<p>입하된 자재를 MES 재고로 등록하는 업무문서이다.</p>
+<p>입고는 재고증가 이벤트의 업무 근거가 된다.</p>
+<p>하나의 입하 Line을 품질판정별로 여러 입고 건으로 분리할 수 있다.</p>
+<hr>
+<h2 id="s50">8.7 적치작업</h2>
+<p>입고된 자재를 실제 창고 로케이션으로 이동시키는 작업이다.</p>
+<p>적치는 두 개념으로 구분한다.</p>
+<ul><li><strong>적치 규칙(기준정보)</strong>: 품목 × 창고(또는 세부 위치) 단위의 수용량·우선순위 규칙. 권장 도착위치를 산출하는 판단 기준이며, 규칙 변경은 데이터 수정으로 처리한다.</li><li><strong>적치 지시(실행)</strong>: 규칙에 따라 산출된 권장 위치로 실물을 옮기는 작업 건. 어떤 규칙이 적용되었는지를 지시에 남긴다.</li></ul>
+<p>주요 개념 정보:</p>
+<ul><li>근거 입고 건</li><li>대상 LOT·수량</li><li>출발 위치와 권장 도착 로케이션 (적용된 적치 규칙 포함)</li><li>실제 적치 로케이션 (확정 시)</li><li>우선순위와 담당 작업자</li></ul>
+<p>하나의 입고 건을 여러 로케이션에 나누어 적치(분산적치)할 수 있으며, 미적치 상태의 입고 건은 예외조회 대상이 된다.</p>
+<hr>
+<h2 id="s51">8.8 입하예정 (ASN)</h2>
+<p>공급사가 사전에 통보한 납품예정 정보이다.</p>
+<ul><li>예정 입하일, 품목·수량, 공급사 LOT를 건 단위로 관리한다.</li><li>입하 Line은 입하예정 Line을 근거로 연결될 수 있다.</li><li>기입하수량·미입하수량 조회의 기준이 된다.</li></ul>
+<hr>
+<h1 id="s52">9. E. 재고·물류 영역</h1>
+<h2 id="s53">9.1 LOT</h2>
+<p>자재·반제품·완제품의 핵심 추적단위이다.</p>
+<p>모든 LOT 유형을 하나의 LOT 개념으로 관리하고 LOT 유형으로 구분한다.</p>
+<p>LOT 유형 예:</p>
+<ul><li>내부 자재 LOT</li><li>반제품 LOT</li><li>완제품 LOT</li><li>재작업 LOT</li><li>잔량 LOT</li><li>출하 LOT</li></ul>
+<p>주요 정보:</p>
+<ul><li>품목</li><li>LOT 번호</li><li>LOT 유형</li><li>최초수량</li><li>제조·생산일자</li><li>유효기간</li><li>공급사 LOT</li><li>품질상태</li></ul>
+<hr>
+<h2 id="s54">9.2 재고단위</h2>
+<p>특정 품목·LOT가 특정 위치와 상태로 존재하는 수량단위이다.</p>
+<p>재고단위의 식별 기준은 개념적으로 다음과 같다.</p>
+<div class="codewrap"><pre><code class="lang-text">법인
++ 사업부
++ 공장
++ 창고
++ 로케이션
++ 품목
++ LOT
++ 품질상태
++ 재고상태
++ 소유구분</code></pre></div>
+<p>같은 LOT라도 로케이션이나 품질상태가 다르면 별도의 재고단위로 구분한다.</p>
+<hr>
+<h2 id="s55">9.3 재고 트랜잭션</h2>
+<p>재고의 수량·위치·상태 변화를 발생시키는 원본 이벤트이다.</p>
+<p>트랜잭션 유형 예:</p>
+<ul><li>구매입고</li><li>생산출고</li><li>자재투입</li><li>자재반납</li><li>생산품 입고</li><li>이동출고</li><li>이동입고</li><li>외주출고</li><li>외주입고</li><li>판매출하</li><li>고객반품</li><li>공급사반품</li><li>폐기</li><li>재고조정</li></ul>
+<p>모든 트랜잭션은 업무 근거문서를 참조한다.</p>
+<hr>
+<h2 id="s56">9.4 재고현황</h2>
+<p>현재 시점의 품목·LOT·로케이션별 수량이다.</p>
+<p>재고현황은 재고 트랜잭션을 기반으로 유지되는 현재값이다.</p>
+<p>구분수량:</p>
+<ul><li>현재수량</li><li>가용수량</li><li>예약수량</li><li>피킹수량</li><li>이동중수량</li><li>생산현장수량</li><li>보류수량</li><li>격리수량</li><li>출하대기수량</li></ul>
+<hr>
+<h2 id="s57">9.5 재고예약</h2>
+<p>특정 작업지시·이동요청·출하요청을 위해 가용재고를 선점한다.</p>
+<p>예약은 재고의 물리적 위치나 총수량을 변경하지 않지만 가용수량을 감소시킨다.</p>
+<hr>
+<h2 id="s58">9.6 재고할당</h2>
+<p>예약 대상에 실제 사용할 LOT와 로케이션을 지정한다.</p>
+<hr>
+<h2 id="s59">9.7 피킹작업</h2>
+<p>할당된 LOT를 실제 로케이션에서 꺼내는 현장 작업이다.</p>
+<hr>
+<h2 id="s60">9.8 출고</h2>
+<p>창고에서 생산현장·사업부·외주처 등으로 재고를 내보내는 업무문서이다.</p>
+<hr>
+<h2 id="s61">9.9 재고이동</h2>
+<p>로케이션·창고·사업부·공장·외부창고 간의 재고이동을 관리하는 문서이다.</p>
+<p>하나의 재고이동은 여러 이동 Line을 가진다.</p>
+<hr>
+<h2 id="s62">9.10 재고이동 Line</h2>
+<p>이동 대상 품목, LOT, 수량, 출발위치, 도착위치를 정의한다.</p>
+<hr>
+<h2 id="s63">9.11 취급단위</h2>
+<p>박스, 트레이, 대차, 팔레트 등의 물리적 이동단위이다.</p>
+<hr>
+<h2 id="s64">9.12 취급단위 구성</h2>
+<p>취급단위에 포함된 LOT와 수량을 나타낸다.</p>
+<p>하나의 취급단위에 여러 LOT가 포함될 수 있고, 하나의 LOT가 여러 취급단위로 나뉠 수 있다.</p>
+<hr>
+<h2 id="s65">9.13 재고실사</h2>
+<p>특정 창고·로케이션·품목·LOT의 실물재고를 확인하는 업무이다.</p>
+<hr>
+<h2 id="s66">9.14 재고조정</h2>
+<p>실사차이 또는 확인된 재고오류를 승인에 따라 보정하는 이벤트이다.</p>
+<p>재고조정은 과거 입출고 이력을 수정하지 않는다.</p>
+<hr>
+<h1 id="s67">10. F. 자재투입 영역</h1>
+<h2 id="s68">10.1 생산출고 요청</h2>
+<p>작업지시에 필요한 자재를 생산현장으로 출고하도록 요청하는 문서이다.</p>
+<p>작업지시와 BOM 소요자재를 근거로 생성된다.</p>
+<hr>
+<h2 id="s69">10.2 생산현장 인수</h2>
+<p>창고에서 출고된 자재를 생산현장에서 실제 인수한 이벤트이다.</p>
+<p>출고수량과 인수수량 차이를 관리한다.</p>
+<hr>
+<h2 id="s70">10.3 자재투입</h2>
+<p>특정 자재 LOT를 특정 작업지시에 실제 투입한 이벤트이다.</p>
+<p>주요 관계:</p>
+<ul><li>하나의 작업지시는 여러 자재투입을 가진다.</li><li>하나의 자재 LOT는 여러 작업지시에 투입될 수 있다.</li><li>하나의 자재투입은 하나 이상의 생산실적 또는 생산 LOT에 배분될 수 있다.</li></ul>
+<hr>
+<h2 id="s71">10.4 자재사용 배분</h2>
+<p>투입된 자재가 어떤 생산실적 또는 생산 LOT에 얼마만큼 사용되었는지를 연결한다.</p>
+<p>배분방식:</p>
+<ul><li>직접 지정</li><li>생산수량 비례</li><li>시간구간 기준</li><li>BOM 기준</li><li>자재 LOT 전환시점 기준</li></ul>
+<p>정확배분과 추정배분을 구분한다.</p>
+<hr>
+<h2 id="s72">10.5 자재반납</h2>
+<p>생산현장에 남은 자재를 창고로 되돌리는 업무이다.</p>
+<p>원 자재 LOT와 관계를 유지한다.</p>
+<hr>
+<h2 id="s73">10.6 자재폐기</h2>
+<p>퍼징, 오염, 손실 등의 사유로 사용하지 못한 자재수량을 처리하는 이벤트이다.</p>
+<hr>
+<h1 id="s74">11. G. 생산실적 영역</h1>
+<h2 id="s75">11.1 생산실적</h2>
+<p>작업지시에서 발생한 부분 또는 최종 생산결과이다.</p>
+<p>하나의 작업지시는 여러 생산실적을 가진다.</p>
+<p>주요 수량:</p>
+<ul><li>양품수량</li><li>불량수량</li><li>보류수량</li><li>재작업수량</li><li>폐기수량</li></ul>
+<hr>
+<h2 id="s76">11.2 생산실적 출처</h2>
+<p>생산실적의 입력방식을 구분한다.</p>
+<p>예:</p>
+<ul><li>작업자 수동입력</li><li>설비 자동수집</li><li>파일 업로드</li><li>ERP 수신</li><li>관리자 보정</li></ul>
+<hr>
+<h2 id="s77">11.3 생산 LOT 배분</h2>
+<p>생산실적의 양품수량을 하나 이상의 생산 LOT에 배분한다.</p>
+<p>관계:</p>
+<ul><li>하나의 생산실적이 여러 생산 LOT에 분할될 수 있다.</li><li>하나의 생산 LOT에 여러 부분 생산실적이 누적될 수 있다.</li></ul>
+<p>따라서 생산실적과 생산 LOT는 다대다 관계이며 배분 엔터티가 필요하다.</p>
+<hr>
+<h2 id="s78">11.4 공정 인계</h2>
+<p>선행 공정 생산 LOT 또는 수량을 후속 공정 작업지시에 투입하는 이벤트이다.</p>
+<p>공정 인계는 작업지시 간 수량 흐름과 LOT 계보의 근거가 된다.</p>
+<hr>
+<h2 id="s79">11.5 생산품 입고</h2>
+<p>생산된 반제품·완제품 LOT를 생산현장에서 창고재고로 인수하는 업무이다.</p>
+<p>부분 입고를 지원한다.</p>
+<hr>
+<h1 id="s80">12. H. 품질관리 영역</h1>
+<h2 id="s81">12.1 검사계획</h2>
+<p>품목·공정·검사유형별 검사기준이다.</p>
+<p>하나의 검사계획은 여러 버전을 가질 수 있다.</p>
+<hr>
+<h2 id="s82">12.2 검사항목</h2>
+<p>검사계획에 포함되는 개별 측정 또는 판정 항목이다.</p>
+<hr>
+<h2 id="s83">12.3 검사대상</h2>
+<p>실제 검사를 수행해야 하는 업무대상이다.</p>
+<p>검사대상은 다음 중 하나 이상과 연결될 수 있다.</p>
+<ul><li>입하 Line</li><li>자재 LOT</li><li>작업지시</li><li>생산실적</li><li>생산 LOT</li><li>출하 LOT</li></ul>
+<hr>
+<h2 id="s84">12.4 검사실적</h2>
+<p>검사대상에 대해 수행한 전체 검사결과이다.</p>
+<p>하나의 검사대상은 재검사를 포함해 여러 검사실적을 가질 수 있다.</p>
+<hr>
+<h2 id="s85">12.5 검사측정값</h2>
+<p>검사항목별 실제 측정값과 판정이다.</p>
+<p>하나의 검사실적은 여러 검사측정값을 가진다.</p>
+<hr>
+<h2 id="s86">12.6 품질판정</h2>
+<p>검사결과에 따른 최종 사용 가능 여부이다.</p>
+<p>예:</p>
+<ul><li>합격</li><li>불합격</li><li>보류</li><li>특채</li><li>재검사대기</li></ul>
+<p>품질판정은 LOT와 재고단위의 품질상태에 영향을 준다.</p>
+<hr>
+<h2 id="s87">12.7 불량</h2>
+<p>생산 또는 검사에서 발견한 개별 불량현상이다.</p>
+<p>불량 발생공정과 발견공정을 구분한다.</p>
+<p>불량현상과 불량원인은 별도 기준정보로 분리 관리한다. 불량 건에는 추정원인과 확정원인, 귀책구분(자체·공급사·외주 등)과 귀책부서를 기록할 수 있다.</p>
+<hr>
+<h2 id="s88">12.8 부적합</h2>
+<p>중대한 불량 또는 품질문제를 관리하는 업무 건이다.</p>
+<p>부적합은 하나 이상의 LOT·생산실적·검사실적과 연결될 수 있다.</p>
+<hr>
+<h2 id="s89">12.9 부적합 처리결정</h2>
+<p>부적합 대상의 처리방향이다.</p>
+<p>예:</p>
+<ul><li>재작업</li><li>선별</li><li>재검사</li><li>특채</li><li>반품</li><li>폐기</li></ul>
+<p>처리결정이 선별인 경우, 선별 실행 결과(선별수량과 양품·불량·보류 분해, 선별기준, 작업자, 결과 LOT)를 별도로 기록한다.</p>
+<p>부적합 건에는 처리결정과 별개로 최소한의 조치사항(조치내용, 담당자, 완료기한)을 기록한다. 정식 CAPA는 2차 범위이다.</p>
+<hr>
+<h2 id="s90">12.10 특채</h2>
+<p>품질기준에 완전히 합격하지 않았지만 제한조건에 따라 사용을 허가하는 승인이다.</p>
+<p>특채는 적용 LOT, 수량, 공정, 작업지시, 고객, 기간 등의 조건을 가진다.</p>
+<p>특채는 단순 판정값이 아니라 사용범위 통제 데이터이다. 자재투입·출하 시 특채 조건(허용 작업지시·공정·고객·유효기간)을 검증하고, 승인수량 한도 내에서 소진수량을 관리한다. 특채는 반드시 승인요청과 연결된다.</p>
+<hr>
+<h2 id="s91">12.11 재작업 작업지시</h2>
+<p>부적합 처리결정이 재작업인 경우 생성되는 작업지시이다.</p>
+<p>일반 작업지시 엔터티를 사용하되 작업지시 유형으로 재작업을 구분한다.</p>
+<hr>
+<h1 id="s92">13. I. LOT 추적성 영역</h1>
+<h2 id="s93">13.1 LOT 관계</h2>
+<p>두 LOT 사이의 계보관계를 표현한다.</p>
+<p>LOT 관계는 단순 부모·자식 관계가 아니라 관계유형과 수량을 가진다.</p>
+<p>관계유형 예:</p>
+<ul><li>투입됨</li><li>생산됨</li><li>분할됨</li><li>병합됨</li><li>재작업됨</li><li>포장됨</li><li>출하구성됨</li><li>잔량분리됨</li><li>외주처리됨</li></ul>
+<p>주요 정보:</p>
+<ul><li>원본 LOT</li><li>대상 LOT</li><li>관계유형</li><li>관계수량</li><li>발생시각</li><li>근거 업무 이벤트</li><li>추적 정확도</li></ul>
+<hr>
+<h2 id="s94">13.2 LOT 외부 식별번호</h2>
+<p>하나의 내부 LOT에 연결되는 외부 번호이다.</p>
+<p>예:</p>
+<ul><li>공급사 LOT</li><li>고객 LOT</li><li>ERP LOT</li><li>외주처 LOT</li><li>현품표 번호</li><li>고객 바코드</li></ul>
+<hr>
+<h2 id="s95">13.3 일련번호</h2>
+<p>개별 제품 또는 부품의 개체 식별번호이다.</p>
+<p>LOT 관리와 개별 일련번호 관리를 동시에 사용할 수 있다.</p>
+<hr>
+<h2 id="s96">13.4 일련번호 조립관계</h2>
+<p>개별 부품 일련번호와 완제품 일련번호 간 조립관계이다.</p>
+<hr>
+<h2 id="s97">13.5 LOT 보류</h2>
+<p>품질문제나 영향범위 분석으로 특정 LOT 또는 일부 수량을 사용 중지하는 업무이다.</p>
+<p>보류는 LOT 상태값 변경이 아니라 독립 업무 건으로 관리한다. 보류 사유, 대상 수량(전량 또는 일부), 해제조건, 보류·해제 주체와 시각의 이력을 보존한다.</p>
+<hr>
+<h2 id="s98">13.6 LOT 영향범위</h2>
+<p>문제 LOT를 기준으로 관련 생산 LOT, 현재 재고, 후속공정, 포장, 출하, 고객을 식별한 분석결과이다.</p>
+<p>영향범위 분석결과는 분석 시점과 조건을 보존할 수 있어야 한다. 분석 건별로 분석번호, 추적방향(정방향·역방향), 분석조건, 분석 시각·수행자, 결과 요약을 스냅샷으로 저장한다. 대규모 리콜 사건관리(회수수량·고객통지 추적)는 2차 범위로 이연한다.</p>
+<hr>
+<h1 id="s99">14. J. 출하·외주·공통관리 영역</h1>
+<h2 id="s100">14.1 판매오더</h2>
+<p>고객 주문의 상위 문서이다.</p>
+<p>ERP에서 수신할 수 있다.</p>
+<hr>
+<h2 id="s101">14.2 출하요청</h2>
+<p>특정 고객·품목·수량을 출하하도록 요청하는 실행문서이다.</p>
+<p>하나의 판매오더 Line이 여러 번 부분 출하될 수 있다.</p>
+<hr>
+<h2 id="s102">14.3 출하</h2>
+<p>실제 고객에게 제품을 반출하는 업무문서이다.</p>
+<p>하나의 출하는 여러 출하 Line을 가진다.</p>
+<hr>
+<h2 id="s103">14.4 출하 Line</h2>
+<p>출하 품목과 출하수량을 정의한다.</p>
+<hr>
+<h2 id="s104">14.5 출하 LOT 배분</h2>
+<p>출하 Line에 어떤 생산 LOT 또는 포장단위가 얼마만큼 포함되었는지를 연결한다.</p>
+<p>출하 Line과 LOT는 다대다 관계이다.</p>
+<hr>
+<h2 id="s105">14.6 외주 작업지시</h2>
+<p>외주처에서 수행하는 공정을 지시하는 문서이다.</p>
+<p>외주 작업지시도 기본적으로 작업지시의 특수유형으로 관리할 수 있다.</p>
+<hr>
+<h2 id="s106">14.7 외주출고</h2>
+<p>외주처에 자재·반제품을 보내는 물류 이벤트이다.</p>
+<hr>
+<h2 id="s107">14.8 외주입고</h2>
+<p>외주가공 결과품이 되돌아온 입고 이벤트이다.</p>
+<p>원 외주출고 LOT와 외주입고 LOT 관계를 유지한다.</p>
+<p>외주 건별로 수량 정산을 관리한다. 출고수량을 합격·불량·폐기·분실·조정·잔량으로 분해하여 기록하고, 정산 확정 주체와 시각을 남긴다.</p>
+<div class="codewrap"><pre><code class="lang-text">외주출고수량
+= 외주입고수량(합격+불량) + 외주처 잔량 + 폐기 + 분실 + 조정</code></pre></div>
+<hr>
+<h2 id="s108">14.9 승인요청</h2>
+<p>초과입하, 초과생산, 특채, 실적정정, 재고조정 등의 예외업무 승인을 관리한다.</p>
+<p>승인경로는 기준정보로 관리한다. 업무유형·사업부·수량(금액) 구간별로 승인단계와 단계별 승인자(사용자·역할·부서)를 설정하고, 개별 승인요청은 이 경로를 근거로 생성된다.</p>
+<hr>
+<h2 id="s109">14.10 예외업무</h2>
+<p>정상처리되지 않은 미완료·오류 업무를 관리한다.</p>
+<p>예:</p>
+<ul><li>작업지시 생성 실패</li><li>자재수량 불일치</li><li>검사 미완료</li><li>LOT 연결 누락</li><li>이동수량 불일치</li><li>ERP 전송 실패</li></ul>
+<hr>
+<h2 id="s110">14.11 첨부파일</h2>
+<p>검사사진, 거래명세서, 폐기증빙, 특채승인서 등 업무 근거자료를 연결한다.</p>
+<hr>
+<h2 id="s111">14.12 감사이력</h2>
+<p>누가, 언제, 어떤 값을, 왜 변경했는지를 기록한다.</p>
+<p>일반 업무데이터와 분리하여 변경 불가능한 감사이력으로 관리한다.</p>
+<hr>
+<h2 id="s112">14.13 연계 메시지</h2>
+<p>ERP 및 외부시스템과 송수신되는 개별 연계 건이다.</p>
+<p>상태:</p>
+<ul><li>전송대기</li><li>전송중</li><li>전송완료</li><li>전송실패</li><li>재처리대기</li></ul>
+<hr>
+<h2 id="s113">14.14 발행이력</h2>
+<p>라벨, 검사성적서(COA), 추적성 증빙 등 출력물의 발행·재발행 기록이다.</p>
+<ul><li>발행 대상(LOT·출하·검사실적 등), 발행자, 발행시각, 단말기, 프린터를 기록한다.</li><li>재발행은 회차를 증가시키고 재발행 사유를 필수로 남긴다.</li><li>라벨 재발행으로 새로운 LOT가 생성되어서는 안 된다.</li></ul>
+<hr>
+<h2 id="s114">14.15 운영정책·채번규칙</h2>
+<p>프로그램 수정 없이 운영 파라미터를 조정하기 위한 기준정보이다.</p>
+<ul><li>운영정책: 초과생산 허용, FIFO 위반 처리, 초과투입 허용, 사후입력 허용시간, 생산 LOT 생성시점, 품목별 LOT 정책 등을 적용범위(사업부·공장·품목·공정)별로 수치·문자·불리언 값으로 관리한다.</li><li>채번규칙: 작업지시·LOT·입하·출하 등 업무번호의 생성패턴과 리셋 주기, 시퀀스 상태를 관리한다.</li></ul>
+<hr>
+<h1 id="s115">15. 핵심 엔터티 관계 및 카디널리티</h1>
+<h2 id="s116">15.1 조직·위치</h2>
+<div class="codewrap"><pre><code class="lang-text">법인 1 ── N 사업부
+사업부 1 ── N 공장
+공장 1 ── N 창고
+창고 1 ── N 로케이션
+로케이션 1 ── N 하위 로케이션
+
+공장 1 ── N 생산라인
+생산라인 1 ── N 작업구역
+부서 1 ── N 사용자
+사용자 N ── M 역할</code></pre></div>
+<hr>
+<h2 id="s117">15.2 품목·제품구조</h2>
+<div class="codewrap"><pre><code class="lang-text">품목 1 ── N BOM
+BOM 1 ── N BOM 구성자재
+자재품목 1 ── N BOM 구성자재
+
+품목 1 ── N 라우팅
+라우팅 1 ── N 라우팅 공정
+공정 1 ── N 라우팅 공정</code></pre></div>
+<hr>
+<h2 id="s118">15.3 생산계획·작업지시</h2>
+<div class="codewrap"><pre><code class="lang-text">생산오더 1 ── N 생산계획
+생산계획 1 ── N 작업지시
+라우팅 공정 1 ── N 작업지시
+작업지시 1 ── N 작업 세션
+작업지시 N ── M 작업지시
+  └─ 작업지시 선후관계로 연결</code></pre></div>
+<hr>
+<h2 id="s119">15.4 구매입하·입고</h2>
+<div class="codewrap"><pre><code class="lang-text">구매 P/O 1 ── N 구매 P/O Line
+구매 P/O Line 1 ── N 입하 Line
+입하 1 ── N 입하 Line
+입하 Line 1 ── N 검사대상
+입하 Line 1 ── N 입고
+입고 1 ── N 재고 트랜잭션
+입고 1 ── N LOT</code></pre></div>
+<hr>
+<h2 id="s120">15.5 재고</h2>
+<div class="codewrap"><pre><code class="lang-text">품목 1 ── N LOT
+LOT 1 ── N 재고단위
+로케이션 1 ── N 재고단위
+재고단위 1 ── N 재고 트랜잭션
+
+재고이동 1 ── N 재고이동 Line
+재고이동 Line 1 ── N 재고 트랜잭션</code></pre></div>
+<hr>
+<h2 id="s121">15.6 작업지시·자재투입</h2>
+<div class="codewrap"><pre><code class="lang-text">작업지시 1 ── N 자재투입
+LOT 1 ── N 자재투입
+생산출고 1 ── N 생산현장 인수
+생산현장 인수 1 ── N 자재투입</code></pre></div>
+<p>하나의 자재 LOT는 여러 작업지시에 나누어 투입될 수 있다.</p>
+<hr>
+<h2 id="s122">15.7 생산실적·생산 LOT</h2>
+<div class="codewrap"><pre><code class="lang-text">작업지시 1 ── N 생산실적
+생산실적 N ── M 생산 LOT
+  └─ 생산 LOT 배분으로 연결
+
+작업지시 1 ── N 생산 LOT
+생산 LOT 1 ── N 생산품 입고</code></pre></div>
+<hr>
+<h2 id="s123">15.8 자재와 생산 LOT 추적</h2>
+<div class="codewrap"><pre><code class="lang-text">자재투입 N ── M 생산 LOT
+  └─ 자재사용 배분으로 연결
+
+LOT N ── M LOT
+  └─ LOT 관계로 연결</code></pre></div>
+<hr>
+<h2 id="s124">15.9 품질</h2>
+<div class="codewrap"><pre><code class="lang-text">검사계획 1 ── N 검사항목
+검사대상 1 ── N 검사실적
+검사실적 1 ── N 검사측정값
+검사실적 1 ── 1 품질판정
+
+생산실적 1 ── N 검사대상
+LOT 1 ── N 검사대상
+
+검사실적 1 ── N 불량
+검사실적 N ── M 부적합
+LOT N ── M 부적합</code></pre></div>
+<hr>
+<h2 id="s125">15.10 출하</h2>
+<div class="codewrap"><pre><code class="lang-text">판매오더 1 ── N 출하요청
+출하요청 1 ── N 출하
+출하 1 ── N 출하 Line
+출하 Line N ── M LOT
+  └─ 출하 LOT 배분으로 연결</code></pre></div>
+<hr>
+<h2 id="s126">15.11 취급단위</h2>
+<div class="codewrap"><pre><code class="lang-text">취급단위 N ── M LOT
+  └─ 취급단위 구성으로 연결
+
+취급단위 1 ── N 하위 취급단위</code></pre></div>
+<hr>
+<h1 id="s127">16. 핵심 데이터 책임</h1>
+<div class="tablewrap"><table><thead><tr><th>데이터</th><th>원본 책임 엔터티</th></tr></thead><tbody><tr><td>생산 지시수량·상태</td><td>작업지시</td></tr><tr><td>실제 작업시간·작업자</td><td>작업 세션</td></tr><tr><td>실제 자재 투입량</td><td>자재투입</td></tr><tr><td>자재별 생산 LOT 사용량</td><td>자재사용 배분</td></tr><tr><td>양품·불량 생산수량</td><td>생산실적</td></tr><tr><td>생산 LOT 수량</td><td>생산 LOT 배분</td></tr><tr><td>품질판정</td><td>품질판정</td></tr><tr><td>LOT 부모·자식 관계</td><td>LOT 관계</td></tr><tr><td>재고 증감</td><td>재고 트랜잭션</td></tr><tr><td>현재 재고</td><td>재고현황</td></tr><tr><td>출하된 LOT·수량</td><td>출하 LOT 배분</td></tr></tbody></table></div>
+<p>다른 기능이 원본 데이터를 별도로 중복 관리하지 않도록 해야 한다.</p>
+<hr>
+<h1 id="s128">17. 주요 수량 보존 규칙</h1>
+<h2 id="s129">17.1 입하·입고</h2>
+<div class="codewrap"><pre><code class="lang-text">입하수량
+= 입고수량
++ 검사대기수량
++ 반송수량
++ 파손수량
++ 차이수량</code></pre></div>
+<h2 id="s130">17.2 자재 출고·투입</h2>
+<div class="codewrap"><pre><code class="lang-text">생산출고수량
+= 현장재고수량
++ 작업지시 투입수량
++ 반납수량
++ 폐기수량
++ 차이수량</code></pre></div>
+<h2 id="s131">17.3 공정 생산</h2>
+<div class="codewrap"><pre><code class="lang-text">공정 투입수량
+= 양품수량
++ 불량수량
++ 보류수량
++ 현재 재공수량
++ 공정손실수량
++ 조정수량</code></pre></div>
+<h2 id="s132">17.4 생산 LOT</h2>
+<div class="codewrap"><pre><code class="lang-text">생산 LOT 양품수량
+= 창고입고수량
++ 후속 공정 투입수량
++ 생산현장 잔량
++ 출하수량
++ 폐기수량
++ 조정수량</code></pre></div>
+<h2 id="s133">17.5 외주</h2>
+<div class="codewrap"><pre><code class="lang-text">외주출고수량
+= 외주입고수량
++ 외주처 잔량
++ 불량수량
++ 폐기수량
++ 분실수량
++ 조정수량</code></pre></div>
+<hr>
+<h1 id="s134">18. 주요 상태 책임</h1>
+<h2 id="s135">18.1 작업지시 상태</h2>
+<div class="codewrap"><pre><code class="lang-text">작성 → 발행 → 작업대기 → 작업중 → 작업완료 → 마감</code></pre></div>
+<h2 id="s136">18.2 재고상태</h2>
+<div class="codewrap"><pre><code class="lang-text">가용
+예약
+피킹중
+이동중
+생산현장
+검사대기
+보류
+격리
+출하대기
+출하완료
+소진
+폐기</code></pre></div>
+<h2 id="s137">18.3 품질상태</h2>
+<div class="codewrap"><pre><code class="lang-text">미검사
+검사대기
+합격
+불합격
+보류
+특채
+재검사대기</code></pre></div>
+<h2 id="s138">18.4 입하·입고 상태</h2>
+<div class="codewrap"><pre><code class="lang-text">입하예정 → 도착 → 입하등록 → 검사대기 → 입고 → 적치완료</code></pre></div>
+<h2 id="s139">18.5 이동 상태</h2>
+<div class="codewrap"><pre><code class="lang-text">이동요청 → 이동출고 → 이동중 → 이동입고 → 이동완료</code></pre></div>
+<h2 id="s140">18.6 출하 상태</h2>
+<div class="codewrap"><pre><code class="lang-text">출하요청 → 재고할당 → 피킹 → 검수 → 상차 → 출하완료</code></pre></div>
+<hr>
+<h1 id="s141">19. 권장 애그리게이트 경계</h1>
+<p>개념 모델을 논리 모델로 전환할 때 다음 업무단위를 독립적인 변경 경계로 사용하는 것이 적절하다.</p>
+<div class="tablewrap"><table><thead><tr><th>애그리게이트</th><th>대표 루트</th></tr></thead><tbody><tr><td>생산계획</td><td>생산계획</td></tr><tr><td>작업실행</td><td>작업지시</td></tr><tr><td>구매입하</td><td>입하</td></tr><tr><td>구매입고</td><td>입고</td></tr><tr><td>재고이동</td><td>재고이동</td></tr><tr><td>생산출고</td><td>생산출고 요청</td></tr><tr><td>자재사용</td><td>자재투입</td></tr><tr><td>생산결과</td><td>생산실적</td></tr><tr><td>품질검사</td><td>검사대상</td></tr><tr><td>부적합관리</td><td>부적합</td></tr><tr><td>LOT 추적</td><td>LOT</td></tr><tr><td>고객출하</td><td>출하</td></tr><tr><td>외주실행</td><td>외주 작업지시</td></tr><tr><td>재고실사</td><td>재고실사</td></tr></tbody></table></div>
+<p>하나의 애그리게이트 내부는 동일 트랜잭션으로 처리하고, 애그리게이트 간 상태전파는 업무 이벤트로 연결하는 것이 적절하다.</p>
+<hr>
+<h1 id="s142">20. 모델링 시 확정된 주요 의사결정</h1>
+<ol><li>생산계획 확정 시 MES 관리 공정의 작업지시를 전체 일괄 생성한다.</li><li>작업지시 한 건은 하나의 MES 관리 대상 공정을 담당한다.</li><li>전체 실제 공정은 라우팅에 유지한다.</li><li>MES 미관리 공정에는 공식 작업지시와 생산실적을 생성하지 않는다.</li><li>단말기와 공정은 다대다 관계로 관리한다.</li><li>예정 근무조와 실제 근무조를 구분한다.</li><li>작업지시와 작업 세션을 분리한다.</li><li>생산출고와 자재투입을 분리한다.</li><li>생산실적과 생산품 입고를 분리한다.</li><li>품질상태와 재고상태를 분리한다.</li><li>LOT와 취급단위를 분리한다.</li><li>사업부 간 이동은 고객 출하로 처리하지 않는다.</li><li>외주처 보유재고는 소진재고가 아니라 외부 위치재고로 관리한다.</li><li>LOT 관계는 관계유형과 관계수량을 가진다.</li><li>모든 취소·정정은 원본을 보존하고 보정 이벤트로 처리한다.</li><li>작업지시의 분할·재작업은 원본 작업지시(및 원본 LOT·부적합) 참조를 유지한다.</li><li>음수재고 허용 여부는 품목 정책으로 관리하고, 허용 품목에 한해 음수를 허용한다.</li><li>라벨·성적서 등 출력물은 발행이력을 남기며, 재발행이 새 LOT를 만들지 않는다.</li><li>작업자(현장 수행 주체)와 사용자(시스템 입력 주체)를 분리하고 선택적으로 연결한다.</li></ol>
+<hr>
+<h1 id="s143">21. 논리 모델링 전 추가 확정사항</h1>
+<h2 id="s144">21.1 LOT 생성 단위</h2>
+<p>품목별로 다음 중 어떤 기준을 적용할지 확정해야 한다.</p>
+<ul><li>작업지시별</li><li>생산일자별</li><li>근무조별</li><li>박스별</li><li>자재 LOT 변경별</li><li>설비·금형 변경별</li></ul>
+<hr>
+<h2 id="s145">21.2 재고 관리 최소 단위</h2>
+<p>창고별로 관리 수준을 확정해야 한다.</p>
+<ul><li>공장 단위</li><li>창고 단위</li><li>구역 단위</li><li>랙 단위</li><li>셀 단위</li><li>취급단위 단위</li></ul>
+<hr>
+<h2 id="s146">21.3 부분 품질판정 처리</h2>
+<p>동일 LOT 내에서 합격·보류·불합격수량이 발생할 때 다음 중 어떤 방식을 사용할지 확정해야 한다.</p>
+<ul><li>동일 LOT 내 품질상태별 재고단위 분리</li><li>별도 파생 LOT 생성</li><li>물리적으로 분리된 경우에만 파생 LOT 생성</li></ul>
+<p>권장 방식:</p>
+<blockquote><p>LOT 원본 식별은 유지하되 재고단위를 품질상태별로 분리하고, 별도 라벨과 물리적 분리가 필요한 경우 파생 LOT를 생성한다.</p></blockquote>
+<hr>
+<h2 id="s147">21.4 ERP 재고 책임</h2>
+<p>다음 사항을 확정해야 한다.</p>
+<ul><li>MES와 ERP 중 어느 시스템이 회계상 재고의 최종 원장인지</li><li>생산현장 재고를 ERP에도 별도 창고로 보낼지</li><li>사업부 간 이동을 ERP에서 어떤 전표로 처리할지</li><li>외주처 재고를 ERP에서 관리할지</li><li>MES 재고조정 결과를 ERP에 즉시 반영할지</li></ul>
+<p>권장 구조:</p>
+<div class="codewrap"><pre><code class="lang-text">MES
+= LOT·로케이션·품질상태·현장 실행재고
+
+ERP
+= 회계·금액·공식 창고재고</code></pre></div>
+<p>두 시스템은 확정된 재고 트랜잭션을 기준으로 동기화한다.</p>
+<hr>
+<h1 id="s148">22. 개념 모델 최종 요약</h1>
+<p>본 MES의 개념 모델은 작업지시를 중심으로 생산실행 데이터를 연결하되, LOT와 재고 트랜잭션을 통해 생산 전후의 물류 흐름을 관리하는 구조이다.</p>
+<div class="codewrap"><pre><code class="lang-text">구매 P/O
+→ 입하
+→ 검사
+→ 입고
+→ 자재 LOT·재고
+→ 생산출고
+→ 작업지시 자재투입
+→ 생산실적
+→ 생산 LOT
+→ 품질판정
+→ 생산품 입고
+→ 재고이동
+→ 출하
+→ 고객</code></pre></div>
+<p>핵심 추적관계는 다음과 같다.</p>
+<div class="codewrap"><pre><code class="lang-text">공급사 LOT
+→ 내부 자재 LOT
+→ 자재투입
+→ 공정별 작업지시
+→ 생산실적
+→ 반제품·완제품 LOT
+→ 창고재고
+→ 출하 LOT
+→ 고객</code></pre></div>
+<p>이 구조를 기준으로 다음 단계인 논리적 모델링에서는 엔터티별 속성, 식별자, 외래키, 상태코드, 수량 필드 및 정규화 구조를 구체화한다.</p>
+  </article>
+  <div class="pager"><a class="pv" href="2-7.html"><span>이전</span>물류 재고 실행 관리</a><a class="nx" href="3-2.html"><span>다음</span>논리적 모델링</a></div>
+</main>
+</body>
+</html>

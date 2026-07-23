@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>입고 거래 명세표 — 공통 양식</title>
+<style>
+  :root { --accent:#1a3a5c; --border:#555; --muted:#666; --soft:#eef2f6; }
+  * { box-sizing:border-box; }
+  body { font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif; color:#1a1a1a; background:#f0f0f0; margin:0; padding:24px; }
+  .sheet { background:#fff; width:210mm; min-height:297mm; margin:0 auto; padding:16mm 14mm; box-shadow:0 1px 8px rgba(0,0,0,.18); }
+  .head { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid var(--accent); padding-bottom:10px; }
+  .head .company { font-size:12px; color:var(--muted); }
+  .head .company .name { font-size:15px; font-weight:800; color:#111; }
+  .title { text-align:center; flex:1; }
+  .title h1 { margin:0; font-size:26px; letter-spacing:6px; color:var(--accent); }
+  .title .sub { font-size:12px; color:var(--muted); letter-spacing:1px; }
+  .approval { border:1px solid var(--border); border-collapse:collapse; font-size:10px; }
+  .approval td { border:1px solid var(--border); text-align:center; padding:2px 6px; }
+  .approval td.h { background:var(--soft); font-weight:700; }
+  .approval td.box { height:38px; width:52px; }
+  .docmeta { display:flex; justify-content:flex-end; gap:26px; margin:10px 0 4px; font-size:12px; }
+  .docmeta b { color:var(--muted); font-weight:600; margin-right:6px; }
+  .u { display:inline-block; min-width:90px; border-bottom:1px solid #999; }
+  .parties { display:flex; gap:0; border:1px solid var(--border); margin-top:8px; }
+  .parties .col { flex:1; padding:10px 12px; font-size:12px; }
+  .parties .col + .col { border-left:1px solid var(--border); }
+  .parties .lbl { font-weight:800; color:var(--accent); margin-bottom:8px; font-size:12px; border-bottom:1px dashed #ccc; padding-bottom:4px; }
+  .parties .fld { display:flex; margin:5px 0; }
+  .parties .fld .k { color:var(--muted); min-width:74px; }
+  .parties .fld .v { flex:1; border-bottom:1px dotted #bbb; min-height:16px; }
+  .options { border:1px solid var(--border); border-top:none; padding:8px 12px; font-size:11.5px; display:flex; flex-wrap:wrap; gap:6px 4px; align-items:center; }
+  .options b { color:var(--accent); margin-right:4px; }
+  .options label { display:inline-flex; align-items:center; gap:4px; border:1px solid #bbb; border-radius:4px; padding:2px 8px; }
+  .options input { transform:translateY(1px); }
+  table.items { width:100%; border-collapse:collapse; margin-top:12px; font-size:11.5px; }
+  table.items th, table.items td { border:1px solid var(--border); padding:6px 4px; text-align:center; }
+  table.items th { background:var(--soft); color:var(--accent); }
+  table.items td { height:26px; }
+  table.items tr.total td { background:#f4f4f4; font-weight:700; }
+  .receipt { border:1px solid var(--border); margin-top:12px; padding:10px 12px; font-size:11.5px; }
+  .receipt .rt { font-weight:800; color:var(--accent); margin-bottom:6px; }
+  .receipt .line { margin:4px 0; }
+  .sign { display:flex; margin-top:14px; border:1px solid var(--border); }
+  .sign .cell { flex:1; text-align:center; font-size:11px; }
+  .sign .cell + .cell { border-left:1px solid var(--border); }
+  .sign .cell .r { background:var(--soft); padding:5px; font-weight:700; color:var(--accent); border-bottom:1px solid var(--border); }
+  .sign .cell .s { height:56px; }
+  .note { font-size:10.5px; color:var(--muted); margin-top:8px; }
+  .toolbar { width:210mm; margin:0 auto 14px; text-align:right; }
+  .toolbar button { font-size:13px; padding:7px 16px; border:1px solid var(--accent); background:var(--accent); color:#fff; border-radius:6px; cursor:pointer; }
+  @media print { body{background:#fff;padding:0;} .sheet{box-shadow:none;width:auto;min-height:auto;padding:10mm;} .toolbar{display:none;} }
+</style>
+</head>
+<body>
+
+<div class="toolbar"><button onclick="window.print()">🖨 인쇄 / PDF 저장</button></div>
+
+<div class="sheet">
+  <!-- 헤더 -->
+  <div class="head">
+    <div class="company">
+      <div class="name">[ 공급업체명 ]</div>
+      <div>Supplier / Nhà cung cấp</div>
+    </div>
+    <div class="title">
+      <h1>입고 거래 명세표</h1>
+      <div class="sub">DELIVERY &amp; RECEIVING NOTE · PHIẾU GIAO HÀNG / XUẤT KHO</div>
+    </div>
+    <table class="approval">
+      <tr><td class="h">작성</td><td class="h">검사1</td><td class="h">검사2</td><td class="h">승인</td></tr>
+      <tr><td class="box"></td><td class="box"></td><td class="box"></td><td class="box"></td></tr>
+    </table>
+  </div>
+
+  <div class="docmeta">
+    <span><b>문서번호 No.</b><span class="u"></span></span>
+    <span><b>발행일 Date</b><span class="u"></span></span>
+    <span><b>시각 Time</b><span class="u"></span></span>
+  </div>
+
+  <!-- 공급자 / 수령자 -->
+  <div class="parties">
+    <div class="col">
+      <div class="lbl">공급자 (인도) · Supplier / Delivered by</div>
+      <div class="fld"><span class="k">상 호</span><span class="v"></span></div>
+      <div class="fld"><span class="k">주 소</span><span class="v"></span></div>
+      <div class="fld"><span class="k">사업자번호</span><span class="v"></span></div>
+      <div class="fld"><span class="k">연 락 처</span><span class="v"></span></div>
+    </div>
+    <div class="col">
+      <div class="lbl">수령자 · Receiver / Ship-To</div>
+      <div class="fld"><span class="k">상 호</span><span class="v">SAMJIN LND VINA CO., LTD</span></div>
+      <div class="fld"><span class="k">주 소</span><span class="v">Lô A12-1, KCN Bá Thiện 2, Bình Xuyên</span></div>
+      <div class="fld"><span class="k">담 당</span><span class="v"></span></div>
+      <div class="fld"><span class="k">연 락 처</span><span class="v"></span></div>
+    </div>
+  </div>
+
+  <!-- 출고구분 / 운송수단 -->
+  <div class="options">
+    <b>출고구분</b>
+    <label><input type="checkbox">판매 Bán</label>
+    <label><input type="checkbox">샘플 Sample</label>
+    <label><input type="checkbox">대체품/NG보충 Bù NG</label>
+    <label><input type="checkbox">RMA</label>
+    &nbsp;&nbsp;<b>운송수단</b>
+    <label><input type="checkbox">화물차 Xe Tải</label>
+    <label><input type="checkbox">자동차 Taxi</label>
+    <label><input type="checkbox">오토바이 Xe Ôm</label>
+    <label><input type="checkbox">기타 Khác</label>
+  </div>
+
+  <!-- 품목 테이블 -->
+  <table class="items">
+    <thead>
+      <tr>
+        <th style="width:6%">No<br>순번</th>
+        <th style="width:15%">Model<br>모델</th>
+        <th style="width:15%">Code<br>코드</th>
+        <th style="width:24%">Description<br>품명</th>
+        <th style="width:11%">Spec<br>규격</th>
+        <th style="width:6%">Unit<br>단위</th>
+        <th style="width:9%">Qty<br>수량</th>
+        <th style="width:14%">Lot No / 포장</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>2</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>3</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>4</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>5</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>6</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>7</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>8</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr class="total"><td colspan="6">합계 · TOTAL</td><td></td><td></td></tr>
+    </tbody>
+  </table>
+
+  <!-- 수령 확인란 (LOTTE 문서 기반) -->
+  <div class="receipt">
+    <div class="rt">수령 확인 · Receiving Confirmation</div>
+    <div class="line">· 수령일시 Receiving Date &amp; Time : 20____년 ____월 ____일 ____시 ____분</div>
+    <div class="line">· 기상 Weather : ☐ 맑음 Sunny &nbsp; ☐ 흐림 Cloudy &nbsp; ☐ 비 Rainy &nbsp; ☐ 눈 Snow</div>
+    <div class="line">· 하역장소 Unloading : ☐ 실내 Indoors &nbsp; ☐ 실외 Outdoors &nbsp;&nbsp; 습기침투 Moisture : ☐ 유 Yes &nbsp; ☐ 무 No</div>
+    <div class="line">· 파손 Broken : (&nbsp;&nbsp;&nbsp;&nbsp;) 박스/봉지 &nbsp;&nbsp; 수량부족 Shortage : (&nbsp;&nbsp;&nbsp;&nbsp;) EA/KG</div>
+  </div>
+
+  <!-- 서명란 -->
+  <div class="sign">
+    <div class="cell"><div class="r">작성자<br><small>Người lập</small></div><div class="s"></div></div>
+    <div class="cell"><div class="r">인도자<br><small>Người giao</small></div><div class="s"></div></div>
+    <div class="cell"><div class="r">운송/기사<br><small>Lái xe</small></div><div class="s"></div></div>
+    <div class="cell"><div class="r">수령자<br><small>Người nhận</small></div><div class="s"></div></div>
+    <div class="cell"><div class="r">승인<br><small>Duyệt</small></div><div class="s"></div></div>
+  </div>
+  <div class="note">※ 서명 후 성명을 정자로 기재할 것 · Ký và ghi rõ họ và tên &nbsp;|&nbsp; 규격 상이 시 즉시 연락 · Please contact us when products differ from the specification</div>
+</div>
+
+</body>
+</html>

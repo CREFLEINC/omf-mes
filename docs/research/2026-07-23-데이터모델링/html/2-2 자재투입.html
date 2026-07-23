@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>자재투입 · MES 데이터 모델링 v3</title>
+<style>:root{
+  --bg:#F4F5F6; --surface:#FFFFFF; --surface-2:#EDEFF1; --surface-3:#E4E7EA;
+  --ink:#14181B; --ink-2:#5A6570; --ink-3:#8B959D;
+  --rule:#DCE0E4; --rule-strong:#C3CAD0;
+  --accent:#A9660A; --tint-accent:#F7ECD9;
+  --blue:#28558F; --green:#1D7043; --red:#B93E28;
+  --start:#B93E28; --flow:#1D7043; --done:#28558F; --warn:#9B3427;
+  --tint-start:#F6E5E1; --tint-flow:#E2F0E7; --tint-done:#E2EAF5;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Pretendard","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+  --side:264px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#101315; --surface:#171B1E; --surface-2:#1D2226; --surface-3:#242A2F;
+    --ink:#E7EBEE; --ink-2:#9AA5AE; --ink-3:#6E7A83;
+    --rule:#2A3035; --rule-strong:#3A4249;
+    --accent:#DFA149; --tint-accent:#2B2317;
+    --blue:#83ACE4; --green:#5FC68B; --red:#E4816C;
+  --start:#E4816C; --flow:#5FC68B; --done:#83ACE4; --warn:#E0806E;
+  --tint-start:#2A1D1A; --tint-flow:#16281F; --tint-done:#182432;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101315; --surface:#171B1E; --surface-2:#1D2226; --surface-3:#242A2F;
+  --ink:#E7EBEE; --ink-2:#9AA5AE; --ink-3:#6E7A83;
+  --rule:#2A3035; --rule-strong:#3A4249;
+  --accent:#DFA149; --tint-accent:#2B2317;
+  --blue:#83ACE4; --green:#5FC68B; --red:#E4816C;
+  --start:#E4816C; --flow:#5FC68B; --done:#83ACE4; --warn:#E0806E;
+  --tint-start:#2A1D1A; --tint-flow:#16281F; --tint-done:#182432;
+}
+:root[data-theme="light"]{
+  --bg:#F4F5F6; --surface:#FFFFFF; --surface-2:#EDEFF1; --surface-3:#E4E7EA;
+  --ink:#14181B; --ink-2:#5A6570; --ink-3:#8B959D;
+  --rule:#DCE0E4; --rule-strong:#C3CAD0;
+  --accent:#A9660A; --tint-accent:#F7ECD9;
+  --blue:#28558F; --green:#1D7043; --red:#B93E28;
+  --start:#B93E28; --flow:#1D7043; --done:#28558F; --warn:#9B3427;
+  --tint-start:#F6E5E1; --tint-flow:#E2F0E7; --tint-done:#E2EAF5;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans);
+     font-size:15px; line-height:1.75; letter-spacing:-0.003em}
+
+/* ── 사이드바 ───────────────────────────── */
+nav.side{position:sticky; top:0; z-index:20; background:var(--surface);
+         border-bottom:1px solid var(--rule); max-height:none}
+.nav-brand{padding:16px 22px 12px; border-bottom:1px solid var(--rule)}
+.nav-brand a{text-decoration:none; display:block}
+.nav-brand .bt{display:block; font-size:14px; font-weight:700; color:var(--ink); letter-spacing:-0.02em}
+.nav-brand .bs{display:block; font-family:var(--mono); font-size:10px; color:var(--ink-3);
+               letter-spacing:.1em; text-transform:uppercase; margin-top:4px}
+.nav-docs{display:flex; gap:2px; overflow-x:auto; padding:0 14px; scrollbar-width:thin}
+.nav-docs .grp{flex:none; align-self:center; font-family:var(--mono); font-size:10px;
+               letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); padding:0 8px 0 4px}
+.nav-docs a{flex:none; padding:11px 10px; font-size:12.5px; color:var(--ink-2);
+            text-decoration:none; white-space:nowrap; border-bottom:2px solid transparent}
+.nav-docs a:hover{color:var(--ink)}
+.nav-docs a.on{color:var(--ink); font-weight:600; border-bottom-color:var(--accent)}
+.ontop{display:none}
+
+main{max-width:940px; margin:0 auto; padding:0 26px 100px}
+
+@media (min-width:1120px){
+  body{padding-left:var(--side)}
+  nav.side{position:fixed; inset:0 auto 0 0; width:var(--side); height:100vh;
+           overflow-y:auto; border-bottom:0; border-right:1px solid var(--rule);
+           display:flex; flex-direction:column; padding-bottom:28px}
+  .nav-brand{padding:24px 22px 18px}
+  .nav-docs{flex-direction:column; overflow:visible; padding:14px 12px 0; gap:0}
+  .nav-docs .grp{align-self:stretch; padding:14px 10px 5px}
+  .nav-docs .grp:first-child{padding-top:0}
+  .nav-docs a{padding:6px 10px; border-bottom:0; border-left:2px solid transparent;
+              white-space:normal; line-height:1.45; border-radius:0 3px 3px 0}
+  .nav-docs a:hover{background:var(--surface-2)}
+  .nav-docs a.on{background:var(--surface-2); border-left-color:var(--accent)}
+  .ontop{display:flex; flex-direction:column; margin-top:20px; padding:14px 12px 0;
+         border-top:1px solid var(--rule)}
+  .ontop .grp{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+              color:var(--ink-3); padding:0 10px 6px}
+  .ontop a{padding:3px 10px; font-size:11.5px; color:var(--ink-2); text-decoration:none;
+           line-height:1.5; border-left:2px solid transparent}
+  .ontop a:hover{color:var(--accent); border-left-color:var(--rule-strong)}
+  .ontop a.l1{font-weight:600; color:var(--ink); margin-top:6px}
+  .ontop a.l2{padding-left:20px}
+  .ontop a.l3{padding-left:32px; color:var(--ink-3); font-size:11px}
+  main{margin:0; padding:0 56px 120px}
+}
+
+/* ── 문서 헤더 ──────────────────────────── */
+.dochead{padding:44px 0 26px; border-bottom:2px solid var(--ink); margin-bottom:8px}
+.eyebrow{font-family:var(--mono); font-size:10.5px; letter-spacing:.13em; text-transform:uppercase;
+         color:var(--ink-3)}
+.doctitle{font-size:clamp(24px,3.2vw,32px); line-height:1.22; margin:10px 0 0; font-weight:700;
+          letter-spacing:-0.025em; text-wrap:balance}
+.docsub{margin:10px 0 0; color:var(--ink-2); font-size:14px; max-width:64ch}
+
+/* ── 본문 ──────────────────────────────── */
+.md{padding-top:12px}
+.md h1,.md h2,.md h3,.md h4,.md h5,.md h6{letter-spacing:-0.02em; text-wrap:balance; scroll-margin-top:80px}
+.md h1{font-size:23px; font-weight:700; margin:52px 0 14px; padding-bottom:9px;
+       border-bottom:1px solid var(--rule-strong)}
+.md h2{font-size:18.5px; font-weight:700; margin:38px 0 10px}
+.md h3{font-size:15.5px; font-weight:700; margin:28px 0 8px; color:var(--ink)}
+.md h4,.md h5,.md h6{font-size:14px; font-weight:700; margin:22px 0 6px; color:var(--ink-2)}
+.md > :first-child{margin-top:0}
+.md p{margin:0 0 13px; max-width:76ch}
+.md a{color:var(--blue)}
+.md strong{font-weight:700}
+.md hr{border:0; border-top:1px solid var(--rule); margin:34px 0}
+.md ul,.md ol{margin:0 0 14px; padding-left:22px; max-width:76ch}
+.md li{margin:3px 0}
+.md li > ul,.md li > ol{margin:3px 0}
+.md blockquote{margin:0 0 16px; padding:12px 18px; border-left:3px solid var(--accent);
+               background:var(--tint-accent); border-radius:0 3px 3px 0; max-width:76ch}
+.md blockquote p{margin:0}
+.md blockquote p + p{margin-top:8px}
+code{font-family:var(--mono); font-size:.87em; background:var(--surface-2); padding:1.5px 5px;
+     border-radius:2px; color:var(--ink); word-break:break-word}
+.codewrap{margin:0 0 16px; border:1px solid var(--rule); border-radius:3px; background:var(--surface);
+          overflow-x:auto}
+.codewrap pre{margin:0; padding:14px 18px}
+.codewrap code{background:none; padding:0; font-size:12.5px; line-height:1.65; white-space:pre;
+               display:block}
+.codewrap code.lang-sql{color:var(--ink)}
+
+/* ── 표 ────────────────────────────────── */
+.tablewrap{overflow-x:auto; margin:0 0 18px; border:1px solid var(--rule); border-radius:3px;
+           background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-size:13.5px; min-width:480px}
+th,td{text-align:left; padding:9px 14px; border-bottom:1px solid var(--rule); vertical-align:top;
+      line-height:1.6}
+thead th{font-family:var(--mono); font-size:11px; letter-spacing:.06em; color:var(--ink-3);
+         font-weight:600; background:var(--surface-2); white-space:nowrap; text-transform:uppercase}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--surface-2)}
+td code{font-size:12px; white-space:nowrap}
+
+/* ── 페이저 ────────────────────────────── */
+.pager{display:flex; justify-content:space-between; gap:16px; margin-top:56px; padding-top:22px;
+       border-top:1px solid var(--rule)}
+.pager a{flex:0 1 auto; max-width:46%; text-decoration:none; color:var(--ink); font-size:13.5px;
+         font-weight:600; padding:12px 16px; border:1px solid var(--rule); border-radius:3px;
+         background:var(--surface); line-height:1.4}
+.pager a:hover{border-color:var(--accent); color:var(--accent)}
+.pager a span{display:block; font-family:var(--mono); font-size:10px; letter-spacing:.1em;
+              text-transform:uppercase; color:var(--ink-3); font-weight:500; margin-bottom:3px}
+.pager a.nx{text-align:right}
+a:focus-visible,.nav-docs a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+/* ── 인덱스 전용 ───────────────────────── */
+.hero{padding:56px 0 34px; border-bottom:2px solid var(--ink)}
+.hero h1{font-size:clamp(27px,4vw,40px); line-height:1.15; margin:12px 0 0; font-weight:700;
+         letter-spacing:-0.03em}
+.hero .lede{margin:14px 0 0; color:var(--ink-2); font-size:15px; max-width:68ch}
+.statbar{display:flex; flex-wrap:wrap; gap:0; margin:30px 0 0; border:1px solid var(--rule);
+         border-radius:3px; background:var(--surface); overflow:hidden}
+.statbar div{flex:1 1 130px; padding:14px 18px; border-right:1px solid var(--rule)}
+.statbar div:last-child{border-right:0}
+.statbar .v{font-family:var(--mono); font-size:21px; font-weight:600; letter-spacing:-0.02em;
+            font-variant-numeric:tabular-nums; display:block}
+.statbar .k{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+            color:var(--ink-3); margin-top:3px; display:block}
+.secgrp{margin:52px 0 0}
+.secgrp > h2{font-size:13px; font-family:var(--mono); letter-spacing:.12em; text-transform:uppercase;
+             color:var(--accent); margin:0 0 4px; font-weight:600}
+.secgrp > p{margin:0 0 18px; color:var(--ink-2); font-size:13.5px; max-width:70ch}
+.cards{display:grid; gap:12px}
+@media(min-width:720px){.cards{grid-template-columns:1fr 1fr}}
+.card{display:block; text-decoration:none; color:inherit; background:var(--surface);
+      border:1px solid var(--rule); border-radius:3px; padding:17px 19px; transition:border-color .12s}
+.card:hover{border-color:var(--accent)}
+.card .num{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; color:var(--accent);
+           font-weight:600}
+.card h3{margin:6px 0 5px; font-size:16px; font-weight:700; letter-spacing:-0.02em}
+.card p{margin:0; font-size:13px; color:var(--ink-2); line-height:1.6}
+.card .facts{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px}
+.card .facts span{font-family:var(--mono); font-size:10.5px; color:var(--ink-3);
+                  background:var(--surface-2); padding:2px 7px; border-radius:2px;
+                  font-variant-numeric:tabular-nums}
+.card .facts span.hi{background:var(--tint-accent); color:var(--accent); font-weight:600}
+.card.ext .num{color:var(--blue)}
+.card.ext:hover{border-color:var(--blue)}
+.note{margin:44px 0 0; padding:16px 20px; border:1px solid var(--rule); border-left:3px solid var(--blue);
+      border-radius:0 3px 3px 0; background:var(--surface); font-size:13.5px; color:var(--ink-2)}
+.note b{color:var(--ink)}
+footer{margin-top:64px; padding-top:22px; border-top:1px solid var(--rule);
+        font-size:12.5px; color:var(--ink-3); display:flex; flex-wrap:wrap; gap:14px;
+        justify-content:space-between}
+@media (prefers-reduced-motion:reduce){*{transition:none!important; scroll-behavior:auto!important}}
+
+/* ── 워크플로우 페이지: 넓은 본문 ── */
+body.wide main{max-width:1180px}
+</style>
+</head>
+<body>
+<nav class="side"><div class="nav-brand"><a href="index.html"><span class="bt">MES 데이터 모델링</span><span class="bs">v3 · 문서 인덱스</span></a></div>
+<div class="nav-docs">
+<span class="grp">업무 흐름 정본</span>
+<a href="workflow-v2.html">OMF MES 시스템 워크플로우 v2</a>
+<span class="grp">1. 도메인 이해</span>
+<a href="1-1.html">비즈니스 도메인의 이해</a>
+<a href="1-2.html">MES의 핵심 필수 기능</a>
+<a href="1-3.html">사용자 시나리오</a>
+<span class="grp">2. 기능 요구사항</span>
+<a href="2-1.html">작업지시</a>
+<a href="2-2.html" class="on">자재투입</a>
+<a href="2-3.html">생산 실적 관리</a>
+<a href="2-4.html">품질관리</a>
+<a href="2-5.html">LOT 추적성</a>
+<a href="2-6.html">요구사항 누락분 보충</a>
+<a href="2-7.html">물류 재고 실행 관리</a>
+<span class="grp">3. 데이터 모델링</span>
+<a href="3-1.html">개념적 모델링</a>
+<a href="3-2.html">논리적 모델링</a>
+<a href="3-3.html">물리적 모델링</a>
+<a href="mes_erd.html">ERD — 도메인별 다이어그램</a>
+<a href="mes_scenarios_workflows.html">업무 시나리오 &amp; 워크플로우</a>
+<a href="mes_workflows_detailed.html">상세 워크플로우</a>
+<span class="grp">참고</span>
+<a href="changelog.html">변경 이력</a>
+</div><aside class="ontop"><span class="grp">이 문서</span><a class="l1" href="#s1">MES 핵심 기능 요구사항 ② 자재 투입 관리</a><a class="l2" href="#s2">1. 적용 목적</a><a class="l1" href="#s3">2. 용어 정의</a><a class="l2" href="#s4">2.1 소요자재</a><a class="l2" href="#s5">2.2 투입자재</a><a class="l2" href="#s6">2.3 자재 LOT</a><a class="l2" href="#s7">2.4 투입수량</a><a class="l2" href="#s8">2.5 실제 사용수량</a><a class="l2" href="#s9">2.6 자재잔량</a><a class="l2" href="#s10">2.7 Running Change</a><a class="l1" href="#s11">3. 기본 처리 구조</a><a class="l1" href="#s12">4. 자재 관리 수준</a><a class="l1" href="#s13">5. 기능적 요구사항</a><a class="l2" href="#s14">FR-MI-001 작업지시별 소요자재 조회</a><a class="l2" href="#s15">FR-MI-002 공정별 소요자재 관리</a><a class="l2" href="#s16">FR-MI-003 MES 미관리 공정 투입자재 처리</a><a class="l2" href="#s17">FR-MI-004 자재투입 등록 가능 상태 검증</a><a class="l2" href="#s18">FR-MI-005 자재 LOT 바코드 스캔</a><a class="l2" href="#s19">FR-MI-006 작업지시 바코드와 자재 바코드 연속 처리</a><a class="l2" href="#s20">FR-MI-007 자재 적합성 검증</a><a class="l2" href="#s21">FR-MI-008 자재 LOT 상태별 투입 통제</a><a class="l2" href="#s22">FR-MI-009 투입수량 등록</a><a class="l2" href="#s23">FR-MI-010 단위 및 환산 관리</a><a class="l2" href="#s24">FR-MI-011 포장단위 전체 투입 및 부분 투입</a><a class="l2" href="#s25">FR-MI-012 다중 자재 LOT 투입</a><a class="l2" href="#s26">FR-MI-013 자재 LOT 분할 사용</a><a class="l2" href="#s27">FR-MI-014 작업 시작 전 자재투입</a><a class="l2" href="#s28">FR-MI-015 생산 중 추가 자재투입</a><a class="l2" href="#s29">FR-MI-016 사후 투입 등록</a><a class="l2" href="#s30">FR-MI-017 공용 단말기 자재투입 지원</a><a class="l2" href="#s31">FR-MI-018 단말기 허용 공정 검증</a><a class="l2" href="#s32">FR-MI-019 FIFO 및 선입선출 안내</a><a class="l2" href="#s33">FR-MI-020 대체자재 투입</a><a class="l2" href="#s34">FR-MI-021 Running Change 관리</a><a class="l2" href="#s35">FR-MI-022 LOT 전환시점 관리</a><a class="l2" href="#s36">FR-MI-023 자재투입량 초과 경고</a><a class="l2" href="#s37">FR-MI-024 자재투입 부족 확인</a><a class="l2" href="#s38">FR-MI-025 가용재고 및 음수재고 통제</a><a class="l2" href="#s39">FR-MI-026 자동 차감</a><a class="l2" href="#s40">FR-MI-027 실제 사용수량 확정</a><a class="l2" href="#s41">FR-MI-028 자재잔량 등록</a><a class="l2" href="#s42">FR-MI-029 자재잔량 처리</a><a class="l2" href="#s43">FR-MI-030 잔량 LOT 유지 및 잔량 라벨 발행</a><a class="l2" href="#s44">FR-MI-031 잔량 재사용</a><a class="l2" href="#s45">FR-MI-032 자재 폐기 및 손실 등록</a><a class="l2" href="#s46">FR-MI-033 투입자재 취소</a><a class="l2" href="#s47">FR-MI-034 투입자재 정정</a><a class="l2" href="#s48">FR-MI-035 작업지시 마감 연계</a><a class="l2" href="#s49">FR-MI-036 생산실적 연계</a><a class="l2" href="#s50">FR-MI-037 생산 LOT 연계</a><a class="l2" href="#s51">FR-MI-038 자재투입 현황 조회</a><a class="l2" href="#s52">FR-MI-039 작업지시별 자재현황 조회</a><a class="l2" href="#s53">FR-MI-040 자재 LOT 사용처 조회</a><a class="l2" href="#s54">FR-MI-041 자재투입 이력 관리</a><a class="l1" href="#s55">6. 비기능 요구사항</a><a class="l2" href="#s56">NFR-MI-001 응답성</a><a class="l2" href="#s57">NFR-MI-002 중복 등록 방지</a><a class="l2" href="#s58">NFR-MI-003 동시성 통제</a><a class="l2" href="#s59">NFR-MI-004 데이터 정합성</a><a class="l2" href="#s60">NFR-MI-005 추적성 보장</a><a class="l2" href="#s61">NFR-MI-006 감사 가능성</a><a class="l2" href="#s62">NFR-MI-007 권한 관리</a><a class="l2" href="#s63">NFR-MI-008 사용성</a><a class="l2" href="#s64">NFR-MI-009 장애 및 재처리</a><a class="l2" href="#s65">NFR-MI-010 성능 및 처리용량</a><a class="l2" href="#s66">NFR-MI-011 확장성</a><a class="l2" href="#s67">NFR-MI-012 유지보수성</a><a class="l2" href="#s68">NFR-MI-013 시간 정확성</a><a class="l2" href="#s69">NFR-MI-014 데이터 보존</a><a class="l1" href="#s70">7. 핵심 업무 규칙</a><a class="l2" href="#s71">BR-MI-001</a><a class="l2" href="#s72">BR-MI-002</a><a class="l2" href="#s73">BR-MI-003</a><a class="l2" href="#s74">BR-MI-004</a><a class="l2" href="#s75">BR-MI-005</a><a class="l2" href="#s76">BR-MI-006</a><a class="l2" href="#s77">BR-MI-007</a><a class="l2" href="#s78">BR-MI-008</a><a class="l2" href="#s79">BR-MI-009</a><a class="l2" href="#s80">BR-MI-010</a><a class="l2" href="#s81">BR-MI-011</a><a class="l2" href="#s82">BR-MI-012</a><a class="l1" href="#s83">8. 기본 자재 투입 흐름</a></aside></nav>
+<main>
+  <header class="dochead">
+    <div class="eyebrow">2. 기능 요구사항 · 2-2 자재투입</div>
+    <h1 class="doctitle">자재투입</h1>
+    <p class="docsub">출고·현장 인수·투입·정정·Running Change·반납</p>
+  </header>
+  <article class="md">
+<h1 id="s1">MES 핵심 기능 요구사항 ② 자재 투입 관리</h1>
+<h2 id="s2">1. 적용 목적</h2>
+<p>자재 투입 관리 기능은 생산에 사용된 자재의 품목, LOT, 수량, 투입 공정, 작업지시, 작업자 및 투입 시점을 기록하여 다음 목적을 달성하기 위한 기능이다.</p>
+<ul><li>올바른 자재의 투입 여부 확인</li><li>자재 LOT와 생산 LOT 간 추적성 확보</li><li>작업지시별 실제 자재 사용량 파악</li><li>자재 교체 및 Running Change 이력 관리</li><li>투입 후 잔량의 반납·보관·재사용 관리</li><li>재고수량과 생산실적 간 정합성 확보</li></ul>
+<hr>
+<h1 id="s3">2. 용어 정의</h1>
+<h2 id="s4">2.1 소요자재</h2>
+<p>작업지시를 수행하기 위해 필요한 자재로서 BOM 또는 공정별 자재 구성에 정의된 자재이다.</p>
+<h2 id="s5">2.2 투입자재</h2>
+<p>작업지시에 실제로 투입된 자재이다.</p>
+<p>소요자재와 투입자재는 다음과 같이 다를 수 있다.</p>
+<ul><li>BOM의 표준 자재와 실제 투입자재가 동일한 경우</li><li>승인된 대체자재가 투입된 경우</li><li>여러 자재 LOT가 나누어 투입된 경우</li><li>자재가 과다 또는 과소 투입된 경우</li></ul>
+<h2 id="s6">2.3 자재 LOT</h2>
+<p>동일한 제조·입고·품질 조건을 갖는 자재의 추적 단위이다.</p>
+<h2 id="s7">2.4 투입수량</h2>
+<p>작업지시에 사용하기 위해 생산현장에 투입 등록한 수량이다.</p>
+<h2 id="s8">2.5 실제 사용수량</h2>
+<p>투입수량 중 실제 생산에 소비된 수량이다.</p>
+<h2 id="s9">2.6 자재잔량</h2>
+<p>투입수량 중 생산에 사용되지 않고 남은 수량이다.</p>
+<div class="codewrap"><pre><code class="lang-text">자재잔량
+= 투입수량
+- 실제 사용수량
+- 불량·폐기수량</code></pre></div>
+<h2 id="s10">2.7 Running Change</h2>
+<p>생산 진행 중 기존 자재에서 다른 자재 LOT 또는 변경 자재로 전환하는 것이다.</p>
+<hr>
+<h1 id="s11">3. 기본 처리 구조</h1>
+<div class="codewrap"><pre><code class="lang-text">작업지시
+   ↓
+공정별 소요자재 조회
+   ↓
+자재 LOT 스캔 또는 자재 선택
+   ↓
+품목·LOT·상태·수량 검증
+   ↓
+자재투입 등록
+   ↓
+생산실적 등록
+   ↓
+실제 사용수량 및 잔량 확정
+   ↓
+생산 LOT와 투입 자재 LOT 연결</code></pre></div>
+<p>하나의 작업지시에는 여러 자재 LOT를 투입할 수 있어야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">작업지시 1건
+├─ Resin LOT A
+├─ Resin LOT B
+├─ Insert LOT C
+└─ 부자재 LOT D</code></pre></div>
+<p>하나의 자재 LOT를 여러 작업지시에 나누어 투입할 수도 있어야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">자재 LOT A
+├─ 작업지시 WO-001에 100kg
+├─ 작업지시 WO-002에 70kg
+└─ 잔량 30kg</code></pre></div>
+<hr>
+<h1 id="s12">4. 자재 관리 수준</h1>
+<p>자재별로 MES 관리 수준을 설정할 수 있어야 한다.</p>
+<div class="tablewrap"><table><thead><tr><th>관리 수준</th><th>적용 대상</th><th>처리 방식</th></tr></thead><tbody><tr><td>LOT 추적</td><td>원재료, 금속 Insert, 핵심부품</td><td>자재 LOT 스캔 및 실제 수량 등록</td></tr><tr><td>수량 관리</td><td>일반 부품, 포장재</td><td>품목과 수량만 등록</td></tr><tr><td>자동 차감</td><td>반복 투입되는 일반 부자재</td><td>BOM과 생산실적 기준 자동 소비</td></tr><tr><td>관리 제외</td><td>소모품, 공구성 자재</td><td>MES 투입 관리 제외</td></tr></tbody></table></div>
+<p>자재의 중요도와 고객 추적성 요구에 따라 품목별 관리 수준을 변경할 수 있어야 한다.</p>
+<hr>
+<h1 id="s13">5. 기능적 요구사항</h1>
+<h2 id="s14">FR-MI-001 작업지시별 소요자재 조회</h2>
+<p>시스템은 작업지시의 품목, 공정, 라우팅 버전 및 BOM을 기준으로 해당 작업지시에 필요한 소요자재 목록을 조회할 수 있어야 한다.</p>
+<p>소요자재 목록에는 최소한 다음 정보가 포함되어야 한다.</p>
+<ul><li>자재코드</li><li>자재명</li><li>자재 유형</li><li>표준 소요량</li><li>단위</li><li>LOT 추적 여부</li><li>필수 투입 여부</li><li>허용 대체자재</li><li>투입 등록 대상 공정</li><li>현재 투입수량</li><li>부족수량</li></ul>
+<hr>
+<h2 id="s15">FR-MI-002 공정별 소요자재 관리</h2>
+<p>시스템은 동일 제품에 사용되는 자재라도 어느 공정에서 투입되는지를 구분할 수 있어야 한다.</p>
+<p>예시:</p>
+<div class="codewrap"><pre><code class="lang-text">사출 공정
+- Resin
+- Color Master Batch
+- Metal Insert
+
+조립 공정
+- 사출 반제품
+- 볼트
+- Gasket
+- Harness</code></pre></div>
+<p>자재는 BOM에만 연결하지 않고 필요에 따라 라우팅 공정과 연결할 수 있어야 한다.</p>
+<hr>
+<h2 id="s16">FR-MI-003 MES 미관리 공정 투입자재 처리</h2>
+<p>MES 미관리 공정에서 실제 자재가 투입되는 경우에도 추적이 필요한 자재는 MES에 등록할 수 있어야 한다.</p>
+<p>MES 미관리 공정의 자재에는 별도의 <code>투입 등록 담당 공정</code>을 지정해야 한다.</p>
+<p>예시:</p>
+<div class="codewrap"><pre><code class="lang-text">실제 투입 공정: 융착 공정
+MES 관리 여부: 미관리
+투입 등록 담당 공정: 조립 작업지시</code></pre></div>
+<p>시스템은 다음 정보를 구분하여 저장해야 한다.</p>
+<ul><li>실제 자재가 사용되는 공정</li><li>MES에서 투입을 등록하는 관리 대상 공정</li><li>해당 공정의 작업지시</li></ul>
+<p>이를 통해 단말기가 없는 공정의 자재도 인접한 관리 대상 공정에서 등록할 수 있어야 한다.</p>
+<hr>
+<h2 id="s17">FR-MI-004 자재투입 등록 가능 상태 검증</h2>
+<p>자재투입은 다음 상태의 작업지시에 대해서만 허용해야 한다.</p>
+<ul><li>발행</li><li>작업대기</li><li>작업중</li><li>일시중지 상태 중 투입 허용 정책이 적용된 경우</li></ul>
+<p>다음 상태에서는 일반 사용자의 자재투입을 제한해야 한다.</p>
+<ul><li>작성</li><li>작업완료</li><li>마감</li><li>취소</li><li>보류</li></ul>
+<p>관리자 권한으로 예외 투입하는 경우 사유를 기록해야 한다.</p>
+<hr>
+<h2 id="s18">FR-MI-005 자재 LOT 바코드 스캔</h2>
+<p>LOT 추적 대상 자재는 자재 라벨의 바코드 또는 QR 코드를 스캔하여 투입할 수 있어야 한다.</p>
+<p>스캔 시 시스템은 최소한 다음 정보를 조회해야 한다.</p>
+<ul><li>자재 품목</li><li>내부 자재 LOT</li><li>공급사 LOT</li><li>현재 재고수량</li><li>현재 로케이션</li><li>재고상태</li><li>검사상태</li><li>유효기간</li><li>사용 가능 여부</li></ul>
+<hr>
+<h2 id="s19">FR-MI-006 작업지시 바코드와 자재 바코드 연속 처리</h2>
+<p>공용 단말기에서는 다음 순서로 작업지시와 자재를 연결할 수 있어야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">작업자 인증
+→ 작업지시 바코드 스캔
+→ 대상 공정 확인
+→ 자재 LOT 바코드 스캔
+→ 자재 검증
+→ 투입수량 입력
+→ 저장</code></pre></div>
+<p>작업지시를 선택하지 않은 상태에서 자재 LOT를 스캔한 경우 시스템은 대상 작업지시 선택을 요구해야 한다.</p>
+<hr>
+<h2 id="s20">FR-MI-007 자재 적합성 검증</h2>
+<p>자재 투입 시 시스템은 스캔된 자재가 작업지시에서 사용할 수 있는 자재인지 검증해야 한다.</p>
+<p>검증 항목은 다음과 같다.</p>
+<ul><li>BOM 또는 공정별 소요자재에 포함되는지</li><li>품목이 일치하는지</li><li>승인된 대체자재인지</li><li>해당 공정에서 사용할 수 있는지</li><li>재고상태가 가용인지</li><li>품질검사가 합격 또는 특채 상태인지</li><li>유효기간이 지나지 않았는지</li><li>보류·격리·불량 LOT가 아닌지</li><li>해당 사업부 또는 공장에서 사용할 수 있는지</li></ul>
+<p>부적합한 자재는 기본적으로 투입을 차단해야 한다.</p>
+<hr>
+<h2 id="s21">FR-MI-008 자재 LOT 상태별 투입 통제</h2>
+<p>시스템은 다음 재고상태의 자재 투입을 통제해야 한다.</p>
+<div class="tablewrap"><table><thead><tr><th>재고상태</th><th>기본 처리</th></tr></thead><tbody><tr><td>가용</td><td>투입 허용</td></tr><tr><td>검사대기</td><td>투입 차단</td></tr><tr><td>보류</td><td>투입 차단</td></tr><tr><td>격리</td><td>투입 차단</td></tr><tr><td>불량</td><td>투입 차단</td></tr><tr><td>특채</td><td>승인조건 확인 후 허용</td></tr><tr><td>유효기간 경과</td><td>투입 차단 또는 관리자 승인</td></tr><tr><td>소진</td><td>투입 차단</td></tr></tbody></table></div>
+<hr>
+<h2 id="s22">FR-MI-009 투입수량 등록</h2>
+<p>자재 투입 시 실제 투입수량을 등록할 수 있어야 한다.</p>
+<p>투입수량에는 다음 검증을 적용해야 한다.</p>
+<ul><li>0보다 큰 수량인지</li><li>현재 가용재고를 초과하지 않는지</li><li>소수점 허용 기준에 맞는지</li><li>품목의 기본단위와 일치하는지</li><li>포장단위 또는 환산단위가 유효한지</li></ul>
+<hr>
+<h2 id="s23">FR-MI-010 단위 및 환산 관리</h2>
+<p>자재 입고단위, 재고단위, 생산 투입단위가 다른 경우 단위 환산을 지원해야 한다.</p>
+<p>예시:</p>
+<div class="codewrap"><pre><code class="lang-text">입고단위: BAG
+1 BAG = 25kg
+
+재고단위: kg
+투입단위: kg</code></pre></div>
+<p>또는:</p>
+<div class="codewrap"><pre><code class="lang-text">입고단위: BOX
+1 BOX = 1,000개
+
+투입단위: 개</code></pre></div>
+<p>환산기준은 품목 기준정보에서 관리하고, 투입 이력에는 입력단위와 환산된 재고단위를 모두 저장해야 한다.</p>
+<hr>
+<h2 id="s24">FR-MI-011 포장단위 전체 투입 및 부분 투입</h2>
+<p>시스템은 다음 두 가지 방식을 지원해야 한다.</p>
+<ul><li>포장단위 전체 투입</li><li>포장 개봉 후 부분수량 투입</li></ul>
+<p>부분 투입 후 남은 수량은 동일 자재 LOT의 잔량으로 관리해야 한다.</p>
+<p>예시:</p>
+<div class="codewrap"><pre><code class="lang-text">원래 수량: 1,000개
+투입수량: 600개
+잔량: 400개</code></pre></div>
+<hr>
+<h2 id="s25">FR-MI-012 다중 자재 LOT 투입</h2>
+<p>하나의 작업지시에 동일 품목의 여러 자재 LOT를 투입할 수 있어야 한다.</p>
+<p>예시:</p>
+<div class="codewrap"><pre><code class="lang-text">작업지시 WO-001
+
+Resin LOT R001: 80kg
+Resin LOT R002: 30kg</code></pre></div>
+<p>시스템은 LOT별 투입 시작시점, 종료시점 및 투입수량을 구분하여 저장해야 한다.</p>
+<hr>
+<h2 id="s26">FR-MI-013 자재 LOT 분할 사용</h2>
+<p>하나의 자재 LOT를 여러 작업지시 또는 여러 설비에 나누어 투입할 수 있어야 한다.</p>
+<p>각 투입이 등록될 때마다 해당 자재 LOT의 가용수량을 차감해야 한다.</p>
+<p>동일 자재 LOT의 투입수량 합계는 가용재고수량을 초과할 수 없어야 한다.</p>
+<hr>
+<h2 id="s27">FR-MI-014 작업 시작 전 자재투입</h2>
+<p>공정별 운영정책에 따라 작업 시작 전에 자재투입을 등록할 수 있어야 한다.</p>
+<p>예시:</p>
+<div class="codewrap"><pre><code class="lang-text">전일 야간
+→ 익일 생산에 사용할 자재 준비 및 투입예정 등록
+
+익일 작업 시작
+→ 실제 투입 확인</code></pre></div>
+<p>필요한 경우 다음 상태를 구분할 수 있어야 한다.</p>
+<ul><li>투입예정</li><li>현장출고</li><li>실제투입</li><li>사용완료</li><li>잔량반납</li></ul>
+<hr>
+<h2 id="s28">FR-MI-015 생산 중 추가 자재투입</h2>
+<p>작업 진행 중 자재가 부족하거나 자재 LOT가 변경되는 경우 추가 투입할 수 있어야 한다.</p>
+<p>추가 투입 시 기존 투입자재 이력을 삭제하거나 덮어쓰지 않아야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">1차 투입: Resin LOT A 50kg
+2차 투입: Resin LOT B 40kg
+3차 투입: Resin LOT C 20kg</code></pre></div>
+<hr>
+<h2 id="s29">FR-MI-016 사후 투입 등록</h2>
+<p>공용 단말기 부족 또는 현장 상황으로 실제 투입 후 MES에 사후 등록하는 것을 허용할 수 있어야 한다.</p>
+<p>사후 투입 시 다음 정보를 구분하여 저장해야 한다.</p>
+<ul><li>실제 투입일시</li><li>MES 입력일시</li><li>실제 투입 작업자</li><li>MES 입력자</li><li>지연입력 사유</li></ul>
+<p>허용시간을 초과한 사후 등록은 관리자 승인 대상으로 설정할 수 있어야 한다.</p>
+<hr>
+<h2 id="s30">FR-MI-017 공용 단말기 자재투입 지원</h2>
+<p>단말기 한 대에서 여러 공정의 자재투입을 처리할 수 있어야 한다.</p>
+<p>단말기에서 작업지시를 선택하거나 스캔하면 해당 작업지시의 대상 공정과 소요자재 목록이 자동으로 결정되어야 한다.</p>
+<p>단말기별로 다음 권한을 설정할 수 있어야 한다.</p>
+<ul><li>처리 가능 공정</li><li>자재투입 등록</li><li>자재투입 취소</li><li>잔량반납</li><li>라벨 출력</li></ul>
+<hr>
+<h2 id="s31">FR-MI-018 단말기 허용 공정 검증</h2>
+<p>자재투입 시 시스템은 해당 단말기에서 대상 작업지시의 공정을 처리할 수 있는지 검증해야 한다.</p>
+<p>허용되지 않은 공정의 자재투입을 시도하면 입력을 차단해야 한다.</p>
+<hr>
+<h2 id="s32">FR-MI-019 FIFO 및 선입선출 안내</h2>
+<p>시스템은 동일 품목의 여러 자재 LOT가 존재하는 경우 입고일자, 제조일자 또는 유효기간을 기준으로 권장 투입 LOT를 안내할 수 있어야 한다.</p>
+<p>FIFO 위반 시 다음 중 하나의 정책을 적용할 수 있어야 한다.</p>
+<ul><li>경고만 표시</li><li>사유 입력 후 허용</li><li>관리자 승인 후 허용</li><li>투입 차단</li></ul>
+<p>현재 고객사가 FIFO를 강제하지 않는 경우에도 향후 적용을 위해 정책 설정이 가능해야 한다.</p>
+<hr>
+<h2 id="s33">FR-MI-020 대체자재 투입</h2>
+<p>BOM에 정의된 기본 자재 대신 승인된 대체자재를 투입할 수 있어야 한다.</p>
+<p>대체자재 투입 시 다음 정보를 기록해야 한다.</p>
+<ul><li>원래 자재</li><li>대체자재</li><li>대체사유</li><li>승인자</li><li>승인일시</li><li>적용 작업지시</li><li>적용수량</li></ul>
+<p>승인되지 않은 대체자재는 투입할 수 없어야 한다.</p>
+<hr>
+<h2 id="s34">FR-MI-021 Running Change 관리</h2>
+<p>생산 중 자재 품목, 사양 또는 자재 LOT가 변경되는 경우 변경시점을 기록할 수 있어야 한다.</p>
+<p>Running Change 이력에는 다음 정보가 포함되어야 한다.</p>
+<ul><li>작업지시</li><li>변경 전 자재 품목 및 LOT</li><li>변경 후 자재 품목 및 LOT</li><li>변경수량</li><li>변경 적용시각</li><li>적용 생산수량 또는 생산 LOT</li><li>변경사유</li><li>승인자</li><li>처리자</li></ul>
+<hr>
+<h2 id="s35">FR-MI-022 LOT 전환시점 관리</h2>
+<p>동일 작업지시에서 자재 LOT가 변경된 경우 각 LOT가 어느 생산구간에 사용되었는지 구분할 수 있어야 한다.</p>
+<p>구분방식은 다음 중 하나 이상을 지원할 수 있어야 한다.</p>
+<ul><li>투입시각 기준</li><li>생산실적 순번 기준</li><li>생산 LOT 기준</li><li>작업자가 지정한 전환수량 기준</li></ul>
+<p>예시:</p>
+<div class="codewrap"><pre><code class="lang-text">제품 생산 LOT P001
+
+1~2,000개: 자재 LOT R001
+2,001~5,000개: 자재 LOT R002</code></pre></div>
+<hr>
+<h2 id="s36">FR-MI-023 자재투입량 초과 경고</h2>
+<p>실제 투입수량이 BOM 표준소요량 또는 허용범위를 초과하는 경우 경고해야 한다.</p>
+<p>기본 비교식은 다음과 같다.</p>
+<div class="codewrap"><pre><code class="lang-text">예상소요량
+= 생산계획수량 × 단위당 표준소요량</code></pre></div>
+<p>초과 투입 정책은 다음과 같이 설정할 수 있어야 한다.</p>
+<ul><li>경고</li><li>사유 입력 후 허용</li><li>관리자 승인 후 허용</li><li>허용범위 초과 시 차단</li></ul>
+<hr>
+<h2 id="s37">FR-MI-024 자재투입 부족 확인</h2>
+<p>작업 시작 또는 작업완료 시 필수 자재 투입수량이 부족한 경우 시스템은 경고해야 한다.</p>
+<p>필수 LOT 추적 자재가 등록되지 않은 경우 작업완료 또는 마감을 차단할 수 있어야 한다.</p>
+<hr>
+<h2 id="s38">FR-MI-025 가용재고 및 음수재고 통제</h2>
+<p>자재 투입수량이 현재 가용재고를 초과하는 경우 기본적으로 투입을 차단해야 한다.</p>
+<p>음수재고 허용 여부는 공장 또는 품목별 정책으로 관리할 수 있어야 한다.</p>
+<p>음수재고를 허용하는 경우 다음 정보를 필수로 기록해야 한다.</p>
+<ul><li>부족수량</li><li>발생사유</li><li>승인자</li><li>사후 입고 또는 재고조정 대상 여부</li></ul>
+<hr>
+<h2 id="s39">FR-MI-026 자동 차감</h2>
+<p>LOT 추적이 필요하지 않은 일반 자재는 생산실적과 BOM을 기준으로 자동 차감할 수 있어야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">자동 사용수량
+= 생산실적수량 × 단위당 표준소요량</code></pre></div>
+<p>자동 차감 대상 자재는 품목별로 설정해야 한다.</p>
+<p>자동 차감 결과는 사용자가 조회하고 권한에 따라 조정할 수 있어야 한다.</p>
+<hr>
+<h2 id="s40">FR-MI-027 실제 사용수량 확정</h2>
+<p>투입수량과 실제 사용수량이 다른 경우 작업완료 시 실제 사용수량을 확정할 수 있어야 한다.</p>
+<p>예시:</p>
+<div class="codewrap"><pre><code class="lang-text">투입수량: 100kg
+실제 사용수량: 92kg
+잔량: 7kg
+폐기: 1kg</code></pre></div>
+<p>다음 수량 관계가 성립해야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">투입수량
+= 실제 사용수량
++ 잔량
++ 폐기수량
++ 조정수량</code></pre></div>
+<hr>
+<h2 id="s41">FR-MI-028 자재잔량 등록</h2>
+<p>작업 종료 또는 자재 교체 시 남은 자재수량을 등록할 수 있어야 한다.</p>
+<p>잔량 등록 시 다음 정보를 기록해야 한다.</p>
+<ul><li>자재 품목</li><li>자재 LOT</li><li>잔량</li><li>단위</li><li>발생 작업지시</li><li>발생 공정</li><li>발생 설비</li><li>잔량 상태</li><li>보관 위치</li><li>처리자</li><li>발생일시</li></ul>
+<hr>
+<h2 id="s42">FR-MI-029 자재잔량 처리</h2>
+<p>자재잔량은 다음 방식으로 처리할 수 있어야 한다.</p>
+<ul><li>동일 작업지시에서 계속 사용</li><li>후속 작업지시에서 재사용</li><li>생산현장 보관</li><li>자재창고 반납</li><li>다른 설비로 이동</li><li>품질확인 대기</li><li>폐기</li><li>재고조정</li></ul>
+<p>처리방법에 따라 재고수량과 로케이션을 갱신해야 한다.</p>
+<hr>
+<h2 id="s43">FR-MI-030 잔량 LOT 유지 및 잔량 라벨 발행</h2>
+<p>잔량이 발생한 경우 원래 자재 LOT를 유지하는 것을 원칙으로 한다.</p>
+<p>필요한 경우 다음 정보가 포함된 잔량 라벨을 발행할 수 있어야 한다.</p>
+<ul><li>자재코드</li><li>자재명</li><li>원 자재 LOT</li><li>잔량</li><li>단위</li><li>개봉일시</li><li>발생 작업지시</li><li>보관위치</li><li>재사용 가능 여부</li><li>바코드</li></ul>
+<p>잔량을 별도 관리 단위로 분리하는 경우 원본 LOT와의 관계를 보존해야 한다.</p>
+<hr>
+<h2 id="s44">FR-MI-031 잔량 재사용</h2>
+<p>이전 작업에서 발생한 자재잔량을 신규 작업지시에 재투입할 수 있어야 한다.</p>
+<p>잔량 재사용 시 다음을 검증해야 한다.</p>
+<ul><li>동일 자재인지</li><li>자재 LOT가 유효한지</li><li>잔량이 실제로 존재하는지</li><li>보관상태가 적합한지</li><li>재사용 가능기간 이내인지</li><li>품질확인이 필요한지</li><li>다른 작업지시에 이미 투입되지 않았는지</li></ul>
+<hr>
+<h2 id="s45">FR-MI-032 자재 폐기 및 손실 등록</h2>
+<p>투입된 자재 중 생산에 사용되지 못하고 폐기되거나 손실된 수량을 등록할 수 있어야 한다.</p>
+<p>폐기 및 손실 사유 예시는 다음과 같다.</p>
+<ul><li>퍼징</li><li>자재 오염</li><li>설비 청소</li><li>자재 교체</li><li>작업 중 유실</li><li>품질불량</li><li>유효기간 경과</li><li>기타</li></ul>
+<p>폐기수량은 정상 사용수량과 구분하여 재고에서 차감해야 한다.</p>
+<hr>
+<h2 id="s46">FR-MI-033 투입자재 취소</h2>
+<p>잘못 등록한 자재투입을 취소할 수 있어야 한다.</p>
+<p>취소 시 다음을 검증해야 한다.</p>
+<ul><li>해당 자재가 생산실적 또는 생산 LOT에 이미 연결되었는지</li><li>자재잔량이나 폐기처리가 발생했는지</li><li>작업지시가 마감되었는지</li><li>취소 후 재고수량이 정상적으로 복원되는지</li></ul>
+<p>생산 LOT에 이미 연결된 투입은 단순 취소할 수 없고 승인된 정정 절차를 사용해야 한다.</p>
+<hr>
+<h2 id="s47">FR-MI-034 투입자재 정정</h2>
+<p>투입수량, 실제 투입일시 또는 자재 LOT를 잘못 입력한 경우 정정할 수 있어야 한다.</p>
+<p>정정 시 다음 정보를 보존해야 한다.</p>
+<ul><li>정정 전 값</li><li>정정 후 값</li><li>정정사유</li><li>요청자</li><li>승인자</li><li>정정일시</li></ul>
+<p>기존 이력을 삭제하거나 덮어쓰지 않아야 한다.</p>
+<hr>
+<h2 id="s48">FR-MI-035 작업지시 마감 연계</h2>
+<p>작업지시 마감 시 다음 자재 관련 항목을 검증해야 한다.</p>
+<ul><li>필수 자재투입 등록 여부</li><li>LOT 추적 대상 자재 등록 여부</li><li>실제 사용수량 확정 여부</li><li>잔량 처리 여부</li><li>폐기수량 처리 여부</li><li>미확정 자동 차감 여부</li><li>음수재고 또는 부족재고 발생 여부</li></ul>
+<p>필수 항목이 처리되지 않은 경우 마감을 차단할 수 있어야 한다.</p>
+<hr>
+<h2 id="s49">FR-MI-036 생산실적 연계</h2>
+<p>자재투입 정보는 해당 작업지시의 생산실적과 연결되어야 한다.</p>
+<p>다음 정보를 조회할 수 있어야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">작업지시
+→ 투입 자재
+→ 생산실적
+→ 생산 LOT</code></pre></div>
+<p>한 작업지시에 생산실적이 여러 번 등록되는 경우에도 각 자재 LOT가 사용된 생산구간을 식별할 수 있어야 한다.</p>
+<hr>
+<h2 id="s50">FR-MI-037 생산 LOT 연계</h2>
+<p>추적 대상 자재 LOT는 해당 자재가 사용된 반제품 또는 완제품 생산 LOT와 연결되어야 한다.</p>
+<p>기본 추적 관계는 다음과 같다.</p>
+<div class="codewrap"><pre><code class="lang-text">자재 LOT
+→ 자재투입
+→ 공정 작업지시
+→ 생산실적
+→ 생산 LOT</code></pre></div>
+<p>하나의 생산 LOT에 여러 자재 LOT가 연결될 수 있어야 한다.</p>
+<p>하나의 자재 LOT가 여러 생산 LOT에 사용될 수도 있어야 한다.</p>
+<hr>
+<h2 id="s51">FR-MI-038 자재투입 현황 조회</h2>
+<p>사용자는 다음 조건으로 자재투입 이력을 조회할 수 있어야 한다.</p>
+<ul><li>작업지시번호</li><li>생산오더번호</li><li>생산계획번호</li><li>품목</li><li>공정</li><li>자재 품목</li><li>내부 자재 LOT</li><li>공급사 LOT</li><li>설비</li><li>금형</li><li>작업자</li><li>투입일자</li><li>사용 단말기</li><li>투입상태</li><li>잔량처리 상태</li></ul>
+<hr>
+<h2 id="s52">FR-MI-039 작업지시별 자재현황 조회</h2>
+<p>작업지시 상세화면에서는 다음 내용을 조회할 수 있어야 한다.</p>
+<ul><li>표준 소요자재</li><li>표준 소요량</li><li>실제 투입자재</li><li>투입 자재 LOT</li><li>누적 투입수량</li><li>실제 사용수량</li><li>잔량</li><li>폐기수량</li><li>대체자재</li><li>LOT 변경이력</li><li>미투입 필수자재</li><li>예상 대비 투입차이</li></ul>
+<hr>
+<h2 id="s53">FR-MI-040 자재 LOT 사용처 조회</h2>
+<p>특정 자재 LOT가 어느 작업지시와 생산 LOT에 사용되었는지 조회할 수 있어야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">자재 LOT R001
+├─ 작업지시 WO-001: 50kg
+│  ├─ 생산 LOT P001
+│  └─ 생산 LOT P002
+└─ 작업지시 WO-002: 30kg
+   └─ 생산 LOT P003</code></pre></div>
+<hr>
+<h2 id="s54">FR-MI-041 자재투입 이력 관리</h2>
+<p>시스템은 다음 이벤트를 시간순으로 기록해야 한다.</p>
+<ul><li>투입예정 등록</li><li>자재 현장출고</li><li>실제 투입</li><li>추가 투입</li><li>자재 LOT 전환</li><li>Running Change</li><li>대체자재 투입</li><li>투입수량 변경</li><li>실제 사용수량 확정</li><li>잔량 발생</li><li>잔량 반납</li><li>잔량 재사용</li><li>폐기</li><li>투입 취소</li><li>투입 정정</li><li>관리자 승인</li></ul>
+<p>각 이력에는 최소한 다음 정보가 포함되어야 한다.</p>
+<ul><li>작업지시</li><li>대상 공정</li><li>자재 품목</li><li>자재 LOT</li><li>처리수량</li><li>처리 전 수량</li><li>처리 후 수량</li><li>실제 발생일시</li><li>MES 입력일시</li><li>실제 작업자</li><li>입력자</li><li>입력 단말기</li><li>처리사유</li><li>승인자</li></ul>
+<hr>
+<h1 id="s55">6. 비기능 요구사항</h1>
+<h2 id="s56">NFR-MI-001 응답성</h2>
+<p>자재 LOT 바코드 스캔 후 자재정보와 검증결과는 정상적인 사내 네트워크 환경에서 2초 이내에 표시되어야 한다.</p>
+<p>자재투입 저장 요청은 일반적인 경우 2초 이내에 처리되어야 한다.</p>
+<p>처리 중 사용자가 동일 요청을 반복하지 않도록 진행상태를 표시해야 한다.</p>
+<hr>
+<h2 id="s57">NFR-MI-002 중복 등록 방지</h2>
+<p>동일한 자재투입 요청이 통신 지연, 버튼 중복 클릭 또는 재전송으로 여러 번 전달되더라도 한 번만 처리되어야 한다.</p>
+<p>시스템은 다음 방법을 적용해야 한다.</p>
+<ul><li>요청 식별키</li><li>중복 스캔 방지</li><li>데이터베이스 트랜잭션</li><li>멱등성 처리</li><li>처리완료 여부 확인</li></ul>
+<hr>
+<h2 id="s58">NFR-MI-003 동시성 통제</h2>
+<p>동일한 자재 LOT를 여러 단말기 또는 여러 작업지시에서 동시에 투입하는 경우 가용재고수량을 정확하게 통제해야 한다.</p>
+<p>동시 투입으로 인해 다음 상황이 발생해서는 안 된다.</p>
+<ul><li>동일 재고의 중복 차감</li><li>가용수량 초과 투입</li><li>잘못된 잔량 계산</li><li>음수재고 발생</li><li>동일 잔량의 중복 사용</li></ul>
+<hr>
+<h2 id="s59">NFR-MI-004 데이터 정합성</h2>
+<p>자재투입 등록, 재고차감, 작업지시 연결 및 자재이력 생성은 하나의 트랜잭션으로 처리해야 한다.</p>
+<p>일부 처리만 성공하여 다음과 같은 상태가 발생해서는 안 된다.</p>
+<ul><li>자재투입은 등록되었지만 재고가 차감되지 않음</li><li>재고는 차감되었지만 투입이력은 없음</li><li>잔량반납은 등록되었지만 재고가 복원되지 않음</li><li>투입취소 후 생산 LOT 연결이 남아 있음</li></ul>
+<hr>
+<h2 id="s60">NFR-MI-005 추적성 보장</h2>
+<p>LOT 추적 대상 자재는 다음 정보가 끊김 없이 연결되어야 한다.</p>
+<div class="codewrap"><pre><code class="lang-text">공급사 LOT
+→ 내부 자재 LOT
+→ 재고
+→ 자재투입
+→ 작업지시
+→ 생산실적
+→ 생산 LOT
+→ 출하</code></pre></div>
+<p>중간 데이터가 수정되거나 취소되더라도 과거 연결관계와 변경이력을 조회할 수 있어야 한다.</p>
+<hr>
+<h2 id="s61">NFR-MI-006 감사 가능성</h2>
+<p>자재투입, 취소, 정정, 대체, 잔량 및 폐기 처리는 감사 가능한 이력으로 보존해야 한다.</p>
+<p>이력에는 최소한 다음 정보가 포함되어야 한다.</p>
+<ul><li>처리자</li><li>실제 작업자</li><li>처리 단말기</li><li>처리일시</li><li>실제 발생일시</li><li>변경 전 값</li><li>변경 후 값</li><li>처리사유</li><li>승인자</li></ul>
+<p>감사 이력은 일반 사용자가 수정하거나 삭제할 수 없어야 한다.</p>
+<hr>
+<h2 id="s62">NFR-MI-007 권한 관리</h2>
+<p>역할에 따라 자재투입 기능을 제한해야 한다.</p>
+<div class="tablewrap"><table><thead><tr><th>역할</th><th>주요 권한</th></tr></thead><tbody><tr><td>작업자</td><td>투입 등록, 잔량 등록</td></tr><tr><td>현장 관리자</td><td>투입 정정 요청, 대체자재 요청</td></tr><tr><td>자재 담당자</td><td>현장출고, 반납, 재고이동</td></tr><tr><td>품질 담당자</td><td>보류·특채 LOT 사용 승인</td></tr><tr><td>생산관리자</td><td>초과투입 승인, 사후입력 승인</td></tr><tr><td>시스템 관리자</td><td>정책 및 기준정보 설정</td></tr></tbody></table></div>
+<p>모든 권한 검증은 화면뿐 아니라 서버에서도 수행해야 한다.</p>
+<hr>
+<h2 id="s63">NFR-MI-008 사용성</h2>
+<p>공용 단말기에서 자재투입 처리는 최소한의 조작으로 완료할 수 있어야 한다.</p>
+<p>권장 흐름은 다음과 같다.</p>
+<div class="codewrap"><pre><code class="lang-text">작업지시 스캔
+→ 자재 LOT 스캔
+→ 수량 입력 또는 자동확인
+→ 저장</code></pre></div>
+<p>화면에는 항상 다음 정보를 명확하게 표시해야 한다.</p>
+<ul><li>현재 작업지시</li><li>현재 공정</li><li>생산품목</li><li>스캔한 자재</li><li>자재 LOT</li><li>투입수량</li><li>투입 가능 여부</li></ul>
+<p>품목 불일치, 보류 LOT, 수량 부족 등 오류는 명확한 원인과 조치방법을 표시해야 한다.</p>
+<hr>
+<h2 id="s64">NFR-MI-009 장애 및 재처리</h2>
+<p>네트워크 또는 서버 장애가 발생한 경우 시스템은 저장 성공 여부를 명확하게 표시해야 한다.</p>
+<p>처리 결과가 불확실한 경우 사용자가 다시 저장하기 전에 서버의 기존 처리 여부를 확인해야 한다.</p>
+<p>장애 복구 후 실패한 ERP·재고 연계 건은 재처리할 수 있어야 한다.</p>
+<hr>
+<h2 id="s65">NFR-MI-010 성능 및 처리용량</h2>
+<p>시스템은 다음 규모에서 자재투입 기능을 안정적으로 처리할 수 있어야 한다.</p>
+<ul><li>현장 단말 1,000대 이하</li><li>동시 사용자 300명 이상</li><li>일 수만 건의 자재투입 이력</li><li>다수 사업부·공장·창고 운영</li><li>장기간 LOT 추적이력 보관</li></ul>
+<p>자재 LOT, 작업지시, 자재품목, 투입일자 등에 적절한 인덱스를 적용해야 한다.</p>
+<hr>
+<h2 id="s66">NFR-MI-011 확장성</h2>
+<p>자재투입 모델은 다음 생산형태에서 공통으로 사용할 수 있어야 한다.</p>
+<ul><li>사출</li><li>자동조립</li><li>수동조립</li><li>검사</li><li>포장</li><li>외주공정</li><li>재작업</li></ul>
+<p>품목별 차이는 프로그램 분기문이 아니라 기준정보와 정책 설정으로 처리해야 한다.</p>
+<hr>
+<h2 id="s67">NFR-MI-012 유지보수성</h2>
+<p>다음 정책은 프로그램 소스 수정 없이 설정할 수 있어야 한다.</p>
+<ul><li>LOT 추적 대상 여부</li><li>자동 차감 대상 여부</li><li>필수 투입 여부</li><li>FIFO 통제 방식</li><li>초과투입 허용범위</li><li>사후입력 허용시간</li><li>음수재고 허용 여부</li><li>잔량 재사용 조건</li><li>대체자재 승인정책</li><li>작업완료 및 마감 검증조건</li></ul>
+<hr>
+<h2 id="s68">NFR-MI-013 시간 정확성</h2>
+<p>실제 투입일시와 MES 입력일시를 구분하여 저장해야 한다.</p>
+<p>서버와 단말기의 시간 차이가 추적성에 영향을 미치지 않도록 서버 시간을 기준시간으로 사용해야 한다.</p>
+<p>단말기 시간이 서버 시간과 크게 다른 경우 경고할 수 있어야 한다.</p>
+<hr>
+<h2 id="s69">NFR-MI-014 데이터 보존</h2>
+<p>자재투입 및 LOT 추적이력은 고객사 품질보증기간, 제품수명 및 법적 보존기간을 고려하여 장기간 보존할 수 있어야 한다.</p>
+<p>작업지시 또는 품목이 비활성화되어도 기존 자재투입 이력은 삭제되지 않아야 한다.</p>
+<hr>
+<h1 id="s70">7. 핵심 업무 규칙</h1>
+<h2 id="s71">BR-MI-001</h2>
+<p>LOT 추적 대상 자재는 자재 LOT를 등록하지 않고 투입할 수 없다.</p>
+<h2 id="s72">BR-MI-002</h2>
+<p>MES 미관리 공정에서 사용하는 추적 대상 자재는 지정된 MES 관리 대상 공정에서 투입 등록한다.</p>
+<h2 id="s73">BR-MI-003</h2>
+<p>보류·격리·불량 상태의 자재 LOT는 일반 작업자가 투입할 수 없다.</p>
+<h2 id="s74">BR-MI-004</h2>
+<p>자재투입수량은 해당 LOT의 가용재고수량을 초과할 수 없다.</p>
+<h2 id="s75">BR-MI-005</h2>
+<p>하나의 작업지시에 동일 품목의 여러 자재 LOT를 투입할 수 있다.</p>
+<h2 id="s76">BR-MI-006</h2>
+<p>하나의 자재 LOT를 여러 작업지시에 나누어 투입할 수 있다.</p>
+<h2 id="s77">BR-MI-007</h2>
+<p>자재 LOT 전환과 Running Change 이력은 기존 투입이력을 덮어쓰지 않는다.</p>
+<h2 id="s78">BR-MI-008</h2>
+<p>작업완료 시 투입수량, 사용수량, 잔량, 폐기수량 간 수량 정합성이 확인되어야 한다.</p>
+<h2 id="s79">BR-MI-009</h2>
+<p>생산 LOT에 연결된 자재투입은 승인 없이 취소할 수 없다.</p>
+<h2 id="s80">BR-MI-010</h2>
+<p>마감된 작업지시의 자재투입은 마감 취소 또는 별도 정정 승인 없이 변경할 수 없다.</p>
+<h2 id="s81">BR-MI-011</h2>
+<p>자재 투입과 재고 차감은 동일한 트랜잭션으로 처리한다.</p>
+<h2 id="s82">BR-MI-012</h2>
+<p>실제 투입일시와 MES 입력일시는 구분하여 보존한다.</p>
+<hr>
+<h1 id="s83">8. 기본 자재 투입 흐름</h1>
+<div class="codewrap"><pre><code class="lang-text">작업지시 선택 또는 스캔
+   ↓
+공정별 소요자재 조회
+   ↓
+자재 LOT 스캔
+   ↓
+품목·LOT·상태·수량 검증
+   ↓
+투입수량 등록
+   ↓
+재고 차감
+   ↓
+생산 진행
+   ↓
+추가 투입 또는 LOT 변경
+   ↓
+실제 사용수량 확정
+   ↓
+잔량·폐기 처리
+   ↓
+생산 LOT 연결
+   ↓
+작업지시 마감</code></pre></div>
+<p>다음 검토에서는 <strong>자재를 생산라인으로 출고하는 시점과 실제 작업지시에 투입하는 시점을 별도 거래로 관리할지</strong>를 확정하는 것이 중요합니다.</p>
+  </article>
+  <div class="pager"><a class="pv" href="2-1.html"><span>이전</span>작업지시</a><a class="nx" href="2-3.html"><span>다음</span>생산 실적 관리</a></div>
+</main>
+</body>
+</html>
