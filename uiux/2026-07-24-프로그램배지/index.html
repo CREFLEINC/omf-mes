@@ -34,13 +34,14 @@
 <p>
   개발 대상 사용자 프로그램은 <strong>3종</strong>(관리웹 · POP · 모바일 — React 코드 1벌·셸 3종, 결정 16)이며,
   각 프로그램을 <strong>누가 · 언제</strong> 사용하는지를 FigJam v2 도식 63개 지점에 배지로 표시했다.
-  작화는 Wave A(범례·01·02·03) · Wave B(04·05·06) 2회로 나눠 진행했고, 두 검토 모두 판정 PASS다.
+  작화는 Wave A(범례·01·02·03) · Wave B(04·05·06) 2회로 나눠 진행했고, 이후 <strong>이슈 <code>#11</code> 확정</strong>으로
+  미정(<code>?</code>)이던 7개 지점의 단말을 확정 배지로 교체했다. 세 차례 검토 모두 판정 PASS다.
 </p>
 
 <div class="kpi">
-  <div><span class="big">64</span><span class="lbl">배지 칩<br>(63배치 + 스택 1)</span></div>
-  <div><span class="big">2/2</span><span class="lbl">검토 PASS<br>(Wave A · B)</span></div>
-  <div><span class="big">0</span><span class="lbl">C·M 결함</span></div>
+  <div><span class="big">66</span><span class="lbl">배지 칩<br>(웹32·POP17·모바일17·미정0)</span></div>
+  <div><span class="big">3/3</span><span class="lbl">검토 PASS<br>(Wave A·B·단말확정)</span></div>
+  <div><span class="big">0</span><span class="lbl">C·M 결함 · 미정 지점</span></div>
 </div>
 
 <h2>문서 목록</h2>
@@ -87,20 +88,33 @@
       <td>검토 (PASS)</td>
       <td>30칩 전수 실측 대조 · 전역 68개 집계 확증 · C/M 0</td>
     </tr>
+    <tr>
+      <th>7</th>
+      <td><a href="./04_followup_단말확정_minibrief.html">미니 지시서 — 미정 배지 7곳 확정 반영</a></td>
+      <td>지시서 (경량)</td>
+      <td>#11 확정 8건 → ? 배지 7개 교체(단일 5 + 스택 2)</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td><a href="./04_followup_단말확정_review_r1.html">검토 보고 — 단말확정 r1</a></td>
+      <td>검토 (PASS)</td>
+      <td>9칩 전수 대조 · ? 소거 · 전역 66배치 확증 · C/M 0</td>
+    </tr>
   </tbody>
 </table>
 
 <div class="callout">
   <p><strong>정본 안내.</strong> 같은 폴더의 <code>.md</code> 파일이 작업 정본이고, 이 HTML은 열람·인쇄용 정리본이다.
   docs/(기획·설계 문서) 반영이 필요한 사항은 uiux 규칙에 따라 GitHub 이슈로 위임했다 —
-  <code>#10</code> 배지 레이어 문서 반영 · <code>#11</code> 단말 미정 7개 지점 확정.</p>
+  <code>#10</code> 배지 레이어 문서 반영(처리 완료) · <code>#11</code> 단말 미정 7개 지점 확정(처리 완료).</p>
 </div>
 
 <h2>남은 일</h2>
 
 <ol>
-  <li>이슈 <code>#11</code> 확정 시 미정(<code>?</code>) 배지 7곳을 확정 프로그램 배지로 교체</li>
-  <li>이슈 <code>#10</code> 처리에 따라 도식스펙 정본화 결과를 이 폴더 문서에 역참조</li>
+  <li><strong>완료</strong> — 이슈 <code>#11</code> 확정 8건으로 미정(<code>?</code>) 배지 7곳을 확정 배지로 교체(단일 5 + 2단말 스택 2). 검토 PASS(<code>04_followup_단말확정_review_r1.md</code>).</li>
+  <li><strong>완료</strong> — 이슈 <code>#10</code>: 도식스펙 정본화는 하지 않기로 확정(<code>#10-2</code>), 배지 정본은 이 폴더의 <code>placement-plan.md</code>.</li>
+  <li>고객 회신 대기 2건 회신 시 배지 추가 — 03 미확정 3상태(한도승인·특채·폐기) 승인 매체 · 설치 위치(REQ-PR-0017).</li>
 </ol>
 
 <script src="./crefle-doc/crefle-chart.js"></script>
