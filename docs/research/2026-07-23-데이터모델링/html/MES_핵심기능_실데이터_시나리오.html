@@ -676,11 +676,12 @@
 <pre><span class="k">CREATE TABLE</span> mdm.mold (
     mold_id               bigint <span class="k">GENERATED ALWAYS AS IDENTITY PRIMARY KEY</span>,
     <span class="n">plant_id</span>              bigint <span class="k">NOT NULL REFERENCES</span> mdm.plant(plant_id),  <span class="c">-- PL11</span>
-    <span class="n">mold_code</span>             app.code_t <span class="k">NOT NULL</span>,        <span class="c">-- SMHAADTS025002</span>
-    <span class="n">mold_name</span>             app.name_t <span class="k">NOT NULL</span>,
-    <span class="n">cavity_count</span>          integer <span class="k">NOT NULL DEFAULT</span> 1 <span class="k">CHECK</span> (cavity_count &gt; 0),  <span class="c">-- 1</span>
+    <span class="n">mold_code</span>             app.code_t <span class="k">NOT NULL</span>,        <span class="c">-- Code No 체계: SM17145 / DSH13072 / KM16136</span>
+                                                      <span class="c">-- 단 TA25W KR Lower #1은 원본 공란 → 채번 필요</span>
+    <span class="n">mold_name</span>             app.name_t <span class="k">NOT NULL</span>,        <span class="c">-- TA25W KR Lower (Model+Country+Type, 차수 #1)</span>
+    <span class="n">cavity_count</span>          integer <span class="k">NOT NULL DEFAULT</span> 1 <span class="k">CHECK</span> (cavity_count &gt; 0),  <span class="c">-- 4 (Cavity 1X4)</span>
     guaranteed_shot_count bigint,
-    <span class="n">current_shot_count</span>    bigint <span class="k">NOT NULL DEFAULT</span> 0,   <span class="c">-- 선행 사출 금형 TA25W KR Lower</span>
+    <span class="n">current_shot_count</span>    bigint <span class="k">NOT NULL DEFAULT</span> 0,   <span class="c">-- 4,691 (SHOT 컬럼)</span>
     <span class="n">status_code</span>           app.code_t <span class="k">NOT NULL</span>,        <span class="c">-- 가동</span>
     is_active             boolean <span class="k">NOT NULL DEFAULT</span> true,
     <span class="k">CONSTRAINT</span> uq_mold <span class="k">UNIQUE</span> (plant_id, mold_code)
