@@ -15,6 +15,8 @@ omf-mes(OhMyFactory MES — AI Agent 네이티브 MES) 프로젝트의 기획안
 
 공통 파일명 규칙: `YYYY-MM-DD-<제목>.md` (날짜 = 최초 작성일).
 
+> **인접 폴더 `../uiux/`** (저장소 루트 `apps/omf/uiux/` — `docs/`의 **형제** 디렉토리, docs/ 밖): 사용자 프로그램(관리웹·POP·모바일)의 UI/UX 작업 산출물. 정본 규칙 = `uiux/CLAUDE.md`. **경계 규칙(절대 · 사용자 지시 2026-07-24)**: uiux 작업은 `docs/`(research/·planning/·raw/·`CLAUDE.md`·`.claude/` 하네스 포함)를 **직접 수정하지 않고 읽기 전용 참조**만 한다. docs 반영이 필요하면 GitHub 이슈(`[uiux→docs]` · repo `CREFLEINC/omf-mes`)를 발행하고 **docs 측이 이 저장소에서 반영**한다(예: 이슈 #10 프로그램 배지 레이어 → `figjam-workflow-diagram` 진행 상태 노트 등재). 두 스트림은 각자 브랜치에서 작업한다(uiux/program-badges 등 ↔ docs/*).
+
 ## raw/ — 읽기 전용 (절대 규칙)
 
 - raw/ 안의 파일은 **읽기만 한다.** 어떤 파일도 만들거나, 고치거나, 지우거나, 옮기지 않는다. 다운로드 저장도 금지. 자료 추가는 사용자가 직접 한다.
