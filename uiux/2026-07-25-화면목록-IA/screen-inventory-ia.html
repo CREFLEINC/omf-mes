@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>프로그램별 화면 목록 · IA (정보 구조)</title>
+<link rel="stylesheet" href="./crefle-doc/crefle-doc.css">
+<style>
+  :root { --doc-running-title: '프로그램별 화면 목록 · IA'; }
+</style>
+</head>
+<body class="doc">
+
+<header class="doc-cover">
+  <p class="eyebrow">CREFLE · OMF UI/UX · 정보 구조(IA)</p>
+  <h1>프로그램별 화면 목록 · IA (정보 구조)</h1>
+  <p class="lede">관리웹·POP·모바일 3종의 화면 인벤토리 112건과 프로그램별 정보 구조(IA). 이후 화면 설계·개발이 이 목록과 IA 위에 얹힌다.</p>
+  <table>
+    <caption>문서 정보</caption>
+    <tbody>
+      <tr><th>작성 주체</th><td>CREFLE OMF 팀 (UI/UX)</td></tr>
+      <tr><th>작성일</th><td>2026-07-25</td></tr>
+      <tr><th>버전</th><td>v1.0</td></tr>
+      <tr><th>대상</th><td>CREFLE OMF 팀 내부 (내부 대외비)</td></tr>
+    </tbody>
+  </table>
+</header>
+
+<h2>문서 개요</h2>
+<p>작성일: 2026-07-25 (v1.0 — 최초 확정) · 작성 주체: CREFLE OMF 팀 (UI/UX)</p>
+<p>근거 자료: <code>docs/research/2026-07-06·07-도식스펙-01~06</code> · <code>docs/research/2026-07-03-워크플로우-요구사항반영-01~06</code> · <code>uiux/2026-07-24-프로그램배지/placement-plan.md</code>(프로그램 배정 정본) · <code>docs/planning/2026-07-08-OMF-MES-개발-WBS.md</code>(§7 화면 원천) · <code>docs/research/2026-07-03-개념데이터모델-v2-요구사항통합.md</code>(엔티티) · <code>docs/research/2026-07-24-프로그램배지-단말확정-확정기록.md</code>(#11)</p>
+<p>표기 원칙: 화면은 <strong>도식 터치포인트에 근거해 도출</strong>한다(창작 아님). 프로그램 배정은 배지 정본이 1차 근거. 신뢰도 = 확정(도식+배지 명확) / 추정(성격 판단) / 미정(#11 보류 등 근거 대기). docs/는 읽기 전용 — 반영 필요분은 GitHub 이슈로 위임한다(uiux 경계 규칙).</p>
+
+<h2>0. 목적과 범위</h2>
+<p>개발 대상 프로그램 3종(<strong>관리웹</strong>·<strong>POP</strong>·<strong>모바일</strong>, 결정 16)의 <strong>화면 목록(인벤토리)</strong>과 <strong>프로그램별 정보 구조(IA)</strong>를 정리한다. 이후 화면 설계(와이어프레임)·개발이 이 목록과 IA 위에 얹힌다.</p>
+<ul>
+<li><strong>포함</strong>: 화면 인벤토리(화면ID·프로그램·도메인·유형·사용자·엔티티·근거·신뢰도) + 프로그램별 IA(네비게이션 구조).</li>
+<li><strong>제외(다음 단계)</strong>: 화면별 상세 스펙(필드·컴포넌트·상태), 와이어프레임, 시각 사이트맵(FigJam — 문서 확정 후 2단계).</li>
+<li><strong>세 프로그램의 IA 모델은 서로 다르다</strong>: 관리웹=메뉴 트리 · POP=사번 인증→W/O 태스크 모드(메뉴 아님) · 모바일=스캔 퍼스트 홈 타일.</li>
+</ul>
+<h2>1. 요약 — 집계</h2>
+<div class="kpi"><div><span class="big">112</span><span class="lbl">화면<br>관리웹71·POP22·모바일19</span></div><div><span class="big">3</span><span class="lbl">프로그램<br>(IA 모델 3종)</span></div><div><span class="big">78</span><span class="lbl">확정<br>(추정30·미정4)</span></div></div>
+<table>
+<thead><tr><th>도메인</th><th>관리웹</th><th>POP</th><th>모바일</th><th>계</th></tr></thead>
+<tbody>
+<tr><th>01 자재창고관리</th><td class="num">9</td><td class="num">2</td><td class="num">11</td><td class="num">22</td></tr>
+<tr><th>02 생산실행</th><td class="num">10</td><td class="num">13</td><td class="num">2</td><td class="num">25</td></tr>
+<tr><th>03 품질관리</th><td class="num">9</td><td class="num">0</td><td class="num">0</td><td class="num">9</td></tr>
+<tr><th>04 제품출하</th><td class="num">10</td><td class="num">4</td><td class="num">3</td><td class="num">17</td></tr>
+<tr><th>05 설비·툴 관리</th><td class="num">14</td><td class="num">2</td><td class="num">2</td><td class="num">18</td></tr>
+<tr><th>06 기준정보·연계</th><td class="num">12</td><td class="num">0</td><td class="num">0</td><td class="num">12</td></tr>
+<tr><th>공통</th><td class="num">7</td><td class="num">1</td><td class="num">1</td><td class="num">9</td></tr>
+<tr><th><strong>합계</strong></th><td class="num"><strong>71</strong></td><td class="num"><strong>22</strong></td><td class="num"><strong>19</strong></td><td class="num"><strong>112</strong></td></tr>
+</tbody></table>
+<p>신뢰도: 확정 78 · 추정 30 · 미정 4 (총 112). WBS §7 도메인 추정(01≈17·02≈27·03≈10·04≈14·05≈13·06≈11)과 대비해 전 도메인 동등 이상 — 누락 신호 없음.</p>
+<h2>2. 프로그램별 IA (정보 구조)</h2>
+<h3>2.1 관리웹</h3>
+<ul>
+<li><strong>기준정보</strong><ul>
+<li>마스터<ul>
+<li>Routing(공정) 등록·관리 (W-06-01)</li>
+<li>수신본 확장속성 편집(품목·BOM) (W-06-05)</li>
+<li>공통코드·조직 마스터(다국어) (W-06-06)</li>
+<li>창고·Location 마스터 (W-06-07)</li>
+<li>예비품 마스터 (W-06-08)</li>
+<li>마스터 변경관리(신규 Rev 발행) (W-06-11)</li>
+</ul></li>
+<li>품질 기준<ul>
+<li>검사기준 등록(IQC/PQC/OQC) (W-06-02)</li>
+<li>불량코드 2계층 마스터 (W-06-03)</li>
+<li>판정유형 코드 마스터 (W-06-04)</li>
+</ul></li>
+<li>연계(I/F)<ul>
+<li>ERP-MES I/F 연계정의 관리 (W-06-09)</li>
+<li>MES→ERP 송신 I/F 정의(항목 on/off) (W-06-12)</li>
+<li>연계 동기화 현황·실패 재처리 (W-06-10)</li>
+</ul></li>
+</ul></li>
+<li><strong>생산</strong><ul>
+<li>계획·지시<ul>
+<li>P/O 수신·조회 (W-02-01)</li>
+<li>W/O 전개·편성 (W-02-02)</li>
+<li>4M 자원배정·유효성 점검 (W-02-03)</li>
+<li>W/O 확정·배포·생산LOT 선발행 (W-02-04)</li>
+<li>긴급 W/O 발행 (W-02-07)</li>
+<li>P/O 변경 관리자 확인 (W-02-06)</li>
+<li>추가 자재 출고 요청(수동) (W-02-10)</li>
+</ul></li>
+<li>마감·모니터링<ul>
+<li>W/O 마감·ERP 실적 송신 (W-02-05)</li>
+<li>W/O 진행현황 조회 (W-02-08)</li>
+<li>생산 현황·비가동 알람 대시보드 (W-02-09)</li>
+</ul></li>
+</ul></li>
+<li><strong>품질</strong><ul>
+<li>Lot Status<ul>
+<li>Lot Status 현황 조회 (W-03-01)</li>
+<li>Lot Status 판정·전이 처리 (W-03-02)</li>
+<li>의심자재 등록 (W-03-03)</li>
+<li>Lot Status 변경이력 조회 (W-03-04)</li>
+<li>특채·한도승인 승인 처리 (W-03-09)</li>
+</ul></li>
+<li>검사·불량<ul>
+<li>검사실적·검사결과 조회 (W-03-05)</li>
+<li>불량·부적합 판정·폐기 품의 (W-03-06)</li>
+</ul></li>
+<li>관제<ul>
+<li>SPC 관제 대시보드 (W-03-07)</li>
+<li>품질 대시보드·불량 발생 알람 (W-03-08)</li>
+</ul></li>
+</ul></li>
+<li><strong>자재/창고</strong><ul>
+<li>입하·검사<ul>
+<li>입하 예정 조회 (W-01-09)</li>
+<li>IQC 수입검사·판정 (W-01-01)</li>
+<li>긴급 IQC 생략 한도승인 (W-01-02)</li>
+<li>초과 입하 분리·신규 P/O 등록 (W-01-03)</li>
+</ul></li>
+<li>재고·출고<ul>
+<li>재고 현황·상태 조회 (W-01-07)</li>
+<li>위치 확인 모니터링 (W-01-08)</li>
+<li>재고실사·조정 (W-01-04)</li>
+</ul></li>
+<li>반품·폐기<ul>
+<li>공급사 반품 처리 (W-01-05)</li>
+<li>폐기 품의·기타출고 (W-01-06)</li>
+</ul></li>
+</ul></li>
+<li><strong>출하</strong><ul>
+<li>출하 지시·확정<ul>
+<li>출하지시서 Import·작업지시 생성 (W-04-01)</li>
+<li>출하 예정 목록 (W-04-02)</li>
+<li>OQC 출하검사 판정 (W-04-03)</li>
+<li>출하 확정·PGI 송신 (W-04-04)</li>
+<li>긴급 직행 출하 처리 (W-04-05)</li>
+</ul></li>
+<li>반품·재고<ul>
+<li>반품·클레임 입고 등록 (W-04-06)</li>
+<li>재작업/폐기 판정 의뢰 (W-04-07)</li>
+<li>완제품 재고·Lot Status 조회 (W-04-08)</li>
+<li>제품 폐기 품의 (W-04-10)</li>
+<li>출하 현황 모니터링 대시보드 (W-04-09)</li>
+</ul></li>
+</ul></li>
+<li><strong>설비/툴</strong><ul>
+<li>툴 관리<ul>
+<li>타발수 환산 파라미터 설정 (W-05-01)</li>
+<li>툴보전오더 생성(PM 도래 조회) (W-05-02)</li>
+<li>툴 PM 실적 등록 (W-05-03)</li>
+<li>툴/금형/지그 마스터·QR 발급 (W-05-13)</li>
+</ul></li>
+<li>설비 보전<ul>
+<li>설비 고장 상세·처리 (W-05-04)</li>
+<li>보전 지시 발행 (W-05-05)</li>
+<li>보전 실적·예비품 출고 등록 (W-05-06)</li>
+<li>설비·설비그룹 마스터 (W-05-12)</li>
+</ul></li>
+<li>비가동·계측<ul>
+<li>비가동 집계·조회 (W-05-08)</li>
+<li>작업 캘린더(WorkCalendar) 설정 (W-05-09)</li>
+<li>수집채널 매핑 관리 (W-05-07)</li>
+<li>계측기 검교정 이력 등록 (W-05-10)</li>
+<li>계측기 마스터 관리 (W-05-11)</li>
+</ul></li>
+<li>모니터링<ul>
+<li>설비·툴 대시보드 (W-05-14)</li>
+</ul></li>
+</ul></li>
+<li><strong>시스템/공통</strong><ul>
+<li>계정·권한<ul>
+<li>계정 로그인 (W-CO-01)</li>
+<li>사용자·역할·권한 관리 (W-CO-02)</li>
+</ul></li>
+<li>알림·공지<ul>
+<li>알림센터 (W-CO-03)</li>
+<li>공지·전달 게시/조회 (W-CO-04)</li>
+</ul></li>
+<li>설정<ul>
+<li>단말기-공정 매핑 설정(EX-10) (W-CO-06)</li>
+<li>다국어(한/베) 환경설정 (W-CO-07)</li>
+</ul></li>
+<li>경영 대시보드<ul>
+<li>통합 대시보드(경영·생산) (W-CO-05)</li>
+</ul></li>
+</ul></li>
+</ul>
+<h3>2.2 POP</h3>
+<h4>0. 진입 (공통 셸)</h4>
+<ul>
+<li><strong>사번 경량 인증</strong> (P-CO-01) — 터치 키패드 사번 입력, 로그인 생략, 실적 귀속 태깅</li>
+<li>배정 <strong>W/O 선택 → 작업 착수</strong> (P-02-01, 작업 시작 화면에서 사번+W/O 선택 연속)</li>
+</ul>
+<h4>1. 작업 전 점검 게이트</h4>
+<ul>
+<li><strong>작업 전 점검 이력 확인·통제</strong> (P-02-02) — 주기 내 점검이력 조회, 통제 차단/경고/미적용 판정, 긴급 W/O 우회</li>
+</ul>
+<h3>2. 생산 실행 모드</h3>
+<ul>
+<li><strong>자재 투입 스캔·오투입 검증</strong> (P-02-03) — 자재LOT·금형 QR 스캔, genealogy 시작</li>
+<li><strong>작업실적 등록(LOT·제품 선택)</strong> (P-02-04) — 양품/불량/손실 3원 실적, 타발수</li>
+<li><strong>PQC 제품 검사·검사 결과 입력</strong> (P-02-13) — 양품/불량, 재작업/폐기 2분류</li>
+<li><strong>인식표 발행·부착</strong> (P-02-05) / <strong>LOT 라벨 출력·부착</strong> (P-02-07) — 라벨 인쇄 내장</li>
+<li><strong>생산LOT 완료 처리</strong> (P-02-06) — 초과분 추가 LOT 발행</li>
+<li>(예외) <strong>작업 중단(홀드) 등록</strong> (P-02-10) · <strong>러닝체인지 부품 교체 등록</strong> (P-02-11)</li>
+<li>(긴급) <strong>긴급 W/O 현장 투입·실적</strong> (P-02-12) — 라인 재고 즉시 투입→실적→인식표</li>
+</ul>
+<h4>3. 포장·출하 모드 (02·04)</h4>
+<ul>
+<li><strong>포장 작업(LOT 스캔·제품 포장)</strong> (P-02-08)</li>
+<li><strong>포장 라벨·인식표 재출력·부착</strong> (P-02-09)</li>
+<li><strong>Packing(P&amp;P) 실적 등록</strong> (P-04-01) — 납품라벨↔생산LOT 매칭 스캔</li>
+<li><strong>납품·포장 라벨 출력</strong> (P-04-02)</li>
+<li><strong>재구성 신규 라벨 발행</strong> (P-04-04) · <strong>재작업 실적 등록</strong> (P-04-03)</li>
+</ul>
+<h4>4. 창고 스테이션 모드 (01)</h4>
+<ul>
+<li><strong>자재LOT 등록·라벨 발행</strong> (P-01-01) — MES 발번, Lot Status Hold, 라벨 인쇄</li>
+<li><strong>출고 QR 발행</strong> (P-01-02) — 이동 단위 QR 인쇄</li>
+</ul>
+<h4>5. 설비·현장 수집 모드 (05)</h4>
+<ul>
+<li><strong>툴 사용실적 입력(타발수)</strong> (P-05-01) — 금형 QR 스캔, 타발수 기입</li>
+<li><strong>비가동 실적 입력</strong> (P-05-02) — 사유코드·비가동 시간 현장 즉시 수집</li>
+</ul>
+<div class="callout"><p>상태바 상시요소: 오프라인·미동기 N건(결정17)은 화면이 아닌 셸 표시. 축2~4(작업자·포장)는 동일 POP 키오스크 셸의 연속 탭/스텝으로 구현될 수 있음.</p></div>
+<h3>2.3 모바일</h3>
+<h4>진입</h4>
+<ul>
+<li><strong>로그인·기기 등록</strong> (M-CO-01) — 계정 로그인, 기기 인증, 무선 스캐너 페어링, 언어 선택</li>
+</ul>
+<h4>📦 입하 타일</h4>
+<ul>
+<li><strong>입하 등록</strong> (M-01-01) — P/O 선택 → 거래명세서 촬영·OCR 자동 등록 → 품목·수량 대조</li>
+<li>→ <strong>자재LOT 번호 스캔</strong> (M-01-02) — 사전부착 LOT 스캔 / 미부착 시 입하 목록 선택</li>
+<li>→ (예외) <strong>입하 오류 등록</strong> (M-01-06) — 수량·품목 오류 등록, 반품/판정 라우팅</li>
+</ul>
+<h4>🔬 수입검사 타일</h4>
+<ul>
+<li><strong>IQC 대상 LOT 스캔</strong> (M-01-03) — 검사 대상 LOT 특정 스캔 (판정은 관리웹 W-01-01)</li>
+</ul>
+<h4>📥 적치 타일</h4>
+<ul>
+<li><strong>자재 위치 확인</strong> (M-01-04) — LOT 스캔 → 적치 위치 안내</li>
+<li>→ <strong>적치·입고 완료</strong> (M-01-05) — 위치 코드 검증 스캔, LOT 스캔, 적치 완료</li>
+<li>→ (포화) <strong>임시 위치 적재</strong> (M-01-07) — 임시 위치 스캔, 사유 입력, 정위치 이동 요청</li>
+</ul>
+<h4>📤 피킹/출고 타일</h4>
+<ul>
+<li><strong>자재 출고·피킹</strong> (M-01-08) — 출고요청 선택 → 피킹 LOT 확인(FEFO/FIFO·Hold 차단) → LOT 스캔 → 수량 입력</li>
+<li>→ <strong>생산창고 입고·호퍼/재생재 등록</strong> (M-01-09) — 출고 QR 입고 스캔, 호퍼 잔량 실측, 재생재 등록</li>
+</ul>
+<h4>🔀 이동 타일</h4>
+<ul>
+<li><strong>재고이동·불량 반출</strong> (M-01-10) — 이동 대상 선택 → 반출 QR 스캔 → 도착 스캔 → 이동 기록</li>
+</ul>
+<h4>🧮 실사 타일</h4>
+<ul>
+<li><strong>실물 카운트</strong> (M-01-11) — 창고 순회 실물 카운트, 실사 수량 입력 (조정은 관리웹 W-01-04)</li>
+</ul>
+<h4>🏭 생산 이동/수리 타일 (02)</h4>
+<ul>
+<li><strong>WIP 공정 이동 스캔</strong> (M-02-01) — 다음 공정 투입 LOT 스캔, WIP 이동 기록</li>
+<li><strong>수리 왕복 투입·반출 스캔</strong> (M-02-02) — 수리 투입/반출 스캔, 수리이력 기록</li>
+</ul>
+<h4>🚚 출하 스캔 타일 (04)</h4>
+<ul>
+<li><strong>피킹 대상 목록</strong> (M-04-02) → <strong>제품LOT 피킹 스캔</strong> (M-04-01) — FEFO/FIFO 선출, Release 차단</li>
+<li><strong>포장 재구성 스캔</strong> (M-04-03) — 원 포장 LOT 스캔, 합병/분할/재구성 (신규 라벨은 POP P-04-04)</li>
+</ul>
+<h4>🛠 설비 타일 (05)</h4>
+<ul>
+<li><strong>설비 점검 입력</strong> (M-05-01) — 사번 입력, 점검항목 조회, 결과 입력, 합/NG 판정</li>
+<li><strong>설비 고장 현장 보고</strong> (M-05-02) — 고장 현상·사유코드 입력, 설비담당 호출</li>
+</ul>
+<h2>3. 화면 인벤토리</h2>
+<p>프로그램 → 도메인 순. 화면ID = 프로그램(W 관리웹·P POP·M 모바일) + 도메인(01~06·CO 공통) + 일련.</p>
+<h3>3.1 관리웹 (React 웹 · 사무 PC)</h3>
+<p><strong>01 자재창고관리</strong></p>
+<table>
+<thead><tr><th>화면ID</th><th>화면명</th><th>유형</th><th>주요 사용자</th><th>핵심 엔티티</th><th>신뢰도</th><th>근거</th></tr></thead>
+<tbody>
+<tr><th><code>W-01-01</code></th><td>IQC 수입검사·판정</td><td>판정·승인</td><td>품질담당</td><td>IQC검사실적·검사기준·자재LOT·LotStatus·의심자재</td><td>확정</td><td>01-S-C Desktop「IQC 진행」·File「결과 기록」·판정 OR(부분입고/불량/의심자재)/배지=웹·REQ-PR-0027</td></tr>
+<tr><th><code>W-01-02</code></th><td>긴급 IQC 생략 한도승인</td><td>판정·승인</td><td>권한자</td><td>자재LOT·LotStatus·LotStatus변경이력</td><td>추정</td><td>메인 OR 545:4443 생략·긴급승인→한도승인 914:9058·인라인 라벨(별도 게이트 노드 미신설)/배지 없음·E3 대기</td></tr>
+<tr><th><code>W-01-03</code></th><td>초과 입하 분리·신규 P/O 등록</td><td>입력</td><td>물류담당</td><td>입하·구매발주(P/O)·자재LOT</td><td>확정</td><td>01-S-B File 정량분 입하·초과분 분리(P/O 비귀속)·Desktop 신규 P/O/배지=웹·REQ-OA-0011</td></tr>
+<tr><th><code>W-01-04</code></th><td>재고실사·조정</td><td>입력</td><td>물류담당</td><td>재고실사·재고조정·재고·수불원장</td><td>확정</td><td>01-S-H(WF S9) Desktop 장부 조회·OR 대조·File 조정 등록·ERP 조정 전표 선택 연계/배지=웹·오프라인 금지·결정08</td></tr>
+<tr><th><code>W-01-05</code></th><td>공급사 반품 처리</td><td>입력</td><td>물류담당</td><td>반품·자재LOT·재고·수불원장</td><td>확정</td><td>01-S-I(WF S10) Desktop 반품 등록(Hold 유지)·File 반출 기록·ERP 반품 전표 선택 연계/배지=웹</td></tr>
+<tr><th><code>W-01-06</code></th><td>폐기 품의·기타출고</td><td>판정·승인</td><td>물류담당·품의 승인권자</td><td>폐기(기타출고)·자재LOT·재고·수불원장</td><td>확정</td><td>01-S-I(WF S11) Archive 불량창고 입고·File 내부 품의·Desktop 기타출고(재고 차감)/배지=웹·REQ-PR-0025·0028</td></tr>
+<tr><th><code>W-01-07</code></th><td>재고 현황·상태 조회</td><td>조회·상세</td><td>물류담당·품질담당</td><td>재고·자재LOT·LotStatus·의심자재</td><td>추정</td><td>WF S6 재고 보관·상태(가용/Hold·유효기간)·REQ-PR-0027 의심자재/도식 앵커 밖·결정08·10</td></tr>
+<tr><th><code>W-01-08</code></th><td>위치 확인 모니터링</td><td>대시보드</td><td>물류담당</td><td>재고·Location</td><td>추정</td><td>REQ-PR-0005 위치 확인 모니터링(선택적 위치 관리)·WF S5/도식 앵커 밖</td></tr>
+<tr><th><code>W-01-09</code></th><td>입하 예정 조회</td><td>목록</td><td>물류담당</td><td>구매발주(P/O)·입하</td><td>추정</td><td>WF S1 입하 예정·P/O 수신·변경 이벤트(REQ-PR-0024·QA#23)/도식 커버 밖(§1.0 미커버)</td></tr>
+</tbody></table>
+<p><strong>02 생산실행</strong></p>
+<table>
+<thead><tr><th>화면ID</th><th>화면명</th><th>유형</th><th>주요 사용자</th><th>핵심 엔티티</th><th>신뢰도</th><th>근거</th></tr></thead>
+<tbody>
+<tr><th><code>W-02-01</code></th><td>P/O 수신·조회</td><td>조회·상세</td><td>생산관리자·전산담당</td><td>P/O(생산계획)·BOM</td><td>확정</td><td>WF02 S1 §1.2-A Desktop 297:5499 P/O 수신확인/배지 축1=웹·REQ-PR-0024</td></tr>
+<tr><th><code>W-02-02</code></th><td>W/O 전개·편성</td><td>입력</td><td>생산관리자</td><td>W/O(작업지시)·공정Routing·BOM</td><td>확정</td><td>WF02 S2 §1.2-A Desktop 297:5500 W/O 전개·Routing/BOM 점검·Rev 스냅샷 고정/배지 축1=웹·REQ-PR-0002·결정07</td></tr>
+<tr><th><code>W-02-03</code></th><td>4M 자원배정·유효성 점검</td><td>입력</td><td>생산관리자·설비담당</td><td>자원배정(4M)·설비마스터·작업자마스터·툴/금형마스터</td><td>확정</td><td>WF02 S3 §1.2-A Desktop 297:5501 4M 자원배정·Validation·우선순위/배지 축1=웹·결정04·REQ-PR-0003</td></tr>
+<tr><th><code>W-02-04</code></th><td>W/O 확정·배포·생산LOT 선발행</td><td>판정·승인</td><td>생산관리자</td><td>W/O(작업지시)·생산LOT·자재출고요청</td><td>확정</td><td>WF02 S4 §1.2-A Desktop·File 생산LOT N건 선발행·자재 출고요청 자동/배지 축1=웹·REQ-PR-0022·0008</td></tr>
+<tr><th><code>W-02-05</code></th><td>W/O 마감·ERP 실적 송신</td><td>판정·승인</td><td>생산관리자</td><td>W/O마감·P/O(생산계획)</td><td>확정</td><td>WF02 S12 §1.2-F Desktop 마감·OR 3분류(미달/정상/초과)·ERP 실적 송신/배지 5.생산관리자=웹·REQ-PR-0019</td></tr>
+<tr><th><code>W-02-06</code></th><td>P/O 변경 관리자 확인</td><td>판정·승인</td><td>생산관리자</td><td>P/O변경·W/O(작업지시)</td><td>확정</td><td>§2.3 02-S-C Desktop 297:6340 관리자 확인·반영/강행 분기·불일치 플래그/배지=웹·REQ-PR-0024</td></tr>
+<tr><th><code>W-02-07</code></th><td>긴급 W/O 발행</td><td>입력</td><td>권한자(생산관리자)</td><td>W/O(작업지시)</td><td>확정</td><td>§2.4 02-S-D Desktop 297:6359 긴급 W/O(P/O 비귀속)·공정/BOM 자동 전개·무배정 배포/배지=웹·REQ-PR-0014</td></tr>
+<tr><th><code>W-02-08</code></th><td>W/O 진행현황 조회</td><td>목록</td><td>생산관리자</td><td>W/O(작업지시)·생산LOT·작업홀드이력</td><td>추정</td><td>WF02 S1~S12 상태 체계(결정14)/도식 앵커 밖·W/O 상태(편성~마감)·홀드·LOT 드릴다운</td></tr>
+<tr><th><code>W-02-09</code></th><td>생산 현황·비가동 알람 대시보드</td><td>대시보드</td><td>생산관리자·현장반장</td><td>작업실적·불량·비가동기록</td><td>추정</td><td>WF02 S9 N8 알람(대시보드·SNS)·02-S-H 비가동 골격/도식 앵커 밖·결정03·REQ-PR-0016</td></tr>
+<tr><th><code>W-02-10</code></th><td>추가 자재 출고 요청(수동)</td><td>입력</td><td>생산관리자·현장반장</td><td>자재출고요청·W/O(작업지시)</td><td>추정</td><td>WF02 S4 문답#4·#8 신규 기능(긴급 W/O 부족분 정식 출고 경유)/도식 앵커 밖·성격 판정</td></tr>
+</tbody></table>
+<p><strong>03 품질관리</strong></p>
+<table>
+<thead><tr><th>화면ID</th><th>화면명</th><th>유형</th><th>주요 사용자</th><th>핵심 엔티티</th><th>신뢰도</th><th>근거</th></tr></thead>
+<tbody>
+<tr><th><code>W-03-01</code></th><td>Lot Status 현황 조회</td><td>조회·상세</td><td>품질담당·물류담당</td><td>Lot Status·검사실적·LOT</td><td>확정</td><td>도식스펙-03 §1 Lot Status 전이도·N6 단일 정본/차단 단일 지점/배지=웹 수렴 허브·WF03 S5</td></tr>
+<tr><th><code>W-03-02</code></th><td>Lot Status 판정·전이 처리</td><td>판정·승인</td><td>품질담당</td><td>Lot Status·Lot Status 변경이력</td><td>확정</td><td>배지 §03 보류(C7/C8 재판정)·Release(C9 재Hold) 웹 확정/도식스펙-03 §1.3·WF03 S4·S5 Exception</td></tr>
+<tr><th><code>W-03-03</code></th><td>의심자재 등록</td><td>입력</td><td>품질담당</td><td>Lot Status·Lot Status 변경이력·의심자재</td><td>확정</td><td>배지 §03 의심자재등록 웹 확정·§1.3 C10(→보류) 트리거/WF03 S5·REQ-PR-0027</td></tr>
+<tr><th><code>W-03-04</code></th><td>Lot Status 변경이력 조회</td><td>조회·상세</td><td>품질담당·품질책임자</td><td>Lot Status 변경이력·Lot Status·검사실적</td><td>추정</td><td>§1.4 N7 변경이력 1:N 전수·§1.6 모든 전이=변경이력 기록/WF03 S5·결정10 감사 대상</td></tr>
+<tr><th><code>W-03-05</code></th><td>검사실적·검사결과 조회</td><td>조회·상세</td><td>품질담당</td><td>검사실적·검사결과·검사측정치</td><td>추정</td><td>WF03 S3·S4 헤더-결과-측정치 3계층 통합 조회(결정01)/검사 수행은 01·02·04 co-locate·통합 조회는 03</td></tr>
+<tr><th><code>W-03-06</code></th><td>불량·부적합 판정·폐기 품의</td><td>판정·승인</td><td>품질담당·품의결재권자</td><td>불량실적·불량코드·Lot Status</td><td>추정</td><td>WF03 S6 재작업/폐기 2분류·불량창고 우선입고·내부 품의→기타출고/REQ-PR-0025·0028·결정09</td></tr>
+<tr><th><code>W-03-07</code></th><td>SPC 관제 대시보드</td><td>대시보드</td><td>품질담당</td><td>검사측정치·수집채널매핑·검사항목</td><td>추정</td><td>WF03 S7 Xbar-R·Cp/Cpk·OOC·Nelson(결정11 1차=수집+상하한 판정)/REQ-PR-0032</td></tr>
+<tr><th><code>W-03-08</code></th><td>품질 대시보드·불량 발생 알람</td><td>대시보드</td><td>품질담당·관리자</td><td>불량실적·검사실적·Lot Status</td><td>추정</td><td>WF03 S6 불량 발생 알람(SNS·대시보드)·불량률/불량코드 분포/REQ-PR-0016·QA#24</td></tr>
+<tr><th><code>W-03-09</code></th><td>특채·한도승인 승인 처리</td><td>판정·승인</td><td>품질책임자·품질담당</td><td>Lot Status·Lot Status 변경이력</td><td>미정</td><td>§1.1 미확정 3상태(한도승인·특채·폐기·별표·무배선)·§4.1 E3 목록 대기·placement §4 잔여 미결(승인 주체·기록 매체 회신 대기)·REQ-PR-0027</td></tr>
+</tbody></table>
+<p><strong>04 제품출하</strong></p>
+<table>
+<thead><tr><th>화면ID</th><th>화면명</th><th>유형</th><th>주요 사용자</th><th>핵심 엔티티</th><th>신뢰도</th><th>근거</th></tr></thead>
+<tbody>
+<tr><th><code>W-04-01</code></th><td>출하지시서 Import·작업지시 생성</td><td>입력</td><td>물류 출하담당·전산담당</td><td>고객사 출하지시서·출하작업지시·출하지시(3계층)</td><td>확정</td><td>WF04 S3 메인 M2 Desktop 지시서 import·File 출하작업지시(D+1)·시간대 슬롯·standalone/배지 M2=웹·REQ-PR-0029</td></tr>
+<tr><th><code>W-04-02</code></th><td>출하 예정 목록</td><td>목록</td><td>물류 출하담당</td><td>출하작업지시·시간대 슬롯</td><td>확정</td><td>메인 M2 Wallet 출하 예정 목록·시간대 슬롯별 필터/WF04 S3·REQ-PR-0029</td></tr>
+<tr><th><code>W-04-03</code></th><td>OQC 출하검사 판정</td><td>판정·승인</td><td>품질담당</td><td>OQC검사·검사성적서(CoA/CoC)·Lot Status·제품LOT</td><td>확정</td><td>메인 M6 Desktop 출하검사 판정·File 성적서·H5 합/불·불합격→재작업 분기/배지 M6=웹(정책2)·WF04 S5·REQ-PR-0027</td></tr>
+<tr><th><code>W-04-04</code></th><td>출하 확정·PGI 송신</td><td>입력</td><td>물류 출하담당·전산담당</td><td>출하·제품LOT·재고·PGI 전표</td><td>확정</td><td>메인 M10 Desktop 출하 확정·File 출하 기록·ERP PGI 송신·genealogy 종결/배지 M10=웹·오프라인 금지·WF04 S7·REQ-PR-0030</td></tr>
+<tr><th><code>W-04-05</code></th><td>긴급 직행 출하 처리</td><td>입력</td><td>물류담당</td><td>출하·제품입고·제품LOT</td><td>확정</td><td>04-S-A 직행 처리 원클릭·제품입고+출하 2건 자동·O3 실물 합류/배지=웹·#11 확정·QA#26·REQ-PR-0014</td></tr>
+<tr><th><code>W-04-06</code></th><td>반품·클레임 입고 등록</td><td>입력</td><td>완제품창고담당</td><td>반품·반품입고·재고·원천구분 속성</td><td>확정</td><td>04-S-C 불량창고 반품입고·원천 구분(내부/외부 클레임)·재고 재등록·O2 재진입/배지=웹·QA#15</td></tr>
+<tr><th><code>W-04-07</code></th><td>재작업/폐기 판정 의뢰</td><td>판정·승인</td><td>품질담당</td><td>반품·Lot Status</td><td>추정</td><td>04-S-C H8 판정→03 도식 위임·결과 수신·재작업/폐기 stub 분기/배지=웹·WF04 S9·반품입고에 흡수 가능</td></tr>
+<tr><th><code>W-04-08</code></th><td>완제품 재고·Lot Status 조회</td><td>조회·상세</td><td>물류 출하담당·품질담당</td><td>재고·제품LOT·Lot Status</td><td>추정</td><td>WF04 S2 완제품 재고·가용/Hold·유효기간·선출 정책(결정10)/도식 앵커 밖·QA#28</td></tr>
+<tr><th><code>W-04-09</code></th><td>출하 현황 모니터링 대시보드</td><td>대시보드</td><td>물류 출하담당·관리자</td><td>출하·출하작업지시</td><td>미정</td><td>WF04 S7 D20 현행 모니터링 없음·추후 고객 요구(QA#21)/도식 앵커 밖</td></tr>
+<tr><th><code>W-04-10</code></th><td>제품 폐기 품의</td><td>판정·승인</td><td>물류담당·관리자</td><td>폐기(기타 출고)·재고·제품LOT</td><td>미정</td><td>04-S-C SC6 폐기 stub(도식 범위 외)·WF04 S10·REQ-PR-0028·계정 항목(E4) 대기</td></tr>
+</tbody></table>
+<p><strong>05 설비·툴 관리</strong></p>
+<table>
+<thead><tr><th>화면ID</th><th>화면명</th><th>유형</th><th>주요 사용자</th><th>핵심 엔티티</th><th>신뢰도</th><th>근거</th></tr></thead>
+<tbody>
+<tr><th><code>W-05-01</code></th><td>타발수 환산 파라미터 설정</td><td>설정·마스터</td><td>설비담당</td><td>툴/금형·툴사용실적</td><td>확정</td><td>WF05 S7 사이드 A B9 환산옵션(선택형)·수량 대비 타발수 비율(Cavity 배수)/배지=웹·QA#12</td></tr>
+<tr><th><code>W-05-02</code></th><td>툴보전오더 생성(PM 도래 조회)</td><td>입력</td><td>설비담당</td><td>툴보전오더·툴/금형·적정타수</td><td>확정</td><td>WF05 S8 사이드 A H5 PM도달·B10 PM도래목록·B11 오더생성(BaseDate·항목·담당자)/배지=웹·MES-4</td></tr>
+<tr><th><code>W-05-03</code></th><td>툴 PM 실적 등록</td><td>입력</td><td>설비담당</td><td>툴PM실적·툴보전오더·툴/금형</td><td>확정</td><td>WF05 S8 사이드 A B12 PM실적기록·SA2 PM완료·차기 PM 기준 갱신·누계 리셋/배지=웹·MES-5</td></tr>
+<tr><th><code>W-05-04</code></th><td>설비 고장 상세·처리</td><td>조회·상세</td><td>설비담당</td><td>설비보전이력·비가동실적·설비</td><td>확정</td><td>WF05 S4 사이드 B B13 고장 조회·상세·사후보전 연계·W/O 중단 경계/배지=모바일+웹 2단말 스택(사무 상세/처리=웹)</td></tr>
+<tr><th><code>W-05-05</code></th><td>보전 지시 발행</td><td>입력</td><td>설비담당</td><td>설비보전이력(보전지시)·설비</td><td>확정</td><td>WF05 S5 사이드 B SB1 보전트리거·B14 보전지시발행(사후/예방/예지)·예정일·항목·담당자/배지=웹·MES-6</td></tr>
+<tr><th><code>W-05-06</code></th><td>보전 실적·예비품 출고 등록</td><td>입력</td><td>설비담당</td><td>설비보전이력·예비품출고이력·예비품</td><td>확정</td><td>WF05 S5·S6 사이드 B B15 예비품목록·B16 출고·B17 보전실적·SB3 가동복귀/배지=웹·MES-7·QA#7</td></tr>
+<tr><th><code>W-05-07</code></th><td>수집채널 매핑 관리</td><td>설정·마스터</td><td>전산담당·설비담당</td><td>수집채널매핑·설비·검사항목·검사측정치</td><td>추정</td><td>WF05 S4 사이드 C MES-10 설비 FK+채널명→검사항목 유일 지점(결정11)·03재정의4/도식 앵커 밖</td></tr>
+<tr><th><code>W-05-08</code></th><td>비가동 집계·조회</td><td>조회·상세</td><td>설비담당·품질담당</td><td>비가동실적·설비·WorkCalendar</td><td>확정</td><td>WF05 S4 사이드 D B19·MES-9 OEE 파생·계획 대비 실적/배지=POP+웹 2단말 스택(사무 집계=웹)</td></tr>
+<tr><th><code>W-05-09</code></th><td>작업 캘린더(WorkCalendar) 설정</td><td>설정·마스터</td><td>설비담당·생산관리자</td><td>WorkCalendar·캘린더적용·설비그룹</td><td>확정</td><td>WF05 S4 사이드 D B20 캘린더설정·계층형(공장 기본+설비그룹 override·결정03)·계획 비가동/배지=웹</td></tr>
+<tr><th><code>W-05-10</code></th><td>계측기 검교정 이력 등록</td><td>입력</td><td>품질담당</td><td>계측기이력·계측기</td><td>확정</td><td>[03 계측기 검교정 관리 병합] WF03→05 이관 사이드 E 검교정 등록·이력(MES-12)·성적서/교정기관/차기예정일·03재정의4/배지=웹</td></tr>
+<tr><th><code>W-05-11</code></th><td>계측기 마스터 관리</td><td>설정·마스터</td><td>품질담당</td><td>계측기</td><td>추정</td><td>[03 병합] 사이드 E MES-11 계측기 마스터·검교정 유효 게이트→01/02/04 검사실적·유효/만료/고장 상태(결정06)/배지 분리 근거 약함</td></tr>
+<tr><th><code>W-05-12</code></th><td>설비·설비그룹 마스터</td><td>설정·마스터</td><td>설비담당·전산담당</td><td>설비·설비그룹·점검항목</td><td>추정</td><td>WF05 S1 §0 특칙3(도식 범위 외·Wallet 참조)·데이터모델 §1 설비·설비그룹·점검/보전 항목·주기·REQ-PR-0036 위치</td></tr>
+<tr><th><code>W-05-13</code></th><td>툴/금형/지그 마스터·QR 발급</td><td>설정·마스터</td><td>설비담당</td><td>툴/금형/지그·적정타수·예비품</td><td>추정</td><td>WF05 S1 REQ-PR-0003 모든 도구 MES 직접 등록·정본·QR 발급·부착·적정타수·§0 특칙1/도식 앵커 밖</td></tr>
+<tr><th><code>W-05-14</code></th><td>설비·툴 대시보드</td><td>대시보드</td><td>설비담당·생산관리자</td><td>설비·비가동실적·툴사용실적·설비보전이력</td><td>추정</td><td>WF05 S4 REQ-PR-0036 알람 발생 설비 위치·REQ-PR-0016 적정타수 초과·고장 이벤트 알람·가동/PM 도래/도식 앵커 밖(M5 배치도 대기)</td></tr>
+</tbody></table>
+<p><strong>06 기준정보·연계</strong></p>
+<table>
+<thead><tr><th>화면ID</th><th>화면명</th><th>유형</th><th>주요 사용자</th><th>핵심 엔티티</th><th>신뢰도</th><th>근거</th></tr></thead>
+<tbody>
+<tr><th><code>W-06-01</code></th><td>Routing(공정) 등록·관리</td><td>설정·마스터</td><td>생산관리자·전산담당</td><td>Routing헤더·Routing라인·공정·품목</td><td>확정</td><td>WF06 S4 §1.2 B4·MES-3·공정 순서/외주구분 CRUD·Rev 발행·표준 C/T·PQC 검사 공정 플래그/배지=웹·REQ-PR-0026·결정07</td></tr>
+<tr><th><code>W-06-02</code></th><td>검사기준 등록(IQC/PQC/OQC)</td><td>설정·마스터</td><td>품질담당·전산담당</td><td>검사기준·검사항목·품질기준값·불량코드·판정유형</td><td>확정</td><td>[03 검사기준정보 병합] WF06 S5 §1.2 B5·B6·MES-4·UCL/LCL/Target·PQC opt-in 생략·엑셀 DX 업로드·불량코드/판정유형 연결/배지=웹·QA#4</td></tr>
+<tr><th><code>W-06-03</code></th><td>불량코드 2계층 마스터</td><td>설정·마스터</td><td>품질담당·운영관리자</td><td>불량코드(대분류/상세)·공정-불량코드매핑(N:M)·손실사유코드</td><td>추정</td><td>§1.4 MES-11·결정12·대분류(외관/치수/기능/이물/기타)·공정별 상세코드·처분구분·다국어·N:M 매핑·손실코드/배지 없음·REQ-PR-0025·0035</td></tr>
+<tr><th><code>W-06-04</code></th><td>판정유형 코드 마스터</td><td>설정·마스터</td><td>품질담당·운영관리자</td><td>판정유형코드·공통코드·Lot Status</td><td>추정</td><td>§1.4 MES-12·확정 판정유형(보류/Release/Hold/PQC 필요)·미확정 3상태(한도승인/특채/폐기) E3 대기(결정10)/배지 없음·REQ-PR-0027</td></tr>
+<tr><th><code>W-06-05</code></th><td>수신본 확장속성 편집(품목·BOM)</td><td>입력</td><td>전산담당·생산관리자</td><td>품목·BOM·다국어명칭</td><td>확정</td><td>WF06 S2 §1.2 B3·MES-1·2·개발품 플래그(실적 송신 제외)·재생재 하위코드·다국어·원본 읽기전용/배지=웹·QA#34·#35</td></tr>
+<tr><th><code>W-06-06</code></th><td>공통코드·조직 마스터(다국어)</td><td>설정·마스터</td><td>전산담당·운영자</td><td>공통코드·조직·다국어명칭</td><td>추정</td><td>WF06 S1 §1.4 MES-6 수신 5종(품목·BOM·공통코드·조직·작업자)·코드값 ERP 정본·다국어 명칭 편집/도식 앵커=수신·확장 화면 추정·QA#33</td></tr>
+<tr><th><code>W-06-07</code></th><td>창고·Location 마스터</td><td>설정·마스터</td><td>물류담당·전산담당</td><td>창고·Location·창고유형</td><td>추정</td><td>[01 Location 마스터 설정 병합] WF06 S6 §1.2 B7·MES-5·창고유형(자재/제품/반제품/상품/생산)·Location 선택적 사용·변경 이력/REQ-PR-0021·0034</td></tr>
+<tr><th><code>W-06-08</code></th><td>예비품 마스터</td><td>설정·마스터</td><td>설비담당·전산담당</td><td>예비품·설비</td><td>추정</td><td>[05 예비품 마스터 병합] WF06 S6 B7 운영마스터·QA#7 별도 마스터(품목 통합 아님)·엑셀 DX·설비-예비품 매핑</td></tr>
+<tr><th><code>W-06-09</code></th><td>ERP-MES I/F 연계정의 관리</td><td>설정·마스터</td><td>전산담당</td><td>ERP-MES I/F 연계정의·연계대상·트리거</td><td>확정</td><td>WF06 S7 §2.1 B8·연계대상(수신 5종+P/O)·트리거(Time/Event)·DB 중계 Temp 매핑·송수신 방향/배지=웹·QA#18</td></tr>
+<tr><th><code>W-06-10</code></th><td>연계 동기화 현황·실패 재처리</td><td>조회·상세</td><td>전산담당</td><td>연계로그·Temp Table·ERP-MES I/F 연계정의</td><td>미정</td><td>WF06 S7 예외 §2.1 SA2~3·마커 M4 실패재처리·연계 로그·재처리·알람/자동 파이프라인 무배지·E1 유형 목록 회신 대기</td></tr>
+<tr><th><code>W-06-11</code></th><td>마스터 변경관리(신규 Rev 발행)</td><td>입력</td><td>생산관리자·품질담당·전산담당</td><td>Routing Rev·BOM Rev·변경이력</td><td>확정</td><td>WF06 S8 §2.2 B9·B10·MES-8·신규 Rev 발행(in-place 금지)·작성중만 편집·변경 이력·확정 Rev W/O 스냅샷/배지=웹·결정07</td></tr>
+<tr><th><code>W-06-12</code></th><td>MES→ERP 송신 I/F 정의(항목 on/off)</td><td>설정·마스터</td><td>전산담당</td><td>ERP-MES I/F 연계정의·송신항목·추적관리시스템</td><td>확정</td><td>WF06 S7 §2.4 B13·B14·MES-10·송신 on/off(생산실적 필수·G/R·PGI·반품·실사조정)·부속 항목·검사 비연계·추적관리시스템 경계/배지=웹·REQ-PR-0030</td></tr>
+</tbody></table>
+<p><strong>공통</strong></p>
+<table>
+<thead><tr><th>화면ID</th><th>화면명</th><th>유형</th><th>주요 사용자</th><th>핵심 엔티티</th><th>신뢰도</th><th>근거</th></tr></thead>
+<tbody>
+<tr><th><code>W-CO-01</code></th><td>계정 로그인</td><td>입력</td><td>관리자·생산관리자·품질관리자·시스템관리자·사무직 전체</td><td>사용자/역할/권한(app_user)</td><td>확정</td><td>WBS §7 L189 폼팩터① 관리 Desktop 웹 계정 로그인·결정16 L118·개념모델 app_user(login_id/user_name)·아이디/PW·언어 선택</td></tr>
+<tr><th><code>W-CO-02</code></th><td>사용자·역할·권한 관리</td><td>설정·마스터</td><td>시스템 관리자·운영자·전산담당</td><td>사용자/역할/권한·역할·권한(role_permission)·데이터 접근범위(user_data_scope)·부서</td><td>확정</td><td>[06 사용자·권한 관리 병합] 시나리오 §2·REQ-PR-0015 부서/기능 접근 분리·개념모델 C1(role/role_permission/user_role/user_data_scope)·06 §2.3 B11·다법인 격리</td></tr>
+<tr><th><code>W-CO-03</code></th><td>알림센터</td><td>목록</td><td>고객사 지정 담당자·생산관리자·품질관리자</td><td>알림(Notification)</td><td>확정</td><td>결정15 L85 정본 알림(사내망 채널)·REQ-PR-0016 이벤트 알람·개념모델 §6.5 Notification(이벤트-구독-채널)·목록/읽음/필터/구독</td></tr>
+<tr><th><code>W-CO-04</code></th><td>공지·전달 게시/조회</td><td>목록</td><td>관리자(작성)·전 사용자(열람)·생산관리자</td><td>공지/전달(Notice)·확인 이력</td><td>확정</td><td>[02 전달사항 등록·배포 병합] WBS §7 공지·개념모델 C2 Notice 단일 엔티티(scope 전사/사업부/설비그룹/작업조/W-O·확인 이력)·결정02·02 N4(297:5503)</td></tr>
+<tr><th><code>W-CO-05</code></th><td>통합 대시보드(경영·생산)</td><td>대시보드</td><td>경영진·생산관리자</td><td>레이아웃(공장/창고 master)·알림(Notification)·생산실적(집계 뷰)</td><td>추정</td><td>REQ-PR-0036 일일 생산실적·알람 설비 위치(레이아웃)·결정15 L85·WBS §7 공통 대시보드/도식 앵커 밖·KPI 드릴다운</td></tr>
+<tr><th><code>W-CO-06</code></th><td>단말기-공정 매핑 설정(EX-10)</td><td>설정·마스터</td><td>시스템 관리자</td><td>단말기(Device)·공정(Process)·설비</td><td>추정</td><td>시나리오 L134 지시→해당 공정 현장 단말 표시·WBS 트랙 H POP 단말 설치·개념모델 mdm §3 단말기 기준정보/배지 없는 설정·설치위치 의존</td></tr>
+<tr><th><code>W-CO-07</code></th><td>다국어(한/베) 환경설정</td><td>설정·마스터</td><td>전 사용자</td><td>공통코드(code_group/code_value)·사용자 환경설정</td><td>추정</td><td>REQ-PR-0012 한/베·QA#33 언어=사용자별 설정(전범위 UI+마스터+출력물)·개념모델 공통코드 다국어(code_value ko/vi)/전역 컨트롤 대표 화면</td></tr>
+</tbody></table>
+<h3>3.2 POP (Electron 키오스크 · 산업용 패널 PC)</h3>
+<p><strong>01 자재창고관리</strong></p>
+<table>
+<thead><tr><th>화면ID</th><th>화면명</th><th>유형</th><th>주요 사용자</th><th>핵심 엔티티</th><th>신뢰도</th><th>근거</th></tr></thead>
+<tbody>
+<tr><th><code>P-01-01</code></th><td>자재LOT 등록·라벨 발행</td><td>출력·인쇄</td><td>물류담당</td><td>자재LOT·LotStatus</td><td>확정</td><td>메인 Archive 545:4582 MES 발번·Lot Status Hold·라벨 인쇄/배지=POP·결정18·REQ-PR-0007</td></tr>
+<tr><th><code>P-01-02</code></th><td>출고 QR 발행</td><td>출력·인쇄</td><td>물류담당</td><td>출고QR·출고·자재LOT</td><td>확정</td><td>01-S-E File 219:5470 출고 QR(이동 단위) 발행/배지=POP·REQ-OA-0010</td></tr>
+</tbody></table>
+<p><strong>02 생산실행</strong></p>
+<table>
+<thead><tr><th>화면ID</th><th>화면명</th><th>유형</th><th>주요 사용자</th><th>핵심 엔티티</th><th>신뢰도</th><th>근거</th></tr></thead>
+<tbody>
+<tr><th><code>P-02-01</code></th><td>작업 시작(사번 인증·W/O 선택)</td><td>입력</td><td>작업자·현장반장</td><td>W/O(작업지시)·작업전점검이력</td><td>확정</td><td>WF02 S5 §1.2-B Mobile 297:5395 사번·Wallet 297:5396 W/O 선택/배지 축2=POP·REQ-PR-0023</td></tr>
+<tr><th><code>P-02-02</code></th><td>작업 전 점검 이력 확인·통제</td><td>판정·승인</td><td>작업자·현장반장</td><td>작업전점검이력·설비점검이력·작업지시(W/O)</td><td>확정</td><td>[02·05 병합] WF02 S5 점검 기록 확인·OR 분기 + WF05 S3 A4 작업전통제·H3 차단/경고/미적용·긴급 W/O 우회/배지=POP·QA#9·REQ-PR-0023</td></tr>
+<tr><th><code>P-02-03</code></th><td>자재 투입 스캔·오투입 검증</td><td>스캔</td><td>작업자</td><td>4M투입·자재LOT·금형(툴)</td><td>확정</td><td>WF02 S6 §1.2-B Mobile 자재LOT·금형 QR 스캔·OR 오투입 Validation(NG=재스캔)·genealogy 시작/배지 축2=POP·REQ-OA-0002</td></tr>
+<tr><th><code>P-02-04</code></th><td>작업실적 등록(LOT·제품 선택)</td><td>입력</td><td>작업자</td><td>작업실적·생산LOT</td><td>확정</td><td>WF02 S7 §1.2-C Mobile LOT·Service 제품 선택·양품/불량/손실 3원·타발수·잔여수량 반복/배지 축3=POP·QA#12·#13</td></tr>
+<tr><th><code>P-02-05</code></th><td>인식표 발행·부착</td><td>출력·인쇄</td><td>작업자</td><td>인식표·생산LOT</td><td>확정</td><td>WF02 S10 §1.2-C File 492:7814 양품 개체별 인식표 1:1·라벨 인쇄/배지 축3=POP·결정05</td></tr>
+<tr><th><code>P-02-06</code></th><td>생산LOT 완료 처리</td><td>입력</td><td>작업자</td><td>생산LOT</td><td>확정</td><td>WF02 S10 §1.2-C Desktop 297:5439 LOT 완료·초과분 추가 생산LOT 발행/배지 축3=POP</td></tr>
+<tr><th><code>P-02-07</code></th><td>LOT 라벨 출력·부착</td><td>출력·인쇄</td><td>작업자</td><td>생산LOT·LOT라벨</td><td>확정</td><td>WF02 S10 §1.2-C File 492:6693 LOT 단위 라벨 출력·부착/배지 축3=POP·결정13</td></tr>
+<tr><th><code>P-02-08</code></th><td>포장 작업(LOT 스캔·제품 포장)</td><td>스캔</td><td>포장 작업자</td><td>포장단위·생산LOT</td><td>확정</td><td>WF02 S10 §1.2-D Mobile 497:4545 LOT 스캔·Service 제품 포장·OR 포장 단위 분기/배지 축4=POP·결정05 보정</td></tr>
+<tr><th><code>P-02-09</code></th><td>포장 라벨·인식표 재출력·부착</td><td>출력·인쇄</td><td>포장 작업자</td><td>포장단위·LOT라벨·인식표</td><td>확정</td><td>§1.2-D File 497:4828 LOT 라벨·497:4842 인식표 재출력·박스 부착/배지 축4=POP·결정13</td></tr>
+<tr><th><code>P-02-10</code></th><td>작업 중단(홀드) 등록</td><td>입력</td><td>작업자</td><td>작업홀드이력·생산LOT</td><td>확정</td><td>§2.1 02-S-A Wallet 중단 사유·Mobile 홀드품 등록·라인사이드 적치·재개 전이/배지=POP·REQ-PR-0009·결정14</td></tr>
+<tr><th><code>P-02-11</code></th><td>러닝체인지 부품 교체 등록</td><td>입력</td><td>작업자</td><td>생산LOT·BOM</td><td>확정</td><td>§2.2 02-S-B Mobile 신규 부품 등록·File LOT 전/후 분할·BOM 스냅샷·4M 재진입/배지=POP·REQ-PR-0020</td></tr>
+<tr><th><code>P-02-12</code></th><td>긴급 W/O 현장 투입·실적</td><td>스캔</td><td>작업자</td><td>4M투입·자재LOT·작업실적·생산LOT</td><td>확정</td><td>§2.4 02-S-D Mobile 자재 즉시 투입·금형/설비 스캔·실적·LOT 완료·인식표·→04 직행/배지=POP·문답#4·#6</td></tr>
+<tr><th><code>P-02-13</code></th><td>PQC 제품 검사·검사 결과 입력</td><td>판정·승인</td><td>작업자·품질담당</td><td>검사실적·생산불량LOT·불량·비가동기록</td><td>확정</td><td>§2.5 02-S-E Service 제품 검사·Wallet 결과 입력·재작업/폐기 2분류·불량창고 우선 입고/배지=POP(결정12·정책2 예외)·REQ-OA-0003</td></tr>
+</tbody></table>
+<p><strong>04 제품출하</strong></p>
+<table>
+<thead><tr><th>화면ID</th><th>화면명</th><th>유형</th><th>주요 사용자</th><th>핵심 엔티티</th><th>신뢰도</th><th>근거</th></tr></thead>
+<tbody>
+<tr><th><code>P-04-01</code></th><td>Packing(P&amp;P) 실적 등록</td><td>입력</td><td>물류 출하담당</td><td>포장단위·납품라벨·생산LOT·포장구성</td><td>확정</td><td>메인 M8 Mobile 매칭 스캔(납품라벨↔생산LOT)·File 포장 실적·Desktop 고객 바코드/배지 M8=POP·WF04 S6</td></tr>
+<tr><th><code>P-04-02</code></th><td>납품·포장 라벨 출력</td><td>출력·인쇄</td><td>물류 출하담당</td><td>납품라벨·포장라벨</td><td>확정</td><td>메인 M8 Desktop 납품라벨 출력(OQC 합격 트리거)·포장라벨 사전발행·재출력/배지 M8=POP·REQ-PR-0036</td></tr>
+<tr><th><code>P-04-03</code></th><td>재작업 실적 등록</td><td>입력</td><td>생산담당</td><td>재작업실적·생산실적·제품LOT</td><td>추정</td><td>04-S-B B3 재작업 실적·양품화분 생산실적 반영·O2 출하 재진입/배지=POP(주체 잠정)·REQ-PR-0011·0025</td></tr>
+<tr><th><code>P-04-04</code></th><td>재구성 신규 라벨 발행</td><td>출력·인쇄</td><td>완제품창고담당</td><td>재구성이벤트·포장단위·포장라벨</td><td>확정</td><td>04-S-D File 재구성 이벤트(헤더-라인)·Desktop 신규 발번(분할 잔량=원 단위)·새 라벨 인쇄/배지=POP·결정13</td></tr>
+</tbody></table>
+<p><strong>05 설비·툴 관리</strong></p>
+<table>
+<thead><tr><th>화면ID</th><th>화면명</th><th>유형</th><th>주요 사용자</th><th>핵심 엔티티</th><th>신뢰도</th><th>근거</th></tr></thead>
+<tbody>
+<tr><th><code>P-05-01</code></th><td>툴 사용실적 입력(타발수)</td><td>입력</td><td>작업자(현장 오퍼레이터)</td><td>툴사용실적·툴/금형·작업실적</td><td>확정</td><td>WF05 S7 사이드 A B7 금형QR 스캔·B8 타발수 기입·누계/사용가능타수/배지=POP·MES-3</td></tr>
+<tr><th><code>P-05-02</code></th><td>비가동 실적 입력</td><td>입력</td><td>현장 오퍼레이터·현장반장</td><td>비가동실적·설비</td><td>확정</td><td>WF05 S4 사이드 D B19 비가동기록·사유코드·시간·현장 즉시 수집(MES-9)/배지=POP+웹 2단말 스택(현장 수집=POP)</td></tr>
+</tbody></table>
+<p><strong>공통</strong></p>
+<table>
+<thead><tr><th>화면ID</th><th>화면명</th><th>유형</th><th>주요 사용자</th><th>핵심 엔티티</th><th>신뢰도</th><th>근거</th></tr></thead>
+<tbody>
+<tr><th><code>P-CO-01</code></th><td>사번 경량 인증</td><td>입력</td><td>생산 작업자·현장 관리자·현장작업자</td><td>사용자/역할/권한(app_user↔작업자)·사번</td><td>확정</td><td>[06 현장 사번 경량 인증 병합] REQ-PR-0023 로그인 생략·작업 전 사번만·결정16 L118·WBS §7 폼팩터②·06 §2.3 B12·사번 검증·실적 귀속</td></tr>
+</tbody></table>
+<h3>3.3 모바일 (Capacitor Android · 무선 스캐너)</h3>
+<p><strong>01 자재창고관리</strong></p>
+<table>
+<thead><tr><th>화면ID</th><th>화면명</th><th>유형</th><th>주요 사용자</th><th>핵심 엔티티</th><th>신뢰도</th><th>근거</th></tr></thead>
+<tbody>
+<tr><th><code>M-01-01</code></th><td>입하 등록</td><td>스캔</td><td>물류담당</td><td>입하·구매발주(P/O)·거래명세서·공급사</td><td>확정</td><td>WF S1·S2 메인작업자(1) Wallet「P/O 선택」·Mobile「거래명세서 스캔」·User「품목·수량 확인」/배지=모바일·REQ-PR-0006·0024</td></tr>
+<tr><th><code>M-01-02</code></th><td>자재LOT 번호 스캔</td><td>스캔</td><td>물류담당</td><td>자재LOT·LotStatus·입하</td><td>확정</td><td>WF S3·S4 메인작업자(2) Mobile「LOT 스캔」·Wallet「입하 목록 선택」/배지=모바일</td></tr>
+<tr><th><code>M-01-03</code></th><td>IQC 대상 LOT 스캔</td><td>스캔</td><td>품질담당</td><td>자재LOT·IQC검사실적</td><td>확정</td><td>01-S-C Mobile 545:5843 IQC 대상 LOT 특정 스캔/배지=모바일</td></tr>
+<tr><th><code>M-01-04</code></th><td>자재 위치 확인</td><td>조회·상세</td><td>물류담당</td><td>자재LOT·재고·Location</td><td>확정</td><td>WF S5 메인작업자(3) Mobile LOT 스캔·Desktop 위치 조회(조회 전용)/배지=모바일·REQ-OA-0001</td></tr>
+<tr><th><code>M-01-05</code></th><td>적치·입고 완료</td><td>스캔</td><td>물류담당</td><td>자재LOT·재고·Location·수불원장</td><td>확정</td><td>WF S4·S5 메인작업자(4) Mobile 위치코드 검증 스캔·LOT 스캔·Wallet 위치 직접 선택/배지=모바일</td></tr>
+<tr><th><code>M-01-06</code></th><td>입하 오류 등록</td><td>입력</td><td>물류담당</td><td>입하오류·입하·자재LOT</td><td>확정</td><td>01-S-A Desktop 224:5593 오류 등록·OR 반품/판정 분기/배지=모바일·#11 확정·WF S2 Exception②</td></tr>
+<tr><th><code>M-01-07</code></th><td>임시 위치 적재</td><td>스캔</td><td>물류담당</td><td>재고·Location·자재LOT</td><td>확정</td><td>01-S-D Wallet·Mobile 임시 위치 스캔·Desktop 사유 입력/배지=모바일·WF S5 포화 예외</td></tr>
+<tr><th><code>M-01-08</code></th><td>자재 출고·피킹</td><td>스캔</td><td>물류담당</td><td>출고·출고요청·자재LOT·재고·수불원장</td><td>확정</td><td>01-S-E(WF S7) Wallet 출고요청·Desktop 피킹 LOT(FEFO/FIFO·Hold 차단)·Mobile LOT 스캔·수량 입력/배지=모바일·REQ-PR-0022</td></tr>
+<tr><th><code>M-01-09</code></th><td>생산창고 입고·호퍼/재생재 등록</td><td>스캔</td><td>생산(현장)담당</td><td>생산창고재고·자재LOT·호퍼(Location)·수불원장</td><td>확정</td><td>01-S-F(WF S12) Mobile 출고 QR 스캔·User 호퍼 잔량 실측·재생재 등록/배지=모바일·REQ-OA-0002</td></tr>
+<tr><th><code>M-01-10</code></th><td>재고이동·불량 반출</td><td>스캔</td><td>물류담당</td><td>이동·자재LOT·재고·Location·수불원장</td><td>확정</td><td>01-S-G(WF S8) Wallet 이동 대상·Mobile 반출 QR·도착 스캔·File 이동 기록·일반/불량 반출 분기/배지=모바일·REQ-OA-0008</td></tr>
+<tr><th><code>M-01-11</code></th><td>실물 카운트</td><td>스캔</td><td>물류담당</td><td>재고실사·재고·자재LOT</td><td>확정</td><td>01-S-H Mobile 219:5551 창고 순회 실물 카운트·수량 입력/배지=모바일·WF S9</td></tr>
+</tbody></table>
+<p><strong>02 생산실행</strong></p>
+<table>
+<thead><tr><th>화면ID</th><th>화면명</th><th>유형</th><th>주요 사용자</th><th>핵심 엔티티</th><th>신뢰도</th><th>근거</th></tr></thead>
+<tbody>
+<tr><th><code>M-02-01</code></th><td>WIP 공정 이동 스캔</td><td>스캔</td><td>현장반장</td><td>WIP이동·생산LOT</td><td>확정</td><td>WF02 S11 §1.2-E Mobile 545:5479 WIP 이동 스캔·MES 이동 기록/배지 현장반장=모바일·#11 확정·온라인 전용</td></tr>
+<tr><th><code>M-02-02</code></th><td>수리 왕복 투입·반출 스캔</td><td>스캔</td><td>작업자</td><td>생산불량LOT·수리이력</td><td>확정</td><td>§2.9 02-S-I Mobile 609:6868 수리 투입·609:6894 반출 스캔·수리이력·재투입/배지=모바일·#11·REQ-OA-0004</td></tr>
+</tbody></table>
+<p><strong>04 제품출하</strong></p>
+<table>
+<thead><tr><th>화면ID</th><th>화면명</th><th>유형</th><th>주요 사용자</th><th>핵심 엔티티</th><th>신뢰도</th><th>근거</th></tr></thead>
+<tbody>
+<tr><th><code>M-04-01</code></th><td>제품LOT 피킹 스캔</td><td>스캔</td><td>물류 출하담당</td><td>제품LOT·재고·Lot Status</td><td>확정</td><td>메인 M4 Mobile 제품LOT 스캔·File 피킹 실적·FEFO/FIFO·Release 차단/배지 M4=모바일·REQ-PR-0017·QA#28</td></tr>
+<tr><th><code>M-04-02</code></th><td>피킹 대상 목록</td><td>목록</td><td>물류 출하담당</td><td>출하작업지시·제품LOT</td><td>추정</td><td>메인 M4 Wallet 피킹 목록(제품LOT·위치·수량)/WF04 S4·스캔 화면과 통합 가능</td></tr>
+<tr><th><code>M-04-03</code></th><td>포장 재구성 스캔</td><td>스캔</td><td>완제품창고담당</td><td>포장단위·재구성이벤트</td><td>확정</td><td>04-S-D Mobile 원 포장 LOT 스캔·H10 합병/분할/재구성 유형 선택/배지=모바일+POP 스택·결정13·QA#17</td></tr>
+</tbody></table>
+<p><strong>05 설비·툴 관리</strong></p>
+<table>
+<thead><tr><th>화면ID</th><th>화면명</th><th>유형</th><th>주요 사용자</th><th>핵심 엔티티</th><th>신뢰도</th><th>근거</th></tr></thead>
+<tbody>
+<tr><th><code>M-05-01</code></th><td>설비 점검 입력</td><td>입력</td><td>점검자(현장 오퍼레이터)·설비담당</td><td>설비점검이력·설비·점검항목</td><td>확정</td><td>WF05 S2 §1 A2 점검수행·B1 사번·B3 점검입력·H1 합격/NG/배지=모바일·#11 확정(M3 POP→모바일 교정)</td></tr>
+<tr><th><code>M-05-02</code></th><td>설비 고장 현장 보고</td><td>입력</td><td>현장 오퍼레이터·현장반장</td><td>설비보전이력·비가동실적·설비</td><td>확정</td><td>WF05 S4 사이드 B B13 고장기록·H4 가동 중 고장·사후보전 트리거/배지=모바일+웹 2단말 스택(현장 즉시 보고=모바일)</td></tr>
+</tbody></table>
+<p><strong>공통</strong></p>
+<table>
+<thead><tr><th>화면ID</th><th>화면명</th><th>유형</th><th>주요 사용자</th><th>핵심 엔티티</th><th>신뢰도</th><th>근거</th></tr></thead>
+<tbody>
+<tr><th><code>M-CO-01</code></th><td>로그인·기기 등록</td><td>입력</td><td>입하 담당자·자재 담당자·창고 담당자·출하 담당자</td><td>사용자/역할/권한(app_user)</td><td>추정</td><td>결정16 모바일 Capacitor Android·무선 스캐너·WBS §7 폼팩터③·계정 로그인·기기 등록·스캐너 페어링·언어 선택</td></tr>
+</tbody></table>
+<h2>4. 미결·추정 지점</h2>
+<p>아래는 신뢰도 미정/추정으로 남거나 후속 확인이 필요한 화면이다. #11 보류 2건(고객 회신 대기)과 연결된다.</p>
+<ul>
+<li>[미정·#11 보류] W-03-09 특채·한도승인 승인 처리 — 도식스펙-03 §1.1 미확정 3상태(한도승인/특채/폐기)의 승인 주체·기록 매체가 E3(판정유형 목록) 고객 회신 대기. 03 미확정 3상태 승인화면의 존재는 분명하나 무배선.</li>
+<li>[미정] W-04-09 출하 현황 모니터링 대시보드 — WF04 S7 D20 현행 모니터링 없음, QA#21 추후 고객 요구로 화면 존재 자체 유동.</li>
+<li>[미정] W-04-10 제품 폐기 품의 — 04-S-C SC6 폐기 stub·도식 범위 외, 기타출고 계정 항목(E4) 회신 대기.</li>
+<li>[미정] W-06-10 연계 동기화 현황·실패 재처리 — SA1~4 자동 파이프라인 무배지, 실패 흐름·알람 유형 목록(E1) 회신 대기.</li>
+<li>[추정·#11 보류] W-01-02 긴급 IQC 생략 한도승인 — 도식 인라인 라벨(914:9058)만 존재, 별도 승인 게이트 노드 미신설·승인 주체 E3 의존.</li>
+<li>[추정·설치위치 의존] W-CO-06 단말기-공정 매핑 설정(EX-10) — 도식 배지·앵커 없는 인프라 설정, POP 단말 설치위치(트랙 H)·시나리오 L134 역산.</li>
+<li>[추정] 01 앵커 밖 사무 화면 3종 — W-01-07 재고 현황·상태 조회, W-01-08 위치 확인 모니터링, W-01-09 입하 예정 조회. 도식 배지 밖, 성격상 관리웹 판정(REQ-PR-0005·0024 근거).</li>
+<li>[추정] 02 앵커 밖 사무 화면 3종 — W-02-08 W/O 진행현황 조회, W-02-09 생산 현황·비가동 알람 대시보드, W-02-10 추가 자재 출고 요청. 02-S-F(BOM 미비)·02-S-G(점검 이력)·02-S-H(비가동)는 행위 노드 없는 '미정 골격'이라 화면 미도출.</li>
+<li>[추정] 03 앵커 밖 품질 화면 5종 — W-03-04 변경이력 조회, W-03-05 검사실적 조회, W-03-06 불량 판정·폐기 품의, W-03-07 SPC 대시보드, W-03-08 품질 대시보드. Lot Status 전이도 미표기이나 WF03·REQ상 관리웹 성격 분명.</li>
+<li>[추정] 04 유동 화면 4종 — W-04-07 재작업/폐기 판정 의뢰(반품입고에 흡수 가능), W-04-08 완제품 재고 조회, M-04-02 피킹 대상 목록(M-04-01 스캔과 통합 가능), P-04-03 재작업 실적 등록(수행 주체 '생산담당' 잠정).</li>
+<li>[추정] 05 도식 범위 외 마스터·대시보드 5종 — W-05-11 계측기 마스터, W-05-12 설비·설비그룹 마스터, W-05-13 툴/금형/지그 마스터, W-05-14 설비·툴 대시보드(M5 배치도 대기), W-05-07 수집채널 매핑. §0 특칙3 범위 외이나 WF05 S1·REQ-PR-0003/0036 근거.</li>
+<li>[추정] 06 노트/Wallet 근거 마스터 5종 — W-06-03 불량코드, W-06-04 판정유형(미확정 3상태 E3 대기), W-06-06 공통코드·조직, W-06-07 창고·Location, W-06-08 예비품. 도식 배지 없이 MES 노트·운영마스터 참조 근거.</li>
+<li>[추정] 공통 앵커 밖 3종 — M-CO-01 로그인·기기 등록, W-CO-05 통합 대시보드, W-CO-07 다국어 환경설정(전역 컨트롤). WBS §7 폼팩터·REQ 역산.</li>
+<li>[통합 병합 기록] 중복 8건 제거(원 열거 120건→통합 112건): 01 Location 마스터→W-06-07, 03 검사기준정보→W-06-02, 03 계측기 검교정 관리→W-05-10/11, 05 예비품 마스터→W-06-08, 05 작업 전 점검 통제→P-02-02(02 점검 기록 확인과 병합·판정·승인 승격), 06 사용자·권한→W-CO-02, 06 현장 사번 인증→P-CO-01, 02 전달사항 등록·배포→W-CO-04(Notice 단일 엔티티·결정02). 잔여 재검토 후보: 폐기 품의 도메인 분산(W-01-06·W-03-06·W-04-10), 예비품 마스터 05↔06 귀속.</li>
+</ul>
+<h2>5. 검증 기록</h2>
+<ul>
+<li><strong>도출 방식</strong>: 도메인 6 + 공통 병렬 추출(도식스펙·WF·배지 근거) → 통합·ID 부여·IA 구성. 원 열거 120건 → 중복 8건 병합 → 112건.</li>
+<li><strong>인라인 정합 검증(리더 · 2026-07-25)</strong>: 프로그램 접두-배정 불일치 0 · 중복 ID 0 · <strong>IA↔인벤토리 ID 무결성 완전 정합</strong>(IA 참조 화면 전부 인벤토리에 존재, 인벤토리 화면 전부 IA에 연결) · 도메인별 수 WBS §7 추정 이상.</li>
+<li><strong>적대 검증(에이전트 2렌즈: 배정 정합·커버리지)</strong>: 주간 사용 한도로 <strong>미실행(2026-07-27 리셋 후 보강 예정)</strong>. 현재 판정은 리더 인라인 검증까지로, 프로그램 배정·커버리지의 독립 재검은 잔여.</li>
+</ul>
+<h2>변경 이력</h2>
+<table>
+<thead><tr><th>버전</th><th>날짜</th><th>변경 요지</th></tr></thead>
+<tbody>
+<tr><th>v1.0</th><td>2026-07-25</td><td>최초 작성 — 화면 인벤토리 112건(관리웹 71·POP 22·모바일 19) + 프로그램별 IA 3종(관리웹 메뉴트리·POP 태스크모드·모바일 스캔타일). 도식스펙·WF·배지 정본 근거. 인라인 정합 검증 통과, 적대 검증은 사용 한도로 이연.</td></tr>
+</tbody></table>
+
+<script src="./crefle-doc/crefle-chart.js"></script>
+</body>
+</html>

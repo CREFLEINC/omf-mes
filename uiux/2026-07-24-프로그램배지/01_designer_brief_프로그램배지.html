@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>작업 지시서 — 프로그램 배지 오버레이</title>
+
+<link rel="stylesheet" href="./crefle-doc/crefle-doc.css">
+
+<style>
+  :root {
+    --doc-running-title: '작업 지시서 — 프로그램 배지 오버레이';
+  }
+</style>
+</head>
+
+<body class="doc doc-numbered">
+
+<!-- ══ 표지 ══════════════════════════════════════════════════════════════ -->
+<header class="doc-cover">
+  <p class="eyebrow">CREFLE · OMF UI/UX · 지시서</p>
+  <h1>작업 지시서 — 프로그램 배지 오버레이</h1>
+  <p class="lede">앵커 63건 전수 노드 ID 확정(미해결 0), 마스터 칩 4종·범례 등재 스펙, 배지별 로컬 좌표와 Wave A/B 분할, 검토 기준.</p>
+
+  <table>
+    <caption>문서 정보</caption>
+    <tbody>
+      <tr><th>작성자</th><td>workflow-designer (CREFLE OMF 팀)</td></tr>
+      <tr><th>작성일</th><td>2026-07-24</td></tr>
+      <tr><th>버전</th><td>r1 (전 도메인 v2)</td></tr>
+      <tr><th>대상</th><td>CREFLE OMF 팀 내부</td></tr>
+    </tbody>
+  </table>
+</header>
+
+<!-- ══ 문서 개요 ═════════════════════════════════════════════════════════ -->
+<h2>문서 개요</h2>
+
+<ul>
+  <li><strong>근거</strong>: <code>_workspace/figjam-team/2026-07-24-프로그램배지/placement-plan.md</code>(배치 정본 §1~§4) · 공통 문법 <code>.claude/skills/figjam-workflow-diagram/SKILL.md</code> · 지시서 포맷 <code>.claude/skills/workflow-plan-brief/SKILL.md</code></li>
+  <li><strong>작성</strong>: workflow-designer · 2026-07-24 · 대상 파일 fileKey <code>Sgy5IKD4aWuzpKtJAbMyWz</code> · 작업 페이지 <code>system workflow v2</code> = <strong><code>219:4509</code></strong></li>
+  <li><strong>성격</strong>: 신규 작화가 아니라 <strong>기존 v2 도식 63개 지점에 프로그램 배지(칩) 오버레이</strong>. 앵커 63건 전수를 노드 ID로 확정했다(미해결 0건). 배치 추가·삭제·프로그램 변경 금지 — 본 지시서의 63행이 곧 검토 정본이다.</li>
+</ul>
+
+<div class="kpi">
+  <div><span class="big">63/63</span><span class="lbl">앵커 확정<br>미해결 0</span></div>
+  <div><span class="big">64</span><span class="lbl">칩 총계<br>배치 63 + 스택 1</span></div>
+  <div><span class="big">4종</span><span class="lbl">마스터 칩<br>웹·POP·모바일·미정</span></div>
+</div>
+
+<!-- ══ 0. 앵커 확정 결과 요약 ════════════════════════════════════════════ -->
+<h2>앵커 확정 결과 요약</h2>
+
+<ul>
+  <li><strong>확정 앵커: 63 / 63</strong> (미해결 0). 캔버스 12개 섹션 전수 조회로 각 앵커의 노드 ID·라벨·아이콘유형·섹션로컬 좌표를 확정했다.</li>
+  <li>동명 라벨은 x좌표 순서 + placement-plan의 축 위치 주석으로 1:1 소거 완료(02 「작업자」 3개, 04 「물류 출하담당」 4개, 05/04 「설비담당·완제품창고담당·품질담당」 중복 — 아래 각 표 비고 참조).</li>
+  <li><strong>칩 총계: 64개</strong>(배치 지점 63 + 04-S-D 스택 1개 추가 칩). 유형별 칩 수 = <strong>웹 29 · POP 16 · 모바일 12 · 미정 7</strong>.</li>
+</ul>
+
+<div class="callout callout-warning">
+  <p><strong>정합 경고(비차단, 배치 변경 금지).</strong> placement-plan §5 합계줄은 「웹 30」이라 적었으나 §3 배치표 63행을 전수 집계하면 <strong>웹 29</strong>다(계획 합계줄의 −1 오기로 판단). 지시서는 §3 배치표를 정본으로 삼아 <strong>웹 29</strong>로 확정한다. 30번째 웹 배지를 창작해 채우지 말 것.</p>
+</div>
+
+<div class="callout callout-warning">
+  <p><strong>라벨 불일치(비차단).</strong> 02 메인 마지막 생산관리자 앵커의 캔버스 라벨은 <strong>「6. 생산관리자」</strong>(노드 <code>297:5381</code>)인데 placement-plan은 「5. 생산관리자」로 표기. 앵커는 유일하게 특정됨(W/O 마감·ERP 실적 송신 담당, 최우측). 배지는 그대로 부착하되 캔버스 라벨 텍스트는 건드리지 않는다.</p>
+</div>
+
+<!-- ══ 1. 배지 마스터·클론 전략 ══════════════════════════════════════════ -->
+<h2>배지 마스터·클론 전략 (Wave A 최우선)</h2>
+
+<p>
+  placement-plan §2: 칩은 기존 클론 킷에 동형 소스가 없는 <strong>신규 표기 계층</strong>이므로
+  clone-not-draw 원칙의 예외로 <code>SHAPE_WITH_TEXT(ROUNDED_RECTANGLE)</code> 신규 생성을 허용한다.
+  단, <strong>범례에 마스터 4종을 먼저 만들고, 63개 배치는 전부 그 마스터를 <code>clone()</code></strong> 하여
+  스타일 100% 통일을 보증한다(칩을 배치마다 새로 그리는 것 금지).
+</p>
+
+<h3>마스터 칩 4종 스펙 (00.범례 <code>219:4610</code> 안에 신규 생성)</h3>
+
+<p>
+  공통: <code>SHAPE_WITH_TEXT</code>, <code>shapeType='ROUNDED_RECTANGLE'</code>, 높이 <strong>40</strong>,
+  모서리 반경 8(설정 가능하면 <code>cornerRadius=8</code>, ROUNDED_RECTANGLE 기본 라운딩으로 대체 가능).
+  텍스트는 <strong>색+라벨 이중 부호화</strong>. 폰트는 하드코딩 금지 — 생성 직후
+  <code>getStyledTextSegments(['fontName'])</code>로 현재 폰트 로드 후 <code>characters</code>·크기·색 설정(폰트 미로드 오류 방지).
+  텍스트 크기 14, 굵게(Semi Bold 있으면 Semi Bold, 없으면 Medium). 한국어 글자는 FigJam 자동 폴백 사용.
+</p>
+
+<table>
+  <caption>마스터 칩 4종 스펙</caption>
+  <thead>
+    <tr><th>마스터</th><th>shapeType</th><th>채움(fill)</th><th>테두리(stroke)</th><th>라벨</th><th>라벨 색</th><th>폭(라벨맞춤)</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>웹</th><td>ROUNDED_RECTANGLE</td><td>SOLID <code>#2F6FED</code> (r .184 g .435 b .929)</td><td>없음</td><td><code>웹</code></td><td>흰색 (1,1,1)</td><td class="num">~52</td></tr>
+    <tr><th>POP</th><td>ROUNDED_RECTANGLE</td><td>SOLID <code>#F2994A</code> (r .949 g .600 b .290)</td><td>없음</td><td><code>POP</code></td><td>흰색 (1,1,1)</td><td class="num">~56</td></tr>
+    <tr><th>모바일</th><td>ROUNDED_RECTANGLE</td><td>SOLID <code>#27AE60</code> (r .153 g .682 b .376)</td><td>없음</td><td><code>모바일</code></td><td>흰색 (1,1,1)</td><td class="num">~68</td></tr>
+    <tr><th>미정</th><td>ROUNDED_RECTANGLE</td><td>SOLID 흰색 (1,1,1)</td><td><code>#9AA0A6</code> (r .604 g .627 b .651) <strong>점선</strong> <code>dashPattern=[5,3]</code> weight 1.5 align CENTER</td><td><code>?</code></td><td><code>#9AA0A6</code></td><td class="num">~44</td></tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>이중 부호화 원리: 확정 3종은 <strong>색 채움 + 흰 글자</strong>, 미정 1종은 <strong>채움 없이 회색 점선 테두리 + 회색 「?」</strong>(협의 대기=미완 신호로 시각 구분). 색맹 대비를 위해 라벨 문자(웹/POP/모바일/?)가 항상 색과 함께 읽힌다.</li>
+  <li><strong>드로어는 마스터 4개 생성 후 각 노드 ID를 반환</strong>한다 — 이후 모든 clone의 소스로 사용(예: <code>masterWeb</code>, <code>masterPop</code>, <code>masterMobile</code>, <code>masterUndecided</code>).</li>
+</ul>
+
+<h3>범례 등재 배치 (<code>219:4610</code> 하좌측 빈 영역 — 조회로 공백 확정: x0–540 · y1000–1760 자식 0개)</h3>
+
+<p>모든 좌표는 <strong>범례 섹션 <code>219:4610</code> 로컬</strong>. 마스터 칩 4개가 곧 범례 등재 요소이자 클론 소스다(별도 샘플 만들지 말 것).</p>
+
+<table>
+  <caption>범례 등재 요소·로컬 좌표</caption>
+  <thead>
+    <tr><th>요소</th><th>유형</th><th>로컬 (x,y)</th><th>내용(문구 그대로)</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>배지 섹션 제목</th><td>TEXT</td><td class="num"><code>(48, 1030)</code></td><td><code>프로그램 배지 — 사용 프로그램(폼팩터 3종)</code></td></tr>
+    <tr><th>마스터 <strong>웹</strong></th><td>SHAPE(칩)</td><td class="num"><code>(48, 1080)</code></td><td>라벨 <code>웹</code></td></tr>
+    <tr><th>웹 캡션</th><td>TEXT</td><td class="num"><code>(116, 1088)</code></td><td><code>관리웹 — 브라우저·사무 PC</code></td></tr>
+    <tr><th>마스터 <strong>POP</strong></th><td>SHAPE(칩)</td><td class="num"><code>(48, 1130)</code></td><td>라벨 <code>POP</code></td></tr>
+    <tr><th>POP 캡션</th><td>TEXT</td><td class="num"><code>(116, 1138)</code></td><td><code>POP — Electron·산업용 패널 PC(라벨인쇄 내장)</code></td></tr>
+    <tr><th>마스터 <strong>모바일</strong></th><td>SHAPE(칩)</td><td class="num"><code>(48, 1180)</code></td><td>라벨 <code>모바일</code></td></tr>
+    <tr><th>모바일 캡션</th><td>TEXT</td><td class="num"><code>(116, 1188)</code></td><td><code>모바일 — Capacitor Android·무선 스캐너</code></td></tr>
+    <tr><th>마스터 <strong>미정</strong></th><td>SHAPE(칩)</td><td class="num"><code>(48, 1230)</code></td><td>라벨 <code>?</code></td></tr>
+    <tr><th>미정 캡션</th><td>TEXT</td><td class="num"><code>(116, 1238)</code></td><td><code>미정 — 단말 미확정, 고객 협의 대기</code></td></tr>
+    <tr><th>주석 스티키</th><td>STICKY</td><td class="num"><code>(48, 1300)</code> · 폭 460</td><td>아래 전문</td></tr>
+  </tbody>
+</table>
+
+<p><strong>주석 스티키 문구 전문(placement-plan §2 그대로, 글자 단위 준수):</strong></p>
+
+<blockquote>
+  <p>배지 = 사용 프로그램(폼팩터 3종, 결정 16). 기존 Mobile/Desktop 아이콘은 행위 유형(스캔·입력/화면 조작) 표기로 폼팩터가 아님 — 예: 사번입력은 Mobile 아이콘이지만 프로그램은 POP.</p>
+</blockquote>
+
+<ul>
+  <li>스티키 auto-height 주의: 460폭에 위 문구 주입 후 실측 <code>.height</code> 재확인. 범례 하단(로컬 y 1760)까지 여유 있으나, 실측 bottom이 1760을 넘으면 y를 위로 조정(1300→최소치)하거나 폭을 넓혀 줄 수 감소.</li>
+</ul>
+
+<!-- ══ 2. 좌표 규칙 ══════════════════════════════════════════════════════ -->
+<h2>좌표 규칙 (전 배치 공통 — 반드시 준수)</h2>
+
+<ol>
+  <li><strong>좌표계</strong>: 배지 칩을 <strong>대상 섹션에 <code>appendChild</code> 한 뒤</strong> <code>chip.x</code>/<code>chip.y</code>를 설정한다. 섹션 자식의 x/y는 <strong>섹션 로컬 좌표</strong>이므로, 본 지시서의 모든 배지 좌표는 이미 (섹션 ID + 로컬)로 산정돼 있다. 클론 소스(범례 칩)를 대상 섹션으로 옮긴 다음 좌표를 찍을 것.</li>
+  <li><strong>기본 위치(단일 칩)</strong>: 앵커 노드 <strong>우상단 모서리에 칩의 좌하단이 8~12px 걸치도록</strong>.
+    <ul>
+      <li><code>chip.x = 앵커.x + 앵커.w − 10</code></li>
+      <li><code>chip.y = 앵커.y − 30</code>  (칩 높이 40 → 칩 하단 = 앵커.y+10, 상단 스트립 10px 오버랩)</li>
+      <li>아이콘 인스턴스는 전부 120×120이므로 대개 <code>chip.x = 앵커.x + 110</code>, <code>chip.y = 앵커.y − 30</code>. <strong>본 지시서 「배치 목록」 표에 배치별 최종 (x,y)를 이미 계산해 명시</strong>했으니 표 값을 그대로 사용하고, 공식은 검산용으로만.</li>
+    </ul>
+  </li>
+  <li><strong>다중 칩(가로 스택)</strong>: 간격 4px, <strong>오른쪽→왼쪽 순</strong>(첫 칩이 최우측, 다음 칩이 그 왼쪽). 해당 케이스는 04-S-D 1건뿐이며 배치 목록에 두 칩의 개별 좌표를 명시.</li>
+  <li><strong>겹침 금지</strong>: 이웃 노드·라벨과 도형↔라벨 ≥16px 유지. 우상단이 막힌 앵커는 배치 목록에 <strong>대안 위치</strong>를 개별 지정(검사 판정 / 관리자 확인 / 04-S-D 스택 3건). 드로어는 표 좌표를 임의 변경하지 말 것 — 조정이 필요하면 designer에 질의.</li>
+</ol>
+
+<!-- ══ 3. 배치 목록 63건 ═════════════════════════════════════════════════ -->
+<h2>배치 목록 63건 (섹션ID · 앵커 노드ID · 라벨 · 아이콘 · 칩 · 로컬좌표 · 비고)</h2>
+
+<p>칩 로컬좌표 = 칩 좌상단 (x,y). 칩 폭은 유형별 표준(웹52·POP56·모바일68·?44)이며 드로어가 라벨맞춤으로 미세 조정 가능(높이 40 고정).</p>
+
+<h3>01.자재창고관리 — 메인 (섹션 <code>219:4510</code>) · 배지 5</h3>
+
+<table>
+  <caption>01 메인 배치 5건</caption>
+  <thead>
+    <tr><th>앵커 노드ID</th><th>앵커 라벨</th><th>아이콘</th><th>칩</th><th>칩 로컬(x,y)</th><th>비고(동명 소거)</th></tr>
+  </thead>
+  <tbody>
+    <tr><th><code>219:4514</code></th><td>작업자</td><td>User</td><td>모바일</td><td class="num"><code>(386, 131)</code></td><td>작업자(1)=입하축, x296 최좌(P/O선택·명세서스캔·품목수량<code>219:4579</code> 포괄)</td></tr>
+    <tr><th><code>219:4523</code></th><td>작업자</td><td>User</td><td>모바일</td><td class="num"><code>(886, 131)</code></td><td>작업자(2)=LOT스캔축, x796</td></tr>
+    <tr><th><code>545:4582</code></th><td>자재 LOT 등록 및 부착</td><td>Archive</td><td>POP</td><td class="num"><code>(1120, 483)</code></td><td>MES 발번·라벨 인쇄(창고 조합1)</td></tr>
+    <tr><th><code>219:4533</code></th><td>작업자</td><td>User</td><td>모바일</td><td class="num"><code>(1400, 131)</code></td><td>작업자(3)=적치전 스캔축, x1310</td></tr>
+    <tr><th><code>219:4543</code></th><td>작업자</td><td>User</td><td>모바일</td><td class="num"><code>(1829, 131)</code></td><td>작업자(4)=위치검증축, x1739</td></tr>
+  </tbody>
+</table>
+
+<h3>01.자재창고관리 — 사이드 (섹션 <code>219:5450</code>) · 배지 12</h3>
+
+<table>
+  <caption>01 사이드 배치 12건</caption>
+  <thead>
+    <tr><th>코드</th><th>앵커 노드ID</th><th>앵커 라벨</th><th>아이콘</th><th>칩</th><th>칩 로컬(x,y)</th><th>비고</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>01-S-A</th><td><code>224:5577</code></td><td>작업자</td><td>User</td><td>미정</td><td class="num"><code>(170, 2850)</code></td><td>입하 오류 내용 등록 — 단말 근거 없음</td></tr>
+    <tr><th>01-S-B</th><td><code>225:5648</code></td><td>작업자</td><td>User</td><td>웹</td><td class="num"><code>(990, 2850)</code></td><td>초과분 분리·신규 P/O</td></tr>
+    <tr><th>01-S-C</th><td><code>545:5762</code></td><td>품질담당</td><td>User</td><td>모바일</td><td class="num"><code>(1820, 2848)</code></td><td>IQC 대상 LOT 스캔. ※상단 IQC헥사곤과 근접해 y를 2845→2848로 3px 내림(≥16 확보)</td></tr>
+    <tr><th>01-S-C</th><td><code>545:6037</code></td><td>IQC 진행</td><td>Desktop</td><td>웹</td><td class="num"><code>(1840, 3392)</code></td><td>검사 결과 기록·판정(정책2 관리웹 확정)</td></tr>
+    <tr><th>01-S-D</th><td><code>226:5833</code></td><td>작업자</td><td>User</td><td>모바일</td><td class="num"><code>(2610, 2850)</code></td><td>임시 위치 스캔·사유</td></tr>
+    <tr><th>01-S-E</th><td><code>219:5459</code></td><td>A1. 물류담당</td><td>User</td><td>모바일</td><td class="num"><code>(660, 300)</code></td><td>출고요청→피킹→LOT스캔→수량</td></tr>
+    <tr><th>01-S-E</th><td><code>219:5470</code></td><td>출고 QR 발행</td><td>File</td><td>POP</td><td class="num"><code>(660, 1180)</code></td><td>출고 QR 인쇄(창고 조합1)</td></tr>
+    <tr><th>01-S-F</th><td><code>219:5489</code></td><td>B1. 작업자</td><td>User</td><td>모바일</td><td class="num"><code>(2330, 300)</code></td><td>출고QR 입고 스캔·재생재·잔량입력</td></tr>
+    <tr><th>01-S-G</th><td><code>219:5517</code></td><td>C1. 작업자</td><td>User</td><td>모바일</td><td class="num"><code>(400, 1530)</code></td><td>재고이동·불량반출 스캔</td></tr>
+    <tr><th>01-S-H</th><td><code>219:5545</code></td><td>D1. 물류담당</td><td>User</td><td>웹</td><td class="num"><code>(1720, 1530)</code></td><td>장부 조회·조정 등록(오프라인 금지)</td></tr>
+    <tr><th>01-S-H</th><td><code>219:5551</code></td><td>실물 카운트</td><td>Mobile</td><td>모바일</td><td class="num"><code>(1810, 1730)</code></td><td>창고 순회 실물 카운트</td></tr>
+    <tr><th>01-S-I</th><td><code>219:5576</code></td><td>E1. 물류담당</td><td>User</td><td>웹</td><td class="num"><code>(2830, 1520)</code></td><td>반품·폐기 품의·전표</td></tr>
+  </tbody>
+</table>
+
+<h3>02.생산실행 — 메인 (섹션 <code>297:5370</code>) · 배지 6</h3>
+
+<table>
+  <caption>02 메인 배치 6건</caption>
+  <thead>
+    <tr><th>앵커 노드ID</th><th>앵커 라벨</th><th>아이콘</th><th>칩</th><th>칩 로컬(x,y)</th><th>비고(축 소거)</th></tr>
+  </thead>
+  <tbody>
+    <tr><th><code>297:5373</code></th><td>생산관리자</td><td>User</td><td>웹</td><td class="num"><code>(588, 400)</code></td><td>축1(x478) S1~S4 W/O 전개·배정·확정·배포</td></tr>
+    <tr><th><code>297:5375</code></th><td>작업자</td><td>User</td><td>POP</td><td class="num"><code>(1088, 400)</code></td><td>축2(x998) 점검/4M 투입(사번·W/O선택·투입스캔)</td></tr>
+    <tr><th><code>297:5377</code></th><td>작업자</td><td>User</td><td>POP</td><td class="num"><code>(1609, 400)</code></td><td>축3(x1519) 실적/LOT완료(실적·인식표·라벨)</td></tr>
+    <tr><th><code>497:4413</code></th><td>포장 작업자</td><td>User</td><td>POP</td><td class="num"><code>(2156, 400)</code></td><td>축4(x2066) 포장·라벨/인식표 재출력</td></tr>
+    <tr><th><code>297:5379</code></th><td>현장반장</td><td>User</td><td>미정</td><td class="num"><code>(2408, 400)</code></td><td>WIP 이동 스캔 — POP vs 모바일 미확정</td></tr>
+    <tr><th><code>297:5381</code></th><td><strong>6. 생산관리자</strong></td><td>User</td><td>웹</td><td class="num"><code>(2928, 400)</code></td><td>최우측(x2818) W/O 마감·ERP 송신. ※계획 라벨 「5.」과 캔버스 「6.」 불일치 — 앵커 유일 특정</td></tr>
+  </tbody>
+</table>
+
+<h3>02.생산실행 — 사이드 (섹션 <code>297:6292</code>) · 배지 7</h3>
+
+<table>
+  <caption>02 사이드 배치 7건</caption>
+  <thead>
+    <tr><th>코드</th><th>앵커 노드ID</th><th>앵커 라벨</th><th>아이콘</th><th>칩</th><th>칩 로컬(x,y)</th><th>비고</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>02-S-A</th><td><code>297:6299</code></td><td>중단 사유 선택</td><td>Wallet</td><td>POP</td><td class="num"><code>(240, 315)</code></td><td>홀드품 등록(라인사이드적치 <code>297:6303</code>=실물, 배지 불요)</td></tr>
+    <tr><th>02-S-B</th><td><code>297:6324</code></td><td>신규 부품 등록</td><td>Mobile</td><td>POP</td><td class="num"><code>(1135, 610)</code></td><td>러닝체인지(교체시점지정 <code>297:6320</code>=주체미확정, 제외)</td></tr>
+    <tr><th>02-S-C</th><td><code>297:6340</code></td><td>관리자 확인</td><td>Desktop</td><td>웹</td><td class="num"><strong><code>(1720, 481)</code></strong></td><td><strong>대안 위치</strong>: 상단 ERP(<code>297:6336</code>) 직상 겹침 회피로 기본 y451→481(16px 내림)</td></tr>
+    <tr><th>02-S-D</th><td><code>297:6359</code></td><td>긴급 W/O 발행</td><td>Desktop</td><td>웹</td><td class="num"><code>(2460, 470)</code></td><td>권한자 단독 발행</td></tr>
+    <tr><th>02-S-D</th><td><code>297:6373</code></td><td>자재 즉시 투입</td><td>Mobile</td><td>POP</td><td class="num"><code>(2440, 762)</code></td><td>긴급 W/O 현장 실행. ※상단 헥사곤 근접 y761→762</td></tr>
+    <tr><th>02-S-E</th><td><code>297:5424</code></td><td>검사 결과 입력</td><td>Wallet</td><td>POP</td><td class="num"><code>(4662, 630)</code></td><td>PQC 결과 입력(결정12 — 정책2 예외)</td></tr>
+    <tr><th>02-S-I</th><td><code>609:6868</code></td><td>수리 투입 스캔</td><td>Mobile</td><td>미정</td><td class="num"><code>(5910, 492)</code></td><td>수리 왕복 스캔(반출스캔 <code>609:6894</code> 아님 — 투입만)</td></tr>
+  </tbody>
+</table>
+
+<h3>03.품질관리 (섹션 <code>584:6758</code>) · 배지 4 — Lot Status 전이도 판정 지점(정책 4)</h3>
+
+<table>
+  <caption>03 배치 4건</caption>
+  <thead>
+    <tr><th>앵커 노드ID</th><th>앵커 라벨</th><th>노드유형</th><th>칩</th><th>칩 로컬(x,y)</th><th>비고</th></tr>
+  </thead>
+  <tbody>
+    <tr><th><code>586:6778</code></th><td>의심자재등록</td><td>HEXAGON(180×64)</td><td>웹</td><td class="num"><code>(560, 385)</code></td><td>보류 전이 트리거</td></tr>
+    <tr><th><code>586:6773</code></th><td>검사 판정(⊕ 허브)</td><td>OR(80×80)</td><td>웹</td><td class="num"><strong><code>(470, 225)</code></strong></td><td><strong>대안 위치</strong>: 상단 「검사 판정」 텍스트(<code>586:6781</code>) 회피 → 우측 모서리 오버랩·노드 상단 정렬(위로 안 올림). 라벨 「검사 판정」은 TEXT <code>586:6781</code>이 명명</td></tr>
+    <tr><th><code>584:6759</code></th><td>보류</td><td>ROUNDED_RECT(180×72)</td><td>웹</td><td class="num"><code>(750, 203)</code></td><td>보류 재판정(C7/C8)</td></tr>
+    <tr><th><code>585:6760</code></th><td>Release</td><td>ROUNDED_RECT(180×72)</td><td>웹</td><td class="num"><code>(1080, 83)</code></td><td>재Hold 전이(C9)</td></tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>03 <strong>배지 부재 확인 대상</strong>(잔여 미결이라 배지 없음): Hold <code>585:6763</code> · PQC 검사 필요 <code>632:6932</code> · 한도승인* <code>587:6776</code> · 특채* <code>587:6779</code> · 폐기* <code>587:6782</code>.</p>
+</blockquote>
+
+<h3>04.제품출하 — 메인 (섹션 <code>819:8194</code>) · 배지 5 — M2/M4/M6/M8/M10 x축 소거</h3>
+
+<table>
+  <caption>04 메인 배치 5건</caption>
+  <thead>
+    <tr><th>앵커 노드ID</th><th>앵커 라벨</th><th>아이콘</th><th>칩</th><th>칩 로컬(x,y)</th><th>비고(M코드=x좌표)</th></tr>
+  </thead>
+  <tbody>
+    <tr><th><code>819:8226</code></th><td>물류 출하담당</td><td>User</td><td>웹</td><td class="num"><code>(550, 390)</code></td><td>M2(x440) 출하지시 import·작업지시</td></tr>
+    <tr><th><code>819:8252</code></th><td>물류 출하담당</td><td>User</td><td>모바일</td><td class="num"><code>(1510, 390)</code></td><td>M4(x1420) 제품LOT 스캔 피킹</td></tr>
+    <tr><th><code>819:8278</code></th><td>품질담당</td><td>User</td><td>웹</td><td class="num"><code>(2500, 390)</code></td><td>M6(x2390) OQC 판정·CoA/CoC(정책2)</td></tr>
+    <tr><th><code>819:8310</code></th><td>물류 출하담당</td><td>User</td><td>POP</td><td class="num"><code>(3830, 390)</code></td><td>M8(x3740) 납품라벨·매칭스캔·Packing(조합1)</td></tr>
+    <tr><th><code>819:8336</code></th><td>물류 출하담당</td><td>User</td><td>웹</td><td class="num"><code>(5250, 390)</code></td><td>M10(x5140) 출하확정·PGI(오프라인 금지)</td></tr>
+  </tbody>
+</table>
+
+<h3>04.제품출하 — 사이드 (섹션 <code>845:8641</code>) · 배지 5 (칩 6 — 스택 1건)</h3>
+
+<table>
+  <caption>04 사이드 배치 5건(칩 6)</caption>
+  <thead>
+    <tr><th>코드</th><th>앵커 노드ID</th><th>앵커 라벨</th><th>아이콘</th><th>칩</th><th>칩 로컬(x,y)</th><th>비고</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>04-S-A</th><td><code>845:8688</code></td><td>물류담당</td><td>User</td><td>미정</td><td class="num"><code>(260, 420)</code></td><td>직행 처리 원클릭 — 단말 근거 없음</td></tr>
+    <tr><th>04-S-B</th><td><code>846:8739</code></td><td>생산담당</td><td>User</td><td>POP</td><td class="num"><code>(2140, 420)</code></td><td>재작업 실적 기록(주체 잠정)</td></tr>
+    <tr><th>04-S-C</th><td><code>847:8788</code></td><td>완제품창고담당</td><td>User</td><td>웹</td><td class="num"><code>(260, 1960)</code></td><td>반품입고 등록·재고 재등록(x150·y1990 블록)</td></tr>
+    <tr><th>04-S-C</th><td><code>847:8878</code></td><td>품질담당</td><td>User</td><td>웹</td><td class="num"><code>(260, 2340)</code></td><td>재작업/폐기 판정 의뢰(판정 자체 03 위임)</td></tr>
+    <tr><th>04-S-D</th><td><code>849:8890</code></td><td>완제품창고담당</td><td>User</td><td><strong>모바일+POP 스택</strong></td><td class="num">모바일 <strong><code>(2052, 1948)</code></strong> · POP <strong><code>(1992, 1948)</code></strong></td><td><strong>대안 스택</strong>: 우측 이웃 「포장 스캔」(<code>849:8903</code>, x2180) 회피로 좌측 성장. 모바일 우측끝=노드 우변 2120(8px걸침), POP는 4px 왼쪽. L→R 시각=[POP][모바일](오른쪽→왼쪽 순, 모바일이 첫 칩)</td></tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>04-S-C의 「완제품창고담당」(<code>847:8788</code>, x150/y1990)와 04-S-D의 「완제품창고담당」(<code>849:8890</code>, x2000/y1980)은 x·블록으로 소거. 「품질담당」은 사이드에 1개(<code>847:8878</code>).</p>
+</blockquote>
+
+<h3>05.설비·툴 관리 — 메인 (섹션 <code>746:7514</code>) · 배지 2</h3>
+
+<table>
+  <caption>05 메인 배치 2건</caption>
+  <thead>
+    <tr><th>앵커 노드ID</th><th>앵커 라벨</th><th>아이콘</th><th>칩</th><th>칩 로컬(x,y)</th><th>비고</th></tr>
+  </thead>
+  <tbody>
+    <tr><th><code>746:7540</code></th><td>점검자</td><td>User</td><td>미정</td><td class="num"><code>(540, 190)</code></td><td>점검 입력 매체 M3(점검매체POP 마커 잔존)</td></tr>
+    <tr><th><code>746:7579</code></th><td>작업자</td><td>User</td><td>POP</td><td class="num"><code>(1700, 190)</code></td><td>작업 시작 사번 입력·작업전통제 확인</td></tr>
+  </tbody>
+</table>
+
+<h3>05.설비·툴 관리 — 사이드 (섹션 <code>780:7745</code>) · 배지 9</h3>
+
+<table>
+  <caption>05 사이드 배치 9건</caption>
+  <thead>
+    <tr><th>코드</th><th>앵커 노드ID</th><th>앵커 라벨</th><th>아이콘</th><th>칩</th><th>칩 로컬(x,y)</th><th>비고(동명 소거)</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>05-S-A</th><td><code>780:7774</code></td><td>작업자</td><td>User</td><td>POP</td><td class="num"><code>(460, 170)</code></td><td>금형 QR 스캔·타발수 기입</td></tr>
+    <tr><th>05-S-A</th><td><code>780:7850</code></td><td>환산옵션</td><td>Desktop</td><td>웹</td><td class="num"><code>(640, 400)</code></td><td>환산 파라미터 설정</td></tr>
+    <tr><th>05-S-A</th><td><code>780:7792</code></td><td>설비담당</td><td>User</td><td>웹</td><td class="num"><code>(1020, 170)</code></td><td>설비담당(x910·05-S-A) PM도래·오더·PM실적</td></tr>
+    <tr><th>05-S-B</th><td><code>784:7953</code></td><td>설비담당</td><td>User</td><td>웹</td><td class="num"><code>(2800, 170)</code></td><td>설비담당(x2690·05-S-B) 보전지시·예비품·실적</td></tr>
+    <tr><th>05-S-B</th><td><code>784:7996</code></td><td>고장기록</td><td>File</td><td>미정</td><td class="num"><code>(2230, 400)</code></td><td>To-Be 단말 미확정(가설 종이/엑셀)</td></tr>
+    <tr><th>05-S-C</th><td><code>791:8053</code></td><td>POP버퍼링</td><td>Mobile</td><td>POP</td><td class="num"><code>(200, 1510)</code></td><td>표준 I/F 두절 시 로컬 버퍼링(무인 자동)</td></tr>
+    <tr><th>05-S-D</th><td><code>793:8115</code></td><td>비가동기록</td><td>File</td><td>미정</td><td class="num"><code>(2100, 1310)</code></td><td>To-Be 단말 미확정</td></tr>
+    <tr><th>05-S-D</th><td><code>793:8131</code></td><td>캘린더설정</td><td>Desktop</td><td>웹</td><td class="num"><code>(2360, 1310)</code></td><td>WorkCalendar 마스터 설정</td></tr>
+    <tr><th>05-S-E</th><td><code>797:8142</code></td><td>품질담당</td><td>User</td><td>웹</td><td class="num"><code>(220, 2350)</code></td><td>계측기 검교정 등록·이력</td></tr>
+  </tbody>
+</table>
+
+<h3>06.기준정보·연계 — 메인 (섹션 <code>675:6942</code>) · 배지 3</h3>
+
+<table>
+  <caption>06 메인 배치 3건</caption>
+  <thead>
+    <tr><th>앵커 노드ID</th><th>앵커 라벨</th><th>아이콘</th><th>칩</th><th>칩 로컬(x,y)</th><th>비고</th></tr>
+  </thead>
+  <tbody>
+    <tr><th><code>675:7007</code></th><td>생산관리자</td><td>User</td><td>웹</td><td class="num"><code>(1840, 110)</code></td><td>Routing 등록(B4)</td></tr>
+    <tr><th><code>675:7033</code></th><td>품질담당</td><td>User</td><td>웹</td><td class="num"><code>(2660, 110)</code></td><td>검사기준 등록(B5·B6)</td></tr>
+    <tr><th><code>676:7065</code></th><td>확장속성편집</td><td>Desktop</td><td>웹</td><td class="num"><code>(1500, 390)</code></td><td>MES 확장 속성 편집(B3)</td></tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>06 메인 <strong>ERP 지점 배지 부재 확인</strong>(정책 3): 전산담당 <code>675:6968</code> · 품목등록 <code>676:7039</code>(B1) · BOM등록 <code>676:7052</code>(B2) · UNIERP <code>676:7023</code> — <strong>배지 없음</strong>.</p>
+</blockquote>
+
+<h3>06.기준정보·연계 — 사이드 (섹션 <code>710:7241</code>) · 배지 5</h3>
+
+<table>
+  <caption>06 사이드 배치 5건</caption>
+  <thead>
+    <tr><th>코드</th><th>앵커 노드ID</th><th>앵커 라벨</th><th>아이콘</th><th>칩</th><th>칩 로컬(x,y)</th><th>비고</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>06-S-A</th><td><code>711:7282</code></td><td>전산담당</td><td>User</td><td>웹</td><td class="num"><code>(420, 460)</code></td><td>I/F 연계정의(B8, SA1~SA4 자동 파이프라인=배지 없음)</td></tr>
+    <tr><th>06-S-B</th><td><code>712:7422</code></td><td>작성중편집</td><td>Desktop</td><td>웹</td><td class="num"><code>(2960, 580)</code></td><td>신규 Rev 발행 트랙 편집(B9·B10)</td></tr>
+    <tr><th>06-S-C</th><td><code>715:7414</code></td><td>운영자·전산</td><td>User</td><td>웹</td><td class="num"><code>(220, 1680)</code></td><td>사용자·권한 관리(B11)</td></tr>
+    <tr><th>06-S-C</th><td><code>715:7475</code></td><td>현장작업자</td><td>User</td><td>POP</td><td class="num"><code>(1020, 1680)</code></td><td>사번 경량 인증(B12 — Mobile아이콘이나 프로그램은 POP, 범례 주석 대표사례)</td></tr>
+    <tr><th>06-S-D</th><td><code>717:7490</code></td><td>송신ONOFF</td><td>Desktop</td><td>웹</td><td class="num"><code>(2600, 1760)</code></td><td>MES→ERP 송신 항목 on/off(B13)</td></tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>06 사이드 <strong>배지 부재 확인</strong>: UNIERP <code>710:7254</code> · UNIERP <code>717:7522</code>(ERP) · 추적관리시스템 <code>718:7498</code>.</p>
+</blockquote>
+
+<!-- ══ 4. 작업 분할(웨이브) 지시 ═════════════════════════════════════════ -->
+<h2>작업 분할(웨이브) 지시</h2>
+
+<p>
+  매 <code>use_figma</code> 콜 서두 <code>await figma.setCurrentPageAsync(await figma.getNodeByIdAsync('219:4509'))</code> 필수(currentPage 콜마다 v1 리셋).
+  콜당 논리 연산 ≤10 → <strong>배지 ≤6개/콜</strong>(clone+append+좌표 = 배지당 ~1.5op).
+  클론 소스는 Wave A-1에서 반환한 마스터 4개 ID를 문자열 리터럴로 재사용.
+</p>
+
+<h3>Wave A — 범례 + 01 + 02 + 03 (배지 34 + 범례)</h3>
+
+<ul>
+  <li><strong>A-1. 범례 마스터·등재</strong> (1콜): 마스터 칩 4종 생성(마스터 칩 스펙 참조) + 제목/캡션 TEXT 4 + 주석 스티키. <strong>마스터 4개 노드 ID 반환.</strong> → 자가 스크린샷(범례 하좌측): 칩 4종 색·라벨·점선(미정) 렌더 확인.</li>
+  <li><strong>A-2. 01 메인</strong> (1콜, 배지 5, 섹션 <code>219:4510</code>). → 스크린샷.</li>
+  <li><strong>A-3. 01 사이드 ①</strong> (1콜, 배지 6: 01-S-A/B/C품질/C-IQC/D/E-A1, 섹션 <code>219:5450</code>).</li>
+  <li><strong>A-4. 01 사이드 ②</strong> (1콜, 배지 6: E-출고QR/F/G/H-D1/H-실물/I). → 사이드 전체 스크린샷.</li>
+  <li><strong>A-5. 02 메인</strong> (1콜, 배지 6, 섹션 <code>297:5370</code>). → 스크린샷.</li>
+  <li><strong>A-6. 02 사이드</strong> (1콜, 배지 7 — 필요 시 4+3 두 콜, 섹션 <code>297:6292</code>). 관리자확인 대안 y=481 준수. → 스크린샷.</li>
+  <li><strong>A-7. 03</strong> (1콜, 배지 4, 섹션 <code>584:6758</code>). 검사 판정 대안 <code>(470,225)</code> 준수. → 스크린샷(밀집 구간 crop).</li>
+</ul>
+
+<h3>Wave B — 04 + 05 + 06 (배지 29)</h3>
+
+<ul>
+  <li><strong>B-1. 04 메인</strong> (1콜, 배지 5, 섹션 <code>819:8194</code>). → 스크린샷.</li>
+  <li><strong>B-2. 04 사이드</strong> (1콜, 배지 5, 섹션 <code>845:8641</code>). <strong>04-S-D 스택 2칩</strong>(모바일 <code>(2052,1948)</code>+POP <code>(1992,1948)</code>) 정확 배치. → 스크린샷(스택 격리 확인).</li>
+  <li><strong>B-3. 05 메인</strong> (1콜, 배지 2, 섹션 <code>746:7514</code>).</li>
+  <li><strong>B-4. 05 사이드 ①</strong> (1콜, 배지 5: 05-S-A 3건 + 05-S-B 2건, 섹션 <code>780:7745</code>).</li>
+  <li><strong>B-5. 05 사이드 ②</strong> (1콜, 배지 4: 05-S-C/D 2건/E). → 05 사이드 스크린샷.</li>
+  <li><strong>B-6. 06 메인</strong> (1콜, 배지 3, 섹션 <code>675:6942</code>).</li>
+  <li><strong>B-7. 06 사이드</strong> (1콜, 배지 5, 섹션 <code>710:7241</code>). → 스크린샷.</li>
+</ul>
+
+<p>각 콜은 생성/이동한 칩 노드 ID를 <code>return</code>(배지↔앵커 매핑 유지). 클론한 칩은 대상 섹션 <code>appendChild</code> <strong>후</strong> 좌표 설정(로컬 좌표 재해석).</p>
+
+<!-- ══ 5. 검토 기준 ══════════════════════════════════════════════════════ -->
+<h2>검토 기준 (검토자 전수 대조용)</h2>
+
+<p>판정은 좌표 데이터(get_figjam/조회) 정본 + 스크린샷 보조. 아래를 전수 확인한다.</p>
+
+<h3>도메인별 배지 수 (총 63배치 / 64칩)</h3>
+
+<table>
+  <caption>도메인별 배지 수</caption>
+  <thead>
+    <tr><th>도메인</th><th>메인</th><th>사이드</th><th>계</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>01 자재창고</th><td class="num">5</td><td class="num">12</td><td class="num">17</td></tr>
+    <tr><th>02 생산실행</th><td class="num">6</td><td class="num">7</td><td class="num">13</td></tr>
+    <tr><th>03 품질관리</th><td class="num">4</td><td class="num">—</td><td class="num">4</td></tr>
+    <tr><th>04 제품출하</th><td class="num">5</td><td class="num">5(칩6)</td><td class="num">10(칩11)</td></tr>
+    <tr><th>05 설비·툴</th><td class="num">2</td><td class="num">9</td><td class="num">11</td></tr>
+    <tr><th>06 기준정보</th><td class="num">3</td><td class="num">5</td><td class="num">8</td></tr>
+  </tbody>
+  <tfoot>
+    <tr><th>계</th><td class="num"><strong>25</strong></td><td class="num"><strong>38</strong></td><td class="num"><strong>63 배치 / 64 칩</strong></td></tr>
+  </tfoot>
+</table>
+
+<ul>
+  <li>유형별 칩 수: <strong>웹 29 · POP 16 · 모바일 12 · 미정 7</strong> (합 64). ※계획 §5의 「웹 30」은 오기 — <strong>웹 29가 정본</strong>(30번째 창작 시 결함 C).</li>
+</ul>
+
+<h3>배지별 정합 (전수)</h3>
+
+<ul>
+  <li>배치 목록 각 행의 <strong>(앵커 노드ID · 칩 종류 · 로컬좌표)</strong> 일치. 칩이 지정 앵커의 우상단(대안 3건은 지정 위치)에 8~12px 걸침, 이웃 노드·라벨과 겹침 0·간격 ≥16px(도형↔라벨).</li>
+  <li>칩 스타일: 웹=파랑/흰「웹」, POP=주황/흰「POP」, 모바일=초록/흰「모바일」, 미정=흰바탕/회색 점선/회색「?」. <strong>전부 마스터 clone</strong>(직접 그린 칩·색 편차 = 결함). 텍스트 클리핑(「…」) 없음(격리 스크린샷).</li>
+  <li>대안 위치 3건: 02-S-C 관리자확인 y=481 / 03 검사판정 <code>(470,225)</code> / 04-S-D 스택 2칩 좌표·4px 간격·L→R=[POP][모바일].</li>
+</ul>
+
+<h3>범례</h3>
+
+<ul>
+  <li>마스터 4종 + 캡션 4 + 제목 + 주석 스티키가 <code>219:4610</code> 하좌측(범례 등재 배치 좌표)에 등재. 주석 스티키 문구 전문 일치(글자 단위). 마스터 칩 = 실제 클론 소스.</li>
+</ul>
+
+<h3>배지 부재 확인 (오배치 방지)</h3>
+
+<ul>
+  <li><strong>06 ERP 지점(정책3)</strong>: <code>675:6968</code>(전산담당) · <code>676:7039</code>(품목등록 B1) · <code>676:7052</code>(BOM등록 B2) · <code>676:7023</code>/<code>710:7254</code>/<code>717:7522</code>(UNIERP) — 배지 없음.</li>
+  <li><strong>03 잔여 미결</strong>: <code>585:6763</code>(Hold) · <code>632:6932</code>(PQC검사필요) · <code>587:6776</code>/<code>6779</code>/<code>6782</code>(한도승인*/특채*/폐기*) — 배지 없음.</li>
+  <li><strong>실물 작업</strong>: <code>219:5498</code>(호퍼 잔량 실측) · <code>297:6303</code>(라인사이드 적치) · <code>297:6320</code>(교체 시점 지정) — 배지 없음.</li>
+  <li><strong>전 도메인</strong>: Server(MES)·Email(미정의 마커)·상태 Archive(03 보류/Release 제외)에 배지 없음. 05 도메인 Database/ERP 배지 없음(특칙).</li>
+  <li>스택은 <strong>정확히 1건</strong>(04-S-D). 그 외 다중 칩 없음.</li>
+</ul>
+
+<!-- ══ 6. 미해결 앵커 ════════════════════════════════════════════════════ -->
+<h2>미해결 앵커</h2>
+
+<div class="callout callout-success">
+  <p><strong>없음(0건).</strong> placement-plan §3의 63개 앵커 전수를 캔버스 노드 ID로 확정했다. (참고: placement-plan §4의 "잔여 미결"은 배지 <em>내용</em>(미정 7곳 단말·03 3상태 등)의 후속 협의 사항으로, 앵커 매칭 미해결과는 별개다 — 미정 7곳은 회색 「?」 배지로 이미 배치됨.)</p>
+</div>
+
+<!-- ══ 7. 근거 매핑 ══════════════════════════════════════════════════════ -->
+<h2>근거 매핑 (도식 비반영 — 정합용)</h2>
+
+<table>
+  <caption>근거 매핑</caption>
+  <thead>
+    <tr><th>요소</th><th>근거</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>프로그램 3종·폼팩터</th><td>결정 16~18(기술스택-배포모델-결정서)</td></tr>
+    <tr><th>미정=회색 <code>?</code> 배지</th><td>사용자 표기 정책 1(2026-07-24)</td></tr>
+    <tr><th>IQC·OQC 결과 입력=관리웹</th><td>정책 2(결정16 판정=관리웹 해석) / PQC=POP는 결정12</td></tr>
+    <tr><th>06 ERP 지점 배지 없음</th><td>정책 3</td></tr>
+    <tr><th>03 판정 4곳 배지</th><td>정책 4</td></tr>
+    <tr><th>배지 스펙·범례 문구</th><td>placement-plan §2</td></tr>
+  </tbody>
+</table>
+
+<!-- ══ 개정 이력 ═════════════════════════════════════════════════════════ -->
+<h2>개정 이력</h2>
+
+<table>
+  <caption>개정 이력</caption>
+  <thead>
+    <tr><th>버전</th><th>날짜</th><th>변경</th><th>작성자</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>r1</th><td>2026-07-24</td><td>최초 발행 — 앵커 63건 전수 노드ID 확정(미해결 0), 마스터 칩 4종·범례 등재 스펙, 배지별 로컬좌표(대안 3건 포함), Wave A/B 분할, 검토 기준. 정합 경고 2건(웹 29 vs 계획 30 / 02메인 「6.생산관리자」 라벨) 기록</td><td>workflow-designer</td></tr>
+  </tbody>
+</table>
+
+<script src="./crefle-doc/crefle-chart.js"></script>
+</body>
+</html>
