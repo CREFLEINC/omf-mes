@@ -1,6 +1,9 @@
 # OS
 .DS_Store
 
+# 백엔드는 CREFLEINC/omf-mes-server로 분리 — 로컬에 남은 apps/는 추적하지 않는다
+/apps/
+
 # 로컬 도구/하네스 상태
 .omc/
 **/settings.local.json
