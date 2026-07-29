@@ -7,7 +7,9 @@ OUT  = sys.argv[2]
 
 NEW  = {'W-01-10','W-01-11','W-01-12','W-04-11','M-01-12'}
 GONE = [('M-01-03','IQC 대상 LOT 스캔','mob','01-S-C 전체 웹 확정 → W-01-01 병합'),
-        ('M-04-02','피킹 대상 목록','mob','목록 진입 경로 기준 → M-04-01 통합')]
+        ('M-04-02','피킹 대상 목록','mob','목록 진입 경로 기준 → M-04-01 통합'),
+        ('W-03-06','불량·부적합 판정·폐기 품의','web','03 co-locate 위반 · 소유 엔티티 0 — 판정은 검사 화면, 품의는 도메인 품의 화면으로 이미 갈림'),
+        ('W-03-07','SPC 관제 대시보드','web','결정 11이 Analytics 단계로 이연 명시 — 삭제가 아니라 <b>이관</b>')]
 
 NAME = {r[0]: r[1] for r in ROWS}
 
@@ -24,11 +26,11 @@ STAGES = [
 ]
 # 흐름 밖 — 예외·역방향·지원
 BANDS = [
- ('예외·역흐름', '반품 · 폐기 · 재고조정 · 재작업', {'mob':['M-01-10','M-01-11'], 'pop':[], 'web':['W-01-04','W-01-12','W-01-05','W-01-06','W-04-06','W-04-11','W-04-07','W-04-10','W-03-06']}),
+ ('예외·역흐름', '반품 · 폐기 · 재고조정 · 재작업', {'mob':['M-01-10','M-01-11'], 'pop':[], 'web':['W-01-04','W-01-12','W-01-05','W-01-06','W-04-06','W-04-11','W-04-07','W-04-10']}),
  ('설비·툴 (05)', '점검 · 보전 · 비가동 · 계측', {'mob':['M-05-01','M-05-02'], 'pop':['P-05-01','P-05-02'], 'web':['W-05-01','W-05-02','W-05-03','W-05-04','W-05-05','W-05-06','W-05-07','W-05-08','W-05-09','W-05-10','W-05-11','W-05-12','W-05-13','W-05-14']}),
  ('기준정보·연계 (06)', '마스터 · Rev · I/F', {'mob':[], 'pop':[], 'web':['W-06-01','W-06-02','W-06-03','W-06-04','W-06-05','W-06-06','W-06-07','W-06-08','W-06-09','W-06-10','W-06-11','W-06-12']}),
  ('공통 (CO)', '계정 · 알림 · 대시보드 · 설정', {'mob':['M-CO-01'], 'pop':[], 'web':['W-CO-01','W-CO-02','W-CO-03','W-CO-04','W-CO-05','W-CO-06','W-CO-07']}),
- ('조회·대시보드', '전 도메인 (도식 앵커 밖 · 별도 트랙 28건에 다수 포함)', {'mob':[], 'pop':[], 'web':['W-03-04','W-03-05','W-03-07','W-03-08','W-04-08','W-04-09']}),
+ ('조회·대시보드', '전 도메인 (도식 앵커 밖 · 별도 트랙 28건에 다수 포함)', {'mob':[], 'pop':[], 'web':['W-03-04','W-03-05','W-03-08','W-04-08','W-04-09']}),
 ]
 
 def chip(sid):
@@ -66,8 +68,8 @@ TREE = [
  ('생산',     [('계획·지시', ['W-02-01','W-02-02','W-02-03','W-02-04','W-02-07','W-02-06','W-02-10']),
               ('마감·모니터링', ['W-02-05','W-02-08','W-02-09'])]),
  ('품질',     [('Lot Status', ['W-03-01','W-03-02','W-03-03','W-03-04','W-03-09']),
-              ('검사·불량', ['W-03-05','W-03-06']),
-              ('관제', ['W-03-07','W-03-08'])]),
+              ('검사·불량', ['W-03-05']),
+              ('관제', ['W-03-08'])]),
  ('자재/창고', [('입하·검사', ['W-01-09','W-01-01','W-01-10','W-01-02','W-01-03','W-01-11']),
               ('재고·출고', ['W-01-07','W-01-08','W-01-04','W-01-12']),
               ('반품·폐기', ['W-01-05','W-01-06'])]),
@@ -107,7 +109,8 @@ TILES = [('📦','입하',['M-01-01','M-01-02','M-01-06']), ('📥','적치',['M
          ('🛠','설비',['M-05-01','M-05-02'])]
 tile_html = ''.join('<div class="tile"><span class="ic">%s</span><span class="tn">%s</span><div>%s</div></div>' % (i, n, ''.join(chip(x) for x in ids)) for i, n, ids in TILES)
 
-gone_html = ''.join('<div class="gone"><span class="chip mob del"><b>%s</b>%s</span><p>%s</p></div>' % (i, n, r) for i, n, p, r in GONE)
+gone_html = ''.join('<div class="gone"><span class="chip %s %s"><b>%s</b>%s</span><p>%s</p></div>'
+                    % (p, 'moved' if '이관' in r else 'del', i, n_, r) for i, n_, p, r in GONE)
 new_html  = ''.join('<div class="gone"><span class="chip %s new"><b>%s</b>%s</span><p>%s</p></div>' % (
     {'W':'web','P':'pop','M':'mob'}[i[0]], i, NAME[i], r) for i, r in [
     ('W-01-10','배지 사각지대 해소 — IQC 생략 경로가 화면 없이 Release되던 공백'),
@@ -157,6 +160,7 @@ h2 small{font-weight:400;font-size:12px;color:var(--dim);letter-spacing:0}
 @media (prefers-color-scheme:dark){.chip.pop{color:#f0ad63}.chip.mob{color:#5ecb8c}.chip.web{color:#7ea9f7}}
 .chip.new{box-shadow:0 0 0 2px color-mix(in srgb,var(--new) 45%,transparent)}
 .chip.del{opacity:.55;text-decoration:line-through}
+.chip.moved{opacity:.7;box-shadow:0 0 0 2px color-mix(in srgb,var(--del) 40%,transparent)}
 .none{color:var(--dim);opacity:.5;font-size:12px}
 .legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin:0 0 14px;font-size:12px;color:var(--dim)}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
@@ -230,11 +234,11 @@ table th:first-child span{display:block;font-weight:400;font-size:11px;color:var
 정본 = <code>screen-inventory-ia.md</code> v1.2 · 결정 근거 = <code>보류결정-확정기록.md</code> v1.4 · 판정 기준 = <code>screen-mapping-rule.md</code> v1.3</p>
 
 <div class="kpi">
- <div><b>115</b><span>화면 &nbsp;·&nbsp; 관리웹 75 · POP 22 · 모바일 18</span></div>
+ <div><b>113</b><span>화면 &nbsp;·&nbsp; 관리웹 73 · POP 22 · 모바일 18</span></div>
  <div><b>3</b><span>프로그램 &nbsp;·&nbsp; IA 모델이 서로 다르다</span></div>
- <div><b>82</b><span>확정 &nbsp;·&nbsp; 추정 28 · 미정 5</span></div>
+ <div><b>82</b><span>확정 &nbsp;·&nbsp; 추정 28 · 미정 3</span></div>
  <div><b>73</b><span>화면 그룹 &nbsp;·&nbsp; 도식 미대응 0</span></div>
- <div><b>+3</b><span>v1.1 대비 &nbsp;·&nbsp; 신설 5 · 삭제 2</span></div>
+ <div><b>+1</b><span>v1.1 대비 &nbsp;·&nbsp; 신설 5 · 정리 4</span></div>
 </div>
 
 <div class="note"><b>이 문서를 읽는 법.</b> 화면 115건은 <b>도식(FigJam) 노드에서 도출</b>했지 창작하지 않았다.
@@ -290,7 +294,7 @@ DOC.write('''<h2>⑥ v1.2 변동 <small>2계층 매핑 4단계 사람 확정의 
 <p class="lead">보류 89건을 사람이 판정한 결과 화면이 <b>112 → 115</b>가 됐다. 수보다 <b>구성</b>이 바뀐 것이 핵심이다.</p>
 <div class="grid3">
 <div><h2 style="font-size:14px;margin-top:0">신설 5</h2><div class="card">''' + new_html + '</div></div>' +
-'<div><h2 style="font-size:14px;margin-top:0">삭제 2</h2><div class="card">' + gone_html +
+'<div><h2 style="font-size:14px;margin-top:0">삭제 3 · 이관 1</h2><div class="card">' + gone_html +
 '<p style="font-size:12px;color:var(--dim);margin:12px 0 0">범위만 바뀐 화면 8건(<code>W-01-01</code> 01-S-C 전 구간 · <code>M-04-01</code> 목록 흡수 · <code>P-02-01</code> 사번 분리 등)은 수에 영향이 없다.</p></div></div></div>')
 
 DOC.write('''<h2>⑦ 전체 화면 목록 <small>115건 · 필터</small></h2>
