@@ -17,6 +17,12 @@ docs/raw/
 *.ttf
 *.zip
 
+# 예외 — 07-07 워크플로우 도식 설명자료 덱은 colors_and_type.css @font-face가 이 3건을 상대경로로 직접 참조한다.
+# 위 *.otf 규칙보다 나중에 와야 무시가 풀린다(gitignore는 뒤에 오는 부정 패턴이 우선).
+!docs/planning/2026-07-07-OMF-MES-워크플로우-도식-설명자료/assets/fonts/SpoqaHanSansNeo-Bold.otf
+!docs/planning/2026-07-07-OMF-MES-워크플로우-도식-설명자료/assets/fonts/SpoqaHanSansNeo-Medium.otf
+!docs/planning/2026-07-07-OMF-MES-워크플로우-도식-설명자료/assets/fonts/SpoqaHanSansNeo-Regular.otf
+
 # 현장점검 생성물 PDF (HTML·생성 스크립트에서 재생성 — 커밋 제외)
 docs/research/2026-06-28-현장점검-체크리스트.pdf
 docs/research/2026-06-29-현장점검-코드참조-미결코드·클러스터.pdf
