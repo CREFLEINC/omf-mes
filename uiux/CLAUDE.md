@@ -63,7 +63,17 @@ uiux/
 - **⚠ 화면 상세 스펙·와이어프레임 단계는 물리 모델이 필수 입력이다.** 화면 목록·IA 단계는 개념모델만으로 됐지만(도출 기준=저장 엔티티의 존재 여부), 상세 스펙이 정의할 **필드·타입·필수·유일·FK·CHECK 제약**은 하류에만 있다(`mes_postgresql_physical_model.sql` — 테이블 129·제약 1,417곳). 따라서 입력은 **4면**으로 읽는다: `deliverables/05`(단계·행위자·단말) × `deliverables/04`(화면·IA) × `deliverables/01`(REQ 추적) × **물리 모델 컬럼**. (`deliverables/90` §6-5가 「3면」이라 한 것은 물리 모델을 빠뜨린 표기다.)
 - **⚠ 상류만 보고 판단하지 말 것 — 하류가 앞서간다.** 대표 사례: 개념모델은 현장 단말을 「인프라 비기능·엔티티 아님」으로 두었으나 하류에는 `mdm.terminal` + **`mdm.terminal_process` 8플래그**(`can_input_material`·`can_input_result`·`can_input_inspection`·`can_print_label`·`can_start_work`·`can_complete_work`·`can_cancel_input`·`can_return_material`)가 실재한다. 이 플래그는 프로그램 배지가 다룬 「어느 단말이 어느 지점에서 무엇을 하는가」와 **겹치는 문제 영역**이다(축은 다르다 — 배지=프로그램 3종 / 플래그=단말×공정). 화면의 **버튼 활성·기능 노출 조건을 스스로 재발명하지 말고 이 플래그와 대조**한다.
 
-> 이 지도는 스냅샷(2026-07-30 갱신 — 최초 2026-07-24)이다 — docs/ 구조가 크게 바뀌면 갱신한다. FigJam 도식 진행 상태의 정본은 `docs/.claude/skills/figjam-workflow-diagram`의 진행 상태 노트(uiux에서는 읽기만).
+**디자인 시스템 (앱 UI)**: **`@crefle/web-ui`** — 로컬 클론 `/Users/rangkim/projects/crefle/designsystem/repos/design-system-v2-web-ui` · 원격 `github:CREFLEINC/design-system-v2-webui`. CREFLE 웹 프런트엔드 DS이며 **omf-mes의 UI 기반이다**(사용자 확정 2026-07-31).
+
+- **규모**(v0.1.0 실측): 컴포넌트 **42개**(Core / Phase 2~4 티어) · 토큰 **web 76**(type 20·space 12·elevation 6·chart 6·radius 5·state 4·motion 3 …) + **foundation 51**(브랜드·색상) · Storybook·테스트·드리프트 게이트 보유.
+- **우리는 소비자다 — DS를 만들지 않는다.** 인벤토리 정본 = `docs/COMPONENTS.md`(자동 생성) · 컨벤션 = `docs/component-conventions.md` · **갭 처리 절차 = `docs/component-requests.md`**(이 절차를 그대로 따른다).
+- **갭은 4갈래로 분류한다** — **a** 그대로 있음(끝) / **b** 컴포넌트는 있으나 변형·prop 부족(webui 이슈) / **c** 기존 컴포넌트의 **조합**(제품이 소유·이슈 없음) / **d** 진짜 새 원시 요소(제품에서 먼저 만들고 **세 번째 사용처**에서 승격). ⚠ **c가 가장 많고, c를 DS로 올리는 것이 DS를 망가뜨리는 가장 흔한 경로다.** 색·간격·라운드·타이포 **값**이 없는 것은 webui가 아니라 **파운데이션(`design-system-v2`) 이슈**다.
+- **절차**: 와이어프레임을 그리는 자리에서 `docs/ds-gap.md`에 요소를 적고(요소 / 유형 a~d / DS 컴포넌트 또는 갭 이름) → **전 화면을 다 매핑한 뒤** → **한 번에 몰아서** 이슈(컴포넌트당 1개, 본문에 사용처 나열). 화면 단위로 찔끔 내면 빈도 신호가 흩어져 티어·우선순위를 못 정한다.
+- **⚠ webui 저장소는 공개(public)다.** 우리 자료는 내부 대외비이므로 이슈에 **제품 와이어 캡처·내부 화면명·고객사명을 붙이지 않는다.** 갭은 제품의 언어가 아니라 **컴포넌트의 언어**로 쓴다(예: 「설비 상세의 가동률 추이」가 아니라 「시계열 차트 위 기간 선택기」).
+- **⚠ `crefle-doc`과 혼동 금지** — `design-system-v2-doc`은 **문서** DS(보고서·덱 렌더링)이고, `@crefle/web-ui`가 **앱 UI** DS다. 둘은 같은 파운데이션을 공유하는 형제다.
+- **POP·모바일도 같은 DS를 쓴다** — 결정 16이 「React 코드 1벌 → 셸 3종」이고 02 §2.3이 **디자인 토큰을 공유물**로, 「폼팩터 분기는 진입점·레이아웃 레벨만」으로 못박았다. 다만 DS에 **15형 터치·PDA용 터치 타겟·밀도 프리셋은 없다**(있는 것은 Button·TextField `sm|md|lg`, Table `comfortable|compact`). 부족분은 별도 DS를 만드는 게 아니라 **b 유형(변형 추가) 이슈**로 낸다.
+
+> 이 지도는 스냅샷(2026-07-31 갱신 — 최초 2026-07-24)이다 — docs/ 구조가 크게 바뀌면 갱신한다. FigJam 도식 진행 상태의 정본은 `docs/.claude/skills/figjam-workflow-diagram`의 진행 상태 노트(uiux에서는 읽기만).
 
 ## 작업 이력
 
