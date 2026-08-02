@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<title>P-02-04 POP 레이아웃 실측 — 1024×768</title>
+<link rel="stylesheet" href="./styles/index.css">
+<style>
+  /* 이 파일은 검증용 목업이다. 색·타이포·간격은 @crefle/web-ui 토큰만 쓴다.
+     DS 컴포넌트는 CSS Modules(해시 클래스)라 직접 못 쓰므로, 토큰 값으로 치수만 재현한다.
+     검증 대상 = 세로 예산이 실제 텍스트와 함께 성립하는가. */
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px; background: var(--surface-container-low); }
+
+  .frame {
+    width: 1024px; height: 768px;
+    background: var(--surface);
+    border: 1px solid var(--outline);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── 헤더 64 ── */
+  .hdr {
+    height: 64px; flex: 0 0 64px;
+    display: flex; align-items: center; gap: var(--space-4);
+    padding: 0 var(--space-4);
+    background: var(--surface-container);
+    border-bottom: 1px solid var(--outline);
+  }
+  .hdr .wo   { font: var(--type-title-sm); color: var(--on-surface); }
+  .hdr .item { font: var(--type-body-sm); color: var(--on-surface-variant); }
+  .hdr .sp   { margin-left: auto; }
+  .chip {
+    height: 32px; display: inline-flex; align-items: center; gap: var(--space-2);
+    padding: 0 var(--space-3); border-radius: var(--radius-full, 999px);
+    background: var(--surface-container-high); color: var(--on-surface-variant);
+    font: var(--type-label-lg);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); }
+
+  /* ── 본문 616 ── */
+  .body {
+    flex: 0 0 616px; height: 616px;
+    display: flex; gap: var(--space-4);
+    padding: var(--space-4);
+  }
+  .col-l { width: 600px; display: flex; flex-direction: column; gap: var(--space-3); }
+  .col-r { width: 376px; display: flex; flex-direction: column; gap: var(--space-3); }
+
+  /* 행 — POP 요구 치수 */
+  .row {
+    display: flex; align-items: center; gap: var(--space-3);
+    padding: 0 var(--space-4);
+    border: 1px solid var(--outline); border-radius: var(--radius-md);
+    background: var(--surface);
+  }
+  .row.h64 { height: 64px; }
+  .row.h72 { height: 72px; }            /* 핵심 입력 */
+  .row .lbl { width: 104px; flex: 0 0 104px; font: var(--type-label-lg); color: var(--on-surface-variant); }
+  .row .val { flex: 1; font: var(--type-body-lg); color: var(--on-surface); }
+  .row .val.num { font: var(--type-title-lg); text-align: right; }
+  .row .unit { font: var(--type-body-sm); color: var(--on-surface-muted); }
+  .row.key { background: var(--primary-container); border-color: var(--primary); }
+  .row .mono { font-family: var(--font-mono, monospace); font-size: 15px; letter-spacing: .01em; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: var(--radius-full, 999px); font: var(--type-label-lg);
+    border: 1px solid var(--outline); background: var(--surface-container-high);
+    color: var(--on-surface); cursor: default; padding: 0 var(--space-5);
+  }
+  .btn.h56 { height: 56px; }
+  .btn.h64 { height: 64px; }
+  .btn.h72 { height: 72px; padding: 0 var(--space-7); font: var(--type-title-sm); }
+  .btn.primary { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+
+  .divider { height: 1px; background: var(--outline); margin: var(--space-1) 0; }
+
+  /* 키패드 — 키 64×64 · 간격 12 → 216×292 */
+  .pad { display: grid; grid-template-columns: repeat(3, 64px); gap: var(--space-3); }
+  .pad .k {
+    width: 64px; height: 64px; display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--outline); border-radius: var(--radius-md);
+    background: var(--surface-container); font: var(--type-title-lg); color: var(--on-surface);
+  }
+  .quick { display: flex; gap: var(--space-3); }
+
+  /* DS 기본 vs POP 요구 비교 */
+  .cmp { margin-top: auto; border-top: 1px dashed var(--outline); padding-top: var(--space-3); }
+  .cmp h4 { margin: 0 0 var(--space-2); font: var(--type-label-sm); color: var(--on-surface-muted); }
+  .cmp .bar { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-2); }
+  .cmp .sw { border: 1px solid var(--outline); border-radius: var(--radius-full, 999px);
+             background: var(--surface-container-high); width: 120px;
+             display: flex; align-items: center; justify-content: center; font: var(--type-label-sm); }
+  .cmp .t  { font: var(--type-label-sm); color: var(--on-surface-variant); }
+
+  /* ── 액션바 88 ── */
+  .act {
+    flex: 0 0 88px; height: 88px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--space-2) var(--space-4);
+    border-top: 1px solid var(--outline); background: var(--surface-container);
+  }
+
+  /* 세로 예산 눈금 */
+  .ruler { position: relative; }
+  .tick { position: absolute; left: -22px; font: var(--type-label-sm); color: var(--on-surface-muted); }
+</style>
+</head>
+<body>
+
+<div class="frame">
+
+  <!-- 헤더 64 -->
+  <div class="hdr">
+    <span class="wo">WO-2026-0731-004</span>
+    <span class="item">ABC-123 사출 하우징 커버 · 3공정</span>
+    <span class="sp"></span>
+    <span class="item">112233</span>
+    <span class="chip"><span class="dot"></span>온라인 · 미동기 0</span>
+  </div>
+
+  <!-- 본문 616 -->
+  <div class="body">
+
+    <div class="col-l">
+      <div class="row h64">
+        <span class="lbl">대상 LOT</span>
+        <span class="val mono">0001234500000012002607310001230007</span>
+        <span class="btn h56">변경</span>
+      </div>
+
+      <div class="row h64">
+        <span class="lbl">제품</span>
+        <span class="val">ABC-123 사출 하우징 커버</span>
+        <span class="btn h56">변경</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="row h72 key">
+        <span class="lbl">양품수량</span>
+        <span class="val num">120</span>
+        <span class="unit">EA</span>
+      </div>
+
+      <div class="row h64">
+        <span class="lbl">타발수</span>
+        <span class="val num">—</span>
+      </div>
+
+      <div class="row h64">
+        <span class="lbl">비고</span>
+        <span class="val" style="color:var(--on-surface-muted)">입력 없음</span>
+      </div>
+
+      <div class="row h64">
+        <span class="lbl">잔여수량</span>
+        <span class="val">380 <span class="unit">/ 500 EA</span></span>
+      </div>
+    </div>
+
+    <div class="col-r">
+      <div class="pad">
+        <div class="k">7</div><div class="k">8</div><div class="k">9</div>
+        <div class="k">4</div><div class="k">5</div><div class="k">6</div>
+        <div class="k">1</div><div class="k">2</div><div class="k">3</div>
+        <div class="k">C</div><div class="k">0</div><div class="k">←</div>
+      </div>
+      <div class="quick">
+        <span class="btn h64">＋10</span>
+        <span class="btn h64">＋100</span>
+      </div>
+
+      <div class="cmp">
+        <h4>터치 타겟 — DS 기본 vs POP 요구</h4>
+        <div class="bar"><span class="sw" style="height:48px">48</span><span class="t">DS <code>lg</code> 최대</span></div>
+        <div class="bar"><span class="sw" style="height:56px">56</span><span class="t">POP 일반 최소</span></div>
+        <div class="bar"><span class="sw" style="height:72px">72</span><span class="t">POP 위험 버튼</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 액션바 88 -->
+  <div class="act">
+    <span class="btn h72">취소</span>
+    <span class="btn h72 primary">저장</span>
+  </div>
+
+</div>
+
+</body>
+</html>
