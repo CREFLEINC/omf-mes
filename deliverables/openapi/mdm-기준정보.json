@@ -3223,6 +3223,813 @@
           }
         }
       }
+    },
+    "/mdm/items": {
+      "get": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "품목 목록",
+        "description": "근거: W-06-05 §3 좌측 품목 목록 · 공유계약 G-8(유효성 판정은 서버가 한다)",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "품목코드·품목명 검색"
+          },
+          {
+            "name": "itemTypeCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Item"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/items/{itemId}": {
+      "parameters": [
+        {
+          "name": "itemId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "품목 상세",
+        "description": "원본(ERP)·MES 확장 속성 전 필드를 함께 준다 — 화면이 위/아래 구획으로 나눠 그린다(§3). editability 는 itemCode 등 ERP 원본 필드가 항상 잠김임을 알린다(RECEIVED_FROM_ERP). 근거: W-06-05 §4-A·§4-B · 공유계약 B-4",
+        "responses": {
+          "200": {
+            "description": "상세",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "품목 MES 확장 속성 수정",
+        "description": "ERP 수신본. 원본 필드(itemCode·itemName·itemTypeCode·baseUomId)는 읽기 전용이고 MES 확장 속성만 편집한다 — QA #34. 미착지 넷: 자재LOT 보관단위·생산LOT 기본크기·개발품 플래그·재생재 하위코드 — #64. 그리고 수신본 식별 플래그 부재로 읽기 전용 판정 자체가 불가능하다 — #65. 「유효기한 관리」 토글은 별도 컬럼이 아니라 shelfLifeDays 의 NULL 여부로 표현한다(§8-2) — 화면이 토글 OFF 시 shelfLifeDays 를 null 로 보낸다. 낙관적 잠금은 공유계약 B-1. 근거: W-06-05 §4-B·§5-1",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "수정됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Item"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패 — 예: 유효기한 관리 ON인데 shelfLifeDays 미입력(조건부 필수 A-2)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-05 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌 — ERP 재동기화 배치(conflictCause=erpSync)가 원본 열을 갱신했을 가능성이 높다. 다른 사용자(user)와 문구를 구분한다 — W-06-05 §9-1",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/items/{itemId}/uom-conversions": {
+      "parameters": [
+        {
+          "name": "itemId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "단위 환산 목록",
+        "description": "근거: W-06-05 §4-C 「부속 정보」 단위환산 탭",
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemUomConversionListResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "단위 환산 전체 치환",
+        "description": "개별 부여·회수가 아니라 최종 상태를 통째로 보낸다. ck_item_uom_distinct·ck_item_uom_dates 를 서버가 검증한다. is_active·version_no 없음 — 부여·회수 형태. 서버는 한 트랜잭션으로 반영한다. 근거: W-06-05 §4-C·§5-1 「부속 행 추가/삭제」 · 공유계약 B-6",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "conversions"
+                ],
+                "properties": {
+                  "conversions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "fromUomId",
+                        "toUomId",
+                        "conversionRate",
+                        "effectiveFrom"
+                      ],
+                      "properties": {
+                        "fromUomId": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "toUomId": {
+                          "type": "integer",
+                          "format": "int64",
+                          "description": "ck_item_uom_distinct — fromUomId 와 같으면 불가"
+                        },
+                        "conversionRate": {
+                          "type": "number",
+                          "exclusiveMinimum": 0,
+                          "description": "rate_t numeric(18,8) · CHECK > 0"
+                        },
+                        "effectiveFrom": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "effectiveTo": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "format": "date",
+                          "description": "ck_item_uom_dates — 있으면 effectiveFrom 이상"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "치환됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemUomConversionListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패 — ck_item_uom_distinct 또는 ck_item_uom_dates 위반",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-05 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/items/{itemId}/external-codes": {
+      "parameters": [
+        {
+          "name": "itemId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "외부 코드 목록",
+        "description": "근거: W-06-05 §4-D 「부속 정보」 외부코드 탭",
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemExternalCodeListResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "외부 코드 전체 치환",
+        "description": "개별 부여·회수가 아니라 최종 상태를 통째로 보낸다. uq_item_external_code 의 COALESCE(partner_id,0) — 거래처를 비우면 (전체)로 접혀 유일 판정한다(A-7). external_item_code 는 고객 바코드 체계의 저장처(WF04 S6). is_active·version_no 없음 — 부여·회수 형태. 서버는 한 트랜잭션으로 반영한다. 근거: W-06-05 §4-D·§5-1 · 공유계약 B-6",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "externalCodes"
+                ],
+                "properties": {
+                  "externalCodes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "externalSystemCode",
+                        "externalItemCode"
+                      ],
+                      "properties": {
+                        "externalSystemCode": {
+                          "type": "string",
+                          "maxLength": 50,
+                          "description": "공통코드"
+                        },
+                        "partnerId": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "format": "int64",
+                          "description": "비우면 (전체) — A-7"
+                        },
+                        "externalItemCode": {
+                          "type": "string",
+                          "maxLength": 100
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "치환됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemExternalCodeListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패 — uq_item_external_code 위반",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-05 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/items/{itemId}/bu-item-maps": {
+      "parameters": [
+        {
+          "name": "itemId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "사업부 매핑 목록",
+        "description": "itemId 를 fromItemId 로 고정한 매핑만 낸다. 근거: W-06-05 §3 「부속 정보」 사업부매핑 탭",
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemBuItemMapListResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "사업부 매핑 전체 치환",
+        "description": "개별 부여·회수가 아니라 최종 상태를 통째로 보낸다. fromItemId 는 경로의 itemId 로 고정한다. ck_item_bu_map_distinct — fromBusinessUnitId 와 toBusinessUnitId 가 같으면 불가. ck_item_bu_map_dates 짝 제약(A-2). 사업부 간 이동입고는 이 매핑이 없으면 차단된다(1-3 SCN-28). is_active·version_no 없음 — 부여·회수 형태. 서버는 한 트랜잭션으로 반영한다. 근거: W-06-05 §3·§5-1 · 공유계약 B-6",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "maps"
+                ],
+                "properties": {
+                  "maps": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "fromBusinessUnitId",
+                        "toBusinessUnitId",
+                        "toItemId",
+                        "effectiveFrom"
+                      ],
+                      "properties": {
+                        "fromBusinessUnitId": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "toBusinessUnitId": {
+                          "type": "integer",
+                          "format": "int64",
+                          "description": "ck_item_bu_map_distinct — fromBusinessUnitId 와 같으면 불가"
+                        },
+                        "toItemId": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "effectiveFrom": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "effectiveTo": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "format": "date",
+                          "description": "ck_item_bu_map_dates — 있으면 effectiveFrom 이상"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "치환됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemBuItemMapListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패 — ck_item_bu_map_distinct 또는 ck_item_bu_map_dates 위반",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-05 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planning/boms": {
+      "get": {
+        "tags": [
+          "planning"
+        ],
+        "summary": "BOM 헤더 목록",
+        "description": "품목의 BOM 헤더 전체(코드·Rev 불문)를 준다. ERP 정본 — QA #3. 근거: W-06-05 §3 BOM 탭 좌측 목록 · 공유계약 G-8",
+        "parameters": [
+          {
+            "name": "parentItemId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "필수. BOM 목록은 품목을 고른 뒤에 본다 — W-06-05 §3"
+          },
+          {
+            "name": "bomCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BomListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planning/boms/{bomId}": {
+      "parameters": [
+        {
+          "name": "bomId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "planning"
+        ],
+        "summary": "BOM 헤더 상세",
+        "description": "ERP 정본 — 전 필드 읽기 전용(QA #3). editability.reason 은 항상 RECEIVED_FROM_ERP. 근거: W-06-05 §4-E",
+        "responses": {
+          "200": {
+            "description": "상세",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BomDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planning/boms/{bomId}:set-default": {
+      "parameters": [
+        {
+          "name": "bomId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "planning"
+        ],
+        "summary": "기본 BOM 지정",
+        "description": "uq_bom_default ON (parent_item_id) WHERE is_default — 부분 유일 인덱스라 동시에 둘을 막을 뿐 자동 전환은 하지 않는다. 서버가 한 트랜잭션으로 처리한다 — 지정한 BOM 을 isDefault=true 로 세우는 동시에 같은 품목의 기존 기본 BOM 을 isDefault=false 로 내린다(공유계약 A-6). 화면은 해제→설정 2회 호출을 하지 않는다 — W-06-05 §8-4 가 우려한 「그 사이 기본 BOM 0개」 상태를 만들지 않기 위함이다. 근거: W-06-05 §6 「기본 BOM 전환」",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "지정됨 — 응답은 지정한 BOM 만 반환한다(기존 기본 BOM 해제는 반영되나 응답에 포함하지 않는다)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Bom"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-05 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planning/boms/{bomId}/components": {
+      "parameters": [
+        {
+          "name": "bomId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "planning"
+        ],
+        "summary": "BOM 구성품 목록",
+        "description": "sequenceNo 오름차순. ERP 원본 열과 MES 확장 열이 한 행에 섞인다(§4-F). 근거: W-06-05 §4-F",
+        "responses": {
+          "200": {
+            "description": "구성품",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BomComponentListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/planning/boms/{bomId}/components/{bomComponentId}": {
+      "parameters": [
+        {
+          "name": "bomId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "name": "bomComponentId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "put": {
+        "tags": [
+          "planning"
+        ],
+        "summary": "BOM 구성품 MES 확장 열 수정",
+        "description": "편집 가능한 것은 routingOperationId·actualUseProcessId·lotTraceRequired·backflushAllowed 넷뿐이다. scrapRate 는 0~1 비율이며 퍼센트가 아니다 — A-8. 나머지 열(sequenceNo·componentItemId·requiredQty·uomId·scrapRate·isMandatory)은 ERP 원본이라 이 API 로 바꾸지 않는다. BOM 상태가 작성중일 때만 허용한다 — 상태≠작성중이면 400(ErrorResponse, code=STATE_LOCKED). routingOperationId 선택은 Routing 등록(W-06-01)이 선행돼야 한다. 낙관적 잠금은 공유계약 B-1. 근거: W-06-05 §4-F·§5-1 「구성품 확장 열 편집」",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BomComponentUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "수정됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BomComponent"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패 또는 BOM 상태≠작성중(code=STATE_LOCKED) — W-06-05 §5-1",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-05 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -5308,6 +6115,650 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/WorkerQualification"
+            }
+          }
+        }
+      },
+      "Item": {
+        "x-source-table": "mdm.item",
+        "type": "object",
+        "required": [
+          "itemId",
+          "itemCode",
+          "itemName",
+          "itemTypeCode",
+          "baseUomId",
+          "lotControlTypeCode",
+          "serialControlTypeCode",
+          "inspectionRequired",
+          "fifoPolicyCode",
+          "negativeStockAllowed",
+          "isActive"
+        ],
+        "description": "ERP 수신본. 원본 필드(itemCode·itemName·itemTypeCode·baseUomId)는 읽기 전용이고 MES 확장 속성만 편집한다 — QA #34. 미착지 넷: 자재LOT 보관단위·생산LOT 기본크기·개발품 플래그·재생재 하위코드 — #64. 그리고 수신본 식별 플래그 부재로 읽기 전용 판정 자체가 불가능하다 — #65",
+        "properties": {
+          "itemId": {
+            "x-source-column": "item_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "itemCode": {
+            "x-source-column": "item_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "itemName": {
+            "x-source-column": "item_name",
+            "type": "string",
+            "maxLength": 200,
+            "description": "⚠ 한/베 두 언어를 담을 컬럼이 없다 — W-06-06 §8-1 과 같은 결함"
+          },
+          "itemTypeCode": {
+            "x-source-column": "item_type_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "공통코드 — 값 목록 미정"
+          },
+          "baseUomId": {
+            "x-source-column": "base_uom_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "lotControlTypeCode": {
+            "x-source-column": "lot_control_type_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "MES 확장 · 공통코드 — 값 목록 미정 [추정]"
+          },
+          "serialControlTypeCode": {
+            "x-source-column": "serial_control_type_code",
+            "type": "string",
+            "maxLength": 50,
+            "default": "NONE",
+            "description": "MES 확장 · 공통코드"
+          },
+          "shelfLifeDays": {
+            "x-source-column": "shelf_life_days",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "description": "MES 확장 · CHECK ≥ 0 · 「유효기한 관리」 토글은 이 값의 NULL 여부로 표현한다(§8-2, 확정 QA #28)"
+          },
+          "inspectionRequired": {
+            "x-source-column": "inspection_required",
+            "type": "boolean",
+            "default": false,
+            "description": "MES 확장 · W-01-01 IQC 대상 판정의 입력"
+          },
+          "fifoPolicyCode": {
+            "x-source-column": "fifo_policy_code",
+            "type": "string",
+            "maxLength": 50,
+            "default": "FIFO",
+            "description": "MES 확장 · 확정(QA #28) — 유효기한 관리 품목=FEFO, 나머지=FIFO"
+          },
+          "negativeStockAllowed": {
+            "x-source-column": "negative_stock_allowed",
+            "type": "boolean",
+            "default": false,
+            "description": "MES 확장"
+          },
+          "storageConditionCode": {
+            "x-source-column": "storage_condition_code",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 50,
+            "description": "MES 확장 · 공통코드 — location.storage_condition_code 와 같은 코드계"
+          },
+          "openedShelfLifeHours": {
+            "x-source-column": "opened_shelf_life_hours",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "exclusiveMinimum": 0,
+            "description": "MES 확장 · CHECK > 0 — 0 은 불가"
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true,
+            "description": "MES 확장 — 별도 :deactivate 없이 이 PUT 으로 바꾼다(item 은 사용 중지 액션이 화면에 없다 — ui-요구목록 W-06-05)"
+          }
+        }
+      },
+      "ItemUpdate": {
+        "x-source-table": "mdm.item",
+        "type": "object",
+        "required": [
+          "lotControlTypeCode",
+          "serialControlTypeCode",
+          "inspectionRequired",
+          "fifoPolicyCode",
+          "negativeStockAllowed",
+          "isActive"
+        ],
+        "description": "품목 MES 확장 속성 수정 요청. 원본 4열(itemCode·itemName·itemTypeCode·baseUomId)은 이 요청에 포함하지 않는다 — 항상 읽기 전용(ERP 수신본). 근거: W-06-05 §4-B·§5-1",
+        "properties": {
+          "lotControlTypeCode": {
+            "x-source-column": "lot_control_type_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "serialControlTypeCode": {
+            "x-source-column": "serial_control_type_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "shelfLifeDays": {
+            "x-source-column": "shelf_life_days",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "description": "조건부 필수 — 「유효기한 관리」 토글 ON 이면 필수(A-2). OFF 이면 null 로 보낸다"
+          },
+          "inspectionRequired": {
+            "x-source-column": "inspection_required",
+            "type": "boolean"
+          },
+          "fifoPolicyCode": {
+            "x-source-column": "fifo_policy_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "negativeStockAllowed": {
+            "x-source-column": "negative_stock_allowed",
+            "type": "boolean"
+          },
+          "storageConditionCode": {
+            "x-source-column": "storage_condition_code",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 50
+          },
+          "openedShelfLifeHours": {
+            "x-source-column": "opened_shelf_life_hours",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "exclusiveMinimum": 0
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean"
+          }
+        }
+      },
+      "ItemDetailResponse": {
+        "type": "object",
+        "required": [
+          "item",
+          "editability"
+        ],
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/Item"
+          },
+          "editability": {
+            "$ref": "#/components/schemas/Editability"
+          }
+        }
+      },
+      "ItemUomConversion": {
+        "x-source-table": "mdm.item_uom_conversion",
+        "type": "object",
+        "required": [
+          "itemUomConversionId",
+          "itemId",
+          "fromUomId",
+          "toUomId",
+          "conversionRate",
+          "effectiveFrom"
+        ],
+        "description": "ck_item_uom_distinct — 변환 전/후 단위가 같으면 불가. ck_item_uom_dates — 유효종료는 유효시작 이상(A-2 짝 제약)",
+        "properties": {
+          "itemUomConversionId": {
+            "x-source-column": "item_uom_conversion_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "itemId": {
+            "x-source-column": "item_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "fromUomId": {
+            "x-source-column": "from_uom_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "toUomId": {
+            "x-source-column": "to_uom_id",
+            "type": "integer",
+            "format": "int64",
+            "description": "ck_item_uom_distinct — fromUomId 와 같으면 불가"
+          },
+          "conversionRate": {
+            "x-source-column": "conversion_rate",
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "rate_t numeric(18,8) · CHECK > 0"
+          },
+          "effectiveFrom": {
+            "x-source-column": "effective_from",
+            "type": "string",
+            "format": "date"
+          },
+          "effectiveTo": {
+            "x-source-column": "effective_to",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "ck_item_uom_dates — 있으면 effectiveFrom 이상"
+          }
+        }
+      },
+      "ItemUomConversionListResponse": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemUomConversion"
+            }
+          }
+        }
+      },
+      "ItemExternalCode": {
+        "x-source-table": "mdm.item_external_code",
+        "type": "object",
+        "required": [
+          "itemExternalCodeId",
+          "itemId",
+          "externalSystemCode",
+          "externalItemCode"
+        ],
+        "description": "uq_item_external_code 의 COALESCE(partner_id,0) — A-7. 고객 바코드 체계의 저장처(W-06-05 §4-D)",
+        "properties": {
+          "itemExternalCodeId": {
+            "x-source-column": "item_external_code_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "itemId": {
+            "x-source-column": "item_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "externalSystemCode": {
+            "x-source-column": "external_system_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "공통코드"
+          },
+          "partnerId": {
+            "x-source-column": "partner_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "비우면 (전체) — uq_item_external_code 가 COALESCE(partner_id,0) 으로 접는다(A-7)"
+          },
+          "externalItemCode": {
+            "x-source-column": "external_item_code",
+            "type": "string",
+            "maxLength": 100
+          }
+        }
+      },
+      "ItemExternalCodeListResponse": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemExternalCode"
+            }
+          }
+        }
+      },
+      "ItemBuItemMap": {
+        "x-source-table": "mdm.item_bu_item_map",
+        "type": "object",
+        "required": [
+          "itemBuItemMapId",
+          "fromBusinessUnitId",
+          "fromItemId",
+          "toBusinessUnitId",
+          "toItemId",
+          "effectiveFrom"
+        ],
+        "description": "ck_item_bu_map_distinct — fromBusinessUnitId 와 toBusinessUnitId 가 같으면 불가. ck_item_bu_map_dates 짝 제약",
+        "properties": {
+          "itemBuItemMapId": {
+            "x-source-column": "item_bu_item_map_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "fromBusinessUnitId": {
+            "x-source-column": "from_business_unit_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "fromItemId": {
+            "x-source-column": "from_item_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "toBusinessUnitId": {
+            "x-source-column": "to_business_unit_id",
+            "type": "integer",
+            "format": "int64",
+            "description": "ck_item_bu_map_distinct — fromBusinessUnitId 와 같으면 불가"
+          },
+          "toItemId": {
+            "x-source-column": "to_item_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "effectiveFrom": {
+            "x-source-column": "effective_from",
+            "type": "string",
+            "format": "date"
+          },
+          "effectiveTo": {
+            "x-source-column": "effective_to",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "ck_item_bu_map_dates — 있으면 effectiveFrom 이상"
+          }
+        }
+      },
+      "ItemBuItemMapListResponse": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemBuItemMap"
+            }
+          }
+        }
+      },
+      "Bom": {
+        "x-source-table": "planning.bom",
+        "type": "object",
+        "required": [
+          "bomId",
+          "parentItemId",
+          "bomCode",
+          "bomVersion",
+          "statusCode",
+          "isDefault",
+          "effectiveFrom",
+          "baseQty",
+          "baseUomId"
+        ],
+        "description": "ERP 정본 — QA #3. uq_bom_default 는 부분 유일 인덱스라 동시에 둘을 막을 뿐 자동 전환은 하지 않는다. :set-default 는 서버가 한 트랜잭션으로 처리해야 한다 — 공유계약 A-6",
+        "properties": {
+          "bomId": {
+            "x-source-column": "bom_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "parentItemId": {
+            "x-source-column": "parent_item_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "bomCode": {
+            "x-source-column": "bom_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "uq_bom(parent_item_id, bom_code, bom_version) 구성"
+          },
+          "bomVersion": {
+            "x-source-column": "bom_version",
+            "type": "integer",
+            "minimum": 1,
+            "description": "CHECK > 0"
+          },
+          "statusCode": {
+            "x-source-column": "status_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "공통코드 — 값 목록 미정. W-06-11 「작성중만 편집」 규칙의 판정 컬럼"
+          },
+          "isDefault": {
+            "x-source-column": "is_default",
+            "type": "boolean",
+            "default": false,
+            "description": "uq_bom_default — 품목당 1개뿐(부분 유일). :set-default 로만 바꾼다"
+          },
+          "effectiveFrom": {
+            "x-source-column": "effective_from",
+            "type": "string",
+            "format": "date"
+          },
+          "effectiveTo": {
+            "x-source-column": "effective_to",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "ck_bom_dates — 있으면 effectiveFrom 이상"
+          },
+          "baseQty": {
+            "x-source-column": "base_qty",
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "qty_t · CHECK > 0"
+          },
+          "baseUomId": {
+            "x-source-column": "base_uom_id",
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "BomDetailResponse": {
+        "type": "object",
+        "required": [
+          "bom",
+          "editability"
+        ],
+        "properties": {
+          "bom": {
+            "$ref": "#/components/schemas/Bom"
+          },
+          "editability": {
+            "$ref": "#/components/schemas/Editability"
+          }
+        }
+      },
+      "BomListResponse": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "description": "품목당 BOM 헤더는 소수라 페이지네이션을 두지 않는다(Routing 목록과 같은 이유)",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Bom"
+            }
+          }
+        }
+      },
+      "BomComponent": {
+        "x-source-table": "planning.bom_component",
+        "type": "object",
+        "required": [
+          "bomComponentId",
+          "bomId",
+          "componentItemId",
+          "requiredQty",
+          "uomId",
+          "scrapRate",
+          "isMandatory",
+          "lotTraceRequired",
+          "backflushAllowed",
+          "sequenceNo"
+        ],
+        "description": "ERP 원본 열(sequenceNo·componentItemId·requiredQty·uomId·scrapRate·isMandatory)과 MES 확장 열(routingOperationId·actualUseProcessId·lotTraceRequired·backflushAllowed) 이 한 행에 섞인다 — W-06-05 §4-F. MES 확장 4열만 PUT 으로 편집한다. scrapRate 는 0~1 비율이며 퍼센트가 아니다(A-8)",
+        "properties": {
+          "bomComponentId": {
+            "x-source-column": "bom_component_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "bomId": {
+            "x-source-column": "bom_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "componentItemId": {
+            "x-source-column": "component_item_id",
+            "type": "integer",
+            "format": "int64",
+            "description": "ERP 원본"
+          },
+          "routingOperationId": {
+            "x-source-column": "routing_operation_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "MES 확장 — SQL 683 주석 「MES 등록(관리) 공정」"
+          },
+          "actualUseProcessId": {
+            "x-source-column": "actual_use_process_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "MES 확장 — SQL 684 주석 「실제 사용 공정」. routingOperationId 와 다를 수 있다"
+          },
+          "requiredQty": {
+            "x-source-column": "required_qty",
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "ERP 원본 · qty_t · CHECK > 0"
+          },
+          "uomId": {
+            "x-source-column": "uom_id",
+            "type": "integer",
+            "format": "int64",
+            "description": "ERP 원본"
+          },
+          "scrapRate": {
+            "x-source-column": "scrap_rate",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0,
+            "description": "ERP 원본 · CHECK BETWEEN 0 AND 1 — 비율이지 퍼센트가 아니다(A-8)"
+          },
+          "isMandatory": {
+            "x-source-column": "is_mandatory",
+            "type": "boolean",
+            "default": true,
+            "description": "ERP 원본"
+          },
+          "lotTraceRequired": {
+            "x-source-column": "lot_trace_required",
+            "type": "boolean",
+            "default": false,
+            "description": "MES 확장 — 투입 시 자재 LOT 스캔 강제 여부"
+          },
+          "backflushAllowed": {
+            "x-source-column": "backflush_allowed",
+            "type": "boolean",
+            "default": false,
+            "description": "MES 확장 — 실적 등록 시 자동 차감 허용"
+          },
+          "sequenceNo": {
+            "x-source-column": "sequence_no",
+            "type": "integer",
+            "minimum": 1,
+            "default": 1,
+            "description": "ERP 원본 · uq_bom_component(bom_id, sequence_no) · CHECK > 0"
+          }
+        }
+      },
+      "BomComponentUpdate": {
+        "x-source-table": "planning.bom_component",
+        "type": "object",
+        "required": [
+          "lotTraceRequired",
+          "backflushAllowed"
+        ],
+        "description": "BOM 구성품 MES 확장 열 수정 요청 — 편집 가능한 4열만 담는다. 근거: W-06-05 §4-F·§5-1",
+        "properties": {
+          "routingOperationId": {
+            "x-source-column": "routing_operation_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "actualUseProcessId": {
+            "x-source-column": "actual_use_process_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "lotTraceRequired": {
+            "x-source-column": "lot_trace_required",
+            "type": "boolean"
+          },
+          "backflushAllowed": {
+            "x-source-column": "backflush_allowed",
+            "type": "boolean"
+          }
+        }
+      },
+      "BomComponentListResponse": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BomComponent"
             }
           }
         }
