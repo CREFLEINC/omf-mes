@@ -1,0 +1,121 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "omf-mes 기준정보 도메인 API (초안)",
+    "version": "0.1.0",
+    "description": "화면 상세 스펙 확대 1차에서 도출한 계약 초안. 정본은 물리 모델이며 이 문서는 그것을 옮긴 것이다. 근거·맥락은 deliverables/06-API-요구서.md 를 본다. WBS P0.4 API 계약 v0 의 초안 입력이며 계약 확정·소유는 통합 Agent 소관이다."
+  },
+  "servers": [{ "url": "/api", "description": "온프레미스 설치형" }],
+  "tags": [
+    { "name": "mdm", "description": "기준정보 마스터" },
+    { "name": "app", "description": "사용자·권한" },
+    { "name": "planning", "description": "공정 순서·BOM" },
+    { "name": "quality", "description": "품질 기준" },
+    { "name": "integration", "description": "ERP 연계 실행" },
+    { "name": "audit", "description": "변경 이력" },
+    { "name": "lookup", "description": "선택 목록 — 관리 화면이 없는 조회 전용" }
+  ],
+  "paths": {},
+  "components": {
+    "parameters": {
+      "IdempotencyKey": {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": true,
+        "schema": { "type": "string", "format": "uuid" },
+        "description": "전 쓰기 API 필수. 근거: deliverables/02-SW설계사양서 §3.3"
+      },
+      "IfMatchVersion": {
+        "name": "If-Match",
+        "in": "header",
+        "required": true,
+        "schema": { "type": "string" },
+        "description": "낙관적 잠금용 version_no. 근거: 공유계약 B-1"
+      }
+    },
+    "schemas": {
+      "ErrorItem": {
+        "type": "object",
+        "required": ["scope", "code", "message"],
+        "properties": {
+          "scope": {
+            "type": "string",
+            "enum": ["field", "screen"],
+            "description": "오류의 범위. 근거: 공유계약 G-1 — 한 필드의 문제는 인라인, 화면 수준 문제는 배너"
+          },
+          "field": { "type": "string", "description": "scope=field 일 때 대상 프로퍼티명" },
+          "code": { "type": "string", "description": "UNIQUE_VIOLATION · REQUIRED · RANGE · PAIR · PERMISSION_DENIED 등" },
+          "uniqueScope": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "code=UNIQUE_VIOLATION 일 때 어느 유일키 범위에서 중복인지. 근거: 공유계약 A-1 — 범위 없이 「중복」만 오면 화면이 문구를 만들 수 없다"
+          },
+          "message": { "type": "string" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["errors"],
+        "properties": {
+          "errors": { "type": "array", "items": { "$ref": "#/components/schemas/ErrorItem" } }
+        }
+      },
+      "ConflictResponse": {
+        "type": "object",
+        "required": ["conflictCause", "message"],
+        "properties": {
+          "conflictCause": {
+            "type": "string",
+            "enum": ["user", "erpSync", "workerLease"],
+            "description": "충돌 원인. 근거: 공유계약 B-1 확장 — user=다른 사용자, erpSync=ERP 재동기화 배치, workerLease=워커가 처리 중. 구분 없이 내려주면 화면이 「다른 사용자가 먼저 수정했습니다」라는 사실과 다른 안내를 하게 된다"
+          },
+          "message": { "type": "string" }
+        }
+      },
+      "BatchFailure": {
+        "type": "object",
+        "required": ["index", "errors"],
+        "properties": {
+          "index": { "type": "integer", "description": "요청 배열에서의 위치" },
+          "key": { "type": "string", "description": "식별 가능한 값(코드 등)" },
+          "errors": { "type": "array", "items": { "$ref": "#/components/schemas/ErrorItem" } }
+        }
+      },
+      "BatchResult": {
+        "type": "object",
+        "required": ["succeeded", "failed"],
+        "description": "일괄 처리 결과. 근거: 공유계약 C-2 — 전체 롤백하지 않고 거부 건만 되돌린다",
+        "properties": {
+          "succeeded": { "type": "integer" },
+          "failed": { "type": "array", "items": { "$ref": "#/components/schemas/BatchFailure" } }
+        }
+      },
+      "Editability": {
+        "type": "object",
+        "required": ["codeEditable", "reason"],
+        "description": "코드 필드 수정 가능 여부. 근거: 공유계약 B-4 — 참조 건수가 0일 때만 수정 허용. 화면이 별도 호출로 세면 화면마다 다르게 구현된다",
+        "properties": {
+          "codeEditable": { "type": "boolean" },
+          "reason": {
+            "type": "string",
+            "enum": ["EDITABLE", "REFERENCED", "NOT_COUNTABLE", "RECEIVED_FROM_ERP"],
+            "description": "NOT_COUNTABLE = 참조가 FK 가 아니라 세지 못함(의도적 비-FK 또는 코드 문자열 참조) → 화면은 무조건 잠근다. RECEIVED_FROM_ERP = 수신본이라 항상 읽기 전용"
+          },
+          "referenceCount": {
+            "type": ["integer", "null"],
+            "description": "reason=NOT_COUNTABLE 이면 null"
+          }
+        }
+      },
+      "PageMeta": {
+        "type": "object",
+        "required": ["page", "size", "total"],
+        "properties": {
+          "page": { "type": "integer" },
+          "size": { "type": "integer" },
+          "total": { "type": "integer" }
+        }
+      }
+    }
+  }
+}
