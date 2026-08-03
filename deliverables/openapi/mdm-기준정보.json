@@ -4142,7 +4142,7 @@
           "planning"
         ],
         "summary": "BOM 구성품 상세",
-        "description": "ERP 원본 열(sequenceNo·componentItemId·requiredQty·uomId·scrapRate·isMandatory)과 MES 확장 열(routingOperationId·actualUseProcessId·lotTraceRequired·backflushAllowed)이 한 행에 섞인다. editability 는 원본 열이 항상 잠김임을 알린다(RECEIVED_FROM_ERP) — `Item`(같은 화면)과 같은 원리. 행 단위 GET 신설로 `PUT` 의 `If-Match` 가 실을 `ETag` 자리가 비로소 생겼다(§5 미착지 16 해소 — 2026-08-03 사용자 결정). 근거: W-06-05 §5-1 「구성품 확장 열 편집」",
+        "description": "ERP 원본 열(sequenceNo·componentItemId·requiredQty·uomId·scrapRate·isMandatory)과 MES 확장 열(routingOperationId·actualUseProcessId·lotTraceRequired·backflushAllowed)이 한 행에 섞인다. editability 는 원본 열이 항상 잠김임을 알린다(RECEIVED_FROM_ERP) — `Item`(같은 화면)과 같은 원리. 참조 건수로 갈리지 않는다 — MES 확장 4열은 항상 편집 가능하고 나머지는 항상 잠김이다. 행 단위 GET 신설로 `PUT` 의 `If-Match` 가 실을 `ETag` 자리가 비로소 생겼다(§5 미착지 16 해소 — 2026-08-03 사용자 결정). 근거: W-06-05 §5-1 「구성품 확장 열 편집」",
         "responses": {
           "200": {
             "description": "상세",
@@ -9480,7 +9480,6 @@
           "bomComponent",
           "editability"
         ],
-        "description": "editability 는 `Item`(같은 화면 W-06-05)과 같은 원리 — 원본 열이 항상 잠김임을 알린다(RECEIVED_FROM_ERP 고정). 참조 건수로 갈리지 않는다 — MES 확장 4열은 항상 편집 가능하고 나머지는 항상 잠김이다",
         "properties": {
           "bomComponent": {
             "$ref": "#/components/schemas/BomComponent"
