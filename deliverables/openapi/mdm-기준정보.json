@@ -2171,7 +2171,7 @@
           "mdm"
         ],
         "summary": "코드그룹 등록",
-        "description": "근거: W-06-06 §5-1 「그룹 추가」 · 공유계약 A-1(유일 위반은 범위를 담아 응답). ⚠ 코드그룹의 정본이 ERP 인지 MES 인지는 미결이다(§5-4 「구멍」 · §8-7 — WF06 S1 Boundary 는 「정본=ERP」이나 Action 은 「MES 에서 정의」라 원문 안에서 갈린다). 결정 전까지는 등록을 막지 않는다",
+        "description": "⚠ 코드그룹의 정본이 ERP 인지 MES 인지는 미결이다(§5-4 「구멍」 · §8-7 — WF06 S1 Boundary 는 「정본=ERP」이나 Action 은 「MES 에서 정의」라 원문 안에서 갈린다). 결정 전까지는 등록을 막지 않는다. 근거: W-06-06 §5-1 「그룹 추가」 · 공유계약 A-1(유일 위반은 범위를 담아 응답)",
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
@@ -8079,7 +8079,7 @@
           "displayOrder",
           "isActive"
         ],
-        "description": "미착지: 다국어(한/베) 명칭 — #64. ck_code_value_dates 짝 제약. display_order 에는 유일 제약이 없어 순서 재배치에 전체 치환이 불필요하다 — 공유계약 A-5 대상 아님",
+        "description": "미착지: 다국어(한/베) 명칭 — #64. ck_code_value_dates 짝 제약. display_order 에는 유일 제약이 없어 순서 재배치에 전체 치환이 불필요하다 — 공유계약 A-5 대상 아님. 미착지: 수신본 식별 플래그 — #65. ERP 수신본이라 읽기 전용이어야 하는데 판정할 컬럼이 없다",
         "properties": {
           "codeValueId": {
             "x-source-column": "code_value_id",
@@ -9967,7 +9967,7 @@
           "defectName",
           "isActive"
         ],
-        "description": "2계층(parent_defect_code_id). ck_*_parent 자기참조 CHECK 가 없다 — department·location 에는 있는데 여기엔 없다(비대칭·#64). 3계층 이상은 결정 12 위반이라 서버가 차단한다. 미착지: 처분구분·다국어(ko/vi)·공정 N:M 매핑 — #64. N:M 테이블이 없어 공정 매핑 엔드포인트가 성립하지 않는다",
+        "description": "2계층(parent_defect_code_id). ck_*_parent 자기참조 CHECK 가 없다 — department 에만 있고 location·defect_code 엔 둘 다 없다(#64). 3계층 이상은 결정 12 위반이라 서버가 차단한다. 미착지: 처분구분·다국어(ko/vi)·공정 N:M 매핑 — #64. N:M 테이블이 없어 공정 매핑 엔드포인트가 성립하지 않는다",
         "properties": {
           "defectCodeId": {
             "x-source-column": "defect_code_id",
@@ -10322,7 +10322,8 @@
           "createdAt": {
             "x-source-column": "created_at",
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "감사 컬럼 제외 원칙(공유계약 A-4)의 의도된 예외다. 이 테이블은 created_at 하나만 있고 created_by·updated_at·updated_by·version_no 는 없으며, created_at 은 워크플로 타임스탐프로서 화면 W-06-10 §4-B 가 「생성」 열로 명시 요구한다"
           },
           "availableAt": {
             "x-source-column": "available_at",
