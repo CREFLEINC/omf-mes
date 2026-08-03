@@ -6662,7 +6662,7 @@
           "lookup"
         ],
         "summary": "설비 목록",
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 화면이 쓰는 것은 equipmentId·equipmentName 과 calibrationRequired·calibrationDueDate 다 — 뒤 둘은 교정 만료 장비를 지정할 때 경고를 띄우는 판정 입력이다(W-06-02 §6, 공유계약 A-9 ⓑ 경고). statusCode·equipmentTypeCode·plantId·processId·productionLineId·lastCalibrationDate 는 이 화면이 표시하지 않는다 — 물리 모델 1:1 유지로 옮겼을 뿐이다. 근거: W-06-02 §4-C 지정 검사장비",
+        "description": "선택 목록용(이 10화면 기준). 관리 화면 자체는 있다 — W-05-12 설비·설비그룹 마스터(도메인 05, 인벤토리 108건에 포함) — 단 이 API가 다루는 10화면 범위에서는 조회 전용이다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 화면이 쓰는 것은 equipmentId·equipmentName 과 calibrationRequired·calibrationDueDate 다 — 뒤 둘은 교정 만료 장비를 지정할 때 경고를 띄우는 판정 입력이다(W-06-02 §6, 공유계약 A-9 ⓑ 경고). statusCode·equipmentTypeCode·plantId·processId·productionLineId·lastCalibrationDate 는 이 화면이 표시하지 않는다 — 물리 모델 1:1 유지로 옮겼을 뿐이다. 근거: W-06-02 §4-C 지정 검사장비",
         "parameters": [
           {
             "name": "q",
@@ -11112,7 +11112,7 @@
           "calibrationRequired",
           "isActive"
         ],
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 화면이 쓰는 것은 equipmentId·equipmentName 과 calibrationRequired·calibrationDueDate 다 — 뒤 둘은 교정 만료 장비를 지정할 때 경고를 띄우는 판정 입력이다(W-06-02 §6, 공유계약 A-9 ⓑ 경고). statusCode·equipmentTypeCode·plantId·processId·productionLineId·lastCalibrationDate 는 이 화면이 표시하지 않는다 — 물리 모델 1:1 유지로 옮겼을 뿐이다. 근거: W-06-02 §4-C 지정 검사장비",
+        "description": "선택 목록용(이 10화면 기준). 관리 화면 자체는 있다 — W-05-12 설비·설비그룹 마스터(도메인 05, 인벤토리 108건에 포함) — 단 이 API가 다루는 10화면 범위에서는 조회 전용이다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 화면이 쓰는 것은 equipmentId·equipmentName 과 calibrationRequired·calibrationDueDate 다 — 뒤 둘은 교정 만료 장비를 지정할 때 경고를 띄우는 판정 입력이다(W-06-02 §6, 공유계약 A-9 ⓑ 경고). statusCode·equipmentTypeCode·plantId·processId·productionLineId·lastCalibrationDate 는 이 화면이 표시하지 않는다 — 물리 모델 1:1 유지로 옮겼을 뿐이다. 근거: W-06-02 §4-C 지정 검사장비",
         "properties": {
           "equipmentId": {
             "x-source-column": "equipment_id",

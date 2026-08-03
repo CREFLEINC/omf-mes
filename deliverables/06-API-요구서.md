@@ -36,7 +36,7 @@ WBS §4.2 **P0.4**가 「API 계약 v0 + 목업 서버」로 이미 계획돼 �
 | **대상 화면 10** | `W-CO-02` · `W-06-01`~`06` · `W-06-07` · `W-06-10` · `W-06-11` |
 | **API를 정의할 수 없는 화면 3** | `W-06-08` · `W-06-09` · `W-06-12` — §6 |
 | **통합 폐지 1** | `W-06-13`(검사정책 설정) — 확대 1차에서 `W-06-02`에 흡수 |
-| **조회 전용 8종** | `uom` · `partner` · `legal_entity` · `business_unit` · `plant` · `production_line` · `process` · `equipment` — 관리 화면이 인벤토리 108건에 **하나도 없다**(실측) |
+| **조회 전용 8종** | `uom` · `partner` · `legal_entity` · `business_unit` · `plant` · `production_line` · `process` · `equipment` — **`equipment`는 예외**(`W-05-12` 설비·설비그룹 마스터가 인벤토리에 있다, 도메인 05). 나머지 7종은 관리 화면이 인벤토리 108건에 **하나도 없다**(실측) |
 
 ---
 
@@ -185,7 +185,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 매핑 토글 | **없음 — 미착지 #64.** 공정–불량코드 **N:M 매핑 테이블이 물리 모델에 없다**(결정 12가 N:M 조정을 승인했으나 17일 뒤 물리 모델이 조정 전 형태로 굳었다) | §4-D·§8-1 |
 | 변경 이력 | `GET /audit/events` | §5-1 · B-5 |
 
-- **자기참조·3계층을 DB가 막지 않는다.** `department`에는 `ck_department_parent`가 있는데 `defect_code`·`location`에는 **둘 다 없다**(실측). 서버가 차단한다 — A-9 ⓐ. 이 비대칭 자체가 §5 미착지 11이다.
+- **자기참조·3계층을 DB가 막지 않는다.** `department`·`production_line` 등 계층 컬럼을 가진 대다수 테이블에는 `ck_*_parent`가 있는데 `defect_code`·`location`에는 **둘 다 없다**(실측). 서버가 차단한다 — A-9 ⓐ. 이 비대칭 자체가 §5 미착지 11이다.
 - 대분류 사용 중지 시의 **하위 건수**는 추가 호출로 세지 않는다 — `GET /quality/defect-codes`가 2계층 전체를 주므로 화면이 이미 갖고 있다.
 
 ### 3-5. `W-06-04` 판정유형 코드 마스터
@@ -401,7 +401,9 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 
 ## §4-1. 공통 규약 대조표 — 공유계약이 어느 스키마·필드로 구현됐는가
 
-> ⚠ **「8건」은 낡은 수다.** `00-설계.md` §1-1이 센 8건은 v0.3 시점(API 파급 5 + 서버 동작 규정 3)이고, **공유계약은 v0.4에서 신규 조항 17건이 늘었다.** 아래는 OpenAPI `description`이 **실제로 인용한 조항을 세어** 만든 것이다 — **20개 조항 · 인용 273회**(경로 210 · 스키마 61 · 공통 파라미터 2).
+> ⚠ **「8건」은 낡은 수다.** `00-설계.md` §1-1이 센 8건은 v0.3 시점(API 파급 5 + 서버 동작 규정 3)이고, **공유계약은 v0.4에서 신규 조항 17건이 늘었다.** 아래는 OpenAPI `description`이 **실제로 인용한 조항을 세어** 만든 것이다 — **20개 조항 · 인용 279회**(경로 216 · 스키마 61 · 공통 파라미터 2).
+>
+> **계수 방법**: `paths`·`components.schemas`·`components.parameters` 전체를 순회하며 `description`·`summary` 문자열 안의 `[A-G]-숫자(-숫자)?` 형태 조항 토큰(예: `A-1`·`B-4-1`)을 정규식으로 센다 — 고객 회신 코드 `E-9`는 조항이 아니므로 제외한다. `bom_component` 행 단위 GET 신설(2026-08-03) 뒤 재계수하지 않아 남아 있던 낡은 수(273·경로 210)를 이번에 재현·정정했다.
 >
 > 인용 수는 「얼마나 널리 걸리는가」의 대략적 신호일 뿐이다. **A-4·B-1이 유독 큰 것은 이번에 추가한 `ETag`/`If-Match` 설명이 리소스마다 같은 문장을 반복하기 때문**이고, 조항의 중요도 순위가 아니다.
 
@@ -409,13 +411,13 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | --- | --- | --- | :-: |
 | **A-1** | 유일 위반은 **범위**를 담아 응답 | `ErrorItem.uniqueScope`(배열) + `code: "UNIQUE_VIOLATION"` · 전 `POST`/`PUT`의 400 | 11 |
 | **A-2** | 조건부 필수·짝 제약을 **관련 필드에 함께** | `ErrorItem.scope="field"` 다건 + `code: "PAIR"` · `ck_*_dates`·`ck_external_warehouse_partner` 등을 `description`에 명시 | 8 |
-| **A-4** | 감사 컬럼 5종·`version_no`를 노출하지 않는다 | 전 스키마에서 5종 제외(예외 1건 — 아래 편차 표) · `version_no`는 **`ETag`/`If-Match` 헤더로만** 오간다(본문 필드 아님) | 64 |
+| **A-4** | 감사 컬럼 5종·`version_no`를 노출하지 않는다 | 전 스키마에서 5종 제외(예외 1건 — 아래 편차 표) · `version_no`는 **`ETag`/`If-Match` 헤더로만** 오간다(본문 필드 아님) | 68 |
 | **A-5** | 순서 재배치는 **서버가 한 트랜잭션**으로 | 라인 **전체 치환 PUT 2곳** — `routing_operation` · `inspection_item_spec`. 세 번째 대상인 `bom_component.sequence_no`는 **ERP 원본이라 MES가 재배치하지 않는다**(편집 대상이 확장 4열뿐) → 행 단위 PUT | 7 |
 | **A-6** | 「하나만 참」 전환도 서버가 | `POST /planning/boms/{id}:set-default` — 해제·설정을 한 트랜잭션으로 | 2 |
 | **A-7** | `COALESCE` 부분 유일 인덱스는 빈 축을 `(전체)`로 | `user_data_scope`·`worker_qualification`·`item_external_code`의 PUT `description` | 10 |
 | **A-8** | 수치 컬럼의 **저장 단위**를 못박는다 | `scrapRate`·`standardYieldRate` = **비율 0~1**(`%` 변환은 화면 책임) · `standardCycleTimeSec` = 초 | 7 |
 | **A-9** | DB가 막지 않는 검증은 **3등급**(차단/경고/표시만) | ⓐ 차단 = 400(순환 참조·3계층·자기참조) · ⓑ 경고 = 화면 책임으로 명시(교정 만료 장비·전사 고정 축) | 10 |
-| **B-1** | 낙관적 잠금 — **덮어쓰기 강제 없음** · 원인 3종 구분 | `ConflictResponse.conflictCause` `user`/`erpSync`/`workerLease` + `If-Match` 필수 + **`ETag` 응답 헤더** | 65 |
+| **B-1** | 낙관적 잠금 — **덮어쓰기 강제 없음** · 원인 3종 구분 | `ConflictResponse.conflictCause` `user`/`erpSync`/`workerLease` + `If-Match` 필수 + **`ETag` 응답 헤더** | 67 |
 | **B-2** | 「입력」과 「확정」의 2단계 분리 | `PUT`(값 저장)과 `:confirm`(상태 전이)을 **다른 오퍼레이션**으로 | 4 |
 | **B-4** | 물리 삭제 금지 · **참조 0일 때만 코드 수정** | `:deactivate` **10개** · `Editability{codeEditable, reason, referenceCount}` — **16개 `XDetailResponse`에 전건**(`bom_component` 포함) | 31 |
 | **B-4-1** | ERP 수신본 편집 게이트 | ⚠ **`sourceType` 자리표를 두지 않았다** — 아래 주 참조. `Editability.reason = RECEIVED_FROM_ERP`(`worker`·`item`·`bom`)로 표현 | 0* |
@@ -457,7 +459,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | **8** | **ERP 수신본 판정 컬럼** | ⚠ **가장 위험한 항목이다.** `code_group`·`code_value`·`department`는 ERP 수신본일 가능성이 있어 읽기 전용이어야 하는데(§5-4·B-4-1), **그것을 판정할 컬럼이 물리 모델에 없다.** 그래서 **API가 지금 이 셋의 쓰기를 열어 두고 있다** — 구현팀이 「완전 편집 가능」으로 오인하면 **MES에서 고친 값이 다음 재동기화에 조용히 덮인다.** 각 스키마 `description`에 이 사실을 적어 뒀으나 **API가 강제하지는 못한다** | **#65** |
 | **9** | I/F 연계정의 · 송신 항목 on/off 테이블 | `W-06-09`·`W-06-12` **엔드포인트 전무** — §6 | **#66** |
 | **10** | **`audit.audit_event` 사용 규약** | 변경 이력 응답을 **사람이 읽게 만들 수 없다.** `target_id`가 **FK가 아니고**(유형별로 다른 테이블) `before/after` **jsonb 키 규약이 없다.** 그래서 ① 리소스별 `/history`를 만들지 않고 **횡단 `GET /audit/events` 하나**로 갔고 ② `W-06-11`이 「MES 정본 / ERP 정본」을 행마다 가를 수 없다(`target_type_code` 값 목록 미정) | **#68** |
-| **11** | **자기참조 CHECK의 비대칭** | `mdm.location`·`quality.defect_code`에 자기참조 CHECK가 **없다** — `department`에만 있다(실측 정정). **계층 순환을 DB가 막지 않으므로 서버가 막아야 한다**(A-9 ⓐ). 계약에 적었으나 강제는 애플리케이션 책임이다 | **#64(추가)** |
+| **11** | **자기참조 CHECK의 비대칭** | `mdm.location`·`quality.defect_code`에 자기참조 CHECK가 **없다** — `department`·`production_line` 등 계층 컬럼을 가진 대다수 테이블에는 있다(실측 정정 — 「department에만」은 과잉 정정이었다). **계층 순환을 DB가 막지 않으므로 서버가 막아야 한다**(A-9 ⓐ). 계약에 적었으나 강제는 애플리케이션 책임이다 | **#64(추가)** |
 | **12** | 인증 수단 · 권한의 **법인 축** | `app_user`에 `password_hash` 류 전무 → `loginId`는 항상 `NOT_COUNTABLE`. `user_data_scope`에 `legal_entity_id`가 없어 **법인 단위 부여가 사업부 나열로만** 가능하다 → 사업부 추가 시 **격리 구멍**. `GET /mdm/legal-entities`가 어느 화면에도 안 쓰이는 이유이기도 하다 | **#69** |
 | **13** | 판정유형 「**회신 전 임시 등록분**」 표식 | `W-06-04` §6이 「재검토 대상으로 표시」를 요구하는데 그것을 판정할 컬럼이 `code_value`에 없다 — 회신 도착 전후를 서버도 화면도 모른다 | **#64(추가)** |
 | **14** | **공통코드 그룹·값 목록 미정** | 선택 목록이 `GET /mdm/code-values?codeGroupId=`로 오는데 **어느 그룹인지가 정해져 있지 않다**(창고유형·관리수준·Location유형·품질구역·보관조건·판정유형·상태코드 …). 화면이 그룹 키를 **하드코딩할 수 없다** → 진입 호출 수가 정해지지 않는 근본 원인(4-2 ①) | 회신 **E-3** 등 · 각 화면 §8 |
