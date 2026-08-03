@@ -1,11 +1,55 @@
 # -*- coding: utf-8 -*-
-"""화면 목록·IA 도식본 — 단일 HTML(외부 asset 0) 생성."""
-import io, json, sys
+"""화면 목록·IA 도식본 — 단일 HTML(외부 asset 0) 생성.
 
-ROWS = json.load(io.open(sys.argv[1], encoding='utf-8'))
-OUT  = sys.argv[2]
+**2026-08-03 최종 검토 정정**: 이전 판은 ROWS 를 저장소에 없는 중간 JSON(CLI 인자)으로
+받았다 — 「저장소에 없어 완전 재현 불가 · screen-inventory-ia.md 값을 반자동 이관」이라는
+주석을 커밋된 HTML 에 손으로 남겨야 했다(화면 수가 바뀔 때마다 재생성이 아니라 수동 정합).
+이번에 **정본 md 를 직접 파싱**하도록 바꿔 그 한계를 없앴다 — build-04-ia-도식본.py 와 같은
+방식(md 가 유일한 데이터 원천 · 빌드 assert)이다.
 
-NEW  = {'M-04-04','W-06-13','W-CO-08'}
+사용법: python3 build-도식본.py [md경로] [출력경로]
+  둘 다 기본값이 있다 — md경로 기본값 = 이 스크립트와 같은 폴더의 screen-inventory-ia.md,
+  출력경로 기본값 = 같은 폴더의 화면목록-IA-도식본.html.
+"""
+import io, json, os, re, sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+SRC  = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, 'screen-inventory-ia.md')
+OUT  = sys.argv[2] if len(sys.argv) > 2 else os.path.join(HERE, '화면목록-IA-도식본.html')
+
+# ── 정본 파싱 — §3 화면 인벤토리 표만 읽는다(md 가 유일한 데이터 원천) ──
+_ROW = re.compile(r'^\|\s*`([WPM]-(?:CO|\d{2})-\d{2})`\s*\|(.+)$')
+_MD  = re.compile(r'\*\*([^*]+)\*\*|`([^`]+)`')
+
+def _plain(s):
+    """화면명·행위자 셀의 강조 마크다운(**굵게**·`코드`)을 걷어낸다 —
+    이 도식은 칩 라벨에 원문 텍스트만 쓰고 마크다운을 렌더링하지 않는다."""
+    return _MD.sub(lambda m: m.group(1) or m.group(2), s)
+
+def parse_rows(md):
+    seg = re.search(r'## 3\. 화면 인벤토리(.*?)## 4\.', md, re.S).group(1)
+    rows, seen = [], set()
+    for ln in seg.split('\n'):
+        m = _ROW.match(ln)
+        if not m:
+            continue
+        cells = [c.strip() for c in m.group(2).split('|')]
+        if len(cells) < 6:
+            continue
+        sid = m.group(1)
+        if sid in seen:
+            raise SystemExit('중복 행: ' + sid)
+        seen.add(sid)
+        prog = {'W': 'web', 'P': 'pop', 'M': 'mob'}[sid[0]]
+        dom = sid.split('-')[1]
+        rows.append([sid, _plain(cells[0]), cells[1], _plain(cells[2]), cells[4], prog, dom])
+    return rows
+
+ROWS = parse_rows(io.open(SRC, encoding='utf-8').read())
+if len(ROWS) != 108:
+    raise SystemExit('화면 %d건 (108 아님)' % len(ROWS))
+
+NEW  = {'M-04-04','W-CO-08'}
 GONE = [('M-01-03','IQC 대상 LOT 스캔','mob','01-S-C 전체 웹 확정 → W-01-01 병합'),
         ('M-04-02','피킹 대상 목록','mob','목록 진입 경로 기준 → M-04-01 통합'),
         ('W-03-06','불량·부적합 판정·폐기 품의','web','03 co-locate 위반 · 소유 엔티티 0 — 판정은 검사 화면, 품의는 도메인 품의 화면으로 이미 갈림'),
@@ -14,7 +58,8 @@ GONE = [('M-01-03','IQC 대상 LOT 스캔','mob','01-S-C 전체 웹 확정 → W
         ('W-02-09','생산 현황·비가동 알람 대시보드','web','<b>v1.3</b> · REQ-PR-0016은 <b>알람</b> 요구 → 알람은 W-CO-03 알림센터 · 생산 실적 집계는 W-02-08 · 일일생산실적은 W-CO-05'),
         ('W-03-08','품질 대시보드·불량 발생 알람','web','<b>v1.3</b> · 동상 → 알람은 W-CO-03 · <b>불량률·불량코드 분포 집계</b>는 W-03-05'),
         ('W-04-09','출하 현황 모니터링 대시보드','web','<b>v1.3</b> · QA #21 「현행 모니터링 없음 · <b>추후</b> 고객 요구」 = 아직 요구가 아님 → W-04-02 출하 예정 목록 · W-04-08 완제품 재고 조회'),
-        ('W-05-14','설비·툴 대시보드','web','<b>v1.3</b> · REQ-PR-0036 하나가 화면 둘을 정당화하지 못한다 → W-CO-05 통합 · 가동률/OEE는 W-05-08 · PM 도래는 W-05-02')]
+        ('W-05-14','설비·툴 대시보드','web','<b>v1.3</b> · REQ-PR-0036 하나가 화면 둘을 정당화하지 못한다 → W-CO-05 통합 · 가동률/OEE는 W-05-08 · PM 도래는 W-05-02'),
+        ('W-06-13','검사정책 설정(전수/샘플·샘플 비율·합격판정개수)','web','<b>v1.5</b> · 개념모델 검사정책 속성 11개 중 7개가 W-06-02의 <code>inspection_plan(_version)</code>에 착지 — 신설 근거 소멸 → <b>W-06-02로 통합·폐지</b>')]
 
 NAME = {r[0]: r[1] for r in ROWS}
 
@@ -33,7 +78,7 @@ STAGES = [
 BANDS = [
  ('예외·역흐름', '반품 · 폐기 · 재고조정 · 재작업', {'mob':['M-01-10','M-01-11'], 'pop':[], 'web':['W-01-04','W-01-12','W-01-05','W-01-06','W-04-06','W-04-11','W-04-07','W-04-10']}),
  ('설비·툴 (05)', '점검 · 보전 · 비가동 · 계측', {'mob':['M-05-01','M-05-02'], 'pop':['P-05-01','P-05-02'], 'web':['W-05-01','W-05-02','W-05-03','W-05-04','W-05-05','W-05-06','W-05-07','W-05-08','W-05-09','W-05-10','W-05-11','W-05-12','W-05-13']}),
- ('기준정보·연계 (06)', '마스터 · Rev · I/F', {'mob':[], 'pop':[], 'web':['W-06-01','W-06-02','W-06-03','W-06-04','W-06-05','W-06-06','W-06-07','W-06-08','W-06-09','W-06-10','W-06-11','W-06-12','W-06-13']}),
+ ('기준정보·연계 (06)', '마스터 · Rev · I/F', {'mob':[], 'pop':[], 'web':['W-06-01','W-06-02','W-06-03','W-06-04','W-06-05','W-06-06','W-06-07','W-06-08','W-06-09','W-06-10','W-06-11','W-06-12']}),
  ('공통 (CO)', '계정 · 알림 · 대시보드 · 설정', {'mob':['M-CO-01'], 'pop':[], 'web':['W-CO-01','W-CO-02','W-CO-03','W-CO-04','W-CO-05','W-CO-06','W-CO-08']}),
  ('조회', '전 도메인 (도식 앵커 밖 · 별도 트랙 18건에 다수 포함 · v1.3에서 대시보드 5건이 빠져 순수 조회만 남았다)', {'mob':[], 'pop':[], 'web':['W-03-04','W-03-05','W-04-08']}),
 ]
@@ -68,7 +113,7 @@ mtot = ''.join('<td class="tot">%d</td>' % sum(mat.get((d,p),0) for d,_ in DOMS)
 # ── 관리웹 메뉴 트리
 TREE = [
  ('기준정보', [('마스터', ['W-06-01','W-06-05','W-06-06','W-06-07','W-06-08','W-06-11']),
-              ('품질 기준', ['W-06-02','W-06-03','W-06-04','W-06-13']),
+              ('품질 기준', ['W-06-02','W-06-03','W-06-04']),
               ('연계(I/F)', ['W-06-09','W-06-12','W-06-10'])]),
  ('생산',     [('계획·지시', ['W-02-01','W-02-02','W-02-03','W-02-04','W-02-07','W-02-06','W-02-10']),
               ('마감·모니터링', ['W-02-05','W-02-08'])]),
@@ -125,7 +170,7 @@ new_html  = ''.join('<div class="gone"><span class="chip %s new"><b>%s</b>%s</sp
 DOC = io.open(OUT, 'w', encoding='utf-8')
 DOC.write('''<!doctype html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>화면 목록 · IA 도식본 (v1.3)</title>
+<title>화면 목록 · IA 도식본 (v1.5)</title>
 <style>
 *,*::before,*::after{box-sizing:border-box}
 :root{
@@ -233,13 +278,13 @@ table th:first-child span{display:block;font-weight:400;font-size:11px;color:var
 </style></head><body><div class="wrap">
 
 <h1>화면 목록 · IA 도식본</h1>
-<p class="sub">CREFLE · OMF MES UI/UX · <b>v1.3</b> (2026-07-29) · 내부 대외비<br>
-정본 = <code>screen-inventory-ia.md</code> v1.3 · 결정 근거 = <code>보류결정-확정기록.md</code> v1.4 · <code>비도식근거-적용결과.md</code> §2 · 판정 기준 = <code>screen-mapping-rule.md</code> v1.3</p>
+<p class="sub">CREFLE · OMF MES UI/UX · <b>v1.5</b> (2026-08-03) · 내부 대외비<br>
+정본 = <code>screen-inventory-ia.md</code> v1.5 · 결정 근거 = <code>보류결정-확정기록.md</code> v1.4 · <code>비도식근거-적용결과.md</code> §2 · 판정 기준 = <code>screen-mapping-rule.md</code> v1.3</p>
 
 <div class="kpi">
- <div><b>109</b><span>화면 &nbsp;·&nbsp; 관리웹 68 · POP 22 · 모바일 19</span></div>
+ <div><b>108</b><span>화면 &nbsp;·&nbsp; 관리웹 67 · POP 22 · 모바일 19</span></div>
  <div><b>3</b><span>프로그램 &nbsp;·&nbsp; IA 모델이 서로 다르다</span></div>
- <div><b>82</b><span>확정 &nbsp;·&nbsp; 추정 25 · 미정 2</span></div>
+ <div><b>82</b><span>확정 &nbsp;·&nbsp; 추정 24 · 미정 2</span></div>
  <div><b>73</b><span>화면 그룹 &nbsp;·&nbsp; 도식 미대응 0</span></div>
  <div><b>−4</b><span>v1.2 대비 &nbsp;·&nbsp; 존치 21·삭제 6·통합 1·신설 3</span></div>
 </div>
@@ -294,11 +339,11 @@ DOC.write('<div class="grid3" style="margin-top:16px">'
  '<p class="lead">홈에서 타일을 골라 바로 스캔한다. 계정 로그인(M-CO-01) 후 진입.</p>'
  '<div class="card"><div class="tiles">' + tile_html + '</div></div></div></div>')
 
-DOC.write('''<h2>⑥ 최근 변동 <small>v1.2 2계층 매핑 사람 확정 → v1.3 대시보드 정리</small></h2>
-<p class="lead">v1.2에서 보류 89건을 사람이 판정해 <b>112 → 113</b>, v1.3에서 대시보드 5건을 삭제해 <b>113 → 108</b>이 됐다. 수보다 <b>구성</b>이 바뀐 것이 핵심이다.</p>
+DOC.write('''<h2>⑥ 최근 변동 <small>v1.2 2계층 매핑 사람 확정 → v1.3 대시보드 정리 → v1.5 확대 1차 통합</small></h2>
+<p class="lead">v1.2에서 보류 89건을 사람이 판정해 <b>112 → 113</b>, v1.3에서 대시보드 5건을 삭제해 <b>113 → 109</b>, v1.5에서 <code>W-06-13</code>을 <code>W-06-02</code>로 통합·폐지해 <b>109 → 108</b>이 됐다. 수보다 <b>구성</b>이 바뀐 것이 핵심이다.</p>
 <div class="grid3">
 <div><h2 style="font-size:14px;margin-top:0">신설 5 <small>v1.2</small></h2><div class="card">''' + new_html + '</div></div>' +
-'<div><h2 style="font-size:14px;margin-top:0">삭제 8 · 이관 1</h2><div class="card">' + gone_html +
+'<div><h2 style="font-size:14px;margin-top:0">삭제 8 · 이관 1 · 통합 1</h2><div class="card">' + gone_html +
 '<p style="font-size:12px;color:var(--dim);margin:12px 0 0">범위만 바뀐 화면은 수에 영향이 없다 — v1.2 8건(<code>W-01-01</code> 01-S-C 전 구간 · <code>M-04-01</code> 목록 흡수 · <code>P-02-01</code> 사번 분리 등) + v1.3 <b>집계 뷰 요건 3건</b>(<code>W-03-05</code> 불량률·분포 · <code>W-02-08</code> 생산 실적 · <code>W-01-07</code> 위치별 분포).</p></div></div></div>')
 
 DOC.write('''<h2>⑦ 전체 화면 목록 <small>108건 · 필터</small></h2>

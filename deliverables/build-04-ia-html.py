@@ -8,12 +8,36 @@ crefle-doc 번들 규약(report 템플릿)을 따르되, 폰트를 base64 로 �
   번들경로 기본값 = ../uiux/2026-07-25-화면목록-IA/crefle-doc (저장소 내 동일 lock 사본)
 """
 import base64, html, io, os, re, sys
+from collections import Counter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, '04-통합-IA.md')
 DST = os.path.join(HERE, '04-통합-IA.html')
 KIT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(
     HERE, '..', 'uiux', '2026-07-25-화면목록-IA', 'crefle-doc')
+
+# ── 표지 KPI 집계 — md 에서 직접 센다(하드코딩 금지) ──
+# build-04-ia-도식본.py 의 parse_rows 와 같은 파싱 규칙: §3~§5 화면 인벤토리 표만
+# 읽는다(§6 이전 · 셀 6개 이상 — §6 삭제 표·§7 미결 표의 3셀 백틱 ID 오인 방지).
+_KPI_ROW = re.compile(r'^\|\s*`([WPM]-(?:CO|\d{2})-\d{2})`\s*\|(.+)$')
+
+def parse_kpi_counts(md):
+    seg = re.search(r'## §3\.(.*?)## §6\.', md, re.S)
+    progs, confs, seen = Counter(), Counter(), set()
+    for ln in seg.group(1).split('\n'):
+        m = _KPI_ROW.match(ln)
+        if not m:
+            continue
+        cells = [c.strip() for c in m.group(2).split('|')]
+        if len(cells) < 6:
+            continue
+        sid = m.group(1)
+        if sid in seen:
+            raise SystemExit('중복 행: ' + sid)
+        seen.add(sid)
+        progs[{'W': 'web', 'P': 'pop', 'M': 'mob'}[sid[0]]] += 1
+        confs[cells[4]] += 1
+    return len(seen), progs, confs
 
 # ── 마크다운 변환 (uiux/2026-07-25-화면목록-IA/build-정식본.py 계승 + 순서 목록 지원) ──
 
@@ -171,11 +195,20 @@ def main():
     overview = '\n'.join('<p>%s</p>' % inline(m) for m in meta)
     doc = render('\n'.join(rest))
 
+    total, progs, confs = parse_kpi_counts(md)
+    if progs['web'] + progs['pop'] + progs['mob'] != total:
+        raise SystemExit('프로그램 합계가 화면 전건과 불일치: %s / %d' % (dict(progs), total))
+    if sum(confs.values()) != total:
+        raise SystemExit('신뢰도 합계가 화면 전건과 불일치: %s / %d' % (dict(confs), total))
+
     kpi = ''.join('<div><span class="big">%s</span><span class="lbl">%s</span></div>' % (a, b) for a, b in [
-        ('109', '화면 전건<br>관리웹 68 · POP 22 · 모바일 19'),
-        ('82', '신뢰도 확정<br>추정 25 · 미정 2'),
+        (str(total), '화면 전건<br>관리웹 %d · POP %d · 모바일 %d' % (progs['web'], progs['pop'], progs['mob'])),
+        (str(confs['확정']), '신뢰도 확정<br>추정 %d · 미정 %d' % (confs['추정'], confs['미정'])),
         ('3', 'IA 모델<br>메뉴트리 · 태스크모드 · 스캔타일'),
     ])
+    lede = ('관리웹·POP·모바일 3종의 화면 인벤토리 %d건 전건과 프로그램별 정보 구조(IA), 배지 배정·미결·'
+            '상세 스펙 이월 요건을 한 문서로 모은 개발 열람용 편람. 화면 정본은 '
+            'uiux/2026-07-25-화면목록-IA/screen-inventory-ia.md v1.5.') % total
 
     html_out = """<!doctype html>
 <html lang="ko">
@@ -225,7 +258,7 @@ def main():
 <header class="doc-cover">
   <p class="eyebrow">CREFLE · OMF-MES · 통합 편람</p>
   <h1>OMF-MES 통합 IA (정보 구조)</h1>
-  <p class="lede">관리웹·POP·모바일 3종의 화면 인벤토리 109건 전건과 프로그램별 정보 구조(IA), 배지 배정·미결·상세 스펙 이월 요건을 한 문서로 모은 개발 열람용 편람. 화면 정본은 uiux/2026-07-25-화면목록-IA/screen-inventory-ia.md v1.3.</p>
+  <p class="lede">%s</p>
   <table>
     <caption>문서 정보</caption>
     <tbody>
@@ -246,7 +279,7 @@ def main():
 
 </body>
 </html>
-""" % (licenses(KIT), css_with_fonts(KIT), overview, kpi, doc)
+""" % (licenses(KIT), css_with_fonts(KIT), lede, overview, kpi, doc)
 
     io.open(DST, 'w', encoding='utf-8').write(html_out)
     print('생성:', DST, '(%d bytes)' % os.path.getsize(DST))
