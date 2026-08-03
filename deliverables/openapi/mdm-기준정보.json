@@ -4019,7 +4019,7 @@
             }
           },
           "409": {
-            "description": "충돌",
+            "description": "충돌 — conflictCause=user 는 다른 사용자, erpSync 는 ERP 재동기화 배치가 같은 BOM 을 갱신했을 가능성이 높다(bom_component 도 원본 열을 통해 재동기화 대상이다). 구분 없이 내려주면 화면이 「다른 사용자가 먼저 수정했습니다」라는 사실과 다른 안내를 하게 된다 — W-06-05 §9-1",
             "content": {
               "application/json": {
                 "schema": {
@@ -8753,7 +8753,7 @@
           "conversionRate",
           "effectiveFrom"
         ],
-        "description": "ck_item_uom_distinct — 변환 전/후 단위가 같으면 불가. ck_item_uom_dates — 유효종료는 유효시작 이상(A-2 짝 제약)",
+        "description": "uq_item_uom_conversion(item_id, from_uom_id, to_uom_id, effective_from) — 네 컬럼 조합 유일. ck_item_uom_distinct — 변환 전/후 단위가 같으면 불가. ck_item_uom_dates — 유효종료는 유효시작 이상(A-2 짝 제약)",
         "properties": {
           "itemUomConversionId": {
             "x-source-column": "item_uom_conversion_id",
