@@ -1650,7 +1650,7 @@
           "planning"
         ],
         "summary": "Routing 헤더 수정",
-        "description": "상태=작성중일 때만 허용한다 — 확정 Rev 는 in-place 수정을 금지한다(설계 결정 07). itemId 는 신규만(편집 불가) · routingVersion 은 시스템 채번(편집 불가) · statusCode 는 이 API 로 바꾸지 않고 :new-revision·:confirm·:obsolete 로만 전이한다. ck_routing_dates — effectiveTo 는 있으면 effectiveFrom 이상이어야 한다(짝 제약). 근거: W-06-01 §4-A · §5-4 · 공유계약 B-1(낙관적 잠금)",
+        "description": "상태=작성중일 때만 허용한다 — 확정 Rev 는 in-place 수정을 금지한다(설계 결정 07). 상태≠작성중이면 400(ErrorResponse, code=STATE_LOCKED — 확정 또는 폐기 상태라 잠김). itemId 는 신규만(편집 불가) · routingVersion 은 시스템 채번(편집 불가) · statusCode 는 이 API 로 바꾸지 않고 :new-revision·:confirm·:obsolete 로만 전이한다. ck_routing_dates — effectiveTo 는 있으면 effectiveFrom 이상이어야 한다(짝 제약). 근거: W-06-01 §4-A · §5-4 · 공유계약 B-1(낙관적 잠금)",
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
@@ -1681,7 +1681,7 @@
             }
           },
           "400": {
-            "description": "검증 실패",
+            "description": "검증 실패. 상태≠작성중일 때의 수정 시도도 여기 포함된다(code=STATE_LOCKED) — §5-4",
             "content": {
               "application/json": {
                 "schema": {
@@ -1701,7 +1701,7 @@
             }
           },
           "409": {
-            "description": "충돌 또는 상태 잠금 — conflictCause=user 는 낙관적 잠금(B-1), stateLocked 는 상태가 작성중이 아님(§5-4)",
+            "description": "충돌 — 공유계약 B-1(낙관적 잠금). 상태 잠김(확정·폐기)은 409 가 아니라 400(STATE_LOCKED)",
             "content": {
               "application/json": {
                 "schema": {
@@ -1730,7 +1730,7 @@
           "planning"
         ],
         "summary": "신규 Rev 발행 (최신 Rev 복사)",
-        "description": "지정한 Rev 를 복사해 routingVersion+1 의 작성중 Rev 를 새로 만든다 — 헤더 속성(routingCode·effectiveFrom·effectiveTo)과 공정 라인 전부를 함께 복제한다(§8-7). 지정한 Rev 의 상태가 확정이어야 한다 — 작성중 Rev 는 이미 있는 초안을 편집하면 되고, 폐기 Rev 는 이 전이 자체가 불가하다(§5-4 상태표: 폐기 → (없음)). 복제된 effectiveFrom·effectiveTo 는 원본 값을 그대로 물려받으며, 작성중 동안 PUT 으로 조정한다. 라인도 함께 복제되지만 응답은 헤더만 반환한다 — 화면은 이어서 GET .../operations 로 복제된 라인을 받는다. 근거: W-06-01 §5-1 「신규 Rev 발행」 · §5-4 · §8-7",
+        "description": "지정한 Rev 를 복사해 routingVersion+1 의 작성중 Rev 를 새로 만든다 — 헤더 속성(routingCode·effectiveFrom·effectiveTo)과 공정 라인 전부를 함께 복제한다(§8-7). 지정한 Rev 의 상태가 확정이어야 한다 — 작성중 Rev 는 이미 있는 초안을 편집하면 되고, 폐기 Rev 는 이 전이 자체가 불가하다(§5-4 상태표: 폐기 → (없음)). 상태≠확정이면 400(ErrorResponse, code=STATE_LOCKED). 복제된 effectiveFrom·effectiveTo 는 원본 값을 그대로 물려받으며, 작성중 동안 PUT 으로 조정한다. 라인도 함께 복제되지만 응답은 헤더만 반환한다 — 화면은 이어서 GET .../operations 로 복제된 라인을 받는다. 근거: W-06-01 §5-1 「신규 Rev 발행」 · §5-4 · §8-7",
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
@@ -1747,8 +1747,8 @@
               }
             }
           },
-          "403": {
-            "description": "권한 없음. 근거: W-06-01 §6 「권한 없음」(회신 E-9 대기)",
+          "400": {
+            "description": "지정한 Rev 의 상태가 확정이 아님(code=STATE_LOCKED) — §5-4",
             "content": {
               "application/json": {
                 "schema": {
@@ -1757,12 +1757,12 @@
               }
             }
           },
-          "409": {
-            "description": "지정한 Rev 의 상태가 확정이 아님(stateLocked) — §5-4",
+          "403": {
+            "description": "권한 없음. 근거: W-06-01 §6 「권한 없음」(회신 E-9 대기)",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ConflictResponse"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -1787,7 +1787,7 @@
           "planning"
         ],
         "summary": "Rev 확정",
-        "description": "작성중 → 확정. 이후 in-place 수정은 불가하며 변경은 신규 Rev 로만 한다. 라인이 1건 이상이어야 한다. 근거: W-06-01 §5-4 · 설계 결정 07 · 공유계약 B-2·B-7",
+        "description": "작성중 → 확정. 이후 in-place 수정은 불가하며 변경은 신규 Rev 로만 한다. 라인이 1건 이상이어야 한다(위반 시 400, code=LINE_REQUIRED). 상태≠작성중이면 400(code=STATE_LOCKED). 근거: W-06-01 §5-4 · 설계 결정 07 · 공유계약 B-2·B-7",
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
@@ -1805,7 +1805,7 @@
             }
           },
           "400": {
-            "description": "검증 실패 — 라인 0건인 채 확정 시도(§6)",
+            "description": "검증 실패 — 라인 0건인 채 확정 시도(code=LINE_REQUIRED, §6) 또는 상태≠작성중(code=STATE_LOCKED, §5-4)",
             "content": {
               "application/json": {
                 "schema": {
@@ -1820,16 +1820,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "상태가 작성중이 아님(stateLocked) — §5-4",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConflictResponse"
                 }
               }
             }
@@ -1854,7 +1844,7 @@
           "planning"
         ],
         "summary": "Rev 폐기",
-        "description": "확정 → 폐기. 폐기 후에는 되돌릴 수 없고 편집도, 신규 Rev 발행의 원본으로도 쓸 수 없다(§5-4 상태표 — 폐기: (없음)). 근거: W-06-01 §5-4 · 설계 결정 07",
+        "description": "확정 → 폐기. 폐기 후에는 되돌릴 수 없고 편집도, 신규 Rev 발행의 원본으로도 쓸 수 없다(§5-4 상태표 — 폐기: (없음)). 상태≠확정이면 400(ErrorResponse, code=STATE_LOCKED). 근거: W-06-01 §5-4 · 설계 결정 07",
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
@@ -1871,8 +1861,8 @@
               }
             }
           },
-          "403": {
-            "description": "권한 없음. 근거: W-06-01 §6 「권한 없음」(회신 E-9 대기)",
+          "400": {
+            "description": "상태가 확정이 아님(code=STATE_LOCKED) — §5-4",
             "content": {
               "application/json": {
                 "schema": {
@@ -1881,12 +1871,12 @@
               }
             }
           },
-          "409": {
-            "description": "상태가 확정이 아님(stateLocked) — §5-4",
+          "403": {
+            "description": "권한 없음. 근거: W-06-01 §6 「권한 없음」(회신 E-9 대기)",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ConflictResponse"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -1930,7 +1920,7 @@
           "planning"
         ],
         "summary": "공정 라인 전체 치환 (순서 포함)",
-        "description": "화면이 최종 순서를 통째로 보내고 서버가 한 트랜잭션으로 반영한다. 순서 컬럼에 유일 제약(uq_routing_operation)이 걸려 있어 두 행을 맞바꿀 때 중간 상태가 반드시 제약을 위반하는데, 전체 치환이면 그 상태가 화면에 노출되지 않는다 — 공유계약 A-5.\n\n⚠ 전체 치환은 「행 교체」가 아니다. routing_operation 을 참조하는 곳이 넷이고(routing_operation_dependency 선행·후행 2컬럼 · bom_component.routing_operation_id · production.work_order.routing_operation_id) 특히 work_order 는 NOT NULL 이라 DELETE 후 INSERT 로 구현하면 진행 중 작업지시가 무너진다. 서버는 기존 행을 유지하며 순서만 갱신해야 한다.\n\n상태가 작성중일 때만 허용한다. 근거: W-06-01 §5-1·§5-4·§8-8",
+        "description": "화면이 최종 순서를 통째로 보내고 서버가 한 트랜잭션으로 반영한다. 순서 컬럼에 유일 제약(uq_routing_operation)이 걸려 있어 두 행을 맞바꿀 때 중간 상태가 반드시 제약을 위반하는데, 전체 치환이면 그 상태가 화면에 노출되지 않는다 — 공유계약 A-5.\n\n⚠ 전체 치환은 「행 교체」가 아니다. routing_operation 을 참조하는 곳이 넷이고(routing_operation_dependency 선행·후행 2컬럼 · bom_component.routing_operation_id · production.work_order.routing_operation_id) 특히 work_order 는 NOT NULL 이라 DELETE 후 INSERT 로 구현하면 진행 중 작업지시가 무너진다. 서버는 기존 행을 유지하며 순서만 갱신해야 한다.\n\n상태가 작성중일 때만 허용한다 — 상태≠작성중이면 400(ErrorResponse, code=STATE_LOCKED). 이 엔드포인트는 컬렉션 전체 치환이라 IfMatchVersion(행 단위 낙관적 잠금)을 쓰지 않는다 — 409 는 없다. 근거: W-06-01 §5-1·§5-4·§8-8",
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
@@ -1969,7 +1959,7 @@
             }
           },
           "400": {
-            "description": "검증 실패",
+            "description": "검증 실패(유일 위반·범위 위반 등) 또는 상태≠작성중(code=STATE_LOCKED, §5-4)",
             "content": {
               "application/json": {
                 "schema": {
@@ -1984,16 +1974,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "충돌 또는 확정 상태",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConflictResponse"
                 }
               }
             }
@@ -2037,7 +2017,7 @@
           "planning"
         ],
         "summary": "공정 선후행 전체 치환",
-        "description": "선후행은 라인 행을 가리키는 별개 관계라 라인 전체 치환에 포함하지 않는다. 라인이 확정된 뒤에 건다 — 여기서 「확정」은 상태 전이(작성중→확정)가 아니라 저장(커밋)을 뜻한다. Routing 상태 자체는 작성중이어야 한다(§5-1 「선후행 설정」). ck_routing_dependency_self — 자기 자신 금지. 순환(A→B→A)은 DB 가 막지 않으므로 서버가 검사한다(공유계약 A-9 ⓐ 차단). 근거: W-06-01 §4-C·§8-6",
+        "description": "선후행은 라인 행을 가리키는 별개 관계라 라인 전체 치환에 포함하지 않는다. 라인이 확정된 뒤에 건다 — 여기서 「확정」은 상태 전이(작성중→확정)가 아니라 저장(커밋)을 뜻한다. Routing 상태 자체는 작성중이어야 한다(§5-1 「선후행 설정」) — 상태≠작성중이면 400(ErrorResponse, code=STATE_LOCKED). routing_operation_dependency 에는 version_no 자체가 없어(부여·회수 형) 409/낙관적 잠금 대상이 아니다. ck_routing_dependency_self — 자기 자신 금지. 순환(A→B→A)은 DB 가 막지 않으므로 서버가 검사한다(공유계약 A-9 ⓐ 차단). 근거: W-06-01 §4-C·§8-6",
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
@@ -2095,7 +2075,7 @@
             }
           },
           "400": {
-            "description": "검증 실패 — 자기참조(ck_routing_dependency_self) 또는 순환(A-9 ⓐ)",
+            "description": "검증 실패 — 자기참조(ck_routing_dependency_self) 또는 순환(A-9 ⓐ) 또는 상태≠작성중(code=STATE_LOCKED, §5-4)",
             "content": {
               "application/json": {
                 "schema": {
@@ -2110,16 +2090,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "상태가 작성중이 아님(stateLocked) — §5-4",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConflictResponse"
                 }
               }
             }
@@ -2213,10 +2183,9 @@
             "enum": [
               "user",
               "erpSync",
-              "workerLease",
-              "stateLocked"
+              "workerLease"
             ],
-            "description": "충돌 원인. 근거: 공유계약 B-1 확장 — user=다른 사용자, erpSync=ERP 재동기화 배치, workerLease=워커가 처리 중, stateLocked=버전 마스터 형 리소스가 편집 불가 상태(확정·폐기 등)라 요청이 막힘(Task 6 — W-06-01 §5-4). 구분 없이 내려주면 화면이 「다른 사용자가 먼저 수정했습니다」라는 사실과 다른 안내를 하게 된다"
+            "description": "충돌 원인. 근거: 공유계약 B-1 확장 — user=다른 사용자, erpSync=ERP 재동기화 배치, workerLease=워커가 처리 중. 구분 없이 내려주면 화면이 「다른 사용자가 먼저 수정했습니다」라는 사실과 다른 안내를 하게 된다"
           },
           "message": {
             "type": "string"
