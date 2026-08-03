@@ -225,7 +225,7 @@ DS에 **`MatrixGrid`**(`columns`·`rows`·`groupHeaders`·`summaryRow`·`renderC
 1. **부여·회수 테이블은 물리 삭제가 정상이다 — B-4의 예외 축을 세워야 한다.**
    `role_permission`·`user_role`·`user_data_scope`에는 `is_active`·`updated_at`·`version_no`가 **없다**(실측). B-4 「물리 삭제 금지·`is_active`로만」은 **마스터 테이블 규칙**이며, 이 형태에 적용하면 존재하지 않는 컬럼을 요구하게 된다. **구분 기준을 계약에 명시**: `version_no`·`is_active`를 가진 것 = 마스터(B-4 적용) / `created_at`·`created_by`만 가진 것 = 부여·회수(INSERT/DELETE + `audit.audit_event`).
 2. **부분 유일 인덱스(`COALESCE`)의 사용자 표기·오류 문구 규칙.**
-   `uq_user_data_scope`·`uq_operation_policy`·`uq_numbering_rule`·`uq_worker_qualification`이 모두 `COALESCE(...,0)`으로 NULL을 접어 유일 판정한다(실측 4곳). 화면은 ① 빈 축을 **`(전체)`**로 표기하고 ② 중복 오류 문구에 **접힘 규칙을 담아야** 한다. A-1의 「유일키 범위를 문구에 담는다」를 이 형태로 확장.
+   `uq_user_data_scope`·`uq_item_external_code`·`uq_worker_qualification`·`uq_lot_external_identifier`·`uq_inventory_balance_dim`·`uq_putaway_rule`·`uq_shipment_lot_allocation`·`uq_operation_policy`·`uq_numbering_rule`이 모두 `COALESCE(...,0)`으로 NULL을 접어 유일 판정한다(실측 9곳). 화면은 ① 빈 축을 **`(전체)`**로 표기하고 ② 중복 오류 문구에 **접힘 규칙을 담아야** 한다. A-1의 「유일키 범위를 문구에 담는다」를 이 형태로 확장.
 3. **변경 이력의 정본은 `audit.audit_event`다** — B-4 ⬜를 닫는 근거(§8-1). 「변경 이력」 버튼은 전 마스터가 **같은 조회 규약**(`target_type_code` + `target_id`)을 쓴다. 화면마다 다른 이력 테이블을 찾지 않는다.
 4. **B-4 「참조 건수 0일 때만 코드 수정」의 적용 한계.**
    `created_by`/`updated_by`는 **의도적으로 FK를 걸지 않았다**(SQL 210~211 주석 — 대량 적재 성능). 따라서 사용자 코드의 참조 건수는 DB가 세어 줄 수 없다. **참조 건수를 셀 수 있는 대상과 없는 대상을 계약이 구분**해야 한다.
