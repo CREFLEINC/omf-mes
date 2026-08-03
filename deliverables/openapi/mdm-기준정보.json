@@ -619,6 +619,913 @@
           }
         }
       }
+    },
+    "/app/users": {
+      "get": {
+        "tags": [
+          "app"
+        ],
+        "summary": "사용자 목록",
+        "description": "근거: W-CO-02 §3 좌측 목록 · 공유계약 G-8(유효성 판정은 서버가 한다)",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "로그인ID·이름 검색"
+          },
+          {
+            "name": "departmentId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "부서 필터"
+          },
+          {
+            "name": "statusCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "상태 필터"
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "기본은 사용 중인 것만. 「미사용 포함」 체크박스"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AppUser"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 이 화면 자체가 권한 관리 화면이라 진입 자체를 막고 배너로 사유를 표시한다(G-1 화면 수준). 근거: W-CO-02 §6 「권한 없음」 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "app"
+        ],
+        "summary": "사용자 등록",
+        "description": "근거: W-CO-02 §5-1 「사용자 추가」 · 공유계약 A-1(유일 위반은 범위를 담아 응답)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppUserCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "등록됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppUser"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-CO-02 §6 「권한 없음」 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/app/users/{appUserId}": {
+      "parameters": [
+        {
+          "name": "appUserId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "app"
+        ],
+        "summary": "사용자 상세",
+        "description": "근거: W-CO-02 §4-A · 공유계약 B-4(참조 건수를 응답에 담는다 — 화면이 세지 않는다). loginId 는 항상 editability.reason=NOT_COUNTABLE — 미착지 #69",
+        "responses": {
+          "200": {
+            "description": "상세",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppUserDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "app"
+        ],
+        "summary": "사용자 수정",
+        "description": "근거: W-CO-02 §5-2 · 공유계약 B-1(낙관적 잠금 — 덮어쓰기 강제는 제공하지 않는다)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppUserUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "수정됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppUser"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-CO-02 §6 「권한 없음」 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/app/users/{appUserId}:deactivate": {
+      "parameters": [
+        {
+          "name": "appUserId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "app"
+        ],
+        "summary": "사용자 사용 중지",
+        "description": "물리 삭제는 제공하지 않는다. 근거: W-CO-02 §5-1 「사용 중지」 · 공유계약 B-4",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "중지됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppUser"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-CO-02 §6 「권한 없음」 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/app/users/{appUserId}/roles": {
+      "parameters": [
+        {
+          "name": "appUserId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "app"
+        ],
+        "summary": "사용자에게 부여된 역할",
+        "description": "근거: W-CO-02 §4-C",
+        "responses": {
+          "200": {
+            "description": "부여분",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRoleListResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "app"
+        ],
+        "summary": "역할 전체 치환",
+        "description": "개별 부여·회수가 아니라 최종 상태를 통째로 보낸다. 체크박스 화면이 서버와 어긋날 여지가 없다. 서버는 한 트랜잭션으로 반영한다. 동시에 같은 역할이 부여되는 경합은 유일 위반으로 거부하지 않고 이미 반영된 상태로 조용히 갱신한다(§6 「역할 중복 부여 경합」). 근거: W-CO-02 §4-C·§5-1 · 공유계약 B-6(부여·회수 테이블은 INSERT/DELETE 이며 물리 삭제 금지 규칙을 적용하지 않는다)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "roleIds"
+                ],
+                "properties": {
+                  "roleIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "format": "int64"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "치환됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRoleListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-CO-02 §6 「권한 없음」 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/app/users/{appUserId}/data-scopes": {
+      "parameters": [
+        {
+          "name": "appUserId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "app"
+        ],
+        "summary": "사용자에게 부여된 데이터 접근범위",
+        "description": "근거: W-CO-02 §4-D",
+        "responses": {
+          "200": {
+            "description": "부여분",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDataScopeListResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "app"
+        ],
+        "summary": "데이터 접근범위 전체 치환",
+        "description": "개별 부여·회수가 아니라 최종 상태를 통째로 보낸다. ck_user_data_scope_target — businessUnitId·plantId 둘 중 하나 이상 필수, 위반 시 400(PAIR). uq_user_data_scope 가 COALESCE(...,0) 으로 NULL 을 접어 유일 판정하므로 같은 범위를 두 번 넣으면 400(UNIQUE_VIOLATION) — 화면은 빈 축을 (전체)로 표기한다(공유계약 A-7). 서버는 한 트랜잭션으로 반영한다. 근거: W-CO-02 §4-D·§5-1 · 공유계약 B-6. 미착지: 법인 축(legal_entity_id) 부재 — #69",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "scopes"
+                ],
+                "properties": {
+                  "scopes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "businessUnitId": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "format": "int64"
+                        },
+                        "plantId": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "format": "int64"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "치환됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDataScopeListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-CO-02 §6 「권한 없음」 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/app/roles": {
+      "get": {
+        "tags": [
+          "app"
+        ],
+        "summary": "역할 목록",
+        "description": "근거: W-CO-02 §3 좌측 목록(역할 탭) · 공유계약 G-8(유효성 판정은 서버가 한다)",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "역할코드·역할명 검색"
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "기본은 사용 중인 것만"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Role"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 이 화면 자체가 권한 관리 화면이라 진입 자체를 막고 배너로 사유를 표시한다(G-1 화면 수준). 근거: W-CO-02 §6 「권한 없음」 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "app"
+        ],
+        "summary": "역할 등록",
+        "description": "근거: W-CO-02 §5-1 「역할 추가」 · 공유계약 A-1(유일 위반은 범위를 담아 응답)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "등록됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Role"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-CO-02 §6 「권한 없음」 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/app/roles/{roleId}": {
+      "parameters": [
+        {
+          "name": "roleId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "app"
+        ],
+        "summary": "역할 상세",
+        "description": "근거: W-CO-02 §4-B · 공유계약 B-4(참조 건수를 응답에 담는다 — 화면이 세지 않는다)",
+        "responses": {
+          "200": {
+            "description": "상세",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "app"
+        ],
+        "summary": "역할 수정",
+        "description": "근거: W-CO-02 §5-2 · 공유계약 B-1(낙관적 잠금 — 덮어쓰기 강제는 제공하지 않는다)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "수정됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Role"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-CO-02 §6 「권한 없음」 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/app/roles/{roleId}:deactivate": {
+      "parameters": [
+        {
+          "name": "roleId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "app"
+        ],
+        "summary": "역할 사용 중지",
+        "description": "물리 삭제는 제공하지 않는다. 배정된 사용자가 있는 역할은 확인 다이얼로그 + 배정 건수 표시가 선행된다(허용 여부 자체는 §8-6 미결). 근거: W-CO-02 §6 「참조 중인 역할 사용 중지」 · 공유계약 B-4",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "중지됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Role"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-CO-02 §6 「권한 없음」 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/app/roles/{roleId}/permissions": {
+      "parameters": [
+        {
+          "name": "roleId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "app"
+        ],
+        "summary": "역할에 부여된 기능 권한",
+        "description": "근거: W-CO-02 §4-E",
+        "responses": {
+          "200": {
+            "description": "부여분",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolePermissionListResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "app"
+        ],
+        "summary": "기능 권한 전체 치환",
+        "description": "개별 부여·회수가 아니라 최종 상태를 통째로 보낸다. 서버는 한 트랜잭션으로 반영한다. 미착지: permission_code 값 목록이 회신 E-9 대기 — 화면은 비활성+사유로 둔다(공유계약 G-2·G-6). 근거: W-CO-02 §4-E·§5-1 · 공유계약 B-6(부여·회수 테이블은 INSERT/DELETE 이며 물리 삭제 금지 규칙을 적용하지 않는다)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "permissionCodes"
+                ],
+                "properties": {
+                  "permissionCodes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "치환됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolePermissionListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-CO-02 §6 「권한 없음」 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1285,6 +2192,409 @@
           },
           "editability": {
             "$ref": "#/components/schemas/Editability"
+          }
+        }
+      },
+      "AppUser": {
+        "x-source-table": "app.app_user",
+        "type": "object",
+        "required": [
+          "appUserId",
+          "loginId",
+          "userName",
+          "statusCode",
+          "isActive"
+        ],
+        "description": "사용자. 미착지: 인증 수단(password_hash·last_login_at·failed_login_count) 전무 — #69. 비밀번호 초기화 액션을 정의할 수 없다. loginId 는 참조를 셀 수 없어(created_by 류가 의도적 비-FK) editability.reason=NOT_COUNTABLE 로 무조건 잠근다 — 공유계약 B-4",
+        "properties": {
+          "appUserId": {
+            "x-source-column": "app_user_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "loginId": {
+            "x-source-column": "login_id",
+            "type": "string",
+            "maxLength": 100
+          },
+          "userName": {
+            "x-source-column": "user_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "departmentId": {
+            "x-source-column": "department_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "email": {
+            "x-source-column": "email",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200
+          },
+          "statusCode": {
+            "x-source-column": "status_code",
+            "type": "string",
+            "maxLength": 50,
+            "default": "ACTIVE",
+            "description": "공통코드 — 값 목록 미정(§8-4) · isActive 와의 역할 분담 미정(§8-4)"
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "AppUserCreate": {
+        "x-source-table": "app.app_user",
+        "type": "object",
+        "required": [
+          "loginId",
+          "userName"
+        ],
+        "description": "사용자 등록 요청. isActive 는 받지 않는다(신규는 항상 사용 중). loginId 는 등록 시에만 지정하고 이후 편집은 항상 잠긴다(참조를 셀 수 없어 NOT_COUNTABLE — 공유계약 B-4). 근거: W-CO-02 §4-A · §5-1 「사용자 추가」",
+        "properties": {
+          "loginId": {
+            "x-source-column": "login_id",
+            "type": "string",
+            "maxLength": 100,
+            "description": "uq — 전역 유일. 공백만 불가"
+          },
+          "userName": {
+            "x-source-column": "user_name",
+            "type": "string",
+            "maxLength": 200,
+            "description": "공백만 불가"
+          },
+          "departmentId": {
+            "x-source-column": "department_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "email": {
+            "x-source-column": "email",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "형식 검증은 화면 책임 — DB 제약 없음"
+          },
+          "statusCode": {
+            "x-source-column": "status_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "미지정 시 서버가 물리 모델 DEFAULT('ACTIVE')로 채운다. 공통코드 값 목록 미정 — §8-4"
+          }
+        }
+      },
+      "AppUserUpdate": {
+        "x-source-table": "app.app_user",
+        "type": "object",
+        "required": [
+          "userName",
+          "statusCode"
+        ],
+        "description": "사용자 수정 요청. loginId 는 항상 잠김(NOT_COUNTABLE)이라 요청에 포함하지 않는다. isActive 는 별도 사용 중지 액션(:deactivate)으로만 바꾼다. 낙관적 잠금은 공유계약 B-1. 근거: W-CO-02 §5-2",
+        "properties": {
+          "userName": {
+            "x-source-column": "user_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "departmentId": {
+            "x-source-column": "department_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "email": {
+            "x-source-column": "email",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200
+          },
+          "statusCode": {
+            "x-source-column": "status_code",
+            "type": "string",
+            "maxLength": 50
+          }
+        }
+      },
+      "AppUserDetailResponse": {
+        "type": "object",
+        "required": [
+          "appUser",
+          "editability"
+        ],
+        "properties": {
+          "appUser": {
+            "$ref": "#/components/schemas/AppUser"
+          },
+          "editability": {
+            "$ref": "#/components/schemas/Editability"
+          }
+        }
+      },
+      "Role": {
+        "x-source-table": "app.role",
+        "type": "object",
+        "required": [
+          "roleId",
+          "roleCode",
+          "roleName",
+          "isActive"
+        ],
+        "description": "역할. roleCode·roleId 는 role_permission·user_role 의 FK 대상이라 참조 건수를 셀 수 있다 — loginId 와 달리 editability 가 EDITABLE/REFERENCED 로 정상 판정된다.",
+        "properties": {
+          "roleId": {
+            "x-source-column": "role_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "roleCode": {
+            "x-source-column": "role_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "roleName": {
+            "x-source-column": "role_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "description": {
+            "x-source-column": "description",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "RoleCreate": {
+        "x-source-table": "app.role",
+        "type": "object",
+        "required": [
+          "roleCode",
+          "roleName"
+        ],
+        "description": "역할 등록 요청. isActive 는 받지 않는다(신규는 항상 사용 중). 근거: W-CO-02 §4-B · §5-1 「역할 추가」",
+        "properties": {
+          "roleCode": {
+            "x-source-column": "role_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "uq — 전역 유일. 공백만 불가"
+          },
+          "roleName": {
+            "x-source-column": "role_name",
+            "type": "string",
+            "maxLength": 200,
+            "description": "공백만 불가"
+          },
+          "description": {
+            "x-source-column": "description",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "RoleUpdate": {
+        "x-source-table": "app.role",
+        "type": "object",
+        "required": [
+          "roleCode",
+          "roleName"
+        ],
+        "description": "역할 수정 요청. isActive 는 별도 사용 중지 액션(:deactivate)으로만 바꾼다. 낙관적 잠금은 공유계약 B-1. 근거: W-CO-02 §4-B",
+        "properties": {
+          "roleCode": {
+            "x-source-column": "role_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "uq — 전역 유일. 실제 편집 가능 여부는 GET 응답의 editability 를 따른다"
+          },
+          "roleName": {
+            "x-source-column": "role_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "description": {
+            "x-source-column": "description",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "RoleDetailResponse": {
+        "type": "object",
+        "required": [
+          "role",
+          "editability"
+        ],
+        "properties": {
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          },
+          "editability": {
+            "$ref": "#/components/schemas/Editability"
+          }
+        }
+      },
+      "UserRole": {
+        "x-source-table": "app.user_role",
+        "type": "object",
+        "required": [
+          "userRoleId",
+          "appUserId",
+          "roleId"
+        ],
+        "properties": {
+          "userRoleId": {
+            "x-source-column": "user_role_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "appUserId": {
+            "x-source-column": "app_user_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "roleId": {
+            "x-source-column": "role_id",
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "UserRoleListResponse": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRole"
+            }
+          }
+        }
+      },
+      "RolePermission": {
+        "x-source-table": "app.role_permission",
+        "type": "object",
+        "required": [
+          "rolePermissionId",
+          "roleId",
+          "permissionCode"
+        ],
+        "description": "미착지: permission_code 값 목록이 회신 E-9 대기 — 화면은 비활성+사유로 둔다(공유계약 G-2·G-6)",
+        "properties": {
+          "rolePermissionId": {
+            "x-source-column": "role_permission_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "roleId": {
+            "x-source-column": "role_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "permissionCode": {
+            "x-source-column": "permission_code",
+            "type": "string",
+            "maxLength": 50
+          }
+        }
+      },
+      "RolePermissionListResponse": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RolePermission"
+            }
+          }
+        }
+      },
+      "UserDataScope": {
+        "x-source-table": "app.user_data_scope",
+        "type": "object",
+        "required": [
+          "userDataScopeId",
+          "appUserId"
+        ],
+        "description": "ck_user_data_scope_target — businessUnitId·plantId 둘 중 하나 이상 필수. uq_user_data_scope 가 COALESCE(...,0) 으로 NULL 을 접어 유일 판정하므로 화면은 빈 축을 (전체)로 표기한다 — 공유계약 A-7. 미착지: 법인 축(legal_entity_id) 부재 — #69",
+        "properties": {
+          "userDataScopeId": {
+            "x-source-column": "user_data_scope_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "appUserId": {
+            "x-source-column": "app_user_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "businessUnitId": {
+            "x-source-column": "business_unit_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "비어 있으면 (전체) — ck_user_data_scope_target"
+          },
+          "plantId": {
+            "x-source-column": "plant_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "비어 있으면 (전체) — ck_user_data_scope_target"
+          }
+        }
+      },
+      "UserDataScopeListResponse": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserDataScope"
+            }
           }
         }
       }
