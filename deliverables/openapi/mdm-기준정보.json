@@ -5,115 +5,1451 @@
     "version": "0.1.0",
     "description": "화면 상세 스펙 확대 1차에서 도출한 계약 초안. 정본은 물리 모델이며 이 문서는 그것을 옮긴 것이다. 근거·맥락은 deliverables/06-API-요구서.md 를 본다. WBS P0.4 API 계약 v0 의 초안 입력이며 계약 확정·소유는 통합 Agent 소관이다."
   },
-  "servers": [{ "url": "/api", "description": "온프레미스 설치형" }],
-  "tags": [
-    { "name": "mdm", "description": "기준정보 마스터" },
-    { "name": "app", "description": "사용자·권한" },
-    { "name": "planning", "description": "공정 순서·BOM" },
-    { "name": "quality", "description": "품질 기준" },
-    { "name": "integration", "description": "ERP 연계 실행" },
-    { "name": "audit", "description": "변경 이력" },
-    { "name": "lookup", "description": "선택 목록 — 관리 화면이 없는 조회 전용" }
+  "servers": [
+    {
+      "url": "/api",
+      "description": "온프레미스 설치형"
+    }
   ],
-  "paths": {},
+  "tags": [
+    {
+      "name": "mdm",
+      "description": "기준정보 마스터"
+    },
+    {
+      "name": "app",
+      "description": "사용자·권한"
+    },
+    {
+      "name": "planning",
+      "description": "공정 순서·BOM"
+    },
+    {
+      "name": "quality",
+      "description": "품질 기준"
+    },
+    {
+      "name": "integration",
+      "description": "ERP 연계 실행"
+    },
+    {
+      "name": "audit",
+      "description": "변경 이력"
+    },
+    {
+      "name": "lookup",
+      "description": "선택 목록 — 관리 화면이 없는 조회 전용"
+    }
+  ],
+  "paths": {
+    "/mdm/warehouses": {
+      "get": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "창고 목록",
+        "description": "근거: W-06-07 §3 좌측 목록 · 공유계약 G-8(유효성 판정은 서버가 한다)",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "코드·명칭 검색"
+          },
+          {
+            "name": "warehouseTypeCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "기본은 사용 중인 것만. 과거 데이터 표시용으로 켜면 isActive 표식을 함께 내린다"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Warehouse"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "창고 등록",
+        "description": "근거: W-06-07 §5-1 「창고 추가」 · 공유계약 A-1(유일 위반은 범위를 담아 응답)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WarehouseCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "등록됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarehouseDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-07 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/warehouses/{warehouseId}": {
+      "parameters": [
+        {
+          "name": "warehouseId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "창고 상세",
+        "description": "근거: W-06-07 §4-A · 공유계약 B-4(참조 건수를 응답에 담는다 — 화면이 세지 않는다)",
+        "responses": {
+          "200": {
+            "description": "상세",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarehouseDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "창고 수정",
+        "description": "근거: W-06-07 §5-3 · 공유계약 B-1(낙관적 잠금 — 덮어쓰기 강제는 제공하지 않는다)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WarehouseUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "수정됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarehouseDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-07 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/warehouses/{warehouseId}:deactivate": {
+      "parameters": [
+        {
+          "name": "warehouseId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "창고 사용 중지",
+        "description": "물리 삭제는 제공하지 않는다. 근거: W-06-07 §5-1 · 공유계약 B-4",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "중지됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarehouseDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-07 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/locations": {
+      "get": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "Location 목록",
+        "description": "창고를 고른 뒤에만 조회한다. 근거: W-06-07 §3 우측 Location 탭 · 공유계약 G-8(유효성 판정은 서버가 한다)",
+        "parameters": [
+          {
+            "name": "warehouseId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "필수. Location 은 창고를 고른 뒤에 본다 — W-06-07 §3"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "코드·명칭 검색"
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Location"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "Location 등록",
+        "description": "근거: W-06-07 §5-1 「Location 추가 / 하위 추가」 · 공유계약 A-1(유일 위반은 범위를 담아 응답)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "등록됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-07 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/locations/{locationId}": {
+      "parameters": [
+        {
+          "name": "locationId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "Location 상세",
+        "description": "근거: W-06-07 §4-B · 공유계약 B-4(참조 건수를 응답에 담는다 — 화면이 세지 않는다)",
+        "responses": {
+          "200": {
+            "description": "상세",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "Location 수정",
+        "description": "행 선택 → 인스펙터/Dialog 편집. 근거: W-06-07 §4-B 편집 열 · §3 · 공유계약 B-1(낙관적 잠금 — 덮어쓰기 강제는 제공하지 않는다)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "수정됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-07 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/locations/{locationId}:deactivate": {
+      "parameters": [
+        {
+          "name": "locationId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "Location 사용 중지",
+        "description": "물리 삭제는 제공하지 않는다. 재고가 있는 Location 은 확인 다이얼로그 + 사유 안내가 선행된다(허용 여부 자체는 §8-6 미결). 근거: W-06-07 §6 「참조 중 비활성화」 · 공유계약 B-4",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "중지됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-07 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
   "components": {
     "parameters": {
       "IdempotencyKey": {
         "name": "Idempotency-Key",
         "in": "header",
         "required": true,
-        "schema": { "type": "string", "format": "uuid" },
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
         "description": "전 쓰기 API 필수. 근거: deliverables/02-SW설계사양서 §3.3"
       },
       "IfMatchVersion": {
         "name": "If-Match",
         "in": "header",
         "required": true,
-        "schema": { "type": "string" },
+        "schema": {
+          "type": "string"
+        },
         "description": "낙관적 잠금용 version_no. 근거: 공유계약 B-1"
       }
     },
     "schemas": {
       "ErrorItem": {
         "type": "object",
-        "required": ["scope", "code", "message"],
+        "required": [
+          "scope",
+          "code",
+          "message"
+        ],
         "properties": {
           "scope": {
             "type": "string",
-            "enum": ["field", "screen"],
+            "enum": [
+              "field",
+              "screen"
+            ],
             "description": "오류의 범위. 근거: 공유계약 G-1 — 한 필드의 문제는 인라인, 화면 수준 문제는 배너"
           },
-          "field": { "type": "string", "description": "scope=field 일 때 대상 프로퍼티명" },
-          "code": { "type": "string", "description": "UNIQUE_VIOLATION · REQUIRED · RANGE · PAIR · PERMISSION_DENIED 등" },
+          "field": {
+            "type": "string",
+            "description": "scope=field 일 때 대상 프로퍼티명"
+          },
+          "code": {
+            "type": "string",
+            "description": "UNIQUE_VIOLATION · REQUIRED · RANGE · PAIR · PERMISSION_DENIED 등"
+          },
           "uniqueScope": {
             "type": "array",
-            "items": { "type": "string" },
+            "items": {
+              "type": "string"
+            },
             "description": "code=UNIQUE_VIOLATION 일 때 어느 유일키 범위에서 중복인지. 근거: 공유계약 A-1 — 범위 없이 「중복」만 오면 화면이 문구를 만들 수 없다"
           },
-          "message": { "type": "string" }
+          "message": {
+            "type": "string"
+          }
         }
       },
       "ErrorResponse": {
         "type": "object",
-        "required": ["errors"],
+        "required": [
+          "errors"
+        ],
         "properties": {
-          "errors": { "type": "array", "items": { "$ref": "#/components/schemas/ErrorItem" } }
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ErrorItem"
+            }
+          }
         }
       },
       "ConflictResponse": {
         "type": "object",
-        "required": ["conflictCause", "message"],
+        "required": [
+          "conflictCause",
+          "message"
+        ],
         "properties": {
           "conflictCause": {
             "type": "string",
-            "enum": ["user", "erpSync", "workerLease"],
+            "enum": [
+              "user",
+              "erpSync",
+              "workerLease"
+            ],
             "description": "충돌 원인. 근거: 공유계약 B-1 확장 — user=다른 사용자, erpSync=ERP 재동기화 배치, workerLease=워커가 처리 중. 구분 없이 내려주면 화면이 「다른 사용자가 먼저 수정했습니다」라는 사실과 다른 안내를 하게 된다"
           },
-          "message": { "type": "string" }
+          "message": {
+            "type": "string"
+          }
         }
       },
       "BatchFailure": {
         "type": "object",
-        "required": ["index", "errors"],
+        "required": [
+          "index",
+          "errors"
+        ],
         "properties": {
-          "index": { "type": "integer", "description": "요청 배열에서의 위치" },
-          "key": { "type": "string", "description": "식별 가능한 값(코드 등)" },
-          "errors": { "type": "array", "items": { "$ref": "#/components/schemas/ErrorItem" } }
+          "index": {
+            "type": "integer",
+            "description": "요청 배열에서의 위치"
+          },
+          "key": {
+            "type": "string",
+            "description": "식별 가능한 값(코드 등)"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ErrorItem"
+            }
+          }
         }
       },
       "BatchResult": {
         "type": "object",
-        "required": ["succeeded", "failed"],
+        "required": [
+          "succeeded",
+          "failed"
+        ],
         "description": "일괄 처리 결과. 근거: 공유계약 C-2 — 전체 롤백하지 않고 거부 건만 되돌린다",
         "properties": {
-          "succeeded": { "type": "integer" },
-          "failed": { "type": "array", "items": { "$ref": "#/components/schemas/BatchFailure" } }
+          "succeeded": {
+            "type": "integer"
+          },
+          "failed": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BatchFailure"
+            }
+          }
         }
       },
       "Editability": {
         "type": "object",
-        "required": ["codeEditable", "reason"],
+        "required": [
+          "codeEditable",
+          "reason"
+        ],
         "description": "코드 필드 수정 가능 여부. 근거: 공유계약 B-4 — 참조 건수가 0일 때만 수정 허용. 화면이 별도 호출로 세면 화면마다 다르게 구현된다",
         "properties": {
-          "codeEditable": { "type": "boolean" },
+          "codeEditable": {
+            "type": "boolean"
+          },
           "reason": {
             "type": "string",
-            "enum": ["EDITABLE", "REFERENCED", "NOT_COUNTABLE", "RECEIVED_FROM_ERP"],
+            "enum": [
+              "EDITABLE",
+              "REFERENCED",
+              "NOT_COUNTABLE",
+              "RECEIVED_FROM_ERP"
+            ],
             "description": "NOT_COUNTABLE = 참조가 FK 가 아니라 세지 못함(의도적 비-FK 또는 코드 문자열 참조) → 화면은 무조건 잠근다. RECEIVED_FROM_ERP = 수신본이라 항상 읽기 전용"
           },
           "referenceCount": {
-            "type": ["integer", "null"],
+            "type": [
+              "integer",
+              "null"
+            ],
             "description": "reason=NOT_COUNTABLE 이면 null"
           }
         }
       },
       "PageMeta": {
         "type": "object",
-        "required": ["page", "size", "total"],
+        "required": [
+          "page",
+          "size",
+          "total"
+        ],
         "properties": {
-          "page": { "type": "integer" },
-          "size": { "type": "integer" },
-          "total": { "type": "integer" }
+          "page": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        }
+      },
+      "Warehouse": {
+        "x-source-table": "mdm.warehouse",
+        "type": "object",
+        "required": [
+          "warehouseId",
+          "plantId",
+          "businessUnitId",
+          "warehouseCode",
+          "warehouseName",
+          "warehouseTypeCode",
+          "managementLevelCode",
+          "isExternal",
+          "isActive"
+        ],
+        "description": "창고. 미착지: 다국어(한/베) 명칭 — #64",
+        "properties": {
+          "warehouseId": {
+            "x-source-column": "warehouse_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "plantId": {
+            "x-source-column": "plant_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "businessUnitId": {
+            "x-source-column": "business_unit_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "warehouseCode": {
+            "x-source-column": "warehouse_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "warehouseName": {
+            "x-source-column": "warehouse_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "warehouseTypeCode": {
+            "x-source-column": "warehouse_type_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "managementLevelCode": {
+            "x-source-column": "management_level_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "isExternal": {
+            "x-source-column": "is_external",
+            "type": "boolean",
+            "default": false
+          },
+          "partnerId": {
+            "x-source-column": "partner_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "ck_external_warehouse_partner — isExternal 이 참이면 필수"
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "WarehouseDetail": {
+        "x-source-table": "mdm.warehouse",
+        "type": "object",
+        "required": [
+          "warehouseId",
+          "plantId",
+          "businessUnitId",
+          "warehouseCode",
+          "warehouseName",
+          "warehouseTypeCode",
+          "managementLevelCode",
+          "isExternal",
+          "isActive"
+        ],
+        "description": "창고 상세. editability 는 공유계약 B-4.",
+        "properties": {
+          "warehouseId": {
+            "x-source-column": "warehouse_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "plantId": {
+            "x-source-column": "plant_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "businessUnitId": {
+            "x-source-column": "business_unit_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "warehouseCode": {
+            "x-source-column": "warehouse_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "warehouseName": {
+            "x-source-column": "warehouse_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "warehouseTypeCode": {
+            "x-source-column": "warehouse_type_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "managementLevelCode": {
+            "x-source-column": "management_level_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "isExternal": {
+            "x-source-column": "is_external",
+            "type": "boolean"
+          },
+          "partnerId": {
+            "x-source-column": "partner_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean"
+          }
+        }
+      },
+      "WarehouseCreate": {
+        "x-source-table": "mdm.warehouse",
+        "type": "object",
+        "required": [
+          "plantId",
+          "businessUnitId",
+          "warehouseCode",
+          "warehouseName",
+          "warehouseTypeCode",
+          "managementLevelCode"
+        ],
+        "description": "창고 등록 요청. isActive 는 받지 않는다(신규는 항상 사용 중). 근거: W-06-07 §4-A · §5-1 「창고 추가」",
+        "properties": {
+          "plantId": {
+            "x-source-column": "plant_id",
+            "type": "integer",
+            "format": "int64",
+            "description": "편집 신규만 — 등록 후 변경 불가. 근거: W-06-07 §4-A"
+          },
+          "businessUnitId": {
+            "x-source-column": "business_unit_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "warehouseCode": {
+            "x-source-column": "warehouse_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "uq_warehouse — plantId 내 유일. 공백만 불가"
+          },
+          "warehouseName": {
+            "x-source-column": "warehouse_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "warehouseTypeCode": {
+            "x-source-column": "warehouse_type_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "managementLevelCode": {
+            "x-source-column": "management_level_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "isExternal": {
+            "x-source-column": "is_external",
+            "type": "boolean",
+            "default": false
+          },
+          "partnerId": {
+            "x-source-column": "partner_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "ck_external_warehouse_partner — isExternal 이 참이면 필수"
+          }
+        }
+      },
+      "WarehouseUpdate": {
+        "x-source-table": "mdm.warehouse",
+        "type": "object",
+        "required": [
+          "businessUnitId",
+          "warehouseCode",
+          "warehouseName",
+          "warehouseTypeCode",
+          "managementLevelCode",
+          "isExternal"
+        ],
+        "description": "창고 수정 요청. plantId 는 신규만(편집 불가) — 근거: W-06-07 §4-A 편집 열. isActive 는 별도 사용 중지 액션(:deactivate)으로만 바꾼다 — 근거: W-06-07 §5-1. 낙관적 잠금은 공유계약 B-1.",
+        "properties": {
+          "businessUnitId": {
+            "x-source-column": "business_unit_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "warehouseCode": {
+            "x-source-column": "warehouse_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "uq_warehouse — plantId 내 유일. 실제 편집 가능 여부는 GET 응답의 editability(§8-7 미결 반영)를 따른다"
+          },
+          "warehouseName": {
+            "x-source-column": "warehouse_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "warehouseTypeCode": {
+            "x-source-column": "warehouse_type_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "managementLevelCode": {
+            "x-source-column": "management_level_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "isExternal": {
+            "x-source-column": "is_external",
+            "type": "boolean"
+          },
+          "partnerId": {
+            "x-source-column": "partner_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "ck_external_warehouse_partner — isExternal 이 참이면 필수"
+          }
+        }
+      },
+      "WarehouseDetailResponse": {
+        "type": "object",
+        "required": [
+          "warehouse",
+          "editability"
+        ],
+        "properties": {
+          "warehouse": {
+            "$ref": "#/components/schemas/WarehouseDetail"
+          },
+          "editability": {
+            "$ref": "#/components/schemas/Editability"
+          }
+        }
+      },
+      "Location": {
+        "x-source-table": "mdm.location",
+        "type": "object",
+        "required": [
+          "locationId",
+          "warehouseId",
+          "locationCode",
+          "locationName",
+          "locationTypeCode",
+          "allowMixedItem",
+          "allowMixedLot",
+          "isActive"
+        ],
+        "description": "Location. 계층 구조(parent_location_id 자기참조). ck_location_capacity — capacityQty 와 capacityUomId 는 함께 있거나 함께 비어야 한다. 근거: W-06-07 §4-B · 공유계약 A-2",
+        "properties": {
+          "locationId": {
+            "x-source-column": "location_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "warehouseId": {
+            "x-source-column": "warehouse_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "parentLocationId": {
+            "x-source-column": "parent_location_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "locationCode": {
+            "x-source-column": "location_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "locationName": {
+            "x-source-column": "location_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "locationTypeCode": {
+            "x-source-column": "location_type_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "qualityZoneCode": {
+            "x-source-column": "quality_zone_code",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 50
+          },
+          "storageConditionCode": {
+            "x-source-column": "storage_condition_code",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 50
+          },
+          "allowMixedItem": {
+            "x-source-column": "allow_mixed_item",
+            "type": "boolean",
+            "default": true
+          },
+          "allowMixedLot": {
+            "x-source-column": "allow_mixed_lot",
+            "type": "boolean",
+            "default": true
+          },
+          "capacityQty": {
+            "x-source-column": "capacity_qty",
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "description": "qty_t numeric(20,6)"
+          },
+          "capacityUomId": {
+            "x-source-column": "capacity_uom_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "LocationDetail": {
+        "x-source-table": "mdm.location",
+        "type": "object",
+        "required": [
+          "locationId",
+          "warehouseId",
+          "locationCode",
+          "locationName",
+          "locationTypeCode",
+          "allowMixedItem",
+          "allowMixedLot",
+          "isActive"
+        ],
+        "description": "Location 상세. editability 는 공유계약 B-4. 계층 구조(parent_location_id 자기참조). ck_location_capacity — capacityQty 와 capacityUomId 는 함께 있거나 함께 비어야 한다. 근거: W-06-07 §4-B · 공유계약 A-2",
+        "properties": {
+          "locationId": {
+            "x-source-column": "location_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "warehouseId": {
+            "x-source-column": "warehouse_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "parentLocationId": {
+            "x-source-column": "parent_location_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "locationCode": {
+            "x-source-column": "location_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "locationName": {
+            "x-source-column": "location_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "locationTypeCode": {
+            "x-source-column": "location_type_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "qualityZoneCode": {
+            "x-source-column": "quality_zone_code",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 50
+          },
+          "storageConditionCode": {
+            "x-source-column": "storage_condition_code",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 50
+          },
+          "allowMixedItem": {
+            "x-source-column": "allow_mixed_item",
+            "type": "boolean"
+          },
+          "allowMixedLot": {
+            "x-source-column": "allow_mixed_lot",
+            "type": "boolean"
+          },
+          "capacityQty": {
+            "x-source-column": "capacity_qty",
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "description": "qty_t numeric(20,6)"
+          },
+          "capacityUomId": {
+            "x-source-column": "capacity_uom_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean"
+          }
+        }
+      },
+      "LocationCreate": {
+        "x-source-table": "mdm.location",
+        "type": "object",
+        "required": [
+          "warehouseId",
+          "locationCode",
+          "locationName",
+          "locationTypeCode"
+        ],
+        "description": "Location 등록 요청. isActive 는 받지 않는다(신규는 항상 사용 중). 근거: W-06-07 §4-B · §5-1 「Location 추가 / 하위 추가」. 계층 구조(parent_location_id 자기참조). ck_location_capacity — capacityQty 와 capacityUomId 는 함께 있거나 함께 비어야 한다. 근거: W-06-07 §4-B · 공유계약 A-2",
+        "properties": {
+          "warehouseId": {
+            "x-source-column": "warehouse_id",
+            "type": "integer",
+            "format": "int64",
+            "description": "좌측에서 선택한 창고로 고정 — 편집 신규만. 근거: W-06-07 §4-B"
+          },
+          "parentLocationId": {
+            "x-source-column": "parent_location_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "하위 추가 시 자동 설정. 자기 자신·순환 금지 — §8-5"
+          },
+          "locationCode": {
+            "x-source-column": "location_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "uq_location — warehouseId 내 유일"
+          },
+          "locationName": {
+            "x-source-column": "location_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "locationTypeCode": {
+            "x-source-column": "location_type_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "qualityZoneCode": {
+            "x-source-column": "quality_zone_code",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 50
+          },
+          "storageConditionCode": {
+            "x-source-column": "storage_condition_code",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 50
+          },
+          "allowMixedItem": {
+            "x-source-column": "allow_mixed_item",
+            "type": "boolean",
+            "default": true
+          },
+          "allowMixedLot": {
+            "x-source-column": "allow_mixed_lot",
+            "type": "boolean",
+            "default": true
+          },
+          "capacityQty": {
+            "x-source-column": "capacity_qty",
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "description": "qty_t numeric(20,6)"
+          },
+          "capacityUomId": {
+            "x-source-column": "capacity_uom_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "LocationUpdate": {
+        "x-source-table": "mdm.location",
+        "type": "object",
+        "required": [
+          "locationCode",
+          "locationName",
+          "locationTypeCode",
+          "allowMixedItem",
+          "allowMixedLot"
+        ],
+        "description": "Location 수정 요청. warehouseId 는 신규만(편집 불가) — 근거: W-06-07 §4-B 편집 열. isActive 는 별도 사용 중지 액션(:deactivate)으로만 바꾼다. 계층 구조(parent_location_id 자기참조). ck_location_capacity — capacityQty 와 capacityUomId 는 함께 있거나 함께 비어야 한다. 근거: W-06-07 §4-B · 공유계약 A-2",
+        "properties": {
+          "parentLocationId": {
+            "x-source-column": "parent_location_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "계층 재배치. 자기 자신·순환 금지 — §8-5"
+          },
+          "locationCode": {
+            "x-source-column": "location_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "uq_location — warehouseId 내 유일. 실제 편집 가능 여부는 GET 응답의 editability(§8-7 미결 반영)를 따른다"
+          },
+          "locationName": {
+            "x-source-column": "location_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "locationTypeCode": {
+            "x-source-column": "location_type_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "qualityZoneCode": {
+            "x-source-column": "quality_zone_code",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 50
+          },
+          "storageConditionCode": {
+            "x-source-column": "storage_condition_code",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 50
+          },
+          "allowMixedItem": {
+            "x-source-column": "allow_mixed_item",
+            "type": "boolean"
+          },
+          "allowMixedLot": {
+            "x-source-column": "allow_mixed_lot",
+            "type": "boolean"
+          },
+          "capacityQty": {
+            "x-source-column": "capacity_qty",
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "description": "qty_t numeric(20,6)"
+          },
+          "capacityUomId": {
+            "x-source-column": "capacity_uom_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "LocationDetailResponse": {
+        "type": "object",
+        "required": [
+          "location",
+          "editability"
+        ],
+        "properties": {
+          "location": {
+            "$ref": "#/components/schemas/LocationDetail"
+          },
+          "editability": {
+            "$ref": "#/components/schemas/Editability"
+          }
         }
       }
     }
