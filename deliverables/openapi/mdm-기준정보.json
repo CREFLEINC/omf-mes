@@ -5843,6 +5843,622 @@
           }
         }
       }
+    },
+    "/mdm/uoms": {
+      "get": {
+        "tags": [
+          "mdm",
+          "lookup"
+        ],
+        "summary": "단위(UOM) 목록",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "코드·명칭 검색"
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Uom"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/partners": {
+      "get": {
+        "tags": [
+          "mdm",
+          "lookup"
+        ],
+        "summary": "거래처 목록",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "코드·명칭 검색"
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Partner"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/legal-entities": {
+      "get": {
+        "tags": [
+          "mdm",
+          "lookup"
+        ],
+        "summary": "법인 목록",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "코드·명칭 검색"
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/LegalEntity"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/business-units": {
+      "get": {
+        "tags": [
+          "mdm",
+          "lookup"
+        ],
+        "summary": "사업부 목록",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "코드·명칭 검색"
+          },
+          {
+            "name": "legalEntityId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/BusinessUnit"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/plants": {
+      "get": {
+        "tags": [
+          "mdm",
+          "lookup"
+        ],
+        "summary": "공장 목록",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "코드·명칭 검색"
+          },
+          {
+            "name": "legalEntityId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "businessUnitId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Plant"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/production-lines": {
+      "get": {
+        "tags": [
+          "mdm",
+          "lookup"
+        ],
+        "summary": "생산라인 목록",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "코드·명칭 검색"
+          },
+          {
+            "name": "plantId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProductionLine"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/processes": {
+      "get": {
+        "tags": [
+          "mdm",
+          "lookup"
+        ],
+        "summary": "공정 목록",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "코드·명칭 검색"
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Process"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/equipments": {
+      "get": {
+        "tags": [
+          "mdm",
+          "lookup"
+        ],
+        "summary": "설비 목록",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "코드·명칭 검색"
+          },
+          {
+            "name": "plantId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "processId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Equipment"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -9840,6 +10456,426 @@
             ],
             "maxLength": 150,
             "description": "한 트랜잭션의 여러 이벤트를 묶는다[추정] — 펼침 그룹 기준"
+          }
+        }
+      },
+      "Uom": {
+        "x-source-table": "mdm.uom",
+        "type": "object",
+        "required": [
+          "uomId",
+          "uomCode",
+          "uomName",
+          "decimalScale",
+          "isActive"
+        ],
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "properties": {
+          "uomId": {
+            "x-source-column": "uom_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "uomCode": {
+            "x-source-column": "uom_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "uomName": {
+            "x-source-column": "uom_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "decimalScale": {
+            "x-source-column": "decimal_scale",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 6,
+            "default": 0,
+            "description": "CHECK BETWEEN 0 AND 6"
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "Partner": {
+        "x-source-table": "mdm.partner",
+        "type": "object",
+        "required": [
+          "partnerId",
+          "partnerCode",
+          "partnerName",
+          "isActive"
+        ],
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "properties": {
+          "partnerId": {
+            "x-source-column": "partner_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "partnerCode": {
+            "x-source-column": "partner_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "partnerName": {
+            "x-source-column": "partner_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "countryCode": {
+            "x-source-column": "country_code",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 3
+          },
+          "erpPartnerCode": {
+            "x-source-column": "erp_partner_code",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 100
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "LegalEntity": {
+        "x-source-table": "mdm.legal_entity",
+        "type": "object",
+        "required": [
+          "legalEntityId",
+          "legalEntityCode",
+          "legalEntityName",
+          "countryCode",
+          "timezoneCode",
+          "isActive"
+        ],
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "properties": {
+          "legalEntityId": {
+            "x-source-column": "legal_entity_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "legalEntityCode": {
+            "x-source-column": "legal_entity_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "legalEntityName": {
+            "x-source-column": "legal_entity_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "countryCode": {
+            "x-source-column": "country_code",
+            "type": "string",
+            "maxLength": 3
+          },
+          "timezoneCode": {
+            "x-source-column": "timezone_code",
+            "type": "string",
+            "maxLength": 64
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "BusinessUnit": {
+        "x-source-table": "mdm.business_unit",
+        "type": "object",
+        "required": [
+          "businessUnitId",
+          "legalEntityId",
+          "businessUnitCode",
+          "businessUnitName",
+          "isActive"
+        ],
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "properties": {
+          "businessUnitId": {
+            "x-source-column": "business_unit_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "legalEntityId": {
+            "x-source-column": "legal_entity_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "businessUnitCode": {
+            "x-source-column": "business_unit_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "uq_business_unit(legal_entity_id, business_unit_code)"
+          },
+          "businessUnitName": {
+            "x-source-column": "business_unit_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "Plant": {
+        "x-source-table": "mdm.plant",
+        "type": "object",
+        "required": [
+          "plantId",
+          "legalEntityId",
+          "plantCode",
+          "plantName",
+          "timezoneCode",
+          "isActive"
+        ],
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "properties": {
+          "plantId": {
+            "x-source-column": "plant_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "legalEntityId": {
+            "x-source-column": "legal_entity_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "businessUnitId": {
+            "x-source-column": "business_unit_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "plantCode": {
+            "x-source-column": "plant_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "uq_plant(legal_entity_id, plant_code)"
+          },
+          "plantName": {
+            "x-source-column": "plant_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "timezoneCode": {
+            "x-source-column": "timezone_code",
+            "type": "string",
+            "maxLength": 64
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "ProductionLine": {
+        "x-source-table": "mdm.production_line",
+        "type": "object",
+        "required": [
+          "productionLineId",
+          "plantId",
+          "lineCode",
+          "lineName",
+          "lineTypeCode",
+          "isActive"
+        ],
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5 계층(parent_line_id) — 귀속 관리 화면 미정(W-06-06 §7-2 「세 곳 규칙」 표 참고).",
+        "properties": {
+          "productionLineId": {
+            "x-source-column": "production_line_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "plantId": {
+            "x-source-column": "plant_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "parentLineId": {
+            "x-source-column": "parent_line_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "자기참조 — 라인/작업구역 계층"
+          },
+          "lineCode": {
+            "x-source-column": "line_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "uq_production_line(plant_id, line_code)"
+          },
+          "lineName": {
+            "x-source-column": "line_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "lineTypeCode": {
+            "x-source-column": "line_type_code",
+            "type": "string",
+            "maxLength": 50,
+            "default": "LINE",
+            "description": "LINE | WORK_AREA"
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "Process": {
+        "x-source-table": "mdm.process",
+        "type": "object",
+        "required": [
+          "processId",
+          "processCode",
+          "processName",
+          "processTypeCode",
+          "isActive"
+        ],
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "properties": {
+          "processId": {
+            "x-source-column": "process_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "processCode": {
+            "x-source-column": "process_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "processName": {
+            "x-source-column": "process_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "processTypeCode": {
+            "x-source-column": "process_type_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "공통코드 — 값 목록 미정"
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "Equipment": {
+        "x-source-table": "mdm.equipment",
+        "type": "object",
+        "required": [
+          "equipmentId",
+          "plantId",
+          "equipmentCode",
+          "equipmentName",
+          "equipmentTypeCode",
+          "statusCode",
+          "calibrationRequired",
+          "isActive"
+        ],
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5 calibrationRequired·calibrationDueDate 는 W-06-02 검사 항목의 「지정 검사장비」 선택 시 교정 만료 경고에 쓰인다(W-06-02 §4-C).",
+        "properties": {
+          "equipmentId": {
+            "x-source-column": "equipment_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "plantId": {
+            "x-source-column": "plant_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "equipmentCode": {
+            "x-source-column": "equipment_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "uq_equipment(plant_id, equipment_code)"
+          },
+          "equipmentName": {
+            "x-source-column": "equipment_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "equipmentTypeCode": {
+            "x-source-column": "equipment_type_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "공통코드 — 값 목록 미정"
+          },
+          "processId": {
+            "x-source-column": "process_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "productionLineId": {
+            "x-source-column": "production_line_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "statusCode": {
+            "x-source-column": "status_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "공통코드 — 값 목록 미정"
+          },
+          "calibrationRequired": {
+            "x-source-column": "calibration_required",
+            "type": "boolean",
+            "default": false
+          },
+          "lastCalibrationDate": {
+            "x-source-column": "last_calibration_date",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "calibrationDueDate": {
+            "x-source-column": "calibration_due_date",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "경과 시 W-06-02 검사 항목 지정 화면이 경고를 표시한다(차단 아님)"
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true
           }
         }
       }
