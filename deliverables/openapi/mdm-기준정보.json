@@ -4030,6 +4030,1389 @@
           }
         }
       }
+    },
+    "/quality/inspection-plans": {
+      "get": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "검사기준 목록",
+        "description": "근거: W-06-02 §3 좌측 기준 목록 · 공유계약 G-8(유효성 판정은 서버가 한다)",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "기준코드·기준명 검색"
+          },
+          {
+            "name": "inspectionTypeCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "itemId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/InspectionPlan"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "검사기준 등록",
+        "description": "근거: W-06-02 §5-1 「기준 추가」 · 공유계약 A-1(유일 위반은 범위를 담아 응답)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InspectionPlanCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "등록됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-02 §6 「권한 없음」",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quality/inspection-plans/{inspectionPlanId}": {
+      "parameters": [
+        {
+          "name": "inspectionPlanId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "검사기준 헤더 상세",
+        "description": "근거: W-06-02 §4-A · 공유계약 B-4",
+        "responses": {
+          "200": {
+            "description": "상세",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionPlanDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "검사기준 헤더 수정",
+        "description": "approvedBy·approvedAt 은 이 요청에 포함하지 않는다 — 별도 :approve 액션으로만 기록한다. 낙관적 잠금은 공유계약 B-1. 근거: W-06-02 §4-A·§5-1",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InspectionPlanUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "수정됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-02 §6 「권한 없음」",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quality/inspection-plans/{inspectionPlanId}:deactivate": {
+      "parameters": [
+        {
+          "name": "inspectionPlanId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "검사기준 사용 중지",
+        "description": "물리 삭제는 제공하지 않는다. 근거: W-06-02 §4-A · 공유계약 B-4",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "중지됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionPlan"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-02 §6 「권한 없음」",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quality/inspection-plans/{inspectionPlanId}:approve": {
+      "parameters": [
+        {
+          "name": "inspectionPlanId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "검사기준 승인",
+        "description": "approvedBy·approvedAt 을 서버가 동시에 기록한다(현재 사용자·현재 시각) — 둘은 짝이어야 하나 물리 모델에 CHECK 제약이 없어(§8-3) 서버가 항상 함께 채우는 방식으로 짝을 보장한다(A-9 취지). 전제: 이 기준에 확정(status_code=확정) 버전이 1건 이상 있어야 한다 — 없으면 400(code=CONFIRMED_VERSION_REQUIRED). 승인 해제(취소)는 제공하지 않는다 — 미결 §8-3, 결정 시 추가한다. 근거: W-06-02 §5-1 「승인」",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "승인됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "확정된 버전이 없음(code=CONFIRMED_VERSION_REQUIRED) — W-06-02 §5-1",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-02 §6 「권한 없음」",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quality/inspection-plan-versions": {
+      "get": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "검사기준 버전 목록",
+        "description": "검사기준의 버전 전체를 planVersion 내림차순(최신이 위)으로 준다 — Routing Rev 목록과 같은 형태(공유계약 후보 「버전을 가진 마스터의 공통 골격」). 상태를 가리지 않고 전부 낸다. 근거: W-06-02 §3 버전 목록 · 공유계약 G-8",
+        "parameters": [
+          {
+            "name": "inspectionPlanId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "필수. 버전 목록은 기준을 고른 뒤에 본다 — W-06-02 §3"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "버전 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionPlanVersionListResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "검사기준 버전 최초 등록 (버전 1)",
+        "description": "기준에 아직 버전이 하나도 없을 때만 쓴다 — planVersion 을 항상 1로, statusCode 를 항상 작성중으로 채운다. 두 번째 이후 버전은 이 경로가 아니라 최신(확정) 버전 위에서 :new-revision 을 호출해 만든다. uq_inspection_plan_version 위반은 400(UNIQUE_VIOLATION). 근거: W-06-02 §5-1 「신규 버전」(기준에 버전이 없는 경우)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InspectionPlanVersionCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "등록됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionPlanVersion"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-02 §6 「권한 없음」",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quality/inspection-plan-versions/{inspectionPlanVersionId}": {
+      "parameters": [
+        {
+          "name": "inspectionPlanVersionId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "검사기준 버전 상세",
+        "description": "근거: W-06-02 §4-B · 공유계약 B-4",
+        "responses": {
+          "200": {
+            "description": "상세",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionPlanVersionDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "검사기준 버전 수정",
+        "description": "상태=작성중일 때만 허용한다 — W-06-01 §5-4 와 같은 규칙을 적용한다(다만 근거는 status_code 의 존재와 inspection_item_spec 에 version_no 가 없다는 구조에서 읽은 것이다 [추정] — W-06-02 §5-4). 상태≠작성중이면 400(ErrorResponse, code=STATE_LOCKED). planVersion·statusCode 는 이 API 로 바꾸지 않고 :new-revision·:confirm·:obsolete 로만 전이한다. ck_inspection_plan_version_dates — effectiveTo 는 있으면 effectiveFrom 이상. ⚠ sampling_qty 의 단위 해석(비율/수량)이 미결이다 §8-2 — 규약 없이 개발하면 30%가 30개로 저장된다. 낙관적 잠금은 공유계약 B-1. 근거: W-06-02 §4-B·§5-4",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InspectionPlanVersionUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "수정됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionPlanVersion"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패. 상태≠작성중일 때의 수정 시도도 여기 포함된다(code=STATE_LOCKED) — §5-4",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-02 §6 「권한 없음」",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌 — 공유계약 B-1(낙관적 잠금). 상태 잠김(확정·폐기)은 409 가 아니라 400(STATE_LOCKED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quality/inspection-plan-versions/{inspectionPlanVersionId}:new-revision": {
+      "parameters": [
+        {
+          "name": "inspectionPlanVersionId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "신규 버전 발행 (최신 버전 복사)",
+        "description": "지정한 버전을 복사해 planVersion+1 의 작성중 버전을 새로 만든다 — 샘플링·판정 설정과 검사 항목 라인 전부를 함께 복제한다. 지정한 버전의 상태가 확정이어야 한다 — 상태≠확정이면 400(ErrorResponse, code=STATE_LOCKED). 라인도 함께 복제되지만 응답은 헤더(버전)만 반환한다 — 화면은 이어서 GET .../items 로 복제된 라인을 받는다. 근거: W-06-02 §5-1 「신규 버전」",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "발행됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionPlanVersion"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "지정한 버전의 상태가 확정이 아님(code=STATE_LOCKED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-02 §6 「권한 없음」",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quality/inspection-plan-versions/{inspectionPlanVersionId}:confirm": {
+      "parameters": [
+        {
+          "name": "inspectionPlanVersionId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "버전 확정",
+        "description": "작성중 → 확정. 이후 in-place 수정은 불가하며 변경은 신규 버전으로만 한다. 검사 항목이 1건 이상이어야 한다(위반 시 400, code=LINE_REQUIRED). 상태≠작성중이면 400(code=STATE_LOCKED). 근거: W-06-02 §5-1 「확정」 · 공유계약 B-2",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "확정됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionPlanVersion"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패 — 항목 0건인 채 확정 시도(code=LINE_REQUIRED) 또는 상태≠작성중(code=STATE_LOCKED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-02 §6 「권한 없음」",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quality/inspection-plan-versions/{inspectionPlanVersionId}:obsolete": {
+      "parameters": [
+        {
+          "name": "inspectionPlanVersionId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "버전 폐기",
+        "description": "확정 → 폐기. 폐기 후에는 되돌릴 수 없다. 상태≠확정이면 400(code=STATE_LOCKED). 근거: W-06-02 §5-1 「폐기」",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "폐기됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionPlanVersion"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "상태가 확정이 아님(code=STATE_LOCKED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-02 §6 「권한 없음」",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quality/inspection-plan-versions/{inspectionPlanVersionId}/items": {
+      "parameters": [
+        {
+          "name": "inspectionPlanVersionId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "검사 항목 목록",
+        "description": "sequenceNo 오름차순. 화면은 이 값을 그대로 보여주지 않고 목록 내 위치로 1부터 연속 표시한다. 근거: W-06-02 §4-C",
+        "responses": {
+          "200": {
+            "description": "항목",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionItemSpecListResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "검사 항목 전체 치환 (순서 포함)",
+        "description": "화면이 최종 순서를 통째로 보내고 서버가 한 트랜잭션으로 반영한다. 순서 컬럼에 유일 제약(uq_inspection_item_spec)이 걸려 있어 전체 치환으로만 안전하게 순서를 바꿀 수 있다 — 공유계약 A-5. ⚠ 전체 치환은 「행 교체」가 아니다 — inspection_measurement 가 이 항목을 NOT NULL FK 로 참조하므로 서버는 기존 행을 유지하며 순서만 갱신해야 한다. 상태가 작성중일 때만 허용한다 — 상태≠작성중이면 400(ErrorResponse, code=STATE_LOCKED). 이 엔드포인트는 컬렉션 전체 치환이라 IfMatchVersion(행 단위 낙관적 잠금)을 쓰지 않는다 — 409 는 없다. 근거: W-06-02 §4-C·§5-1·§5-4",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "items"
+                ],
+                "properties": {
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/InspectionItemSpecUpsert"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "치환됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionItemSpecListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패(유일 위반·범위 위반 등) 또는 상태≠작성중(code=STATE_LOCKED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-02 §6 「권한 없음」",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quality/defect-codes": {
+      "get": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "불량코드 목록",
+        "description": "2계층 전체(parentDefectCodeId IS NULL 이면 대분류, 있으면 상세). 근거: W-06-03 §3 불량코드 탭 · 공유계약 G-8",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "불량코드·불량명 검색"
+          },
+          {
+            "name": "parentDefectCodeId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "지정하면 그 대분류의 상세만"
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/DefectCode"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "불량코드 등록",
+        "description": "대분류 추가는 경고 동반(전사 고정 축) — 화면 책임. 3계층 이상은 결정 12 위반이라 서버가 차단한다(parentDefectCodeId 가 이미 상세인 코드를 가리키면 400). 근거: W-06-03 §5-1 「대분류 추가」·「상세 추가」 · 공유계약 A-1",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DefectCodeCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "등록됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefectCode"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패 — 3계층 이상 시도 포함(결정 12 위반)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-03 §6 「권한 없음」",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quality/defect-codes/{defectCodeId}": {
+      "parameters": [
+        {
+          "name": "defectCodeId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "불량코드 상세",
+        "description": "근거: W-06-03 §4-A · 공유계약 B-4(참조처는 defect_record — FK 실재라 셀 수 있다)",
+        "responses": {
+          "200": {
+            "description": "상세",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefectCodeDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "불량코드 수정",
+        "description": "⚠ ck_defect_code_parent 가 없다 — department·location 에는 자기참조 방지 CHECK 가 있는데 여기엔 없다(비대칭·#64). 자기 자신을 상위로 지정하는 것과 3계층 이상 시도를 서버가 차단한다. 낙관적 잠금은 공유계약 B-1. 근거: W-06-03 §4-A·§6",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DefectCodeUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "수정됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefectCode"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패 — 자기 자신을 상위로 지정 또는 3계층 이상 시도",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-03 §6 「권한 없음」",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quality/defect-codes/{defectCodeId}:deactivate": {
+      "parameters": [
+        {
+          "name": "defectCodeId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "불량코드 사용 중지",
+        "description": "물리 삭제는 제공하지 않는다. 대분류는 하위 상세 코드가 딸려 있으면 확인 다이얼로그 + 하위 건수 표시(화면 책임). 근거: W-06-03 §5-1 · 공유계약 B-4",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "중지됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefectCode"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-03 §6 「권한 없음」",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quality/cause-codes": {
+      "get": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "원인코드 목록",
+        "description": "2계층 전체 — defect_code 와 완전히 같은 구조. 이 화면(W-06-03)이 흡수한다 — 화면명 「불량·원인코드 2계층 마스터」. 근거: W-06-03 §3 원인코드 탭 · 공유계약 G-8",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "원인코드·원인명 검색"
+          },
+          {
+            "name": "parentCauseCodeId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CauseCode"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "원인코드 등록",
+        "description": "defect_code 등록과 동일 규칙(3계층 이상 서버 차단). 근거: W-06-03 §5-1 「원인코드 추가·편집」 · 공유계약 A-1",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CauseCodeCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "등록됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CauseCode"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패 — 3계층 이상 시도 포함",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-03 §6 「권한 없음」",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quality/cause-codes/{causeCodeId}": {
+      "parameters": [
+        {
+          "name": "causeCodeId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "원인코드 상세",
+        "description": "근거: W-06-03 §4-C · 공유계약 B-4(참조처는 defect_record.suspected_cause_code_id·confirmed_cause_code_id — FK 실재)",
+        "responses": {
+          "200": {
+            "description": "상세",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CauseCodeDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "원인코드 수정",
+        "description": "defect_code 와 완전히 같은 구조·제약. 자기참조 CHECK 없음 — 서버가 검사. 낙관적 잠금은 공유계약 B-1. 근거: W-06-03 §4-C",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CauseCodeUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "수정됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CauseCode"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패 — 자기 자신을 상위로 지정 또는 3계층 이상 시도",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-03 §6 「권한 없음」",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quality/cause-codes/{causeCodeId}:deactivate": {
+      "parameters": [
+        {
+          "name": "causeCodeId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "원인코드 사용 중지",
+        "description": "물리 삭제는 제공하지 않는다. 근거: W-06-03 §5-1 · 공유계약 B-4",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "중지됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CauseCode"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-03 §6 「권한 없음」",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -6760,6 +8143,1056 @@
             "items": {
               "$ref": "#/components/schemas/BomComponent"
             }
+          }
+        }
+      },
+      "InspectionPlan": {
+        "x-source-table": "quality.inspection_plan",
+        "type": "object",
+        "required": [
+          "inspectionPlanId",
+          "inspectionPlanCode",
+          "inspectionPlanName",
+          "inspectionTypeCode",
+          "isActive"
+        ],
+        "description": "approved_by 와 approved_at 은 짝이어야 하나 CHECK 제약이 없다 — 서버가 검사한다(A-9). item_id·process_id·routing_id 가 모두 NULL 허용이라 적용 우선순위 규칙이 필요하다 — W-06-02 §8-4",
+        "properties": {
+          "inspectionPlanId": {
+            "x-source-column": "inspection_plan_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "inspectionPlanCode": {
+            "x-source-column": "inspection_plan_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "inspectionPlanName": {
+            "x-source-column": "inspection_plan_name",
+            "type": "string",
+            "maxLength": 200,
+            "description": "⚠ 한/베 컬럼 없음"
+          },
+          "itemId": {
+            "x-source-column": "item_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "비우면 「전 품목 공통 기준」[추정] — 적용 우선순위 §8-4"
+          },
+          "processId": {
+            "x-source-column": "process_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "IQC 는 공정이 없다"
+          },
+          "routingId": {
+            "x-source-column": "routing_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "SQL 1745 주석 「적용 라우팅(버전) 연결」 — Routing Rev 단위로 묶인다. W-06-01 의 Rev 가 바뀌면 재연결 규칙 미정 §8-5"
+          },
+          "inspectionTypeCode": {
+            "x-source-column": "inspection_type_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "공통코드 — IQC/PQC(공정·초중종·자주)/OQC"
+          },
+          "approvedBy": {
+            "x-source-column": "approved_by",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": ":approve 액션으로만 기록"
+          },
+          "approvedAt": {
+            "x-source-column": "approved_at",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "approvedBy 와 짝(CHECK 없음 — 서버가 항상 함께 기록해 보장)"
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "InspectionPlanCreate": {
+        "x-source-table": "quality.inspection_plan",
+        "type": "object",
+        "required": [
+          "inspectionPlanCode",
+          "inspectionPlanName",
+          "inspectionTypeCode"
+        ],
+        "description": "검사기준 헤더 등록 요청. approvedBy·approvedAt·isActive 는 받지 않는다. 근거: W-06-02 §4-A·§5-1",
+        "properties": {
+          "inspectionPlanCode": {
+            "x-source-column": "inspection_plan_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "uq — 전역 유일"
+          },
+          "inspectionPlanName": {
+            "x-source-column": "inspection_plan_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "itemId": {
+            "x-source-column": "item_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "processId": {
+            "x-source-column": "process_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "routingId": {
+            "x-source-column": "routing_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "inspectionTypeCode": {
+            "x-source-column": "inspection_type_code",
+            "type": "string",
+            "maxLength": 50
+          }
+        }
+      },
+      "InspectionPlanUpdate": {
+        "x-source-table": "quality.inspection_plan",
+        "type": "object",
+        "required": [
+          "inspectionPlanCode",
+          "inspectionPlanName",
+          "inspectionTypeCode"
+        ],
+        "description": "검사기준 헤더 수정 요청. approvedBy·approvedAt 은 :approve 전용, isActive 는 :deactivate 전용. 낙관적 잠금은 공유계약 B-1. 근거: W-06-02 §4-A",
+        "properties": {
+          "inspectionPlanCode": {
+            "x-source-column": "inspection_plan_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "inspectionPlanName": {
+            "x-source-column": "inspection_plan_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "itemId": {
+            "x-source-column": "item_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "processId": {
+            "x-source-column": "process_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "routingId": {
+            "x-source-column": "routing_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "inspectionTypeCode": {
+            "x-source-column": "inspection_type_code",
+            "type": "string",
+            "maxLength": 50
+          }
+        }
+      },
+      "InspectionPlanDetailResponse": {
+        "type": "object",
+        "required": [
+          "inspectionPlan",
+          "editability"
+        ],
+        "properties": {
+          "inspectionPlan": {
+            "$ref": "#/components/schemas/InspectionPlan"
+          },
+          "editability": {
+            "$ref": "#/components/schemas/Editability"
+          }
+        }
+      },
+      "InspectionPlanVersion": {
+        "x-source-table": "quality.inspection_plan_version",
+        "type": "object",
+        "required": [
+          "inspectionPlanVersionId",
+          "inspectionPlanId",
+          "planVersion",
+          "effectiveFrom",
+          "samplingMethodCode",
+          "inspectionFrequencyCode",
+          "statusCode"
+        ],
+        "description": "미착지 셋: PQC 생략 허용·생략 근거·검사기준 미비 시 단순 선택 허용 — #64. samplingQty 는 확정 문구가 「샘플 비율(%)」인데 컬럼은 수량(app.qty_t)이다 — 규약 없이 개발하면 30%가 30개로 저장된다(A-8·#64)",
+        "properties": {
+          "inspectionPlanVersionId": {
+            "x-source-column": "inspection_plan_version_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "inspectionPlanId": {
+            "x-source-column": "inspection_plan_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "planVersion": {
+            "x-source-column": "plan_version",
+            "type": "integer",
+            "minimum": 1,
+            "description": "CHECK > 0 · uq_inspection_plan_version(inspection_plan_id, plan_version). 시스템 채번 — 편집 불가"
+          },
+          "effectiveFrom": {
+            "x-source-column": "effective_from",
+            "type": "string",
+            "format": "date"
+          },
+          "effectiveTo": {
+            "x-source-column": "effective_to",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "ck_inspection_plan_version_dates — 있으면 effectiveFrom 이상"
+          },
+          "samplingMethodCode": {
+            "x-source-column": "sampling_method_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "공통코드 — 「전수/샘플」+「제품 단위/LOT 단위」가 여기 들어간다. 값 목록 §8-2"
+          },
+          "samplingQty": {
+            "x-source-column": "sampling_qty",
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "description": "⚠ 확정은 「샘플 비율(%)」인데 하류는 「수량」이다 — 단위 규약 §8-2"
+          },
+          "aqlValue": {
+            "x-source-column": "aql_value",
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "AQL·허용불량수(SQL 1766 주석)"
+          },
+          "acceptanceNumber": {
+            "x-source-column": "acceptance_number",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "description": "CHECK ≥ 0 · 확정 「합격판정개수(공정별) 초과 시 W/O 전체 재검사」의 설정처"
+          },
+          "rejectionNumber": {
+            "x-source-column": "rejection_number",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "exclusiveMinimum": 0,
+            "description": "CHECK > 0 — 0 불가(합격판정개수는 ≥0)"
+          },
+          "inspectionFrequencyCode": {
+            "x-source-column": "inspection_frequency_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "공통코드 — 값 목록 미정"
+          },
+          "frequencyIntervalValue": {
+            "x-source-column": "frequency_interval_value",
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "주기 파라미터: N시간·N수량(SQL 1770 주석) — frequencyIntervalUomCode 와 짝이어야 하나 CHECK 없음 §8-3"
+          },
+          "frequencyIntervalUomCode": {
+            "x-source-column": "frequency_interval_uom_code",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 50
+          },
+          "statusCode": {
+            "x-source-column": "status_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "공통코드 — 값 목록 미정. W-06-01 의 작성중/확정/폐기 준용 여부 §8-2. 이 값으로 화면이 편집 잠금을 판정한다(§5-4). 이 API 로는 직접 바꾸지 않고 :new-revision·:confirm·:obsolete 로만 전이한다"
+          }
+        }
+      },
+      "InspectionPlanVersionCreate": {
+        "x-source-table": "quality.inspection_plan_version",
+        "type": "object",
+        "required": [
+          "inspectionPlanId",
+          "effectiveFrom",
+          "samplingMethodCode",
+          "inspectionFrequencyCode"
+        ],
+        "description": "검사기준 버전 최초 등록(버전 1) 요청 — 기준에 버전이 하나도 없을 때만 쓴다. planVersion 은 서버가 항상 1로, statusCode 는 항상 작성중으로 채운다. 근거: W-06-02 §4-B·§5-1",
+        "properties": {
+          "inspectionPlanId": {
+            "x-source-column": "inspection_plan_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "effectiveFrom": {
+            "x-source-column": "effective_from",
+            "type": "string",
+            "format": "date"
+          },
+          "effectiveTo": {
+            "x-source-column": "effective_to",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "samplingMethodCode": {
+            "x-source-column": "sampling_method_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "samplingQty": {
+            "x-source-column": "sampling_qty",
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "aqlValue": {
+            "x-source-column": "aql_value",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "acceptanceNumber": {
+            "x-source-column": "acceptance_number",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "rejectionNumber": {
+            "x-source-column": "rejection_number",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "exclusiveMinimum": 0
+          },
+          "inspectionFrequencyCode": {
+            "x-source-column": "inspection_frequency_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "frequencyIntervalValue": {
+            "x-source-column": "frequency_interval_value",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "frequencyIntervalUomCode": {
+            "x-source-column": "frequency_interval_uom_code",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 50
+          }
+        }
+      },
+      "InspectionPlanVersionUpdate": {
+        "x-source-table": "quality.inspection_plan_version",
+        "type": "object",
+        "required": [
+          "effectiveFrom",
+          "samplingMethodCode",
+          "inspectionFrequencyCode"
+        ],
+        "description": "검사기준 버전 수정 요청. 상태=작성중일 때만 허용한다. inspectionPlanId·planVersion·statusCode 는 이 요청에 포함하지 않는다. 근거: W-06-02 §4-B·§5-4",
+        "properties": {
+          "effectiveFrom": {
+            "x-source-column": "effective_from",
+            "type": "string",
+            "format": "date"
+          },
+          "effectiveTo": {
+            "x-source-column": "effective_to",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "samplingMethodCode": {
+            "x-source-column": "sampling_method_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "samplingQty": {
+            "x-source-column": "sampling_qty",
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "aqlValue": {
+            "x-source-column": "aql_value",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "acceptanceNumber": {
+            "x-source-column": "acceptance_number",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "rejectionNumber": {
+            "x-source-column": "rejection_number",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "exclusiveMinimum": 0
+          },
+          "inspectionFrequencyCode": {
+            "x-source-column": "inspection_frequency_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "frequencyIntervalValue": {
+            "x-source-column": "frequency_interval_value",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "frequencyIntervalUomCode": {
+            "x-source-column": "frequency_interval_uom_code",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 50
+          }
+        }
+      },
+      "InspectionPlanVersionDetailResponse": {
+        "type": "object",
+        "required": [
+          "inspectionPlanVersion",
+          "editability"
+        ],
+        "properties": {
+          "inspectionPlanVersion": {
+            "$ref": "#/components/schemas/InspectionPlanVersion"
+          },
+          "editability": {
+            "$ref": "#/components/schemas/Editability"
+          }
+        }
+      },
+      "InspectionPlanVersionListResponse": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "description": "버전 목록은 기준당 소수라 페이지네이션을 두지 않는다(Routing Rev 목록과 같은 이유)",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InspectionPlanVersion"
+            }
+          }
+        }
+      },
+      "InspectionItemSpec": {
+        "x-source-table": "quality.inspection_item_spec",
+        "type": "object",
+        "required": [
+          "inspectionItemSpecId",
+          "inspectionPlanVersionId",
+          "sequenceNo",
+          "inspectionItemCode",
+          "inspectionItemName",
+          "dataTypeCode",
+          "measurementCount",
+          "requiredFlag",
+          "automaticJudgment"
+        ],
+        "description": "ck_inspection_limits — 상한 ≥ 하한. 목표값이 범위 밖인 것은 DB 가 막지 않으므로 서버가 경고한다(A-9 ⓑ). 항목코드에 버전 내 유일 제약이 없어 중복 입력이 가능하다 — W-06-02 §8-3. created_at·created_by 만 있고 is_active·updated_at·version_no 가 없다 — 부여·회수 형태",
+        "properties": {
+          "inspectionItemSpecId": {
+            "x-source-column": "inspection_item_spec_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "inspectionPlanVersionId": {
+            "x-source-column": "inspection_plan_version_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "sequenceNo": {
+            "x-source-column": "sequence_no",
+            "type": "integer",
+            "minimum": 1,
+            "description": "CHECK > 0 · uq_inspection_item_spec(version_id, sequence_no). 채번 값 자체는 화면에 노출하지 않는다"
+          },
+          "inspectionItemCode": {
+            "x-source-column": "inspection_item_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "⚠ 버전 내 유일 제약이 없다 — 같은 코드를 두 줄에 넣을 수 있다 §8-3"
+          },
+          "inspectionItemName": {
+            "x-source-column": "inspection_item_name",
+            "type": "string",
+            "maxLength": 200,
+            "description": "⚠ 한/베 컬럼 없음"
+          },
+          "dataTypeCode": {
+            "x-source-column": "data_type_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "공통코드 — 수치/텍스트/불리언 [추정](근거: inspection_measurement 가 numeric_value·text_value·boolean_value 3종을 갖고 num_nonnulls ≤ 1 CHECK)"
+          },
+          "uomId": {
+            "x-source-column": "uom_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "수치형일 때만 의미 — 조건부 필수는 DB 에 없다 §8-3"
+          },
+          "targetValue": {
+            "x-source-column": "target_value",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "lowerLimit": {
+            "x-source-column": "lower_limit",
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "ck_inspection_limits — 상한 ≥ 하한(둘 다 있을 때만)"
+          },
+          "upperLimit": {
+            "x-source-column": "upper_limit",
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "ck_inspection_limits — 목표가 범위 밖인 것은 DB 가 막지 않는다. 서버가 경고한다(A-9 ⓑ 경고 등급) — W-06-02 §8-3"
+          },
+          "measurementCount": {
+            "x-source-column": "measurement_count",
+            "type": "integer",
+            "minimum": 1,
+            "default": 1,
+            "description": "CHECK > 0 · inspection_measurement.sample_no 의 상한"
+          },
+          "inspectionMethodCode": {
+            "x-source-column": "inspection_method_code",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 50
+          },
+          "defaultInspectionEquipmentId": {
+            "x-source-column": "default_inspection_equipment_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "equipment.calibration_required·calibration_due_date 와 연동 — 교정 만료 장비 선택 시 경고(차단 아님)"
+          },
+          "requiredFlag": {
+            "x-source-column": "required_flag",
+            "type": "boolean",
+            "default": true
+          },
+          "automaticJudgment": {
+            "x-source-column": "automatic_judgment",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "InspectionItemSpecUpsert": {
+        "x-source-table": "quality.inspection_item_spec",
+        "type": "object",
+        "required": [
+          "inspectionPlanVersionId",
+          "sequenceNo",
+          "inspectionItemCode",
+          "inspectionItemName",
+          "dataTypeCode",
+          "measurementCount",
+          "requiredFlag",
+          "automaticJudgment"
+        ],
+        "description": "InspectionItemSpec 에서 inspectionItemSpecId 를 선택으로 바꾼 전체 치환 요청 항목(신규 행은 이 배열에 새 항목을 추가하는 방식으로 만든다 — id 를 생략하면 신규, 포함하면 기존 행 갱신). 순서 컬럼(sequenceNo)에 유일 제약(uq_inspection_item_spec)이 있어 두 행을 맞바꿀 때 중간 상태가 반드시 제약을 위반하는데, 전체 치환이면 그 상태가 화면에 노출되지 않는다 — 공유계약 A-5. ⚠ 전체 치환은 「행 교체」가 아니다 — inspection_measurement.inspection_item_spec_id 가 NOT NULL FK 로 참조하므로(routing_operation 을 work_order 가 참조하는 것과 같은 형태) DELETE 후 INSERT 로 구현하면 이미 측정 기록이 있는 항목이 무너진다. 서버는 기존 행을 유지하며 순서·내용만 갱신해야 한다. 근거: W-06-02 §4-C·§5-1 「항목 추가·삭제·순서 이동」 · 공유계약 A-5",
+        "properties": {
+          "inspectionItemSpecId": {
+            "x-source-column": "inspection_item_spec_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "inspectionPlanVersionId": {
+            "x-source-column": "inspection_plan_version_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "sequenceNo": {
+            "x-source-column": "sequence_no",
+            "type": "integer",
+            "minimum": 1,
+            "description": "CHECK > 0 · uq_inspection_item_spec(version_id, sequence_no). 채번 값 자체는 화면에 노출하지 않는다"
+          },
+          "inspectionItemCode": {
+            "x-source-column": "inspection_item_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "⚠ 버전 내 유일 제약이 없다 — 같은 코드를 두 줄에 넣을 수 있다 §8-3"
+          },
+          "inspectionItemName": {
+            "x-source-column": "inspection_item_name",
+            "type": "string",
+            "maxLength": 200,
+            "description": "⚠ 한/베 컬럼 없음"
+          },
+          "dataTypeCode": {
+            "x-source-column": "data_type_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "공통코드 — 수치/텍스트/불리언 [추정](근거: inspection_measurement 가 numeric_value·text_value·boolean_value 3종을 갖고 num_nonnulls ≤ 1 CHECK)"
+          },
+          "uomId": {
+            "x-source-column": "uom_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "수치형일 때만 의미 — 조건부 필수는 DB 에 없다 §8-3"
+          },
+          "targetValue": {
+            "x-source-column": "target_value",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "lowerLimit": {
+            "x-source-column": "lower_limit",
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "ck_inspection_limits — 상한 ≥ 하한(둘 다 있을 때만)"
+          },
+          "upperLimit": {
+            "x-source-column": "upper_limit",
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "ck_inspection_limits — 목표가 범위 밖인 것은 DB 가 막지 않는다. 서버가 경고한다(A-9 ⓑ 경고 등급) — W-06-02 §8-3"
+          },
+          "measurementCount": {
+            "x-source-column": "measurement_count",
+            "type": "integer",
+            "minimum": 1,
+            "default": 1,
+            "description": "CHECK > 0 · inspection_measurement.sample_no 의 상한"
+          },
+          "inspectionMethodCode": {
+            "x-source-column": "inspection_method_code",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 50
+          },
+          "defaultInspectionEquipmentId": {
+            "x-source-column": "default_inspection_equipment_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "equipment.calibration_required·calibration_due_date 와 연동 — 교정 만료 장비 선택 시 경고(차단 아님)"
+          },
+          "requiredFlag": {
+            "x-source-column": "required_flag",
+            "type": "boolean",
+            "default": true
+          },
+          "automaticJudgment": {
+            "x-source-column": "automatic_judgment",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "InspectionItemSpecListResponse": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InspectionItemSpec"
+            }
+          }
+        }
+      },
+      "DefectCode": {
+        "x-source-table": "quality.defect_code",
+        "type": "object",
+        "required": [
+          "defectCodeId",
+          "defectCode",
+          "defectName",
+          "isActive"
+        ],
+        "description": "2계층(parent_defect_code_id). ck_*_parent 자기참조 CHECK 가 없다 — department·location 에는 있는데 여기엔 없다(비대칭·#64). 3계층 이상은 결정 12 위반이라 서버가 차단한다. 미착지: 처분구분·다국어(ko/vi)·공정 N:M 매핑 — #64. N:M 테이블이 없어 공정 매핑 엔드포인트가 성립하지 않는다",
+        "properties": {
+          "defectCodeId": {
+            "x-source-column": "defect_code_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "defectCode": {
+            "x-source-column": "defect_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "defectName": {
+            "x-source-column": "defect_name",
+            "type": "string",
+            "maxLength": 200,
+            "description": "⚠ 결정 12 가 「다국어 명칭(ko/vi)」으로 컬럼 형태까지 지정했는데 단일 컬럼이다 §8-2"
+          },
+          "parentDefectCodeId": {
+            "x-source-column": "parent_defect_code_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "비우면 대분류, 채우면 상세[추정]. 자기참조 CHECK 없음 — 서버가 검사"
+          },
+          "processId": {
+            "x-source-column": "process_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "⚠ N:1 — 결정 12 가 N:M 으로 조정 승인했으나 물리 모델 미반영(§8-1). N:M 매핑 테이블이 없어 공정 매핑 엔드포인트를 만들 수 없다"
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "DefectCodeCreate": {
+        "x-source-table": "quality.defect_code",
+        "type": "object",
+        "required": [
+          "defectCode",
+          "defectName"
+        ],
+        "description": "불량코드 등록 요청. isActive 는 받지 않는다. 근거: W-06-03 §4-A·§5-1",
+        "properties": {
+          "defectCode": {
+            "x-source-column": "defect_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "uq — 전역 유일"
+          },
+          "defectName": {
+            "x-source-column": "defect_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "parentDefectCodeId": {
+            "x-source-column": "parent_defect_code_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "상세 추가 시 대분류를 지정(자동 설정) — 서버가 3계층 이상·자기참조를 차단"
+          },
+          "processId": {
+            "x-source-column": "process_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "DefectCodeUpdate": {
+        "x-source-table": "quality.defect_code",
+        "type": "object",
+        "required": [
+          "defectCode",
+          "defectName"
+        ],
+        "description": "불량코드 수정 요청. isActive 는 별도 :deactivate. 낙관적 잠금은 공유계약 B-1. 근거: W-06-03 §4-A",
+        "properties": {
+          "defectCode": {
+            "x-source-column": "defect_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "defectName": {
+            "x-source-column": "defect_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "parentDefectCodeId": {
+            "x-source-column": "parent_defect_code_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "processId": {
+            "x-source-column": "process_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "DefectCodeDetailResponse": {
+        "type": "object",
+        "required": [
+          "defectCode",
+          "editability"
+        ],
+        "properties": {
+          "defectCode": {
+            "$ref": "#/components/schemas/DefectCode"
+          },
+          "editability": {
+            "$ref": "#/components/schemas/Editability"
+          }
+        }
+      },
+      "CauseCode": {
+        "x-source-table": "quality.cause_code",
+        "type": "object",
+        "required": [
+          "causeCodeId",
+          "causeCode",
+          "causeName",
+          "isActive"
+        ],
+        "description": "불량 현상과 분리 관리(SQL 1906 주석). W-06-03 이 흡수한다 — 화면명 「불량·원인코드 2계층 마스터」",
+        "properties": {
+          "causeCodeId": {
+            "x-source-column": "cause_code_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "causeCode": {
+            "x-source-column": "cause_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "causeName": {
+            "x-source-column": "cause_name",
+            "type": "string",
+            "maxLength": 200,
+            "description": "다국어 결함 동일 — W-06-06 §8-1"
+          },
+          "parentCauseCodeId": {
+            "x-source-column": "parent_cause_code_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "defect_code 와 완전히 같은 구조. 자기참조 CHECK 없음"
+          },
+          "processId": {
+            "x-source-column": "process_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "CauseCodeCreate": {
+        "x-source-table": "quality.cause_code",
+        "type": "object",
+        "required": [
+          "causeCode",
+          "causeName"
+        ],
+        "description": "원인코드 등록 요청. isActive 는 받지 않는다. 근거: W-06-03 §4-C·§5-1",
+        "properties": {
+          "causeCode": {
+            "x-source-column": "cause_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "uq — 전역 유일"
+          },
+          "causeName": {
+            "x-source-column": "cause_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "parentCauseCodeId": {
+            "x-source-column": "parent_cause_code_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "processId": {
+            "x-source-column": "process_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "CauseCodeUpdate": {
+        "x-source-table": "quality.cause_code",
+        "type": "object",
+        "required": [
+          "causeCode",
+          "causeName"
+        ],
+        "description": "원인코드 수정 요청. isActive 는 별도 :deactivate. 낙관적 잠금은 공유계약 B-1. 근거: W-06-03 §4-C",
+        "properties": {
+          "causeCode": {
+            "x-source-column": "cause_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "causeName": {
+            "x-source-column": "cause_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "parentCauseCodeId": {
+            "x-source-column": "parent_cause_code_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "processId": {
+            "x-source-column": "process_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "CauseCodeDetailResponse": {
+        "type": "object",
+        "required": [
+          "causeCode",
+          "editability"
+        ],
+        "properties": {
+          "causeCode": {
+            "$ref": "#/components/schemas/CauseCode"
+          },
+          "editability": {
+            "$ref": "#/components/schemas/Editability"
           }
         }
       }
