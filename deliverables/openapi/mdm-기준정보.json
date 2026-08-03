@@ -4137,6 +4137,33 @@
           }
         }
       ],
+      "get": {
+        "tags": [
+          "planning"
+        ],
+        "summary": "BOM 구성품 상세",
+        "description": "ERP 원본 열(sequenceNo·componentItemId·requiredQty·uomId·scrapRate·isMandatory)과 MES 확장 열(routingOperationId·actualUseProcessId·lotTraceRequired·backflushAllowed)이 한 행에 섞인다. editability 는 원본 열이 항상 잠김임을 알린다(RECEIVED_FROM_ERP) — `Item`(같은 화면)과 같은 원리. 행 단위 GET 신설로 `PUT` 의 `If-Match` 가 실을 `ETag` 자리가 비로소 생겼다(§5 미착지 16 해소 — 2026-08-03 사용자 결정). 근거: W-06-05 §5-1 「구성품 확장 열 편집」",
+        "responses": {
+          "200": {
+            "description": "상세",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BomComponentDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "planning"
@@ -4164,6 +4191,14 @@
         "responses": {
           "200": {
             "description": "수정됨",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -9436,6 +9471,22 @@
             "items": {
               "$ref": "#/components/schemas/BomComponent"
             }
+          }
+        }
+      },
+      "BomComponentDetailResponse": {
+        "type": "object",
+        "required": [
+          "bomComponent",
+          "editability"
+        ],
+        "description": "editability 는 `Item`(같은 화면 W-06-05)과 같은 원리 — 원본 열이 항상 잠김임을 알린다(RECEIVED_FROM_ERP 고정). 참조 건수로 갈리지 않는다 — MES 확장 4열은 항상 편집 가능하고 나머지는 항상 잠김이다",
+        "properties": {
+          "bomComponent": {
+            "$ref": "#/components/schemas/BomComponent"
+          },
+          "editability": {
+            "$ref": "#/components/schemas/Editability"
           }
         }
       },
