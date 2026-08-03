@@ -6788,7 +6788,7 @@
           },
           "code": {
             "type": "string",
-            "description": "UNIQUE_VIOLATION · REQUIRED · RANGE · PAIR · PERMISSION_DENIED 등"
+            "description": "UNIQUE_VIOLATION · REQUIRED · RANGE · PAIR · PERMISSION_DENIED · STATE_LOCKED 등. STATE_LOCKED 는 확정·폐기 상태라 수정이 잠긴 것으로, 재로드해도 풀리지 않는다 — 재로드로 풀리는 저장 충돌(409)과 구분한다(공유계약 G-1)"
           },
           "uniqueScope": {
             "type": "array",
