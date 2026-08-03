@@ -3,7 +3,7 @@
   "info": {
     "title": "omf-mes 기준정보 도메인 API (초안)",
     "version": "0.1.0",
-    "description": "화면 상세 스펙 확대 1차에서 도출한 계약 초안. 정본은 물리 모델이며 이 문서는 그것을 옮긴 것이다. 근거·맥락은 deliverables/06-API-요구서.md 를 본다. WBS P0.4 API 계약 v0 의 초안 입력이며 계약 확정·소유는 통합 Agent 소관이다. 마스터 형 패턴의 개별 「변경 이력」(/history) 엔드포인트는 이슈 #68 해소 후에 추가한다 — target_id 가 FK 가 아니고 before_value/after_value jsonb 의 키 규약이 없어 지금 만들면 필드를 지어내게 된다. 다만 W-06-11(마스터 변경관리)이 필요로 하는 횡단 조회 GET /audit/events 는 Task 7 에서 추가했다 — 원본 컬럼(beforeValue·afterValue 포함)을 해석하지 않고 그대로 노출할 뿐이다(필드를 지어내지 않는다)."
+    "description": "화면 상세 스펙 확대 1차에서 도출한 계약 초안. 정본은 물리 모델이며 이 문서는 그것을 옮긴 것이다. 근거·맥락은 deliverables/06-API-요구서.md 를 본다. WBS P0.4 API 계약 v0 의 초안 입력이며 계약 확정·소유는 통합 Agent 소관이다. 마스터 형 패턴의 개별 「변경 이력」(/history) 엔드포인트는 이슈 #68 해소 후에 추가한다 — target_id 가 FK 가 아니고 before_value/after_value jsonb 의 키 규약이 없어 지금 만들면 필드를 지어내게 된다. 전 마스터의 「변경 이력」 액션은 그때까지 횡단 조회 GET /audit/events 하나로 받는다(W-06-11 §4-A·§5-1) — 원본 컬럼(beforeValue·afterValue 포함)을 해석하지 않고 그대로 노출할 뿐이다."
   },
   "servers": [
     {
@@ -195,6 +195,14 @@
         "responses": {
           "200": {
             "description": "상세",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -232,6 +240,14 @@
         "responses": {
           "200": {
             "description": "수정됨",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -294,6 +310,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
           }
         ],
         "responses": {
@@ -318,7 +337,7 @@
             }
           },
           "409": {
-            "description": "충돌",
+            "description": "낙관적 잠금 충돌 — ConflictResponse.conflictCause 3값. 사용 중지도 is_active·version_no 를 쓰는 행 갱신이라 다른 쓰기와 같은 규칙을 적용한다(공유계약 A-4 「version_no 가 있으면 B-1 을 반드시 구현」). 업무 규칙 위반(상태 잠김·참조 존재)은 409 가 아니라 400 이다",
             "content": {
               "application/json": {
                 "schema": {
@@ -485,6 +504,14 @@
         "responses": {
           "200": {
             "description": "상세",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -522,6 +549,14 @@
         "responses": {
           "200": {
             "description": "수정됨",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -584,6 +619,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
           }
         ],
         "responses": {
@@ -608,7 +646,7 @@
             }
           },
           "409": {
-            "description": "충돌",
+            "description": "낙관적 잠금 충돌 — ConflictResponse.conflictCause 3값. 사용 중지도 is_active·version_no 를 쓰는 행 갱신이라 다른 쓰기와 같은 규칙을 적용한다(공유계약 A-4 「version_no 가 있으면 B-1 을 반드시 구현」). 업무 규칙 위반(상태 잠김·참조 존재)은 409 가 아니라 400 이다",
             "content": {
               "application/json": {
                 "schema": {
@@ -793,6 +831,14 @@
         "responses": {
           "200": {
             "description": "상세",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -830,6 +876,14 @@
         "responses": {
           "200": {
             "description": "수정됨",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -892,6 +946,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
           }
         ],
         "responses": {
@@ -916,7 +973,7 @@
             }
           },
           "409": {
-            "description": "충돌",
+            "description": "낙관적 잠금 충돌 — ConflictResponse.conflictCause 3값. 사용 중지도 is_active·version_no 를 쓰는 행 갱신이라 다른 쓰기와 같은 규칙을 적용한다(공유계약 A-4 「version_no 가 있으면 B-1 을 반드시 구현」). 업무 규칙 위반(상태 잠김·참조 존재)은 409 가 아니라 400 이다",
             "content": {
               "application/json": {
                 "schema": {
@@ -1295,6 +1352,14 @@
         "responses": {
           "200": {
             "description": "상세",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -1332,6 +1397,14 @@
         "responses": {
           "200": {
             "description": "수정됨",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -1394,6 +1467,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
           }
         ],
         "responses": {
@@ -1418,7 +1494,7 @@
             }
           },
           "409": {
-            "description": "충돌",
+            "description": "낙관적 잠금 충돌 — ConflictResponse.conflictCause 3값. 사용 중지도 is_active·version_no 를 쓰는 행 갱신이라 다른 쓰기와 같은 규칙을 적용한다(공유계약 A-4 「version_no 가 있으면 B-1 을 반드시 구현」). 업무 규칙 위반(상태 잠김·참조 존재)은 409 가 아니라 400 이다",
             "content": {
               "application/json": {
                 "schema": {
@@ -1635,6 +1711,14 @@
         "responses": {
           "200": {
             "description": "상세",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -1672,6 +1756,14 @@
         "responses": {
           "200": {
             "description": "수정됨",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -2242,6 +2334,14 @@
         "responses": {
           "200": {
             "description": "상세",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -2279,6 +2379,14 @@
         "responses": {
           "200": {
             "description": "수정됨",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -2341,6 +2449,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
           }
         ],
         "responses": {
@@ -2365,7 +2476,7 @@
             }
           },
           "409": {
-            "description": "충돌",
+            "description": "낙관적 잠금 충돌 — ConflictResponse.conflictCause 3값. 사용 중지도 is_active·version_no 를 쓰는 행 갱신이라 다른 쓰기와 같은 규칙을 적용한다(공유계약 A-4 「version_no 가 있으면 B-1 을 반드시 구현」). 업무 규칙 위반(상태 잠김·참조 존재)은 409 가 아니라 400 이다",
             "content": {
               "application/json": {
                 "schema": {
@@ -2532,6 +2643,14 @@
         "responses": {
           "200": {
             "description": "상세",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -2569,6 +2688,14 @@
         "responses": {
           "200": {
             "description": "수정됨",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -2631,6 +2758,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
           }
         ],
         "responses": {
@@ -2655,7 +2785,7 @@
             }
           },
           "409": {
-            "description": "충돌",
+            "description": "낙관적 잠금 충돌 — ConflictResponse.conflictCause 3값. 사용 중지도 is_active·version_no 를 쓰는 행 갱신이라 다른 쓰기와 같은 규칙을 적용한다(공유계약 A-4 「version_no 가 있으면 B-1 을 반드시 구현」). 업무 규칙 위반(상태 잠김·참조 존재)은 409 가 아니라 400 이다",
             "content": {
               "application/json": {
                 "schema": {
@@ -2820,6 +2950,14 @@
         "responses": {
           "200": {
             "description": "상세",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -2857,6 +2995,14 @@
         "responses": {
           "200": {
             "description": "수정됨",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -2919,6 +3065,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
           }
         ],
         "responses": {
@@ -2943,7 +3092,7 @@
             }
           },
           "409": {
-            "description": "충돌",
+            "description": "낙관적 잠금 충돌 — ConflictResponse.conflictCause 3값. 사용 중지도 is_active·version_no 를 쓰는 행 갱신이라 다른 쓰기와 같은 규칙을 적용한다(공유계약 A-4 「version_no 가 있으면 B-1 을 반드시 구현」). 업무 규칙 위반(상태 잠김·참조 존재)은 409 가 아니라 400 이다",
             "content": {
               "application/json": {
                 "schema": {
@@ -3230,7 +3379,7 @@
           "mdm"
         ],
         "summary": "품목 목록",
-        "description": "근거: W-06-05 §3 좌측 품목 목록 · 공유계약 G-8(유효성 판정은 서버가 한다)",
+        "description": "품목 목록. W-06-05 는 확장 속성 편집 대상으로, W-06-01 은 Routing 을 붙일 대상으로 같은 목록을 쓴다. 근거: W-06-05 §3 좌측 품목 목록 · W-06-01 §3 좌측 품목 검색·§6 · 공유계약 G-8(유효성 판정은 서버가 한다)",
         "parameters": [
           {
             "name": "q",
@@ -3246,6 +3395,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "hasRouting",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Routing 보유 여부로 거른다. false 면 Routing 이 한 건도 없는 품목만 낸다 — W-06-01 §6 「Routing 미보유 품목 필터를 제공해 보강 등록을 돕는다」. 이것이 없으면 화면이 전 품목과 전 Routing 을 받아 스스로 대조해야 한다"
           },
           {
             "name": "includeInactive",
@@ -3322,6 +3480,14 @@
         "responses": {
           "200": {
             "description": "상세",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -3359,6 +3525,14 @@
         "responses": {
           "200": {
             "description": "수정됨",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -4191,6 +4365,14 @@
         "responses": {
           "200": {
             "description": "상세",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -4228,6 +4410,14 @@
         "responses": {
           "200": {
             "description": "수정됨",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -4290,6 +4480,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
           }
         ],
         "responses": {
@@ -4314,7 +4507,7 @@
             }
           },
           "409": {
-            "description": "충돌",
+            "description": "낙관적 잠금 충돌 — ConflictResponse.conflictCause 3값. 사용 중지도 is_active·version_no 를 쓰는 행 갱신이라 다른 쓰기와 같은 규칙을 적용한다(공유계약 A-4 「version_no 가 있으면 B-1 을 반드시 구현」). 업무 규칙 위반(상태 잠김·참조 존재)은 409 가 아니라 400 이다",
             "content": {
               "application/json": {
                 "schema": {
@@ -4491,6 +4684,14 @@
         "responses": {
           "200": {
             "description": "상세",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -4528,6 +4729,14 @@
         "responses": {
           "200": {
             "description": "수정됨",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -4991,6 +5200,14 @@
         "responses": {
           "200": {
             "description": "상세",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -5028,6 +5245,14 @@
         "responses": {
           "200": {
             "description": "수정됨",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -5090,6 +5315,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
           }
         ],
         "responses": {
@@ -5114,7 +5342,7 @@
             }
           },
           "409": {
-            "description": "충돌",
+            "description": "낙관적 잠금 충돌 — ConflictResponse.conflictCause 3값. 사용 중지도 is_active·version_no 를 쓰는 행 갱신이라 다른 쓰기와 같은 규칙을 적용한다(공유계약 A-4 「version_no 가 있으면 B-1 을 반드시 구현」). 업무 규칙 위반(상태 잠김·참조 존재)은 409 가 아니라 400 이다",
             "content": {
               "application/json": {
                 "schema": {
@@ -5279,6 +5507,14 @@
         "responses": {
           "200": {
             "description": "상세",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -5316,6 +5552,14 @@
         "responses": {
           "200": {
             "description": "수정됨",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -5378,6 +5622,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
           }
         ],
         "responses": {
@@ -5402,7 +5649,7 @@
             }
           },
           "409": {
-            "description": "충돌",
+            "description": "낙관적 잠금 충돌 — ConflictResponse.conflictCause 3값. 사용 중지도 is_active·version_no 를 쓰는 행 갱신이라 다른 쓰기와 같은 규칙을 적용한다(공유계약 A-4 「version_no 가 있으면 B-1 을 반드시 구현」). 업무 규칙 위반(상태 잠김·참조 존재)은 409 가 아니라 400 이다",
             "content": {
               "application/json": {
                 "schema": {
@@ -5562,14 +5809,14 @@
           "integration"
         ],
         "summary": "연계 메시지 상세",
-        "description": "payload(jsonb) 전문·lastErrorMessage 전문을 포함한다. ⚠ payload 는 대외비를 담을 수 있어 노출 범위가 미결이다 — W-06-10 §8-4(내보내기 기능과 함께 판단해야 한다). 근거: W-06-10 §4-C",
+        "description": "payload(jsonb) 전문·lastErrorMessage 전문을 포함한다 — 목록 응답에는 payload 가 없고 이 상세에만 있다. ⚠ payload 는 대외비를 담을 수 있어 노출 범위가 미결이다 — W-06-10 §8-4(내보내기 기능과 함께 판단해야 한다). 근거: W-06-10 §4-C",
         "responses": {
           "200": {
             "description": "상세",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/IntegrationMessage"
+                  "$ref": "#/components/schemas/IntegrationMessageDetail"
                 }
               }
             }
@@ -5851,7 +6098,7 @@
           "lookup"
         ],
         "summary": "단위(UOM) 목록",
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 화면이 쓰는 것은 uomId·uomCode·uomName 이고 decimalScale 은 수량 입력란의 소수 자릿수 판정에 쓴다. 근거: W-06-07 §4-B 수용량 단위 · W-06-05 §4-A 기준단위 표시·§4-C 단위 환산 전/후 · W-06-02 §4-C 검사 항목 단위",
         "parameters": [
           {
             "name": "q",
@@ -5922,7 +6169,7 @@
           "lookup"
         ],
         "summary": "거래처 목록",
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 화면이 쓰는 것은 partnerId·partnerName 이다. countryCode·erpPartnerCode 는 이 10화면이 표시하지 않는다 — 물리 모델 1:1 유지(00-설계 §3-2 규칙 2)로 옮겼을 뿐이며 서버가 목록에서 빼도 화면은 영향받지 않는다. 근거: W-06-07 §4-A 외부창고 거래처(조건부 필수 ck_external_warehouse_partner) · W-06-05 §4-D 외부코드 거래처",
         "parameters": [
           {
             "name": "q",
@@ -5993,7 +6240,7 @@
           "lookup"
         ],
         "summary": "법인 목록",
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: 없음 — 이 10화면 중 어느 화면도 직접 쓰지 않는다(06-API-요구서 §4-3). business_unit·plant 응답의 legalEntityId 를 이름으로 풀 때만 필요하며, 「법인」 축을 부여·표시하는 화면은 아직 없다. W-CO-02 §9-3 의 법인 축 부재(#69)가 해소되면 데이터 접근범위가 첫 사용처가 된다",
         "parameters": [
           {
             "name": "q",
@@ -6064,7 +6311,7 @@
           "lookup"
         ],
         "summary": "사업부 목록",
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 화면이 쓰는 것은 businessUnitId·businessUnitName 이다. 근거: W-06-07 §4-A · W-06-06 §4-C 부서의 사업부·§4-D 작업자(읽기 전용 표시) · W-CO-02 §4-D 데이터 접근범위 · W-06-05 §3 사업부매핑 탭",
         "parameters": [
           {
             "name": "q",
@@ -6143,7 +6390,7 @@
           "lookup"
         ],
         "summary": "공장 목록",
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 화면이 쓰는 것은 plantId·plantName 이다. timezoneCode 는 이 10화면이 표시하지 않는다 — 물리 모델 1:1 유지로 옮겼을 뿐이다. 근거: W-06-07 §4-A(창고 유일키 구성) · W-CO-02 §4-D · W-06-06 §3 작업자 탭 공장 필터",
         "parameters": [
           {
             "name": "q",
@@ -6230,7 +6477,7 @@
           "lookup"
         ],
         "summary": "생산라인 목록",
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: 없음 — 이 10화면 중 어느 화면도 선택 목록으로 쓰지 않는다(06-API-요구서 §4-3). 라인·작업구역 마스터의 귀속 화면이 미정이다(W-06-07 §7-2 · W-06-06 §7-2 · W-CO-02 §7-2 의 계층 표시 갭 표). equipment 응답의 productionLineId 를 이름으로 풀 때만 쓴다",
         "parameters": [
           {
             "name": "q",
@@ -6309,7 +6556,7 @@
           "lookup"
         ],
         "summary": "공정 목록",
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 화면이 쓰는 것은 processId·processName 이다. 근거: W-06-01 §4-B 공정 · W-06-02 §4-A 검사 대상 공정 · W-06-03 §4-A·§4-C 공정 · W-06-05 §4-F 실제 사용 공정 · W-06-06 §4-E 자격 대상 공정. ⚠ 공정 마스터의 관리 화면이 어디인지 자체가 미결이다 — W-06-01 §8-5",
         "parameters": [
           {
             "name": "q",
@@ -6380,7 +6627,7 @@
           "lookup"
         ],
         "summary": "설비 목록",
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 화면이 쓰는 것은 equipmentId·equipmentName 과 calibrationRequired·calibrationDueDate 다 — 뒤 둘은 교정 만료 장비를 지정할 때 경고를 띄우는 판정 입력이다(W-06-02 §6, 공유계약 A-9 ⓑ 경고). statusCode·equipmentTypeCode·plantId·processId·productionLineId·lastCalibrationDate 는 이 화면이 표시하지 않는다 — 물리 모델 1:1 유지로 옮겼을 뿐이다. 근거: W-06-02 §4-C 지정 검사장비",
         "parameters": [
           {
             "name": "q",
@@ -6480,7 +6727,7 @@
         "schema": {
           "type": "string"
         },
-        "description": "낙관적 잠금용 version_no. 근거: 공유계약 B-1"
+        "description": "낙관적 잠금용 version_no. 값은 같은 리소스의 상세 GET 200 이 내려주는 ETag 응답 헤더에서 받는다 — version_no 는 공유계약 A-4 에 따라 본문 필드로 노출하지 않는다. 근거: 공유계약 B-1"
       }
     },
     "schemas": {
@@ -10252,13 +10499,12 @@
           "directionCode",
           "targetTypeCode",
           "targetId",
-          "payload",
           "statusCode",
           "retryCount",
           "createdAt",
           "availableAt"
         ],
-        "description": "message_key 가 UNIQUE 라 재처리는 중복 전송이 아니다. lockedBy 가 있으면 워커가 처리 중이므로 재처리를 거부하고 409 conflictCause=workerLease 로 응답한다. version_no 가 없어 낙관적 잠금 대신 리스 충돌이다 — 공유계약 B-1·C-4. payload 는 대외비를 담을 수 있어 노출 범위가 미결이다 — W-06-10 §8-4",
+        "description": "message_key 가 UNIQUE 라 재처리는 중복 전송이 아니다. lockedBy 가 있으면 워커가 처리 중이므로 재처리를 거부하고 409 conflictCause=workerLease 로 응답한다. version_no 가 없어 낙관적 잠금 대신 리스 충돌이다 — 공유계약 B-1·C-4. payload 는 이 스키마에 없다 — W-06-10 §4-B 표시 열에 payload 가 없고 대외비 노출 범위가 미결(§8-4)이라, 목록이 전 행의 payload 를 나르지 않도록 상세 전용 IntegrationMessageDetail 로 분리했다",
         "properties": {
           "integrationMessageId": {
             "x-source-column": "integration_message_id",
@@ -10293,11 +10539,6 @@
             "type": "integer",
             "format": "int64",
             "description": "⚠ FK 가 아니다 — 표시명 해석은 화면 책임(W-06-11 §8-2 와 같은 결손)"
-          },
-          "payload": {
-            "x-source-column": "payload",
-            "type": "object",
-            "description": "실제 전송 내용(jsonb). ⚠ 대외비 노출 위험 — 노출 범위 미결 §8-4"
           },
           "statusCode": {
             "x-source-column": "status_code",
@@ -10366,6 +10607,27 @@
             "description": "값이 있으면 워커가 처리 중 — 이 상태에서는 :retry 가 409(workerLease)"
           }
         }
+      },
+      "IntegrationMessageDetail": {
+        "description": "W-06-10 §4-C 상세 패널 전용 — 목록(IntegrationMessage)에 payload 를 싣지 않는다. payload 는 거래처·단가·수량 등 대외비를 담을 수 있어 노출 범위가 미결이고(§8-4), 권한이 없으면 이 응답 자체가 403 이다",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/IntegrationMessage"
+          },
+          {
+            "type": "object",
+            "required": [
+              "payload"
+            ],
+            "properties": {
+              "payload": {
+                "x-source-column": "payload",
+                "type": "object",
+                "description": "실제 전송 내용(jsonb). ⚠ 대외비 노출 위험 — 노출 범위 미결 §8-4"
+              }
+            }
+          }
+        ]
       },
       "AuditEvent": {
         "x-source-table": "audit.audit_event",
@@ -10470,7 +10732,7 @@
           "decimalScale",
           "isActive"
         ],
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 화면이 쓰는 것은 uomId·uomCode·uomName 이고 decimalScale 은 수량 입력란의 소수 자릿수 판정에 쓴다. 근거: W-06-07 §4-B 수용량 단위 · W-06-05 §4-A 기준단위 표시·§4-C 단위 환산 전/후 · W-06-02 §4-C 검사 항목 단위",
         "properties": {
           "uomId": {
             "x-source-column": "uom_id",
@@ -10511,7 +10773,7 @@
           "partnerName",
           "isActive"
         ],
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 화면이 쓰는 것은 partnerId·partnerName 이다. countryCode·erpPartnerCode 는 이 10화면이 표시하지 않는다 — 물리 모델 1:1 유지(00-설계 §3-2 규칙 2)로 옮겼을 뿐이며 서버가 목록에서 빼도 화면은 영향받지 않는다. 근거: W-06-07 §4-A 외부창고 거래처(조건부 필수 ck_external_warehouse_partner) · W-06-05 §4-D 외부코드 거래처",
         "properties": {
           "partnerId": {
             "x-source-column": "partner_id",
@@ -10562,7 +10824,7 @@
           "timezoneCode",
           "isActive"
         ],
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: 없음 — 이 10화면 중 어느 화면도 직접 쓰지 않는다(06-API-요구서 §4-3). business_unit·plant 응답의 legalEntityId 를 이름으로 풀 때만 필요하며, 「법인」 축을 부여·표시하는 화면은 아직 없다. W-CO-02 §9-3 의 법인 축 부재(#69)가 해소되면 데이터 접근범위가 첫 사용처가 된다",
         "properties": {
           "legalEntityId": {
             "x-source-column": "legal_entity_id",
@@ -10606,7 +10868,7 @@
           "businessUnitName",
           "isActive"
         ],
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 화면이 쓰는 것은 businessUnitId·businessUnitName 이다. 근거: W-06-07 §4-A · W-06-06 §4-C 부서의 사업부·§4-D 작업자(읽기 전용 표시) · W-CO-02 §4-D 데이터 접근범위 · W-06-05 §3 사업부매핑 탭",
         "properties": {
           "businessUnitId": {
             "x-source-column": "business_unit_id",
@@ -10647,7 +10909,7 @@
           "timezoneCode",
           "isActive"
         ],
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 화면이 쓰는 것은 plantId·plantName 이다. timezoneCode 는 이 10화면이 표시하지 않는다 — 물리 모델 1:1 유지로 옮겼을 뿐이다. 근거: W-06-07 §4-A(창고 유일키 구성) · W-CO-02 §4-D · W-06-06 §3 작업자 탭 공장 필터",
         "properties": {
           "plantId": {
             "x-source-column": "plant_id",
@@ -10701,7 +10963,7 @@
           "lineTypeCode",
           "isActive"
         ],
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5 계층(parent_line_id) — 귀속 관리 화면 미정(W-06-06 §7-2 「세 곳 규칙」 표 참고).",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: 없음 — 이 10화면 중 어느 화면도 선택 목록으로 쓰지 않는다(06-API-요구서 §4-3). 라인·작업구역 마스터의 귀속 화면이 미정이다(W-06-07 §7-2 · W-06-06 §7-2 · W-CO-02 §7-2 의 계층 표시 갭 표). equipment 응답의 productionLineId 를 이름으로 풀 때만 쓴다 계층(parent_line_id) — 귀속 관리 화면 미정(W-06-06 §7-2 「세 곳 규칙」 표 참고).",
         "properties": {
           "productionLineId": {
             "x-source-column": "production_line_id",
@@ -10757,7 +11019,7 @@
           "processTypeCode",
           "isActive"
         ],
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 화면이 쓰는 것은 processId·processName 이다. 근거: W-06-01 §4-B 공정 · W-06-02 §4-A 검사 대상 공정 · W-06-03 §4-A·§4-C 공정 · W-06-05 §4-F 실제 사용 공정 · W-06-06 §4-E 자격 대상 공정. ⚠ 공정 마스터의 관리 화면이 어디인지 자체가 미결이다 — W-06-01 §8-5",
         "properties": {
           "processId": {
             "x-source-column": "process_id",
@@ -10800,7 +11062,7 @@
           "calibrationRequired",
           "isActive"
         ],
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: Task 7 브리프 Step 5 calibrationRequired·calibrationDueDate 는 W-06-02 검사 항목의 「지정 검사장비」 선택 시 교정 만료 경고에 쓰인다(W-06-02 §4-C).",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 화면이 쓰는 것은 equipmentId·equipmentName 과 calibrationRequired·calibrationDueDate 다 — 뒤 둘은 교정 만료 장비를 지정할 때 경고를 띄우는 판정 입력이다(W-06-02 §6, 공유계약 A-9 ⓑ 경고). statusCode·equipmentTypeCode·plantId·processId·productionLineId·lastCalibrationDate 는 이 화면이 표시하지 않는다 — 물리 모델 1:1 유지로 옮겼을 뿐이다. 근거: W-06-02 §4-C 지정 검사장비",
         "properties": {
           "equipmentId": {
             "x-source-column": "equipment_id",
