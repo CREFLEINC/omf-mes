@@ -10323,7 +10323,7 @@
             "x-source-column": "created_at",
             "type": "string",
             "format": "date-time",
-            "description": "감사 컬럼 제외 원칙(공유계약 A-4)의 의도된 예외다. 이 테이블은 created_at 하나만 있고 created_by·updated_at·updated_by·version_no 는 없으며, created_at 은 워크플로 타임스탐프로서 화면 W-06-10 §4-B 가 「생성」 열로 명시 요구한다"
+            "description": "감사 컬럼 제외 원칙(공유계약 A-4)의 의도된 예외다. 이 테이블은 created_at 하나만 있고 created_by·updated_at·updated_by·version_no 는 없으며, created_at 은 워크플로 타임스탬프로서 화면 W-06-10 §4-B 가 「생성」 열로 명시 요구한다"
           },
           "availableAt": {
             "x-source-column": "available_at",
