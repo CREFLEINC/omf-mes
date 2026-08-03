@@ -2096,6 +2096,1133 @@
           }
         }
       }
+    },
+    "/mdm/code-groups": {
+      "get": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "코드그룹 목록",
+        "description": "근거: W-06-06 §3 좌측 그룹 목록 · 공유계약 G-8(유효성 판정은 서버가 한다)",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "그룹코드·그룹명 검색"
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CodeGroup"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "코드그룹 등록",
+        "description": "근거: W-06-06 §5-1 「그룹 추가」 · 공유계약 A-1(유일 위반은 범위를 담아 응답). ⚠ 코드그룹의 정본이 ERP 인지 MES 인지는 미결이다(§5-4 「구멍」 · §8-7 — WF06 S1 Boundary 는 「정본=ERP」이나 Action 은 「MES 에서 정의」라 원문 안에서 갈린다). 결정 전까지는 등록을 막지 않는다",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CodeGroupCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "등록됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CodeGroup"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-06 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/code-groups/{codeGroupId}": {
+      "parameters": [
+        {
+          "name": "codeGroupId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "코드그룹 상세",
+        "description": "근거: W-06-06 §4-A · 공유계약 B-4(참조 건수를 응답에 담는다 — 화면이 세지 않는다)",
+        "responses": {
+          "200": {
+            "description": "상세",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CodeGroupDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "코드그룹 수정",
+        "description": "근거: W-06-06 §4-A · 공유계약 B-1(낙관적 잠금 — 덮어쓰기 강제는 제공하지 않는다)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CodeGroupUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "수정됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CodeGroup"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-06 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/code-groups/{codeGroupId}:deactivate": {
+      "parameters": [
+        {
+          "name": "codeGroupId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "코드그룹 사용 중지",
+        "description": "물리 삭제는 제공하지 않는다. 참조 중(code_value 존재)이면 확인 다이얼로그 + 참조 건수. 근거: W-06-06 §5-1 · 공유계약 B-4",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "중지됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CodeGroup"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-06 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/code-values": {
+      "get": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "코드값 목록",
+        "description": "코드그룹을 고른 뒤에만 조회한다. 판정유형 코드도 이 경로로 조회한다(W-06-04 는 codeGroupId 를 「판정유형」 그룹으로 고정해 호출한다). 근거: W-06-06 §3 코드값 목록 · W-06-04 §4-A · 공유계약 G-8(유효성 판정은 서버가 한다)",
+        "parameters": [
+          {
+            "name": "codeGroupId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "필수. 코드값은 그룹을 고른 뒤에 본다"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "코드·코드명 검색"
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CodeValue"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "코드값 등록",
+        "description": "좌측에서 선택한 코드그룹으로 codeGroupId 를 고정한다. uq_code_value — codeGroupId 내 유일(A-1). 근거: W-06-06 §5-1 「코드값 추가」 · W-06-04 §5-1 「판정유형 추가」",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CodeValueCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "등록됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CodeValue"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-06 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/code-values/{codeValueId}": {
+      "parameters": [
+        {
+          "name": "codeValueId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "코드값 상세",
+        "description": "근거: W-06-06 §4-B · 공유계약 B-4",
+        "responses": {
+          "200": {
+            "description": "상세",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CodeValueDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "코드값 수정",
+        "description": "codeGroupId 는 신규만(편집 불가). isActive 는 별도 :deactivate. displayOrder 재배치는 이 PUT 으로 한 행씩 바꾼다 — display_order 에는 유일 제약이 없어 전체 치환(A-5)이 불필요하다. ck_code_value_dates 짝 제약(A-2). code 는 전 하류가 code_t 문자열로만 참조해 FK 참조 건수를 셀 수 없다 — editability.reason=NOT_COUNTABLE 로 무조건 잠근다(공유계약 B-4, AppUser.loginId 와 같은 형태). 낙관적 잠금은 공유계약 B-1. 근거: W-06-06 §4-B · W-06-04 §4-A·§5-1 「정렬 재배치」",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CodeValueUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "수정됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CodeValue"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-06 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/code-values/{codeValueId}:deactivate": {
+      "parameters": [
+        {
+          "name": "codeValueId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "코드값 사용 중지",
+        "description": "물리 삭제는 제공하지 않는다. 끄면 신규 선택지에서 제외되고 과거 데이터는 그대로 남는다(참조 건수는 셀 수 없어 확인 다이얼로그 없이 즉시 처리한다). 근거: W-06-06 §5-1 · W-06-04 §5-1 · 공유계약 B-4",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "중지됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CodeValue"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-06 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/departments": {
+      "get": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "부서 목록",
+        "description": "계층 전체(들여쓰기 표시는 화면 책임). 근거: W-06-06 §3 조직(부서) 탭 · 공유계약 G-8",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "부서코드·부서명 검색"
+          },
+          {
+            "name": "businessUnitId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Department"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "부서 등록",
+        "description": "ck_department_parent 는 자기 자신만 막고 순환(A→B→A)은 막지 않으므로 서버가 검사한다. 근거: W-06-06 §4-C·§5-1 · 공유계약 A-1",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepartmentCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "등록됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Department"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패 — 자기참조 포함(ck_department_parent)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-06 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/departments/{departmentId}": {
+      "parameters": [
+        {
+          "name": "departmentId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "부서 상세",
+        "description": "근거: W-06-06 §4-C · 공유계약 B-4",
+        "responses": {
+          "200": {
+            "description": "상세",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepartmentDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "부서 수정",
+        "description": "⚠ W-06-06 §5-4 는 부서를 ERP 수신본으로 규정해 전 필드를 읽기 전용으로 두어야 한다고 적었으나, 판정할 수신본 식별 컬럼이 없어(#65) 이 API 는 잠정적으로 마스터 형(전 필드 편집 가능)으로 노출한다 — 컬럼이 생기면 편집을 막아야 한다. ck_department_parent 는 자기 자신만 막고 순환은 막지 않으므로 서버가 검사한다. 낙관적 잠금은 공유계약 B-1. 근거: W-06-06 §4-C·§5-4",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepartmentUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "수정됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Department"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패 — 자기참조 또는 순환 참조 포함",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-06 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/departments/{departmentId}:deactivate": {
+      "parameters": [
+        {
+          "name": "departmentId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "부서 사용 중지",
+        "description": "물리 삭제는 제공하지 않는다. worker·app_user 가 참조 중이면 확인 다이얼로그 + 참조 건수. 근거: W-06-06 §5-1 · 공유계약 B-4",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "중지됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Department"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-06 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/workers": {
+      "get": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "작업자 목록",
+        "description": "ERP 수신본. 전 필드 읽기 전용 — 근거: W-06-06 §3 작업자 탭 좌측 목록 · §5-4 · 공유계약 G-8",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "사번·성명 검색"
+          },
+          {
+            "name": "departmentId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "plantId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "businessUnitId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Worker"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/workers/{workerId}": {
+      "parameters": [
+        {
+          "name": "workerId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "작업자 상세 (읽기 전용)",
+        "description": "쓰기 경로를 제공하지 않는다 — 작업자 기본 정보는 전부 ERP 수신본이다(W-06-06 §5-4). editability.reason 은 항상 RECEIVED_FROM_ERP 로 고정한다 — 이 테이블 전체가 ERP 수신본이라 행 단위 식별 플래그(#65)가 없어도 판정에 모호함이 없다. 자격·인증 편집은 GET/PUT .../qualifications 를 쓴다. 근거: W-06-06 §4-D·§5-4",
+        "responses": {
+          "200": {
+            "description": "상세",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/workers/{workerId}/qualifications": {
+      "parameters": [
+        {
+          "name": "workerId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "작업자 자격·인증 목록",
+        "description": "MES 확장 · 편집 가능. 근거: W-06-06 §4-E",
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerQualificationListResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "자격·인증 전체 치환",
+        "description": "개별 부여·회수가 아니라 최종 상태를 통째로 보낸다. uq_worker_qualification 이 COALESCE(process_id,0) 으로 접는다 — 빈 축은 (전체 공정)으로 표기(A-7). certified_by 는 FK 없는 bigint 라 무엇을 가리키는지 하류에 근거가 없다 — #64. valid_to 만료는 검사 확정을 막는다(공유계약 B-2). worker_qualification 은 created_at·created_by 만 있고 is_active·updated_at·version_no 가 없다 — 「물리 삭제 금지」(B-4)를 적용하지 않는다. 서버는 한 트랜잭션으로 반영한다. 근거: W-06-06 §4-E·§5-1 「자격 추가/삭제」 · 공유계약 B-6",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "qualifications"
+                ],
+                "properties": {
+                  "qualifications": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "qualificationTypeCode",
+                        "validFrom"
+                      ],
+                      "properties": {
+                        "qualificationTypeCode": {
+                          "type": "string",
+                          "maxLength": 50,
+                          "description": "공통코드 — 값 목록 미정 §8-5"
+                        },
+                        "processId": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "format": "int64",
+                          "description": "비우면 (전체 공정) — A-7"
+                        },
+                        "certificateNo": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "maxLength": 100
+                        },
+                        "validFrom": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "validTo": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "format": "date",
+                          "description": "ck_worker_qualification_dates — 있으면 validFrom 이상. 비우면 무기한"
+                        },
+                        "certifiedBy": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "format": "int64",
+                          "description": "FK 없음 — 무엇을 가리키는지 근거 없음 §8-2"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "치환됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerQualificationListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패 — 유일 위반(uq_worker_qualification) 또는 날짜 짝 제약 위반",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-06 §6 · §8-8(편집 권한 매트릭스는 미결)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3589,6 +4716,598 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RoutingOperationDependency"
+            }
+          }
+        }
+      },
+      "CodeGroup": {
+        "x-source-table": "mdm.code_group",
+        "type": "object",
+        "required": [
+          "codeGroupId",
+          "groupCode",
+          "groupName",
+          "isActive"
+        ],
+        "description": "코드그룹 — 공통코드 값 목록의 최상위 분류. 근거: W-06-06 §4-A. 등록 주체(ERP/MES)가 미결이라(§5-4 「구멍」·§8-7) 잠정적으로 MES 등록을 허용한다",
+        "properties": {
+          "codeGroupId": {
+            "x-source-column": "code_group_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "groupCode": {
+            "x-source-column": "group_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "groupName": {
+            "x-source-column": "group_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "description": {
+            "x-source-column": "description",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "CodeGroupCreate": {
+        "x-source-table": "mdm.code_group",
+        "type": "object",
+        "required": [
+          "groupCode",
+          "groupName"
+        ],
+        "description": "코드그룹 등록 요청. isActive 는 받지 않는다(신규는 항상 사용 중). 근거: W-06-06 §5-1 「그룹 추가」",
+        "properties": {
+          "groupCode": {
+            "x-source-column": "group_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "uq — 전역 유일. 공백만 불가"
+          },
+          "groupName": {
+            "x-source-column": "group_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "description": {
+            "x-source-column": "description",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "CodeGroupUpdate": {
+        "x-source-table": "mdm.code_group",
+        "type": "object",
+        "required": [
+          "groupCode",
+          "groupName"
+        ],
+        "description": "코드그룹 수정 요청. isActive 는 별도 사용 중지 액션(:deactivate)으로만 바꾼다. groupCode 는 code_value 가 FK 로 참조하므로 참조 건수를 셀 수 있다 — 실제 편집 가능 여부는 GET 응답의 editability(B-4)를 따른다. 낙관적 잠금은 공유계약 B-1. 근거: W-06-06 §4-A",
+        "properties": {
+          "groupCode": {
+            "x-source-column": "group_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "groupName": {
+            "x-source-column": "group_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "description": {
+            "x-source-column": "description",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "CodeGroupDetailResponse": {
+        "type": "object",
+        "required": [
+          "codeGroup",
+          "editability"
+        ],
+        "properties": {
+          "codeGroup": {
+            "$ref": "#/components/schemas/CodeGroup"
+          },
+          "editability": {
+            "$ref": "#/components/schemas/Editability"
+          }
+        }
+      },
+      "CodeValue": {
+        "x-source-table": "mdm.code_value",
+        "type": "object",
+        "required": [
+          "codeValueId",
+          "codeGroupId",
+          "code",
+          "codeName",
+          "displayOrder",
+          "isActive"
+        ],
+        "description": "미착지: 다국어(한/베) 명칭 — #64. ck_code_value_dates 짝 제약. display_order 에는 유일 제약이 없어 순서 재배치에 전체 치환이 불필요하다 — 공유계약 A-5 대상 아님",
+        "properties": {
+          "codeValueId": {
+            "x-source-column": "code_value_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "codeGroupId": {
+            "x-source-column": "code_group_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "code": {
+            "x-source-column": "code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "uq_code_value — codeGroupId 내 유일"
+          },
+          "codeName": {
+            "x-source-column": "code_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "displayOrder": {
+            "x-source-column": "display_order",
+            "type": "integer",
+            "default": 0
+          },
+          "effectiveFrom": {
+            "x-source-column": "effective_from",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "effectiveTo": {
+            "x-source-column": "effective_to",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "ck_code_value_dates — 있으면 effectiveFrom 이상"
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "CodeValueCreate": {
+        "x-source-table": "mdm.code_value",
+        "type": "object",
+        "required": [
+          "codeGroupId",
+          "code",
+          "codeName"
+        ],
+        "description": "코드값 등록 요청. isActive 는 받지 않는다. 근거: W-06-06 §4-B·§5-1 · W-06-04 §4-A·§5-1",
+        "properties": {
+          "codeGroupId": {
+            "x-source-column": "code_group_id",
+            "type": "integer",
+            "format": "int64",
+            "description": "좌측에서 선택한 그룹으로 고정 — 편집 신규만"
+          },
+          "code": {
+            "x-source-column": "code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "uq_code_value — codeGroupId 내 유일"
+          },
+          "codeName": {
+            "x-source-column": "code_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "displayOrder": {
+            "x-source-column": "display_order",
+            "type": "integer",
+            "description": "미지정 시 서버가 물리 모델 DEFAULT(0)로 채운다"
+          },
+          "effectiveFrom": {
+            "x-source-column": "effective_from",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "effectiveTo": {
+            "x-source-column": "effective_to",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "ck_code_value_dates — 있으면 effectiveFrom 이상"
+          }
+        }
+      },
+      "CodeValueUpdate": {
+        "x-source-table": "mdm.code_value",
+        "type": "object",
+        "required": [
+          "code",
+          "codeName",
+          "displayOrder"
+        ],
+        "description": "코드값 수정 요청. codeGroupId 는 신규만(편집 불가). isActive 는 별도 :deactivate. code 의 실제 편집 가능 여부는 GET 응답의 editability(B-4, NOT_COUNTABLE)를 따른다. 근거: W-06-06 §4-B · W-06-04 §4-A",
+        "properties": {
+          "code": {
+            "x-source-column": "code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "codeName": {
+            "x-source-column": "code_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "displayOrder": {
+            "x-source-column": "display_order",
+            "type": "integer"
+          },
+          "effectiveFrom": {
+            "x-source-column": "effective_from",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "effectiveTo": {
+            "x-source-column": "effective_to",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "ck_code_value_dates — 있으면 effectiveFrom 이상"
+          }
+        }
+      },
+      "CodeValueDetailResponse": {
+        "type": "object",
+        "required": [
+          "codeValue",
+          "editability"
+        ],
+        "properties": {
+          "codeValue": {
+            "$ref": "#/components/schemas/CodeValue"
+          },
+          "editability": {
+            "$ref": "#/components/schemas/Editability"
+          }
+        }
+      },
+      "Department": {
+        "x-source-table": "mdm.department",
+        "type": "object",
+        "required": [
+          "departmentId",
+          "departmentCode",
+          "departmentName",
+          "isActive"
+        ],
+        "description": "계층(parent_department_id). ck_department_parent 는 자기 자신만 막고 순환(A→B→A)은 막지 않으므로 서버가 검사한다. 미착지: 수신본 식별 플래그 — #65. ERP 수신본이라 읽기 전용이어야 하는데 판정할 컬럼이 없다",
+        "properties": {
+          "departmentId": {
+            "x-source-column": "department_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "departmentCode": {
+            "x-source-column": "department_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "departmentName": {
+            "x-source-column": "department_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "parentDepartmentId": {
+            "x-source-column": "parent_department_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "ck_department_parent — 자기 자신 금지. 순환은 서버 검사"
+          },
+          "businessUnitId": {
+            "x-source-column": "business_unit_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "DepartmentCreate": {
+        "x-source-table": "mdm.department",
+        "type": "object",
+        "required": [
+          "departmentCode",
+          "departmentName"
+        ],
+        "description": "부서 등록 요청. isActive 는 받지 않는다. 근거: W-06-06 §4-C·§5-1",
+        "properties": {
+          "departmentCode": {
+            "x-source-column": "department_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "uq — 전역 유일"
+          },
+          "departmentName": {
+            "x-source-column": "department_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "parentDepartmentId": {
+            "x-source-column": "parent_department_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "businessUnitId": {
+            "x-source-column": "business_unit_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "DepartmentUpdate": {
+        "x-source-table": "mdm.department",
+        "type": "object",
+        "required": [
+          "departmentCode",
+          "departmentName"
+        ],
+        "description": "부서 수정 요청. isActive 는 별도 :deactivate. 낙관적 잠금은 공유계약 B-1. 근거: W-06-06 §4-C·§5-4",
+        "properties": {
+          "departmentCode": {
+            "x-source-column": "department_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "departmentName": {
+            "x-source-column": "department_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "parentDepartmentId": {
+            "x-source-column": "parent_department_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "businessUnitId": {
+            "x-source-column": "business_unit_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "DepartmentDetailResponse": {
+        "type": "object",
+        "required": [
+          "department",
+          "editability"
+        ],
+        "properties": {
+          "department": {
+            "$ref": "#/components/schemas/Department"
+          },
+          "editability": {
+            "$ref": "#/components/schemas/Editability"
+          }
+        }
+      },
+      "Worker": {
+        "x-source-table": "mdm.worker",
+        "type": "object",
+        "required": [
+          "workerId",
+          "workerNo",
+          "workerName",
+          "businessUnitId",
+          "plantId",
+          "statusCode",
+          "isActive"
+        ],
+        "description": "ERP 수신본. 미착지: 수신본 식별 플래그 — #65",
+        "properties": {
+          "workerId": {
+            "x-source-column": "worker_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "workerNo": {
+            "x-source-column": "worker_no",
+            "type": "string",
+            "maxLength": 50,
+            "description": "POP·모바일 사번 경량 인증의 원천(P-CO-01·M-CO-01)"
+          },
+          "workerName": {
+            "x-source-column": "worker_name",
+            "type": "string",
+            "maxLength": 200
+          },
+          "businessUnitId": {
+            "x-source-column": "business_unit_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "plantId": {
+            "x-source-column": "plant_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "departmentId": {
+            "x-source-column": "department_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "appUserId": {
+            "x-source-column": "app_user_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "작업자 ↔ 입력자 구분(SQL 502 주석). 연결 편집 소관 미결 — W-06-06 §8-3"
+          },
+          "statusCode": {
+            "x-source-column": "status_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "공통코드 — 값 목록 미정"
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "WorkerDetailResponse": {
+        "type": "object",
+        "required": [
+          "worker",
+          "editability"
+        ],
+        "properties": {
+          "worker": {
+            "$ref": "#/components/schemas/Worker"
+          },
+          "editability": {
+            "$ref": "#/components/schemas/Editability"
+          }
+        }
+      },
+      "WorkerQualification": {
+        "x-source-table": "mdm.worker_qualification",
+        "type": "object",
+        "required": [
+          "workerQualificationId",
+          "workerId",
+          "qualificationTypeCode",
+          "validFrom"
+        ],
+        "description": "uq_worker_qualification 이 COALESCE(process_id,0) 으로 접는다 — 빈 축은 (전체 공정)으로 표기(A-7). certified_by 는 FK 없는 bigint 라 무엇을 가리키는지 하류에 근거가 없다 — #64. valid_to 만료는 검사 확정을 막는다(공유계약 B-2)",
+        "properties": {
+          "workerQualificationId": {
+            "x-source-column": "worker_qualification_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "workerId": {
+            "x-source-column": "worker_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "qualificationTypeCode": {
+            "x-source-column": "qualification_type_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "공통코드 — 값 목록 미정 §8-5"
+          },
+          "processId": {
+            "x-source-column": "process_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "비우면 (전체 공정) — A-7"
+          },
+          "certificateNo": {
+            "x-source-column": "certificate_no",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 100
+          },
+          "validFrom": {
+            "x-source-column": "valid_from",
+            "type": "string",
+            "format": "date"
+          },
+          "validTo": {
+            "x-source-column": "valid_to",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "ck_worker_qualification_dates — 있으면 validFrom 이상"
+          },
+          "certifiedBy": {
+            "x-source-column": "certified_by",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "FK 없음 — 무엇을 가리키는지 근거 없음 §8-2"
+          }
+        }
+      },
+      "WorkerQualificationListResponse": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkerQualification"
             }
           }
         }
