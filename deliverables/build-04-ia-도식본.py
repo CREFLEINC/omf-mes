@@ -41,7 +41,7 @@ KIT  = sys.argv[1] if len(sys.argv) > 1 else os.path.join(
 SNAPSHOT = '2026-07-30'          # 미결·이월 스냅샷 기준일 (§7·§8 은 며칠 단위로 바뀐다)
 
 # ════════════════════════════════════════════════════════════════════════════
-# 1. 정본 파싱 — 화면 109건 (v1 과 동일 · md 가 유일한 데이터 원천)
+# 1. 정본 파싱 — 화면 108건 (v1.1 — W-06-13 통합 폐지) (v1 과 동일 · md 가 유일한 데이터 원천)
 # ════════════════════════════════════════════════════════════════════════════
 
 ROW = re.compile(r'^\|\s*`([WPM]-(?:CO|\d{2})-\d{2})`\s*\|(.+)$')
@@ -128,7 +128,7 @@ BANDS = [
  ('기준정보 · 연계 (06)', '마스터 · Rev · I/F — 전 단계의 입력을 공급한다',
   'WF06 S1~S9 · 06-S-A~D',
   {'web': ['W-06-01', 'W-06-02', 'W-06-03', 'W-06-04', 'W-06-05', 'W-06-06', 'W-06-07', 'W-06-08',
-           'W-06-09', 'W-06-10', 'W-06-11', 'W-06-12', 'W-06-13'], 'pop': [], 'mob': []}),
+           'W-06-09', 'W-06-10', 'W-06-11', 'W-06-12'], 'pop': [], 'mob': []}),
  ('공통 (CO)', '계정 · 권한 · 알림 · 대시보드 · 설정 — 셸에 상시',
   '§3-1 시스템/공통 · §5-1 진입',
   {'web': ['W-CO-01', 'W-CO-02', 'W-CO-03', 'W-CO-04', 'W-CO-05', 'W-CO-06', 'W-CO-08'],
@@ -173,6 +173,9 @@ GONE = [
  ('W-05-14', '설비·툴 대시보드', 'web', 'del',
   [('W-CO-05', '통합 대시보드'), ('W-05-08', '가동률/OEE'), ('W-05-02', 'PM 도래')],
   'REQ-PR-0036 하나가 화면 둘을 정당화하지 못한다'),
+ ('W-06-13', '검사정책 설정(전수/샘플·합격판정개수)', 'web', 'merge',
+  [('W-06-02', '검사기준 등록 — 샘플링·판정 설정은 검사기준 버전의 속성')],
+  '개념모델 「검사정책」 엔티티가 물리 모델에서 inspection_plan + inspection_plan_version 에 흡수 — 속성 11개 중 7개 완전 착지·1개 형태 상이·3개 미착지(이슈 #64). 같은 저장 대상을 두 화면이 나눠 편집하게 되어 통합(사용자 확정 2026-08-03)'),
  ('W-03-04', '변경이력 조회', 'web', 'merge',
   [('W-03-01', 'Lot Status 현황·변경이력 조회')],
   'N6 현재 / N7 이력 = 같은 엔티티의 현재와 과거(결정 10) — 단 §8-1 요건 2종(이력 검색 모드·권한 분리)이 조건'),
@@ -194,7 +197,6 @@ GONE = [
 ]
 NEW3 = [
  ('M-04-04', 'WF04 S1 제품입고 = 제품LOT genealogy 시작점 공백(적대 검증 N2). 모바일 근거 3종 — Actor 완제품창고담당 · Action 적치 · Input 인식표 QR'),
- ('W-06-13', '개념모델에 「검사정책」 엔티티 실재 — MES 정본 엔티티는 관리 화면 1개(비도식 근거 규칙 기준 A)'),
  ('W-CO-08', 'REQ-PR-0036 「현장 공장 및 창고 레이아웃 배치」 + 레이아웃 엔티티 실재'),
 ]
 
@@ -237,7 +239,7 @@ CARRY = [
  (['W-04-04'], '출하 후 ERP 반영(PGI 전표) 송신 on/off', 'QA #6'),
  (['W-01-02', 'W-02-07', 'P-02-12', 'W-04-05'], '긴급 경로 = 정상 화면 재사용 + 긴급 플래그 (신설 아님)', '매핑 4단계 확정'),
  (['W-CO-03'], '알림 수신처 단일화 — 대시보드 5건 삭제의 근거', 'QA #24'),
- (['W-CO-01', 'P-CO-01', 'M-CO-01'], '인증 3계층 — 계정 로그인 / 사번 경량(로그인 생략) / 계정+기기 등록', '결정 16 · POP인증 §6'),
+ (['W-CO-01', 'P-CO-01', 'M-CO-01'], '인증 2종 3화면 — 계정 로그인(관리웹) / 사번 귀속 인증(POP·모바일, 로그인 생략)', '결정 16 · POP인증 §6-③(모바일=POP과 동일) · 인벤토리 v1.4'),
  ([], '조회 화면의 적정 표시 범위 — 집계 뷰 요건이 붙은 조회 화면 공통 (전역 원칙)', '§8-16'),
 ]
 
@@ -264,7 +266,7 @@ AUTH = [
  ('web', '관리웹', 'W-CO-01', '계정 로그인', ['온라인 전제', '계정·역할 기반', '판정·승인 행위의 감사 기록 주체']),
  ('pop', 'POP', 'P-CO-01', '사번 경량 인증', ['**로그인이 아니다** — 작업 시작 전 사번만 입력(REQ-PR-0023)',
                                         '단말 토큰 + 사번 귀속 3층 분리(POP인증 §6-①②③)', '실적 귀속 태깅']),
- ('mob', '모바일', 'M-CO-01', '계정 로그인 + 기기 등록', ['BLE 스캐너 페어링 · 언어 선택',
+ ('mob', '모바일', 'M-CO-01', '기기 등록(단말 토큰) + 사번 입력', ['BLE 스캐너 페어링 · 언어 선택',
                                                  '단말 인증 말단 확정 = POP 과 동일(POP인증 §6-③)']),
 ]
 GATES = [('W-01-02', '권한자(MES 권한 보유 관리자)'), ('W-03-09', '품질책임자·권한자'),
@@ -278,7 +280,7 @@ SHELL = [
 
 TREE = [
  ('기준정보', [('마스터', ['W-06-01', 'W-06-05', 'W-06-06', 'W-06-07', 'W-06-08', 'W-06-11']),
-            ('품질 기준', ['W-06-02', 'W-06-03', 'W-06-04', 'W-06-13']),
+            ('품질 기준', ['W-06-02', 'W-06-03', 'W-06-04']),
             ('연계(I/F)', ['W-06-09', 'W-06-12', 'W-06-10'])]),
  ('생산', [('계획·지시', ['W-02-01', 'W-02-02', 'W-02-03', 'W-02-04', 'W-02-07', 'W-02-06', 'W-02-10']),
          ('마감·모니터링', ['W-02-05', 'W-02-08'])]),
@@ -335,14 +337,14 @@ tree_ids = [s for _, gs in TREE for _, ids in gs for s in ids]
 pop_ids  = [s for _, ids, _ in POP_MODES for s in ids]
 tile_ids = MOB_ENTRY + [s for _, _, ids in TILES for s in ids]
 
-if len(ROWS) != 109: die('화면 %d건 (109 아님)' % len(ROWS))
+if len(ROWS) != 108: die('화면 %d건 (108 아님)' % len(ROWS))
 c = Counter(r['prog'] for r in ROWS)
-if (c['web'], c['pop'], c['mob']) != (68, 22, 19): die('프로그램 계수 %s' % dict(c))
+if (c['web'], c['pop'], c['mob']) != (67, 22, 19): die('프로그램 계수 %s' % dict(c))
 d = Counter(r['dom'] for r in ROWS)
-if dict(d) != {'01': 24, '02': 24, '03': 5, '04': 17, '05': 17, '06': 13, 'CO': 9}: die('도메인 계수 %s' % dict(d))
+if dict(d) != {'01': 24, '02': 24, '03': 5, '04': 17, '05': 17, '06': 12, 'CO': 9}: die('도메인 계수 %s' % dict(d))
 f = Counter(r['conf'] for r in ROWS)
-if (f['확정'], f['추정'], f['미정']) != (82, 25, 2): die('신뢰도 계수 %s' % dict(f))
-if sum(Counter(r['type'] for r in ROWS).values()) != 109: die('유형 합계')
+if (f['확정'], f['추정'], f['미정']) != (82, 24, 2): die('신뢰도 계수 %s' % dict(f))
+if sum(Counter(r['type'] for r in ROWS).values()) != 108: die('유형 합계')
 
 for label, ids in (('흐름축', flow_ids), ('관리웹 트리', tree_ids), ('POP 모드', pop_ids), ('모바일 타일', tile_ids)):
     dup = [k for k, v in Counter(ids).items() if v > 1]
@@ -353,10 +355,10 @@ for label, ids in (('흐름축', flow_ids), ('관리웹 트리', tree_ids), ('PO
 if set(flow_ids) != set(BY): die('흐름축 차집합: %s' % sorted(set(BY) ^ set(flow_ids)))
 ia_ids = set(tree_ids) | set(pop_ids) | set(tile_ids)
 if ia_ids != set(BY): die('IA 3모델 차집합: %s' % sorted(set(BY) ^ ia_ids))
-if len(tree_ids) != 68 or len(pop_ids) != 22 or len(tile_ids) != 19:
+if len(tree_ids) != 67 or len(pop_ids) != 22 or len(tile_ids) != 19:
     die('IA 계수 트리%d POP%d 타일%d' % (len(tree_ids), len(pop_ids), len(tile_ids)))
 if VACATED & set(BY): die('결번이 현행 화면에 존재: %s' % sorted(VACATED & set(BY)))
-if len(VACATED) != 11: die('결번 %d건 (11 아님)' % len(VACATED))
+if len(VACATED) != 12: die('결번 %d건 (12 아님)' % len(VACATED))
 
 for ids, *_ in CARRY:
     for s in ids:
@@ -488,7 +490,7 @@ for dcode, dname in DOMS:
 f3_foot = ''.join('<td class="tot">%d</td>' % sum(len(cell[(d, cf)]) for d, _ in DOMS) for cf in CONFS)
 
 bars = ''
-for p, pname, total in (('web', '관리웹', 68), ('pop', 'POP', 22), ('mob', '모바일', 19)):
+for p, pname, total in (('web', '관리웹', 67), ('pop', 'POP', 22), ('mob', '모바일', 19)):
     segs, pct = '', {}
     for cf in CONFS:
         n = sum(1 for r in ROWS if r['prog'] == p and r['conf'] == cf)
@@ -569,12 +571,12 @@ TYPES = ['입력', '스캔', '판정·승인', '조회·상세', '목록', '설�
 tcount = defaultdict(list)
 for r in ROWS:
     tcount[(r['prog'], r['type'])].append(r['id'])
-if sum(len(v) for v in tcount.values()) != 109: die('유형 교차 합계')
+if sum(len(v) for v in tcount.values()) != 108: die('유형 교차 합계')
 unknown = {r['type'] for r in ROWS} - set(TYPES)
 if unknown: die('미등록 유형: %s' % unknown)
 
 f7_bars = ''
-for p, pname, total in (('web', '관리웹', 68), ('pop', 'POP', 22), ('mob', '모바일', 19)):
+for p, pname, total in (('web', '관리웹', 67), ('pop', 'POP', 22), ('mob', '모바일', 19)):
     segs = ''
     for i, t in enumerate(TYPES):
         n = len(tcount[(p, t)])
@@ -603,7 +605,7 @@ J_ROWS = [[r['id'], r['name'], r['type'], r['actor'], r['conf'], r['prog'], r['d
 J_GONE = [[g[0], g[1], g[2], g[3], ' · '.join('%s(%s)' % (t[0], t[1]) for t in g[4]), g[5]] for g in GONE]
 
 VERSION_FLOW = [('원 열거', 120, ''), ('중복 8 병합', 112, 'v1.0'), ('적대 검증', 112, 'v1.1'),
-                ('2계층 매핑 4단계', 113, 'v1.2'), ('비도식 근거 규칙', 109, 'v1.3')]
+                ('2계층 매핑 4단계', 113, 'v1.2'), ('비도식 근거 규칙', 109, 'v1.3'), ('상세 스펙 확대 1차', 108, 'v1.5')]
 vflow = ''.join('<div class="vstep%s"><b>%d</b><span>%s</span><em>%s</em></div>' % (
     ' cur' if i == len(VERSION_FLOW) - 1 else '', n, esc(lab), esc(v)) for i, (lab, n, v) in enumerate(VERSION_FLOW))
 
@@ -835,7 +837,7 @@ function draw(){var tb=document.getElementById('tb'),h='',n=0;
   h+='<tr class="gr"><th style="text-decoration:line-through;opacity:.6">'+g[0]+'</th>'
    +'<td style="opacity:.6"><s>'+g[1]+'</s></td><td class="cf">'+mk+'</td>'
    +'<td colspan="2" class="bl">→ '+g[4]+'</td><td colspan="2" class="wy">'+g[5]+' · <strong>ID 재사용 금지</strong></td></tr>';}}
- tb.innerHTML=h;document.getElementById('cnt').textContent=n+' / 109건'+(showG?' + 결번 '+G.length:'');}
+ tb.innerHTML=h;document.getElementById('cnt').textContent=n+' / 108건'+(showG?' + 결번 '+G.length:'');}
 function tg(el,k,v){var on=el.getAttribute('aria-pressed')==='true';
  var g=document.querySelectorAll('[data-k="'+k+'"]');for(var i=0;i<g.length;i++)g[i].setAttribute('aria-pressed','false');
  if(k==='p')fp=on?'':v; if(k==='d')fd=on?'':v; if(k==='c')fc=on?'':v;
@@ -874,13 +876,13 @@ f2_body = ('<div class="card ladder-wrap"><div class="ladder">%s</div></div>'
 f3_body = ('%s<div class="wide"><table class="grid"><thead><tr><th>도메인</th>'
            '<th>확정 <small>(도식+배지 명확)</small></th><th>추정 <small>(성격 판단)</small></th>'
            '<th>미정 <small>(회신 대기)</small></th></tr></thead><tbody>%s</tbody>'
-           '<tfoot><tr><th class="tot">109</th>%s</tr></tfoot></table></div>'
+           '<tfoot><tr><th class="tot">108</th>%s</tr></tfoot></table></div>'
            % (bars, f3_rows, f3_foot))
 
 f4_body = ('<div class="wide"><table><thead><tr><th></th><th>관리웹</th>'
            '<th>POP</th><th>모바일</th></tr></thead><tbody>%s</tbody></table></div>'
            '<div class="grid-3 equal" style="margin-top:var(--s-6)">'
-           '<div class="card"><h3>관리웹 — 메뉴 트리 <small>68건 · 7 대분류</small></h3>%s</div>'
+           '<div class="card"><h3>관리웹 — 메뉴 트리 <small>67건 · 7 대분류</small></h3>%s</div>'
            '<div class="card"><h3>POP — 태스크 모드 <small>22건 · 메뉴가 아니다</small></h3>%s</div>'
            '<div class="card"><h3>모바일 — 스캔 타일 <small>19건</small></h3>'
            '<div class="entry"><b>진입 — 로그인 · 기기 등록</b>%s</div>%s</div></div>'
@@ -918,7 +920,7 @@ out.write('''<!doctype html><html lang="ko"><head><meta charset="utf-8">
 <header class="doc-cover">
   <p class="eyebrow">CREFLE · OMF-MES · 통합 편람</p>
   <h1>OMF-MES 통합 IA — 도식본</h1>
-  <p class="lede">화면 109건을 흐름·확정도·구조·의존으로 그린 9개 도식. 화면 정본은
+  <p class="lede">화면 108건을 흐름·확정도·구조·의존으로 그린 9개 도식. 화면 정본은
   <code>uiux/2026-07-25-화면목록-IA/screen-inventory-ia.md</code> v1.3, 본 도식본은
   <code>deliverables/04-통합-IA.md</code> 파생 문서다.</p>
   <table>
@@ -934,8 +936,8 @@ out.write('''<!doctype html><html lang="ko"><head><meta charset="utf-8">
 </header>
 
 <div class="kpi">
- <div><span class="big">109</span><span class="lbl">화면 전건<br>관리웹 68 · POP 22 · 모바일 19</span></div>
- <div><span class="big">82</span><span class="lbl">확정 · 추정 25 · 미정 2</span></div>
+ <div><span class="big">108</span><span class="lbl">화면 전건<br>관리웹 67 · POP 22 · 모바일 19</span></div>
+ <div><span class="big">82</span><span class="lbl">확정 · 추정 24 · 미정 2</span></div>
  <div><span class="big">9</span><span class="lbl">업무 단계 (+ 흐름 밖 5밴드)</span></div>
 </div>
 
@@ -967,10 +969,10 @@ out.write('''<!doctype html><html lang="ko"><head><meta charset="utf-8">
 
 <h2>근거 · 재생성 · crefle-doc 준수</h2>
 <ul>
-<li><strong>근거</strong> — 화면 109건·유형·행위자·신뢰도·근거 요지 = <code>deliverables/04-통합-IA.md</code> §3-2·§4-2·§5-2(생성기가 직접 파싱) ·
+<li><strong>근거</strong> — 화면 108건·유형·행위자·신뢰도·근거 요지 = <code>deliverables/04-통합-IA.md</code> §3-2·§4-2·§5-2(생성기가 직접 파싱) ·
 IA 3모델 = §3-1·§4-1·§5-1 · 배지·정책 = §2-2·§2-3 · 변동 = §6 · 미결 = §7 · 이월 요건 = §8 · 판정 규칙 = §9-1.</li>
 <li><strong>재생성</strong> — <code>python3 build-04-ia-도식본.py</code>. md 를 고치면 화면·유형·행위자·신뢰도는 자동 반영되고,
-흐름 배치·IA 트리·미결 상수는 생성기 상단에서 고친다. 빌드 assert(109·프로그램·도메인·신뢰도·유형·차집합·결번)가 어긋나면 생성이 중단된다.</li>
+흐름 배치·IA 트리·미결 상수는 생성기 상단에서 고친다. 빌드 assert(108·프로그램·도메인·신뢰도·유형·차집합·결번)가 어긋나면 생성이 중단된다.</li>
 <li><strong>crefle-doc 준수</strong> — 표지(<code>.doc-cover</code>)·KPI(<code>.kpi</code>)·카드(<code>.card</code>/<code>.card-outline</code>/<code>.card-filled</code>)·
 콜아웃(<code>.callout</code>)·강조(<code>&lt;strong&gt;</code>)·코드(<code>&lt;code&gt;</code>)는 전부 crefle-doc 번들의 진짜 컴포넌트를 그대로 썼다.
 없는 컴포넌트 3종(칩·흐름 다이어그램·미터/세그먼트 바)은 <strong><code>--chart-2/5/8</code> 등 기존 토큰만으로</strong> 새로 설계했고,
@@ -988,7 +990,7 @@ IA 3모델 = §3-1·§4-1·§5-1 · 배지·정책 = §2-2·§2-3 · 변동 = §
 </html>
 ''' % (
     licenses(KIT), css_with_fonts(KIT), LOCAL_CSS, SNAPSHOT,
-    sec('①', '업무 흐름 × 단말 3레인', '순방향 9단계 59건 + 흐름 밖 5밴드 50건 = 109',
+    sec('①', '업무 흐름 × 단말 3레인', '순방향 9단계 59건 + 흐름 밖 5밴드 49건 = 108',
         '이 공정이 스프린트에 잡혔다 — 어느 셸에 무슨 화면을 만들어야 하고, 이 단계는 화면 몇 개짜리 일인가?',
         f1_body,
         '가로가 아니라 세로로 읽는다 — 한 단계 안에서 웹·POP·모바일 레인 중 어디가 비어 있는지가 그 단계의 성격이다.'),
@@ -996,11 +998,11 @@ IA 3모델 = §3-1·§4-1·§5-1 · 배지·정책 = §2-2·§2-3 · 변동 = §
         '웹에서 POP으로, POP에서 PDA로 일이 넘어가는 지점이 어디고 셸 간 인터페이스를 몇 개 정의해야 하나?',
         f2_body,
         '레인 점유가 바뀌는 열이 전환 지점이다. 「스택」은 같은 지점에 두 단말이 서는 경우로, 배지 정본이 확정한 3건이다.'),
-    sec('③', '확정도 × 도메인 — 109건이 전부 여기 있다', '커버리지 담당 1',
+    sec('③', '확정도 × 도메인 — 108건이 전부 여기 있다', '커버리지 담당 1',
         '내일 상세 스펙 착수해도 되는 화면이 어느 도메인에 몇 개고, 흔들리는 건 어디에 몰려 있나?',
         f3_body,
         '확정 82는 v1.2→v1.3 정리에서 한 건도 건드리지 않았다 — 줄어든 4건은 전부 추정·미정 쪽이었다.'),
-    sec('④', 'IA 3모델 병렬 — 셸을 세 벌 만든다', '커버리지 담당 2 · 68 + 22 + 19',
+    sec('④', 'IA 3모델 병렬 — 셸을 세 벌 만든다', '커버리지 담당 2 · 67 + 22 + 19',
         '내가 짜야 하는 셸은 라우터·스텝퍼·타일 중 뭔가? 메뉴 트리의 어느 묶음에 어느 화면이 들어가나?',
         f4_body,
         'React 코드는 1벌이지만 탐색 모델은 세 벌이다 — 관리웹은 메뉴 트리, POP은 W/O 태스크 모드(메뉴 아님), 모바일은 스캔 퍼스트 타일.'),
@@ -1024,7 +1026,7 @@ IA 3모델 = §3-1·§4-1·§5-1 · 배지·정책 = §2-2·§2-3 · 변동 = §
         '<h3>권한 정본 · 게이트 화면</h3><div class="card">%s<div>%s</div></div>'
         % (f8_cards, '<p>%s <span class="none">— role·권한 매트릭스의 정본. 아래 화면들이 이걸 참조한다</span></p>' % chip('W-CO-02', False), f8_gates),
         'POP은 로그인이 아니다 — 사번만 입력해 실적을 귀속시킨다(REQ-PR-0023). 단말 인증은 토큰 + 사번 3층 분리(POP인증 §6-①②③).'),
-    sec('⑨', '전건 목록 — 109건 필터 · 결번 11건', '변동 궤적 120 → 109',
+    sec('⑨', '전건 목록 — 108건 필터 · 결번 12건', '변동 궤적 120 → 108',
         '지금 잡은 티켓이 W-02-08인데 단말·유형·신뢰도·차단 요인·근거가 뭔가? 옛 문서의 W-02-09는 어디로 갔나?',
         '<div class="vsteps">%s</div>'
         '<div class="ctl"><input id="q" placeholder="ID · 화면명 · 행위자 · 근거 검색">'
@@ -1035,14 +1037,14 @@ IA 3모델 = §3-1·§4-1·§5-1 · 배지·정책 = §2-2·§2-3 · 변동 = §
         '<button data-k="c" data-v="추정" aria-pressed="false">추정</button>'
         '<button data-k="c" data-v="미정" aria-pressed="false">미정</button>'
         '<button id="bl" aria-pressed="false">차단·이월만</button>'
-        '<button id="gt" aria-pressed="false">결번 11건 보기</button>'
+        '<button id="gt" aria-pressed="false">결번 %d건 보기</button>'
         '<span class="cnt" id="cnt"></span></div>'
         '<div class="wide"><table id="lst"><thead><tr><th>ID</th><th>화면명</th><th>유형</th>'
         '<th>행위자</th><th>신뢰도</th><th>차단 · 이월</th><th>근거 요지</th></tr></thead>'
-        '<tbody id="tb"></tbody></table></div>' % vflow,
+        '<tbody id="tb"></tbody></table></div>' % (vflow, len(VACATED)),
         '결번은 토글로만 보인다 — 본 표에는 나오지 않는다. ID 재사용 금지(옛 문서·코드에서 만나면 흡수처를 따라간다).'),
     JS,
 ))
 out.close()
 print('생성: %s (%.1f KB)' % (DST, os.path.getsize(DST) / 1024.0))
-print('검산 통과 — 화면 109 · 흐름축 %d · IA 3모델 %d · 결번 %d' % (len(flow_ids), len(ia_ids), len(VACATED)))
+print('검산 통과 — 화면 %d · 흐름축 %d · IA 3모델 %d · 결번 %d' % (len(ROWS), len(flow_ids), len(ia_ids), len(VACATED)))

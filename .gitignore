@@ -28,3 +28,6 @@ docs/research/2026-06-28-현장점검-체크리스트.pdf
 docs/research/2026-06-29-현장점검-코드참조-미결코드·클러스터.pdf
 docs/research/2026-07-03-현장점검-체크리스트.pdf
 docs/research/2026-07-03-현장점검-코드참조-미결코드·클러스터.pdf
+
+# SDD 작업 공간 — 계획 실행 중 스크래치(원장·브리프·리뷰 패키지). 기록의 정본은 git 이력이다.
+.superpowers/
