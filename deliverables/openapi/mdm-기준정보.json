@@ -3,7 +3,7 @@
   "info": {
     "title": "omf-mes 기준정보 도메인 API (초안)",
     "version": "0.1.0",
-    "description": "화면 상세 스펙 확대 1차에서 도출한 계약 초안. 정본은 물리 모델이며 이 문서는 그것을 옮긴 것이다. 근거·맥락은 deliverables/06-API-요구서.md 를 본다. WBS P0.4 API 계약 v0 의 초안 입력이며 계약 확정·소유는 통합 Agent 소관이다."
+    "description": "화면 상세 스펙 확대 1차에서 도출한 계약 초안. 정본은 물리 모델이며 이 문서는 그것을 옮긴 것이다. 근거·맥락은 deliverables/06-API-요구서.md 를 본다. WBS P0.4 API 계약 v0 의 초안 입력이며 계약 확정·소유는 통합 Agent 소관이다. 마스터 형 패턴의 「변경 이력」 엔드포인트는 이슈 #68 해소 후에 추가한다. `audit.audit_event` 는 실재하나(공유계약 B-5) `target_id` 가 FK 가 아니고 `before_value`/`after_value` jsonb 의 키 규약이 없어, 지금 응답 스키마를 만들면 필드를 지어내게 된다."
   },
   "servers": [
     {
@@ -146,7 +146,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WarehouseDetail"
+                  "$ref": "#/components/schemas/Warehouse"
                 }
               }
             }
@@ -235,7 +235,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WarehouseDetail"
+                  "$ref": "#/components/schemas/Warehouse"
                 }
               }
             }
@@ -302,7 +302,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WarehouseDetail"
+                  "$ref": "#/components/schemas/Warehouse"
                 }
               }
             }
@@ -436,7 +436,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LocationDetail"
+                  "$ref": "#/components/schemas/Location"
                 }
               }
             }
@@ -525,7 +525,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LocationDetail"
+                  "$ref": "#/components/schemas/Location"
                 }
               }
             }
@@ -592,7 +592,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LocationDetail"
+                  "$ref": "#/components/schemas/Location"
                 }
               }
             }
@@ -878,75 +878,6 @@
           }
         }
       },
-      "WarehouseDetail": {
-        "x-source-table": "mdm.warehouse",
-        "type": "object",
-        "required": [
-          "warehouseId",
-          "plantId",
-          "businessUnitId",
-          "warehouseCode",
-          "warehouseName",
-          "warehouseTypeCode",
-          "managementLevelCode",
-          "isExternal",
-          "isActive"
-        ],
-        "description": "창고 상세. editability 는 공유계약 B-4.",
-        "properties": {
-          "warehouseId": {
-            "x-source-column": "warehouse_id",
-            "type": "integer",
-            "format": "int64"
-          },
-          "plantId": {
-            "x-source-column": "plant_id",
-            "type": "integer",
-            "format": "int64"
-          },
-          "businessUnitId": {
-            "x-source-column": "business_unit_id",
-            "type": "integer",
-            "format": "int64"
-          },
-          "warehouseCode": {
-            "x-source-column": "warehouse_code",
-            "type": "string",
-            "maxLength": 50
-          },
-          "warehouseName": {
-            "x-source-column": "warehouse_name",
-            "type": "string",
-            "maxLength": 200
-          },
-          "warehouseTypeCode": {
-            "x-source-column": "warehouse_type_code",
-            "type": "string",
-            "maxLength": 50
-          },
-          "managementLevelCode": {
-            "x-source-column": "management_level_code",
-            "type": "string",
-            "maxLength": 50
-          },
-          "isExternal": {
-            "x-source-column": "is_external",
-            "type": "boolean"
-          },
-          "partnerId": {
-            "x-source-column": "partner_id",
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int64"
-          },
-          "isActive": {
-            "x-source-column": "is_active",
-            "type": "boolean"
-          }
-        }
-      },
       "WarehouseCreate": {
         "x-source-table": "mdm.warehouse",
         "type": "object",
@@ -1070,7 +1001,7 @@
         ],
         "properties": {
           "warehouse": {
-            "$ref": "#/components/schemas/WarehouseDetail"
+            "$ref": "#/components/schemas/Warehouse"
           },
           "editability": {
             "$ref": "#/components/schemas/Editability"
@@ -1172,101 +1103,6 @@
             "x-source-column": "is_active",
             "type": "boolean",
             "default": true
-          }
-        }
-      },
-      "LocationDetail": {
-        "x-source-table": "mdm.location",
-        "type": "object",
-        "required": [
-          "locationId",
-          "warehouseId",
-          "locationCode",
-          "locationName",
-          "locationTypeCode",
-          "allowMixedItem",
-          "allowMixedLot",
-          "isActive"
-        ],
-        "description": "Location 상세. editability 는 공유계약 B-4. 계층 구조(parent_location_id 자기참조). ck_location_capacity — capacityQty 와 capacityUomId 는 함께 있거나 함께 비어야 한다. 근거: W-06-07 §4-B · 공유계약 A-2",
-        "properties": {
-          "locationId": {
-            "x-source-column": "location_id",
-            "type": "integer",
-            "format": "int64"
-          },
-          "warehouseId": {
-            "x-source-column": "warehouse_id",
-            "type": "integer",
-            "format": "int64"
-          },
-          "parentLocationId": {
-            "x-source-column": "parent_location_id",
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int64"
-          },
-          "locationCode": {
-            "x-source-column": "location_code",
-            "type": "string",
-            "maxLength": 50
-          },
-          "locationName": {
-            "x-source-column": "location_name",
-            "type": "string",
-            "maxLength": 200
-          },
-          "locationTypeCode": {
-            "x-source-column": "location_type_code",
-            "type": "string",
-            "maxLength": 50
-          },
-          "qualityZoneCode": {
-            "x-source-column": "quality_zone_code",
-            "type": [
-              "string",
-              "null"
-            ],
-            "maxLength": 50
-          },
-          "storageConditionCode": {
-            "x-source-column": "storage_condition_code",
-            "type": [
-              "string",
-              "null"
-            ],
-            "maxLength": 50
-          },
-          "allowMixedItem": {
-            "x-source-column": "allow_mixed_item",
-            "type": "boolean"
-          },
-          "allowMixedLot": {
-            "x-source-column": "allow_mixed_lot",
-            "type": "boolean"
-          },
-          "capacityQty": {
-            "x-source-column": "capacity_qty",
-            "type": [
-              "number",
-              "null"
-            ],
-            "minimum": 0,
-            "description": "qty_t numeric(20,6)"
-          },
-          "capacityUomId": {
-            "x-source-column": "capacity_uom_id",
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int64"
-          },
-          "isActive": {
-            "x-source-column": "is_active",
-            "type": "boolean"
           }
         }
       },
@@ -1445,7 +1281,7 @@
         ],
         "properties": {
           "location": {
-            "$ref": "#/components/schemas/LocationDetail"
+            "$ref": "#/components/schemas/Location"
           },
           "editability": {
             "$ref": "#/components/schemas/Editability"
