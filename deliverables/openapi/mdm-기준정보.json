@@ -3,7 +3,7 @@
   "info": {
     "title": "omf-mes 기준정보 도메인 API (초안)",
     "version": "0.1.0",
-    "description": "화면 상세 스펙 확대 1차에서 도출한 계약 초안. 정본은 물리 모델이며 이 문서는 그것을 옮긴 것이다. 근거·맥락은 deliverables/06-API-요구서.md 를 본다. WBS P0.4 API 계약 v0 의 초안 입력이며 계약 확정·소유는 통합 Agent 소관이다. 마스터 형 패턴의 「변경 이력」 엔드포인트는 이슈 #68 해소 후에 추가한다. `audit.audit_event` 는 실재하나(공유계약 B-5) `target_id` 가 FK 가 아니고 `before_value`/`after_value` jsonb 의 키 규약이 없어, 지금 응답 스키마를 만들면 필드를 지어내게 된다."
+    "description": "화면 상세 스펙 확대 1차에서 도출한 계약 초안. 정본은 물리 모델이며 이 문서는 그것을 옮긴 것이다. 근거·맥락은 deliverables/06-API-요구서.md 를 본다. WBS P0.4 API 계약 v0 의 초안 입력이며 계약 확정·소유는 통합 Agent 소관이다. 마스터 형 패턴의 개별 「변경 이력」(/history) 엔드포인트는 이슈 #68 해소 후에 추가한다 — target_id 가 FK 가 아니고 before_value/after_value jsonb 의 키 규약이 없어 지금 만들면 필드를 지어내게 된다. 다만 W-06-11(마스터 변경관리)이 필요로 하는 횡단 조회 GET /audit/events 는 Task 7 에서 추가했다 — 원본 컬럼(beforeValue·afterValue 포함)을 해석하지 않고 그대로 노출할 뿐이다(필드를 지어내지 않는다)."
   },
   "servers": [
     {
@@ -5413,6 +5413,436 @@
           }
         }
       }
+    },
+    "/integration/messages": {
+      "get": {
+        "tags": [
+          "integration"
+        ],
+        "summary": "연계 메시지 목록",
+        "description": "이 화면의 본질은 「비동기 워커의 상태를 사람이 읽고 개입하는 창」이다(W-06-10 §3). createdFrom·createdTo 는 로그성 조회의 공통 규약으로 필수다. 근거: W-06-10 §4-A · §5-1 「조회」 · 공유계약 G-8",
+        "parameters": [
+          {
+            "name": "createdFrom",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "필수 — 기간 미지정 조회는 제공하지 않는다"
+          },
+          {
+            "name": "createdTo",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "statusCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "공통코드 — 값 목록 미정 §8-3. 최소 구분: 대기/처리중/완료/실패"
+          },
+          {
+            "name": "interfaceCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "⚠ W-06-09 의 정의 테이블이 없어 선택 목록을 만들 수 없다 — 로그 DISTINCT 값을 잠정 사용[추정] §8-1"
+          },
+          {
+            "name": "directionCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "targetTypeCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "retryCountMin",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "「N회 이상」 필터 — 반복 실패 건을 찾는 주 경로"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/IntegrationMessage"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "기간 미지정 — 조회 버튼 비활성 + 사유",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음 — 전산담당 전용. 근거: W-06-10 §6",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integration/messages/{integrationMessageId}": {
+      "parameters": [
+        {
+          "name": "integrationMessageId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "integration"
+        ],
+        "summary": "연계 메시지 상세",
+        "description": "payload(jsonb) 전문·lastErrorMessage 전문을 포함한다. ⚠ payload 는 대외비를 담을 수 있어 노출 범위가 미결이다 — W-06-10 §8-4(내보내기 기능과 함께 판단해야 한다). 근거: W-06-10 §4-C",
+        "responses": {
+          "200": {
+            "description": "상세",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationMessage"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "payload 조회 권한 없음 — 상세에서 payload 구획만 비활성 + 사유(§8-4). 화면 진입 자체의 전산담당 전용 차단과는 별개",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integration/messages/{integrationMessageId}:retry": {
+      "parameters": [
+        {
+          "name": "integrationMessageId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "integration"
+        ],
+        "summary": "연계 메시지 재처리 (단건)",
+        "description": "message_key 가 UNIQUE 라 재처리는 중복 전송이 아니다 — 같은 메시지 키로 다시 시도한다. statusCode=실패 이고 lockedBy 가 비어 있어야 한다. lockedBy 가 있으면(워커가 이미 처리 중) 409(ConflictResponse, conflictCause=workerLease)로 거부한다 — version_no 가 없어 낙관적 잠금 대신 워커 리스 충돌이다(공유계약 B-1 확장·C-4). statusCode≠실패이면 400(code=NOT_RETRYABLE). 화면은 리스가 오래돼도 임의로 락을 풀지 않는다(§5-4). 근거: W-06-10 §5-1 「재처리(단건)」 · §5-4",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "재처리 요청됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationMessage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "statusCode≠실패(code=NOT_RETRYABLE)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음 — 전산담당 전용. 근거: W-06-10 §6",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "워커가 이미 처리 중(conflictCause=workerLease) — 「워커가 처리 중입니다(HH:MM 시작)」로 안내",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integration/messages:retry-batch": {
+      "post": {
+        "tags": [
+          "integration"
+        ],
+        "summary": "연계 메시지 재처리 (선택 일괄)",
+        "description": "부분 실패를 허용한다 — 전체 롤백하지 않는다(공유계약 C-2). 조건을 만족하지 않는 건(statusCode≠실패 또는 lockedBy 있음)은 BatchResult.failed 에 개별 사유로 담긴다. 근거: W-06-10 §5-1 「재처리(선택 일괄)」 · 공유계약 C-2",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "integrationMessageIds"
+                ],
+                "properties": {
+                  "integrationMessageIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "format": "int64"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "처리 결과",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResult"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음 — 전산담당 전용. 근거: W-06-10 §6",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/audit/events": {
+      "get": {
+        "tags": [
+          "audit"
+        ],
+        "summary": "변경 이력 조회",
+        "description": "occurred_at RANGE 파티션이라 기간 조건이 없으면 전 파티션을 훑는다 — 공유계약 B-5. 미착지: target_id 가 FK 가 아니라 유형별로 다른 테이블을 가리키고 before/after jsonb 의 키 규약이 없어 응답을 사람이 읽게 만들 수 없다 — #68. 이 결손 때문에 별도 /history 엔드포인트는 만들지 않는다(#68 해소 후 추가 — info.description 참고). 근거: W-06-11 §4-A·§5-1 「조회」",
+        "parameters": [
+          {
+            "name": "occurredFrom",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "필수 — 파티션 스캔 방지"
+          },
+          {
+            "name": "occurredTo",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "targetTypeCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "공통코드 — 값 목록 미정 §8-3"
+          },
+          {
+            "name": "targetId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "eventTypeCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "performedBy",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "correlationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "한 트랜잭션의 여러 이벤트를 묶는다[추정]"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AuditEvent"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "기간 미지정 — 조회 버튼 비활성 + 사유",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음 — 진입 차단 + 배너. 이력 조회 권한은 편집 권한과 별개(감사 목적). 근거: W-06-11 §6",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -9193,6 +9623,223 @@
           },
           "editability": {
             "$ref": "#/components/schemas/Editability"
+          }
+        }
+      },
+      "IntegrationMessage": {
+        "x-source-table": "integration.integration_message",
+        "type": "object",
+        "required": [
+          "integrationMessageId",
+          "messageKey",
+          "interfaceCode",
+          "directionCode",
+          "targetTypeCode",
+          "targetId",
+          "payload",
+          "statusCode",
+          "retryCount",
+          "createdAt",
+          "availableAt"
+        ],
+        "description": "message_key 가 UNIQUE 라 재처리는 중복 전송이 아니다. lockedBy 가 있으면 워커가 처리 중이므로 재처리를 거부하고 409 conflictCause=workerLease 로 응답한다. version_no 가 없어 낙관적 잠금 대신 리스 충돌이다 — 공유계약 B-1·C-4. payload 는 대외비를 담을 수 있어 노출 범위가 미결이다 — W-06-10 §8-4",
+        "properties": {
+          "integrationMessageId": {
+            "x-source-column": "integration_message_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "messageKey": {
+            "x-source-column": "message_key",
+            "type": "string",
+            "maxLength": 150,
+            "description": "UNIQUE — 멱등 키"
+          },
+          "interfaceCode": {
+            "x-source-column": "interface_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "⚠ W-06-09 정의 테이블 부재로 선택 목록을 만들 수 없다 §8-1"
+          },
+          "directionCode": {
+            "x-source-column": "direction_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "수신/송신"
+          },
+          "targetTypeCode": {
+            "x-source-column": "target_type_code",
+            "type": "string",
+            "maxLength": 50
+          },
+          "targetId": {
+            "x-source-column": "target_id",
+            "type": "integer",
+            "format": "int64",
+            "description": "⚠ FK 가 아니다 — 표시명 해석은 화면 책임(W-06-11 §8-2 와 같은 결손)"
+          },
+          "payload": {
+            "x-source-column": "payload",
+            "type": "object",
+            "description": "실제 전송 내용(jsonb). ⚠ 대외비 노출 위험 — 노출 범위 미결 §8-4"
+          },
+          "statusCode": {
+            "x-source-column": "status_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "공통코드 — 값 목록 미정. 최소 구분: 대기/처리중/완료/실패"
+          },
+          "retryCount": {
+            "x-source-column": "retry_count",
+            "type": "integer",
+            "minimum": 0,
+            "default": 0,
+            "description": "CHECK ≥ 0 · 상한이 DB 에 없다 — 화면·워커 책임 §8-2"
+          },
+          "lastErrorMessage": {
+            "x-source-column": "last_error_message",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "x-source-column": "created_at",
+            "type": "string",
+            "format": "date-time"
+          },
+          "availableAt": {
+            "x-source-column": "available_at",
+            "type": "string",
+            "format": "date-time",
+            "description": "다음 시도 예정 시각(백오프) — 「HH:MM 자동 재시도」로 표시"
+          },
+          "sentAt": {
+            "x-source-column": "sent_at",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "completedAt": {
+            "x-source-column": "completed_at",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "sentAt 과 다른 시점 — 「보냈으나 미완료」 식별에 쓴다"
+          },
+          "lockedAt": {
+            "x-source-column": "locked_at",
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "lockedBy": {
+            "x-source-column": "locked_by",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 100,
+            "description": "값이 있으면 워커가 처리 중 — 이 상태에서는 :retry 가 409(workerLease)"
+          }
+        }
+      },
+      "AuditEvent": {
+        "x-source-table": "audit.audit_event",
+        "type": "object",
+        "required": [
+          "auditEventId",
+          "occurredAt",
+          "targetTypeCode",
+          "targetId",
+          "eventTypeCode"
+        ],
+        "description": "occurred_at RANGE 파티션이라 기간 조건이 없으면 전 파티션을 훑는다 — 공유계약 B-5. 미착지: target_id 가 FK 가 아니라 유형별로 다른 테이블을 가리키고 before/after jsonb 의 키 규약이 없어 응답을 사람이 읽게 만들 수 없다 — #68",
+        "properties": {
+          "auditEventId": {
+            "x-source-column": "audit_event_id",
+            "type": "integer",
+            "format": "int64"
+          },
+          "occurredAt": {
+            "x-source-column": "occurred_at",
+            "type": "string",
+            "format": "date-time",
+            "description": "파티션 키(RANGE)"
+          },
+          "targetTypeCode": {
+            "x-source-column": "target_type_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "공통코드 — 값 목록 미정 §8-3"
+          },
+          "targetId": {
+            "x-source-column": "target_id",
+            "type": "integer",
+            "format": "int64",
+            "description": "⚠ FK 가 아니다 — 유형별로 다른 테이블을 가리킨다. 화면이 유형→테이블→표시명을 풀어야 한다 §8-2"
+          },
+          "eventTypeCode": {
+            "x-source-column": "event_type_code",
+            "type": "string",
+            "maxLength": 50,
+            "description": "공통코드 — 값 목록 미정"
+          },
+          "beforeValue": {
+            "x-source-column": "before_value",
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "키·값 구조가 정해져 있지 않다 — 표시 규칙 §8-2. 모르는 키도 원문 그대로 표시(파싱 실패로 감추지 않는다)"
+          },
+          "afterValue": {
+            "x-source-column": "after_value",
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "reason": {
+            "x-source-column": "reason",
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "입력처가 어디인지 미정 §8-4"
+          },
+          "performedBy": {
+            "x-source-column": "performed_by",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "⚠ FK 없음(created_by 와 같은 의도적 미연결). 이름 표시는 애플리케이션 조인"
+          },
+          "terminalId": {
+            "x-source-column": "terminal_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "유일하게 FK 가 걸린 참조"
+          },
+          "correlationId": {
+            "x-source-column": "correlation_id",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 150,
+            "description": "한 트랜잭션의 여러 이벤트를 묶는다[추정] — 펼침 그룹 기준"
           }
         }
       }
