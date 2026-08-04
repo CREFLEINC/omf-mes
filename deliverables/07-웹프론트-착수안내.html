@@ -2123,17 +2123,20 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <p><strong>엔드포인트가 openapi.json에 아예 없다.</strong> 목 서버가 mock할 것이 없으므로 화면을 만들 수 없다. 엔드포인트를 지어내면 나중에 전부 버리게 된다.</p>
 <hr>
 <h2>§2. 착수 순서</h2>
-<figure><pre><code>1. 공용 컴포넌트 6건        §4 — 화면 작업 전에 먼저
+<figure><pre><code>0. 목 서버 세팅            §3 — client 저장소에서 만든다
+1. 공용 컴포넌트 6건        §4 — 화면 작업 전에 먼저
 2. W-06-07 창고·Location   마스터 형 원형
 3. W-06-01 Routing         버전 마스터 형 원형
 4. 나머지 6화면            패턴이 서면 빨라진다</code></pre></figure>
-<p><strong>앞의 둘로 세 리소스 패턴 중 둘이 검증된다.</strong> 그 뒤는 복제에 가깝다 — API가 <strong>세 패턴의 반복</strong>으로 설계돼 있다(§5-1).</p>
+<p><strong>앞의 둘(2·3)로 세 리소스 패턴 중 둘이 검증된다.</strong> 그 뒤는 복제에 가깝다 — API가 <strong>세 패턴의 반복</strong>으로 설계돼 있다(§5-1).</p>
 <hr>
 <h2>§3. 목 서버</h2>
-<h3>소스</h3>
-<figure><pre><code>deliverables/openapi/mdm-기준정보.json
+<h3>소스와 소유</h3>
+<figure><pre><code>deliverables/openapi/mdm-기준정보.json     ← 이 저장소(omf-mes)가 정본
   OpenAPI 3.1 · 경로 73 · 스키마 102 · 오퍼레이션 109
   example 478건 포함</code></pre></figure>
+<p><strong>목 서버 구성은 <code>omf-mes-client</code> 저장소에서 만든다</strong>(2026-08-04 확정). 도구 선택도 그쪽 판단이다.</p>
+<p>⚠ <strong><code>openapi.json</code> 자체는 이 저장소가 정본이다.</strong> client 로 복사해 두면 갱신이 갈린다 — <strong>참조하거나 빌드 시 가져오는 형태</strong>를 권한다. 스펙이 바뀌면 여기가 먼저 바뀐다.</p>
 <h3><code>example</code>을 넣어 두었다</h3>
 <p>목 도구가 스키마만 보고 값을 만들면 <code>"string"</code> · <code>0</code> 이 나와 <strong>화면이 실제로 어떻게 보이는지 검증이 안 된다.</strong> 화면 스펙의 예시 값을 그대로 넣었다.</p>
 <figure><pre><code>warehouseName   "1공장 자재창고"       itemCode    "ABC-123"
@@ -2294,6 +2297,7 @@ PUT  /mdm/warehouses/{id}     →  요청 헤더  If-Match: "7"     ← 필수</
 <table>
 <thead><tr><th class="nw">버전</th><th>날짜</th><th>변경 요지</th></tr></thead>
 <tbody>
+<tr><th class="nw">v0.2</th><td>2026-08-04</td><td><strong>목 서버 소유 확정 반영</strong> — <code>omf-mes-client</code> 저장소에서 만든다. 착수 순서에 <strong>0단계(목 서버 세팅)</strong> 추가 · §3에 「<code>openapi.json</code> 은 <code>omf-mes</code> 가 정본이니 복사하지 말고 참조하라」 명시.</td></tr>
 <tr><th class="nw">v0.1</th><td>2026-08-04</td><td>초판 — 도메인 06 기준정보·연계 1차 착수용. <strong>9화면 가능 · 3화면 불가</strong>(#66·#67로 엔드포인트 부재). 착수 순서 · 목 서버(<code>example</code> 478건) · <strong>먼저 만들 공용 컴포넌트 6건</strong>(DS 이슈 #38~#46 연결) · 프런트가 자주 틀리는 공통 규약 · 화면별 ⚠ · <strong>함정 2건</strong>(#65 수신본 잠금 미강제 · <code>W-06-04</code> 재작업 위험).</td></tr>
 </tbody></table>
 
