@@ -6780,15 +6780,18 @@
               "field",
               "screen"
             ],
-            "description": "오류의 범위. 근거: 공유계약 G-1 — 한 필드의 문제는 인라인, 화면 수준 문제는 배너"
+            "description": "오류의 범위. 근거: 공유계약 G-1 — 한 필드의 문제는 인라인, 화면 수준 문제는 배너",
+            "example": "field"
           },
           "field": {
             "type": "string",
-            "description": "scope=field 일 때 대상 프로퍼티명"
+            "description": "scope=field 일 때 대상 프로퍼티명",
+            "example": "문자열"
           },
           "code": {
             "type": "string",
-            "description": "UNIQUE_VIOLATION · REQUIRED · RANGE · PAIR · PERMISSION_DENIED · STATE_LOCKED 등. STATE_LOCKED 는 확정·폐기 상태라 수정이 잠긴 것으로, 재로드해도 풀리지 않는다 — 재로드로 풀리는 저장 충돌(409)과 구분한다(공유계약 G-1)"
+            "description": "UNIQUE_VIOLATION · REQUIRED · RANGE · PAIR · PERMISSION_DENIED · STATE_LOCKED 등. STATE_LOCKED 는 확정·폐기 상태라 수정이 잠긴 것으로, 재로드해도 풀리지 않는다 — 재로드로 풀리는 저장 충돌(409)과 구분한다(공유계약 G-1)",
+            "example": "STANDARD"
           },
           "uniqueScope": {
             "type": "array",
@@ -6798,7 +6801,8 @@
             "description": "code=UNIQUE_VIOLATION 일 때 어느 유일키 범위에서 중복인지. 근거: 공유계약 A-1 — 범위 없이 「중복」만 오면 화면이 문구를 만들 수 없다"
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "example": "문자열"
           }
         }
       },
@@ -6830,10 +6834,12 @@
               "erpSync",
               "workerLease"
             ],
-            "description": "충돌 원인. 근거: 공유계약 B-1 확장 — user=다른 사용자, erpSync=ERP 재동기화 배치, workerLease=워커가 처리 중. 구분 없이 내려주면 화면이 「다른 사용자가 먼저 수정했습니다」라는 사실과 다른 안내를 하게 된다"
+            "description": "충돌 원인. 근거: 공유계약 B-1 확장 — user=다른 사용자, erpSync=ERP 재동기화 배치, workerLease=워커가 처리 중. 구분 없이 내려주면 화면이 「다른 사용자가 먼저 수정했습니다」라는 사실과 다른 안내를 하게 된다",
+            "example": "user"
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "example": "문자열"
           }
         }
       },
@@ -6846,11 +6852,13 @@
         "properties": {
           "index": {
             "type": "integer",
-            "description": "요청 배열에서의 위치"
+            "description": "요청 배열에서의 위치",
+            "example": 1
           },
           "key": {
             "type": "string",
-            "description": "식별 가능한 값(코드 등)"
+            "description": "식별 가능한 값(코드 등)",
+            "example": "a3f7c1e2-8b04-4d15-9e6a-2c7f0b8d1a44"
           },
           "errors": {
             "type": "array",
@@ -6869,7 +6877,8 @@
         "description": "일괄 처리 결과. 근거: 공유계약 C-2 — 전체 롤백하지 않고 거부 건만 되돌린다",
         "properties": {
           "succeeded": {
-            "type": "integer"
+            "type": "integer",
+            "example": 1
           },
           "failed": {
             "type": "array",
@@ -6888,7 +6897,8 @@
         "description": "코드 필드 수정 가능 여부. 근거: 공유계약 B-4 — 참조 건수가 0일 때만 수정 허용. 화면이 별도 호출로 세면 화면마다 다르게 구현된다",
         "properties": {
           "codeEditable": {
-            "type": "boolean"
+            "type": "boolean",
+            "example": false
           },
           "reason": {
             "type": "string",
@@ -6898,14 +6908,16 @@
               "NOT_COUNTABLE",
               "RECEIVED_FROM_ERP"
             ],
-            "description": "NOT_COUNTABLE = 참조가 FK 가 아니라 세지 못함(의도적 비-FK 또는 코드 문자열 참조) → 화면은 무조건 잠근다. RECEIVED_FROM_ERP = 수신본이라 항상 읽기 전용"
+            "description": "NOT_COUNTABLE = 참조가 FK 가 아니라 세지 못함(의도적 비-FK 또는 코드 문자열 참조) → 화면은 무조건 잠근다. RECEIVED_FROM_ERP = 수신본이라 항상 읽기 전용",
+            "example": "라인 정지 임박. 검사 대기 불가."
           },
           "referenceCount": {
             "type": [
               "integer",
               "null"
             ],
-            "description": "reason=NOT_COUNTABLE 이면 null"
+            "description": "reason=NOT_COUNTABLE 이면 null",
+            "example": 3
           }
         }
       },
@@ -6918,13 +6930,16 @@
         ],
         "properties": {
           "page": {
-            "type": "integer"
+            "type": "integer",
+            "example": 1
           },
           "size": {
-            "type": "integer"
+            "type": "integer",
+            "example": 1
           },
           "total": {
-            "type": "integer"
+            "type": "integer",
+            "example": 1
           }
         }
       },
@@ -6947,42 +6962,50 @@
           "warehouseId": {
             "x-source-column": "warehouse_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "plantId": {
             "x-source-column": "plant_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "businessUnitId": {
             "x-source-column": "business_unit_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "warehouseCode": {
             "x-source-column": "warehouse_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "WH-01"
           },
           "warehouseName": {
             "x-source-column": "warehouse_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "1공장 자재창고"
           },
           "warehouseTypeCode": {
             "x-source-column": "warehouse_type_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "MATERIAL"
           },
           "managementLevelCode": {
             "x-source-column": "management_level_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "isExternal": {
             "x-source-column": "is_external",
             "type": "boolean",
-            "default": false
+            "default": false,
+            "example": false
           },
           "partnerId": {
             "x-source-column": "partner_id",
@@ -6991,12 +7014,14 @@
               "null"
             ],
             "format": "int64",
-            "description": "ck_external_warehouse_partner — isExternal 이 참이면 필수"
+            "description": "ck_external_warehouse_partner — isExternal 이 참이면 필수",
+            "example": 1001
           },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": true
           }
         }
       },
@@ -7017,38 +7042,45 @@
             "x-source-column": "plant_id",
             "type": "integer",
             "format": "int64",
-            "description": "편집 신규만 — 등록 후 변경 불가. 근거: W-06-07 §4-A"
+            "description": "편집 신규만 — 등록 후 변경 불가. 근거: W-06-07 §4-A",
+            "example": 1001
           },
           "businessUnitId": {
             "x-source-column": "business_unit_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "warehouseCode": {
             "x-source-column": "warehouse_code",
             "type": "string",
             "maxLength": 50,
-            "description": "uq_warehouse — plantId 내 유일. 공백만 불가"
+            "description": "uq_warehouse — plantId 내 유일. 공백만 불가",
+            "example": "WH-01"
           },
           "warehouseName": {
             "x-source-column": "warehouse_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "1공장 자재창고"
           },
           "warehouseTypeCode": {
             "x-source-column": "warehouse_type_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "MATERIAL"
           },
           "managementLevelCode": {
             "x-source-column": "management_level_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "isExternal": {
             "x-source-column": "is_external",
             "type": "boolean",
-            "default": false
+            "default": false,
+            "example": false
           },
           "partnerId": {
             "x-source-column": "partner_id",
@@ -7057,7 +7089,8 @@
               "null"
             ],
             "format": "int64",
-            "description": "ck_external_warehouse_partner — isExternal 이 참이면 필수"
+            "description": "ck_external_warehouse_partner — isExternal 이 참이면 필수",
+            "example": 1001
           }
         }
       },
@@ -7077,32 +7110,38 @@
           "businessUnitId": {
             "x-source-column": "business_unit_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "warehouseCode": {
             "x-source-column": "warehouse_code",
             "type": "string",
             "maxLength": 50,
-            "description": "uq_warehouse — plantId 내 유일. 실제 편집 가능 여부는 GET 응답의 editability(§8-7 미결 반영)를 따른다"
+            "description": "uq_warehouse — plantId 내 유일. 실제 편집 가능 여부는 GET 응답의 editability(§8-7 미결 반영)를 따른다",
+            "example": "WH-01"
           },
           "warehouseName": {
             "x-source-column": "warehouse_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "1공장 자재창고"
           },
           "warehouseTypeCode": {
             "x-source-column": "warehouse_type_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "MATERIAL"
           },
           "managementLevelCode": {
             "x-source-column": "management_level_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "isExternal": {
             "x-source-column": "is_external",
-            "type": "boolean"
+            "type": "boolean",
+            "example": false
           },
           "partnerId": {
             "x-source-column": "partner_id",
@@ -7111,7 +7150,8 @@
               "null"
             ],
             "format": "int64",
-            "description": "ck_external_warehouse_partner — isExternal 이 참이면 필수"
+            "description": "ck_external_warehouse_partner — isExternal 이 참이면 필수",
+            "example": 1001
           }
         }
       },
@@ -7148,12 +7188,14 @@
           "locationId": {
             "x-source-column": "location_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "warehouseId": {
             "x-source-column": "warehouse_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "parentLocationId": {
             "x-source-column": "parent_location_id",
@@ -7161,22 +7203,26 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "locationCode": {
             "x-source-column": "location_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "A-01-03"
           },
           "locationName": {
             "x-source-column": "location_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "A구역 01열 03단"
           },
           "locationTypeCode": {
             "x-source-column": "location_type_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "RACK"
           },
           "qualityZoneCode": {
             "x-source-column": "quality_zone_code",
@@ -7184,7 +7230,8 @@
               "string",
               "null"
             ],
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "storageConditionCode": {
             "x-source-column": "storage_condition_code",
@@ -7192,17 +7239,20 @@
               "string",
               "null"
             ],
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "allowMixedItem": {
             "x-source-column": "allow_mixed_item",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": false
           },
           "allowMixedLot": {
             "x-source-column": "allow_mixed_lot",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": false
           },
           "capacityQty": {
             "x-source-column": "capacity_qty",
@@ -7211,7 +7261,8 @@
               "null"
             ],
             "minimum": 0,
-            "description": "qty_t numeric(20,6)"
+            "description": "qty_t numeric(20,6)",
+            "example": 500
           },
           "capacityUomId": {
             "x-source-column": "capacity_uom_id",
@@ -7219,12 +7270,14 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": true
           }
         }
       },
@@ -7243,7 +7296,8 @@
             "x-source-column": "warehouse_id",
             "type": "integer",
             "format": "int64",
-            "description": "좌측에서 선택한 창고로 고정 — 편집 신규만. 근거: W-06-07 §4-B"
+            "description": "좌측에서 선택한 창고로 고정 — 편집 신규만. 근거: W-06-07 §4-B",
+            "example": 1001
           },
           "parentLocationId": {
             "x-source-column": "parent_location_id",
@@ -7252,23 +7306,27 @@
               "null"
             ],
             "format": "int64",
-            "description": "하위 추가 시 자동 설정. 자기 자신·순환 금지 — §8-5"
+            "description": "하위 추가 시 자동 설정. 자기 자신·순환 금지 — §8-5",
+            "example": 1001
           },
           "locationCode": {
             "x-source-column": "location_code",
             "type": "string",
             "maxLength": 50,
-            "description": "uq_location — warehouseId 내 유일"
+            "description": "uq_location — warehouseId 내 유일",
+            "example": "A-01-03"
           },
           "locationName": {
             "x-source-column": "location_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "A구역 01열 03단"
           },
           "locationTypeCode": {
             "x-source-column": "location_type_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "RACK"
           },
           "qualityZoneCode": {
             "x-source-column": "quality_zone_code",
@@ -7276,7 +7334,8 @@
               "string",
               "null"
             ],
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "storageConditionCode": {
             "x-source-column": "storage_condition_code",
@@ -7284,17 +7343,20 @@
               "string",
               "null"
             ],
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "allowMixedItem": {
             "x-source-column": "allow_mixed_item",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": false
           },
           "allowMixedLot": {
             "x-source-column": "allow_mixed_lot",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": false
           },
           "capacityQty": {
             "x-source-column": "capacity_qty",
@@ -7303,7 +7365,8 @@
               "null"
             ],
             "minimum": 0,
-            "description": "qty_t numeric(20,6)"
+            "description": "qty_t numeric(20,6)",
+            "example": 500
           },
           "capacityUomId": {
             "x-source-column": "capacity_uom_id",
@@ -7311,7 +7374,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           }
         }
       },
@@ -7334,23 +7398,27 @@
               "null"
             ],
             "format": "int64",
-            "description": "계층 재배치. 자기 자신·순환 금지 — §8-5"
+            "description": "계층 재배치. 자기 자신·순환 금지 — §8-5",
+            "example": 1001
           },
           "locationCode": {
             "x-source-column": "location_code",
             "type": "string",
             "maxLength": 50,
-            "description": "uq_location — warehouseId 내 유일. 실제 편집 가능 여부는 GET 응답의 editability(§8-7 미결 반영)를 따른다"
+            "description": "uq_location — warehouseId 내 유일. 실제 편집 가능 여부는 GET 응답의 editability(§8-7 미결 반영)를 따른다",
+            "example": "A-01-03"
           },
           "locationName": {
             "x-source-column": "location_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "A구역 01열 03단"
           },
           "locationTypeCode": {
             "x-source-column": "location_type_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "RACK"
           },
           "qualityZoneCode": {
             "x-source-column": "quality_zone_code",
@@ -7358,7 +7426,8 @@
               "string",
               "null"
             ],
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "storageConditionCode": {
             "x-source-column": "storage_condition_code",
@@ -7366,15 +7435,18 @@
               "string",
               "null"
             ],
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "allowMixedItem": {
             "x-source-column": "allow_mixed_item",
-            "type": "boolean"
+            "type": "boolean",
+            "example": false
           },
           "allowMixedLot": {
             "x-source-column": "allow_mixed_lot",
-            "type": "boolean"
+            "type": "boolean",
+            "example": false
           },
           "capacityQty": {
             "x-source-column": "capacity_qty",
@@ -7383,7 +7455,8 @@
               "null"
             ],
             "minimum": 0,
-            "description": "qty_t numeric(20,6)"
+            "description": "qty_t numeric(20,6)",
+            "example": 500
           },
           "capacityUomId": {
             "x-source-column": "capacity_uom_id",
@@ -7391,7 +7464,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           }
         }
       },
@@ -7425,17 +7499,20 @@
           "appUserId": {
             "x-source-column": "app_user_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "loginId": {
             "x-source-column": "login_id",
             "type": "string",
-            "maxLength": 100
+            "maxLength": 100,
+            "example": "hong.gd"
           },
           "userName": {
             "x-source-column": "user_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "표시명"
           },
           "departmentId": {
             "x-source-column": "department_id",
@@ -7443,7 +7520,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "email": {
             "x-source-column": "email",
@@ -7451,19 +7529,22 @@
               "string",
               "null"
             ],
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "문자열"
           },
           "statusCode": {
             "x-source-column": "status_code",
             "type": "string",
             "maxLength": 50,
             "default": "ACTIVE",
-            "description": "공통코드 — 값 목록 미정(§8-4) · isActive 와의 역할 분담 미정(§8-4)"
+            "description": "공통코드 — 값 목록 미정(§8-4) · isActive 와의 역할 분담 미정(§8-4)",
+            "example": "ACTIVE"
           },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": true
           }
         }
       },
@@ -7480,13 +7561,15 @@
             "x-source-column": "login_id",
             "type": "string",
             "maxLength": 100,
-            "description": "uq — 전역 유일. 공백만 불가"
+            "description": "uq — 전역 유일. 공백만 불가",
+            "example": "hong.gd"
           },
           "userName": {
             "x-source-column": "user_name",
             "type": "string",
             "maxLength": 200,
-            "description": "공백만 불가"
+            "description": "공백만 불가",
+            "example": "표시명"
           },
           "departmentId": {
             "x-source-column": "department_id",
@@ -7494,7 +7577,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "email": {
             "x-source-column": "email",
@@ -7503,13 +7587,15 @@
               "null"
             ],
             "maxLength": 200,
-            "description": "형식 검증은 화면 책임 — DB 제약 없음"
+            "description": "형식 검증은 화면 책임 — DB 제약 없음",
+            "example": "문자열"
           },
           "statusCode": {
             "x-source-column": "status_code",
             "type": "string",
             "maxLength": 50,
-            "description": "미지정 시 서버가 물리 모델 DEFAULT('ACTIVE')로 채운다. 공통코드 값 목록 미정 — §8-4"
+            "description": "미지정 시 서버가 물리 모델 DEFAULT('ACTIVE')로 채운다. 공통코드 값 목록 미정 — §8-4",
+            "example": "ACTIVE"
           }
         }
       },
@@ -7525,7 +7611,8 @@
           "userName": {
             "x-source-column": "user_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "표시명"
           },
           "departmentId": {
             "x-source-column": "department_id",
@@ -7533,7 +7620,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "email": {
             "x-source-column": "email",
@@ -7541,12 +7629,14 @@
               "string",
               "null"
             ],
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "문자열"
           },
           "statusCode": {
             "x-source-column": "status_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "ACTIVE"
           }
         }
       },
@@ -7579,29 +7669,34 @@
           "roleId": {
             "x-source-column": "role_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "roleCode": {
             "x-source-column": "role_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "ROLE_PROD_MGR"
           },
           "roleName": {
             "x-source-column": "role_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "생산관리자"
           },
           "description": {
             "x-source-column": "description",
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "example": "문자열"
           },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": true
           }
         }
       },
@@ -7618,20 +7713,23 @@
             "x-source-column": "role_code",
             "type": "string",
             "maxLength": 50,
-            "description": "uq — 전역 유일. 공백만 불가"
+            "description": "uq — 전역 유일. 공백만 불가",
+            "example": "ROLE_PROD_MGR"
           },
           "roleName": {
             "x-source-column": "role_name",
             "type": "string",
             "maxLength": 200,
-            "description": "공백만 불가"
+            "description": "공백만 불가",
+            "example": "생산관리자"
           },
           "description": {
             "x-source-column": "description",
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "example": "문자열"
           }
         }
       },
@@ -7648,19 +7746,22 @@
             "x-source-column": "role_code",
             "type": "string",
             "maxLength": 50,
-            "description": "uq — 전역 유일. 실제 편집 가능 여부는 GET 응답의 editability 를 따른다"
+            "description": "uq — 전역 유일. 실제 편집 가능 여부는 GET 응답의 editability 를 따른다",
+            "example": "ROLE_PROD_MGR"
           },
           "roleName": {
             "x-source-column": "role_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "생산관리자"
           },
           "description": {
             "x-source-column": "description",
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "example": "문자열"
           }
         }
       },
@@ -7691,17 +7792,20 @@
           "userRoleId": {
             "x-source-column": "user_role_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "appUserId": {
             "x-source-column": "app_user_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "roleId": {
             "x-source-column": "role_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           }
         }
       },
@@ -7732,17 +7836,20 @@
           "rolePermissionId": {
             "x-source-column": "role_permission_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "roleId": {
             "x-source-column": "role_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "permissionCode": {
             "x-source-column": "permission_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "MASTER_EDIT"
           }
         }
       },
@@ -7772,12 +7879,14 @@
           "userDataScopeId": {
             "x-source-column": "user_data_scope_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "appUserId": {
             "x-source-column": "app_user_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "businessUnitId": {
             "x-source-column": "business_unit_id",
@@ -7786,7 +7895,8 @@
               "null"
             ],
             "format": "int64",
-            "description": "비어 있으면 (전체) — ck_user_data_scope_target"
+            "description": "비어 있으면 (전체) — ck_user_data_scope_target",
+            "example": 1001
           },
           "plantId": {
             "x-source-column": "plant_id",
@@ -7795,7 +7905,8 @@
               "null"
             ],
             "format": "int64",
-            "description": "비어 있으면 (전체) — ck_user_data_scope_target"
+            "description": "비어 있으면 (전체) — ck_user_data_scope_target",
+            "example": 1001
           }
         }
       },
@@ -7829,35 +7940,41 @@
           "routingId": {
             "x-source-column": "routing_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "itemId": {
             "x-source-column": "item_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "routingCode": {
             "x-source-column": "routing_code",
             "type": "string",
             "maxLength": 50,
-            "description": "uq_routing(item_id, routing_code, routing_version) 구성 — 결정 07 헤더 키"
+            "description": "uq_routing(item_id, routing_code, routing_version) 구성 — 결정 07 헤더 키",
+            "example": "STANDARD"
           },
           "routingVersion": {
             "x-source-column": "routing_version",
             "type": "integer",
             "minimum": 1,
-            "description": "CHECK > 0. 시스템 채번 — 결정 07 헤더 키. 편집 불가"
+            "description": "CHECK > 0. 시스템 채번 — 결정 07 헤더 키. 편집 불가",
+            "example": 3
           },
           "statusCode": {
             "x-source-column": "status_code",
             "type": "string",
             "maxLength": 50,
-            "description": "공통코드 — 결정 07 이 작성중/확정/폐기 세 값으로 확정했다(코드 문자열 등록은 W-06-06 소관 §8-4). 이 값으로 화면이 편집 잠금을 판정한다(§5-4). 이 API 로는 직접 바꾸지 않고 :new-revision·:confirm·:obsolete 로만 전이한다"
+            "description": "공통코드 — 결정 07 이 작성중/확정/폐기 세 값으로 확정했다(코드 문자열 등록은 W-06-06 소관 §8-4). 이 값으로 화면이 편집 잠금을 판정한다(§5-4). 이 API 로는 직접 바꾸지 않고 :new-revision·:confirm·:obsolete 로만 전이한다",
+            "example": "ACTIVE"
           },
           "effectiveFrom": {
             "x-source-column": "effective_from",
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "example": "2026-08-04"
           },
           "effectiveTo": {
             "x-source-column": "effective_to",
@@ -7866,7 +7983,8 @@
               "null"
             ],
             "format": "date",
-            "description": "ck_routing_dates — 있으면 effectiveFrom 이상"
+            "description": "ck_routing_dates — 있으면 effectiveFrom 이상",
+            "example": "2026-08-04"
           }
         }
       },
@@ -7884,18 +8002,21 @@
             "x-source-column": "item_id",
             "type": "integer",
             "format": "int64",
-            "description": "편집 신규만 — 등록 후 변경 불가"
+            "description": "편집 신규만 — 등록 후 변경 불가",
+            "example": 1001
           },
           "routingCode": {
             "x-source-column": "routing_code",
             "type": "string",
             "maxLength": 50,
-            "description": "uq_routing — itemId 내 유일. 공백만 불가"
+            "description": "uq_routing — itemId 내 유일. 공백만 불가",
+            "example": "STANDARD"
           },
           "effectiveFrom": {
             "x-source-column": "effective_from",
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "example": "2026-08-04"
           },
           "effectiveTo": {
             "x-source-column": "effective_to",
@@ -7904,7 +8025,8 @@
               "null"
             ],
             "format": "date",
-            "description": "ck_routing_dates — 있으면 effectiveFrom 이상"
+            "description": "ck_routing_dates — 있으면 effectiveFrom 이상",
+            "example": "2026-08-04"
           }
         }
       },
@@ -7920,12 +8042,14 @@
           "routingCode": {
             "x-source-column": "routing_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "effectiveFrom": {
             "x-source-column": "effective_from",
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "example": "2026-08-04"
           },
           "effectiveTo": {
             "x-source-column": "effective_to",
@@ -7934,7 +8058,8 @@
               "null"
             ],
             "format": "date",
-            "description": "ck_routing_dates — 있으면 effectiveFrom 이상"
+            "description": "ck_routing_dates — 있으면 effectiveFrom 이상",
+            "example": "2026-08-04"
           }
         }
       },
@@ -7990,65 +8115,77 @@
           "routingOperationId": {
             "x-source-column": "routing_operation_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "routingId": {
             "x-source-column": "routing_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "operationSeq": {
             "x-source-column": "operation_seq",
             "type": "integer",
             "minimum": 1,
-            "description": "CHECK > 0 · uq_routing_operation(routing_id, operation_seq). 채번 값 자체는 화면에 노출하지 않는다 — GET .../operations 참고"
+            "description": "CHECK > 0 · uq_routing_operation(routing_id, operation_seq). 채번 값 자체는 화면에 노출하지 않는다 — GET .../operations 참고",
+            "example": 1
           },
           "processId": {
             "x-source-column": "process_id",
             "type": "integer",
             "format": "int64",
-            "description": "FK → mdm.process"
+            "description": "FK → mdm.process",
+            "example": 1001
           },
           "operationName": {
             "x-source-column": "operation_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "표시명"
           },
           "mesManaged": {
             "x-source-column": "mes_managed",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": false
           },
           "materialInputManaged": {
             "x-source-column": "material_input_managed",
             "type": "boolean",
-            "default": false
+            "default": false,
+            "example": false
           },
           "productionResultManaged": {
             "x-source-column": "production_result_managed",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": false
           },
           "inspectionManaged": {
             "x-source-column": "inspection_managed",
             "type": "boolean",
             "default": false,
-            "description": "PQC opt-in 의 근거 필드(결정 07) — 끄면 PQC 생략"
+            "description": "PQC opt-in 의 근거 필드(결정 07) — 끄면 PQC 생략",
+            "example": false
           },
           "outputLotRequired": {
             "x-source-column": "output_lot_required",
             "type": "boolean",
-            "default": false
+            "default": false,
+            "example": false
           },
           "equipmentRequired": {
             "x-source-column": "equipment_required",
             "type": "boolean",
-            "default": false
+            "default": false,
+            "example": false
           },
           "moldRequired": {
             "x-source-column": "mold_required",
             "type": "boolean",
-            "default": false
+            "default": false,
+            "example": false
           },
           "standardCycleTimeSec": {
             "x-source-column": "standard_cycle_time_sec",
@@ -8057,7 +8194,8 @@
               "null"
             ],
             "exclusiveMinimum": 0,
-            "description": "단위는 초. CHECK > 0 — 0 은 불가"
+            "description": "단위는 초. CHECK > 0 — 0 은 불가",
+            "example": 1.0
           },
           "standardYieldRate": {
             "x-source-column": "standard_yield_rate",
@@ -8067,7 +8205,8 @@
             ],
             "minimum": 0,
             "maximum": 1,
-            "description": "CHECK BETWEEN 0 AND 1 — 0~1 비율이며 퍼센트가 아니다(공유계약 A-8)"
+            "description": "CHECK BETWEEN 0 AND 1 — 0~1 비율이며 퍼센트가 아니다(공유계약 A-8)",
+            "example": 1.0
           }
         }
       },
@@ -8092,65 +8231,77 @@
           "routingOperationId": {
             "x-source-column": "routing_operation_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "routingId": {
             "x-source-column": "routing_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "operationSeq": {
             "x-source-column": "operation_seq",
             "type": "integer",
             "minimum": 1,
-            "description": "CHECK > 0 · uq_routing_operation(routing_id, operation_seq). 채번 값 자체는 화면에 노출하지 않는다 — GET .../operations 참고"
+            "description": "CHECK > 0 · uq_routing_operation(routing_id, operation_seq). 채번 값 자체는 화면에 노출하지 않는다 — GET .../operations 참고",
+            "example": 1
           },
           "processId": {
             "x-source-column": "process_id",
             "type": "integer",
             "format": "int64",
-            "description": "FK → mdm.process"
+            "description": "FK → mdm.process",
+            "example": 1001
           },
           "operationName": {
             "x-source-column": "operation_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "표시명"
           },
           "mesManaged": {
             "x-source-column": "mes_managed",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": false
           },
           "materialInputManaged": {
             "x-source-column": "material_input_managed",
             "type": "boolean",
-            "default": false
+            "default": false,
+            "example": false
           },
           "productionResultManaged": {
             "x-source-column": "production_result_managed",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": false
           },
           "inspectionManaged": {
             "x-source-column": "inspection_managed",
             "type": "boolean",
             "default": false,
-            "description": "PQC opt-in 의 근거 필드(결정 07) — 끄면 PQC 생략"
+            "description": "PQC opt-in 의 근거 필드(결정 07) — 끄면 PQC 생략",
+            "example": false
           },
           "outputLotRequired": {
             "x-source-column": "output_lot_required",
             "type": "boolean",
-            "default": false
+            "default": false,
+            "example": false
           },
           "equipmentRequired": {
             "x-source-column": "equipment_required",
             "type": "boolean",
-            "default": false
+            "default": false,
+            "example": false
           },
           "moldRequired": {
             "x-source-column": "mold_required",
             "type": "boolean",
-            "default": false
+            "default": false,
+            "example": false
           },
           "standardCycleTimeSec": {
             "x-source-column": "standard_cycle_time_sec",
@@ -8159,7 +8310,8 @@
               "null"
             ],
             "exclusiveMinimum": 0,
-            "description": "단위는 초. CHECK > 0 — 0 은 불가"
+            "description": "단위는 초. CHECK > 0 — 0 은 불가",
+            "example": 1.0
           },
           "standardYieldRate": {
             "x-source-column": "standard_yield_rate",
@@ -8169,7 +8321,8 @@
             ],
             "minimum": 0,
             "maximum": 1,
-            "description": "CHECK BETWEEN 0 AND 1 — 0~1 비율이며 퍼센트가 아니다(공유계약 A-8)"
+            "description": "CHECK BETWEEN 0 AND 1 — 0~1 비율이며 퍼센트가 아니다(공유계약 A-8)",
+            "example": 1.0
           }
         }
       },
@@ -8201,26 +8354,30 @@
           "routingOperationDependencyId": {
             "x-source-column": "routing_operation_dependency_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "predecessorOperationId": {
             "x-source-column": "predecessor_operation_id",
             "type": "integer",
             "format": "int64",
-            "description": "FK → routing_operation"
+            "description": "FK → routing_operation",
+            "example": 1001
           },
           "successorOperationId": {
             "x-source-column": "successor_operation_id",
             "type": "integer",
             "format": "int64",
-            "description": "FK → routing_operation"
+            "description": "FK → routing_operation",
+            "example": 1001
           },
           "dependencyTypeCode": {
             "x-source-column": "dependency_type_code",
             "type": "string",
             "maxLength": 50,
             "default": "FINISH_TO_START",
-            "description": "공통코드 — 값 목록 미정"
+            "description": "공통코드 — 값 목록 미정",
+            "example": "STANDARD"
           }
         }
       },
@@ -8252,29 +8409,34 @@
           "codeGroupId": {
             "x-source-column": "code_group_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "groupCode": {
             "x-source-column": "group_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "groupName": {
             "x-source-column": "group_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "표시명"
           },
           "description": {
             "x-source-column": "description",
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "example": "문자열"
           },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": true
           }
         }
       },
@@ -8291,19 +8453,22 @@
             "x-source-column": "group_code",
             "type": "string",
             "maxLength": 50,
-            "description": "uq — 전역 유일. 공백만 불가"
+            "description": "uq — 전역 유일. 공백만 불가",
+            "example": "STANDARD"
           },
           "groupName": {
             "x-source-column": "group_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "표시명"
           },
           "description": {
             "x-source-column": "description",
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "example": "문자열"
           }
         }
       },
@@ -8319,19 +8484,22 @@
           "groupCode": {
             "x-source-column": "group_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "groupName": {
             "x-source-column": "group_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "표시명"
           },
           "description": {
             "x-source-column": "description",
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "example": "문자열"
           }
         }
       },
@@ -8366,28 +8534,33 @@
           "codeValueId": {
             "x-source-column": "code_value_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "codeGroupId": {
             "x-source-column": "code_group_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "code": {
             "x-source-column": "code",
             "type": "string",
             "maxLength": 50,
-            "description": "uq_code_value — codeGroupId 내 유일"
+            "description": "uq_code_value — codeGroupId 내 유일",
+            "example": "STANDARD"
           },
           "codeName": {
             "x-source-column": "code_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "표시명"
           },
           "displayOrder": {
             "x-source-column": "display_order",
             "type": "integer",
-            "default": 0
+            "default": 0,
+            "example": 1
           },
           "effectiveFrom": {
             "x-source-column": "effective_from",
@@ -8395,7 +8568,8 @@
               "string",
               "null"
             ],
-            "format": "date"
+            "format": "date",
+            "example": "2026-08-04"
           },
           "effectiveTo": {
             "x-source-column": "effective_to",
@@ -8404,12 +8578,14 @@
               "null"
             ],
             "format": "date",
-            "description": "ck_code_value_dates — 있으면 effectiveFrom 이상"
+            "description": "ck_code_value_dates — 있으면 effectiveFrom 이상",
+            "example": "2026-08-04"
           },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": true
           }
         }
       },
@@ -8427,23 +8603,27 @@
             "x-source-column": "code_group_id",
             "type": "integer",
             "format": "int64",
-            "description": "좌측에서 선택한 그룹으로 고정 — 편집 신규만"
+            "description": "좌측에서 선택한 그룹으로 고정 — 편집 신규만",
+            "example": 1001
           },
           "code": {
             "x-source-column": "code",
             "type": "string",
             "maxLength": 50,
-            "description": "uq_code_value — codeGroupId 내 유일"
+            "description": "uq_code_value — codeGroupId 내 유일",
+            "example": "STANDARD"
           },
           "codeName": {
             "x-source-column": "code_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "표시명"
           },
           "displayOrder": {
             "x-source-column": "display_order",
             "type": "integer",
-            "description": "미지정 시 서버가 물리 모델 DEFAULT(0)로 채운다"
+            "description": "미지정 시 서버가 물리 모델 DEFAULT(0)로 채운다",
+            "example": 1
           },
           "effectiveFrom": {
             "x-source-column": "effective_from",
@@ -8451,7 +8631,8 @@
               "string",
               "null"
             ],
-            "format": "date"
+            "format": "date",
+            "example": "2026-08-04"
           },
           "effectiveTo": {
             "x-source-column": "effective_to",
@@ -8460,7 +8641,8 @@
               "null"
             ],
             "format": "date",
-            "description": "ck_code_value_dates — 있으면 effectiveFrom 이상"
+            "description": "ck_code_value_dates — 있으면 effectiveFrom 이상",
+            "example": "2026-08-04"
           }
         }
       },
@@ -8477,16 +8659,19 @@
           "code": {
             "x-source-column": "code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "codeName": {
             "x-source-column": "code_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "표시명"
           },
           "displayOrder": {
             "x-source-column": "display_order",
-            "type": "integer"
+            "type": "integer",
+            "example": 1
           },
           "effectiveFrom": {
             "x-source-column": "effective_from",
@@ -8494,7 +8679,8 @@
               "string",
               "null"
             ],
-            "format": "date"
+            "format": "date",
+            "example": "2026-08-04"
           },
           "effectiveTo": {
             "x-source-column": "effective_to",
@@ -8503,7 +8689,8 @@
               "null"
             ],
             "format": "date",
-            "description": "ck_code_value_dates — 있으면 effectiveFrom 이상"
+            "description": "ck_code_value_dates — 있으면 effectiveFrom 이상",
+            "example": "2026-08-04"
           }
         }
       },
@@ -8536,17 +8723,20 @@
           "departmentId": {
             "x-source-column": "department_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "departmentCode": {
             "x-source-column": "department_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "DEPT-P1"
           },
           "departmentName": {
             "x-source-column": "department_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "생산1팀"
           },
           "parentDepartmentId": {
             "x-source-column": "parent_department_id",
@@ -8555,7 +8745,8 @@
               "null"
             ],
             "format": "int64",
-            "description": "ck_department_parent — 자기 자신 금지. 순환은 서버 검사"
+            "description": "ck_department_parent — 자기 자신 금지. 순환은 서버 검사",
+            "example": 1001
           },
           "businessUnitId": {
             "x-source-column": "business_unit_id",
@@ -8563,12 +8754,14 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": true
           }
         }
       },
@@ -8585,12 +8778,14 @@
             "x-source-column": "department_code",
             "type": "string",
             "maxLength": 50,
-            "description": "uq — 전역 유일"
+            "description": "uq — 전역 유일",
+            "example": "DEPT-P1"
           },
           "departmentName": {
             "x-source-column": "department_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "생산1팀"
           },
           "parentDepartmentId": {
             "x-source-column": "parent_department_id",
@@ -8598,7 +8793,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "businessUnitId": {
             "x-source-column": "business_unit_id",
@@ -8606,7 +8802,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           }
         }
       },
@@ -8622,12 +8819,14 @@
           "departmentCode": {
             "x-source-column": "department_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "DEPT-P1"
           },
           "departmentName": {
             "x-source-column": "department_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "생산1팀"
           },
           "parentDepartmentId": {
             "x-source-column": "parent_department_id",
@@ -8635,7 +8834,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "businessUnitId": {
             "x-source-column": "business_unit_id",
@@ -8643,7 +8843,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           }
         }
       },
@@ -8679,28 +8880,33 @@
           "workerId": {
             "x-source-column": "worker_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "workerNo": {
             "x-source-column": "worker_no",
             "type": "string",
             "maxLength": 50,
-            "description": "POP·모바일 사번 경량 인증의 원천(P-CO-01·M-CO-01)"
+            "description": "POP·모바일 사번 경량 인증의 원천(P-CO-01·M-CO-01)",
+            "example": "문자열"
           },
           "workerName": {
             "x-source-column": "worker_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "홍길동"
           },
           "businessUnitId": {
             "x-source-column": "business_unit_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "plantId": {
             "x-source-column": "plant_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "departmentId": {
             "x-source-column": "department_id",
@@ -8708,7 +8914,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "appUserId": {
             "x-source-column": "app_user_id",
@@ -8717,18 +8924,21 @@
               "null"
             ],
             "format": "int64",
-            "description": "작업자 ↔ 입력자 구분(SQL 502 주석). 연결 편집 소관 미결 — W-06-06 §8-3"
+            "description": "작업자 ↔ 입력자 구분(SQL 502 주석). 연결 편집 소관 미결 — W-06-06 §8-3",
+            "example": 1001
           },
           "statusCode": {
             "x-source-column": "status_code",
             "type": "string",
             "maxLength": 50,
-            "description": "공통코드 — 값 목록 미정"
+            "description": "공통코드 — 값 목록 미정",
+            "example": "ACTIVE"
           },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": true
           }
         }
       },
@@ -8761,18 +8971,21 @@
           "workerQualificationId": {
             "x-source-column": "worker_qualification_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "workerId": {
             "x-source-column": "worker_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "qualificationTypeCode": {
             "x-source-column": "qualification_type_code",
             "type": "string",
             "maxLength": 50,
-            "description": "공통코드 — 값 목록 미정 §8-5"
+            "description": "공통코드 — 값 목록 미정 §8-5",
+            "example": "STANDARD"
           },
           "processId": {
             "x-source-column": "process_id",
@@ -8781,7 +8994,8 @@
               "null"
             ],
             "format": "int64",
-            "description": "비우면 (전체 공정) — A-7"
+            "description": "비우면 (전체 공정) — A-7",
+            "example": 1001
           },
           "certificateNo": {
             "x-source-column": "certificate_no",
@@ -8789,12 +9003,14 @@
               "string",
               "null"
             ],
-            "maxLength": 100
+            "maxLength": 100,
+            "example": "문자열"
           },
           "validFrom": {
             "x-source-column": "valid_from",
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "example": "2026-08-04"
           },
           "validTo": {
             "x-source-column": "valid_to",
@@ -8803,7 +9019,8 @@
               "null"
             ],
             "format": "date",
-            "description": "ck_worker_qualification_dates — 있으면 validFrom 이상"
+            "description": "ck_worker_qualification_dates — 있으면 validFrom 이상",
+            "example": "2026-08-04"
           },
           "certifiedBy": {
             "x-source-column": "certified_by",
@@ -8812,7 +9029,8 @@
               "null"
             ],
             "format": "int64",
-            "description": "FK 없음 — 무엇을 가리키는지 근거 없음 §8-2"
+            "description": "FK 없음 — 무엇을 가리키는지 근거 없음 §8-2",
+            "example": 1001
           }
         }
       },
@@ -8851,42 +9069,49 @@
           "itemId": {
             "x-source-column": "item_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "itemCode": {
             "x-source-column": "item_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "ABC-123"
           },
           "itemName": {
             "x-source-column": "item_name",
             "type": "string",
             "maxLength": 200,
-            "description": "⚠ 한/베 두 언어를 담을 컬럼이 없다 — W-06-06 §8-1 과 같은 결함"
+            "description": "⚠ 한/베 두 언어를 담을 컬럼이 없다 — W-06-06 §8-1 과 같은 결함",
+            "example": "하우징 커버 A"
           },
           "itemTypeCode": {
             "x-source-column": "item_type_code",
             "type": "string",
             "maxLength": 50,
-            "description": "공통코드 — 값 목록 미정"
+            "description": "공통코드 — 값 목록 미정",
+            "example": "MATERIAL"
           },
           "baseUomId": {
             "x-source-column": "base_uom_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "lotControlTypeCode": {
             "x-source-column": "lot_control_type_code",
             "type": "string",
             "maxLength": 50,
-            "description": "MES 확장 · 공통코드 — 값 목록 미정 [추정]"
+            "description": "MES 확장 · 공통코드 — 값 목록 미정 [추정]",
+            "example": "STANDARD"
           },
           "serialControlTypeCode": {
             "x-source-column": "serial_control_type_code",
             "type": "string",
             "maxLength": 50,
             "default": "NONE",
-            "description": "MES 확장 · 공통코드"
+            "description": "MES 확장 · 공통코드",
+            "example": "STANDARD"
           },
           "shelfLifeDays": {
             "x-source-column": "shelf_life_days",
@@ -8895,26 +9120,30 @@
               "null"
             ],
             "minimum": 0,
-            "description": "MES 확장 · CHECK ≥ 0 · 「유효기한 관리」 토글은 이 값의 NULL 여부로 표현한다(§8-2, 확정 QA #28)"
+            "description": "MES 확장 · CHECK ≥ 0 · 「유효기한 관리」 토글은 이 값의 NULL 여부로 표현한다(§8-2, 확정 QA #28)",
+            "example": 1
           },
           "inspectionRequired": {
             "x-source-column": "inspection_required",
             "type": "boolean",
             "default": false,
-            "description": "MES 확장 · W-01-01 IQC 대상 판정의 입력"
+            "description": "MES 확장 · W-01-01 IQC 대상 판정의 입력",
+            "example": true
           },
           "fifoPolicyCode": {
             "x-source-column": "fifo_policy_code",
             "type": "string",
             "maxLength": 50,
             "default": "FIFO",
-            "description": "MES 확장 · 확정(QA #28) — 유효기한 관리 품목=FEFO, 나머지=FIFO"
+            "description": "MES 확장 · 확정(QA #28) — 유효기한 관리 품목=FEFO, 나머지=FIFO",
+            "example": "STANDARD"
           },
           "negativeStockAllowed": {
             "x-source-column": "negative_stock_allowed",
             "type": "boolean",
             "default": false,
-            "description": "MES 확장"
+            "description": "MES 확장",
+            "example": false
           },
           "storageConditionCode": {
             "x-source-column": "storage_condition_code",
@@ -8923,7 +9152,8 @@
               "null"
             ],
             "maxLength": 50,
-            "description": "MES 확장 · 공통코드 — location.storage_condition_code 와 같은 코드계"
+            "description": "MES 확장 · 공통코드 — location.storage_condition_code 와 같은 코드계",
+            "example": "STANDARD"
           },
           "openedShelfLifeHours": {
             "x-source-column": "opened_shelf_life_hours",
@@ -8932,13 +9162,15 @@
               "null"
             ],
             "exclusiveMinimum": 0,
-            "description": "MES 확장 · CHECK > 0 — 0 은 불가"
+            "description": "MES 확장 · CHECK > 0 — 0 은 불가",
+            "example": 1
           },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
             "default": true,
-            "description": "MES 확장 — 별도 :deactivate 없이 이 PUT 으로 바꾼다(item 은 사용 중지 액션이 화면에 없다 — ui-요구목록 W-06-05)"
+            "description": "MES 확장 — 별도 :deactivate 없이 이 PUT 으로 바꾼다(item 은 사용 중지 액션이 화면에 없다 — ui-요구목록 W-06-05)",
+            "example": true
           }
         }
       },
@@ -8958,12 +9190,14 @@
           "lotControlTypeCode": {
             "x-source-column": "lot_control_type_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "serialControlTypeCode": {
             "x-source-column": "serial_control_type_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "shelfLifeDays": {
             "x-source-column": "shelf_life_days",
@@ -8972,20 +9206,24 @@
               "null"
             ],
             "minimum": 0,
-            "description": "조건부 필수 — 「유효기한 관리」 토글 ON 이면 필수(A-2). OFF 이면 null 로 보낸다"
+            "description": "조건부 필수 — 「유효기한 관리」 토글 ON 이면 필수(A-2). OFF 이면 null 로 보낸다",
+            "example": 1
           },
           "inspectionRequired": {
             "x-source-column": "inspection_required",
-            "type": "boolean"
+            "type": "boolean",
+            "example": true
           },
           "fifoPolicyCode": {
             "x-source-column": "fifo_policy_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "negativeStockAllowed": {
             "x-source-column": "negative_stock_allowed",
-            "type": "boolean"
+            "type": "boolean",
+            "example": false
           },
           "storageConditionCode": {
             "x-source-column": "storage_condition_code",
@@ -8993,7 +9231,8 @@
               "string",
               "null"
             ],
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "openedShelfLifeHours": {
             "x-source-column": "opened_shelf_life_hours",
@@ -9001,11 +9240,13 @@
               "integer",
               "null"
             ],
-            "exclusiveMinimum": 0
+            "exclusiveMinimum": 0,
+            "example": 1
           },
           "isActive": {
             "x-source-column": "is_active",
-            "type": "boolean"
+            "type": "boolean",
+            "example": true
           }
         }
       },
@@ -9040,34 +9281,40 @@
           "itemUomConversionId": {
             "x-source-column": "item_uom_conversion_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "itemId": {
             "x-source-column": "item_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "fromUomId": {
             "x-source-column": "from_uom_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "toUomId": {
             "x-source-column": "to_uom_id",
             "type": "integer",
             "format": "int64",
-            "description": "ck_item_uom_distinct — fromUomId 와 같으면 불가"
+            "description": "ck_item_uom_distinct — fromUomId 와 같으면 불가",
+            "example": 1001
           },
           "conversionRate": {
             "x-source-column": "conversion_rate",
             "type": "number",
             "exclusiveMinimum": 0,
-            "description": "rate_t numeric(18,8) · CHECK > 0"
+            "description": "rate_t numeric(18,8) · CHECK > 0",
+            "example": 1.0
           },
           "effectiveFrom": {
             "x-source-column": "effective_from",
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "example": "2026-08-04"
           },
           "effectiveTo": {
             "x-source-column": "effective_to",
@@ -9076,7 +9323,8 @@
               "null"
             ],
             "format": "date",
-            "description": "ck_item_uom_dates — 있으면 effectiveFrom 이상"
+            "description": "ck_item_uom_dates — 있으면 effectiveFrom 이상",
+            "example": "2026-08-04"
           }
         }
       },
@@ -9108,18 +9356,21 @@
           "itemExternalCodeId": {
             "x-source-column": "item_external_code_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "itemId": {
             "x-source-column": "item_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "externalSystemCode": {
             "x-source-column": "external_system_code",
             "type": "string",
             "maxLength": 50,
-            "description": "공통코드"
+            "description": "공통코드",
+            "example": "STANDARD"
           },
           "partnerId": {
             "x-source-column": "partner_id",
@@ -9128,12 +9379,14 @@
               "null"
             ],
             "format": "int64",
-            "description": "비우면 (전체) — uq_item_external_code 가 COALESCE(partner_id,0) 으로 접는다(A-7)"
+            "description": "비우면 (전체) — uq_item_external_code 가 COALESCE(partner_id,0) 으로 접는다(A-7)",
+            "example": 1001
           },
           "externalItemCode": {
             "x-source-column": "external_item_code",
             "type": "string",
-            "maxLength": 100
+            "maxLength": 100,
+            "example": "STANDARD"
           }
         }
       },
@@ -9167,33 +9420,39 @@
           "itemBuItemMapId": {
             "x-source-column": "item_bu_item_map_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "fromBusinessUnitId": {
             "x-source-column": "from_business_unit_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "fromItemId": {
             "x-source-column": "from_item_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "toBusinessUnitId": {
             "x-source-column": "to_business_unit_id",
             "type": "integer",
             "format": "int64",
-            "description": "ck_item_bu_map_distinct — fromBusinessUnitId 와 같으면 불가"
+            "description": "ck_item_bu_map_distinct — fromBusinessUnitId 와 같으면 불가",
+            "example": 1001
           },
           "toItemId": {
             "x-source-column": "to_item_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "effectiveFrom": {
             "x-source-column": "effective_from",
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "example": "2026-08-04"
           },
           "effectiveTo": {
             "x-source-column": "effective_to",
@@ -9202,7 +9461,8 @@
               "null"
             ],
             "format": "date",
-            "description": "ck_item_bu_map_dates — 있으면 effectiveFrom 이상"
+            "description": "ck_item_bu_map_dates — 있으면 effectiveFrom 이상",
+            "example": "2026-08-04"
           }
         }
       },
@@ -9239,41 +9499,48 @@
           "bomId": {
             "x-source-column": "bom_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "parentItemId": {
             "x-source-column": "parent_item_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "bomCode": {
             "x-source-column": "bom_code",
             "type": "string",
             "maxLength": 50,
-            "description": "uq_bom(parent_item_id, bom_code, bom_version) 구성"
+            "description": "uq_bom(parent_item_id, bom_code, bom_version) 구성",
+            "example": "STANDARD"
           },
           "bomVersion": {
             "x-source-column": "bom_version",
             "type": "integer",
             "minimum": 1,
-            "description": "CHECK > 0"
+            "description": "CHECK > 0",
+            "example": 1
           },
           "statusCode": {
             "x-source-column": "status_code",
             "type": "string",
             "maxLength": 50,
-            "description": "공통코드 — 값 목록 미정. W-06-11 「작성중만 편집」 규칙의 판정 컬럼"
+            "description": "공통코드 — 값 목록 미정. W-06-11 「작성중만 편집」 규칙의 판정 컬럼",
+            "example": "ACTIVE"
           },
           "isDefault": {
             "x-source-column": "is_default",
             "type": "boolean",
             "default": false,
-            "description": "uq_bom_default — 품목당 1개뿐(부분 유일). :set-default 로만 바꾼다"
+            "description": "uq_bom_default — 품목당 1개뿐(부분 유일). :set-default 로만 바꾼다",
+            "example": true
           },
           "effectiveFrom": {
             "x-source-column": "effective_from",
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "example": "2026-08-04"
           },
           "effectiveTo": {
             "x-source-column": "effective_to",
@@ -9282,18 +9549,21 @@
               "null"
             ],
             "format": "date",
-            "description": "ck_bom_dates — 있으면 effectiveFrom 이상"
+            "description": "ck_bom_dates — 있으면 effectiveFrom 이상",
+            "example": "2026-08-04"
           },
           "baseQty": {
             "x-source-column": "base_qty",
             "type": "number",
             "exclusiveMinimum": 0,
-            "description": "qty_t · CHECK > 0"
+            "description": "qty_t · CHECK > 0",
+            "example": 500
           },
           "baseUomId": {
             "x-source-column": "base_uom_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           }
         }
       },
@@ -9347,18 +9617,21 @@
           "bomComponentId": {
             "x-source-column": "bom_component_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "bomId": {
             "x-source-column": "bom_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "componentItemId": {
             "x-source-column": "component_item_id",
             "type": "integer",
             "format": "int64",
-            "description": "ERP 원본"
+            "description": "ERP 원본",
+            "example": 1001
           },
           "routingOperationId": {
             "x-source-column": "routing_operation_id",
@@ -9367,7 +9640,8 @@
               "null"
             ],
             "format": "int64",
-            "description": "MES 확장 — SQL 683 주석 「MES 등록(관리) 공정」"
+            "description": "MES 확장 — SQL 683 주석 「MES 등록(관리) 공정」",
+            "example": 1001
           },
           "actualUseProcessId": {
             "x-source-column": "actual_use_process_id",
@@ -9376,19 +9650,22 @@
               "null"
             ],
             "format": "int64",
-            "description": "MES 확장 — SQL 684 주석 「실제 사용 공정」. routingOperationId 와 다를 수 있다"
+            "description": "MES 확장 — SQL 684 주석 「실제 사용 공정」. routingOperationId 와 다를 수 있다",
+            "example": 1001
           },
           "requiredQty": {
             "x-source-column": "required_qty",
             "type": "number",
             "exclusiveMinimum": 0,
-            "description": "ERP 원본 · qty_t · CHECK > 0"
+            "description": "ERP 원본 · qty_t · CHECK > 0",
+            "example": 500
           },
           "uomId": {
             "x-source-column": "uom_id",
             "type": "integer",
             "format": "int64",
-            "description": "ERP 원본"
+            "description": "ERP 원본",
+            "example": 1001
           },
           "scrapRate": {
             "x-source-column": "scrap_rate",
@@ -9396,32 +9673,37 @@
             "minimum": 0,
             "maximum": 1,
             "default": 0,
-            "description": "ERP 원본 · CHECK BETWEEN 0 AND 1 — 비율이지 퍼센트가 아니다(A-8)"
+            "description": "ERP 원본 · CHECK BETWEEN 0 AND 1 — 비율이지 퍼센트가 아니다(A-8)",
+            "example": 1.0
           },
           "isMandatory": {
             "x-source-column": "is_mandatory",
             "type": "boolean",
             "default": true,
-            "description": "ERP 원본"
+            "description": "ERP 원본",
+            "example": false
           },
           "lotTraceRequired": {
             "x-source-column": "lot_trace_required",
             "type": "boolean",
             "default": false,
-            "description": "MES 확장 — 투입 시 자재 LOT 스캔 강제 여부"
+            "description": "MES 확장 — 투입 시 자재 LOT 스캔 강제 여부",
+            "example": false
           },
           "backflushAllowed": {
             "x-source-column": "backflush_allowed",
             "type": "boolean",
             "default": false,
-            "description": "MES 확장 — 실적 등록 시 자동 차감 허용"
+            "description": "MES 확장 — 실적 등록 시 자동 차감 허용",
+            "example": false
           },
           "sequenceNo": {
             "x-source-column": "sequence_no",
             "type": "integer",
             "minimum": 1,
             "default": 1,
-            "description": "ERP 원본 · uq_bom_component(bom_id, sequence_no) · CHECK > 0"
+            "description": "ERP 원본 · uq_bom_component(bom_id, sequence_no) · CHECK > 0",
+            "example": 1
           }
         }
       },
@@ -9440,7 +9722,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "actualUseProcessId": {
             "x-source-column": "actual_use_process_id",
@@ -9448,15 +9731,18 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "lotTraceRequired": {
             "x-source-column": "lot_trace_required",
-            "type": "boolean"
+            "type": "boolean",
+            "example": false
           },
           "backflushAllowed": {
             "x-source-column": "backflush_allowed",
-            "type": "boolean"
+            "type": "boolean",
+            "example": false
           }
         }
       },
@@ -9504,18 +9790,21 @@
           "inspectionPlanId": {
             "x-source-column": "inspection_plan_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "inspectionPlanCode": {
             "x-source-column": "inspection_plan_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "inspectionPlanName": {
             "x-source-column": "inspection_plan_name",
             "type": "string",
             "maxLength": 200,
-            "description": "⚠ 한/베 컬럼 없음"
+            "description": "⚠ 한/베 컬럼 없음",
+            "example": "하우징 IQC 기준"
           },
           "itemId": {
             "x-source-column": "item_id",
@@ -9524,7 +9813,8 @@
               "null"
             ],
             "format": "int64",
-            "description": "비우면 「전 품목 공통 기준」[추정] — 적용 우선순위 §8-4"
+            "description": "비우면 「전 품목 공통 기준」[추정] — 적용 우선순위 §8-4",
+            "example": 1001
           },
           "processId": {
             "x-source-column": "process_id",
@@ -9533,7 +9823,8 @@
               "null"
             ],
             "format": "int64",
-            "description": "IQC 는 공정이 없다"
+            "description": "IQC 는 공정이 없다",
+            "example": 1001
           },
           "routingId": {
             "x-source-column": "routing_id",
@@ -9542,13 +9833,15 @@
               "null"
             ],
             "format": "int64",
-            "description": "SQL 1745 주석 「적용 라우팅(버전) 연결」 — Routing Rev 단위로 묶인다. W-06-01 의 Rev 가 바뀌면 재연결 규칙 미정 §8-5"
+            "description": "SQL 1745 주석 「적용 라우팅(버전) 연결」 — Routing Rev 단위로 묶인다. W-06-01 의 Rev 가 바뀌면 재연결 규칙 미정 §8-5",
+            "example": 1001
           },
           "inspectionTypeCode": {
             "x-source-column": "inspection_type_code",
             "type": "string",
             "maxLength": 50,
-            "description": "공통코드 — IQC/PQC(공정·초중종·자주)/OQC"
+            "description": "공통코드 — IQC/PQC(공정·초중종·자주)/OQC",
+            "example": "IQC"
           },
           "approvedBy": {
             "x-source-column": "approved_by",
@@ -9557,7 +9850,8 @@
               "null"
             ],
             "format": "int64",
-            "description": ":approve 액션으로만 기록"
+            "description": ":approve 액션으로만 기록",
+            "example": 1001
           },
           "approvedAt": {
             "x-source-column": "approved_at",
@@ -9566,12 +9860,14 @@
               "null"
             ],
             "format": "date-time",
-            "description": "approvedBy 와 짝(CHECK 없음 — 서버가 항상 함께 기록해 보장)"
+            "description": "approvedBy 와 짝(CHECK 없음 — 서버가 항상 함께 기록해 보장)",
+            "example": "2026-08-04T09:12:00+09:00"
           },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": true
           }
         }
       },
@@ -9589,12 +9885,14 @@
             "x-source-column": "inspection_plan_code",
             "type": "string",
             "maxLength": 50,
-            "description": "uq — 전역 유일"
+            "description": "uq — 전역 유일",
+            "example": "STANDARD"
           },
           "inspectionPlanName": {
             "x-source-column": "inspection_plan_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "하우징 IQC 기준"
           },
           "itemId": {
             "x-source-column": "item_id",
@@ -9602,7 +9900,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "processId": {
             "x-source-column": "process_id",
@@ -9610,7 +9909,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "routingId": {
             "x-source-column": "routing_id",
@@ -9618,12 +9918,14 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "inspectionTypeCode": {
             "x-source-column": "inspection_type_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "IQC"
           }
         }
       },
@@ -9640,12 +9942,14 @@
           "inspectionPlanCode": {
             "x-source-column": "inspection_plan_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "inspectionPlanName": {
             "x-source-column": "inspection_plan_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "하우징 IQC 기준"
           },
           "itemId": {
             "x-source-column": "item_id",
@@ -9653,7 +9957,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "processId": {
             "x-source-column": "process_id",
@@ -9661,7 +9966,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "routingId": {
             "x-source-column": "routing_id",
@@ -9669,12 +9975,14 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "inspectionTypeCode": {
             "x-source-column": "inspection_type_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "IQC"
           }
         }
       },
@@ -9710,23 +10018,27 @@
           "inspectionPlanVersionId": {
             "x-source-column": "inspection_plan_version_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "inspectionPlanId": {
             "x-source-column": "inspection_plan_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "planVersion": {
             "x-source-column": "plan_version",
             "type": "integer",
             "minimum": 1,
-            "description": "CHECK > 0 · uq_inspection_plan_version(inspection_plan_id, plan_version). 시스템 채번 — 편집 불가"
+            "description": "CHECK > 0 · uq_inspection_plan_version(inspection_plan_id, plan_version). 시스템 채번 — 편집 불가",
+            "example": 1
           },
           "effectiveFrom": {
             "x-source-column": "effective_from",
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "example": "2026-08-04"
           },
           "effectiveTo": {
             "x-source-column": "effective_to",
@@ -9735,13 +10047,15 @@
               "null"
             ],
             "format": "date",
-            "description": "ck_inspection_plan_version_dates — 있으면 effectiveFrom 이상"
+            "description": "ck_inspection_plan_version_dates — 있으면 effectiveFrom 이상",
+            "example": "2026-08-04"
           },
           "samplingMethodCode": {
             "x-source-column": "sampling_method_code",
             "type": "string",
             "maxLength": 50,
-            "description": "공통코드 — 「전수/샘플」+「제품 단위/LOT 단위」가 여기 들어간다. 값 목록 §8-2"
+            "description": "공통코드 — 「전수/샘플」+「제품 단위/LOT 단위」가 여기 들어간다. 값 목록 §8-2",
+            "example": "STANDARD"
           },
           "samplingQty": {
             "x-source-column": "sampling_qty",
@@ -9750,7 +10064,8 @@
               "null"
             ],
             "minimum": 0,
-            "description": "⚠ 확정은 「샘플 비율(%)」인데 하류는 「수량」이다 — 단위 규약 §8-2"
+            "description": "⚠ 확정은 「샘플 비율(%)」인데 하류는 「수량」이다 — 단위 규약 §8-2",
+            "example": 500
           },
           "aqlValue": {
             "x-source-column": "aql_value",
@@ -9758,7 +10073,8 @@
               "number",
               "null"
             ],
-            "description": "AQL·허용불량수(SQL 1766 주석)"
+            "description": "AQL·허용불량수(SQL 1766 주석)",
+            "example": 1.0
           },
           "acceptanceNumber": {
             "x-source-column": "acceptance_number",
@@ -9767,7 +10083,8 @@
               "null"
             ],
             "minimum": 0,
-            "description": "CHECK ≥ 0 · 확정 「합격판정개수(공정별) 초과 시 W/O 전체 재검사」의 설정처"
+            "description": "CHECK ≥ 0 · 확정 「합격판정개수(공정별) 초과 시 W/O 전체 재검사」의 설정처",
+            "example": 1
           },
           "rejectionNumber": {
             "x-source-column": "rejection_number",
@@ -9776,13 +10093,15 @@
               "null"
             ],
             "exclusiveMinimum": 0,
-            "description": "CHECK > 0 — 0 불가(합격판정개수는 ≥0)"
+            "description": "CHECK > 0 — 0 불가(합격판정개수는 ≥0)",
+            "example": 1
           },
           "inspectionFrequencyCode": {
             "x-source-column": "inspection_frequency_code",
             "type": "string",
             "maxLength": 50,
-            "description": "공통코드 — 값 목록 미정"
+            "description": "공통코드 — 값 목록 미정",
+            "example": "STANDARD"
           },
           "frequencyIntervalValue": {
             "x-source-column": "frequency_interval_value",
@@ -9790,7 +10109,8 @@
               "number",
               "null"
             ],
-            "description": "주기 파라미터: N시간·N수량(SQL 1770 주석) — frequencyIntervalUomCode 와 짝이어야 하나 CHECK 없음 §8-3"
+            "description": "주기 파라미터: N시간·N수량(SQL 1770 주석) — frequencyIntervalUomCode 와 짝이어야 하나 CHECK 없음 §8-3",
+            "example": 1.0
           },
           "frequencyIntervalUomCode": {
             "x-source-column": "frequency_interval_uom_code",
@@ -9798,13 +10118,15 @@
               "string",
               "null"
             ],
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "statusCode": {
             "x-source-column": "status_code",
             "type": "string",
             "maxLength": 50,
-            "description": "공통코드 — 값 목록 미정. W-06-01 의 작성중/확정/폐기 준용 여부 §8-2. 이 값으로 화면이 편집 잠금을 판정한다(§5-4). 이 API 로는 직접 바꾸지 않고 :new-revision·:confirm·:obsolete 로만 전이한다"
+            "description": "공통코드 — 값 목록 미정. W-06-01 의 작성중/확정/폐기 준용 여부 §8-2. 이 값으로 화면이 편집 잠금을 판정한다(§5-4). 이 API 로는 직접 바꾸지 않고 :new-revision·:confirm·:obsolete 로만 전이한다",
+            "example": "CONFIRMED"
           }
         }
       },
@@ -9822,12 +10144,14 @@
           "inspectionPlanId": {
             "x-source-column": "inspection_plan_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "effectiveFrom": {
             "x-source-column": "effective_from",
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "example": "2026-08-04"
           },
           "effectiveTo": {
             "x-source-column": "effective_to",
@@ -9835,12 +10159,14 @@
               "string",
               "null"
             ],
-            "format": "date"
+            "format": "date",
+            "example": "2026-08-04"
           },
           "samplingMethodCode": {
             "x-source-column": "sampling_method_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "samplingQty": {
             "x-source-column": "sampling_qty",
@@ -9848,14 +10174,16 @@
               "number",
               "null"
             ],
-            "minimum": 0
+            "minimum": 0,
+            "example": 500
           },
           "aqlValue": {
             "x-source-column": "aql_value",
             "type": [
               "number",
               "null"
-            ]
+            ],
+            "example": 1.0
           },
           "acceptanceNumber": {
             "x-source-column": "acceptance_number",
@@ -9863,7 +10191,8 @@
               "integer",
               "null"
             ],
-            "minimum": 0
+            "minimum": 0,
+            "example": 1
           },
           "rejectionNumber": {
             "x-source-column": "rejection_number",
@@ -9871,19 +10200,22 @@
               "integer",
               "null"
             ],
-            "exclusiveMinimum": 0
+            "exclusiveMinimum": 0,
+            "example": 1
           },
           "inspectionFrequencyCode": {
             "x-source-column": "inspection_frequency_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "frequencyIntervalValue": {
             "x-source-column": "frequency_interval_value",
             "type": [
               "number",
               "null"
-            ]
+            ],
+            "example": 1.0
           },
           "frequencyIntervalUomCode": {
             "x-source-column": "frequency_interval_uom_code",
@@ -9891,7 +10223,8 @@
               "string",
               "null"
             ],
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           }
         }
       },
@@ -9908,7 +10241,8 @@
           "effectiveFrom": {
             "x-source-column": "effective_from",
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "example": "2026-08-04"
           },
           "effectiveTo": {
             "x-source-column": "effective_to",
@@ -9916,12 +10250,14 @@
               "string",
               "null"
             ],
-            "format": "date"
+            "format": "date",
+            "example": "2026-08-04"
           },
           "samplingMethodCode": {
             "x-source-column": "sampling_method_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "samplingQty": {
             "x-source-column": "sampling_qty",
@@ -9929,14 +10265,16 @@
               "number",
               "null"
             ],
-            "minimum": 0
+            "minimum": 0,
+            "example": 500
           },
           "aqlValue": {
             "x-source-column": "aql_value",
             "type": [
               "number",
               "null"
-            ]
+            ],
+            "example": 1.0
           },
           "acceptanceNumber": {
             "x-source-column": "acceptance_number",
@@ -9944,7 +10282,8 @@
               "integer",
               "null"
             ],
-            "minimum": 0
+            "minimum": 0,
+            "example": 1
           },
           "rejectionNumber": {
             "x-source-column": "rejection_number",
@@ -9952,19 +10291,22 @@
               "integer",
               "null"
             ],
-            "exclusiveMinimum": 0
+            "exclusiveMinimum": 0,
+            "example": 1
           },
           "inspectionFrequencyCode": {
             "x-source-column": "inspection_frequency_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "frequencyIntervalValue": {
             "x-source-column": "frequency_interval_value",
             "type": [
               "number",
               "null"
-            ]
+            ],
+            "example": 1.0
           },
           "frequencyIntervalUomCode": {
             "x-source-column": "frequency_interval_uom_code",
@@ -9972,7 +10314,8 @@
               "string",
               "null"
             ],
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           }
         }
       },
@@ -10025,36 +10368,42 @@
           "inspectionItemSpecId": {
             "x-source-column": "inspection_item_spec_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "inspectionPlanVersionId": {
             "x-source-column": "inspection_plan_version_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "sequenceNo": {
             "x-source-column": "sequence_no",
             "type": "integer",
             "minimum": 1,
-            "description": "CHECK > 0 · uq_inspection_item_spec(version_id, sequence_no). 채번 값 자체는 화면에 노출하지 않는다"
+            "description": "CHECK > 0 · uq_inspection_item_spec(version_id, sequence_no). 채번 값 자체는 화면에 노출하지 않는다",
+            "example": 1
           },
           "inspectionItemCode": {
             "x-source-column": "inspection_item_code",
             "type": "string",
             "maxLength": 50,
-            "description": "⚠ 버전 내 유일 제약이 없다 — 같은 코드를 두 줄에 넣을 수 있다 §8-3"
+            "description": "⚠ 버전 내 유일 제약이 없다 — 같은 코드를 두 줄에 넣을 수 있다 §8-3",
+            "example": "STANDARD"
           },
           "inspectionItemName": {
             "x-source-column": "inspection_item_name",
             "type": "string",
             "maxLength": 200,
-            "description": "⚠ 한/베 컬럼 없음"
+            "description": "⚠ 한/베 컬럼 없음",
+            "example": "표시명"
           },
           "dataTypeCode": {
             "x-source-column": "data_type_code",
             "type": "string",
             "maxLength": 50,
-            "description": "공통코드 — 수치/텍스트/불리언 [추정](근거: inspection_measurement 가 numeric_value·text_value·boolean_value 3종을 갖고 num_nonnulls ≤ 1 CHECK)"
+            "description": "공통코드 — 수치/텍스트/불리언 [추정](근거: inspection_measurement 가 numeric_value·text_value·boolean_value 3종을 갖고 num_nonnulls ≤ 1 CHECK)",
+            "example": "STANDARD"
           },
           "uomId": {
             "x-source-column": "uom_id",
@@ -10063,14 +10412,16 @@
               "null"
             ],
             "format": "int64",
-            "description": "수치형일 때만 의미 — 조건부 필수는 DB 에 없다 §8-3"
+            "description": "수치형일 때만 의미 — 조건부 필수는 DB 에 없다 §8-3",
+            "example": 1001
           },
           "targetValue": {
             "x-source-column": "target_value",
             "type": [
               "number",
               "null"
-            ]
+            ],
+            "example": 1.0
           },
           "lowerLimit": {
             "x-source-column": "lower_limit",
@@ -10078,7 +10429,8 @@
               "number",
               "null"
             ],
-            "description": "ck_inspection_limits — 상한 ≥ 하한(둘 다 있을 때만)"
+            "description": "ck_inspection_limits — 상한 ≥ 하한(둘 다 있을 때만)",
+            "example": 1.0
           },
           "upperLimit": {
             "x-source-column": "upper_limit",
@@ -10086,14 +10438,16 @@
               "number",
               "null"
             ],
-            "description": "ck_inspection_limits — 목표가 범위 밖인 것은 DB 가 막지 않는다. 서버가 경고한다(A-9 ⓑ 경고 등급) — W-06-02 §8-3"
+            "description": "ck_inspection_limits — 목표가 범위 밖인 것은 DB 가 막지 않는다. 서버가 경고한다(A-9 ⓑ 경고 등급) — W-06-02 §8-3",
+            "example": 1.0
           },
           "measurementCount": {
             "x-source-column": "measurement_count",
             "type": "integer",
             "minimum": 1,
             "default": 1,
-            "description": "CHECK > 0 · inspection_measurement.sample_no 의 상한"
+            "description": "CHECK > 0 · inspection_measurement.sample_no 의 상한",
+            "example": 3
           },
           "inspectionMethodCode": {
             "x-source-column": "inspection_method_code",
@@ -10101,7 +10455,8 @@
               "string",
               "null"
             ],
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "defaultInspectionEquipmentId": {
             "x-source-column": "default_inspection_equipment_id",
@@ -10110,17 +10465,20 @@
               "null"
             ],
             "format": "int64",
-            "description": "equipment.calibration_required·calibration_due_date 와 연동 — 교정 만료 장비 선택 시 경고(차단 아님)"
+            "description": "equipment.calibration_required·calibration_due_date 와 연동 — 교정 만료 장비 선택 시 경고(차단 아님)",
+            "example": 1001
           },
           "requiredFlag": {
             "x-source-column": "required_flag",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": false
           },
           "automaticJudgment": {
             "x-source-column": "automatic_judgment",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": false
           }
         }
       },
@@ -10142,36 +10500,42 @@
           "inspectionItemSpecId": {
             "x-source-column": "inspection_item_spec_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "inspectionPlanVersionId": {
             "x-source-column": "inspection_plan_version_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "sequenceNo": {
             "x-source-column": "sequence_no",
             "type": "integer",
             "minimum": 1,
-            "description": "CHECK > 0 · uq_inspection_item_spec(version_id, sequence_no). 채번 값 자체는 화면에 노출하지 않는다"
+            "description": "CHECK > 0 · uq_inspection_item_spec(version_id, sequence_no). 채번 값 자체는 화면에 노출하지 않는다",
+            "example": 1
           },
           "inspectionItemCode": {
             "x-source-column": "inspection_item_code",
             "type": "string",
             "maxLength": 50,
-            "description": "⚠ 버전 내 유일 제약이 없다 — 같은 코드를 두 줄에 넣을 수 있다 §8-3"
+            "description": "⚠ 버전 내 유일 제약이 없다 — 같은 코드를 두 줄에 넣을 수 있다 §8-3",
+            "example": "STANDARD"
           },
           "inspectionItemName": {
             "x-source-column": "inspection_item_name",
             "type": "string",
             "maxLength": 200,
-            "description": "⚠ 한/베 컬럼 없음"
+            "description": "⚠ 한/베 컬럼 없음",
+            "example": "표시명"
           },
           "dataTypeCode": {
             "x-source-column": "data_type_code",
             "type": "string",
             "maxLength": 50,
-            "description": "공통코드 — 수치/텍스트/불리언 [추정](근거: inspection_measurement 가 numeric_value·text_value·boolean_value 3종을 갖고 num_nonnulls ≤ 1 CHECK)"
+            "description": "공통코드 — 수치/텍스트/불리언 [추정](근거: inspection_measurement 가 numeric_value·text_value·boolean_value 3종을 갖고 num_nonnulls ≤ 1 CHECK)",
+            "example": "STANDARD"
           },
           "uomId": {
             "x-source-column": "uom_id",
@@ -10180,14 +10544,16 @@
               "null"
             ],
             "format": "int64",
-            "description": "수치형일 때만 의미 — 조건부 필수는 DB 에 없다 §8-3"
+            "description": "수치형일 때만 의미 — 조건부 필수는 DB 에 없다 §8-3",
+            "example": 1001
           },
           "targetValue": {
             "x-source-column": "target_value",
             "type": [
               "number",
               "null"
-            ]
+            ],
+            "example": 1.0
           },
           "lowerLimit": {
             "x-source-column": "lower_limit",
@@ -10195,7 +10561,8 @@
               "number",
               "null"
             ],
-            "description": "ck_inspection_limits — 상한 ≥ 하한(둘 다 있을 때만)"
+            "description": "ck_inspection_limits — 상한 ≥ 하한(둘 다 있을 때만)",
+            "example": 1.0
           },
           "upperLimit": {
             "x-source-column": "upper_limit",
@@ -10203,14 +10570,16 @@
               "number",
               "null"
             ],
-            "description": "ck_inspection_limits — 목표가 범위 밖인 것은 DB 가 막지 않는다. 서버가 경고한다(A-9 ⓑ 경고 등급) — W-06-02 §8-3"
+            "description": "ck_inspection_limits — 목표가 범위 밖인 것은 DB 가 막지 않는다. 서버가 경고한다(A-9 ⓑ 경고 등급) — W-06-02 §8-3",
+            "example": 1.0
           },
           "measurementCount": {
             "x-source-column": "measurement_count",
             "type": "integer",
             "minimum": 1,
             "default": 1,
-            "description": "CHECK > 0 · inspection_measurement.sample_no 의 상한"
+            "description": "CHECK > 0 · inspection_measurement.sample_no 의 상한",
+            "example": 3
           },
           "inspectionMethodCode": {
             "x-source-column": "inspection_method_code",
@@ -10218,7 +10587,8 @@
               "string",
               "null"
             ],
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "defaultInspectionEquipmentId": {
             "x-source-column": "default_inspection_equipment_id",
@@ -10227,17 +10597,20 @@
               "null"
             ],
             "format": "int64",
-            "description": "equipment.calibration_required·calibration_due_date 와 연동 — 교정 만료 장비 선택 시 경고(차단 아님)"
+            "description": "equipment.calibration_required·calibration_due_date 와 연동 — 교정 만료 장비 선택 시 경고(차단 아님)",
+            "example": 1001
           },
           "requiredFlag": {
             "x-source-column": "required_flag",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": false
           },
           "automaticJudgment": {
             "x-source-column": "automatic_judgment",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": false
           }
         }
       },
@@ -10269,18 +10642,21 @@
           "defectCodeId": {
             "x-source-column": "defect_code_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "defectCode": {
             "x-source-column": "defect_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "defectName": {
             "x-source-column": "defect_name",
             "type": "string",
             "maxLength": 200,
-            "description": "⚠ 결정 12 가 「다국어 명칭(ko/vi)」으로 컬럼 형태까지 지정했는데 단일 컬럼이다 §8-2"
+            "description": "⚠ 결정 12 가 「다국어 명칭(ko/vi)」으로 컬럼 형태까지 지정했는데 단일 컬럼이다 §8-2",
+            "example": "표시명"
           },
           "parentDefectCodeId": {
             "x-source-column": "parent_defect_code_id",
@@ -10289,7 +10665,8 @@
               "null"
             ],
             "format": "int64",
-            "description": "비우면 대분류, 채우면 상세[추정]. 자기참조 CHECK 없음 — 서버가 검사"
+            "description": "비우면 대분류, 채우면 상세[추정]. 자기참조 CHECK 없음 — 서버가 검사",
+            "example": 1001
           },
           "processId": {
             "x-source-column": "process_id",
@@ -10298,12 +10675,14 @@
               "null"
             ],
             "format": "int64",
-            "description": "⚠ N:1 — 결정 12 가 N:M 으로 조정 승인했으나 물리 모델 미반영(§8-1). N:M 매핑 테이블이 없어 공정 매핑 엔드포인트를 만들 수 없다"
+            "description": "⚠ N:1 — 결정 12 가 N:M 으로 조정 승인했으나 물리 모델 미반영(§8-1). N:M 매핑 테이블이 없어 공정 매핑 엔드포인트를 만들 수 없다",
+            "example": 1001
           },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": true
           }
         }
       },
@@ -10320,12 +10699,14 @@
             "x-source-column": "defect_code",
             "type": "string",
             "maxLength": 50,
-            "description": "uq — 전역 유일"
+            "description": "uq — 전역 유일",
+            "example": "STANDARD"
           },
           "defectName": {
             "x-source-column": "defect_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "표시명"
           },
           "parentDefectCodeId": {
             "x-source-column": "parent_defect_code_id",
@@ -10334,7 +10715,8 @@
               "null"
             ],
             "format": "int64",
-            "description": "상세 추가 시 대분류를 지정(자동 설정) — 서버가 3계층 이상·자기참조를 차단"
+            "description": "상세 추가 시 대분류를 지정(자동 설정) — 서버가 3계층 이상·자기참조를 차단",
+            "example": 1001
           },
           "processId": {
             "x-source-column": "process_id",
@@ -10342,7 +10724,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           }
         }
       },
@@ -10358,12 +10741,14 @@
           "defectCode": {
             "x-source-column": "defect_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "defectName": {
             "x-source-column": "defect_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "표시명"
           },
           "parentDefectCodeId": {
             "x-source-column": "parent_defect_code_id",
@@ -10371,7 +10756,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "processId": {
             "x-source-column": "process_id",
@@ -10379,7 +10765,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           }
         }
       },
@@ -10412,18 +10799,21 @@
           "causeCodeId": {
             "x-source-column": "cause_code_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "causeCode": {
             "x-source-column": "cause_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "causeName": {
             "x-source-column": "cause_name",
             "type": "string",
             "maxLength": 200,
-            "description": "다국어 결함 동일 — W-06-06 §8-1"
+            "description": "다국어 결함 동일 — W-06-06 §8-1",
+            "example": "표시명"
           },
           "parentCauseCodeId": {
             "x-source-column": "parent_cause_code_id",
@@ -10432,7 +10822,8 @@
               "null"
             ],
             "format": "int64",
-            "description": "defect_code 와 완전히 같은 구조. 자기참조 CHECK 없음"
+            "description": "defect_code 와 완전히 같은 구조. 자기참조 CHECK 없음",
+            "example": 1001
           },
           "processId": {
             "x-source-column": "process_id",
@@ -10440,12 +10831,14 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": true
           }
         }
       },
@@ -10462,12 +10855,14 @@
             "x-source-column": "cause_code",
             "type": "string",
             "maxLength": 50,
-            "description": "uq — 전역 유일"
+            "description": "uq — 전역 유일",
+            "example": "STANDARD"
           },
           "causeName": {
             "x-source-column": "cause_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "표시명"
           },
           "parentCauseCodeId": {
             "x-source-column": "parent_cause_code_id",
@@ -10475,7 +10870,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "processId": {
             "x-source-column": "process_id",
@@ -10483,7 +10879,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           }
         }
       },
@@ -10499,12 +10896,14 @@
           "causeCode": {
             "x-source-column": "cause_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "STANDARD"
           },
           "causeName": {
             "x-source-column": "cause_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "표시명"
           },
           "parentCauseCodeId": {
             "x-source-column": "parent_cause_code_id",
@@ -10512,7 +10911,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "processId": {
             "x-source-column": "process_id",
@@ -10520,7 +10920,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           }
         }
       },
@@ -10559,68 +10960,79 @@
           "integrationMessageId": {
             "x-source-column": "integration_message_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "messageKey": {
             "x-source-column": "message_key",
             "type": "string",
             "maxLength": 150,
-            "description": "UNIQUE — 멱등 키"
+            "description": "UNIQUE — 멱등 키",
+            "example": "GR-2026-0804-007-01"
           },
           "interfaceCode": {
             "x-source-column": "interface_code",
             "type": "string",
             "maxLength": 50,
-            "description": "⚠ W-06-09 정의 테이블 부재로 선택 목록을 만들 수 없다 §8-1"
+            "description": "⚠ W-06-09 정의 테이블 부재로 선택 목록을 만들 수 없다 §8-1",
+            "example": "IF-GR-SEND"
           },
           "directionCode": {
             "x-source-column": "direction_code",
             "type": "string",
             "maxLength": 50,
-            "description": "수신/송신"
+            "description": "수신/송신",
+            "example": "OUTBOUND"
           },
           "targetTypeCode": {
             "x-source-column": "target_type_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "GOODS_RECEIPT"
           },
           "targetId": {
             "x-source-column": "target_id",
             "type": "integer",
             "format": "int64",
-            "description": "⚠ FK 가 아니다 — 표시명 해석은 화면 책임(W-06-11 §8-2 와 같은 결손)"
+            "description": "⚠ FK 가 아니다 — 표시명 해석은 화면 책임(W-06-11 §8-2 와 같은 결손)",
+            "example": 1001
           },
           "statusCode": {
             "x-source-column": "status_code",
             "type": "string",
             "maxLength": 50,
-            "description": "공통코드 — 값 목록 미정. 최소 구분: 대기/처리중/완료/실패"
+            "description": "공통코드 — 값 목록 미정. 최소 구분: 대기/처리중/완료/실패",
+            "example": "FAILED"
           },
           "retryCount": {
             "x-source-column": "retry_count",
             "type": "integer",
             "minimum": 0,
             "default": 0,
-            "description": "CHECK ≥ 0 · 상한이 DB 에 없다 — 화면·워커 책임 §8-2"
+            "description": "CHECK ≥ 0 · 상한이 DB 에 없다 — 화면·워커 책임 §8-2",
+            "example": 3
           },
           "lastErrorMessage": {
             "x-source-column": "last_error_message",
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "example": "연계 대상 시스템 응답 없음(timeout 30s)"
           },
           "createdAt": {
             "x-source-column": "created_at",
             "type": "string",
             "format": "date-time",
-            "description": "감사 컬럼 제외 원칙(공유계약 A-4)의 의도된 예외다. 이 테이블은 created_at 하나만 있고 created_by·updated_at·updated_by·version_no 는 없으며, created_at 은 워크플로 타임스탬프로서 화면 W-06-10 §4-B 가 「생성」 열로 명시 요구한다"
+            "description": "감사 컬럼 제외 원칙(공유계약 A-4)의 의도된 예외다. 이 테이블은 created_at 하나만 있고 created_by·updated_at·updated_by·version_no 는 없으며, created_at 은 워크플로 타임스탬프로서 화면 W-06-10 §4-B 가 「생성」 열로 명시 요구한다",
+            "example": "2026-08-04T09:12:00+09:00"
           },
           "availableAt": {
             "x-source-column": "available_at",
             "type": "string",
             "format": "date-time",
-            "description": "다음 시도 예정 시각(백오프) — 「HH:MM 자동 재시도」로 표시"
+            "description": "다음 시도 예정 시각(백오프) — 「HH:MM 자동 재시도」로 표시",
+            "example": "2026-08-04T09:12:00+09:00"
           },
           "sentAt": {
             "x-source-column": "sent_at",
@@ -10628,7 +11040,8 @@
               "string",
               "null"
             ],
-            "format": "date-time"
+            "format": "date-time",
+            "example": "2026-08-04T09:12:00+09:00"
           },
           "completedAt": {
             "x-source-column": "completed_at",
@@ -10637,7 +11050,8 @@
               "null"
             ],
             "format": "date-time",
-            "description": "sentAt 과 다른 시점 — 「보냈으나 미완료」 식별에 쓴다"
+            "description": "sentAt 과 다른 시점 — 「보냈으나 미완료」 식별에 쓴다",
+            "example": "2026-08-04T09:12:00+09:00"
           },
           "lockedAt": {
             "x-source-column": "locked_at",
@@ -10645,7 +11059,8 @@
               "string",
               "null"
             ],
-            "format": "date-time"
+            "format": "date-time",
+            "example": "2026-08-04T09:12:00+09:00"
           },
           "lockedBy": {
             "x-source-column": "locked_by",
@@ -10654,7 +11069,8 @@
               "null"
             ],
             "maxLength": 100,
-            "description": "값이 있으면 워커가 처리 중 — 이 상태에서는 :retry 가 409(workerLease)"
+            "description": "값이 있으면 워커가 처리 중 — 이 상태에서는 :retry 가 409(workerLease)",
+            "example": "sync-worker-01"
           }
         }
       },
@@ -10694,31 +11110,36 @@
           "auditEventId": {
             "x-source-column": "audit_event_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "occurredAt": {
             "x-source-column": "occurred_at",
             "type": "string",
             "format": "date-time",
-            "description": "파티션 키(RANGE)"
+            "description": "파티션 키(RANGE)",
+            "example": "2026-08-04T09:12:00+09:00"
           },
           "targetTypeCode": {
             "x-source-column": "target_type_code",
             "type": "string",
             "maxLength": 50,
-            "description": "공통코드 — 값 목록 미정 §8-3"
+            "description": "공통코드 — 값 목록 미정 §8-3",
+            "example": "WAREHOUSE"
           },
           "targetId": {
             "x-source-column": "target_id",
             "type": "integer",
             "format": "int64",
-            "description": "⚠ FK 가 아니다 — 유형별로 다른 테이블을 가리킨다. 화면이 유형→테이블→표시명을 풀어야 한다 §8-2"
+            "description": "⚠ FK 가 아니다 — 유형별로 다른 테이블을 가리킨다. 화면이 유형→테이블→표시명을 풀어야 한다 §8-2",
+            "example": 1001
           },
           "eventTypeCode": {
             "x-source-column": "event_type_code",
             "type": "string",
             "maxLength": 50,
-            "description": "공통코드 — 값 목록 미정"
+            "description": "공통코드 — 값 목록 미정",
+            "example": "STANDARD"
           },
           "beforeValue": {
             "x-source-column": "before_value",
@@ -10741,7 +11162,8 @@
               "string",
               "null"
             ],
-            "description": "입력처가 어디인지 미정 §8-4"
+            "description": "입력처가 어디인지 미정 §8-4",
+            "example": "라인 정지 임박. 검사 대기 불가."
           },
           "performedBy": {
             "x-source-column": "performed_by",
@@ -10750,7 +11172,8 @@
               "null"
             ],
             "format": "int64",
-            "description": "⚠ FK 없음(created_by 와 같은 의도적 미연결). 이름 표시는 애플리케이션 조인"
+            "description": "⚠ FK 없음(created_by 와 같은 의도적 미연결). 이름 표시는 애플리케이션 조인",
+            "example": 1001
           },
           "terminalId": {
             "x-source-column": "terminal_id",
@@ -10759,7 +11182,8 @@
               "null"
             ],
             "format": "int64",
-            "description": "유일하게 FK 가 걸린 참조"
+            "description": "유일하게 FK 가 걸린 참조",
+            "example": 1001
           },
           "correlationId": {
             "x-source-column": "correlation_id",
@@ -10768,7 +11192,8 @@
               "null"
             ],
             "maxLength": 150,
-            "description": "한 트랜잭션의 여러 이벤트를 묶는다[추정] — 펼침 그룹 기준"
+            "description": "한 트랜잭션의 여러 이벤트를 묶는다[추정] — 펼침 그룹 기준",
+            "example": "문자열"
           }
         }
       },
@@ -10787,17 +11212,20 @@
           "uomId": {
             "x-source-column": "uom_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "uomCode": {
             "x-source-column": "uom_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "EA"
           },
           "uomName": {
             "x-source-column": "uom_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "개"
           },
           "decimalScale": {
             "x-source-column": "decimal_scale",
@@ -10805,12 +11233,14 @@
             "minimum": 0,
             "maximum": 6,
             "default": 0,
-            "description": "CHECK BETWEEN 0 AND 6"
+            "description": "CHECK BETWEEN 0 AND 6",
+            "example": 1
           },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": true
           }
         }
       },
@@ -10828,17 +11258,20 @@
           "partnerId": {
             "x-source-column": "partner_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "partnerCode": {
             "x-source-column": "partner_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "SUP-014"
           },
           "partnerName": {
             "x-source-column": "partner_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "(주)대한부품"
           },
           "countryCode": {
             "x-source-column": "country_code",
@@ -10846,7 +11279,8 @@
               "string",
               "null"
             ],
-            "maxLength": 3
+            "maxLength": 3,
+            "example": "STANDARD"
           },
           "erpPartnerCode": {
             "x-source-column": "erp_partner_code",
@@ -10854,12 +11288,14 @@
               "string",
               "null"
             ],
-            "maxLength": 100
+            "maxLength": 100,
+            "example": "STANDARD"
           },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": true
           }
         }
       },
@@ -10879,32 +11315,38 @@
           "legalEntityId": {
             "x-source-column": "legal_entity_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "legalEntityCode": {
             "x-source-column": "legal_entity_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "LE-01"
           },
           "legalEntityName": {
             "x-source-column": "legal_entity_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "본사법인"
           },
           "countryCode": {
             "x-source-column": "country_code",
             "type": "string",
-            "maxLength": 3
+            "maxLength": 3,
+            "example": "STANDARD"
           },
           "timezoneCode": {
             "x-source-column": "timezone_code",
             "type": "string",
-            "maxLength": 64
+            "maxLength": 64,
+            "example": "STANDARD"
           },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": true
           }
         }
       },
@@ -10923,28 +11365,33 @@
           "businessUnitId": {
             "x-source-column": "business_unit_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "legalEntityId": {
             "x-source-column": "legal_entity_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "businessUnitCode": {
             "x-source-column": "business_unit_code",
             "type": "string",
             "maxLength": 50,
-            "description": "uq_business_unit(legal_entity_id, business_unit_code)"
+            "description": "uq_business_unit(legal_entity_id, business_unit_code)",
+            "example": "BU-01"
           },
           "businessUnitName": {
             "x-source-column": "business_unit_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "제조사업부"
           },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": true
           }
         }
       },
@@ -10964,12 +11411,14 @@
           "plantId": {
             "x-source-column": "plant_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "legalEntityId": {
             "x-source-column": "legal_entity_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "businessUnitId": {
             "x-source-column": "business_unit_id",
@@ -10977,28 +11426,33 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "plantCode": {
             "x-source-column": "plant_code",
             "type": "string",
             "maxLength": 50,
-            "description": "uq_plant(legal_entity_id, plant_code)"
+            "description": "uq_plant(legal_entity_id, plant_code)",
+            "example": "PLT-01"
           },
           "plantName": {
             "x-source-column": "plant_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "1공장"
           },
           "timezoneCode": {
             "x-source-column": "timezone_code",
             "type": "string",
-            "maxLength": 64
+            "maxLength": 64,
+            "example": "STANDARD"
           },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": true
           }
         }
       },
@@ -11018,12 +11472,14 @@
           "productionLineId": {
             "x-source-column": "production_line_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "plantId": {
             "x-source-column": "plant_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "parentLineId": {
             "x-source-column": "parent_line_id",
@@ -11032,30 +11488,35 @@
               "null"
             ],
             "format": "int64",
-            "description": "자기참조 — 라인/작업구역 계층"
+            "description": "자기참조 — 라인/작업구역 계층",
+            "example": 1001
           },
           "lineCode": {
             "x-source-column": "line_code",
             "type": "string",
             "maxLength": 50,
-            "description": "uq_production_line(plant_id, line_code)"
+            "description": "uq_production_line(plant_id, line_code)",
+            "example": "STANDARD"
           },
           "lineName": {
             "x-source-column": "line_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "표시명"
           },
           "lineTypeCode": {
             "x-source-column": "line_type_code",
             "type": "string",
             "maxLength": 50,
             "default": "LINE",
-            "description": "LINE | WORK_AREA"
+            "description": "LINE | WORK_AREA",
+            "example": "STANDARD"
           },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": true
           }
         }
       },
@@ -11074,28 +11535,33 @@
           "processId": {
             "x-source-column": "process_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "processCode": {
             "x-source-column": "process_code",
             "type": "string",
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "OP-INJ"
           },
           "processName": {
             "x-source-column": "process_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "사출"
           },
           "processTypeCode": {
             "x-source-column": "process_type_code",
             "type": "string",
             "maxLength": 50,
-            "description": "공통코드 — 값 목록 미정"
+            "description": "공통코드 — 값 목록 미정",
+            "example": "STANDARD"
           },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": true
           }
         }
       },
@@ -11117,29 +11583,34 @@
           "equipmentId": {
             "x-source-column": "equipment_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "plantId": {
             "x-source-column": "plant_id",
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "equipmentCode": {
             "x-source-column": "equipment_code",
             "type": "string",
             "maxLength": 50,
-            "description": "uq_equipment(plant_id, equipment_code)"
+            "description": "uq_equipment(plant_id, equipment_code)",
+            "example": "EQ-03"
           },
           "equipmentName": {
             "x-source-column": "equipment_name",
             "type": "string",
-            "maxLength": 200
+            "maxLength": 200,
+            "example": "사출기 3호"
           },
           "equipmentTypeCode": {
             "x-source-column": "equipment_type_code",
             "type": "string",
             "maxLength": 50,
-            "description": "공통코드 — 값 목록 미정"
+            "description": "공통코드 — 값 목록 미정",
+            "example": "STANDARD"
           },
           "processId": {
             "x-source-column": "process_id",
@@ -11147,7 +11618,8 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "productionLineId": {
             "x-source-column": "production_line_id",
@@ -11155,18 +11627,21 @@
               "integer",
               "null"
             ],
-            "format": "int64"
+            "format": "int64",
+            "example": 1001
           },
           "statusCode": {
             "x-source-column": "status_code",
             "type": "string",
             "maxLength": 50,
-            "description": "공통코드 — 값 목록 미정"
+            "description": "공통코드 — 값 목록 미정",
+            "example": "ACTIVE"
           },
           "calibrationRequired": {
             "x-source-column": "calibration_required",
             "type": "boolean",
-            "default": false
+            "default": false,
+            "example": false
           },
           "lastCalibrationDate": {
             "x-source-column": "last_calibration_date",
@@ -11174,7 +11649,8 @@
               "string",
               "null"
             ],
-            "format": "date"
+            "format": "date",
+            "example": "2026-08-04"
           },
           "calibrationDueDate": {
             "x-source-column": "calibration_due_date",
@@ -11183,12 +11659,14 @@
               "null"
             ],
             "format": "date",
-            "description": "경과 시 W-06-02 검사 항목 지정 화면이 경고를 표시한다(차단 아님)"
+            "description": "경과 시 W-06-02 검사 항목 지정 화면이 경고를 표시한다(차단 아님)",
+            "example": "2026-08-04"
           },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
-            "default": true
+            "default": true,
+            "example": true
           }
         }
       }
