@@ -40,6 +40,10 @@
     {
       "name": "lookup",
       "description": "선택 목록 — 관리 화면이 없는 조회 전용"
+    },
+    {
+      "name": "logistics",
+      "description": "물류 스키마에 있으나 성격이 마스터인 것 — 적치 규칙"
     }
   ],
   "paths": {
@@ -6846,6 +6850,343 @@
           }
         }
       }
+    },
+    "/logistics/putaway-rules": {
+      "get": {
+        "tags": [
+          "logistics"
+        ],
+        "summary": "적치 규칙 목록",
+        "description": "근거: W-06-14 · 공유계약 G-8",
+        "parameters": [
+          {
+            "name": "warehouseId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "창고"
+          },
+          {
+            "name": "itemId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "품목"
+          },
+          {
+            "name": "locationId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "기본은 사용 중인 것만"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PutawayRule"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-internal-note": "W-06-14(적치 규칙 마스터)는 화면 상세 스펙이 아직 없다 — 마스터 형 패턴이 형태를 정하고 필드는 물리 모델이 전부 갖고 있어 먼저 쓴 것이다. 화면 고유 요구가 나오면 조정한다. 차단 판정의 근거가 되는 화면은 M-01-05 §5-2-1."
+      },
+      "post": {
+        "tags": [
+          "logistics"
+        ],
+        "summary": "적치 규칙 등록",
+        "description": "같은 품목·창고·위치 조합이 이미 있으면 400 이다. 근거: W-06-14 · 공유계약 A-1",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutawayRuleCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "등록됨",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로는 내리지 않는다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PutawayRule"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/logistics/putaway-rules/{putawayRuleId}": {
+      "parameters": [
+        {
+          "name": "putawayRuleId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "logistics"
+        ],
+        "summary": "적치 규칙 상세",
+        "description": "근거: W-06-14 · 공유계약 B-4",
+        "responses": {
+          "200": {
+            "description": "상세",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로는 내리지 않는다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PutawayRuleDetailResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "대상 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "logistics"
+        ],
+        "summary": "적치 규칙 수정",
+        "description": "근거: W-06-14 · 공유계약 B-1",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutawayRuleUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "수정됨",
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로는 내리지 않는다 — 표시하지 않되 전달한다",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PutawayRule"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/logistics/putaway-rules/{putawayRuleId}:deactivate": {
+      "parameters": [
+        {
+          "name": "putawayRuleId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "logistics"
+        ],
+        "summary": "적치 규칙 사용 중지",
+        "description": "물리 삭제는 제공하지 않는다. 중지하면 그 품목에 권장 위치가 없어지므로 적치가 확인 후 통과로 바뀐다. 근거: M-01-05 §5-2-1 · 공유계약 B-4",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "중지됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PutawayRule"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "낙관적 잠금 충돌 — ConflictResponse.conflictCause 3값. 업무 규칙 위반은 409 가 아니라 400 이다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -11278,14 +11619,16 @@
               "object",
               "null"
             ],
-            "description": "키·값 구조가 정해져 있지 않다 — 표시 규칙 §8-2. 모르는 키도 원문 그대로 표시(파싱 실패로 감추지 않는다)"
+            "description": "키·값 구조가 정해져 있지 않다 — 표시 규칙 §8-2. 모르는 키도 원문 그대로 표시(파싱 실패로 감추지 않는다)",
+            "x-no-example": "키 구조가 정해지지 않은 자유 형식 객체다. 예시를 만들면 없는 키를 지어내게 된다 — #68 해소 전까지 두지 않는다."
           },
           "afterValue": {
             "x-source-column": "after_value",
             "type": [
               "object",
               "null"
-            ]
+            ],
+            "x-no-example": "키 구조가 정해지지 않은 자유 형식 객체다. 예시를 만들면 없는 키를 지어내게 된다 — #68 해소 전까지 두지 않는다."
           },
           "reason": {
             "x-source-column": "reason",
@@ -11800,6 +12143,216 @@
             "type": "boolean",
             "default": true,
             "example": true
+          }
+        }
+      },
+      "PutawayRule": {
+        "x-source-table": "logistics.putaway_rule",
+        "type": "object",
+        "required": [
+          "putawayRuleId",
+          "itemId",
+          "warehouseId",
+          "capacityQty",
+          "uomId",
+          "priorityNo",
+          "isActive"
+        ],
+        "description": "적치 규칙. 품목을 어느 창고 어느 위치에 두는지 정한다. 권장 위치가 있는데 다른 곳에 적치하면 적치 완료가 막힌다 — 규칙이 없는 품목만 확인 후 통과한다. 근거: M-01-05 §5-2-1",
+        "properties": {
+          "putawayRuleId": {
+            "x-source-column": "putaway_rule_id",
+            "type": "integer",
+            "format": "int64",
+            "example": 1001
+          },
+          "itemId": {
+            "x-source-column": "item_id",
+            "type": "integer",
+            "format": "int64",
+            "description": "FK → mdm.item",
+            "example": 1001
+          },
+          "warehouseId": {
+            "x-source-column": "warehouse_id",
+            "type": "integer",
+            "format": "int64",
+            "description": "FK → mdm.warehouse",
+            "example": 1001
+          },
+          "locationId": {
+            "x-source-column": "location_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "비우면 창고 수준 규칙이다 — 세부 위치는 창고 안 정책이 정한다",
+            "example": 1001
+          },
+          "capacityQty": {
+            "x-source-column": "capacity_qty",
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "이 위치가 받을 수 있는 수량. 0 은 넣을 수 없다",
+            "example": 500.0
+          },
+          "uomId": {
+            "x-source-column": "uom_id",
+            "type": "integer",
+            "format": "int64",
+            "example": 1001
+          },
+          "priorityNo": {
+            "x-source-column": "priority_no",
+            "type": "integer",
+            "default": 100,
+            "description": "작을수록 먼저 권장한다",
+            "example": 100
+          },
+          "remarks": {
+            "x-source-column": "remarks",
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "비고 문자열"
+          },
+          "isActive": {
+            "x-source-column": "is_active",
+            "type": "boolean",
+            "default": true,
+            "example": true
+          }
+        },
+        "x-internal-note": "W-06-14(적치 규칙 마스터)는 화면 상세 스펙이 아직 없다 — 마스터 형 패턴이 형태를 정하고 필드는 물리 모델이 전부 갖고 있어 먼저 쓴 것이다. 화면 고유 요구가 나오면 조정한다. 차단 판정의 근거가 되는 화면은 M-01-05 §5-2-1."
+      },
+      "PutawayRuleCreate": {
+        "x-source-table": "logistics.putaway_rule",
+        "type": "object",
+        "required": [
+          "itemId",
+          "warehouseId",
+          "capacityQty",
+          "uomId"
+        ],
+        "description": "적치 규칙 등록 요청. isActive 는 받지 않는다 — 신규는 항상 사용 중이다.",
+        "properties": {
+          "itemId": {
+            "x-source-column": "item_id",
+            "type": "integer",
+            "format": "int64",
+            "description": "FK → mdm.item",
+            "example": 1001
+          },
+          "warehouseId": {
+            "x-source-column": "warehouse_id",
+            "type": "integer",
+            "format": "int64",
+            "description": "FK → mdm.warehouse",
+            "example": 1001
+          },
+          "locationId": {
+            "x-source-column": "location_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "비우면 창고 수준 규칙이다 — 세부 위치는 창고 안 정책이 정한다",
+            "example": 1001
+          },
+          "capacityQty": {
+            "x-source-column": "capacity_qty",
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "이 위치가 받을 수 있는 수량. 0 은 넣을 수 없다",
+            "example": 500.0
+          },
+          "uomId": {
+            "x-source-column": "uom_id",
+            "type": "integer",
+            "format": "int64",
+            "example": 1001
+          },
+          "priorityNo": {
+            "x-source-column": "priority_no",
+            "type": "integer",
+            "default": 100,
+            "description": "작을수록 먼저 권장한다",
+            "example": 100
+          },
+          "remarks": {
+            "x-source-column": "remarks",
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "비고 문자열"
+          }
+        }
+      },
+      "PutawayRuleUpdate": {
+        "x-source-table": "logistics.putaway_rule",
+        "type": "object",
+        "required": [
+          "capacityQty",
+          "uomId"
+        ],
+        "description": "적치 규칙 수정. 품목과 창고는 신규만 — 바꾸면 다른 규칙이 된다. isActive 는 사용 중지 액션으로만 바꾼다. 낙관적 잠금은 공유계약 B-1.",
+        "properties": {
+          "locationId": {
+            "x-source-column": "location_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "비우면 창고 수준 규칙이다 — 세부 위치는 창고 안 정책이 정한다",
+            "example": 1001
+          },
+          "capacityQty": {
+            "x-source-column": "capacity_qty",
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "이 위치가 받을 수 있는 수량. 0 은 넣을 수 없다",
+            "example": 500.0
+          },
+          "uomId": {
+            "x-source-column": "uom_id",
+            "type": "integer",
+            "format": "int64",
+            "example": 1001
+          },
+          "priorityNo": {
+            "x-source-column": "priority_no",
+            "type": "integer",
+            "default": 100,
+            "description": "작을수록 먼저 권장한다",
+            "example": 100
+          },
+          "remarks": {
+            "x-source-column": "remarks",
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "비고 문자열"
+          }
+        }
+      },
+      "PutawayRuleDetailResponse": {
+        "type": "object",
+        "required": [
+          "putawayRule",
+          "editability"
+        ],
+        "properties": {
+          "putawayRule": {
+            "$ref": "#/components/schemas/PutawayRule"
+          },
+          "editability": {
+            "$ref": "#/components/schemas/Editability"
           }
         }
       }
