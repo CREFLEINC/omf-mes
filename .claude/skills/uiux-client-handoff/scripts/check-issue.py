@@ -15,14 +15,24 @@
 
   ⛔ 위반은 종료 코드 1. ⚠ 확인은 사람이 판단할 것이라 막지 않는다.
 
+  ③ 중복·금지 화면 — 같은 화면에 이미 착수 이슈가 있는가 · 발행 금지 화면인가
+
+     ⚠ 이것을 사람의 기억에 맡기지 않는다. 닫힌 이슈는 기본 목록에 안 보이고,
+     차수가 쌓이면 「이 화면 넘겼던가」를 기억으로 답하게 된다. 발행은 되돌릴 수
+     없으므로(공개 저장소) 검사기가 매번 조회한다.
+
 사용법
   python3 check-issue.py <초안.md>                  # 착수 가능 통지
   python3 check-issue.py <초안.md> --change-notice  # ⛔/⚠ 변경 통지 (구조 검증 생략)
   python3 check-issue.py <초안.md> --title "..."    # 통과 시 gh 명령까지 출력
+  python3 check-issue.py --status                   # 발행 현황만 조회
+  python3 check-issue.py <초안.md> --no-remote      # 원격 조회 생략 (오프라인)
 """
 import io
+import json
 import os
 import re
+import subprocess
 import sys
 
 REPO = 'CREFLEINC/omf-mes-client'
@@ -108,6 +118,98 @@ ADVISORY = [
 ]
 
 PLACEHOLDER = re.compile(r'<[가-힣][^>]*>|W-00-00|omf-mes#00|YYYY-MM-DD|v0\.0|<해시>')
+
+SCREEN_ID = re.compile(r'\b([WPM]-(?:CO|\d{2})-\d{2})\b')
+
+# 이미 구현·병합된 화면. 「착수 가능」으로 오면 프론트가 그냥 닫는다.
+# 전할 것이 있으면 ⛔/⚠ 변경 통지로 간다.
+ALREADY_BUILT = {
+    'W-06-07': '창고·Location 마스터',
+    'W-06-01': 'Routing(공정) 등록·관리',
+}
+
+
+def gh_issues():
+    """상대 저장소의 이슈 전건. 조회 실패는 None (막지 않되 알린다).
+
+    --search 를 쓰지 않는다 — GitHub 검색은 인덱싱 지연이 있고 하이픈이 든
+    토큰(W-06-03)에서 헛돌 수 있다. 전건을 받아 제목을 직접 맞춘다.
+    """
+    try:
+        out = subprocess.run(
+            ['gh', 'issue', 'list', '--repo', REPO, '--state', 'all',
+             '--limit', '300', '--json', 'number,title,state,labels'],
+            capture_output=True, timeout=30)
+        if out.returncode != 0:
+            return None
+        return json.loads(out.stdout.decode('utf-8'))
+    except Exception:
+        return None
+
+
+def check_duplicate(screen_id, change_notice):
+    """(errs, warns, 조회했는가)"""
+    errs, warns = [], []
+
+    if not change_notice and screen_id in ALREADY_BUILT:
+        errs.append(('발행 금지 화면',
+                     '%s %s' % (screen_id, ALREADY_BUILT[screen_id]),
+                     '이미 구현·병합된 화면이다. 「착수 가능」으로 오면 프론트가 그냥 닫는다. '
+                     '전할 것이 있으면 ⛔/⚠ 변경 통지로 보낸다'))
+
+    issues = gh_issues()
+    if issues is None:
+        warns.append(('원격 조회 실패', 'gh issue list — %s' % REPO,
+                      '중복 여부를 확인하지 못했다. gh auth status 를 보고 다시 돌리거나 '
+                      '웹에서 직접 확인한 뒤 발행한다'))
+        return errs, warns, False
+
+    same = [i for i in issues if screen_id and screen_id in i['title']]
+    for i in same:
+        labels = [l['name'] for l in i.get('labels', [])]
+        is_ready = 'ready' in labels or '착수 가능' in i['title']
+        num = '#%d' % i['number']
+
+        if change_notice:
+            continue                      # 변경 통지는 같은 화면에 여러 건이 정상이다
+
+        if is_ready and i['state'] == 'OPEN':
+            errs.append(('중복 발행', '%s %s (열려 있음)' % (num, i['title'][:50]),
+                         '같은 화면의 착수 이슈가 이미 열려 있다. 바뀐 것이 있으면 '
+                         '본문을 고치지 말고 ⛔/⚠ 변경 통지를 새 이슈로 올린다'))
+        elif is_ready and i['state'] == 'CLOSED':
+            errs.append(('완료된 화면', '%s %s (닫힘)' % (num, i['title'][:50]),
+                         '프론트가 이미 구현을 마치고 닫은 화면이다. 다시 「착수 가능」을 '
+                         '보내면 안 된다 — ⛔/⚠ 변경 통지로 간다'))
+        else:
+            warns.append(('같은 화면의 다른 이슈', '%s %s' % (num, i['title'][:50]),
+                          '변경 통지로 보인다. 착수 이슈가 이 화면에 처음이면 그대로 진행한다'))
+
+    return errs, warns, True
+
+
+def print_status():
+    issues = gh_issues()
+    if issues is None:
+        print('⛔ 조회 실패 — gh auth status 를 확인하세요.')
+        return 1
+    ready = [i for i in issues
+             if 'ready' in [l['name'] for l in i.get('labels', [])]]
+    print('착수 가능 통지 현황 — %s' % REPO)
+    print('─' * 66)
+    if not ready:
+        print('  (아직 없음)')
+    for i in sorted(ready, key=lambda x: x['number']):
+        m = SCREEN_ID.search(i['title'])
+        mark = '진행 중' if i['state'] == 'OPEN' else '완료'
+        print('  #%-3d %-6s %-10s %s' % (i['number'], mark,
+                                         m.group(1) if m else '?', i['title'][:52]))
+    print('\n  발행 %d건 (진행 중 %d · 완료 %d)'
+          % (len(ready),
+             sum(1 for i in ready if i['state'] == 'OPEN'),
+             sum(1 for i in ready if i['state'] == 'CLOSED')))
+    print('\n  ⛔ 발행 금지: ' + ' · '.join('%s %s' % (k, v) for k, v in ALREADY_BUILT.items()))
+    return 0
 
 
 def sections(text):
@@ -196,6 +298,9 @@ def scan(text, rules):
 
 
 def main():
+    if '--status' in sys.argv:
+        return print_status()
+
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
     if not args:
         print(__doc__)
@@ -214,6 +319,20 @@ def main():
     errs, warns = ([], [])
     if not change_notice:
         errs, warns = check_structure(text, secs)
+
+    checked_remote = False
+    if '--no-remote' in sys.argv:
+        warns.append(('원격 조회 생략', '--no-remote',
+                      '중복 발행 여부를 확인하지 않았다. 발행 전에 반드시 직접 본다'))
+    else:
+        m = SCREEN_ID.search(text)
+        if not m:
+            warns.append(('화면 ID 인식 실패', '1번 칸',
+                          '화면 ID 형식(W-06-03)을 못 찾아 중복 검사를 건너뛰었다'))
+        else:
+            de, dw, checked_remote = check_duplicate(m.group(1), change_notice)
+            errs += de
+            warns += dw
 
     left = PLACEHOLDER.findall(text)
     if left:
@@ -243,7 +362,8 @@ def main():
         print('\n공개 저장소입니다. 고치고 다시 검사하세요.')
         return 1
 
-    print('\n✅ 발행해도 되는 상태입니다.')
+    print('\n✅ 발행해도 되는 상태입니다.%s'
+          % ('' if checked_remote else '  (⚠ 중복 검사는 못 했습니다)'))
 
     if title:
         print('\n─ 발행 명령 ' + '─' * 52)
