@@ -474,6 +474,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
           }
         ],
         "requestBody": {
@@ -513,6 +516,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "저장 충돌. 다시 읽어 오면 풀린다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
                 }
               }
             }
@@ -878,6 +891,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "저장 충돌. 다시 읽어 오면 풀린다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
                 }
               }
             }
@@ -1719,6 +1742,16 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "저장 충돌. 다시 읽어 오면 풀린다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
           }
         },
         "x-internal-note": "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9)."
@@ -1787,6 +1820,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "저장 충돌. 다시 읽어 오면 풀린다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
                 }
               }
             }
@@ -2135,6 +2178,16 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "저장 충돌. 다시 읽어 오면 풀린다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
           }
         },
         "x-internal-note": "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9)."
@@ -2318,6 +2371,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "저장 충돌. 다시 읽어 오면 풀린다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
                 }
               }
             }
@@ -2508,6 +2571,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
           }
         ],
         "requestBody": {
@@ -2550,6 +2616,16 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "저장 충돌. 다시 읽어 오면 풀린다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
           }
         },
         "x-internal-note": "결재선 조회·결재 오퍼레이션은 app-공통 파일 소관이다. 이 트랙은 요청 생성까지만 덮는다."
@@ -2576,6 +2652,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
           }
         ],
         "requestBody": {
@@ -2615,6 +2694,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "저장 충돌. 다시 읽어 오면 풀린다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
                 }
               }
             }
@@ -2749,6 +2838,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "저장 충돌. 다시 읽어 오면 풀린다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
                 }
               }
             }
@@ -2969,6 +3068,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "저장 충돌. 다시 읽어 오면 풀린다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
                 }
               }
             }
@@ -3201,6 +3310,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "저장 충돌. 다시 읽어 오면 풀린다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
                 }
               }
             }
@@ -3564,6 +3683,16 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "저장 충돌. 다시 읽어 오면 풀린다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
           }
         },
         "x-internal-note": "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9)."
@@ -3632,6 +3761,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "저장 충돌. 다시 읽어 오면 풀린다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
                 }
               }
             }
@@ -3990,6 +4129,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
           }
         ],
         "requestBody": {
@@ -4032,6 +4174,16 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "저장 충돌. 다시 읽어 오면 풀린다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
           }
         },
         "x-internal-note": "누가 승인하는지는 아직 정해지지 않았다(W-01-12 §5-3). 계약은 요청 생성까지만 덮는다."
@@ -4058,6 +4210,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
           }
         ],
         "requestBody": {
@@ -4097,6 +4252,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "저장 충돌. 다시 읽어 오면 풀린다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
                 }
               }
             }
@@ -5045,6 +5210,16 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "저장 충돌. 다시 읽어 오면 풀린다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
           }
         },
         "x-internal-note": "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9)."
@@ -5443,51 +5618,6 @@
           }
         }
       },
-      "BatchFailure": {
-        "type": "object",
-        "required": [
-          "index",
-          "errors"
-        ],
-        "properties": {
-          "index": {
-            "type": "integer",
-            "description": "요청 배열에서의 위치",
-            "example": 1
-          },
-          "key": {
-            "type": "string",
-            "description": "식별 가능한 값",
-            "example": "LOT-2026-000045"
-          },
-          "errors": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ErrorItem"
-            }
-          }
-        }
-      },
-      "BatchResult": {
-        "type": "object",
-        "required": [
-          "succeeded",
-          "failed"
-        ],
-        "description": "일괄 처리 결과. 근거: 공유계약 C-2",
-        "properties": {
-          "succeeded": {
-            "type": "integer",
-            "example": 2
-          },
-          "failed": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BatchFailure"
-            }
-          }
-        }
-      },
       "PageMeta": {
         "type": "object",
         "required": [
@@ -5509,29 +5639,6 @@
             "example": 137
           }
         }
-      },
-      "OfflineContext": {
-        "type": "object",
-        "required": [
-          "businessDate",
-          "occurredAt"
-        ],
-        "description": "오프라인 큐가 재전송해도 같은 건으로 판정되게 하는 필드. 단말이 정하며 서버가 수신 시각으로 덮어쓰지 않는다. 근거: 공유계약 C-1 · C-8",
-        "properties": {
-          "businessDate": {
-            "type": "string",
-            "format": "date",
-            "description": "전표 귀속 영업일. 원장의 유일 제약이 이 값을 포함하므로 단말이 정한다. 근거: 공유계약 C-8",
-            "example": "2026-08-06"
-          },
-          "occurredAt": {
-            "type": "string",
-            "format": "date-time",
-            "description": "단말에서 행위가 일어난 시각. 서버 수신 시각과 다를 수 있다. 근거: 공유계약 C-1",
-            "example": "2026-08-06T09:12:00+09:00"
-          }
-        },
-        "x-internal-note": "C-12(단말 시계 오차 보정)는 아직 정해지지 않았다. occurredAt 을 그대로 신뢰하는 것이 현재 계약이다."
       },
       "PurchaseOrderLine": {
         "x-source-table": "logistics.purchase_order_line",
@@ -6802,7 +6909,7 @@
             "example": "2026-08-06T09:12:00+09:00"
           }
         },
-        "x-internal-note": "businessDate·occurredAt 은 바깥에서 한 번만 받는다 — 두 건이 같은 순간의 한 트랜잭션이기 때문이다."
+        "x-internal-note": "businessDate·occurredAt 은 바깥에서 한 번만 받는다 — 두 건이 같은 순간의 한 트랜잭션이기 때문이다. ⚠ mode 에 따른 normal·excess 의 조건부 필수를 oneOf 로 표현하지 않았다 — 초안 단계라 description 으로 둔다. 목 서버·검증기는 mode 와 어긋나는 조합을 통과시킨다."
       },
       "InboundReceiptSplitResponse": {
         "type": "object",
@@ -7228,6 +7335,7 @@
           "receiptDatetime",
           "sourceDocumentTypeCode",
           "sourceDocumentId",
+          "businessDate",
           "lines"
         ],
         "description": "입고 처리. 생성과 전기가 같은 순간이다 — 화면이 「입고 처리」 한 버튼이므로 오퍼레이션도 하나다. 입고 전표·LOT 상태 전이·수불 원장·잔액·ERP 송신 적재가 한 트랜잭션에서 일어나며, ERP 실제 전송만 트랜잭션 밖이다. 근거: W-01-10 §5-4 · 공유계약 B-8",
@@ -8253,6 +8361,8 @@
           "destinationTypeCode",
           "destinationId",
           "issuedAt",
+          "businessDate",
+          "occurredAt",
           "lines"
         ],
         "description": "출고 전표 등록. postImmediately 가 참이면 등록과 전기가 같은 트랜잭션에서 일어난다 — 「출고 확정」·「반품 처리」처럼 화면이 한 버튼인 경우다. 승인을 먼저 받아야 하는 기타 출고는 거짓으로 보내고 나중에 전기한다. 근거: M-01-08 §5-8 · W-01-05 §5-7 · W-01-06 §5-7",

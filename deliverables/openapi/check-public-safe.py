@@ -22,7 +22,11 @@
   통과하면 0, 위반이 있으면 1 을 돌려준다.
 """
 import glob
-import json, re, sys, io, os
+import io
+import json
+import os
+import re
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
