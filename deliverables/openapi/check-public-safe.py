@@ -17,18 +17,20 @@
   ④ 사내 운영 용어 — WBS · 통합 Agent · SQL NNN 주석
 
 사용법
-  python3 check-public-safe.py [spec.json]
+  python3 check-public-safe.py [spec.json ...]
+  인자를 생략하면 이 폴더의 정본 전부를 검사한다.
   통과하면 0, 위반이 있으면 1 을 돌려준다.
 """
+import glob
 import json, re, sys, io, os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DEFAULT = os.path.join(HERE, 'mdm-기준정보.json')
 
 RULES = [
-    ('비공개 문서 경로', re.compile(r'\b(?:deliverables|docs)/'),
+    ('비공개 문서 경로', re.compile(r'\b(?:deliverables|docs|uiux)/'),
      'x-internal-note 로 옮기거나 이슈 번호로 대체한다'),
-    ('설계 규칙 요약', re.compile(r'공유계약\s+[A-K]-\d+\s*\('),
+    # 절 기호는 공유계약이 늘면 함께 늘린다 — 2026-08-06 현재 §A~§L
+    ('설계 규칙 요약', re.compile(r'공유계약\s+[A-L]-\d+\s*\('),
      '괄호 안 요약을 x-internal-note 로 옮기고 식별자만 남긴다'),
     ('설계 진행 상태', re.compile(r'미결|미착지'),
      '진행 상태는 x-internal-note 로. 소비자에게 필요한 경고는 「확정되지 않았다」로 바꿔 남긴다'),
@@ -52,8 +54,7 @@ def collect(node, path='$'):
     return out
 
 
-def main():
-    path = sys.argv[1] if len(sys.argv) > 1 else DEFAULT
+def check(path):
     spec = json.load(io.open(path, encoding='utf-8'))
     descs = collect(spec)
 
@@ -65,7 +66,7 @@ def main():
                 s = max(0, m.start() - 40)
                 violations.append((name, loc, d[s:m.end() + 40].replace('\n', ' '), fix))
 
-    print('description %d개 검사' % len(descs))
+    print('%s — description %d개 검사' % (os.path.basename(path), len(descs)))
     if not violations:
         print('✅ 공개돼도 되는 상태입니다.')
         return 0
@@ -77,6 +78,14 @@ def main():
         print('    → %s' % fix)
     print('\n생성물(api.d.ts)은 공개 저장소에 커밋됩니다. 고치고 다시 검사하세요.')
     return 1
+
+
+def main():
+    targets = sys.argv[1:] or sorted(glob.glob(os.path.join(HERE, '*.json')))
+    if not targets:
+        print('검사할 정본이 없습니다.')
+        return 1
+    return max(check(t) for t in targets)
 
 
 if __name__ == '__main__':

@@ -48,7 +48,7 @@ POST   /logistics/goods-receipts/{id}:cancel      취소
 | --- | --- | --- |
 | **`:confirm`** | **문서가 확정된다** — 더 못 고친다 | 작성중 → 확정 |
 | **`:post`** | **원장에 기록된다** — 재고가 움직인다 | 확정 → 전기 |
-| **`:cancel`** | 취소 상태로 전이 | 어느 상태에서든(문서별 허용 범위는 다르다) |
+| ~~**`:cancel`**~~ | 취소 상태로 전이 | ⛔ **3단계에서 0건이 됐다** — 01 화면의 「취소」는 전부 화면 이탈이다(`03-OpenAPI작성.md` §3-2) |
 | **`:request-approval`** | 승인 요청 | 횡단 — `app-공통` 소관 |
 
 **⭐ `:confirm` 과 `:post` 를 나누는 이유** — 「확정했는데 전기가 실패」를 표현할 수 있다. B-8(트랜잭션 경계)이 **외부 호출을 트랜잭션 밖**에 두므로 두 순간이 갈릴 수 있다.
@@ -77,13 +77,14 @@ POST /logistics/goods-issues        { issueTypeCode: "일반출고" | "반품" |
 **실측이 답을 준다** — `shipped_at` · `received_at` 이 **한 행에 둘 다** 있다.
 
 ```
-POST /logistics/stock-transfers               생성
-POST /logistics/stock-transfers/{id}:depart   반출 스캔  → shipped_at
-POST /logistics/stock-transfers/{id}:arrive   도착 스캔  → received_at
-GET  /logistics/stock-transfers?status=미완   이어하기 목록
+POST /logistics/stock-transfers               생성 + 반출  → shipped_at   ← 3단계 정정
+POST /logistics/stock-transfers/{id}:arrive   도착 스캔    → received_at
+GET  /logistics/stock-transfers?inTransitOnly=true         이어하기 목록
 ```
 
 배지단말 **#8**(통신 두절 시 입·출측을 단일 단말로)이 **한 단말이 양쪽을 다 한다**고 했으므로 두 문서로 나누면 그 규칙이 깨진다.
+
+⚠ **`:depart` 는 3단계에서 없앴다** — `M-01-10` §5-6의 버튼이 「① 반출 스캔」 하나라 생성과 반출이 같은 순간이다. 나누면 오프라인 큐에 「생성됐으나 반출 전」 상태가 남고 그것을 볼 화면이 없다(`03-OpenAPI작성.md` §3-1).
 
 ---
 
@@ -173,16 +174,17 @@ Idempotency-Key: <UUID>            ← 필수 (오프라인 대상 오퍼레이�
 | `stock_transfer` 2단계 | ✅ **한 문서 + 두 전이** — `shipped_at`·`received_at` 실측(§2-4) |
 | 오프라인 큐 표현 | ✅ **3항목 명시**(§5) |
 
-**남은 것 — 3단계(OpenAPI 작성)에서 정한다.**
+**남은 것 — 3단계(OpenAPI 작성)에서 정했다.** ✅ **전건 종결** · 판정은 `03-OpenAPI작성.md` §2.
 
-| # | 항목 |
-| :-: | --- |
-| 1 | **문서별 `status_code` 값** — 전부 미확정(맨 `code_t`). `enum` 을 못박지 않고 `x-internal-note` 로 남긴다(G-2) |
-| 2 | **`:cancel` 허용 상태 범위** — 문서마다 다르다. 화면 §5·§6에서 도출 |
-| 3 | **라인 치환의 단위** — 헤더 전체인지 라인만인지. `A-5`(순서 컬럼 유일 제약) 여부로 갈린다 |
+| # | 항목 | 3단계 판정 |
+| :-: | --- | --- |
+| 1 | **문서별 `status_code` 값** | ✅ `enum` 을 못박지 않았다 — G-2 를 계약에도 적용 |
+| 2 | **`:cancel` 허용 상태 범위** | ⛔ **범위가 아니라 액션 자체가 0건**이었다 |
+| 3 | **라인 치환의 단위** | ✅ **신규 행을 만드는 치환** — 화면에 「라인 추가」가 있다 |
 
 ## 변경 이력
 
 | 버전 | 날짜 | 변경 요지 |
 | --- | --- | --- |
+| v0.2 | 2026-08-06 | **3단계 정정 반영.** 화면 §5의 버튼을 한 줄씩 대조하니 이 문서의 판정이 **세 곳 뒤집혔다** — ⛔ **`:cancel` 0건**(01의 「취소」는 전부 화면 이탈) · ⛔ **`:depart` 삭제**(반출 스캔이 곧 생성) · 예약 쓰기 없음. §6 미결 3건은 전건 종결. 근거는 `03-OpenAPI작성.md` §3. **테이블과 프로세스만 보고 동사를 정하면 어긋난다 — 버튼을 센다.** |
 | v0.1 | 2026-08-06 | 초안 — 실행 2단계. 신설 패턴 **라·마·바**의 URL·동작을 정했다. ⭐ **상태 전이 동사를 넷으로 통일**(`:confirm`·`:post`·`:cancel`·`:request-approval`) — 업무 용어가 아니라 **전이의 성격**으로 짓고, **화면이 두 버튼이면 두 오퍼레이션**이라는 도출 규칙을 함께 못박았다. **`:confirm`↔`:post` 분리**는 「확정했는데 전기 실패」를 표현하기 위함(B-8). **마. 원장 형은 복합 키를 URL에 그대로**(`/{businessDate}/{id}`) — `id` 만으로는 전 파티션 스캔이다. **바. 파생 잔액은 11축이 곧 쿼리**이고 **소유는 `groupBy` 와 무관하게 항상 행을 나눈다**(L-7). **오프라인 큐 3항목**을 계약 표현으로 확정 — 멱등키 헤더 · `business_date` 본문 · **`If-Match` optional(오프라인 대상만)**. 1단계 확인 **6건 전건 종결**(실측 2건이 답을 줬다 — `issue_type_code` · `shipped_at`/`received_at`). 3단계로 넘길 미결 3건. |
