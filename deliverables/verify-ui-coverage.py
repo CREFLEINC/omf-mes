@@ -7,10 +7,15 @@
 #
 # 물리 모델과 OpenAPI 를 대조하지 않는다 — 그것은 데이터모델 담당 소관이다.
 # 표준 라이브러리만 쓴다(저장소 관행).
+#
+# 도메인이 둘이다. `--domain 01` 로 자재창고 23장을 뽑는다.
 import io, os, re, sys
 
 EXPANSION = "uiux/2026-08-03-화면상세스펙-확대1차"
 PILOT = "uiux/2026-07-31-화면상세스펙-파일럿"
+E2 = "uiux/2026-08-04-화면상세스펙-확대2차"
+E4 = "uiux/2026-08-05-화면상세스펙-확대4차"
+E5 = "uiux/2026-08-05-화면상세스펙-확대5차"
 
 # 대상 화면 — 확대 1차 13장 − W-06-13(통합 폐지) − W-06-08·09·12(API 정의 불가) + 파일럿 W-06-07
 SCREENS = [
@@ -26,7 +31,22 @@ SCREENS = [
     (PILOT, "W-06-07"),
 ]
 
-_SCREEN_ID = re.compile(r"(W-(?:CO|[0-9]{2})-[0-9]{2})")
+# 01 자재창고 23장. ⛔ M-01-12(재생재 등록)는 #64 로 동결 · W-01-08 은 결번.
+SCREENS_01 = [
+    (PILOT, "W-01-01"), (PILOT, "M-01-02"),
+    (E2, "W-01-02"), (E2, "W-01-03"), (E2, "W-01-09"), (E2, "W-01-10"), (E2, "W-01-11"),
+    (E2, "M-01-01"), (E2, "M-01-06"), (E2, "P-01-01"),
+    (E4, "W-01-04"), (E4, "M-01-04"), (E4, "M-01-05"), (E4, "M-01-07"), (E4, "M-01-08"),
+    (E4, "M-01-09"), (E4, "M-01-10"), (E4, "M-01-11"), (E4, "P-01-02"),
+    (E5, "W-01-05"), (E5, "W-01-06"), (E5, "W-01-07"), (E5, "W-01-12"),
+]
+
+DOMAINS = {
+    "mdm": (SCREENS, "ui-요구목록.md", "06-API-요구서.md"),
+    "01": (SCREENS_01, "ui-요구목록-01자재창고.md", "06-API-요구서-01자재창고.md"),
+}
+
+_SCREEN_ID = re.compile(r"([WMP]-(?:CO|[0-9]{2})-[0-9]{2})")
 _BOLD = re.compile(r"\*\*(.+?)\*\*")
 _STRIKE = re.compile(r"~~(.+?)~~")
 
@@ -38,17 +58,36 @@ def _strip_md(text):
     return text.replace("`", "").strip()
 
 
+_ACTION_HEADING = re.compile(r"^### §5-\d+\..*액션.*$", re.M)
+_NEXT_HEADING = re.compile(r"^#{2,3} ", re.M)
+
+
+def find_action_block(text):
+    # 액션 표가 든 소절을 돌려준다. 없으면 None.
+    #
+    # 기준정보 10장은 전부 `### §5-1. 액션` 이지만 01 자재창고는 소절 번호가
+    # 화면마다 다르다(§5-2 · §5-5 · §5-6 · §5-7 · §5-8). 번호를 고정하면 조용히
+    # 0건이 되어 커버리지가 부풀려진다 — 제목으로 찾는다.
+    m = _ACTION_HEADING.search(text)
+    if m is None:
+        return None
+    # 소절의 끝은 「다음 ### 」이 아니라 「다음 ## 또는 ### 」이다.
+    # 액션 소절이 §5 의 마지막 소절이면 다음 제목이 `## §6` 이라 ### 만 찾으면
+    # §6·§7·§8 의 표까지 삼킨다(01 자재창고에서 액션이 414건으로 부풀었다).
+    nxt = _NEXT_HEADING.search(text, m.end())
+    return text[m.start():nxt.start()] if nxt else text[m.start():]
+
+
 def extract_actions(md_path):
-    # 한 화면 스펙의 §5-1 액션 표를 [{screen, action, condition, note}] 로.
+    # 한 화면 스펙의 액션 표를 [{screen, action, condition, note}] 로.
     m = _SCREEN_ID.search(os.path.basename(md_path))
     screen = m.group(1) if m else os.path.basename(md_path)
-    text = io.open(md_path, encoding="utf-8").read()
+    with io.open(md_path, encoding="utf-8") as f:
+        text = f.read()
 
-    start = text.find("### §5-1")
-    if start == -1:
+    block = find_action_block(text)
+    if block is None:
         return []
-    end = text.find("###", start + 4)
-    block = text[start:end] if end != -1 else text[start:]
 
     # §5-1 표의 열 구성이 화면마다 다르다 — 대부분 「액션|위치|활성 조건|비고」
     # 4열이지만 W-06-10 은 「액션|활성 조건|비고」 3열(위치 열이 없다). 열 위치를
@@ -91,31 +130,61 @@ def extract_actions(md_path):
     return rows
 
 
-def extract_all(base_dir):
-    # 대상 화면 10개의 액션을 모은다. base_dir 은 deliverables/ 경로.
+def screen_path(root, folder, sid):
+    # 화면 ID 로 시작하는 스펙 파일 경로. 없으면 None.
+    d = os.path.join(root, folder)
+    if not os.path.isdir(d):
+        return None
+    for fn in sorted(os.listdir(d)):
+        if fn.startswith(sid) and fn.endswith(".md"):
+            return os.path.join(d, fn)
+    return None
+
+
+def extract_all(base_dir, screens=None):
+    # 대상 화면의 액션을 모은다. base_dir 은 deliverables/ 경로.
     root = os.path.normpath(os.path.join(base_dir, ".."))
     out = []
-    for folder, sid in SCREENS:
-        d = os.path.join(root, folder)
-        if not os.path.isdir(d):
-            continue
-        for fn in sorted(os.listdir(d)):
-            if fn.startswith(sid) and fn.endswith(".md"):
-                out.extend(extract_actions(os.path.join(d, fn)))
-                break
+    for folder, sid in (screens or SCREENS):
+        path = screen_path(root, folder, sid)
+        if path:
+            out.extend(extract_actions(path))
     return out
 
 
-def render(rows):
+def screens_without_action_table(base_dir, screens=None):
+    # 스펙은 있는데 액션 표가 없는 화면. 조용히 빠지면 커버리지가 부풀려진다.
+    root = os.path.normpath(os.path.join(base_dir, ".."))
+    out = []
+    for folder, sid in (screens or SCREENS):
+        path = screen_path(root, folder, sid)
+        if not path:
+            continue
+        with io.open(path, encoding="utf-8") as f:
+            if find_action_block(f.read()) is None:
+                out.append(sid)
+    return out
+
+
+def render(rows, domain="mdm", no_table=()):
     # 요구 목록을 markdown 으로.
+    _, _, doc = DOMAINS[domain]
+    arg = "" if domain == "mdm" else " --domain %s" % domain
     lines = [
         "# UI 요구 목록 — 화면이 API 에 요구하는 것",
         "",
-        "> 생성물이다. `python3 verify-ui-coverage.py` 로 다시 만든다.",
-        "> 이 목록의 모든 행이 `06-API-요구서.md` §3 매핑표에서 다뤄져야 한다.",
+        "> 생성물이다. `python3 verify-ui-coverage.py%s` 로 다시 만든다." % arg,
+        "> 이 목록의 모든 행이 `%s` §3 매핑표에서 다뤄져야 한다." % doc,
         "> 엔드포인트가 없는 액션은 「없음 + 이유」로 명시한다 — 빈칸은 누락이다.",
         "",
     ]
+    if no_table:
+        lines += [
+            "⚠ **액션 표가 없는 화면 %d장** — %s."
+            % (len(no_table), " · ".join("`%s`" % s for s in no_table)),
+            "이 화면들의 요구는 §5 본문에서 사람이 읽어 §3 에 옮긴다. **목록에 없다고 없는 것이 아니다.**",
+            "",
+        ]
     cur = None
     for r in rows:
         if r["screen"] != cur:
@@ -129,16 +198,28 @@ def render(rows):
 
 
 def main():
+    domain = "mdm"
+    if "--domain" in sys.argv:
+        domain = sys.argv[sys.argv.index("--domain") + 1]
+    if domain not in DOMAINS:
+        print("모르는 도메인: %s (%s 중 하나)" % (domain, " · ".join(DOMAINS)))
+        return 1
+
     here = os.path.dirname(os.path.abspath(__file__))
-    rows = extract_all(here)
-    dst = os.path.join(here, "openapi", "ui-요구목록.md")
+    screens, filename, _ = DOMAINS[domain]
+    rows = extract_all(here, screens)
+    no_table = screens_without_action_table(here, screens)
+
+    dst = os.path.join(here, "openapi", filename)
     d = os.path.dirname(dst)
     if not os.path.isdir(d):
         os.makedirs(d)
     with io.open(dst, "w", encoding="utf-8") as f:
-        f.write(render(rows))
+        f.write(render(rows, domain, no_table))
     print("생성: %s" % dst)
     print("화면 %d · 액션 %d" % (len({r["screen"] for r in rows}), len(rows)))
+    if no_table:
+        print("⚠ 액션 표 없는 화면 %d: %s" % (len(no_table), " ".join(no_table)))
     return 0
 
 
