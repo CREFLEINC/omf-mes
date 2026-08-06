@@ -11,30 +11,52 @@
 #   화면이 된다.
 #
 # 대조 방법
-#   화면별로 요구서 §3 소절을 찾고, 그 소절 안에 액션 문구가 있는지 본다.
+#   화면별로 요구서 §3 소절을 찾고, 그 소절 매핑표의 **첫 열**에 액션 문구가
+#   있는지 본다. 소절 본문 전체를 대조하면 「조회」·「취소」처럼 짧은 액션이
+#   산문에 우연히 등장하기만 해도 통과한다 — 매핑표에 없는데 ✅ 가 나온다.
 #   요구서는 액션 여러 개를 한 행에 묶어 적으므로(「스캔(암묵) / 직접 입력」)
 #   슬래시로 나뉜 조각이 하나라도 있으면 다뤄진 것으로 친다.
 #
 # 표준 라이브러리만 쓴다(저장소 관행).
+import importlib
 import io
 import os
 import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DOMAINS = {
-    "mdm": ("openapi/ui-요구목록.md", "06-API-요구서.md"),
-    "01": ("openapi/ui-요구목록-01자재창고.md", "06-API-요구서-01자재창고.md"),
-}
+
+# 도메인 등록부는 verify-ui-coverage.py 가 갖는다 — 두 곳에 적으면 갈린다.
+sys.path.insert(0, HERE)
+_COV = importlib.import_module("verify-ui-coverage")
+DOMAINS = {name: (files[1], files[2]) for name, files in _COV.DOMAINS.items()}
+DEFAULT_DOMAIN = "mdm"  # 짝인 verify-ui-coverage.py 와 같은 기본값을 쓴다
 
 _LIST_SCREEN = re.compile(r"^## ([WMP]-(?:CO|\d{2})-\d{2})\s*$", re.M)
 _DOC_SCREEN = re.compile(r"^### 3-\d+\.\s*`([WMP]-(?:CO|\d{2})-\d{2})`", re.M)
+
+# 대조에서 지우는 것 — ① 공백과 마크다운 표기(`**` `` ` `` `~~`)는 같은 액션을
+# 두 문서가 다르게 꾸며 적어서, ② 판정 기호(⚠⛔✅❌)와 괄호·중점은 요구서가
+# 강조·묶음으로 덧붙여서 생기는 차이다. 뜻을 담은 글자는 지우지 않는다.
 _NOISE = re.compile(r"[\s·⚠⛔✅❌「」（）()\[\]§*`~]+")
+_ACTION_SPLIT = re.compile(r"[/·]")
 
 
 def _norm(text):
     # 표기 차이를 지운다. 굵게·코드·기호·공백은 대조에 방해만 된다.
     return _NOISE.sub("", text)
+
+
+def _first_column(block):
+    # 표 행의 첫 열만 이어 붙인다. 산문은 대조 대상이 아니다.
+    cells = []
+    for line in block.split("\n"):
+        if not line.startswith("|"):
+            continue
+        head = line.strip("|").split("|")[0].strip()
+        if head and not head.startswith("---"):
+            cells.append(head)
+    return _norm(" ".join(cells))
 
 
 def read(path):
@@ -73,22 +95,23 @@ def doc_sections(path):
 def missing(actions, sections):
     # 다뤄지지 않은 (화면, 액션). 화면 소절 자체가 없으면 그것도 결손이다.
     out = []
+    columns = {screen: _first_column(block) for screen, block in sections.items()}
     for screen, action in actions:
-        block = sections.get(screen)
-        if block is None:
+        if screen not in columns:
             out.append((screen, action, "요구서에 §3 소절이 없다"))
             continue
-        haystack = _norm(block)
-        parts = [p for p in re.split(r"[/·]", action) if _norm(p)]
-        if not any(_norm(p) in haystack for p in parts or [action]):
-            out.append((screen, action, "소절 안에 없다"))
+        haystack = columns[screen]
+        parts = [p for p in _ACTION_SPLIT.split(action) if _norm(p)] or [action]
+        if not any(_norm(p) in haystack for p in parts):
+            out.append((screen, action, "매핑표 첫 열에 없다"))
     return out
 
 
 def check(domain):
-    rel_list, rel_doc = DOMAINS[domain]
-    actions = list_actions(os.path.join(HERE, rel_list))
-    sections = doc_sections(os.path.join(HERE, rel_doc))
+    # 요구 목록은 openapi/ 아래, 요구서는 deliverables/ 바로 아래다.
+    list_name, doc_name = DOMAINS[domain]
+    actions = list_actions(os.path.join(HERE, "openapi", list_name))
+    sections = doc_sections(os.path.join(HERE, doc_name))
     gaps = missing(actions, sections)
 
     print("%s — 액션 %d · 요구서 §3 소절 %d" % (domain, len(actions), len(sections)))
@@ -102,7 +125,7 @@ def check(domain):
 
 
 def main():
-    domain = "01"
+    domain = DEFAULT_DOMAIN
     if "--domain" in sys.argv:
         domain = sys.argv[sys.argv.index("--domain") + 1]
     if domain not in DOMAINS:
