@@ -40,12 +40,13 @@ class ExtractActionsTest(unittest.TestCase):
         self.assertNotIn("액션", acts)
         self.assertFalse(any(a.startswith("---") for a in acts))
 
-    def test_전체_화면을_모으면_10개다(self):
+    def test_전체_화면을_모으면_11개다(self):
         rows = cov.extract_all(HERE)
         screens = sorted({r["screen"] for r in rows})
-        self.assertEqual(len(screens), 10, screens)
+        self.assertEqual(len(screens), 11, screens)
         self.assertIn("W-CO-02", screens)
         self.assertIn("W-06-07", screens)
+        self.assertIn("W-06-14", screens)  # 2026-08-07 편입 — 계약이 먼저 쓰였다
         self.assertNotIn("W-06-13", screens)
         self.assertNotIn("W-06-08", screens)
 
@@ -115,8 +116,24 @@ class Domain01Test(unittest.TestCase):
     def test_기준정보_추출은_그대로다(self):
         # 공용 코드를 고쳤으므로 기존 도메인이 안 흔들리는지 함께 잠근다.
         rows = cov.extract_all(HERE)
-        self.assertEqual(len(rows), 71)
-        self.assertEqual(len({r["screen"] for r in rows}), 10)
+        self.assertEqual(len(rows), 80)
+        self.assertEqual(len({r["screen"] for r in rows}), 11)
+
+
+class DomainAppTest(unittest.TestCase):
+    # 공통 승인 2장. 도메인이 셋이 되면서 등록부가 갈리는지 잠근다.
+    def test_두_화면을_뽑는다(self):
+        rows = cov.extract_all(HERE, cov.SCREENS_APP)
+        self.assertEqual(sorted({r["screen"] for r in rows}), ["W-06-15", "W-CO-09"])
+
+    def test_액션이_20건이다(self):
+        self.assertEqual(len(cov.extract_all(HERE, cov.SCREENS_APP)), 20)
+
+    def test_액션_표_없는_화면이_없다(self):
+        self.assertEqual(cov.screens_without_action_table(HERE, cov.SCREENS_APP), [])
+
+    def test_도메인_등록부에_셋이_있다(self):
+        self.assertEqual(sorted(cov.DOMAINS), ["01", "app", "mdm"])
 
 
 if __name__ == "__main__":
