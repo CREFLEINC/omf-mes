@@ -367,7 +367,7 @@ if (c['web'], c['pop'], c['mob']) != (72, 22, 19): die('프로그램 계수 %s' 
 d = Counter(r['dom'] for r in ROWS)
 if dict(d) != {'01': 25, '02': 24, '03': 5, '04': 18, '05': 17, '06': 14, 'CO': 10}: die('도메인 계수 %s' % dict(d))
 f = Counter(r['conf'] for r in ROWS)
-if (f['확정'], f['추정'], f['미정']) != (83, 28, 2): die('신뢰도 계수 %s' % dict(f))
+if (f['확정'], f['추정'], f['미정']) != (84, 27, 2): die('신뢰도 계수 %s' % dict(f))
 if sum(Counter(r['type'] for r in ROWS).values()) != 113: die('유형 합계')
 
 for label, ids in (('흐름축', flow_ids), ('관리웹 트리', tree_ids), ('POP 모드', pop_ids), ('모바일 타일', tile_ids)):
