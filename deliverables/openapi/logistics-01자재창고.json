@@ -5537,7 +5537,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CancelRequestCreate"
+                "$ref": "#/components/schemas/ApprovalRequestCreate"
               }
             }
           }
@@ -5707,7 +5707,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CancelRequestCreate"
+                "$ref": "#/components/schemas/ApprovalRequestCreate"
               }
             }
           }
@@ -5877,7 +5877,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CancelRequestCreate"
+                "$ref": "#/components/schemas/ApprovalRequestCreate"
               }
             }
           }
@@ -6691,12 +6691,13 @@
         "required": [
           "reason"
         ],
-        "description": "승인 요청. 사유는 비울 수 없다. 승인 진행 상태를 읽고 결재하는 경로는 이 파일이 갖지 않는다. 근거: W-01-11 §5-6 · W-01-06 §5-7 · 공유계약 J-4",
+        "description": "승인 요청. 사유는 비울 수 없다 — 데이터가 NOT NULL 로 강제하고, 결재함 목록에서 이 문장이 요약을 겸한다(approval_request 에 업무 값이 reason 하나뿐이다). 승인 진행 상태를 읽고 결재하는 경로는 app-공통 파일이 갖는다. 근거: W-01-11 §5-6 · W-01-06 §5-7 · W-01-13 §5-5 · 공유계약 J-4 · A-12 보강",
         "properties": {
           "reason": {
             "type": "string",
-            "description": "approval_request.reason 이 NOT NULL 이다",
-            "example": "초과 입하분 정산용 발주"
+            "description": "approval_request.reason 이 NOT NULL 이다. 취소 요청에서는 이 사유가 곧 취소 이력이 된다 — 문서에 취소 흔적을 담을 컬럼이 없다",
+            "example": "초과 입하분 정산용 발주",
+            "minLength": 1
           }
         },
         "x-internal-note": "app.approval_request 계약은 app-공통 파일 소관(01-리소스도출 §1-1). 이 오퍼레이션은 요청 생성만 하고 요청 식별자를 돌려준다."
@@ -12264,23 +12265,6 @@
             "items": {
               "$ref": "#/components/schemas/DocumentSuccessor"
             }
-          }
-        }
-      },
-      "CancelRequestCreate": {
-        "x-source-table": "app.approval_request",
-        "type": "object",
-        "description": "취소 요청. 사유는 비울 수 없다 — 문서에 취소 흔적을 담을 컬럼이 없어 이 사유가 곧 취소 이력이 된다. 근거: W-01-13 §5-5 · 공유계약 A-11 보강",
-        "required": [
-          "reason"
-        ],
-        "properties": {
-          "reason": {
-            "x-source-column": "reason",
-            "type": "string",
-            "minLength": 1,
-            "description": "무엇을 왜 되돌리는지 적는다. 결재함 목록에서 이 문장이 요약을 겸한다",
-            "example": "입고 수량 오등록 — 실물 800 EA 인데 1,200 EA 로 전기됨"
           }
         }
       },
