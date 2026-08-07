@@ -1414,6 +1414,84 @@
           }
         }
       }
+    },
+    "/app/document-issues/summary": {
+      "get": {
+        "tags": [
+          "document-issue"
+        ],
+        "operationId": "getDocumentIssueSummary",
+        "summary": "대상별 발행 요약 — 목록 화면용",
+        "description": "여러 대상의 발행 현황을 **한 번에** 돌려준다.\n\n목록 화면은 행마다 「이미 발행됐는가」를 알아야 액션을 활성할 수 있는데(재발행 사유 입력 · 이력 보기), 대상이 수백 건이면 건별 조회로는 그릴 수 없다. 개체 단위 출력물은 한 작업이 수백 건이다.\n\n발행한 적 없는 대상도 `issueCount: 0` 으로 함께 돌려준다 — 빠뜨리면 화면이 「모른다」와 「없다」를 구분할 수 없다.",
+        "parameters": [
+          {
+            "name": "targetTypeCode",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "example": "HANDLING_UNIT",
+            "description": "대상 유형. 한 번에 한 유형만 묻는다 — 유형이 섞이면 `targetId` 의 뜻이 갈린다."
+          },
+          {
+            "name": "targetIds",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 1000,
+              "items": {
+                "type": "integer",
+                "format": "int64"
+              }
+            },
+            "style": "form",
+            "explode": false,
+            "example": [
+              55021,
+              55022,
+              55023
+            ],
+            "description": "대상 식별자 목록. 발행 상한과 같은 1000 이다."
+          },
+          {
+            "name": "documentTypeCode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "example": "LABEL",
+            "description": "주면 그 종류만 센다. 한 대상에 라벨과 성적서가 따로 붙을 수 있다."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "대상별 요약 — 요청한 전건.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentIssueSummaryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`targetIds` 가 비었거나 상한을 넘었다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2311,7 +2389,7 @@
               "null"
             ],
             "maxLength": 40,
-            "description": "재발행 사유. 대상 중 하나라도 이미 발행된 것이 있으면 필수다 — 없으면 422 다.",
+            "description": "재발행 사유. 대상 중 하나라도 이미 발행된 것이 있으면 **필수**다 — 없으면 422 다.\n\n신규와 재발행이 섞여 들어와도 **한 번만 받는다.** 서버는 회차가 2 이상인 기록에만 이 값을 남긴다 — 신규 기록에 재발행 사유가 붙으면 이력이 거짓이 된다.",
             "example": "PRINT_FAILED"
           },
           "terminalId": {
@@ -2470,6 +2548,79 @@
             "items": {
               "$ref": "#/components/schemas/Printer"
             }
+          }
+        }
+      },
+      "DocumentIssueSummary": {
+        "type": "object",
+        "description": "대상 하나의 발행 현황 요약. 목록 화면이 행마다 「이미 발행됐는가 · 몇 회차인가」를 판정하는 입력이다.",
+        "required": [
+          "targetTypeCode",
+          "targetId",
+          "issueCount"
+        ],
+        "properties": {
+          "targetTypeCode": {
+            "type": "string",
+            "maxLength": 40,
+            "example": "HANDLING_UNIT"
+          },
+          "targetId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 55021
+          },
+          "issueCount": {
+            "type": "integer",
+            "minimum": 0,
+            "example": 2,
+            "description": "발행 횟수. 0 이면 아직 발행하지 않았다 — 재발행 사유가 필요 없다."
+          },
+          "lastIssueSeq": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "example": 2,
+            "description": "마지막 회차. 발행한 적이 없으면 null 이다."
+          },
+          "lastIssuedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "example": "2026-08-07T09:12:30Z"
+          },
+          "lastPrintOutcome": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "PENDING",
+              "SUCCEEDED",
+              "FAILED",
+              null
+            ],
+            "example": "FAILED",
+            "description": "마지막 인쇄 결과. FAILED 면 화면이 재발행을 권한다."
+          }
+        }
+      },
+      "DocumentIssueSummaryResponse": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentIssueSummary"
+            },
+            "description": "요청한 대상 전건을 돌려준다 — 발행한 적 없는 대상도 `issueCount: 0` 으로 들어간다. 빠진 행이 있으면 화면이 「모른다」와 「없다」를 구분할 수 없다."
           }
         }
       }
