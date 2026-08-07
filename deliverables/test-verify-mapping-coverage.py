@@ -107,8 +107,8 @@ class MatchTest(unittest.TestCase):
 
 class RealArtifactTest(unittest.TestCase):
     # 저장소의 실제 산출물이 통과 상태인지 잠근다.
-    def test_두_도메인_모두_전건_다뤘다(self):
-        for domain in ("mdm", "01"):
+    def test_세_도메인_모두_전건_다뤘다(self):
+        for domain in ("mdm", "01", "app"):
             with self.subTest(domain=domain):
                 self.assertEqual(mc.check(domain), 0)
 
