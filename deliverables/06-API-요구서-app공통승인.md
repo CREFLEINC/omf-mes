@@ -1,7 +1,7 @@
 # 06 — API 요구서 · 공통 도메인 승인 워크플로우
 
 > 작성일: 2026-08-07 (v0.1) · 작성 주체: CREFLE OMF 팀 (UI/UX)
-> **대상 계약**: `openapi/app-공통.json` — 경로 9 · 오퍼레이션 12 · 스키마 16
+> **대상 계약**: `openapi/app-공통.json` — 경로 9 · 오퍼레이션 12 · 스키마 17
 > **근거 화면**: `W-06-15` 결재선 정의 · `W-CO-09` 결재함 (확대 7차)
 > **상호 참조**: `uiux/화면상세스펙-공통/공유계약.md` v1.0 **§J**(10조항) · `06-API-요구서-01자재창고.md` §5-3(이 계약이 그 미착지를 푼다)
 
@@ -71,7 +71,7 @@
 2. **`USER` 외 거부** — `approverTypeCode`가 `ROLE`·`DEPARTMENT`면 **400 `APPROVER_TYPE_NOT_SUPPORTED`**
 3. **단계 치환의 낙관적 잠금은 마스터 토큰** — `approval_route_step`에 `version_no`가 없다(B-11)
 
-⚠ **`inProgressCount`를 목록·상세에 함께 내린다** — 결재선을 고쳐도 진행 중인 요청은 **옛 결재선으로 끝나기 때문**이다(J-9). 이 숫자가 없으면 운영자는 소급된다고 믿는다.
+⚠ **`inProgressCount`를 목록·상세에 함께 내린다** — 결재선을 고쳐도 진행 중인 요청은 **옛 결재선으로 끝나기 때문**이다(J-9). 이 숫자가 없으면 운영자는 소급된다고 믿는다. **스키마에서 `required`다** — 선택 필드로 두면 화면이 기대할 수 없다.
 
 ### 3-2. `W-CO-09` 결재함 *(관리웹)*
 
@@ -80,11 +80,11 @@
 | 탭 전환 | `GET /app/approval-requests` — `assignedToMe` · `requestedByMe` 로 가른다 | §5-8 · J-3 |
 | 조회·필터 | 같은 GET — `approvalTypeCode`·`statusCode`·`requestedAtFrom/To`·`q` | §3 · L-3 |
 | 페이지 이동 | 같은 GET 의 `page`·`size` | §5-8 · G-12 |
-| 요청 선택 | `GET /app/approval-requests/{id}` — **단계 배열을 함께 내린다** | §5-8 |
+| 요청 선택 | `GET /app/approval-requests/{id}` — 단계 배열을 함께 내린다 · **승인자도 상신자도 아니면 403** | §5-8 |
 | 대상 화면에서 보기 | 같은 GET 의 `target` — **`displayName`·`screenId`·`openable`** | §5-2 · **A-10 보강** |
-| 의견 입력 | `ApprovalDecision.comment` — 승인은 선택, 반려는 필수 | §5-5 · A-12 |
+| 의견 입력 | `ApprovalDecision.comment`(승인 · 선택) · **`ApprovalRejection.comment`**(반려 · **required**) | §5-5 · A-12 |
 | 승인 | `POST /app/approval-requests/{id}:approve` | §5-6·§5-7 · **J-8** |
-| 반려 | `POST …:reject` — **`comment` 없으면 400** | §5-5 · A-12 |
+| 반려 | `POST …:reject` — **스키마가 `comment`를 required 로 강제**한다 | §5-5 · A-12 |
 | 결재 취소·수정 | **없음 — API 불필요.** `approval_step`이 기록 전용이라 오퍼레이션을 두지 않는다 | §5-6 · **J-6** |
 | 대리 지정 | **없음 — 범위 밖**(2026-08-07 사용자 결정) | §5-8 |
 
@@ -94,7 +94,9 @@
 2. **순차 결재를 서버가 강제한다** — 앞 단계가 전부 승인이 아니면 **400 `NOT_YOUR_TURN`**. 물리 모델에 이 제약이 없으므로 **화면 검증만으로는 API 직접 호출에 뚫린다**
 3. **대상은 표시명·화면 ID·열 수 있는지까지 서버가 내려 준다**(A-10 보강) — 프런트가 「유형 → 화면」 표를 갖지 않는다
 
-⚠ **`isMyTurn`·`currentStepNo`를 목록 행에 내린다** — 상단 대기 건수와 「내 결재 대기」 탭이 이 값으로 선다. 화면이 단계 배열을 받아 스스로 계산하면 **서버 규칙과 갈린다**.
+⚠ **`isMyTurn`·`currentStepNo`를 목록 행에 내린다** — 상단 대기 건수와 「내 결재 대기」 탭이 이 값으로 선다. 화면이 단계 배열을 받아 스스로 계산하면 **서버 규칙과 갈린다**(§5-4의 순차 판정이 서버에 있다). **셋 다 `required`다.**
+
+> ⭐ **화면이 의존한다고 적은 파생 필드는 `required` 여야 한다** — `inProgressCount`·`isMyTurn`·`currentStepNo`·`isCurrent`·`approverIsActive`. 선택 필드로 두면 **문서는 「내려 준다」고 하는데 타입은 「없을 수도 있다」**가 되어 프런트가 방어 코드를 쓰게 된다.
 
 ### 3-3. 커버리지 집계
 
@@ -145,12 +147,12 @@
 | :-: | --- |
 | **A-4** 감사 컬럼 비노출 | `version_no`를 본문에 두지 않고 **ETag 헤더**로만 |
 | **A-10 보강** | `ApprovalTarget`이 표시명·화면 ID·열 수 있는지를 내린다 |
-| **A-12 보강** | `:reject`가 `comment`를 **required**로 받는다 |
-| **B-1** 낙관적 잠금 | If-Match 를 받는 **6 오퍼레이션 전부 409 선언** |
+| **A-12 보강** | `:reject`가 **별도 스키마**(`ApprovalRejection`)로 `comment` 를 **required·minLength 1** 로 받는다 — 승인과 스키마를 나눈 이유다 |
+| **B-1** 낙관적 잠금 | If-Match 를 받는 **6 오퍼레이션 전부 409 선언**(등록 POST 는 대상 행이 없어 받지 않는다 — 쓰기 7 중 6) |
 | **B-4** 물리 삭제 금지 | DELETE 가 **0건** · `:deactivate`/`:activate` 짝 |
 | **B-11 보강** | 단계는 전체 치환 · 충돌 판정은 **마스터 토큰** |
 | **B-12** | 결재선 선택 규칙을 description 이 정본으로 갖는다 |
-| **C-1** 멱등 | 쓰기 **6 오퍼레이션 전부** `Idempotency-Key` 필수 |
+| **C-1** 멱등 | 쓰기 **7 오퍼레이션 전부** `Idempotency-Key` 필수 |
 | **G-1** 오류 구분 | `ErrorItem.code`에 `STATE_LOCKED`·`NOT_YOUR_TURN` — **재로드해도 안 풀린다**(409와 구분) |
 | **G-3** 비활성 사유 | `openable`·`approverIsActive`로 화면이 사유를 만든다 |
 

@@ -762,7 +762,7 @@
           "app"
         ],
         "summary": "승인 요청 상세 (결재선 진행 포함)",
-        "description": "⚠ 대상 문서의 내용은 내리지 않는다 — 결재함은 대상 상세를 그리지 않고 원 화면을 연다(공유계약 J-10). 근거: W-CO-09 §5-2",
+        "description": "⚠ 대상 문서의 내용은 내리지 않는다 — 결재함은 대상 상세를 그리지 않고 원 화면을 연다(공유계약 J-10). 근거: W-CO-09 §5-2 승인자도 상신자도 아니면 403 이다 — 목록에 오지 않는 요청은 상세도 열리지 않는다.",
         "responses": {
           "200": {
             "description": "상세",
@@ -780,6 +780,16 @@
                   "type": "string"
                 },
                 "x-internal-note": "본문 비노출은 공유계약 A-4, 전송 자체는 B-1 구현에 필요하다."
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -912,7 +922,7 @@
           "app"
         ],
         "summary": "반려",
-        "description": "의견이 필수다 — comment 를 비우면 400 이다. 결재는 되돌릴 수 없고 번복은 새 요청이므로, 반려 사유가 없으면 상신자가 같은 요청을 그대로 다시 올린다(공유계약 A-12 · J-6).\n\n순차 규칙은 승인과 같다 — 내 차례가 아니면 400(code=NOT_YOUR_TURN)이다. 근거: W-CO-09 §5-5",
+        "description": "의견이 필수다 — ApprovalRejection.comment 를 비우면 400 이다. 결재는 되돌릴 수 없고 번복은 새 요청이므로, 반려 사유가 없으면 상신자가 같은 요청을 그대로 다시 올린다(공유계약 A-12 · J-6).\n\n순차 규칙은 승인과 같다 — 내 차례가 아니면 400(code=NOT_YOUR_TURN)이다. 근거: W-CO-09 §5-5",
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
@@ -926,7 +936,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ApprovalDecision"
+                "$ref": "#/components/schemas/ApprovalRejection"
               }
             }
           }
@@ -1126,7 +1136,8 @@
           "approvalRouteId",
           "approvalTypeCode",
           "isActive",
-          "stepCount"
+          "stepCount",
+          "inProgressCount"
         ],
         "properties": {
           "approvalRouteId": {
@@ -1233,7 +1244,7 @@
       "ApprovalRouteUpdate": {
         "x-source-table": "app.approval_route",
         "type": "object",
-        "description": "결재선 수정. 승인 유형은 신규만 — 바꾸면 다른 결재선이 된다. isActive 는 사용 중지·재사용 액션으로만 바꾼다.",
+        "description": "결재선 수정. 승인 유형은 신규만 — 바꾸면 다른 결재선이 된다. isActive 는 사용 중지·재사용 액션으로만 바꾼다.\n\nPUT 이므로 보내지 않은 필드는 비워진다 — 사업부를 비우면 전 사업부 공통 결재선이 되고, 값 구간을 비우면 전 구간이 된다. 부분 수정 경로는 두지 않는다.",
         "required": [],
         "properties": {
           "businessUnitId": {
@@ -1273,7 +1284,8 @@
         "required": [
           "approvalRouteStepId",
           "stepNo",
-          "approverTypeCode"
+          "approverTypeCode",
+          "approverIsActive"
         ],
         "properties": {
           "approvalRouteStepId": {
@@ -1474,7 +1486,8 @@
           "stepNo",
           "approverId",
           "approverName",
-          "isMine"
+          "isMine",
+          "isCurrent"
         ],
         "properties": {
           "stepNo": {
@@ -1545,7 +1558,10 @@
           "requestedAt",
           "statusCode",
           "reason",
-          "target"
+          "target",
+          "currentStepNo",
+          "totalStepNo",
+          "isMyTurn"
         ],
         "properties": {
           "approvalRequestId": {
@@ -1637,12 +1653,28 @@
       "ApprovalDecision": {
         "type": "object",
         "required": [],
-        "description": "결재 의견. 승인은 선택, 반려는 필수다 — 반려 사유가 없으면 상신자가 같은 요청을 그대로 다시 올린다(공유계약 A-12).",
+        "description": "승인 의견. 선택 입력이다. 반려는 의견이 필수이므로 스키마가 다르다(ApprovalRejection).",
         "properties": {
           "comment": {
             "x-source-column": "decision_comment",
             "type": "string",
-            "description": "approval_step.decision_comment 에 들어간다. 반려에서 비우면 400 이다",
+            "description": "approval_step.decision_comment 에 들어간다",
+            "example": "수량 확인함"
+          }
+        }
+      },
+      "ApprovalRejection": {
+        "type": "object",
+        "description": "반려. 의견이 필수다 — 결재는 되돌릴 수 없고 번복은 새 요청이므로, 사유가 없으면 상신자가 같은 요청을 그대로 다시 올린다(공유계약 A-12 · J-6).",
+        "required": [
+          "comment"
+        ],
+        "properties": {
+          "comment": {
+            "x-source-column": "decision_comment",
+            "type": "string",
+            "minLength": 1,
+            "description": "approval_step.decision_comment 에 들어간다. 상신자가 무엇을 고쳐야 하는지 알 수 있게 쓴다",
             "example": "수량 근거가 부족합니다 — 실사 차이표를 첨부해 다시 올려 주세요"
           }
         }
