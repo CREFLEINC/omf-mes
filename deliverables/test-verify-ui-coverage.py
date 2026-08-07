@@ -129,7 +129,7 @@ class Domain01Test(unittest.TestCase):
 
 
 class DomainAppTest(unittest.TestCase):
-    # 공통 승인 2장. 도메인이 셋이 되면서 등록부가 갈리는지 잠근다.
+    # 공통 승인 2장. 도메인이 늘면서 등록부가 갈리는지 잠근다.
     def test_두_화면을_뽑는다(self):
         rows = cov.extract_all(HERE, cov.SCREENS_APP)
         self.assertEqual(sorted({r["screen"] for r in rows}), ["W-06-15", "W-CO-09"])
@@ -140,8 +140,34 @@ class DomainAppTest(unittest.TestCase):
     def test_액션_표_없는_화면이_없다(self):
         self.assertEqual(cov.screens_without_action_table(HERE, cov.SCREENS_APP), [])
 
-    def test_도메인_등록부에_셋이_있다(self):
-        self.assertEqual(sorted(cov.DOMAINS), ["01", "app", "mdm"])
+    def test_도메인_등록부에_넷이_있다(self):
+        self.assertEqual(sorted(cov.DOMAINS), ["01", "app", "mdm", "print"])
+
+
+class DomainPrintTest(unittest.TestCase):
+    # 공통 출력물 5장. ⚠ 이 편은 화면을 소유하지 않는다 — 출력이 주 기능이고
+    # 도메인 요구서가 아직 없는 것만 등록한다. 범위가 다시 넓어지면 여기서 걸린다.
+    def test_다섯_화면이_등록돼_있다(self):
+        self.assertEqual(
+            sorted(s for _, s in cov.SCREENS_PRINT),
+            ["P-02-05", "P-02-07", "P-02-09", "P-04-02", "P-04-04"],
+        )
+
+    def test_이미_다른_도메인이_세는_화면은_없다(self):
+        # P-01-01·P-01-02 는 01 이 센다. 여기 들어오면 이중 계상이다.
+        overlap = {s for _, s in cov.SCREENS_PRINT} & {s for _, s in cov.SCREENS_01}
+        self.assertEqual(overlap, set())
+
+    def test_액션이_17건이다(self):
+        # 액션 표가 있는 두 장(P-04-02 8 · P-04-04 9)만 센다.
+        self.assertEqual(len(cov.extract_all(HERE, cov.SCREENS_PRINT)), 17)
+
+    def test_액션_표_없는_화면_셋을_알린다(self):
+        # 확대 3차 서식이라 표가 없다. 조용히 0건으로 넘어가면 안 된다.
+        self.assertEqual(
+            cov.screens_without_action_table(HERE, cov.SCREENS_PRINT),
+            ["P-02-05", "P-02-07", "P-02-09"],
+        )
 
 
 if __name__ == "__main__":
