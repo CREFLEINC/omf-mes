@@ -2092,7 +2092,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <p>작성일: 2026-08-03 · 작성 주체: CREFLE OMF 팀 (UI/UX)</p>
 <p><strong>성격</strong>: 「<strong>어떤 API를 어디서 왜 쓰는가</strong>」를 설명하는 문서다. 무엇(필드·타입·제약)은 적지 않는다 — 그것은 <code>openapi/mdm-기준정보.json</code>에만 둔다.</p>
 <p><strong>정본 관계</strong>: 필드 정의의 정본은 <strong>물리 모델</strong>(<code>docs/research/2026-07-23-데이터모델링/mes_postgresql_physical_model.sql</code>)이다. OpenAPI는 그것을 옮긴 것이고, 이 문서는 화면 → API 매핑과 근거만 담는다. 셋이 어긋나면 <strong>물리 모델이 우선</strong>한다.</p>
-<p><strong>상호 참조</strong>: <code>01-요구사항명세서.md</code>(REQ 원문) · <code>02-SW설계사양서.md</code>(§3.2 인증 계층·§3.3 멱등·실패 3분류) · <code>04-통합-IA.md</code>(화면 108건) · <code>05-사용자-프로세스-태스크플로우.md</code>(화면이 딛는 프로세스) · <code>uiux/화면상세스펙-공통/공유계약.md</code> v0.4.1(횡단 규약).</p>
+<p><strong>상호 참조</strong>: <code>01-요구사항명세서.md</code>(REQ 원문) · <code>02-SW설계사양서.md</code>(§3.2 인증 계층·§3.3 멱등·실패 3분류) · <code>04-통합-IA.md</code>(화면 112건) · <code>05-사용자-프로세스-태스크플로우.md</code>(화면이 딛는 프로세스) · <code>uiux/화면상세스펙-공통/공유계약.md</code> v0.4.1(횡단 규약).</p>
 <p>⚠ <strong>E-번호 이중 체계 주의</strong>: 본 문서의 <strong>회신 E-3·E-9</strong>는 고객 회신 대기 코드이고, 공유계약 <strong>§E-1~E-3</strong>은 폼팩터 규격 조항이다. 표기가 같고 의미가 다르다(<code>04-통합-IA.md</code> 머리말과 같은 주의).</p>
 <div class="kpi"><div><span class="big">71</span><span class="lbl">화면→API 매핑 액션<br>대응 54 · 없음+이유 17</span></div><div><span class="big">50</span><span class="lbl">적합성 판정 셀<br>✅ 36 · ⚠ 14 · ❌ 0</span></div><div><span class="big">16</span><span class="lbl">미착지 건<br>전건 발행 · 미발행 0</span></div></div>
 
@@ -2111,14 +2111,14 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <p>WBS §4.2 <strong>P0.4</strong>가 「API 계약 v0 + 목업 서버」로 이미 계획돼 있고, 전략은 <strong>계약 우선(Contract-first)</strong>, 형식은 <strong>OpenAPI</strong>다. 다만 백엔드 공식 진행이 <strong>데이터 모델링까지</strong>라 P0.4가 아직 서 있지 않다.</p>
 <div class="callout"><p><strong>→ 이 산출물은 P0.4의 초안 입력이다.</strong> 계약으로 확정하고 소유하는 것은 <strong>통합 Agent</strong> 몫이며(변경 승인권도 그쪽 단일화), 우리는 <strong>화면이 무엇을 요구하는지</strong>를 근거와 함께 정리해 넘긴다. 이 문서에서 직접 계약을 확정하지 않는다.</p></div>
 <h3>1-3. 범위</h3>
-<p><strong>화면이 돌아가는 최소 완결</strong>이다 — 대상 10화면이 저장하는 마스터의 CRUD + 그 화면들이 <strong>선택 목록으로 필요로 하는 조회 전용</strong>.</p>
+<p><strong>화면이 돌아가는 최소 완결</strong>이다 — 대상 11화면이 저장하는 마스터의 CRUD + 그 화면들이 <strong>선택 목록으로 필요로 하는 조회 전용</strong>.</p>
 <table>
 <thead><tr><th>구분</th><th>대상</th></tr></thead>
 <tbody>
-<tr><th><strong>대상 화면 10</strong></th><td><code>W-CO-02</code> · <code>W-06-01</code>~<code>06</code> · <code>W-06-07</code> · <code>W-06-10</code> · <code>W-06-11</code></td></tr>
+<tr><th><strong>대상 화면 11</strong></th><td><code>W-CO-02</code> · <code>W-06-01</code>~<code>06</code> · <code>W-06-07</code> · <code>W-06-10</code> · <code>W-06-11</code> · <strong><code>W-06-14</code></strong>(2026-08-07 추가)</td></tr>
 <tr><th><strong>API를 정의할 수 없는 화면 3</strong></th><td><code>W-06-08</code> · <code>W-06-09</code> · <code>W-06-12</code> — §6</td></tr>
 <tr><th><strong>통합 폐지 1</strong></th><td><code>W-06-13</code>(검사정책 설정) — 확대 1차에서 <code>W-06-02</code>에 흡수</td></tr>
-<tr><th><strong>조회 전용 8종</strong></th><td><code>uom</code> · <code>partner</code> · <code>legal_entity</code> · <code>business_unit</code> · <code>plant</code> · <code>production_line</code> · <code>process</code> · <code>equipment</code> — <strong><code>equipment</code>는 예외</strong>(<code>W-05-12</code> 설비·설비그룹 마스터가 인벤토리에 있다, 도메인 05). 나머지 7종은 관리 화면이 인벤토리 108건에 <strong>하나도 없다</strong>(실측)</td></tr>
+<tr><th><strong>조회 전용 8종</strong></th><td><code>uom</code> · <code>partner</code> · <code>legal_entity</code> · <code>business_unit</code> · <code>plant</code> · <code>production_line</code> · <code>process</code> · <code>equipment</code> — <strong><code>equipment</code>는 예외</strong>(<code>W-05-12</code> 설비·설비그룹 마스터가 인벤토리에 있다, 도메인 05). 나머지 7종은 관리 화면이 인벤토리 112건에 <strong>하나도 없다</strong>(실측)</td></tr>
 </tbody></table>
 <hr>
 <h2>§2. 읽는 법</h2>
@@ -2159,7 +2159,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <figure><pre><code class="lang-bash">cd deliverables
 
 # ① UI 요구 목록 재생성 — 화면 스펙 §5-1에서 액션을 전건 추출한다
-python3 verify-ui-coverage.py          # → 화면 10 · 액션 71
+python3 verify-ui-coverage.py          # → 화면 11 · 액션 80
 python3 test-verify-ui-coverage.py     # 회귀 테스트 8건
 
 # ② OpenAPI 문법·규모
@@ -2168,7 +2168,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 <p><strong>대조 규칙</strong>: <code>openapi/ui-요구목록.md</code>의 액션 <strong>71건</strong>이 §3 매핑표에 하나도 빠짐없이 있어야 한다. 엔드포인트가 없는 액션도 <strong>「없음 + 이유」로 한 행을 차지</strong>하며, 그것을 다룬 것으로 친다. <strong>빈칸은 누락이다.</strong></p>
 <hr>
 <h2>§3. 화면 → API 매핑</h2>
-<p><code>openapi/ui-요구목록.md</code>의 <strong>화면 10 · 액션 71</strong>을 전건 소화한다. 액션 이름과 활성 조건은 화면 스펙 §5-1 원문 그대로다.</p>
+<p><code>openapi/ui-요구목록.md</code>의 <strong>화면 11 · 액션 80</strong>을 전건 소화한다. 액션 이름과 활성 조건은 화면 스펙 §5-1 원문 그대로다.</p>
 <h3>3-0. 「없음」의 다섯 가지 — 이유가 다르면 대응이 다르다</h3>
 <p>「없음」을 한 덩어리로 두면 읽는 사람이 전부 결손으로 읽는다. <strong>정상인 없음과 막힌 없음을 가른다.</strong></p>
 <table>
@@ -2313,15 +2313,38 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 <tr><th>변경 이력</th><td><code>GET /audit/events</code></td><td>§5-1 · ✅REQ-PR-0021</td></tr>
 </tbody></table>
 <ul><li>외부창고 토글이 켜지면 거래처가 <strong>조건부 필수</strong>가 된다(<code>ck_external_warehouse_partner</code>) — 위반은 400, 오류는 <strong>거래처 필드에 인라인</strong>(A-2).</li><li><code>location</code>에는 <strong>자기참조 CHECK가 없다</strong>(§5 미착지 11) — 계층 순환을 서버가 막는다.</li></ul>
-<h3>3-11. 커버리지 집계</h3>
+<h3>3-11. <code>W-06-14</code> 적치 규칙 마스터 <em>(관리웹 · 2026-08-07 추가)</em></h3>
+<p>⚠ <strong>계약이 화면보다 먼저 쓰였다</strong> — 이 표는 기준정보 트랙이 만든 3경로를 확대 7차 화면이 <strong>대조한 결과</strong>다. <strong>어긋남 0건</strong>이었고, 대신 <strong>결손 2건이 드러났다</strong>(아래).</p>
+<table>
+<thead><tr><th>화면 액션(§5-7)</th><th>엔드포인트</th><th>근거</th></tr></thead>
+<tbody>
+<tr><th>조회·필터</th><td><code>GET /logistics/putaway-rules</code> — 창고·품목·사용 여부</td><td>§3</td></tr>
+<tr><th>페이지 이동</th><td>같은 GET 의 <code>page</code>·<code>size</code></td><td>§5-7 · G-12</td></tr>
+<tr><th>규칙 추가</th><td><code>POST /logistics/putaway-rules</code> — ⚠ <strong>같은 품목·위치·우선순위 활성본이 있으면 400</strong></td><td>§5-2 · B-12</td></tr>
+<tr><th>규칙 수정</th><td><code>PUT /logistics/putaway-rules/{id}</code></td><td>§5-7 · B-1</td></tr>
+<tr><th>사용 / 사용 안 함</th><td><code>POST …:deactivate</code> · <strong><code>POST …:activate</code>(2026-08-07 신설)</strong></td><td>§5-7 · B-4</td></tr>
+<tr><th>규칙 삭제</th><td><strong>없음 — API 불필요.</strong> 물리 삭제를 두지 않는다(B-4)</td><td>§5-7</td></tr>
+<tr><th>위치 선택</th><td><code>GET /mdm/locations?warehouseId=</code> — 다른 창고의 위치는 오지 않는다</td><td>§5-3</td></tr>
+<tr><th>규칙 없는 품목 보기</th><td><strong><code>GET /logistics/putaway-rules/uncovered-items?warehouseId=</code>(2026-08-07 신설)</strong></td><td>§5-1 · <strong>G-12</strong></td></tr>
+<tr><th>변경 이력</th><td><code>GET /audit/events</code> — ⚠ 키 규약 부재(#68)로 실제 조회는 막혀 있다</td><td>§5-7 · §I-5</td></tr>
+</tbody></table>
+<p><strong>이 화면이 드러낸 계약 결손 2건</strong></p>
+<table>
+<thead><tr><th class="nw">#</th><th>무엇</th><th>왜 없었나</th></tr></thead>
+<tbody>
+<tr><th class="nw">1</th><td><strong>재활성 경로</strong>(<code>:activate</code>)</td><td>기준정보 트랙의 마스터 화면들은 <strong>「사용 중지」만 요구</strong>했다(<code>W-06-07</code> 액션 실측). 이 화면은 목록에 「사용 안 함」 행을 보이고 <strong>다시 켜는 것이 정상 운용</strong>이다</td></tr>
+<tr><th class="nw">2</th><td><strong>규칙 없는 품목 조회</strong></td><td>규칙이 없으면 현장이 <strong>위치 검증 없이 통과</strong>하는데(<code>M-01-05</code> §5-2-1 둘째 갈래), 등록된 것만 보이면 <strong>비어 있다는 사실이 어디에도 드러나지 않는다</strong>(공유계약 <strong>G-12</strong>)</td></tr>
+</tbody></table>
+<div class="callout"><p>⭐ <strong>「계약에 없다」고 적기 전에 다른 계약 파일을 본다.</strong> 화면 초안은 결손을 <strong>둘이 아니라 셋</strong>으로 적었다 — 「현재 적재」를 포함했는데 실측하니 <strong>01 계약이 이미 갖고 있었다</strong>(<code>GET /inventory/balances?groupBy=LOCATION</code>). <strong>이 화면은 두 계약 파일을 부른다</strong> — 마스터는 여기, 재고는 <code>logistics-01자재창고.json</code>이다.</p></div>
+<h3>3-12. 커버리지 집계</h3>
 <table>
 <thead><tr><th>구분</th><th class="nw">건수</th></tr></thead>
 <tbody>
-<tr><th><strong>액션 총계</strong></th><td class="num nw"><strong>71</strong></td></tr>
-<tr><th>엔드포인트가 대응하는 액션</th><td class="num nw"><strong>54</strong></td></tr>
-<tr><th>「없음 + 이유」로 명시한 액션</th><td class="num nw"><strong>17</strong></td></tr>
+<tr><th><strong>액션 총계</strong></th><td class="num nw"><strong>80</strong></td></tr>
+<tr><th>엔드포인트가 대응하는 액션</th><td class="num nw"><strong>62</strong></td></tr>
+<tr><th>「없음 + 이유」로 명시한 액션</th><td class="num nw"><strong>18</strong></td></tr>
 </tbody></table>
-<p><strong>「없음」 17건의 내역</strong></p>
+<p><strong>「없음」 18건의 내역</strong></p>
 <table>
 <thead><tr><th class="nw">분류</th><th class="nw">건수</th><th>해당</th></tr></thead>
 <tbody>
@@ -2329,7 +2352,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 <tr><th class="nw"><strong>미착지</strong></th><td class="num nw">2</td><td>매핑 토글(<code>W-06-03</code> #64) · 통제 속성 편집(<code>W-06-04</code> #64)</td></tr>
 <tr><th class="nw"><strong>선행 미결</strong></th><td class="num nw">3</td><td>엑셀 업로드(<code>W-06-02</code> §8-6) · 즉시 시도(<code>W-06-10</code> §8-2) · 중단·폐기(<code>W-06-10</code> §8-5)</td></tr>
 <tr><th class="nw"><strong>소관 이동</strong></th><td class="num nw">4</td><td>수신 동기화 상태 보기(<code>W-06-06</code>) · 마스터 화면으로 이동 · 재동기화 안내 · 신규 Rev 발행(<code>W-06-11</code> 3건)</td></tr>
-<tr><th class="nw"><strong>API 불필요</strong></th><td class="num nw">5</td><td>취소(<code>W-06-07</code>) · Rev 비교(<code>W-06-01</code>) · 행 펼침 · 내보내기(<code>W-06-11</code> 2건) · 내보내기(<code>W-06-10</code>)</td></tr>
+<tr><th class="nw"><strong>API 불필요</strong></th><td class="num nw"><strong>6</strong></td><td>취소(<code>W-06-07</code>) · Rev 비교(<code>W-06-01</code>) · 행 펼침 · 내보내기(<code>W-06-11</code> 2건) · 내보내기(<code>W-06-10</code>) · <strong>규칙 삭제(<code>W-06-14</code>)</strong></td></tr>
 </tbody></table>
 <div class="callout"><p><strong>막힌 것은 5건뿐이다</strong> — 미착지 2 + 선행 미결 3. 나머지 12건은 <strong>엔드포인트가 없는 것이 정상</strong>이다.</p></div>
 <hr>
@@ -2518,6 +2541,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 <thead><tr><th class="nw">버전</th><th>날짜</th><th>변경 요지</th></tr></thead>
 <tbody>
 <tr><th class="nw">v0.2</th><td>2026-08-03</td><td><strong>사용자 확정 4건 반영 + 공유계약 파생 정정 2건</strong>(기준정보 API 스펙 트랙 Task 10). 공유계약 <strong>A-5</strong> 「해당 4곳」에서 <code>code_value.display_order</code> 제외(유일 제약 없음 — <code>ds-gap.md</code> G-7과 혼동) + 조항 2건 신설(전체 치환=행 교체 아님 · 순서 표시는 목록 내 위치) · <code>W-06-01</code>·<code>W-06-02</code> §3 <code>Seq</code> 열 표기 정정. <strong>A-4</strong>에 「낙관적 잠금 토큰은 헤더로 전송하되 화면에 표시하지 않는다」 단서 추가. <strong>OpenAPI에 <code>GET /planning/boms/{bomId}/components/{bomComponentId}</code> 신설</strong>(경로 73 유지 · 스키마 101→<strong>102</strong> · 오퍼레이션 108→<strong>109</strong> · <code>ETag</code> 26→<strong>28</strong>곳) — 다른 13개 리소스와 같은 패턴(<code>BomComponentDetailResponse{bomComponent, editability}</code>)으로 <code>bom_component</code> 행 단위 낙관적 잠금 구멍을 닫음(§5 미착지 16 해소). 적합성 판정 <code>W-06-05</code> ②를 ⚠에서 ✅로 되돌려 <strong>✅ 36 · ⚠ 14</strong>로 복귀(v0.1의 35/15는 이 잔여로 인한 일시적 하향이었다) — §4-0·§4-2 제목 정정, 관련 각주(¹¹) 삭제. §5 미착지 11·13을 <strong>#64에 편입</strong>, 16을 <strong>해소 기록</strong>으로 전환 — <strong>미발행 0건</strong>(v0.1의 3건에서 하향). §8-2 「사람의 결정」 4건을 「확정 기록」으로 전환(전건 2026-08-03 사용자 확정).</td></tr>
+<tr><th class="nw"><strong>v0.2</strong></th><td><strong>2026-08-07</strong></td><td><strong><code>W-06-14</code> 적치 규칙 마스터 편입 — 화면 10 → 11 · 액션 71 → 80.</strong> ⚠ <strong>계약이 화면보다 먼저 쓰인 첫 사례</strong>이고 대조 결과 <strong>어긋남 0건</strong>이었다. 대신 <strong>결손 2건</strong>이 드러나 계약을 보강했다 — <strong><code>POST …:activate</code></strong>(기준정보 마스터 화면들은 「사용 중지」만 요구했다) · <strong><code>GET …/uncovered-items</code></strong>(규칙이 비면 현장이 위치 검증 없이 통과하는데 등록된 것만 보이면 그 사실이 드러나지 않는다 — 공유계약 <strong>G-12</strong>). ⭐ <strong>「계약에 없다」고 적기 전에 다른 계약 파일을 본다</strong> — 화면 초안이 결손으로 적은 「현재 적재」는 <strong>01 계약에 이미 있었다</strong>. 경로 76 → 78 · 스키마 106 → 107.</td></tr>
 <tr><th class="nw">v0.1</th><td>2026-08-03</td><td>초안 — 화면 10 · 액션 <strong>71건 전건 대조</strong>(엔드포인트 대응 54 · 「없음 + 이유」 17). 적합성 <strong>10화면 × 5항목 = 50셀</strong> 판정(✅ 35 · ⚠ 15 · ❌ 0) 및 <strong>❌ 6건 발견 즉시 수정</strong>(OpenAPI 스키마 100→101). 공통 규약 대조표는 <strong>v0.4 기준 실제 인용 20개 조항</strong>으로 작성(「8건」은 v0.3 시점 수). 미착지 <strong>16건</strong>(#64·#65·#66·#67·#68·#69 · 미발행 3). <strong>필드표를 한 줄도 쓰지 않았다.</strong></td></tr>
 </tbody></table>
 

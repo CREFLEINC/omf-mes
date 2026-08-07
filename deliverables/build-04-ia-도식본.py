@@ -41,15 +41,21 @@ KIT  = sys.argv[1] if len(sys.argv) > 1 else os.path.join(
 SNAPSHOT = '2026-07-30'          # 미결·이월 스냅샷 기준일 (§7·§8 은 며칠 단위로 바뀐다)
 
 # ════════════════════════════════════════════════════════════════════════════
-# 1. 정본 파싱 — 화면 108건 (v1.1 — W-06-13 통합 폐지) (v1 과 동일 · md 가 유일한 데이터 원천)
+# 1. 정본 파싱 — 화면 112건 (v1.3 — 취소·정정·결재 3건 신설) (md 가 유일한 데이터 원천)
 # ════════════════════════════════════════════════════════════════════════════
 
-ROW = re.compile(r'^\|\s*`([WPM]-(?:CO|\d{2})-\d{2})`\s*\|(.+)$')
+# ⛔ 2026-08-07 — 굵게 표기(`| **`W-06-14`** |`)를 받아들이지 못해 신설 4행을 조용히
+#    빠뜨렸다. 그런데 assert 가 108 이라 **버그와 같은 가정을 갖고 있어 통과**했다.
+#    강조 표기는 「신설」을 알리는 정상 관행이므로 정규식이 견뎌야 한다.
+ROW = re.compile(r'^\|\s*\*{0,2}`([WPM]-(?:CO|\d{2})-\d{2})`\*{0,2}\s*\|(.+)$')
+# 느슨한 계수용 — 표기가 어떻든 「첫 칸이 화면 ID 인 6셀 이상 행」을 센다.
+ROW_LOOSE = re.compile(r'^\|[^|]*?([WPM]-(?:CO|\d{2})-\d{2})[^|]*\|(.+)$')
 
 def parse_rows(md):
     """§3-2·§4-2·§5-2 인벤토리 표만 읽는다.
     ⚠ 셀 수 6개 이상 조건이 필수 — §6-2 삭제 표·§7 미결 표가 같은 백틱 ID 패턴을
-    3셀로 쓰기 때문에, 조건을 빼면 결번이 화면으로 섞여 들어온다."""
+    3셀로 쓰기 때문에, 조건을 빼면 결번이 화면으로 섞여 들어온다.
+    ⚠ 엄격 파싱과 느슨한 계수를 함께 세어 **표기 변형으로 조용히 빠지는 것**을 막는다."""
     seg = re.search(r'## §3\.(.*?)## §6\.', md, re.S)
     rows, seen = [], set()
     for ln in seg.group(1).split('\n'):
@@ -69,6 +75,16 @@ def parse_rows(md):
             'prog': {'W': 'web', 'P': 'pop', 'M': 'mob'}[sid[0]],
             'dom': sid.split('-')[1],
         })
+
+    # ⛔ 표기 변형으로 조용히 빠진 행이 있는가 — 이 검사가 없어서 4행이 사라졌다.
+    loose = set()
+    for ln in seg.group(1).split('\n'):
+        m = ROW_LOOSE.match(ln)
+        if m and len([c.strip() for c in m.group(2).split('|')]) >= 6:
+            loose.add(m.group(1))
+    dropped = sorted(loose - seen)
+    if dropped:
+        raise SystemExit('표 행을 읽지 못했다(표기 변형 의심): ' + ' '.join(dropped))
     return rows
 
 MD   = io.open(SRC, encoding='utf-8').read()
@@ -120,6 +136,9 @@ BANDS = [
   'WF01 S8~S11 · WF04 S9·S10 · 01-S-G/H/I · 04-S-C',
   {'web': ['W-01-04', 'W-01-12', 'W-01-05', 'W-01-06', 'W-04-06', 'W-04-11', 'W-04-07', 'W-04-10'],
    'pop': [], 'mob': ['M-01-10', 'M-01-11']}),
+ ('물류 문서 진행·취소', '진행현황 조회 + 취소·역처리 — 되돌리는 전이가 여기 하나뿐이다',
+  'FR-IM-076~080·086 (P0) · v1.7 신설',
+  {'web': ['W-01-13'], 'pop': [], 'mob': []}),
  ('설비 · 툴 (05)', '점검 · 보전 · 비가동 · 계측 — 생산 실행에 게이트로 걸린다',
   'WF05 S1~S9 · 05-S-A~E',
   {'web': ['W-05-01', 'W-05-02', 'W-05-03', 'W-05-04', 'W-05-05', 'W-05-06', 'W-05-07', 'W-05-08',
@@ -128,10 +147,10 @@ BANDS = [
  ('기준정보 · 연계 (06)', '마스터 · Rev · I/F — 전 단계의 입력을 공급한다',
   'WF06 S1~S9 · 06-S-A~D',
   {'web': ['W-06-01', 'W-06-02', 'W-06-03', 'W-06-04', 'W-06-05', 'W-06-06', 'W-06-07', 'W-06-08',
-           'W-06-09', 'W-06-10', 'W-06-11', 'W-06-12'], 'pop': [], 'mob': []}),
+           'W-06-09', 'W-06-10', 'W-06-11', 'W-06-12', 'W-06-14', 'W-06-15'], 'pop': [], 'mob': []}),
  ('공통 (CO)', '계정 · 권한 · 알림 · 대시보드 · 설정 — 셸에 상시',
   '§3-1 시스템/공통 · §5-1 진입',
-  {'web': ['W-CO-01', 'W-CO-02', 'W-CO-03', 'W-CO-04', 'W-CO-05', 'W-CO-06', 'W-CO-08'],
+  {'web': ['W-CO-01', 'W-CO-02', 'W-CO-03', 'W-CO-04', 'W-CO-05', 'W-CO-06', 'W-CO-08', 'W-CO-09'],
    'pop': [], 'mob': ['M-CO-01']}),
  ('조회 (도식 앵커 밖)', '전 도메인 — 비도식 근거로 도출된 조회 화면',
   '§9-2 비도식 근거 규칙 v0.2',
@@ -281,21 +300,23 @@ SHELL = [
 TREE = [
  ('기준정보', [('마스터', ['W-06-01', 'W-06-05', 'W-06-06', 'W-06-07', 'W-06-08', 'W-06-11']),
             ('품질 기준', ['W-06-02', 'W-06-03', 'W-06-04']),
-            ('연계(I/F)', ['W-06-09', 'W-06-12', 'W-06-10'])]),
+            ('연계(I/F)', ['W-06-09', 'W-06-12', 'W-06-10']),
+            ('적치·승인', ['W-06-14', 'W-06-15'])]),
  ('생산', [('계획·지시', ['W-02-01', 'W-02-02', 'W-02-03', 'W-02-04', 'W-02-07', 'W-02-06', 'W-02-10']),
          ('마감·모니터링', ['W-02-05', 'W-02-08'])]),
  ('품질', [('Lot Status', ['W-03-01', 'W-03-02', 'W-03-03', 'W-03-09']),
          ('검사·불량', ['W-03-05'])]),
  ('자재/창고', [('입하·검사', ['W-01-09', 'W-01-01', 'W-01-10', 'W-01-02', 'W-01-03', 'W-01-11']),
              ('재고·출고', ['W-01-07', 'W-01-04', 'W-01-12']),
-             ('반품·폐기', ['W-01-05', 'W-01-06'])]),
+             ('반품·폐기', ['W-01-05', 'W-01-06']),
+             ('진행현황·취소', ['W-01-13'])]),
  ('출하', [('출하 지시·확정', ['W-04-01', 'W-04-02', 'W-04-03', 'W-04-04', 'W-04-05']),
          ('반품·재고', ['W-04-06', 'W-04-11', 'W-04-07', 'W-04-08', 'W-04-10'])]),
  ('설비/툴', [('툴 관리', ['W-05-01', 'W-05-02', 'W-05-03', 'W-05-13']),
             ('설비 보전', ['W-05-04', 'W-05-05', 'W-05-06', 'W-05-12']),
             ('비가동·계측', ['W-05-08', 'W-05-09', 'W-05-07', 'W-05-10', 'W-05-11'])]),
  ('시스템/공통', [('계정·권한', ['W-CO-01', 'W-CO-02']), ('알림·공지', ['W-CO-03', 'W-CO-04']),
-              ('설정', ['W-CO-06', 'W-CO-08']), ('경영 대시보드', ['W-CO-05'])]),
+              ('설정', ['W-CO-06', 'W-CO-08']), ('결재함', ['W-CO-09']), ('경영 대시보드', ['W-CO-05'])]),
 ]
 POP_MODES = [
  ('0. 진입 (공통 셸)', ['P-CO-01', 'P-02-01'], '사번 입력 → 내 W/O 목록'),
@@ -337,14 +358,14 @@ tree_ids = [s for _, gs in TREE for _, ids in gs for s in ids]
 pop_ids  = [s for _, ids, _ in POP_MODES for s in ids]
 tile_ids = MOB_ENTRY + [s for _, _, ids in TILES for s in ids]
 
-if len(ROWS) != 108: die('화면 %d건 (108 아님)' % len(ROWS))
+if len(ROWS) != 112: die('화면 %d건 (112 아님)' % len(ROWS))
 c = Counter(r['prog'] for r in ROWS)
-if (c['web'], c['pop'], c['mob']) != (67, 22, 19): die('프로그램 계수 %s' % dict(c))
+if (c['web'], c['pop'], c['mob']) != (71, 22, 19): die('프로그램 계수 %s' % dict(c))
 d = Counter(r['dom'] for r in ROWS)
-if dict(d) != {'01': 24, '02': 24, '03': 5, '04': 17, '05': 17, '06': 12, 'CO': 9}: die('도메인 계수 %s' % dict(d))
+if dict(d) != {'01': 25, '02': 24, '03': 5, '04': 17, '05': 17, '06': 14, 'CO': 10}: die('도메인 계수 %s' % dict(d))
 f = Counter(r['conf'] for r in ROWS)
-if (f['확정'], f['추정'], f['미정']) != (82, 24, 2): die('신뢰도 계수 %s' % dict(f))
-if sum(Counter(r['type'] for r in ROWS).values()) != 108: die('유형 합계')
+if (f['확정'], f['추정'], f['미정']) != (82, 28, 2): die('신뢰도 계수 %s' % dict(f))
+if sum(Counter(r['type'] for r in ROWS).values()) != 112: die('유형 합계')
 
 for label, ids in (('흐름축', flow_ids), ('관리웹 트리', tree_ids), ('POP 모드', pop_ids), ('모바일 타일', tile_ids)):
     dup = [k for k, v in Counter(ids).items() if v > 1]
@@ -355,7 +376,7 @@ for label, ids in (('흐름축', flow_ids), ('관리웹 트리', tree_ids), ('PO
 if set(flow_ids) != set(BY): die('흐름축 차집합: %s' % sorted(set(BY) ^ set(flow_ids)))
 ia_ids = set(tree_ids) | set(pop_ids) | set(tile_ids)
 if ia_ids != set(BY): die('IA 3모델 차집합: %s' % sorted(set(BY) ^ ia_ids))
-if len(tree_ids) != 67 or len(pop_ids) != 22 or len(tile_ids) != 19:
+if len(tree_ids) != 71 or len(pop_ids) != 22 or len(tile_ids) != 19:
     die('IA 계수 트리%d POP%d 타일%d' % (len(tree_ids), len(pop_ids), len(tile_ids)))
 if VACATED & set(BY): die('결번이 현행 화면에 존재: %s' % sorted(VACATED & set(BY)))
 if len(VACATED) != 12: die('결번 %d건 (12 아님)' % len(VACATED))
@@ -571,7 +592,7 @@ TYPES = ['입력', '스캔', '판정·승인', '조회·상세', '목록', '설�
 tcount = defaultdict(list)
 for r in ROWS:
     tcount[(r['prog'], r['type'])].append(r['id'])
-if sum(len(v) for v in tcount.values()) != 108: die('유형 교차 합계')
+if sum(len(v) for v in tcount.values()) != 112: die('유형 교차 합계')
 unknown = {r['type'] for r in ROWS} - set(TYPES)
 if unknown: die('미등록 유형: %s' % unknown)
 
@@ -605,7 +626,8 @@ J_ROWS = [[r['id'], r['name'], r['type'], r['actor'], r['conf'], r['prog'], r['d
 J_GONE = [[g[0], g[1], g[2], g[3], ' · '.join('%s(%s)' % (t[0], t[1]) for t in g[4]), g[5]] for g in GONE]
 
 VERSION_FLOW = [('원 열거', 120, ''), ('중복 8 병합', 112, 'v1.0'), ('적대 검증', 112, 'v1.1'),
-                ('2계층 매핑 4단계', 113, 'v1.2'), ('비도식 근거 규칙', 109, 'v1.3'), ('상세 스펙 확대 1차', 108, 'v1.5')]
+                ('2계층 매핑 4단계', 113, 'v1.2'), ('비도식 근거 규칙', 109, 'v1.3'), ('상세 스펙 확대 1차', 108, 'v1.5'),
+                ('적치 규칙 신설', 109, 'v1.6'), ('취소·정정·결재 3건', 112, 'v1.7')]
 vflow = ''.join('<div class="vstep%s"><b>%d</b><span>%s</span><em>%s</em></div>' % (
     ' cur' if i == len(VERSION_FLOW) - 1 else '', n, esc(lab), esc(v)) for i, (lab, n, v) in enumerate(VERSION_FLOW))
 
@@ -837,7 +859,7 @@ function draw(){var tb=document.getElementById('tb'),h='',n=0;
   h+='<tr class="gr"><th style="text-decoration:line-through;opacity:.6">'+g[0]+'</th>'
    +'<td style="opacity:.6"><s>'+g[1]+'</s></td><td class="cf">'+mk+'</td>'
    +'<td colspan="2" class="bl">→ '+g[4]+'</td><td colspan="2" class="wy">'+g[5]+' · <strong>ID 재사용 금지</strong></td></tr>';}}
- tb.innerHTML=h;document.getElementById('cnt').textContent=n+' / 108건'+(showG?' + 결번 '+G.length:'');}
+ tb.innerHTML=h;document.getElementById('cnt').textContent=n+' / 112건'+(showG?' + 결번 '+G.length:'');}
 function tg(el,k,v){var on=el.getAttribute('aria-pressed')==='true';
  var g=document.querySelectorAll('[data-k="'+k+'"]');for(var i=0;i<g.length;i++)g[i].setAttribute('aria-pressed','false');
  if(k==='p')fp=on?'':v; if(k==='d')fd=on?'':v; if(k==='c')fc=on?'':v;
@@ -861,7 +883,7 @@ def sec(no, title, small, question, body, lead=''):
 
 f1_body = ('<h3>순방향 9단계 — 자재 입하부터 제품 출하까지 · 각 단계 안에 3개 레인</h3>'
            '<div class="card flow-wrap"><div class="flow">%s</div></div>'
-           '<h3>흐름 밖 — 역흐름 · 횡단 · 상시 (5밴드 · 50건)</h3>'
+           '<h3>흐름 밖 — 역흐름 · 횡단 · 상시 (6밴드 · 53건)</h3>'
            '<div class="card flow-wrap"><div class="flow">%s</div></div>'
            '<ul>%s</ul>'
            '<h4>선례 배치에서 옮긴 3건 (근거가 프로세스 정본에 있는 것만)</h4><ul>%s</ul>'
@@ -876,7 +898,7 @@ f2_body = ('<div class="card ladder-wrap"><div class="ladder">%s</div></div>'
 f3_body = ('%s<div class="wide"><table class="grid"><thead><tr><th>도메인</th>'
            '<th>확정 <small>(도식+배지 명확)</small></th><th>추정 <small>(성격 판단)</small></th>'
            '<th>미정 <small>(회신 대기)</small></th></tr></thead><tbody>%s</tbody>'
-           '<tfoot><tr><th class="tot">108</th>%s</tr></tfoot></table></div>'
+           '<tfoot><tr><th class="tot">112</th>%s</tr></tfoot></table></div>'
            % (bars, f3_rows, f3_foot))
 
 f4_body = ('<div class="wide"><table><thead><tr><th></th><th>관리웹</th>'
@@ -920,7 +942,7 @@ out.write('''<!doctype html><html lang="ko"><head><meta charset="utf-8">
 <header class="doc-cover">
   <p class="eyebrow">CREFLE · OMF-MES · 통합 편람</p>
   <h1>OMF-MES 통합 IA — 도식본</h1>
-  <p class="lede">화면 108건을 흐름·확정도·구조·의존으로 그린 9개 도식. 화면 정본은
+  <p class="lede">화면 112건을 흐름·확정도·구조·의존으로 그린 9개 도식. 화면 정본은
   <code>uiux/2026-07-25-화면목록-IA/screen-inventory-ia.md</code> v1.3, 본 도식본은
   <code>deliverables/04-통합-IA.md</code> 파생 문서다.</p>
   <table>
@@ -936,9 +958,9 @@ out.write('''<!doctype html><html lang="ko"><head><meta charset="utf-8">
 </header>
 
 <div class="kpi">
- <div><span class="big">108</span><span class="lbl">화면 전건<br>관리웹 67 · POP 22 · 모바일 19</span></div>
+ <div><span class="big">112</span><span class="lbl">화면 전건<br>관리웹 71 · POP 22 · 모바일 19</span></div>
  <div><span class="big">82</span><span class="lbl">확정 · 추정 24 · 미정 2</span></div>
- <div><span class="big">9</span><span class="lbl">업무 단계 (+ 흐름 밖 5밴드)</span></div>
+ <div><span class="big">9</span><span class="lbl">업무 단계 (+ 흐름 밖 6밴드)</span></div>
 </div>
 
 <div class="callout callout-warning">
@@ -969,10 +991,10 @@ out.write('''<!doctype html><html lang="ko"><head><meta charset="utf-8">
 
 <h2>근거 · 재생성 · crefle-doc 준수</h2>
 <ul>
-<li><strong>근거</strong> — 화면 108건·유형·행위자·신뢰도·근거 요지 = <code>deliverables/04-통합-IA.md</code> §3-2·§4-2·§5-2(생성기가 직접 파싱) ·
+<li><strong>근거</strong> — 화면 112건·유형·행위자·신뢰도·근거 요지 = <code>deliverables/04-통합-IA.md</code> §3-2·§4-2·§5-2(생성기가 직접 파싱) ·
 IA 3모델 = §3-1·§4-1·§5-1 · 배지·정책 = §2-2·§2-3 · 변동 = §6 · 미결 = §7 · 이월 요건 = §8 · 판정 규칙 = §9-1.</li>
 <li><strong>재생성</strong> — <code>python3 build-04-ia-도식본.py</code>. md 를 고치면 화면·유형·행위자·신뢰도는 자동 반영되고,
-흐름 배치·IA 트리·미결 상수는 생성기 상단에서 고친다. 빌드 assert(108·프로그램·도메인·신뢰도·유형·차집합·결번)가 어긋나면 생성이 중단된다.</li>
+흐름 배치·IA 트리·미결 상수는 생성기 상단에서 고친다. 빌드 assert(112·프로그램·도메인·신뢰도·유형·차집합·결번·<strong>표기 변형 누락</strong>)가 어긋나면 생성이 중단된다.</li>
 <li><strong>crefle-doc 준수</strong> — 표지(<code>.doc-cover</code>)·KPI(<code>.kpi</code>)·카드(<code>.card</code>/<code>.card-outline</code>/<code>.card-filled</code>)·
 콜아웃(<code>.callout</code>)·강조(<code>&lt;strong&gt;</code>)·코드(<code>&lt;code&gt;</code>)는 전부 crefle-doc 번들의 진짜 컴포넌트를 그대로 썼다.
 없는 컴포넌트 3종(칩·흐름 다이어그램·미터/세그먼트 바)은 <strong><code>--chart-2/5/8</code> 등 기존 토큰만으로</strong> 새로 설계했고,
@@ -990,7 +1012,7 @@ IA 3모델 = §3-1·§4-1·§5-1 · 배지·정책 = §2-2·§2-3 · 변동 = §
 </html>
 ''' % (
     licenses(KIT), css_with_fonts(KIT), LOCAL_CSS, SNAPSHOT,
-    sec('①', '업무 흐름 × 단말 3레인', '순방향 9단계 59건 + 흐름 밖 5밴드 49건 = 108',
+    sec('①', '업무 흐름 × 단말 3레인', '순방향 9단계 59건 + 흐름 밖 6밴드 53건 = 112',
         '이 공정이 스프린트에 잡혔다 — 어느 셸에 무슨 화면을 만들어야 하고, 이 단계는 화면 몇 개짜리 일인가?',
         f1_body,
         '가로가 아니라 세로로 읽는다 — 한 단계 안에서 웹·POP·모바일 레인 중 어디가 비어 있는지가 그 단계의 성격이다.'),
@@ -998,7 +1020,7 @@ IA 3모델 = §3-1·§4-1·§5-1 · 배지·정책 = §2-2·§2-3 · 변동 = §
         '웹에서 POP으로, POP에서 PDA로 일이 넘어가는 지점이 어디고 셸 간 인터페이스를 몇 개 정의해야 하나?',
         f2_body,
         '레인 점유가 바뀌는 열이 전환 지점이다. 「스택」은 같은 지점에 두 단말이 서는 경우로, 배지 정본이 확정한 3건이다.'),
-    sec('③', '확정도 × 도메인 — 108건이 전부 여기 있다', '커버리지 담당 1',
+    sec('③', '확정도 × 도메인 — 112건이 전부 여기 있다', '커버리지 담당 1',
         '내일 상세 스펙 착수해도 되는 화면이 어느 도메인에 몇 개고, 흔들리는 건 어디에 몰려 있나?',
         f3_body,
         '확정 82는 v1.2→v1.3 정리에서 한 건도 건드리지 않았다 — 줄어든 4건은 전부 추정·미정 쪽이었다.'),
@@ -1026,7 +1048,7 @@ IA 3모델 = §3-1·§4-1·§5-1 · 배지·정책 = §2-2·§2-3 · 변동 = §
         '<h3>권한 정본 · 게이트 화면</h3><div class="card">%s<div>%s</div></div>'
         % (f8_cards, '<p>%s <span class="none">— role·권한 매트릭스의 정본. 아래 화면들이 이걸 참조한다</span></p>' % chip('W-CO-02', False), f8_gates),
         'POP은 로그인이 아니다 — 사번만 입력해 실적을 귀속시킨다(REQ-PR-0023). 단말 인증은 토큰 + 사번 3층 분리(POP인증 §6-①②③).'),
-    sec('⑨', '전건 목록 — 108건 필터 · 결번 12건', '변동 궤적 120 → 108',
+    sec('⑨', '전건 목록 — 112건 필터 · 결번 12건', '변동 궤적 120 → 112',
         '지금 잡은 티켓이 W-02-08인데 단말·유형·신뢰도·차단 요인·근거가 뭔가? 옛 문서의 W-02-09는 어디로 갔나?',
         '<div class="vsteps">%s</div>'
         '<div class="ctl"><input id="q" placeholder="ID · 화면명 · 행위자 · 근거 검색">'
