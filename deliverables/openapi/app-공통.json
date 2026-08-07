@@ -1,10 +1,10 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "omf-mes 공통 도메인 API — 승인 워크플로우 (초안)",
-    "version": "0.1.0",
-    "description": "전 도메인이 함께 쓰는 승인 워크플로우 계약. 정의(결재선)와 실행(요청·결재)이 나뉘어 있고 화면도 그렇게 갈린다 — 정의는 W-06-15, 실행은 W-CO-09 다.\n\n요청 생성은 이 파일이 갖지 않는다. 각 도메인 계약의 :request-approval 이 만든다(logistics-01자재창고.json 에 세 곳). 이 파일은 그 뒤의 조회와 결재를 덮는다.\n\n1차 범위에서 정한 것 셋 — ① 결재선 승인자는 USER 만 쓴다(상신 시 사람을 고를 입력이 모델에 없다) ② 값 구간(min/max)은 쓰지 않는다(비교할 값이 없고 금액 컬럼이 0건이다) ③ 대리 결재·위임을 두지 않는다(승인자가 부재하면 결재가 멈추는 것을 감수한다).\n\n승인은 자물쇠를 풀 뿐 실행하지 않는다 — 전기·출고는 대상 화면이 별도로 한다.",
-    "x-internal-note": "근거·맥락은 deliverables/06-API-요구서-app공통승인.md 를 본다. 도출은 uiux/2026-08-07-화면상세스펙-확대7차/ 의 W-06-15·W-CO-09 두 장이다. 출력물 발행(app.document_issue_log)·첨부(app.attachment)는 이 파일이 아직 갖지 않는다 — POP·모바일 셸이 생길 때 같은 파일에 더한다. 재활성 경로(:activate)를 둔다 — 결재선은 목록에 「사용 안 함」 행을 보이고 다시 켜는 것이 정상 운용이다. 같은 이유로 mdm-기준정보.json 의 putaway-rules 에도 :activate 를 더했다(W-06-14). 나머지 mdm 마스터에는 두지 않는다 — 그 화면들이 요구하지 않았다."
+    "title": "omf-mes 공통 도메인 API — 승인 워크플로우 · 출력물 발행 (초안)",
+    "version": "0.2.0",
+    "description": "전 도메인이 함께 쓰는 승인 워크플로우 계약. 정의(결재선)와 실행(요청·결재)이 나뉘어 있고 화면도 그렇게 갈린다 — 정의는 W-06-15, 실행은 W-CO-09 다.\n\n요청 생성은 이 파일이 갖지 않는다. 각 도메인 계약의 :request-approval 이 만든다(logistics-01자재창고.json 에 세 곳). 이 파일은 그 뒤의 조회와 결재를 덮는다.\n\n1차 범위에서 정한 것 셋 — ① 결재선 승인자는 USER 만 쓴다(상신 시 사람을 고를 입력이 모델에 없다) ② 값 구간(min/max)은 쓰지 않는다(비교할 값이 없고 금액 컬럼이 0건이다) ③ 대리 결재·위임을 두지 않는다(승인자가 부재하면 결재가 멈추는 것을 감수한다).\n\n승인은 자물쇠를 풀 뿐 실행하지 않는다 — 전기·출고는 대상 화면이 별도로 한다.\n\n## 출력물 발행 (v0.2)\n\n라벨·검사성적서·추적보고서를 발행하고 그 사실을 회차로 쌓는다. 화면이 10장이고 도메인이 셋(01·02·04)에 걸치는데 발행·재발행 규약이 하나(공유계약 §K)라 계약도 하나여야 한다.\n\n지키는 규약 넷 — ① 발행은 회차로 쌓고 이전 것을 지우지 않는다(회차는 서버가 매긴다) ② 재발행에는 사유가 필수다 ③ 발행 기록에 단말과 프린터를 남긴다 ④ 인쇄는 트랜잭션 밖이다 — 발행 기록이 남고 물리 인쇄만 실패하는 경우가 정상적으로 생기며, 그것을 보고하는 경로를 따로 둔다.\n\n라벨 이미지는 서버가 그린다. 클라이언트는 받은 이미지를 프린터로 보낼 뿐이라 단말마다 라벨이 달라지지 않는다.\n\n대상 참조가 두 갈래다 — targetType+targetId 로 무엇을 발행했는지 가리키고, lotId 는 소속을 따로 가리킨다. 개체 단위 출력물은 이 둘이 서로 다른 것을 가리키므로 targetType 을 먼저 보고 판정한다.",
+    "x-internal-note": "근거·맥락은 deliverables/06-API-요구서-app공통승인.md 를 본다. 도출은 uiux/2026-08-07-화면상세스펙-확대7차/ 의 W-06-15·W-CO-09 두 장이다. 출력물 발행(app.document_issue_log)·첨부(app.attachment)는 이 파일이 아직 갖지 않는다 — POP·모바일 셸이 생길 때 같은 파일에 더한다. 재활성 경로(:activate)를 둔다 — 결재선은 목록에 「사용 안 함」 행을 보이고 다시 켜는 것이 정상 운용이다. 같은 이유로 mdm-기준정보.json 의 putaway-rules 에도 :activate 를 더했다(W-06-14). 나머지 mdm 마스터에는 두지 않는다 — 그 화면들이 요구하지 않았다. ▸ v0.2 출력물 편 — 근거는 deliverables/06-API-요구서-app공통출력물.md 다. 도출 화면 10장(P-01-01·P-01-02·P-02-05·P-02-07·P-02-09·M-02-01·W-04-03·P-04-01·P-04-02·P-04-04). 공유계약 §K-1~K-7 이 규약 정본이다. P-02-05·P-02-07·P-02-09 는 액션 표가 없어 §5 본문에서 사람이 읽어 옮겼다(생성기가 경고로 표시한다). 라벨 양식 마스터는 여기가 아니라 mdm 소관이다(W-06-07). 첨부(app.attachment)는 아직 갖지 않는다."
   },
   "servers": [
     {
@@ -16,6 +16,10 @@
     {
       "name": "app",
       "description": "전 도메인 공통 — 승인 워크플로우"
+    },
+    {
+      "name": "document-issue",
+      "description": "출력물 발행·재발행·이력. 공유계약 §K 가 규약 정본이다."
     }
   ],
   "paths": {
@@ -1003,6 +1007,491 @@
           }
         }
       }
+    },
+    "/app/document-issues": {
+      "get": {
+        "tags": [
+          "document-issue"
+        ],
+        "operationId": "listDocumentIssues",
+        "summary": "발행 이력 조회",
+        "description": "회차가 쌓인 그대로 돌려준다. 대상 하나의 이력을 보려면 targetTypeCode 와 targetId 를 함께 준다 — targetId 만으로는 유형이 갈리지 않는다.",
+        "parameters": [
+          {
+            "name": "documentTypeCode",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 40
+            }
+          },
+          {
+            "name": "targetTypeCode",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "description": "targetId 와 함께 준다. 하나만 주면 400 이다."
+          },
+          {
+            "name": "targetId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "lotId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "소속 LOT 로 찾는다. 개체 단위 출력물을 LOT 단위로 모아 볼 때 쓴다."
+          },
+          {
+            "name": "issuedFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "issuedTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "printOutcome",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "SUCCEEDED",
+                "FAILED"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "발행 이력.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentIssueListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "targetTypeCode 와 targetId 중 하나만 주었다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "document-issue"
+        ],
+        "operationId": "createDocumentIssues",
+        "summary": "발행 · 재발행",
+        "description": "대상마다 회차를 매겨 기록을 만든다. 이미 발행된 대상이면 회차가 오르고 재발행 사유가 필수다.\n\n인쇄하지 않는다 — 이 호출은 기록만 만든다. 이미지는 별도로 받아 프린터로 보내고 결과를 따로 보고한다. 프린터가 죽어도 기록은 남는다.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentIssueCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "발행 기록 생성.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentIssueBatchResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "이 단말에 출력 권한이 없다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "재발행인데 사유가 없다. 또는 대상이 발행 대상이 아니다(불량 판정분 등).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/app/document-issues/{documentIssueLogId}": {
+      "parameters": [
+        {
+          "name": "documentIssueLogId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "description": "발행 기록 식별자.",
+          "example": 44001
+        }
+      ],
+      "get": {
+        "tags": [
+          "document-issue"
+        ],
+        "operationId": "getDocumentIssue",
+        "summary": "발행 기록 한 건",
+        "responses": {
+          "200": {
+            "description": "발행 기록.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentIssue"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "없다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/app/document-issues/{documentIssueLogId}/rendition": {
+      "parameters": [
+        {
+          "name": "documentIssueLogId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "description": "발행 기록 식별자.",
+          "example": 44001
+        }
+      ],
+      "get": {
+        "tags": [
+          "document-issue"
+        ],
+        "operationId": "getDocumentRendition",
+        "summary": "출력물 이미지 · 문서",
+        "description": "서버가 그린 결과를 돌려준다. 클라이언트는 레이아웃을 그리지 않는다 — 단말마다 출력물이 달라지지 않게 하기 위함이다.\n\n회차를 인쇄면에 넣어 그린다. 데이터에만 회차가 있으면 현장에서 몇 번째 출력물인지 구분할 수 없다.\n\n미리보기와 인쇄가 같은 경로다. 미리 보고 인쇄한 것과 실제 인쇄물이 다르면 안 된다.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "png",
+                "pdf"
+              ],
+              "default": "png"
+            },
+            "description": "라벨은 이미지이고 성적서·보고서는 문서다. 발행 종류가 지원하지 않는 형식이면 422 다."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "렌더링 결과.",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "없다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "이 발행 종류가 지원하지 않는 형식이다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/app/document-issues/{documentIssueLogId}:report-print": {
+      "parameters": [
+        {
+          "name": "documentIssueLogId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "description": "발행 기록 식별자.",
+          "example": 44001
+        }
+      ],
+      "post": {
+        "tags": [
+          "document-issue"
+        ],
+        "operationId": "reportPrintOutcome",
+        "summary": "인쇄 결과 보고",
+        "description": "물리 인쇄가 끝난 뒤(또는 실패한 뒤) 결과를 남긴다. 발행 기록을 되돌리지 않는다 — 실패는 재발행으로 처리하고, 그 재발행의 사유가 「인쇄 실패」다.\n\n이 경로가 없으면 발행 기록이 곧 인쇄 성공으로 읽혀, 실제로는 안 나온 라벨이 나온 것으로 남는다.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrintOutcomeReport"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "보고 반영.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentIssue"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "없다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "FAILED 인데 사유가 없다. 또는 이미 보고된 건이다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/app/printers": {
+      "get": {
+        "tags": [
+          "document-issue"
+        ],
+        "operationId": "listPrinters",
+        "summary": "프린터 목록 · 상태",
+        "description": "이 단말이 쓸 수 있는 프린터와 그 상태. 화면 머리에 상시 보인다 — 인쇄가 안 될 때 사용자가 가장 먼저 보는 곳이다.",
+        "parameters": [
+          {
+            "name": "terminalId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "주지 않으면 요청 단말 기준이다."
+          },
+          {
+            "name": "documentTypeCode",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "description": "이 종류를 찍을 수 있는 프린터만 거른다."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "프린터 목록.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrinterListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/app/document-issues/summary": {
+      "get": {
+        "tags": [
+          "document-issue"
+        ],
+        "operationId": "getDocumentIssueSummary",
+        "summary": "대상별 발행 요약 — 목록 화면용",
+        "description": "여러 대상의 발행 현황을 **한 번에** 돌려준다.\n\n목록 화면은 행마다 「이미 발행됐는가」를 알아야 액션을 활성할 수 있는데(재발행 사유 입력 · 이력 보기), 대상이 수백 건이면 건별 조회로는 그릴 수 없다. 개체 단위 출력물은 한 작업이 수백 건이다.\n\n발행한 적 없는 대상도 `issueCount: 0` 으로 함께 돌려준다 — 빠뜨리면 화면이 「모른다」와 「없다」를 구분할 수 없다.",
+        "parameters": [
+          {
+            "name": "targetTypeCode",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "example": "HANDLING_UNIT",
+            "description": "대상 유형. 한 번에 한 유형만 묻는다 — 유형이 섞이면 `targetId` 의 뜻이 갈린다."
+          },
+          {
+            "name": "targetIds",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 1000,
+              "items": {
+                "type": "integer",
+                "format": "int64"
+              }
+            },
+            "style": "form",
+            "explode": false,
+            "example": [
+              55021,
+              55022,
+              55023
+            ],
+            "description": "대상 식별자 목록. 발행 상한과 같은 1000 이다."
+          },
+          {
+            "name": "documentTypeCode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "example": "LABEL",
+            "description": "주면 그 종류만 센다. 한 대상에 라벨과 성적서가 따로 붙을 수 있다."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "대상별 요약 — 요청한 전건.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentIssueSummaryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`targetIds` 가 비었거나 상한을 넘었다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1676,6 +2165,462 @@
             "minLength": 1,
             "description": "approval_step.decision_comment 에 들어간다. 상신자가 무엇을 고쳐야 하는지 알 수 있게 쓴다",
             "example": "수량 근거가 부족합니다 — 실사 차이표를 첨부해 다시 올려 주세요"
+          }
+        }
+      },
+      "DocumentTarget": {
+        "type": "object",
+        "description": "무엇을 대상으로 발행했는가. targetType 을 먼저 보고 판정한다 — 개체 단위 출력물은 targetId 와 lotId 가 서로 다른 것을 가리킨다.",
+        "required": [
+          "targetTypeCode",
+          "targetId",
+          "displayName"
+        ],
+        "properties": {
+          "targetTypeCode": {
+            "type": "string",
+            "maxLength": 40,
+            "description": "대상 유형. 이 값이 targetId 의 해석을 정한다.",
+            "example": "LOT"
+          },
+          "targetId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 90101
+          },
+          "displayName": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "화면에 그대로 쓰는 표시명. 클라이언트가 조립하지 않는다.",
+            "example": "LOT-SAMPLE-0001"
+          },
+          "screenId": {
+            "type": "string",
+            "maxLength": 20,
+            "description": "이 대상을 여는 화면. 목록에서 원본으로 이동할 때 쓴다.",
+            "example": "P-02-07"
+          }
+        }
+      },
+      "DocumentIssue": {
+        "type": "object",
+        "description": "발행 기록 한 건. 회차가 오르면 새 행이고 이전 회차는 남는다.",
+        "required": [
+          "documentIssueLogId",
+          "documentTypeCode",
+          "target",
+          "issueSeq",
+          "issuedBy",
+          "issuedByName",
+          "issuedAt",
+          "printOutcome"
+        ],
+        "properties": {
+          "documentIssueLogId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 44001
+          },
+          "documentTypeCode": {
+            "type": "string",
+            "maxLength": 40,
+            "description": "출력물 종류(라벨·검사성적서·추적보고서 등).",
+            "example": "LABEL"
+          },
+          "target": {
+            "$ref": "#/components/schemas/DocumentTarget"
+          },
+          "lotId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "소속 LOT. 대상이 LOT 자신이면 targetId 와 같고, 개체 단위 출력물이면 다르다.",
+            "example": 90101
+          },
+          "lotNo": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 60,
+            "example": "LOT-SAMPLE-0001"
+          },
+          "issueSeq": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "발행 회차. 1 이 최초이고 2 이상이 재발행이다. 서버가 매긴다.",
+            "example": 2
+          },
+          "reissueReasonCode": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 40,
+            "description": "재발행 사유. 회차가 2 이상이면 반드시 있다.",
+            "example": "PRINT_FAILED"
+          },
+          "reissueReasonName": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "example": "인쇄 실패"
+          },
+          "issuedBy": {
+            "type": "integer",
+            "format": "int64",
+            "example": 3101
+          },
+          "issuedByName": {
+            "type": "string",
+            "maxLength": 200,
+            "example": "샘플 작업자"
+          },
+          "issuedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-08-07T09:12:30Z"
+          },
+          "terminalId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "example": 210
+          },
+          "terminalName": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "example": "샘플 POP 단말"
+          },
+          "printerName": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 100,
+            "example": "label-printer-a"
+          },
+          "printOutcome": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "SUCCEEDED",
+              "FAILED"
+            ],
+            "description": "물리 인쇄 결과. 발행 기록과 별개다 — 기록이 남고 인쇄만 실패하는 경우가 정상적으로 생긴다. 보고 전에는 PENDING 이다.",
+            "example": "SUCCEEDED"
+          },
+          "remarks": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": null
+          }
+        }
+      },
+      "DocumentIssueCreate": {
+        "type": "object",
+        "description": "발행 요청. 대상이 여럿이면 한 번에 보낸다 — 개체 단위 출력물은 수백 건이 한 작업이라 건별 호출로 나누면 부분 실패가 생긴다.",
+        "required": [
+          "documentTypeCode",
+          "targets"
+        ],
+        "properties": {
+          "documentTypeCode": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "example": "LABEL"
+          },
+          "targets": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1000,
+            "description": "한 트랜잭션으로 처리한다. 하나라도 실패하면 전건 실패다.",
+            "items": {
+              "type": "object",
+              "required": [
+                "targetTypeCode",
+                "targetId"
+              ],
+              "properties": {
+                "targetTypeCode": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "minLength": 1,
+                  "example": "SERIAL"
+                },
+                "targetId": {
+                  "type": "integer",
+                  "format": "int64",
+                  "example": 771205
+                },
+                "lotId": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "format": "int64",
+                  "example": 90101
+                }
+              }
+            },
+            "example": [
+              {
+                "targetTypeCode": "SERIAL",
+                "targetId": 771205,
+                "lotId": 90101
+              }
+            ]
+          },
+          "reissueReasonCode": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 40,
+            "description": "재발행 사유. 대상 중 하나라도 이미 발행된 것이 있으면 **필수**다 — 없으면 422 다.\n\n신규와 재발행이 섞여 들어와도 **한 번만 받는다.** 서버는 회차가 2 이상인 기록에만 이 값을 남긴다 — 신규 기록에 재발행 사유가 붙으면 이력이 거짓이 된다.",
+            "example": "PRINT_FAILED"
+          },
+          "terminalId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "example": 210
+          },
+          "printerName": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 100,
+            "example": "label-printer-a"
+          },
+          "remarks": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": null
+          }
+        }
+      },
+      "DocumentIssueListResponse": {
+        "type": "object",
+        "required": [
+          "items",
+          "page"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentIssue"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMeta"
+          }
+        }
+      },
+      "DocumentIssueBatchResponse": {
+        "type": "object",
+        "description": "발행 결과. 인쇄는 아직 하지 않았다 — 이미지를 받아 프린터로 보낸 뒤 결과를 따로 보고한다.",
+        "required": [
+          "items",
+          "issuedCount"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentIssue"
+            }
+          },
+          "issuedCount": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 480
+          }
+        }
+      },
+      "PrintOutcomeReport": {
+        "type": "object",
+        "description": "물리 인쇄 결과 보고. 발행 기록을 지우거나 되돌리지 않는다 — 실패는 재발행으로 처리한다.",
+        "required": [
+          "outcome"
+        ],
+        "properties": {
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "SUCCEEDED",
+              "FAILED"
+            ],
+            "example": "FAILED"
+          },
+          "failureReason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 500,
+            "description": "실패 사유. outcome 이 FAILED 면 필수다.",
+            "example": "용지 걸림"
+          }
+        }
+      },
+      "Printer": {
+        "type": "object",
+        "description": "이 단말이 쓸 수 있는 프린터. 상태를 화면 머리에 상시 보인다.",
+        "required": [
+          "printerName",
+          "displayName",
+          "status",
+          "isDefault"
+        ],
+        "properties": {
+          "printerName": {
+            "type": "string",
+            "maxLength": 100,
+            "example": "label-printer-a"
+          },
+          "displayName": {
+            "type": "string",
+            "maxLength": 200,
+            "example": "샘플 라벨 프린터 A"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "READY",
+              "BUSY",
+              "OFFLINE",
+              "ERROR"
+            ],
+            "example": "READY"
+          },
+          "statusMessage": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "사람이 읽는 상태 설명. 클라이언트가 status 로 문구를 조립하지 않는다.",
+            "example": "대기 중"
+          },
+          "isDefault": {
+            "type": "boolean",
+            "example": true
+          },
+          "supportedDocumentTypeCodes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "example": [
+              "LABEL"
+            ]
+          }
+        }
+      },
+      "PrinterListResponse": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Printer"
+            }
+          }
+        }
+      },
+      "DocumentIssueSummary": {
+        "type": "object",
+        "description": "대상 하나의 발행 현황 요약. 목록 화면이 행마다 「이미 발행됐는가 · 몇 회차인가」를 판정하는 입력이다.",
+        "required": [
+          "targetTypeCode",
+          "targetId",
+          "issueCount"
+        ],
+        "properties": {
+          "targetTypeCode": {
+            "type": "string",
+            "maxLength": 40,
+            "example": "HANDLING_UNIT"
+          },
+          "targetId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 55021
+          },
+          "issueCount": {
+            "type": "integer",
+            "minimum": 0,
+            "example": 2,
+            "description": "발행 횟수. 0 이면 아직 발행하지 않았다 — 재발행 사유가 필요 없다."
+          },
+          "lastIssueSeq": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "example": 2,
+            "description": "마지막 회차. 발행한 적이 없으면 null 이다."
+          },
+          "lastIssuedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "example": "2026-08-07T09:12:30Z"
+          },
+          "lastPrintOutcome": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "PENDING",
+              "SUCCEEDED",
+              "FAILED",
+              null
+            ],
+            "example": "FAILED",
+            "description": "마지막 인쇄 결과. FAILED 면 화면이 재발행을 권한다."
+          }
+        }
+      },
+      "DocumentIssueSummaryResponse": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentIssueSummary"
+            },
+            "description": "요청한 대상 전건을 돌려준다 — 발행한 적 없는 대상도 `issueCount: 0` 으로 들어간다. 빠진 행이 있으면 화면이 「모른다」와 「없다」를 구분할 수 없다."
           }
         }
       }
