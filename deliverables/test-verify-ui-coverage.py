@@ -109,6 +109,14 @@ class Domain01Test(unittest.TestCase):
         self.assertEqual(sorted(missing),
                          ["M-01-01", "W-01-01", "W-01-02", "W-01-10"])
 
+    def test_취소_화면이_등록돼_있다(self):
+        # W-01-13 은 01 계약 개정(2026-08-07)으로 들어왔다. 빠지면 취소 액션이
+        # 커버리지 대조에서 통째로 사라진다.
+        rows = cov.extract_all(HERE, cov.SCREENS_01)
+        screens = {r["screen"] for r in rows}
+        self.assertIn("W-01-13", screens)
+        self.assertEqual(len(rows), 116)
+
     def test_모바일_POP_화면ID도_읽는다(self):
         rows = cov.extract_actions(self.M0104)
         self.assertTrue(all(r["screen"] == "M-01-04" for r in rows))
