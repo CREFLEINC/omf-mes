@@ -24,7 +24,7 @@
 | **프로세스** | `05` — **도식 앵커가 없다.** 승인은 각 WF 안의 한 단계로 그려지고 「승인자가 어디서 그것을 보는가」는 어느 도식에도 없다 |
 | **화면·IA** | 인벤토리 v1.7 `W-CO-09` — 유형 조회·처리 · **v1.7 신설(2026-08-07 사용자 확정)** — `approval_request`를 타는 곳이 **확인 6곳 + 04 후보 2 + 신규 1**인데 모아 보는 자리가 없었다 |
 | **요구** | 공유계약 **§J**(J-1 정의/실행 분리 · **J-3** 승인자 사람 확정 · **J-5** 승인하면 무엇이 일어나는가 · **J-6** 결재는 되돌릴 수 없다) · **A-12**(남이 읽고 판단할 자유 텍스트) · #78 · #74 · ⛔ **대리 결재·위임 범위 밖**(2026-08-07) |
-| **데이터** | `app.approval_request`(8열 + 감사 + `version_no` · `approval_request_no` UNIQUE · **`reason` NOT NULL** · **`target_type_code` + `target_id` 다형**) · `app.approval_step`(`approver_id` NOT NULL · `decision_code` · `decision_at` · **`decision_comment` text** · `uq(request, step_no)` · **기록 전용**) · **참조 5테이블**(`inbound_receipt`·`inbound_variance`·`inventory_adjustment`·`disposition_decision`·`concession`) — 전건 실측 |
+| **데이터** | `app.approval_request`(9열 + 감사 + `version_no` · `approval_request_no` UNIQUE · **`reason` NOT NULL** · **`target_type_code` + `target_id` 다형**) · `app.approval_step`(`approver_id` NOT NULL · `decision_code` · `decision_at` · **`decision_comment` text** · `uq(request, step_no)` · **기록 전용**) · **참조 5테이블**(`inbound_receipt`·`inbound_variance`·`inventory_adjustment`·`disposition_decision`·`concession`) — 전건 실측 |
 
 > ⚠ **`approval_request`에 수량·금액 컬럼이 0건이다**(실측). 목록에 보일 업무 값이 **사유 하나뿐**이다 — §5-3.
 
