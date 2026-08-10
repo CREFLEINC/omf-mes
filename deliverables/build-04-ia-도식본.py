@@ -153,7 +153,7 @@ BANDS = [
            'W-06-09', 'W-06-10', 'W-06-11', 'W-06-12', 'W-06-14', 'W-06-15'], 'pop': [], 'mob': []}),
  ('공통 (CO)', '계정 · 권한 · 알림 · 대시보드 · 설정 — 셸에 상시',
   '§3-1 시스템/공통 · §5-1 진입',
-  {'web': ['W-CO-01', 'W-CO-02', 'W-CO-03', 'W-CO-04', 'W-CO-05', 'W-CO-06', 'W-CO-08', 'W-CO-09'],
+  {'web': ['W-CO-01', 'W-CO-02', 'W-CO-03', 'W-CO-04', 'W-CO-05', 'W-CO-06', 'W-CO-08', 'W-CO-09', 'W-CO-10', 'W-CO-11'],
    'pop': [], 'mob': ['M-CO-01']}),
  ('조회 (도식 앵커 밖)', '전 도메인 — 비도식 근거로 도출된 조회 화면',
   '§9-2 비도식 근거 규칙 v0.2',
@@ -318,8 +318,8 @@ TREE = [
  ('설비/툴', [('툴 관리', ['W-05-01', 'W-05-02', 'W-05-03', 'W-05-13']),
             ('설비 보전', ['W-05-04', 'W-05-05', 'W-05-06', 'W-05-12']),
             ('비가동·계측', ['W-05-08', 'W-05-09', 'W-05-07', 'W-05-10', 'W-05-11'])]),
- ('시스템/공통', [('계정·권한', ['W-CO-01', 'W-CO-02']), ('알림·공지', ['W-CO-03', 'W-CO-04']),
-              ('설정', ['W-CO-06', 'W-CO-08']), ('결재함', ['W-CO-09']), ('경영 대시보드', ['W-CO-05'])]),
+ ('시스템/공통', [('계정·권한', ['W-CO-01', 'W-CO-02', 'W-CO-10']), ('알림·공지', ['W-CO-03', 'W-CO-04']),
+              ('설정', ['W-CO-06', 'W-CO-08', 'W-CO-11']), ('결재함', ['W-CO-09']), ('경영 대시보드', ['W-CO-05'])]),
 ]
 POP_MODES = [
  ('0. 진입 (공통 셸)', ['P-CO-01', 'P-02-01'], '사번 입력 → 내 W/O 목록'),
@@ -361,14 +361,30 @@ tree_ids = [s for _, gs in TREE for _, ids in gs for s in ids]
 pop_ids  = [s for _, ids, _ in POP_MODES for s in ids]
 tile_ids = MOB_ENTRY + [s for _, _, ids in TILES for s in ids]
 
-if len(ROWS) != 113: die('화면 %d건 (113 아님)' % len(ROWS))
+# 기대 분포 — 화면이 늘거나 줄면 **여기만** 고친다.
+#   수치를 여러 곳에 박아 두면 신설 때마다 빌드가 깨지고, 고치다 빠뜨린 자리가
+#   낡은 값으로 남는다(실제로 KPI 가 확정 82 ↔ 실측 84 로 어긋나 있었다).
+#   화면 수는 ROWS 에서 파생하고, 이 표는 **분포가 의도대로인가**만 본다.
+EXPECT = {
+    'prog': {'web': 74, 'pop': 22, 'mob': 19},
+    'dom':  {'01': 25, '02': 24, '03': 5, '04': 18, '05': 17, '06': 14, 'CO': 12},
+    'conf': {'확정': 86, '추정': 27, '미정': 2},
+}
+TOTAL = len(ROWS)
+
 c = Counter(r['prog'] for r in ROWS)
-if (c['web'], c['pop'], c['mob']) != (72, 22, 19): die('프로그램 계수 %s' % dict(c))
+if {k: c[k] for k in EXPECT['prog']} != EXPECT['prog']:
+    die('프로그램 계수 %s (기대 %s — EXPECT 를 고친다)' % (dict(c), EXPECT['prog']))
 d = Counter(r['dom'] for r in ROWS)
-if dict(d) != {'01': 25, '02': 24, '03': 5, '04': 18, '05': 17, '06': 14, 'CO': 10}: die('도메인 계수 %s' % dict(d))
+if dict(d) != EXPECT['dom']:
+    die('도메인 계수 %s (기대 %s — EXPECT 를 고친다)' % (dict(d), EXPECT['dom']))
 f = Counter(r['conf'] for r in ROWS)
-if (f['확정'], f['추정'], f['미정']) != (84, 27, 2): die('신뢰도 계수 %s' % dict(f))
-if sum(Counter(r['type'] for r in ROWS).values()) != 113: die('유형 합계')
+if {k: f[k] for k in EXPECT['conf']} != EXPECT['conf']:
+    die('신뢰도 계수 %s (기대 %s — EXPECT 를 고친다)' % (dict(f), EXPECT['conf']))
+if sum(EXPECT['prog'].values()) != TOTAL: die('EXPECT prog 합계 %d ≠ 화면 %d' % (sum(EXPECT['prog'].values()), TOTAL))
+if sum(EXPECT['dom'].values()) != TOTAL: die('EXPECT dom 합계 %d ≠ 화면 %d' % (sum(EXPECT['dom'].values()), TOTAL))
+if sum(EXPECT['conf'].values()) != TOTAL: die('EXPECT conf 합계 %d ≠ 화면 %d' % (sum(EXPECT['conf'].values()), TOTAL))
+if sum(Counter(r['type'] for r in ROWS).values()) != TOTAL: die('유형 합계')
 
 for label, ids in (('흐름축', flow_ids), ('관리웹 트리', tree_ids), ('POP 모드', pop_ids), ('모바일 타일', tile_ids)):
     dup = [k for k, v in Counter(ids).items() if v > 1]
@@ -379,8 +395,10 @@ for label, ids in (('흐름축', flow_ids), ('관리웹 트리', tree_ids), ('PO
 if set(flow_ids) != set(BY): die('흐름축 차집합: %s' % sorted(set(BY) ^ set(flow_ids)))
 ia_ids = set(tree_ids) | set(pop_ids) | set(tile_ids)
 if ia_ids != set(BY): die('IA 3모델 차집합: %s' % sorted(set(BY) ^ ia_ids))
-if len(tree_ids) != 72 or len(pop_ids) != 22 or len(tile_ids) != 19:
-    die('IA 계수 트리%d POP%d 타일%d' % (len(tree_ids), len(pop_ids), len(tile_ids)))
+# IA 3모델 계수는 프로그램 계수와 같아야 한다 — 트리=관리웹 · POP 모드=POP · 타일=모바일.
+# EXPECT 에서 파생하므로 화면이 늘어도 여기를 손대지 않는다.
+if (len(tree_ids), len(pop_ids), len(tile_ids)) != (EXPECT['prog']['web'], EXPECT['prog']['pop'], EXPECT['prog']['mob']):
+    die('IA 계수 트리%d POP%d 타일%d (기대 %s)' % (len(tree_ids), len(pop_ids), len(tile_ids), EXPECT['prog']))
 if VACATED & set(BY): die('결번이 현행 화면에 존재: %s' % sorted(VACATED & set(BY)))
 if len(VACATED) != 12: die('결번 %d건 (12 아님)' % len(VACATED))
 
@@ -595,7 +613,7 @@ TYPES = ['입력', '스캔', '판정·승인', '조회·상세', '목록', '설�
 tcount = defaultdict(list)
 for r in ROWS:
     tcount[(r['prog'], r['type'])].append(r['id'])
-if sum(len(v) for v in tcount.values()) != 113: die('유형 교차 합계')
+if sum(len(v) for v in tcount.values()) != TOTAL: die('유형 교차 합계')
 unknown = {r['type'] for r in ROWS} - set(TYPES)
 if unknown: die('미등록 유형: %s' % unknown)
 
@@ -631,7 +649,7 @@ J_GONE = [[g[0], g[1], g[2], g[3], ' · '.join('%s(%s)' % (t[0], t[1]) for t in 
 VERSION_FLOW = [('원 열거', 120, ''), ('중복 8 병합', 112, 'v1.0'), ('적대 검증', 112, 'v1.1'),
                 ('2계층 매핑 4단계', 113, 'v1.2'), ('비도식 근거 규칙', 109, 'v1.3'), ('상세 스펙 확대 1차', 108, 'v1.5'),
                 ('적치 규칙 신설', 109, 'v1.6'), ('취소·정정·결재 3건', 112, 'v1.7'),
-                ('출하 2단 확정', 113, 'v1.8')]
+                ('출하 2단 확정', 113, 'v1.8'), ('DR-002 비밀번호 변경', 114, 'v2.0'), ('DR-003 알람 수신자', 115, 'v2.1')]
 vflow = ''.join('<div class="vstep%s"><b>%d</b><span>%s</span><em>%s</em></div>' % (
     ' cur' if i == len(VERSION_FLOW) - 1 else '', n, esc(lab), esc(v)) for i, (lab, n, v) in enumerate(VERSION_FLOW))
 
@@ -863,7 +881,7 @@ function draw(){var tb=document.getElementById('tb'),h='',n=0;
   h+='<tr class="gr"><th style="text-decoration:line-through;opacity:.6">'+g[0]+'</th>'
    +'<td style="opacity:.6"><s>'+g[1]+'</s></td><td class="cf">'+mk+'</td>'
    +'<td colspan="2" class="bl">→ '+g[4]+'</td><td colspan="2" class="wy">'+g[5]+' · <strong>ID 재사용 금지</strong></td></tr>';}}
- tb.innerHTML=h;document.getElementById('cnt').textContent=n+' / 113건'+(showG?' + 결번 '+G.length:'');}
+ tb.innerHTML=h;document.getElementById('cnt').textContent=n+' / '+TOTAL_N+'건'+(showG?' + 결번 '+G.length:'');}
 function tg(el,k,v){var on=el.getAttribute('aria-pressed')==='true';
  var g=document.querySelectorAll('[data-k="'+k+'"]');for(var i=0;i<g.length;i++)g[i].setAttribute('aria-pressed','false');
  if(k==='p')fp=on?'':v; if(k==='d')fd=on?'':v; if(k==='c')fc=on?'':v;
@@ -902,8 +920,8 @@ f2_body = ('<div class="card ladder-wrap"><div class="ladder">%s</div></div>'
 f3_body = ('%s<div class="wide"><table class="grid"><thead><tr><th>도메인</th>'
            '<th>확정 <small>(도식+배지 명확)</small></th><th>추정 <small>(성격 판단)</small></th>'
            '<th>미정 <small>(회신 대기)</small></th></tr></thead><tbody>%s</tbody>'
-           '<tfoot><tr><th class="tot">113</th>%s</tr></tfoot></table></div>'
-           % (bars, f3_rows, f3_foot))
+           '<tfoot><tr><th class="tot">%d</th>%s</tr></tfoot></table></div>'
+           % (bars, f3_rows, TOTAL, f3_foot))
 
 f4_body = ('<div class="wide"><table><thead><tr><th></th><th>관리웹</th>'
            '<th>POP</th><th>모바일</th></tr></thead><tbody>%s</tbody></table></div>'
@@ -946,8 +964,8 @@ out.write('''<!doctype html><html lang="ko"><head><meta charset="utf-8">
 <header class="doc-cover">
   <p class="eyebrow">CREFLE · OMF-MES · 통합 편람</p>
   <h1>OMF-MES 통합 IA — 도식본</h1>
-  <p class="lede">화면 113건을 흐름·확정도·구조·의존으로 그린 9개 도식. 화면 정본은
-  <code>uiux/2026-07-25-화면목록-IA/screen-inventory-ia.md</code> v1.3, 본 도식본은
+  <p class="lede">화면 {TOTAL}건을 흐름·확정도·구조·의존으로 그린 9개 도식. 화면 정본은
+  <code>uiux/2026-07-25-화면목록-IA/screen-inventory-ia.md</code>, 본 도식본은
   <code>deliverables/04-통합-IA.md</code> 파생 문서다.</p>
   <table>
     <caption>문서 정보</caption>
@@ -962,8 +980,8 @@ out.write('''<!doctype html><html lang="ko"><head><meta charset="utf-8">
 </header>
 
 <div class="kpi">
- <div><span class="big">113</span><span class="lbl">화면 전건<br>관리웹 72 · POP 22 · 모바일 19</span></div>
- <div><span class="big">82</span><span class="lbl">확정 · 추정 24 · 미정 2</span></div>
+ <div><span class="big">{TOTAL}</span><span class="lbl">화면 전건<br>관리웹 {c[web]} · POP {c[pop]} · 모바일 {c[mob]}</span></div>
+ <div><span class="big">{f[확정]}</span><span class="lbl">확정 · 추정 {f[추정]} · 미정 {f[미정]}</span></div>
  <div><span class="big">9</span><span class="lbl">업무 단계 (+ 흐름 밖 6밴드)</span></div>
 </div>
 
@@ -995,7 +1013,7 @@ out.write('''<!doctype html><html lang="ko"><head><meta charset="utf-8">
 
 <h2>근거 · 재생성 · crefle-doc 준수</h2>
 <ul>
-<li><strong>근거</strong> — 화면 113건·유형·행위자·신뢰도·근거 요지 = <code>deliverables/04-통합-IA.md</code> §3-2·§4-2·§5-2(생성기가 직접 파싱) ·
+<li><strong>근거</strong> — 화면 {TOTAL}건·유형·행위자·신뢰도·근거 요지 = <code>deliverables/04-통합-IA.md</code> §3-2·§4-2·§5-2(생성기가 직접 파싱) ·
 IA 3모델 = §3-1·§4-1·§5-1 · 배지·정책 = §2-2·§2-3 · 변동 = §6 · 미결 = §7 · 이월 요건 = §8 · 판정 규칙 = §9-1.</li>
 <li><strong>재생성</strong> — <code>python3 build-04-ia-도식본.py</code>. md 를 고치면 화면·유형·행위자·신뢰도는 자동 반영되고,
 흐름 배치·IA 트리·미결 상수는 생성기 상단에서 고친다. 빌드 assert(113·프로그램·도메인·신뢰도·유형·차집합·결번·<strong>표기 변형 누락</strong>)가 어긋나면 생성이 중단된다.</li>
