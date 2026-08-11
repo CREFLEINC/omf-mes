@@ -161,6 +161,8 @@ paths["/planning/production-plans/{productionPlanId}:confirm"] = {"post": action
     resp=one("ProductionPlan","200","확정됨"))}
 paths["/planning/production-plans/{productionPlanId}:confirm"]["post"]["parameters"].insert(0, pathparam("productionPlanId"))
 
+OFFLINE = "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 즉시 처리되면 201, 큐에 담기면 202 다(C-7)."
+
 # ══════════ production — work_order ══════════
 schemas["WorkOrder"] = obj(
     ["workOrderId","workOrderNo","productionPlanId","routingOperationId","itemId","orderQty","uomId","workOrderTypeCode","statusCode","priorityNo"], {
@@ -199,11 +201,19 @@ schemas["WorkOrderClose"] = obj(["remainderDispositionCode"], {
     "reasonCode": STR,
     "erpSendItems": {"type":"array","items":STR,"description":"송신 항목 토글 결과"}})
 schemas["WorkOrderCancel"] = obj(["reasonCode"], {"reasonCode": STR, "note": STR})
-schemas["WorkOrderHold"] = obj(["reasonCode"], {"reasonCode": STR, "occurredAt": TS, "note": STR})
+schemas["WorkOrderHold"] = obj(["reasonCode","occurredAt"], {"reasonCode": STR, "occurredAt": TS, "note": STR},
+    description="POP 에서 누른다 — occurredAt 은 단말 시계가 정한다. 근거: 공유계약 C-12")
+schemas["WorkOrderResume"] = obj(["occurredAt"], {"occurredAt": TS, "note": STR},
+    description="재시작은 상태가 아니라 중단→진행 전이 이벤트다 — 그래서 발생 시각을 받는다. 근거: ✓설계확정 결정 14 · 공유계약 C-12")
+schemas["ValidationFinding"] = obj(["severity","code","message"], {
+    "severity": {"type":"string","enum":["BLOCK","WARN"],
+                 "description":"BLOCK 은 고쳐야 넘어간다. WARN 은 화면의 「경고 확인」 체크로 넘어갈 수 있다. 근거: W-02-03 §5"},
+    "field": {"type":"string","description":"대상 프로퍼티명"},
+    "code": STR, "message": STR},
+    description="오류가 아니라 점검 결과다 — ErrorItem 을 재사용하지 않는다. 등급 축(BLOCK/WARN)이 필요하기 때문이다.")
 schemas["ValidationReport"] = obj(["passed","findings"], {
-    "passed": {"type":"boolean"},
-    "findings": {"type":"array","items": ref("ErrorItem"),
-        "description":"scope=screen 인 경고는 확인 체크로 넘어갈 수 있다. 근거: W-02-03 §5"}})
+    "passed": {"type":"boolean","description":"BLOCK 이 하나도 없으면 true"},
+    "findings": {"type":"array","items": ref("ValidationFinding")}})
 
 WO = "/production/work-orders"
 paths[WO] = {
@@ -231,18 +241,21 @@ paths[WO+"/{workOrderId}"] = {
 WO_ACTIONS = [
  (":validate","유효성 재점검","4M 배정이 서로 부딪히는지 본다. 저장하지 않는다. 근거: W-02-03 §5",None,one("ValidationReport","200","점검 결과"),False,None),
  (":release","확정·배포 · 생산LOT 선발행","확정과 배포와 선발행이 한 트랜잭션이다. 선발행은 번호 슬롯 예약이며 완료 전에는 실물에 귀속되지 않는다. 근거: W-02-04 §5 · R26·R27","WorkOrderRelease",one("WorkOrder","200","배포됨"),True,None),
- (":hold","작업 중단","W/O 를 중단 상태로 옮긴다. 세션은 :end 로 따로 닫는다 — 중단 상태를 갖는 것은 W/O 다. 근거: ✓설계확정 결정 14 · P-02-10 §5-4","WorkOrderHold",one("WorkOrder","200","중단됨"),True,None),
- (":resume","작업 재개","중단→진행 전이 이벤트다. 재시작은 상태가 아니다. 근거: ✓설계확정 결정 14 · P-02-01 §5",None,one("WorkOrder","200","재개됨"),True,None),
+ (":hold","작업 중단","W/O 를 중단 상태로 옮긴다. 세션은 :end 로 따로 닫는다 — 중단 상태를 갖는 것은 W/O 다. POP 에서 누르므로 오프라인 대상이다. 근거: ✓설계확정 결정 14 · P-02-10 §5-4","WorkOrderHold",dict(list(one("WorkOrder","200","중단됨").items())+list(QUEUED.items())),True,None),
+ (":resume","작업 재개","중단→진행 전이 이벤트다. 재시작은 상태가 아니다. POP 에서 누르므로 오프라인 대상이다. 근거: ✓설계확정 결정 14 · P-02-01 §5","WorkOrderResume",dict(list(one("WorkOrder","200","재개됨").items())+list(QUEUED.items())),True,None),
  (":close","마감 · ERP 실적 송신","잔량 처분을 함께 정한다. 미달 슬롯은 이 시점에 자동 폐번된다. ERP 실제 전송만 트랜잭션 밖이다. 근거: W-02-05 §5 · R27·R82","WorkOrderClose",one("WorkOrder","200","마감됨"),True,None),
  (":cancel","W/O 취소","취소 상태로 옮긴다. 근거: 예외 E-4 ④ · W-02-06 §5-5","WorkOrderCancel",one("WorkOrder","200","취소됨"),True,
   "선발행 생산LOT 을 어떻게 하는지가 미정이다 — 예외 E-4 ④ 가 「취소 상태 신설은 확정 · 선발행 LOT 회수 규칙은 잔여」로 남겼다. R82 의 마감 자동 폐번은 마감 경로이고 취소 경로가 아니다. 의사결정 요청서 DR-007 로 올렸다. 결정 전에는 이 액션의 부수 효과를 계약이 적지 않으며 착수 통지도 내지 않는다."),
 ]
+OFFLINE_WO = (":hold", ":resume")   # POP 에서 누르는 액션 — 큐로 온다
 for suffix, summary, desc, body, resp, idem, note in WO_ACTIONS:
     op = action("production", summary, desc, body=body, resp=resp, idem=idem, note=note)
+    if suffix in OFFLINE_WO:
+        op["parameters"].append(pref("IfMatchVersionOptional"))
+        op["description"] += " " + OFFLINE
     op["parameters"].insert(0, pathparam("workOrderId"))
     paths[WO+"/{workOrderId}"+suffix] = {"post": op}
 
-OFFLINE = "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 즉시 처리되면 201, 큐에 담기면 202 다(C-7)."
 
 # ══════════ work_session — 구간 형 ══════════
 schemas["WorkSession"] = obj(["workSessionId","workOrderId","sessionNo","shiftId","terminalId","startedAt","statusCode"], {
@@ -455,5 +468,94 @@ doc_resource("/production/operation-handovers","production","operationHandover",
    q("handedOverFrom",TS), q("handedOverTo",TS)],
   note="물리 모델은 handed_over_at NOT NULL / received_at nullable 로 구간 형 모양이다. 그런데 받는 쪽 화면이 없어 received_at 을 채울 경로가 생기지 않는다. 화면을 따라 인계 확정 시 두 시각을 함께 찍는다 — 원칙 1(데이터 모델은 화면 설계를 따라온다). 인수 확인 화면이 나중에 생기면 :receive 를 더한다.")
 
+HERE = os.path.dirname(os.path.abspath(__file__))
 
+# ── 규약 정합 1) :validate 는 상태 전이가 아니다 → GET .../validation
+del paths["/production/work-orders/{workOrderId}:validate"]
+paths["/production/work-orders/{workOrderId}/validation"] = {"get": {
+  "tags":["production"],"summary":"4M 배정 유효성 점검",
+  "description":"자원 배정이 서로 부딪히는지 본다. 저장하지 않으므로 상태 전이가 아니다 — :동사 를 쓰지 않는다. 근거: W-02-03 §5 · 02 계약 2단계 §4-1",
+  "parameters":[pathparam("workOrderId")],
+  "responses": dict(list(one("ValidationReport","200","점검 결과").items())+list(err("403","404").items()))}}
 
+# ── 규약 정합 2) DELETE 에 멱등키 · 선례 없음을 적는다
+_d = paths["/planning/production-plans/{productionPlanId}"]["delete"]
+_d["parameters"] = [pathparam("productionPlanId"), pref("IdempotencyKey"), pref("IfMatchVersion")]
+_d["x-internal-note"] = ("01 자재창고 계약에는 DELETE 가 0건이다 — 업무 문서는 지우는 것이 아니라 상태를 옮기기 때문이다. "
+  "확정 전 생산 계획은 아직 문서가 아니라 편집 중인 초안이라 물리 삭제를 둔다. 화면 액션에도 「계획 추가·삭제」가 있다(W-02-02). "
+  "확정 뒤에는 W/O 가 매달려 있어 404 가 아니라 409 로 막는다.")
+
+# ── example 자동 부여
+EX = {
+ "Id": 1001, "id": 1001,
+ "No": "WO-2026-0812-001", "Code": "NORMAL", "code": "NORMAL",
+ "Qty": 120.0, "qty": 120.0, "At": "2026-08-11T09:12:00+09:00",
+ "Date": "2026-08-11", "Note": "비고", "note": "비고",
+}
+def example_for(name, sch):
+    t = sch.get("type"); f = sch.get("format")
+    if "enum" in sch: return sch["enum"][0]
+    if "example" in sch: return sch["example"]
+    if f == "uuid": return "6f1a0c2e-8b4d-4a1e-9c33-0b7c2f5d1a90"
+    if f == "date-time": return "2026-08-11T09:12:00+09:00"
+    if f == "date": return "2026-08-11"
+    if t == "integer": return 1001 if name.endswith("Id") else 1
+    if t == "number": return 120.0
+    if t == "boolean": return True
+    if t == "string":
+        for k, v in EX.items():
+            if name.endswith(k): return v
+        if name.endswith("No"): return "WO-2026-0812-001"
+        return "값"
+    return None
+
+def fill(schema_name, sch):
+    props = sch.get("properties") or {}
+    for pname, p in props.items():
+        if not isinstance(p, dict): continue
+        if "$ref" in p: continue
+        if p.get("type") == "array":
+            continue
+        if p.get("type") == "object":
+            continue
+        if "example" not in p:
+            e = example_for(pname, p)
+            if e is not None: p["example"] = e
+for n, s in schemas.items(): fill(n, s)
+
+# 검사기가 잡은 둘 — object 타입 example · If-Match 를 받으면 409 를 선언한다
+schemas["WorkOrder"]["properties"]["operationSettingsSnapshot"]["example"] = {
+    "standardCycleTimeSec": 42, "standardYieldRate": 0.98}
+_w = paths["/production/work-sessions/{workSessionId}/workers"]["post"]
+_w["responses"].update(err("409"))
+
+OUT = os.path.join(HERE, 'production-02생산실행.json')
+src = json.load(io.open(os.path.join(HERE, 'logistics-01자재창고.json'),encoding='utf-8'))
+doc = {
+ "openapi": "3.1.0",
+ "info": {
+   "title": "omf-mes 02 생산실행 도메인 API (초안)",
+   "version": "0.1.0",
+   "description": ("02 생산실행 도메인 API 계약. P/O 수신에서 생산 계획·작업지시·작업 세션·자재 투입·생산 실적·공정 인계까지를 덮는다. "
+     "경로는 물리 모델의 스키마를 그대로 네임스페이스로 쓰므로 /planning 과 /production 둘로 나뉜다. "
+     "BOM·Routing 은 기준정보 계약이 소유하므로 여기서는 참조만 한다. "
+     "자재 출고 요청·현장 수령·자재 LOT 은 자재창고 계약이 소유한다. 검사 결과는 품질 계약이 소유한다. "
+     "출력물(인식표·라벨) 발행은 공통 계약이 소유한다. "
+     "작업 세션은 구간 형 리소스다 — 「진행 중」을 상태 컬럼으로 두지 않고 끝 시각의 부재로 판정하며, 닫는 것은 :end 액션이다. "
+     "현장 단말 화면 다수가 오프라인에서 쓰이므로 쓰기 오퍼레이션은 Idempotency-Key 를 필수로 받고 If-Match 를 선택으로 둔다. "
+     "즉시 처리는 201, 큐 접수는 202 로 나뉜다."),
+   "x-internal-note": ("설계·도출 근거는 uiux/2026-08-11-API스펙-02생산실행/ 의 00~03 단계 문서다. "
+     "리소스 11 · 액션 근거 99건(화면 액션 표 83 + 확대 3차 6장 본문 도출 16). "
+     "미해소 상류 셋을 계약이 드러낸다 — omf-mes#76(긴급 W/O 가 P/O NOT NULL 체인에 막힘 · 501), "
+     "omf-mes#60(수량 3원↔5컬럼), DR-007(W/O 취소 시 선발행 LOT 회수 규칙).")
+ },
+ "servers": [{"url": "/api", "description": "온프레미스 설치형"}],
+ "tags": [{"name":"planning","description":"수주·계획 — P/O · 생산 계획"},
+          {"name":"production","description":"생산 실행 — 작업지시 · 세션 · 투입 · 실적 · 인계"}],
+ "paths": dict(sorted(paths.items())),
+ "components": {"parameters": dict(src['components']['parameters']), "schemas": dict(sorted(schemas.items()))}
+}
+io.open(OUT,'w',encoding='utf-8').write(json.dumps(doc, ensure_ascii=False, indent=1))
+ops = sum(1 for p in doc['paths'].values() for m in p if m in ('get','post','put','patch','delete'))
+acts = sum(1 for p in doc['paths'] if ':' in p.rsplit('/',1)[-1])
+print(f"경로 {len(doc['paths'])} · 오퍼레이션 {ops} · 스키마 {len(doc['components']['schemas'])} · :동사 경로 {acts} · {os.path.getsize(OUT)/1024:.0f}KB")

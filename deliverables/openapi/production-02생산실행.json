@@ -2489,7 +2489,7 @@
      "production"
     ],
     "summary": "작업 중단",
-    "description": "W/O 를 중단 상태로 옮긴다. 세션은 :end 로 따로 닫는다 — 중단 상태를 갖는 것은 W/O 다. 근거: ✓설계확정 결정 14 · P-02-10 §5-4",
+    "description": "W/O 를 중단 상태로 옮긴다. 세션은 :end 로 따로 닫는다 — 중단 상태를 갖는 것은 W/O 다. POP 에서 누르므로 오프라인 대상이다. 근거: ✓설계확정 결정 14 · P-02-10 §5-4 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 즉시 처리되면 201, 큐에 담기면 202 다(C-7).",
     "parameters": [
      {
       "name": "workOrderId",
@@ -2503,6 +2503,9 @@
      },
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersionOptional"
      }
     ],
     "requestBody": {
@@ -2522,6 +2525,16 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/WorkOrder"
+        }
+       }
+      }
+     },
+     "202": {
+      "description": "큐에 담겼다 — 아직 서버가 모른다. 근거: 공유계약 C-7",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/QueuedResponse"
         }
        }
       }
@@ -2661,7 +2674,7 @@
      "production"
     ],
     "summary": "작업 재개",
-    "description": "중단→진행 전이 이벤트다. 재시작은 상태가 아니다. 근거: ✓설계확정 결정 14 · P-02-01 §5",
+    "description": "중단→진행 전이 이벤트다. 재시작은 상태가 아니다. POP 에서 누르므로 오프라인 대상이다. 근거: ✓설계확정 결정 14 · P-02-01 §5 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 즉시 처리되면 201, 큐에 담기면 202 다(C-7).",
     "parameters": [
      {
       "name": "workOrderId",
@@ -2675,8 +2688,21 @@
      },
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersionOptional"
      }
     ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/WorkOrderResume"
+       }
+      }
+     }
+    },
     "responses": {
      "200": {
       "description": "재개됨",
@@ -2684,6 +2710,16 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/WorkOrder"
+        }
+       }
+      }
+     },
+     "202": {
+      "description": "큐에 담겼다 — 아직 서버가 모른다. 근거: 공유계약 C-7",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/QueuedResponse"
         }
        }
       }
@@ -4826,19 +4862,52 @@
      "allocatedQty"
     ]
    },
+   "ValidationFinding": {
+    "type": "object",
+    "properties": {
+     "severity": {
+      "type": "string",
+      "enum": [
+       "BLOCK",
+       "WARN"
+      ],
+      "description": "BLOCK 은 고쳐야 넘어간다. WARN 은 화면의 「경고 확인」 체크로 넘어갈 수 있다. 근거: W-02-03 §5",
+      "example": "BLOCK"
+     },
+     "field": {
+      "type": "string",
+      "description": "대상 프로퍼티명",
+      "example": "값"
+     },
+     "code": {
+      "type": "string",
+      "example": "값"
+     },
+     "message": {
+      "type": "string",
+      "example": "값"
+     }
+    },
+    "required": [
+     "severity",
+     "code",
+     "message"
+    ],
+    "description": "오류가 아니라 점검 결과다 — ErrorItem 을 재사용하지 않는다. 등급 축(BLOCK/WARN)이 필요하기 때문이다."
+   },
    "ValidationReport": {
     "type": "object",
     "properties": {
      "passed": {
       "type": "boolean",
+      "description": "BLOCK 이 하나도 없으면 true",
       "example": true
      },
      "findings": {
       "type": "array",
       "items": {
-       "$ref": "#/components/schemas/ErrorItem"
-      },
-      "description": "scope=screen 인 경고는 확인 체크로 넘어갈 수 있다. 근거: W-02-03 §5"
+       "$ref": "#/components/schemas/ValidationFinding"
+      }
      }
     },
     "required": [
@@ -5139,8 +5208,10 @@
      }
     },
     "required": [
-     "reasonCode"
-    ]
+     "reasonCode",
+     "occurredAt"
+    ],
+    "description": "POP 에서 누른다 — occurredAt 은 단말 시계가 정한다. 근거: 공유계약 C-12"
    },
    "WorkOrderRelease": {
     "type": "object",
@@ -5156,6 +5227,24 @@
       "example": "비고"
      }
     }
+   },
+   "WorkOrderResume": {
+    "type": "object",
+    "properties": {
+     "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "note": {
+      "type": "string",
+      "example": "값"
+     }
+    },
+    "required": [
+     "occurredAt"
+    ],
+    "description": "재시작은 상태가 아니라 중단→진행 전이 이벤트다 — 그래서 발생 시각을 받는다. 근거: ✓설계확정 결정 14 · 공유계약 C-12"
    },
    "WorkOrderUpdate": {
     "type": "object",
