@@ -33,7 +33,10 @@ import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-WRITE_METHODS = ('post', 'put', 'delete')
+# ⛔ 2026-08-11 정정 — patch 가 빠져 있었다. 02 계약이 처음 PATCH 를 쓰면서 드러났다.
+#    앞의 세 계약에 PATCH 가 0건이라 구멍이 안 보였을 뿐, PATCH 오퍼레이션은
+#    멱등키·example·409 검사를 통째로 빠져나가고 있었다.
+WRITE_METHODS = ('post', 'put', 'patch', 'delete')
 ALL_METHODS = ('get',) + WRITE_METHODS
 PATH_VAR = re.compile(r'\{(\w+)\}')
 
