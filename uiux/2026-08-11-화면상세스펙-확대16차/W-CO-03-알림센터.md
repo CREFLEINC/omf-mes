@@ -169,7 +169,7 @@ DR-003 **3-B** 가 수신 대상을 **2축**(조직 범위 × 역할 / 개인 �
 
 ### §7-1. ⚠ **`Badge` 가 없다** — 확인된 사실
 
-ds-gap 이 「**없는 것**: `Badge`·`Drawer`·`DatePicker`·`FileInput`·`Pagination`」으로 적어 뒀다. **🔔 배지는 `Chip` + 위치 지정으로 만든다**(`c`).
+ds-gap 이 「**없는 것**: `Badge`·`Drawer`·`DatePicker`·`FileInput`·`Pagination`」으로 적어 뒀다. ⚠ **2026-08-11 재대조 — `DatePicker` 는 이제 실재한다**(이 화면은 쓰지 않는다). **🔔 배지는 `Chip` + 위치 지정으로 만든다**(`c`).
 
 ⛔ **`d` 로 올리지 않는다** — **한 곳**이고(셸 헤더), **`Chip` 으로 성립**한다.
 

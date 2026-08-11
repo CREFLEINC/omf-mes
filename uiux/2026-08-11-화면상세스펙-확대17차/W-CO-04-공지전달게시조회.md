@@ -189,7 +189,7 @@ DR-005 가 「**알림(DR-003)과 같은 모양**」이라 적었고 「**알림
 | 상태 · 확인 요구 표식 | **a** | `Chip` — ⚠ `Badge` 없음(16차와 같은 판정) |
 | 필터 | **a** | `Select` · `SearchInput` |
 | 작성 | **a** | `Dialog` + `TextField` |
-| 게시기간 | **c** | ⚠ **`DatePicker` 가 DS 에 없다** — `TextField`(date) 조합. **기존 갭**(신규 아님) |
+| 게시기간 | ~~c~~ → **a** | ⭐ **`DatePicker` 실재**(재대조 `2891ae8` · **우리 요청 DS #40 구현**) — `mode` `single`\|`range` · `size` `xl` · `mode="range"` 가 **시작–종료를 한 컨트롤로** 받는다 |
 | 확인 요구 토글 | **a** | `Switch` |
 | 확인 현황 수치 | **a** | `StatCard` |
 | 미확인자 목록 | **a** | `Dialog` + `Table` |
