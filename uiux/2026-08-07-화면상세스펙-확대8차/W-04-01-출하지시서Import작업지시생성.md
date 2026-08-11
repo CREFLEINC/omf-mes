@@ -230,7 +230,7 @@ customer_lot_requirement   varchar(200)   ← nullable · 형식 없음
 | 좌측 지시서 목록 | `Table` + `SearchInput` + `Select` | **c** — G-2 |
 | 페이지 이동 | `Button` + `Select` + 상태 | **c** — **G-12** |
 | 편성 폼 | `TextField` + `Select` + `Checkbox` | a |
-| 출하 희망일 | `TextField` `type="date"` — ⚠ **`DatePicker`는 고정 커밋에 없다** | **c** — **G-8** |
+| 출하 희망일 | ⭐ **`DatePicker` 실재**(재대조 `2891ae8` · **우리 요청 DS #40 구현**) — `mode` `single`\|`range` · `size` `xl` | ~~c~~ → **a** — **G-8 해소** |
 | 라인 편집 표 | `Table` + `TableColumn.render` | **c** |
 | 가용 부족 경고 | `AlertBanner` | a — G-1 |
 | 고객 LOT 요구 | `TextField`(multiline) | a |
