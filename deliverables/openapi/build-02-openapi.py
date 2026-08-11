@@ -200,7 +200,8 @@ schemas["WorkOrderClose"] = obj(["remainderDispositionCode"], {
     "remainderDispositionCode": {"type":"string","enum":["CARRY_OVER","WRITE_OFF"],"description":"잔량 처분 — 이월 / 소멸. 근거: W-02-05 §5"},
     "reasonCode": STR,
     "erpSendItems": {"type":"array","items":STR,"description":"송신 항목 토글 결과"}})
-schemas["WorkOrderCancel"] = obj(["reasonCode"], {"reasonCode": STR, "note": STR})
+schemas["WorkOrderCancel"] = obj(["reasonCode"], {"reasonCode": STR, "note": STR},
+    description="취소하면 선발행된 생산LOT 슬롯이 자동 폐번된다 — 화면이 저장 전에 그 파급을 말한다. 근거: DR-007 · 공유계약 G-19")
 schemas["WorkOrderHold"] = obj(["reasonCode","occurredAt"], {"reasonCode": STR, "occurredAt": TS, "note": STR},
     description="POP 에서 누른다 — occurredAt 은 단말 시계가 정한다. 근거: 공유계약 C-12")
 schemas["WorkOrderResume"] = obj(["occurredAt"], {"occurredAt": TS, "note": STR},
@@ -244,8 +245,8 @@ WO_ACTIONS = [
  (":hold","작업 중단","W/O 를 중단 상태로 옮긴다. 세션은 :end 로 따로 닫는다 — 중단 상태를 갖는 것은 W/O 다. POP 에서 누르므로 오프라인 대상이다. 근거: ✓설계확정 결정 14 · P-02-10 §5-4","WorkOrderHold",dict(list(one("WorkOrder","200","중단됨").items())+list(QUEUED.items())),True,None),
  (":resume","작업 재개","중단→진행 전이 이벤트다. 재시작은 상태가 아니다. POP 에서 누르므로 오프라인 대상이다. 근거: ✓설계확정 결정 14 · P-02-01 §5","WorkOrderResume",dict(list(one("WorkOrder","200","재개됨").items())+list(QUEUED.items())),True,None),
  (":close","마감 · ERP 실적 송신","잔량 처분을 함께 정한다. 미달 슬롯은 이 시점에 자동 폐번된다. ERP 실제 전송만 트랜잭션 밖이다. 근거: W-02-05 §5 · R27·R82","WorkOrderClose",one("WorkOrder","200","마감됨"),True,None),
- (":cancel","W/O 취소","취소 상태로 옮긴다. 근거: 예외 E-4 ④ · W-02-06 §5-5","WorkOrderCancel",one("WorkOrder","200","취소됨"),True,
-  "선발행 생산LOT 을 어떻게 하는지가 미정이다 — 예외 E-4 ④ 가 「취소 상태 신설은 확정 · 선발행 LOT 회수 규칙은 잔여」로 남겼다. R82 의 마감 자동 폐번은 마감 경로이고 취소 경로가 아니다. 의사결정 요청서 DR-007 로 올렸다. 결정 전에는 이 액션의 부수 효과를 계약이 적지 않으며 착수 통지도 내지 않는다."),
+ (":cancel","W/O 취소","취소 상태로 옮기고 선발행된 생산LOT 슬롯을 자동 폐번한다. 마감 시 미달 슬롯을 폐번하는 것과 같은 규칙이다. 근거: 예외 E-4 ④(2026-08-12 종결) · R27·R82 · W-02-06 §5-5","WorkOrderCancel",one("WorkOrder","200","취소됨"),True,
+  "DR-007(2026-08-12 확정)로 부수 효과가 정해졌다 — R27 과 같게 즉시 폐번. 선발행은 번호 슬롯 예약이고 완료 전에는 실물에 귀속되지 않으므로(R26) 폐번해도 현장에 라벨이 남지 않는다. 신설 0 — trace.lot.status_code 의 「폐번」 값을 그대로 쓴다."),
 ]
 OFFLINE_WO = (":hold", ":resume")   # POP 에서 누르는 액션 — 큐로 온다
 for suffix, summary, desc, body, resp, idem, note in WO_ACTIONS:
@@ -542,7 +543,7 @@ doc = {
    "x-internal-note": ("설계·도출 근거는 uiux/2026-08-11-API스펙-02생산실행/ 의 00~03 단계 문서다. "
      "리소스 11 · 액션 근거 103건(화면 액션 표 83 + 확대 3차 6장 본문 도출 20). "
      "미해소 상류 셋을 계약이 드러낸다 — omf-mes#76(긴급 W/O 가 P/O NOT NULL 체인에 막힘 · 501), "
-     "omf-mes#60(수량 3원↔5컬럼), DR-007(W/O 취소 시 선발행 LOT 회수 규칙).")
+     "omf-mes#60(수량 3원↔5컬럼). DR-007(취소 시 선발행 LOT 회수)은 2026-08-12 에 확정돼 본문에 반영됐다.")
  },
  "servers": [{"url": "/api", "description": "온프레미스 설치형"}],
  "tags": [{"name":"planning","description":"수주·계획 — P/O · 생산 계획"},
