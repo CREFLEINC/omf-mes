@@ -1,0 +1,5531 @@
+{
+ "openapi": "3.1.0",
+ "info": {
+  "title": "omf-mes 02 생산실행 도메인 API (초안)",
+  "version": "0.1.0",
+  "description": "02 생산실행 도메인 API 계약. P/O 수신에서 생산 계획·작업지시·작업 세션·자재 투입·생산 실적·공정 인계까지를 덮는다. 경로는 물리 모델의 스키마를 그대로 네임스페이스로 쓰므로 /planning 과 /production 둘로 나뉜다. BOM·Routing 은 기준정보 계약이 소유하므로 여기서는 참조만 한다. 자재 출고 요청·현장 수령·자재 LOT 은 자재창고 계약이 소유한다. 검사 결과는 품질 계약이 소유한다. 출력물(인식표·라벨) 발행은 공통 계약이 소유한다. 작업 세션은 구간 형 리소스다 — 「진행 중」을 상태 컬럼으로 두지 않고 끝 시각의 부재로 판정하며, 닫는 것은 :end 액션이다. 현장 단말 화면 다수가 오프라인에서 쓰이므로 쓰기 오퍼레이션은 Idempotency-Key 를 필수로 받고 If-Match 를 선택으로 둔다. 즉시 처리는 201, 큐 접수는 202 로 나뉜다.",
+  "x-internal-note": "설계·도출 근거는 uiux/2026-08-11-API스펙-02생산실행/ 의 00~03 단계 문서다. 리소스 11 · 액션 근거 99건(화면 액션 표 83 + 확대 3차 6장 본문 도출 16). 미해소 상류 셋을 계약이 드러낸다 — omf-mes#76(긴급 W/O 가 P/O NOT NULL 체인에 막힘 · 501), omf-mes#60(수량 3원↔5컬럼), DR-007(W/O 취소 시 선발행 LOT 회수 규칙)."
+ },
+ "servers": [
+  {
+   "url": "/api",
+   "description": "온프레미스 설치형"
+  }
+ ],
+ "tags": [
+  {
+   "name": "planning",
+   "description": "수주·계획 — P/O · 생산 계획"
+  },
+  {
+   "name": "production",
+   "description": "생산 실행 — 작업지시 · 세션 · 투입 · 실적 · 인계"
+  }
+ ],
+ "paths": {
+  "/planning/production-orders": {
+   "get": {
+    "tags": [
+     "planning"
+    ],
+    "summary": "P/O 목록",
+    "description": "근거: W-02-01 §3",
+    "parameters": [
+     {
+      "name": "statusCode",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "example": "값"
+      }
+     },
+     {
+      "name": "plantId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "itemId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "dueDateFrom",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date",
+       "example": "2026-08-11"
+      },
+      "description": "납기 시작"
+     },
+     {
+      "name": "dueDateTo",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date",
+       "example": "2026-08-11"
+      },
+      "description": "납기 종료"
+     },
+     {
+      "name": "q",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "example": "값"
+      },
+      "description": "P/O 번호 검색"
+     },
+     {
+      "name": "includeChildren",
+      "in": "query",
+      "schema": {
+       "type": "boolean",
+       "default": false
+      },
+      "description": "하위 레벨 함께. 계층 펼침용"
+     },
+     {
+      "name": "page",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 1
+      }
+     },
+     {
+      "name": "size",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 50
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "목록",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "items": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/ProductionOrder"
+           }
+          },
+          "page": {
+           "$ref": "#/components/schemas/PageMeta"
+          }
+         },
+         "required": [
+          "items",
+          "page"
+         ]
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/planning/production-orders/{productionOrderId}": {
+   "get": {
+    "tags": [
+     "planning"
+    ],
+    "summary": "P/O 한 건",
+    "description": "근거: W-02-01 §3",
+    "parameters": [
+     {
+      "name": "productionOrderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "상세",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProductionOrder"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/planning/production-orders/{productionOrderId}:acknowledge": {
+   "post": {
+    "tags": [
+     "planning"
+    ],
+    "summary": "P/O 변경 확인 처리",
+    "description": "관리자가 ERP 변경을 반영할지 강행할지 판정한다. 근거: W-02-06 §5-5 · :동사 규약",
+    "parameters": [
+     {
+      "name": "productionOrderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProductionOrderAcknowledge"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "처리됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProductionOrder"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/planning/production-orders/{productionOrderId}:resync": {
+   "post": {
+    "tags": [
+     "planning"
+    ],
+    "summary": "ERP 재동기 요청",
+    "description": "수신본이 어긋났을 때 다시 받는다. 근거: W-02-01 §5",
+    "parameters": [
+     {
+      "name": "productionOrderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     }
+    ],
+    "responses": {
+     "202": {
+      "description": "재동기를 접수했다. 결과는 연계 수신으로 온다"
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/planning/production-plans": {
+   "get": {
+    "tags": [
+     "planning"
+    ],
+    "summary": "생산 계획 목록",
+    "description": "근거: W-02-02 §3",
+    "parameters": [
+     {
+      "name": "productionOrderId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "statusCode",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "example": "값"
+      }
+     },
+     {
+      "name": "planDateFrom",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date",
+       "example": "2026-08-11"
+      }
+     },
+     {
+      "name": "planDateTo",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date",
+       "example": "2026-08-11"
+      }
+     },
+     {
+      "name": "page",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 1
+      }
+     },
+     {
+      "name": "size",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 50
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "목록",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "items": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/ProductionPlan"
+           }
+          },
+          "page": {
+           "$ref": "#/components/schemas/PageMeta"
+          }
+         },
+         "required": [
+          "items",
+          "page"
+         ]
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "planning"
+    ],
+    "summary": "생산 계획 추가",
+    "description": "근거: W-02-02 §5",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProductionPlanCreate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "생성됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProductionPlan"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/planning/production-plans/{productionPlanId}": {
+   "get": {
+    "tags": [
+     "planning"
+    ],
+    "summary": "생산 계획 한 건",
+    "description": "근거: W-02-02 §3",
+    "parameters": [
+     {
+      "name": "productionPlanId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "상세",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProductionPlan"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    }
+   },
+   "put": {
+    "tags": [
+     "planning"
+    ],
+    "summary": "생산 계획 수정",
+    "description": "확정 전에만 고칠 수 있다. 근거: W-02-02 §5",
+    "parameters": [
+     {
+      "name": "productionPlanId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProductionPlanUpdate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "수정됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProductionPlan"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   },
+   "delete": {
+    "tags": [
+     "planning"
+    ],
+    "summary": "생산 계획 삭제",
+    "description": "확정 전 계획만 지운다. 확정 뒤에는 W/O 가 매달려 있어 지우지 않는다. 근거: W-02-02 §5 · 공유계약 B-4",
+    "parameters": [
+     {
+      "name": "productionPlanId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "삭제됨"
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-internal-note": "01 자재창고 계약에는 DELETE 가 0건이다 — 업무 문서는 지우는 것이 아니라 상태를 옮기기 때문이다. 확정 전 생산 계획은 아직 문서가 아니라 편집 중인 초안이라 물리 삭제를 둔다. 화면 액션에도 「계획 추가·삭제」가 있다(W-02-02). 확정 뒤에는 W/O 가 매달려 있어 404 가 아니라 409 로 막는다."
+   }
+  },
+  "/planning/production-plans/{productionPlanId}:confirm": {
+   "post": {
+    "tags": [
+     "planning"
+    ],
+    "summary": "전개 확정",
+    "description": "계획을 확정해 W/O 전개를 연다. 근거: W-02-02 §5 · :동사 규약",
+    "parameters": [
+     {
+      "name": "productionPlanId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "확정됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProductionPlan"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/material-consumptions": {
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "자재 투입 목록",
+    "description": "근거: P-02-03 §3",
+    "parameters": [
+     {
+      "name": "workOrderId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "workSessionId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "lotId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "consumptionTypeCode",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "example": "값"
+      }
+     },
+     {
+      "name": "occurredFrom",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-11T09:12:00+09:00"
+      }
+     },
+     {
+      "name": "occurredTo",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-11T09:12:00+09:00"
+      }
+     },
+     {
+      "name": "page",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 1
+      }
+     },
+     {
+      "name": "size",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 50
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "목록",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "items": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/MaterialConsumption"
+           }
+          },
+          "page": {
+           "$ref": "#/components/schemas/PageMeta"
+          }
+         },
+         "required": [
+          "items",
+          "page"
+         ]
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "자재 투입 등록",
+    "description": "오투입 판정이 서버에서 일어난다 — 화면만으로 막지 않는다. 근거: P-02-03 §5-1·5-3 · 공유계약 F-1 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 즉시 처리되면 201, 큐에 담기면 202 다(C-7).",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersionOptional"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/MaterialConsumptionCreate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "기록됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/MaterialConsumption"
+        }
+       }
+      }
+     },
+     "202": {
+      "description": "큐에 담겼다 — 아직 서버가 모른다. 근거: 공유계약 C-7",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/QueuedResponse"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-internal-note": "idempotency_key 가 테이블 컬럼으로도 있다(NOT NULL UNIQUE) — 헤더로 받아 그 자리에 저장한다. 근거: 공유계약 C-8"
+   }
+  },
+  "/production/material-consumptions/{materialConsumptionId}": {
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "자재 투입 한 건",
+    "description": "근거: P-02-03 §3",
+    "parameters": [
+     {
+      "name": "materialConsumptionId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "상세",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/MaterialConsumption"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/material-losses": {
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "자재 손실 목록",
+    "description": "근거: P-02-04 §5",
+    "parameters": [
+     {
+      "name": "workOrderId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "lossTypeCode",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "example": "값"
+      }
+     },
+     {
+      "name": "occurredFrom",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-11T09:12:00+09:00"
+      }
+     },
+     {
+      "name": "occurredTo",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-11T09:12:00+09:00"
+      }
+     },
+     {
+      "name": "page",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 1
+      }
+     },
+     {
+      "name": "size",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 50
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "목록",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "items": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/MaterialLoss"
+           }
+          },
+          "page": {
+           "$ref": "#/components/schemas/PageMeta"
+          }
+         },
+         "required": [
+          "items",
+          "page"
+         ]
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "자재 손실 등록",
+    "description": "근거: P-02-04 §5 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 즉시 처리되면 201, 큐에 담기면 202 다(C-7).",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersionOptional"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/MaterialLossCreate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "기록됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/MaterialLoss"
+        }
+       }
+      }
+     },
+     "202": {
+      "description": "큐에 담겼다 — 아직 서버가 모른다. 근거: 공유계약 C-7",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/QueuedResponse"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/material-losses/{materialLossId}": {
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "자재 손실 한 건",
+    "description": "근거: P-02-04 §5",
+    "parameters": [
+     {
+      "name": "materialLossId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "상세",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/MaterialLoss"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/material-returns": {
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "자재 반출 목록",
+    "description": "근거: M-02-02 §3",
+    "parameters": [
+     {
+      "name": "workOrderId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "statusCode",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "example": "값"
+      }
+     },
+     {
+      "name": "requestedFrom",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-11T09:12:00+09:00"
+      }
+     },
+     {
+      "name": "requestedTo",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-11T09:12:00+09:00"
+      }
+     },
+     {
+      "name": "page",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 1
+      }
+     },
+     {
+      "name": "size",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 50
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "목록",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "items": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/MaterialReturn"
+           }
+          },
+          "page": {
+           "$ref": "#/components/schemas/PageMeta"
+          }
+         },
+         "required": [
+          "items",
+          "page"
+         ]
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "자재 반출 등록",
+    "description": "근거: M-02-02 §5 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 즉시 처리되면 201, 큐에 담기면 202 다(C-7).",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersionOptional"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/MaterialReturnCreate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "기록됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/MaterialReturn"
+        }
+       }
+      }
+     },
+     "202": {
+      "description": "큐에 담겼다 — 아직 서버가 모른다. 근거: 공유계약 C-7",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/QueuedResponse"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/material-returns/{materialReturnId}": {
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "자재 반출 한 건",
+    "description": "근거: M-02-02 §3",
+    "parameters": [
+     {
+      "name": "materialReturnId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "상세",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/MaterialReturn"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/operation-handovers": {
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "공정 인계 목록",
+    "description": "근거: M-02-01 §3",
+    "parameters": [
+     {
+      "name": "fromWorkOrderId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "toWorkOrderId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "statusCode",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "example": "값"
+      }
+     },
+     {
+      "name": "handedOverFrom",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-11T09:12:00+09:00"
+      }
+     },
+     {
+      "name": "handedOverTo",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-11T09:12:00+09:00"
+      }
+     },
+     {
+      "name": "page",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 1
+      }
+     },
+     {
+      "name": "size",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 50
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "목록",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "items": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/OperationHandover"
+           }
+          },
+          "page": {
+           "$ref": "#/components/schemas/PageMeta"
+          }
+         },
+         "required": [
+          "items",
+          "page"
+         ]
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "공정 인계 확정",
+    "description": "인계와 인수를 한 번에 확정한다 — 화면의 버튼이 하나다. 근거: M-02-01 §5 · 02 계약 2단계 §1-1 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 즉시 처리되면 201, 큐에 담기면 202 다(C-7).",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersionOptional"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/OperationHandoverCreate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "기록됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/OperationHandover"
+        }
+       }
+      }
+     },
+     "202": {
+      "description": "큐에 담겼다 — 아직 서버가 모른다. 근거: 공유계약 C-7",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/QueuedResponse"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-internal-note": "물리 모델은 handed_over_at NOT NULL / received_at nullable 로 구간 형 모양이다. 그런데 받는 쪽 화면이 없어 received_at 을 채울 경로가 생기지 않는다. 화면을 따라 인계 확정 시 두 시각을 함께 찍는다 — 원칙 1(데이터 모델은 화면 설계를 따라온다). 인수 확인 화면이 나중에 생기면 :receive 를 더한다."
+   }
+  },
+  "/production/operation-handovers/{operationHandoverId}": {
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "공정 인계 한 건",
+    "description": "근거: M-02-01 §3",
+    "parameters": [
+     {
+      "name": "operationHandoverId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "상세",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/OperationHandover"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/production-results": {
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "생산 실적 목록",
+    "description": "집계 화면이 이 경로를 쓴다. 근거: P-02-04 §3 · W-02-08 §5",
+    "parameters": [
+     {
+      "name": "workOrderId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "workSessionId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "shiftId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "equipmentId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "occurredFrom",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-11T09:12:00+09:00"
+      }
+     },
+     {
+      "name": "occurredTo",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-11T09:12:00+09:00"
+      }
+     },
+     {
+      "name": "page",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 1
+      }
+     },
+     {
+      "name": "size",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 50
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "목록",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "items": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/ProductionResult"
+           }
+          },
+          "page": {
+           "$ref": "#/components/schemas/PageMeta"
+          }
+         },
+         "required": [
+          "items",
+          "page"
+         ]
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "생산 실적 등록",
+    "description": "다섯 수량을 그대로 받는다. 근거: P-02-04 §5 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 즉시 처리되면 201, 큐에 담기면 202 다(C-7).",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersionOptional"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProductionResultCreate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "기록됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProductionResult"
+        }
+       }
+      }
+     },
+     "202": {
+      "description": "큐에 담겼다 — 아직 서버가 모른다. 근거: 공유계약 C-7",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/QueuedResponse"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-internal-note": "수량 구분이 정본 3원과 물리 5컬럼으로 어긋나 있다 — omf-mes#60. 계약은 5를 그대로 노출하고 접지 않는다."
+   }
+  },
+  "/production/production-results/{productionResultId}": {
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "생산 실적 한 건",
+    "description": "집계 화면이 이 경로를 쓴다. 근거: P-02-04 §3 · W-02-08 §5",
+    "parameters": [
+     {
+      "name": "productionResultId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "상세",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProductionResult"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/production-results/{productionResultId}:correct": {
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "실적 정정",
+    "description": "원본을 고치지 않고 정정 레코드를 덧붙인다. 근거: 공유계약 G-18 · W-02-05 §5",
+    "parameters": [
+     {
+      "name": "productionResultId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProductionResultCorrect"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "정정 기록됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProductionResult"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/work-orders": {
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "W/O 목록·진행현황",
+    "description": "집계 열(실적 누계)을 함께 내려준다. 근거: W-02-08 §3·§5",
+    "parameters": [
+     {
+      "name": "productionPlanId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "statusCode",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "example": "값"
+      }
+     },
+     {
+      "name": "productionLineId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "workOrderTypeCode",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "example": "값"
+      }
+     },
+     {
+      "name": "plannedStartFrom",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-11T09:12:00+09:00"
+      }
+     },
+     {
+      "name": "plannedStartTo",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-11T09:12:00+09:00"
+      }
+     },
+     {
+      "name": "q",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "example": "값"
+      },
+      "description": "W/O 번호 검색"
+     },
+     {
+      "name": "sort",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "default": "priorityNo,asc"
+      },
+      "description": "정렬 키는 제한한다. 근거: 공유계약 L-4"
+     },
+     {
+      "name": "withProgress",
+      "in": "query",
+      "schema": {
+       "type": "boolean",
+       "default": true
+      },
+      "description": "실적 누계를 함께 받는다"
+     },
+     {
+      "name": "page",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 1
+      }
+     },
+     {
+      "name": "size",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 50
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "목록",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "items": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/WorkOrder"
+           }
+          },
+          "page": {
+           "$ref": "#/components/schemas/PageMeta"
+          }
+         },
+         "required": [
+          "items",
+          "page"
+         ]
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "W/O 발행",
+    "description": "전개로 만들거나 긴급으로 직접 만든다. 근거: W-02-02 §5 · W-02-07 §5",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/WorkOrderCreate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "생성됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/WorkOrder"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     },
+     "501": {
+      "description": "구현할 수 없다 — 상류 미해소",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-internal-note": "긴급 W/O(workOrderTypeCode=EMERGENCY)는 productionPlanId 없이 서야 하는데 물리 모델이 NOT NULL 체인으로 막고 있다 — omf-mes#76. 미해소 동안 501 을 답한다. 근거: W-02-07 · 02 계약 2단계 §6-1"
+   }
+  },
+  "/production/work-orders/{workOrderId}": {
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "W/O 한 건",
+    "description": "근거: W-02-08 §3",
+    "parameters": [
+     {
+      "name": "workOrderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "상세",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/WorkOrder"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    }
+   },
+   "put": {
+    "tags": [
+     "production"
+    ],
+    "summary": "W/O 수정 · 4M 자원배정",
+    "description": "배포 전에만 고친다. 근거: W-02-03 §5 · W-02-04 §5",
+    "parameters": [
+     {
+      "name": "workOrderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/WorkOrderUpdate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "수정됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/WorkOrder"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/work-orders/{workOrderId}/validation": {
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "4M 배정 유효성 점검",
+    "description": "자원 배정이 서로 부딪히는지 본다. 저장하지 않으므로 상태 전이가 아니다 — :동사 를 쓰지 않는다. 근거: W-02-03 §5 · 02 계약 2단계 §4-1",
+    "parameters": [
+     {
+      "name": "workOrderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "점검 결과",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ValidationReport"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/work-orders/{workOrderId}:cancel": {
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "W/O 취소",
+    "description": "취소 상태로 옮긴다. 근거: 예외 E-4 ④ · W-02-06 §5-5",
+    "parameters": [
+     {
+      "name": "workOrderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/WorkOrderCancel"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "취소됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/WorkOrder"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-internal-note": "선발행 생산LOT 을 어떻게 하는지가 미정이다 — 예외 E-4 ④ 가 「취소 상태 신설은 확정 · 선발행 LOT 회수 규칙은 잔여」로 남겼다. R82 의 마감 자동 폐번은 마감 경로이고 취소 경로가 아니다. 의사결정 요청서 DR-007 로 올렸다. 결정 전에는 이 액션의 부수 효과를 계약이 적지 않으며 착수 통지도 내지 않는다."
+   }
+  },
+  "/production/work-orders/{workOrderId}:close": {
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "마감 · ERP 실적 송신",
+    "description": "잔량 처분을 함께 정한다. 미달 슬롯은 이 시점에 자동 폐번된다. ERP 실제 전송만 트랜잭션 밖이다. 근거: W-02-05 §5 · R27·R82",
+    "parameters": [
+     {
+      "name": "workOrderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/WorkOrderClose"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "마감됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/WorkOrder"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/work-orders/{workOrderId}:hold": {
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "작업 중단",
+    "description": "W/O 를 중단 상태로 옮긴다. 세션은 :end 로 따로 닫는다 — 중단 상태를 갖는 것은 W/O 다. 근거: ✓설계확정 결정 14 · P-02-10 §5-4",
+    "parameters": [
+     {
+      "name": "workOrderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/WorkOrderHold"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "중단됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/WorkOrder"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/work-orders/{workOrderId}:release": {
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "확정·배포 · 생산LOT 선발행",
+    "description": "확정과 배포와 선발행이 한 트랜잭션이다. 선발행은 번호 슬롯 예약이며 완료 전에는 실물에 귀속되지 않는다. 근거: W-02-04 §5 · R26·R27",
+    "parameters": [
+     {
+      "name": "workOrderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/WorkOrderRelease"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "배포됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/WorkOrder"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/work-orders/{workOrderId}:resume": {
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "작업 재개",
+    "description": "중단→진행 전이 이벤트다. 재시작은 상태가 아니다. 근거: ✓설계확정 결정 14 · P-02-01 §5",
+    "parameters": [
+     {
+      "name": "workOrderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "재개됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/WorkOrder"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/work-sessions": {
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "작업 세션 목록",
+    "description": "기본은 열린 세션이다 — 상태 코드로 거르지 않는다. 근거: 공유계약 G-16 · 02 계약 2단계 §4-3",
+    "parameters": [
+     {
+      "name": "open",
+      "in": "query",
+      "schema": {
+       "type": "boolean",
+       "default": true
+      },
+      "description": "끝 시각이 없는 것만. 기본 true"
+     },
+     {
+      "name": "workOrderId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "terminalId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "shiftId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "startedFrom",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-11T09:12:00+09:00"
+      }
+     },
+     {
+      "name": "startedTo",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-11T09:12:00+09:00"
+      }
+     },
+     {
+      "name": "page",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 1
+      }
+     },
+     {
+      "name": "size",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 50
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "목록",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "items": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/WorkSession"
+           }
+          },
+          "page": {
+           "$ref": "#/components/schemas/PageMeta"
+          }
+         },
+         "required": [
+          "items",
+          "page"
+         ]
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "작업 시작 — 세션 열기",
+    "description": "단말 게이팅(can_start_work)을 서버가 강제한다. 통제 우회는 controlOverride 로 함께 보낸다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 즉시 처리되면 201, 큐에 담기면 202 다(C-7). 근거: P-02-01 §5 · P-02-02 §5 · 공유계약 F-1·F-6",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersionOptional"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/WorkSessionCreate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "시작됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/WorkSession"
+        }
+       }
+      }
+     },
+     "202": {
+      "description": "큐에 담겼다 — 아직 서버가 모른다. 근거: 공유계약 C-7",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/QueuedResponse"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-internal-note": "409 OPEN_SESSION_EXISTS 는 같은 W/O 에 열린 세션이 이미 있다는 뜻이다. uq_work_session(work_order_id, session_no) 가 물리적으로도 막는다."
+   }
+  },
+  "/production/work-sessions/{workSessionId}": {
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "세션 한 건",
+    "description": "근거: P-02-01 §3",
+    "parameters": [
+     {
+      "name": "workSessionId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "상세",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/WorkSession"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/work-sessions/{workSessionId}/events": {
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "세션 이벤트 목록",
+    "description": "근거: P-02-10 §5",
+    "parameters": [
+     {
+      "name": "workSessionId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "eventTypeCode",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "example": "값"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "목록",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/WorkSessionEvent"
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "세션 이벤트 적재",
+    "description": "중단·재개·통제 우회를 기록한다. occurredAt 은 단말이 보낸다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 즉시 처리되면 201, 큐에 담기면 202 다(C-7). ⚠ 세션이 먼저 서야 한다 — 큐에서는 세션 열기와 묶음으로 간다(C-10). 근거: P-02-10 §5-2 · 공유계약 C-12",
+    "parameters": [
+     {
+      "name": "workSessionId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersionOptional"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/WorkSessionEventCreate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "기록됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/WorkSessionEvent"
+        }
+       }
+      }
+     },
+     "202": {
+      "description": "큐에 담겼다 — 아직 서버가 모른다. 근거: 공유계약 C-7",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/QueuedResponse"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/work-sessions/{workSessionId}/workers": {
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "세션 작업자 목록",
+    "description": "근거: P-02-01 §5",
+    "parameters": [
+     {
+      "name": "workSessionId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "active",
+      "in": "query",
+      "schema": {
+       "type": "boolean",
+       "default": true
+      },
+      "description": "떠나지 않은 사람만"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "목록",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/WorkSessionWorker"
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "작업자 참여",
+    "description": "세션을 닫지 않고 사람을 더한다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 즉시 처리되면 201, 큐에 담기면 202 다(C-7).",
+    "parameters": [
+     {
+      "name": "workSessionId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersionOptional"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/WorkSessionWorkerJoin"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "참여됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/WorkSessionWorker"
+        }
+       }
+      }
+     },
+     "202": {
+      "description": "큐에 담겼다 — 아직 서버가 모른다. 근거: 공유계약 C-7",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/QueuedResponse"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/work-sessions/{workSessionId}/workers/{workSessionWorkerId}:leave": {
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "작업자 이탈",
+    "description": "떠난 시각을 찍는다. 행을 지우지 않는다 — 누가 언제까지 있었는지가 기록이다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 즉시 처리되면 201, 큐에 담기면 202 다(C-7). 근거: 공유계약 B-4 의 정신",
+    "parameters": [
+     {
+      "name": "workSessionId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "workSessionWorkerId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/WorkSessionWorkerLeave"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "이탈 기록됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/WorkSessionWorker"
+        }
+       }
+      }
+     },
+     "202": {
+      "description": "큐에 담겼다 — 아직 서버가 모른다. 근거: 공유계약 C-7",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/QueuedResponse"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/work-sessions/{workSessionId}:end": {
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "세션 닫기",
+    "description": "끝 시각을 찍어 구간을 닫는다. 상태 컬럼을 바꾸는 것이 아니다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 즉시 처리되면 201, 큐에 담기면 202 다(C-7). 근거: 공유계약 G-16 · C-16(큐에서 가장 먼저 보낸다)",
+    "parameters": [
+     {
+      "name": "workSessionId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersionOptional"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/WorkSessionEnd"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "닫힘",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/WorkSession"
+        }
+       }
+      }
+     },
+     "202": {
+      "description": "큐에 담겼다 — 아직 서버가 모른다. 근거: 공유계약 C-7",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/QueuedResponse"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "components": {
+  "parameters": {
+   "IdempotencyKey": {
+    "name": "Idempotency-Key",
+    "in": "header",
+    "required": true,
+    "schema": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "전 쓰기 API 필수. 같은 키로 다시 보내면 새 전표를 만들지 않는다.",
+    "x-internal-note": "근거: deliverables/02-SW설계사양서 §3.3 · 공유계약 C-1. 원장의 유일 제약이 (idempotency_key, business_date) 라 재전송 판정에 영업일이 함께 쓰인다(C-8)."
+   },
+   "IfMatchVersion": {
+    "name": "If-Match",
+    "in": "header",
+    "required": true,
+    "schema": {
+     "type": "string"
+    },
+    "description": "낙관적 잠금용 version_no. 값은 같은 리소스의 상세 GET 200 이 내려주는 ETag 응답 헤더에서 받는다. 근거: 공유계약 B-1"
+   },
+   "IfMatchVersionOptional": {
+    "name": "If-Match",
+    "in": "header",
+    "required": false,
+    "schema": {
+     "type": "string"
+    },
+    "description": "오프라인에서도 쓰는 오퍼레이션에서는 선택이다 — 없으면 낙관적 잠금 검사를 건너뛴다. 큐에 쌓인 요청은 토큰을 싣지 않는다. 근거: 공유계약 C-9",
+    "x-internal-note": "관리웹 전용 오퍼레이션에는 IfMatchVersion(required)을 그대로 쓴다 — 이 완화는 오프라인 대상에만 적용한다(02-URL동작규약.md §5)."
+   }
+  },
+  "schemas": {
+   "ConflictResponse": {
+    "type": "object",
+    "properties": {
+     "code": {
+      "type": "string",
+      "enum": [
+       "VERSION_CONFLICT",
+       "DUPLICATE_KEY",
+       "OPEN_SESSION_EXISTS",
+       "BATCH_DEPENDENCY_FAILED",
+       "INVALID_STATE"
+      ],
+      "description": "OPEN_SESSION_EXISTS 는 열린 구간이 이미 있다는 뜻이다. BATCH_DEPENDENCY_FAILED 는 선행 요청이 아직 없다는 뜻이며 큐가 묶음을 멈춰야 한다. 근거: 공유계약 C-2 · C-10",
+      "example": "VERSION_CONFLICT"
+     },
+     "message": {
+      "type": "string",
+      "example": "값"
+     },
+     "failedAt": {
+      "type": "string",
+      "description": "BATCH_DEPENDENCY_FAILED 일 때 멈춘 지점의 멱등키",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "currentVersion": {
+      "type": "string",
+      "description": "VERSION_CONFLICT 일 때 서버의 현재 version_no",
+      "example": "값"
+     }
+    },
+    "required": [
+     "code",
+     "message"
+    ]
+   },
+   "ControlOverride": {
+    "type": "object",
+    "properties": {
+     "reasonCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "note": {
+      "type": "string",
+      "example": "값"
+     }
+    },
+    "required": [
+     "reasonCode"
+    ],
+    "description": "작업 전 점검 통제를 우회하고 시작할 때 함께 보낸다. 서버가 세션과 work_session_event(통제 우회)를 한 트랜잭션으로 만든다. 별도 액션을 두지 않는 이유는 「우회만 하고 세션을 안 여는」 상태를 없애기 위함이다. 근거: QA #9 · P-02-02 §4 · 공유계약 F-6"
+   },
+   "ErrorItem": {
+    "type": "object",
+    "properties": {
+     "scope": {
+      "type": "string",
+      "enum": [
+       "field",
+       "screen"
+      ],
+      "description": "오류의 범위. 근거: 공유계약 G-1",
+      "example": "field"
+     },
+     "field": {
+      "type": "string",
+      "description": "scope=field 일 때 대상 프로퍼티명",
+      "example": "inputQty"
+     },
+     "code": {
+      "type": "string",
+      "example": "QTY_MUST_BE_POSITIVE"
+     },
+     "message": {
+      "type": "string",
+      "description": "화면이 그대로 보여도 되는 문장. 「어떻게 풀 것인가」를 담는다. 근거: 공유계약 G-3",
+      "example": "값"
+     }
+    },
+    "required": [
+     "scope",
+     "code",
+     "message"
+    ]
+   },
+   "ErrorResponse": {
+    "type": "object",
+    "properties": {
+     "errors": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/ErrorItem"
+      }
+     }
+    },
+    "required": [
+     "errors"
+    ]
+   },
+   "MaterialConsumption": {
+    "type": "object",
+    "properties": {
+     "materialConsumptionId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "consumptionNo": {
+      "type": "string",
+      "example": "값"
+     },
+     "workOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "workSessionId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "비어 있을 수 있다 — 세션 없이도 투입이 선다. 근거: P-02-03 §5-5",
+      "example": 1001
+     },
+     "shopfloorReceiptLineId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "bomComponentId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "오투입 판정의 근거. 근거: P-02-03 §5-3",
+      "example": 1001
+     },
+     "itemId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "lotId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "consumptionTypeCode": {
+      "type": "string",
+      "description": "정상·재생재·대체",
+      "example": "NORMAL"
+     },
+     "correctsConsumptionId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "replacedConsumptionId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "changeReasonCode": {
+      "type": "string",
+      "description": "러닝체인지 교체 사유. 근거: P-02-11 §5-2",
+      "example": "NORMAL"
+     },
+     "actualUseProcessId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "교차 투입. 근거: P-02-03 §5-3",
+      "example": 1001
+     },
+     "inputQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "actualConsumedQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "uomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "enteredQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "enteredUomId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "입력 단위가 저장 단위와 다를 수 있다. 근거: P-02-03 §5-6",
+      "example": 1001
+     },
+     "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "recordedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "lateEntryReasonCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "workerId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "terminalId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "statusCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "remarks": {
+      "type": "string",
+      "example": "값"
+     }
+    },
+    "required": [
+     "materialConsumptionId",
+     "consumptionNo",
+     "workOrderId",
+     "itemId",
+     "lotId",
+     "consumptionTypeCode",
+     "inputQty",
+     "uomId",
+     "occurredAt",
+     "workerId",
+     "terminalId",
+     "statusCode"
+    ]
+   },
+   "MaterialConsumptionCreate": {
+    "type": "object",
+    "properties": {
+     "workOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "workSessionId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "shopfloorReceiptLineId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "bomComponentId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "itemId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "lotId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "consumptionTypeCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "actualUseProcessId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "changeReasonCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "replacedConsumptionId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "러닝체인지 — 지우지 않고 잇는다. 근거: P-02-11 §5-2",
+      "example": 1001
+     },
+     "inputQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "uomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "enteredQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "enteredUomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "lateEntryReasonCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "workerId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "terminalId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "remarks": {
+      "type": "string",
+      "example": "값"
+     }
+    },
+    "required": [
+     "workOrderId",
+     "itemId",
+     "lotId",
+     "consumptionTypeCode",
+     "inputQty",
+     "uomId",
+     "occurredAt",
+     "workerId",
+     "terminalId"
+    ]
+   },
+   "MaterialLoss": {
+    "type": "object",
+    "properties": {
+     "materialLossId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "workOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "materialConsumptionId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "itemId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "lotId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "lossTypeCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "lossQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "uomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "reasonCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     }
+    },
+    "required": [
+     "materialLossId",
+     "workOrderId",
+     "materialConsumptionId",
+     "itemId",
+     "lotId",
+     "lossTypeCode",
+     "lossQty",
+     "uomId",
+     "reasonCode",
+     "occurredAt"
+    ]
+   },
+   "MaterialLossCreate": {
+    "type": "object",
+    "properties": {
+     "workOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "materialConsumptionId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "itemId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "lotId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "lossTypeCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "lossQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "uomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "reasonCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     }
+    },
+    "required": [
+     "workOrderId",
+     "materialConsumptionId",
+     "itemId",
+     "lotId",
+     "lossTypeCode",
+     "lossQty",
+     "uomId",
+     "reasonCode",
+     "occurredAt"
+    ]
+   },
+   "MaterialReturn": {
+    "type": "object",
+    "properties": {
+     "materialReturnId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "materialReturnNo": {
+      "type": "string",
+      "example": "값"
+     },
+     "workOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "sourceLocationId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "destinationWarehouseId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "statusCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "requestedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "receivedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "lines": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/MaterialReturnLine"
+      }
+     }
+    },
+    "required": [
+     "materialReturnId",
+     "materialReturnNo",
+     "workOrderId",
+     "sourceLocationId",
+     "destinationWarehouseId",
+     "statusCode",
+     "requestedAt"
+    ]
+   },
+   "MaterialReturnCreate": {
+    "type": "object",
+    "properties": {
+     "workOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "sourceLocationId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "destinationWarehouseId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "lines": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+       "$ref": "#/components/schemas/MaterialReturnLine"
+      }
+     }
+    },
+    "required": [
+     "workOrderId",
+     "sourceLocationId",
+     "destinationWarehouseId",
+     "lines"
+    ],
+    "description": "라인은 본문에 싣는다 — 독립 경로를 두지 않는다. 근거: 01 계약 규약 계승"
+   },
+   "MaterialReturnLine": {
+    "type": "object",
+    "properties": {
+     "materialReturnLineId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "itemId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "lotId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "returnQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "uomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     }
+    },
+    "required": [
+     "itemId",
+     "lotId",
+     "returnQty",
+     "uomId"
+    ]
+   },
+   "OperationHandover": {
+    "type": "object",
+    "properties": {
+     "operationHandoverId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "handoverNo": {
+      "type": "string",
+      "example": "값"
+     },
+     "fromWorkOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "toWorkOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "statusCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "handedOverAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "receivedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "인계 확정과 같은 시각으로 함께 찍는다 — 받는 쪽 화면이 없다. 근거: M-02-01 §5",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "lines": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/OperationHandoverLine"
+      }
+     }
+    },
+    "required": [
+     "operationHandoverId",
+     "handoverNo",
+     "fromWorkOrderId",
+     "toWorkOrderId",
+     "statusCode",
+     "handedOverAt"
+    ]
+   },
+   "OperationHandoverCreate": {
+    "type": "object",
+    "properties": {
+     "fromWorkOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "toWorkOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "handedOverAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "lines": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+       "$ref": "#/components/schemas/OperationHandoverLine"
+      }
+     }
+    },
+    "required": [
+     "fromWorkOrderId",
+     "toWorkOrderId",
+     "handedOverAt",
+     "lines"
+    ]
+   },
+   "OperationHandoverLine": {
+    "type": "object",
+    "properties": {
+     "operationHandoverLineId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "lotId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "handoverQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "uomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     }
+    },
+    "required": [
+     "lotId",
+     "handoverQty",
+     "uomId"
+    ]
+   },
+   "PageMeta": {
+    "type": "object",
+    "properties": {
+     "page": {
+      "type": "integer",
+      "example": 1
+     },
+     "size": {
+      "type": "integer",
+      "example": 50
+     },
+     "total": {
+      "type": "integer",
+      "example": 137
+     }
+    },
+    "required": [
+     "page",
+     "size",
+     "total"
+    ]
+   },
+   "ProductionOrder": {
+    "type": "object",
+    "properties": {
+     "productionOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "productionOrderNo": {
+      "type": "string",
+      "example": "값"
+     },
+     "erpOrderNo": {
+      "type": "string",
+      "description": "ERP 수신 원번호",
+      "example": "WO-2026-0812-001"
+     },
+     "parentProductionOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "bomLevel": {
+      "type": "integer",
+      "example": 1
+     },
+     "businessUnitId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "plantId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "itemId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "orderQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "uomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "dueDate": {
+      "type": "string",
+      "format": "date",
+      "example": "2026-08-11"
+     },
+     "statusCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "remarks": {
+      "type": "string",
+      "example": "값"
+     },
+     "versionNo": {
+      "type": "integer",
+      "example": 1
+     }
+    },
+    "required": [
+     "productionOrderId",
+     "productionOrderNo",
+     "itemId",
+     "orderQty",
+     "uomId",
+     "statusCode"
+    ]
+   },
+   "ProductionOrderAcknowledge": {
+    "type": "object",
+    "properties": {
+     "decisionCode": {
+      "type": "string",
+      "enum": [
+       "APPLY",
+       "PROCEED"
+      ],
+      "description": "반영 / 강행. 근거: W-02-06 §5",
+      "example": "APPLY"
+     },
+     "reason": {
+      "type": "string",
+      "description": "강행이면 사유가 필요하다",
+      "example": "값"
+     }
+    },
+    "required": [
+     "decisionCode"
+    ]
+   },
+   "ProductionPlan": {
+    "type": "object",
+    "properties": {
+     "productionPlanId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "productionOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "planNo": {
+      "type": "string",
+      "example": "값"
+     },
+     "planDate": {
+      "type": "string",
+      "format": "date",
+      "example": "2026-08-11"
+     },
+     "plannedQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "uomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "bomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "routingId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "plannedLineId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "statusCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "confirmedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "confirmedBy": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "remarks": {
+      "type": "string",
+      "example": "값"
+     },
+     "versionNo": {
+      "type": "integer",
+      "example": 1
+     }
+    },
+    "required": [
+     "productionPlanId",
+     "productionOrderId",
+     "planNo",
+     "planDate",
+     "plannedQty",
+     "uomId",
+     "bomId",
+     "routingId",
+     "statusCode"
+    ],
+    "description": "BOM·Routing 은 06 기준정보 계약이 소유한다 — 여기서는 참조만 한다. 근거: 02 계약 2단계 §1-2"
+   },
+   "ProductionPlanCreate": {
+    "type": "object",
+    "properties": {
+     "productionOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "planDate": {
+      "type": "string",
+      "format": "date",
+      "example": "2026-08-11"
+     },
+     "plannedQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "uomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "bomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "routingId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "plannedLineId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "splitOfPlanId": {
+      "$ref": "#/components/schemas/ProductionPlanSplitRef"
+     },
+     "remarks": {
+      "type": "string",
+      "example": "값"
+     }
+    },
+    "required": [
+     "productionOrderId",
+     "planDate",
+     "plannedQty",
+     "uomId",
+     "bomId",
+     "routingId"
+    ]
+   },
+   "ProductionPlanSplitRef": {
+    "type": "object",
+    "properties": {
+     "sourcePlanId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "reasonCode": {
+      "type": "string",
+      "description": "러닝체인지 분할 사유",
+      "example": "NORMAL"
+     }
+    },
+    "description": "러닝체인지로 계획을 나눌 때 원본을 가리킨다. 근거: W-02-02 §5"
+   },
+   "ProductionPlanUpdate": {
+    "type": "object",
+    "properties": {
+     "planDate": {
+      "type": "string",
+      "format": "date",
+      "example": "2026-08-11"
+     },
+     "plannedQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "bomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "routingId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "plannedLineId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "remarks": {
+      "type": "string",
+      "example": "값"
+     }
+    }
+   },
+   "ProductionResult": {
+    "type": "object",
+    "properties": {
+     "productionResultId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "productionResultNo": {
+      "type": "string",
+      "example": "값"
+     },
+     "workOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "workSessionId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "resultSequence": {
+      "type": "integer",
+      "example": 1
+     },
+     "correctsProductionResultId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "정정은 덧붙인다 — 원본을 고치지 않는다. 근거: 공유계약 G-18",
+      "example": 1001
+     },
+     "goodQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "defectQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "holdQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "scrapQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "reworkQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "uomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "resultSourceCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "recordedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "lateEntryReasonCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "workerId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "equipmentId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "moldId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "shiftId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "terminalId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "statusCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "remarks": {
+      "type": "string",
+      "example": "값"
+     }
+    },
+    "required": [
+     "productionResultId",
+     "productionResultNo",
+     "workOrderId",
+     "resultSequence",
+     "goodQty",
+     "defectQty",
+     "holdQty",
+     "scrapQty",
+     "reworkQty",
+     "uomId",
+     "resultSourceCode",
+     "occurredAt",
+     "workerId",
+     "shiftId",
+     "statusCode"
+    ],
+    "description": "수량은 다섯 컬럼 그대로 내려준다. 정본이 3원(양품/불량/손실)이라는 지적이 열려 있으나(omf-mes#60) 계약이 임의로 접지 않는다."
+   },
+   "ProductionResultCorrect": {
+    "type": "object",
+    "properties": {
+     "reasonCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "note": {
+      "type": "string",
+      "example": "값"
+     },
+     "goodQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "defectQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "holdQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "scrapQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "reworkQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     }
+    },
+    "required": [
+     "reasonCode"
+    ]
+   },
+   "ProductionResultCreate": {
+    "type": "object",
+    "properties": {
+     "workOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "workSessionId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "goodQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "defectQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "holdQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "scrapQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "reworkQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "uomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "resultSourceCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "lateEntryReasonCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "workerId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "equipmentId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "moldId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "shiftId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "terminalId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "lotAllocations": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/ResultLotAllocation"
+      },
+      "description": "실적↔LOT 배분은 본문에 싣는다 — 독립 경로를 두지 않는다"
+     },
+     "remarks": {
+      "type": "string",
+      "example": "값"
+     }
+    },
+    "required": [
+     "workOrderId",
+     "uomId",
+     "resultSourceCode",
+     "occurredAt",
+     "workerId",
+     "shiftId"
+    ],
+    "description": "다섯 수량의 합이 0 이면 400 이다 — ck_production_result_qty 가 물리적으로도 막는다."
+   },
+   "QueuedResponse": {
+    "type": "object",
+    "properties": {
+     "idempotencyKey": {
+      "type": "string",
+      "format": "uuid",
+      "example": "6f1a0c2e-8b4d-4a1e-9c33-0b7c2f5d1a90"
+     },
+     "message": {
+      "type": "string",
+      "example": "연결되면 전송됩니다"
+     }
+    },
+    "required": [
+     "idempotencyKey"
+    ],
+    "description": "202 로 받는 몸통. 아직 리소스가 없으므로 식별자를 내려주지 않고 멱등키를 돌려준다. 근거: 공유계약 C-7"
+   },
+   "ResultLotAllocation": {
+    "type": "object",
+    "properties": {
+     "lotId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "allocatedQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     }
+    },
+    "required": [
+     "lotId",
+     "allocatedQty"
+    ]
+   },
+   "ValidationReport": {
+    "type": "object",
+    "properties": {
+     "passed": {
+      "type": "boolean",
+      "example": true
+     },
+     "findings": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/ErrorItem"
+      },
+      "description": "scope=screen 인 경고는 확인 체크로 넘어갈 수 있다. 근거: W-02-03 §5"
+     }
+    },
+    "required": [
+     "passed",
+     "findings"
+    ]
+   },
+   "WorkOrder": {
+    "type": "object",
+    "properties": {
+     "workOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "workOrderNo": {
+      "type": "string",
+      "example": "값"
+     },
+     "productionPlanId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "routingOperationId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "itemId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "orderQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "uomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "workOrderTypeCode": {
+      "type": "string",
+      "description": "NORMAL 기본. 긴급·재작업이 값으로 붙는다",
+      "example": "NORMAL"
+     },
+     "parentWorkOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "reworkSourceWorkOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "reworkSourceLotId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "reworkSourceNonconformanceId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "productionLineId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "responsibleWorkerId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "plannedStartAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "plannedEndAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "plannedEquipmentId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "plannedMoldId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "plannedShiftId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "priorityNo": {
+      "type": "integer",
+      "default": 100,
+      "example": 1
+     },
+     "defaultWipLocationId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "defaultFgLocationId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "defaultScrapLocationId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "operationSettingsSnapshot": {
+      "type": "object",
+      "description": "확정 시점의 공정 설정을 굳혀 둔 것. 근거: 공유계약 A-18",
+      "example": {
+       "standardCycleTimeSec": 42,
+       "standardYieldRate": 0.98
+      }
+     },
+     "statusCode": {
+      "type": "string",
+      "description": "편성 → 확정 → 배포 → 진행 → 완료 → 마감. 중단↕재개 반복. 취소가 값으로 붙는다. 근거: ✓설계확정 결정 14 · 예외 E-4 ④",
+      "example": "NORMAL"
+     },
+     "releasedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "completedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "completionVarianceReasonCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "closedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "remarks": {
+      "type": "string",
+      "example": "값"
+     },
+     "versionNo": {
+      "type": "integer",
+      "example": 1
+     }
+    },
+    "required": [
+     "workOrderId",
+     "workOrderNo",
+     "productionPlanId",
+     "routingOperationId",
+     "itemId",
+     "orderQty",
+     "uomId",
+     "workOrderTypeCode",
+     "statusCode",
+     "priorityNo"
+    ]
+   },
+   "WorkOrderCancel": {
+    "type": "object",
+    "properties": {
+     "reasonCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "note": {
+      "type": "string",
+      "example": "값"
+     }
+    },
+    "required": [
+     "reasonCode"
+    ]
+   },
+   "WorkOrderClose": {
+    "type": "object",
+    "properties": {
+     "remainderDispositionCode": {
+      "type": "string",
+      "enum": [
+       "CARRY_OVER",
+       "WRITE_OFF"
+      ],
+      "description": "잔량 처분 — 이월 / 소멸. 근거: W-02-05 §5",
+      "example": "CARRY_OVER"
+     },
+     "reasonCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "erpSendItems": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "example": "값"
+      },
+      "description": "송신 항목 토글 결과"
+     }
+    },
+    "required": [
+     "remainderDispositionCode"
+    ]
+   },
+   "WorkOrderCreate": {
+    "type": "object",
+    "properties": {
+     "productionPlanId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "routingOperationId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "itemId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "orderQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "uomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "workOrderTypeCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "priorityNo": {
+      "type": "integer",
+      "example": 1
+     },
+     "plannedStartAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "plannedEndAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "remarks": {
+      "type": "string",
+      "example": "값"
+     }
+    },
+    "required": [
+     "productionPlanId",
+     "routingOperationId",
+     "itemId",
+     "orderQty",
+     "uomId"
+    ]
+   },
+   "WorkOrderHold": {
+    "type": "object",
+    "properties": {
+     "reasonCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "note": {
+      "type": "string",
+      "example": "값"
+     }
+    },
+    "required": [
+     "reasonCode"
+    ]
+   },
+   "WorkOrderRelease": {
+    "type": "object",
+    "properties": {
+     "lotSlotCount": {
+      "type": "integer",
+      "description": "선발행할 생산LOT 슬롯 수. 비우면 계획값 N. 근거: R26·R27",
+      "example": 1
+     },
+     "handoverNote": {
+      "type": "string",
+      "description": "전달사항. 공지 확인 이력이 별도로 받는다 — 근거: DR-005",
+      "example": "비고"
+     }
+    }
+   },
+   "WorkOrderUpdate": {
+    "type": "object",
+    "properties": {
+     "orderQty": {
+      "type": "number",
+      "format": "double",
+      "example": 120.0
+     },
+     "priorityNo": {
+      "type": "integer",
+      "example": 1
+     },
+     "plannedStartAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "plannedEndAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "plannedEquipmentId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "plannedMoldId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "plannedShiftId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "productionLineId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "responsibleWorkerId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "defaultWipLocationId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "defaultFgLocationId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "defaultScrapLocationId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "remarks": {
+      "type": "string",
+      "example": "값"
+     }
+    },
+    "description": "4M 자원배정이 이 경로로 들어온다. 근거: W-02-03 §5"
+   },
+   "WorkSession": {
+    "type": "object",
+    "properties": {
+     "workSessionId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "workOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "sessionNo": {
+      "type": "integer",
+      "description": "중단·재개마다 는다. uq(workOrderId, sessionNo). 근거: P-02-01 §5-4",
+      "example": 1
+     },
+     "shiftId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "equipmentId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "moldId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "terminalId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "startedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "endedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "비어 있으면 진행 중이다 — 상태 컬럼을 두지 않는다. 근거: 공유계약 G-16",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "statusCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "stopReasonCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "remarks": {
+      "type": "string",
+      "example": "값"
+     },
+     "versionNo": {
+      "type": "integer",
+      "example": 1
+     }
+    },
+    "required": [
+     "workSessionId",
+     "workOrderId",
+     "sessionNo",
+     "shiftId",
+     "terminalId",
+     "startedAt",
+     "statusCode"
+    ],
+    "description": "구간 형 리소스다. 「진행 중」은 끝 시각의 부재로 판정한다."
+   },
+   "WorkSessionCreate": {
+    "type": "object",
+    "properties": {
+     "workOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "shiftId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "equipmentId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "moldId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "terminalId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "startedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "단말 시계가 정한다. 서버 수신 시각으로 덮지 않는다. 근거: 공유계약 C-12",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "workerIds": {
+      "type": "array",
+      "items": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      },
+      "description": "시작 시점 작업자"
+     },
+     "controlOverride": {
+      "$ref": "#/components/schemas/ControlOverride"
+     }
+    },
+    "required": [
+     "workOrderId",
+     "shiftId",
+     "terminalId",
+     "startedAt"
+    ]
+   },
+   "WorkSessionEnd": {
+    "type": "object",
+    "properties": {
+     "endedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "단말 시계. 시작보다 앞서면 400 이다",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "stopReasonCode": {
+      "type": "string",
+      "example": "값"
+     }
+    },
+    "required": [
+     "endedAt"
+    ]
+   },
+   "WorkSessionEvent": {
+    "type": "object",
+    "properties": {
+     "workSessionEventId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "eventTypeCode": {
+      "type": "string",
+      "description": "중단·재개·통제 우회 등. 값 목록은 공통코드가 갖는다. 근거: P-02-10 §8-1 · 공유계약 A-16",
+      "example": "NORMAL"
+     },
+     "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "단말 시계가 정한다. 근거: 공유계약 C-12",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "recordedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "서버 수신 시각. 단말 시계와 차이가 커도 거부하지 않고 함께 보인다. 근거: 공유계약 G-20",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "reasonCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "performedBy": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "terminalId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     }
+    },
+    "required": [
+     "workSessionEventId",
+     "eventTypeCode",
+     "occurredAt"
+    ]
+   },
+   "WorkSessionEventCreate": {
+    "type": "object",
+    "properties": {
+     "eventTypeCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "reasonCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "performedBy": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "terminalId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     }
+    },
+    "required": [
+     "eventTypeCode",
+     "occurredAt"
+    ]
+   },
+   "WorkSessionWorker": {
+    "type": "object",
+    "properties": {
+     "workSessionWorkerId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "workerId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "workerRoleCode": {
+      "type": "string",
+      "default": "OPERATOR",
+      "example": "NORMAL"
+     },
+     "joinedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "leftAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "비어 있으면 아직 참여 중이다",
+      "example": "2026-08-11T09:12:00+09:00"
+     }
+    },
+    "required": [
+     "workSessionWorkerId",
+     "workerId",
+     "workerRoleCode",
+     "joinedAt"
+    ]
+   },
+   "WorkSessionWorkerJoin": {
+    "type": "object",
+    "properties": {
+     "workerId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "workerRoleCode": {
+      "type": "string",
+      "example": "값"
+     },
+     "joinedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     }
+    },
+    "required": [
+     "workerId",
+     "joinedAt"
+    ]
+   },
+   "WorkSessionWorkerLeave": {
+    "type": "object",
+    "properties": {
+     "leftAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     }
+    },
+    "required": [
+     "leftAt"
+    ]
+   }
+  }
+ }
+}
