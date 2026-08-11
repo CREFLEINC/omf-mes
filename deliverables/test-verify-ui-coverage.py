@@ -141,7 +141,7 @@ class DomainAppTest(unittest.TestCase):
         self.assertEqual(cov.screens_without_action_table(HERE, cov.SCREENS_APP), [])
 
     def test_도메인_등록부에_넷이_있다(self):
-        self.assertEqual(sorted(cov.DOMAINS), ["01", "app", "mdm", "print"])
+        self.assertEqual(sorted(cov.DOMAINS), ["01", "02", "app", "mdm", "print"])
 
 
 class DomainPrintTest(unittest.TestCase):
