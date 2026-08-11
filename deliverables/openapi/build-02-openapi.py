@@ -374,12 +374,6 @@ schemas["MaterialReturnCreate"] = obj(["workOrderId","sourceLocationId","destina
     "workOrderId": I64, "sourceLocationId": I64, "destinationWarehouseId": I64,
     "lines": {"type":"array","minItems":1,"items": ref("MaterialReturnLine")}},
     description="라인은 본문에 싣는다 — 독립 경로를 두지 않는다. 근거: 01 계약 규약 계승")
-schemas["MaterialLoss"] = obj(["materialLossId","workOrderId","materialConsumptionId","itemId","lotId","lossTypeCode","lossQty","uomId","reasonCode","occurredAt"], {
-    "materialLossId": I64, "workOrderId": I64, "materialConsumptionId": I64,
-    "itemId": I64, "lotId": I64, "lossTypeCode": STR,
-    "lossQty": QTY, "uomId": I64, "reasonCode": STR, "occurredAt": TS})
-schemas["MaterialLossCreate"] = obj(["workOrderId","materialConsumptionId","itemId","lotId","lossTypeCode","lossQty","uomId","reasonCode","occurredAt"], {
-    k: v for k, v in schemas["MaterialLoss"]["properties"].items() if k != "materialLossId"})
 schemas["ProductionResult"] = obj(
     ["productionResultId","productionResultNo","workOrderId","resultSequence","goodQty","defectQty","holdQty","scrapQty","reworkQty","uomId","resultSourceCode","occurredAt","workerId","shiftId","statusCode"], {
     "productionResultId": I64, "productionResultNo": STR,
@@ -446,10 +440,11 @@ doc_resource("/production/material-returns","production","materialReturn",
   "MaterialReturn","MaterialReturnCreate","자재 반출 목록","자재 반출 등록",
   "근거: M-02-02 §3","근거: M-02-02 §5",
   [q("workOrderId",I64), q("statusCode",STR), q("requestedFrom",TS), q("requestedTo",TS)])
-doc_resource("/production/material-losses","production","materialLoss",
-  "MaterialLoss","MaterialLossCreate","자재 손실 목록","자재 손실 등록",
-  "근거: P-02-04 §5","근거: P-02-04 §5",
-  [q("workOrderId",I64), q("lossTypeCode",STR), q("occurredFrom",TS), q("occurredTo",TS)])
+# ⛔ /production/material-losses 를 두지 않는다 — 5단계 역방향 점검에서 뺐다.
+#    material_loss 테이블은 실재하지만 부르는 화면이 0건이다.
+#    P-02-04 의 「손실」은 production_result.scrap_qty 로 들어간다(R48 3원 ↔ 5컬럼 · omf-mes#60).
+#    「테이블이 있으니 경로를 만든다」는 01 정정 #2(테이블이 아니라 버튼을 센다)를 되돌리는 것이다.
+#    손실을 별도로 기록하는 화면이 생기면 그때 만든다.
 doc_resource("/production/production-results","production","productionResult",
   "ProductionResult","ProductionResultCreate","생산 실적 목록","생산 실적 등록",
   "집계 화면이 이 경로를 쓴다. 근거: P-02-04 §3 · W-02-08 §5",
