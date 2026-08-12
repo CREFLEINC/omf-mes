@@ -72,10 +72,25 @@ PAGE = [q("page", INT, "1 부터"), q("size", INT, "기본 50")]
 
 OFFLINE = ("오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. "
            "큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). "
-           "즉시 처리되면 201, 큐에 담기면 202 다(C-7).")
+           "⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 "
+           "연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다. "
+           "미확정 표식은 셸이 붙인다(공유계약 C-7 — 화면 조항).")
 
-QUEUED = {"202": {"description": "큐에 담겼다 — 아직 서버가 모른다. 근거: 공유계약 C-7",
-                  "content": {"application/json": {"schema": ref("QueuedResponse")}}}}
+# ⛔ 오프라인 큐를 202 로 표현하지 않는다 (2026-08-12 정정).
+#
+#   C-7 은 「저장 피드백 두 등급」이고 화면 조항이다 — Toast 성공 ↔ Chip(warning) 미확정.
+#   HTTP 코드를 정한 적이 없다. 202 는 이 생성기가 덧붙인 해석이었다.
+#
+#   ⛔ 오프라인이면 HTTP 요청 자체가 일어나지 않는다 — C-1 이 「클라이언트가 생성해
+#      outbox 에 담는다」이므로 서버는 그 요청을 본 적이 없다. 서버가 응답으로
+#      「큐에 담겼다 — 아직 서버가 모른다」를 말하는 것은 자기모순이다.
+#
+#   ⚠ 근거로 삼았던 「01 도 202 를 쓴다(202:6)」도 틀렸다 — 그 여섯은 전부
+#      결재 상신·ERP 재동기라 진짜 서버 비동기다. 응답 코드만 세고 뜻을 안 봤다.
+#
+#   ⭐ 미확정 표식은 셸의 outbox 가 할 일이라 클라이언트 문서 소관이다.
+#      서버 계약은 온라인일 때 서버가 실제로 내는 것만 적는다.
+QUEUED = {}   # 비워 둔다
 
 schemas, paths = {}, {}
 
@@ -106,10 +121,6 @@ schemas["PageMeta"] = obj(["page", "size", "total"], {
     "page": {"type": "integer", "example": 1},
     "size": {"type": "integer", "example": 50},
     "total": {"type": "integer", "example": 412}})
-schemas["QueuedResponse"] = obj(["idempotencyKey"], {
-    "idempotencyKey": {"type": "string", "format": "uuid"},
-    "message": {"type": "string", "example": "연결되면 전송됩니다"}},
-    description="202 로 받는 몸통. 아직 리소스가 없으므로 식별자를 내려주지 않고 멱등키를 돌려준다. 근거: 공유계약 C-7")
 
 schemas["LotVersionRef"] = obj(["lotId", "versionNo"], {
     "lotId": I64,
