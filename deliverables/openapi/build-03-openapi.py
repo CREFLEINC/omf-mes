@@ -90,7 +90,8 @@ OFFLINE = ("오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 �
 #
 #   ⭐ 미확정 표식은 셸의 outbox 가 할 일이라 클라이언트 문서 소관이다.
 #      서버 계약은 온라인일 때 서버가 실제로 내는 것만 적는다.
-QUEUED = {}   # 비워 둔다
+#
+#   ⛔ 빈 dict 로 남겨 두지 않았다 — 한 줄만 되돌리면 12건이 한꺼번에 되살아난다.
 
 schemas, paths = {}, {}
 
@@ -482,7 +483,7 @@ paths["/quality/inspection-results"] = {
         "requestBody": {"required": True, "content": {"application/json": {
             "schema": ref("InspectionResultCreate")}}},
         "responses": dict(list(one("InspectionResult", "201", "저장됨").items())
-                          + list(QUEUED.items()) + list(err("400", "403", "409").items())),
+                          + list(err("400", "403", "409").items())),
         "x-internal-note": ("확정 경로가 둘이다 — 이 경로에 statusCode=확정 으로 보내는 것과 "
                             ":confirm 을 부르는 것. 부수 효과가 같아야 한다(Lot Status 전이 · confirmed_at 기록). "
                             "멱등키가 둘을 잇는다 — 같은 키면 어느 쪽으로 와도 한 건이다. "
