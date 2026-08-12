@@ -140,8 +140,9 @@ class DomainAppTest(unittest.TestCase):
     def test_액션_표_없는_화면이_없다(self):
         self.assertEqual(cov.screens_without_action_table(HERE, cov.SCREENS_APP), [])
 
-    def test_도메인_등록부에_넷이_있다(self):
-        self.assertEqual(sorted(cov.DOMAINS), ["01", "02", "app", "mdm", "print"])
+    def test_도메인_등록부에_여섯이_있다(self):
+        self.assertEqual(sorted(cov.DOMAINS),
+                         ["01", "02", "03", "app", "mdm", "print"])
 
 
 class DomainPrintTest(unittest.TestCase):
@@ -169,6 +170,27 @@ class DomainPrintTest(unittest.TestCase):
             ["P-02-05", "P-02-07", "P-02-09"],
         )
 
+class Domain03Test(unittest.TestCase):
+    # 03 품질 7장. ⭐ 도메인 배지(dom=03)는 5장인데 계약 대상은 7이다 —
+    # 01·02 가 「03 소관」으로 미룬 두 장이 여기서 풀린다. 그 둘이 조용히
+    # 빠지면 커버리지가 「전건 다뤘다」로 부풀려진다.
+    def test_일곱_화면이_등록돼_있다(self):
+        self.assertEqual(len(cov.SCREENS_03), 7)
+
+    def test_이월_두_장이_들어_있다(self):
+        ids = [sid for _, sid in cov.SCREENS_03]
+        self.assertIn("W-01-01", ids)   # 01 요구서 §6-1
+        self.assertIn("P-02-13", ids)   # 02 요구서 머리 「03 소관 1 제외」
+
+    def test_결번은_등록하지_않는다(self):
+        ids = {sid for _, sid in cov.SCREENS_03}
+        for vacated in ("W-03-04", "W-03-06", "W-03-07", "W-03-08"):
+            self.assertNotIn(vacated, ids)
+
+    def test_액션_표_없는_화면은_W_01_01_뿐이다(self):
+        # 파일럿 서식이라 액션 표가 없다. 요구는 §5 본문에서 사람이 읽는다.
+        self.assertEqual(
+            cov.screens_without_action_table(HERE, cov.SCREENS_03), ["W-01-01"])
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
