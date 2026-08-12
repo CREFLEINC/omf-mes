@@ -20,6 +20,18 @@
 
 세 화면 다 착수 통지가 나가 있었다(client #72·#75·#76). 프론트가 아직 착수하지
 않아 코드 피해는 없었다.
+
+## ⚠ 이 패치는 파일을 통째로 다시 쓴다
+
+`paths` 와 `schemas` 를 **이름순으로 정렬**해 내보내므로, 손으로 유지되던 기존
+순서가 바뀌어 **줄 단위 diff 가 파일 전체로 번진다**(12,320 → 12,773줄).
+
+의미는 바뀌지 않는다 — OpenAPI 에서 이 둘은 map 이라 순서가 뜻을 갖지 않는다.
+02·03 생성기도 같은 정렬을 쓰므로 **세 계약의 정렬 규칙이 여기서 맞춰진다**.
+
+⛔ **다만 diff 로는 검토가 안 되므로 의미 비교로 확인해야 한다** — 경로·스키마의
+추가/삭제/변경 집합과 그 밖의 최상위 키가 그대로인지 본다. 2026-08-12 확인:
+추가 경로 2 · 추가 스키마 4 · POST 가 얹힌 기존 경로 1 · **삭제 0 · 그 밖 변경 0**.
 """
 from __future__ import annotations
 
@@ -32,8 +44,6 @@ TARGET = os.path.join(HERE, "logistics-01자재창고.json")
 
 I64 = {"type": "integer", "format": "int64"}
 QTY = {"type": "number", "format": "double"}
-TS = {"type": "string", "format": "date-time"}
-DT = {"type": "string", "format": "date"}
 
 
 def ref(name: str) -> dict:
