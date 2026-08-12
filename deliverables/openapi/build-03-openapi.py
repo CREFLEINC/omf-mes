@@ -133,13 +133,16 @@ schemas["InspectionRequest"] = obj(
     "targetId": I64,
     "itemId": I64, "lotId": I64, "workOrderId": I64, "productionResultId": I64,
     "targetQty": QTY, "uomId": I64,
-    "coverageFromAt": TS, "coverageToAt": TS,
-    "statusCode": STR, "requestedAt": TS, "versionNo": INT},
+    # ⛔ 전역 TS 를 그대로 쓰고 나중에 description 을 넣으면 공유 객체가 오염된다 —
+    #    date-time 프로퍼티 전부에 같은 설명이 붙는다. 인라인으로 편다.
+    "coverageFromAt": {**TS, "description": (
+        "이 검사 결과가 대표하는 생산 구간의 시작. 표본 검사라 불합격 시 회수 범위를 정하는 데 쓴다. "
+        "확정에 없는 개념인데 모델이 갖고 있다. 근거: P-02-13 §5-5")},
+    "coverageToAt": {**TS, "description": "그 구간의 끝. 검사 시작·종료 시각으로 채우되 작업자가 조정할 수 있다"},
+    "statusCode": STR, "requestedAt": {**TS, "description": "검사 의뢰가 만들어진 시각"},
+    "versionNo": INT},
     description=("검사 의뢰. ⛔ 등록 경로를 두지 않는다 — 화면 7장에 「의뢰 등록」 버튼이 0건이고 "
                  "P-02-13 §4-A 가 「대개 자동 생성」이라 한다. 서버가 입고·생산 실적에서 만든다."))
-schemas["InspectionRequest"]["properties"]["coverageFromAt"]["description"] = (
-    "이 검사 결과가 대표하는 생산 구간의 시작. 표본 검사라 불합격 시 회수 범위를 정하는 데 쓴다. "
-    "확정에 없는 개념인데 모델이 갖고 있다. 근거: P-02-13 §5-5")
 
 schemas["InspectionMeasurement"] = obj(
     ["inspectionMeasurementId", "inspectionItemSpecId", "sampleNo", "judgmentCode", "measuredAt"], {
@@ -705,6 +708,24 @@ def fill(sch):
 
 for _s in schemas.values():
     fill(_s)
+
+# ⛔ 공유 스칼라가 오염되지 않았는지 본다.
+#
+# I64·TS 같은 전역 dict 는 수십 개 프로퍼티가 **같은 객체를 참조**한다. 어딘가에서
+# schemas[...]["properties"][...]["description"] = ... 처럼 나중에 넣으면 그 하나가
+# 전부에 붙는다. 실제로 그렇게 새서 date-time 필드 12개에 엉뚱한 설명이 붙었다(PR #141).
+#
+# 검사기는 description 의 「존재」를 보지 「내용」을 보지 않아 이것을 못 잡는다.
+# 여기서 막는다 — 설명을 붙이려면 {**TS, "description": …} 로 인라인 사본을 만든다.
+_ALLOWED = {"type", "format", "example"}
+for _name, _proto in (("I64", I64), ("QTY", QTY), ("TS", TS), ("DT", DT),
+                      ("STR", STR), ("INT", INT), ("BOOL", BOOL)):
+    _extra = set(_proto) - _ALLOWED
+    if _extra:
+        raise SystemExit(
+            f"⛔ 공유 스칼라 {_name} 이 오염됐습니다 — 추가된 키 {sorted(_extra)}.\n"
+            f"   전역 dict 를 변형하면 그 타입의 모든 프로퍼티에 같은 값이 붙습니다.\n"
+            f"   설명을 붙이려면 {{**{_name}, \"description\": …}} 로 인라인 사본을 만드세요.")
 
 OUT = os.path.join(HERE, "quality-03품질.json")
 src = json.load(io.open(os.path.join(HERE, "logistics-01자재창고.json"), encoding="utf-8"))

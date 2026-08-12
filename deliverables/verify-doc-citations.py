@@ -24,6 +24,7 @@ import json
 import os
 import re
 import sys
+from collections.abc import Iterator
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OPENAPI_DIR = os.path.join(HERE, "openapi")
@@ -55,7 +56,7 @@ def load_contracts() -> dict[tuple[str, str], set[str]]:
     return found
 
 
-def citations(md_path: str):
+def citations(md_path: str) -> Iterator[tuple[int, str, str]]:
     """(줄번호, 메서드, 경로) — 코드펜스 안은 건너뛴다."""
     in_fence = False
     with open(md_path, encoding="utf-8") as fh:
@@ -71,7 +72,12 @@ def citations(md_path: str):
                     continue          # `/logistics/{문서}/{id}:cancel`
                 if raw.count("{") != raw.count("}"):
                     continue          # 정규식이 한글 자리표시에서 끊긴 조각
-                yield lineno, method, normalize(raw.split("?")[0])
+                path = normalize(raw.split("?")[0])
+                if path.endswith("/"):
+                    # 정규식 문자군이 ASCII 뿐이라 `/quality/한글` 은 `/quality/` 까지만
+                    # 잡힌다. 끝이 `/` 인 경로는 실재하지 않으므로 조각으로 본다.
+                    continue
+                yield lineno, method, path
 
 
 def main() -> int:
@@ -102,7 +108,9 @@ def main() -> int:
         if missing:
             print(f"⛔ {name} — 인용 {len(cited)} 중 계약에 없는 것 {len(missing)}")
             for lineno, method, path in missing:
-                print(f"      {lineno:5d}  {method} {path}")
+                others = sorted({m for m, p in contracts if p == path})
+                hint = f"  ← 경로는 있다. 있는 메서드: {', '.join(others)}" if others else ""
+                print(f"      {lineno:5d}  {method} {path}{hint}")
         else:
             print(f"✅ {name} — 인용 {len(cited)} 전건 계약에 있다")
 
