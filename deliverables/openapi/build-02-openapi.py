@@ -76,15 +76,23 @@ schemas["ConflictResponse"] = obj(["code","message"], {
     "failedAt": {"type":"string","description":"BATCH_DEPENDENCY_FAILED 일 때 멈춘 지점의 멱등키"},
     "currentVersion": {"type":"string","description":"VERSION_CONFLICT 일 때 서버의 현재 version_no"}})
 schemas["PageMeta"] = obj(["page","size","total"], {"page":{"type":"integer","example":1},"size":{"type":"integer","example":50},"total":{"type":"integer","example":137}})
-schemas["QueuedResponse"] = obj(["idempotencyKey"], {
-    "idempotencyKey": {"type":"string","format":"uuid"},
-    "message": {"type":"string","example":"연결되면 전송됩니다"}},
-    description="202 로 받는 몸통. 아직 리소스가 없으므로 식별자를 내려주지 않고 멱등키를 돌려준다. 근거: 공유계약 C-7")
-schemas["AcceptedOrCreated"] = obj([], {}, description="사용하지 않는다 — 오퍼레이션마다 201/202 를 따로 적는다")
-del schemas["AcceptedOrCreated"]
 
-QUEUED = {"202": {"description":"큐에 담겼다 — 아직 서버가 모른다. 근거: 공유계약 C-7",
-    "content":{"application/json":{"schema": ref("QueuedResponse")}}}}
+# ⛔ 오프라인 큐를 202 로 표현하지 않는다 (2026-08-12 정정).
+#
+#   C-7 은 「저장 피드백 두 등급」이고 화면 조항이다 — Toast 성공 ↔ Chip(warning) 미확정.
+#   HTTP 코드를 정한 적이 없다. 202 는 이 생성기가 덧붙인 해석이었다.
+#
+#   ⛔ 오프라인이면 HTTP 요청 자체가 일어나지 않는다 — C-1 이 「클라이언트가 생성해
+#      outbox 에 담는다」이므로 서버는 그 요청을 본 적이 없다. 서버가 응답으로
+#      「큐에 담겼다 — 아직 서버가 모른다」를 말하는 것은 자기모순이다.
+#
+#   ⚠ 근거로 삼았던 「01 도 202 를 쓴다(202:6)」도 틀렸다 — 그 여섯은 전부
+#      결재 상신·ERP 재동기라 진짜 서버 비동기다. 응답 코드만 세고 뜻을 안 봤다.
+#
+#   ⭐ 미확정 표식은 셸의 outbox 가 할 일이라 클라이언트 문서 소관이다.
+#      서버 계약은 온라인일 때 서버가 실제로 내는 것만 적는다.
+#
+#   ⛔ 빈 dict 로 남겨 두지 않았다 — 한 줄만 되돌리면 12건이 한꺼번에 되살아난다.
 
 # ══════════ planning ══════════
 schemas["ProductionOrder"] = obj(
@@ -161,7 +169,11 @@ paths["/planning/production-plans/{productionPlanId}:confirm"] = {"post": action
     resp=one("ProductionPlan","200","확정됨"))}
 paths["/planning/production-plans/{productionPlanId}:confirm"]["post"]["parameters"].insert(0, pathparam("productionPlanId"))
 
-OFFLINE = "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 즉시 처리되면 201, 큐에 담기면 202 다(C-7)."
+OFFLINE = ("오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. "
+           "큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). "
+           "⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 "
+           "연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다. "
+           "미확정 표식은 셸이 붙인다(공유계약 C-7 — 화면 조항).")
 
 # ══════════ production — work_order ══════════
 schemas["WorkOrder"] = obj(
@@ -242,8 +254,8 @@ paths[WO+"/{workOrderId}"] = {
 WO_ACTIONS = [
  (":validate","유효성 재점검","4M 배정이 서로 부딪히는지 본다. 저장하지 않는다. 근거: W-02-03 §5",None,one("ValidationReport","200","점검 결과"),False,None),
  (":release","확정·배포 · 생산LOT 선발행","확정과 배포와 선발행이 한 트랜잭션이다. 선발행은 번호 슬롯 예약이며 완료 전에는 실물에 귀속되지 않는다. 근거: W-02-04 §5 · R26·R27","WorkOrderRelease",one("WorkOrder","200","배포됨"),True,None),
- (":hold","작업 중단","W/O 를 중단 상태로 옮긴다. 세션은 :end 로 따로 닫는다 — 중단 상태를 갖는 것은 W/O 다. POP 에서 누르므로 오프라인 대상이다. 근거: ✓설계확정 결정 14 · P-02-10 §5-4","WorkOrderHold",dict(list(one("WorkOrder","200","중단됨").items())+list(QUEUED.items())),True,None),
- (":resume","작업 재개","중단→진행 전이 이벤트다. 재시작은 상태가 아니다. POP 에서 누르므로 오프라인 대상이다. 근거: ✓설계확정 결정 14 · P-02-01 §5","WorkOrderResume",dict(list(one("WorkOrder","200","재개됨").items())+list(QUEUED.items())),True,None),
+ (":hold","작업 중단","W/O 를 중단 상태로 옮긴다. 세션은 :end 로 따로 닫는다 — 중단 상태를 갖는 것은 W/O 다. POP 에서 누르므로 오프라인 대상이다. 근거: ✓설계확정 결정 14 · P-02-10 §5-4","WorkOrderHold",dict(list(one("WorkOrder","200","중단됨").items())),True,None),
+ (":resume","작업 재개","중단→진행 전이 이벤트다. 재시작은 상태가 아니다. POP 에서 누르므로 오프라인 대상이다. 근거: ✓설계확정 결정 14 · P-02-01 §5","WorkOrderResume",dict(list(one("WorkOrder","200","재개됨").items())),True,None),
  (":close","마감 · ERP 실적 송신","잔량 처분을 함께 정한다. 미달 슬롯은 이 시점에 자동 폐번된다. ERP 실제 전송만 트랜잭션 밖이다. 근거: W-02-05 §5 · R27·R82","WorkOrderClose",one("WorkOrder","200","마감됨"),True,None),
  (":cancel","W/O 취소","취소 상태로 옮기고 선발행된 생산LOT 슬롯을 자동 폐번한다. 마감 시 미달 슬롯을 폐번하는 것과 같은 규칙이다. 근거: 예외 E-4 ④(2026-08-12 종결) · R27·R82 · W-02-06 §5-5","WorkOrderCancel",one("WorkOrder","200","취소됨"),True,
   "DR-007(2026-08-12 확정)로 부수 효과가 정해졌다 — R27 과 같게 즉시 폐번. 선발행은 번호 슬롯 예약이고 완료 전에는 실물에 귀속되지 않으므로(R26) 폐번해도 현장에 라벨이 남지 않는다. 신설 0 — trace.lot.status_code 의 「폐번」 값을 그대로 쓴다."),
@@ -307,13 +319,13 @@ paths[WS] = {
    "description":"단말 게이팅(can_start_work)을 서버가 강제한다. 통제 우회는 controlOverride 로 함께 보낸다. "+OFFLINE+" 근거: P-02-01 §5 · P-02-02 §5 · 공유계약 F-1·F-6",
    "parameters":[pref("IdempotencyKey"), pref("IfMatchVersionOptional")],
    "requestBody":{"required":True,"content":{"application/json":{"schema": ref("WorkSessionCreate")}}},
-   "responses": dict(list(one("WorkSession","201","시작됨").items())+list(QUEUED.items())+list(err("400","403","409").items())),
+   "responses": dict(list(one("WorkSession","201","시작됨").items())+list(err("400","403","409").items())),
    "x-internal-note":"409 OPEN_SESSION_EXISTS 는 같은 W/O 에 열린 세션이 이미 있다는 뜻이다. uq_work_session(work_order_id, session_no) 가 물리적으로도 막는다."}}
 paths[WS+"/{workSessionId}"] = {"get":{"tags":["production"],"summary":"세션 한 건","description":"근거: P-02-01 §3",
    "parameters":[pathparam("workSessionId")],
    "responses": dict(list(one("WorkSession").items())+list(err("404").items()))}}
 _end = action("production","세션 닫기","끝 시각을 찍어 구간을 닫는다. 상태 컬럼을 바꾸는 것이 아니다. "+OFFLINE+" 근거: 공유계약 G-16 · C-16(큐에서 가장 먼저 보낸다)",
-              body="WorkSessionEnd", resp=dict(list(one("WorkSession","200","닫힘").items())+list(QUEUED.items())))
+              body="WorkSessionEnd", resp=dict(list(one("WorkSession","200","닫힘").items())))
 _end["parameters"] = [pathparam("workSessionId"), pref("IdempotencyKey"), pref("IfMatchVersionOptional")]
 paths[WS+"/{workSessionId}:end"] = {"post": _end}
 
@@ -324,9 +336,9 @@ paths[WS+"/{workSessionId}/workers"] = {
  "post": {"tags":["production"],"summary":"작업자 참여","description":"세션을 닫지 않고 사람을 더한다. "+OFFLINE,
    "parameters":[pathparam("workSessionId"), pref("IdempotencyKey"), pref("IfMatchVersionOptional")],
    "requestBody":{"required":True,"content":{"application/json":{"schema": ref("WorkSessionWorkerJoin")}}},
-   "responses": dict(list(one("WorkSessionWorker","201","참여됨").items())+list(QUEUED.items())+list(err("400","403","404").items()))}}
+   "responses": dict(list(one("WorkSessionWorker","201","참여됨").items())+list(err("400","403","404").items()))}}
 _leave = action("production","작업자 이탈","떠난 시각을 찍는다. 행을 지우지 않는다 — 누가 언제까지 있었는지가 기록이다. "+OFFLINE+" 근거: 공유계약 B-4 의 정신",
-                body="WorkSessionWorkerLeave", resp=dict(list(one("WorkSessionWorker","200","이탈 기록됨").items())+list(QUEUED.items())))
+                body="WorkSessionWorkerLeave", resp=dict(list(one("WorkSessionWorker","200","이탈 기록됨").items())))
 _leave["parameters"] = [pathparam("workSessionId"), pathparam("workSessionWorkerId"), pref("IdempotencyKey")]
 paths[WS+"/{workSessionId}/workers/{workSessionWorkerId}:leave"] = {"post": _leave}
 
@@ -338,7 +350,7 @@ paths[WS+"/{workSessionId}/events"] = {
    "description":"중단·재개·통제 우회를 기록한다. occurredAt 은 단말이 보낸다. "+OFFLINE+" ⚠ 세션이 먼저 서야 한다 — 큐에서는 세션 열기와 묶음으로 간다(C-10). 근거: P-02-10 §5-2 · 공유계약 C-12",
    "parameters":[pathparam("workSessionId"), pref("IdempotencyKey"), pref("IfMatchVersionOptional")],
    "requestBody":{"required":True,"content":{"application/json":{"schema": ref("WorkSessionEventCreate")}}},
-   "responses": dict(list(one("WorkSessionEvent","201","기록됨").items())+list(QUEUED.items())+list(err("400","403","404","409").items()))}}
+   "responses": dict(list(one("WorkSessionEvent","201","기록됨").items())+list(err("400","403","404","409").items()))}}
 
 # ══════════ 투입 · 반출 · 손실 · 실적 · 인계 ══════════
 schemas["MaterialConsumption"] = obj(
@@ -420,7 +432,6 @@ def doc_resource(path, tag, name, schema, create, summary_list, summary_post, de
             "parameters": ps,
             "requestBody":{"required":True,"content":{"application/json":{"schema": ref(create)}}},
             "responses": dict(list(one(schema,"201","기록됨").items())
-                              + (list(QUEUED.items()) if offline else [])
                               + list(err("400","403","409").items()))}
     if note: post["x-internal-note"] = note
     paths[path] = {"get": {"tags":[tag],"summary":summary_list,"description":desc_list,
