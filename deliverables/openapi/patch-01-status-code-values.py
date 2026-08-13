@@ -31,6 +31,8 @@
 손대지 않은 곳은 한 바이트도 바뀌지 않는다. (patch-01-missing-ops.py 가
 정렬 출력으로 파일 전체를 churn 시킨 전례가 있어 여기서는 피한다.)
 """
+from __future__ import annotations  # py3.9 에서 `str | None` 표기를 쓰기 위해
+
 import json
 import sys
 
@@ -64,12 +66,46 @@ QUALITY_NOTE = (
 
 
 def is_nullable(prop: dict) -> bool:
+    """type 이 ["string","null"] 처럼 null 을 허용하는가."""
     t = prop.get("type")
     return isinstance(t, list) and "null" in t
 
 
-def rebuild(prop: dict, *, description: str, note: str, enum=None) -> dict:
-    """키 순서를 보존하며 description/x-internal-note 를 갈고 enum 을 끼운다."""
+def classify(source_column: str | None) -> str | None:
+    """컬럼 이름을 값 영역으로 가른다.
+
+    ⛔ 이름 일치가 아니라 **접미사**로 본다. 전이 컬럼
+    (from_/to_inventory_status_code · from_/to_quality_status_code)이
+    같은 값 영역인데 이름이 달라, 완전 일치로 매칭하면 조용히 빠진다.
+    실제로 1차 패치가 InventoryTransactionLine 의 넷을 놓쳤다.
+    """
+    if not source_column:
+        return None
+    if source_column.endswith("inventory_status_code"):
+        return "inventory"
+    if source_column.endswith("quality_status_code"):
+        return "quality"
+    return None
+
+
+def transition_prefix(source_column: str) -> str:
+    """전이 컬럼이면 「전이 전/후」임을 밝히는 접두 문구를 준다."""
+    if source_column.startswith("from_"):
+        return "전이 전 "
+    if source_column.startswith("to_"):
+        return "전이 후 "
+    return ""
+
+
+def rebuild(
+    prop: dict, *, description: str, note: str, enum: list[str] | None = None
+) -> dict:
+    """키 순서를 보존하며 description/x-internal-note 를 갈고 enum 을 끼운다.
+
+    enum 은 maxLength 바로 뒤에 둔다(type/format 계열과 붙여 읽히게).
+    ⛔ 끼울 자리가 없으면 조용히 넘어가지 않고 SystemExit 한다 — 자리 부재로
+    enum 이 빠졌는데 호출부가 성공을 찍는 것이 가장 나쁜 실패다.
+    """
     out = {}
     for k, v in prop.items():
         if k == "description":
@@ -78,35 +114,49 @@ def rebuild(prop: dict, *, description: str, note: str, enum=None) -> dict:
             out[k] = note
         else:
             out[k] = v
-        # enum 은 maxLength 바로 뒤에 둔다 (type/format 계열과 붙여 읽히게)
         if k == "maxLength" and enum is not None:
             out["enum"] = enum + ([None] if is_nullable(prop) else [])
     if "description" not in out:
         out["description"] = description
     if "x-internal-note" not in out:
         out["x-internal-note"] = note
+    if enum is not None and "enum" not in out:
+        raise SystemExit(
+            f"⛔ enum 을 끼울 자리(maxLength)가 없다: {prop.get('x-source-column')}. "
+            "삽입 기준을 바꾸거나 프로퍼티에 maxLength 를 넣는다."
+        )
     return out
 
 
-def patch(node, counts) -> None:
+def patch(node: object, counts: dict[str, int]) -> None:
+    """문서를 훑으며 두 값 영역의 프로퍼티를 제자리에서 갈아 끼운다."""
     if isinstance(node, dict):
         for key, val in list(node.items()):
-            if isinstance(val, dict) and val.get("x-source-column") == "inventory_status_code":
-                node[key] = rebuild(
-                    val, description=INVENTORY_DESC, note=INVENTORY_NOTE, enum=INVENTORY_ENUM
-                )
-                counts["inventory"] += 1
-            elif isinstance(val, dict) and val.get("x-source-column") == "quality_status_code":
-                node[key] = rebuild(val, description=QUALITY_DESC, note=QUALITY_NOTE)
-                counts["quality"] += 1
-            else:
+            kind = classify(val.get("x-source-column")) if isinstance(val, dict) else None
+            if kind is None:
                 patch(val, counts)
+                continue
+            column = val["x-source-column"]
+            where = transition_prefix(column)
+            if kind == "inventory":
+                node[key] = rebuild(
+                    val,
+                    description=where + INVENTORY_DESC,
+                    note=INVENTORY_NOTE,
+                    enum=INVENTORY_ENUM,
+                )
+            else:
+                node[key] = rebuild(
+                    val, description=where + QUALITY_DESC, note=QUALITY_NOTE
+                )
+            counts[kind] += 1
     elif isinstance(node, list):
         for item in node:
             patch(item, counts)
 
 
 def main() -> int:
+    """계약을 읽어 두 값 영역을 갈아 끼우고, 바뀐 것이 있을 때만 다시 쓴다."""
     original = open(CONTRACT, encoding="utf-8").read()
     doc = json.loads(original)
 
@@ -127,8 +177,9 @@ def main() -> int:
         return 0
 
     open(CONTRACT, "w", encoding="utf-8").write(updated)
-    print(f"  ✅ inventoryStatusCode {counts['inventory']}곳 — enum 4값 + 근거")
-    print(f"  ✅ qualityStatusCode  {counts['quality']}곳 — E-3 4값 서술 (enum 없음: 코드 문자열 미정)")
+    print(f"  ✅ *inventory_status_code {counts['inventory']}곳 — enum 4값 + 근거")
+    print(f"  ✅ *quality_status_code  {counts['quality']}곳 — E-3 4값 서술 (enum 없음: 코드 문자열 미정)")
+    print("     ⭐ 접미사 매칭이라 from_/to_ 전이 컬럼도 함께 덮는다")
     return 0
 
 
