@@ -97,6 +97,27 @@ class CountTest(unittest.TestCase):
                                  ["조항 번호"])
 
 
+class DefinedTermTest(unittest.TestCase):
+    """⚠ 정의를 표에 적으면 본 검사는 표를 건너뛰어 못 본다 —
+    그래서 규칙 문서 자신이 「뜻 없이 썼다」로 걸렸다. 정의는 표까지 훑는다."""
+
+    def test_표에_적은_정의를_인정한다(self):
+        t = ("| 말 | 뜻 |\n| --- | --- |\n"
+             "| **다형**(참조) | 한 칸이 여러 표를 가리킨다 |\n\n"
+             "다형 구조를 바꾼다.\n")
+        self.assertNotIn("전문 용어(첫 등장)", kinds(t))
+
+    def test_줄표로_적은_정의도_인정한다(self):
+        t = "다형 — 한 칸이 여러 표를 가리킨다.\n\n다형 구조를 바꾼다.\n"
+        self.assertNotIn("전문 용어(첫 등장)", kinds(t))
+
+    def test_정의가_없으면_여전히_잡는다(self):
+        self.assertIn("전문 용어(첫 등장)", kinds("본문\n\n다형 구조를 바꾼다.\n"))
+
+    def test_기호만_있고_한글_풀이가_없으면_정의가_아니다(self):
+        self.assertNotIn("다형", chk.defined_terms("| 다형 | polymorphic |\n"))
+
+
 class SkipTest(unittest.TestCase):
     """검사하지 않는 자리 — 여기서 잡으면 오탐이 쏟아진다."""
 

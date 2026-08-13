@@ -21,7 +21,8 @@
   ① 화면 번호      W-01-06 · P-02-13 · M-04-01
   ② 조항 번호      A-10 · G-2 · B-8 · L-3
   ③ 회신 번호      E-3 · E-4
-  ④ 전문 용어      다형 · 멱등 · 낙관적 잠금 · 구간 형 · 파생 · 다국어
+  ④ 전문 용어      다형 · 멱등 · 낙관적 잠금 · 구간 형 · 파생
+                   (「다형 참조」는 「다형」으로 잡힌다 — 따로 두면 한 곳을 두 번 센다)
   ⑤ 업무 약어      IQC · PQC · OQC · WO · PO · PM · BOM
 
 **뜻이 함께 있다**로 인정하는 것 — 같은 줄에 한글 설명이 있고, 그것이 기호
@@ -63,7 +64,6 @@ TERMS = {
     "낙관적 잠금": "저장할 때 버전을 대조해 충돌을 잡는다",
     "구간 형": "「진행 중」을 끝 시각의 부재로 판정한다",
     "파생": "저장하지 않고 계산해 낸다",
-    "다형 참조": "한 칸이 여러 표를 가리킨다",
 }
 ABBR = {
     "IQC": "수입 검사", "PQC": "공정 검사", "OQC": "출하 검사",
@@ -99,10 +99,28 @@ def explained(line: str, token: str) -> bool:
     return bool(m and HANGUL.search(m.group(1)))
 
 
+def defined_terms(text: str) -> set[str]:
+    """문서가 **어디서든** 뜻을 밝힌 전문 용어를 모은다.
+
+    ⚠ 정의를 표에 적는 일이 흔한데 본 검사는 표를 건너뛴다. 그래서 정의를
+    못 보고 「뜻 없이 썼다」고 잡았다 — 규칙 문서 자신이 그렇게 걸렸다.
+    정의는 **표·코드블록을 가리지 않고** 먼저 훑는다.
+    """
+    found = set()
+    for term in TERMS:
+        for m in re.finditer(re.escape(term), text):
+            tail = text[m.end():m.end() + 80]
+            # 「다형(…)」 · 「다형** | 한 칸이…」 · 「다형 — 한 칸이…」
+            if re.match(r"\**\s*[(（|—:：]", tail) and HANGUL.search(tail):
+                found.add(term)
+                break
+    return found
+
+
 def scan_text(text: str) -> list[tuple[int, str, str]]:
     """(줄번호, 종류, 기호) 목록을 낸다."""
     out: list[tuple[int, str, str]] = []
-    seen_terms: set[str] = set()
+    seen_terms: set[str] = set(defined_terms(text))
     in_fence = False
 
     for no, line in enumerate(text.split("\n"), 1):
