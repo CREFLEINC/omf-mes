@@ -48,14 +48,19 @@ TYPE_DESC = (
     "자체 폐기면 도착지 짝을 통째로 비운다 — 나가서 없어지는 물건에는 도착지가 없다."
 )
 TYPE_NOTE = (
-    "값 목록 미확정 — 1차 값 목록 제안안 §5-4(LOCATION·PARTNER·PROCESS·WORK_ORDER·DISPOSAL_SITE). "
+    "⭐ A-10 대응표 — 유형 코드가 어느 테이블을 가리키는가. "
+    "FK 가 없어 DB 가 무결성을 보장하지 않으므로 이 표가 유일한 근거다. "
+    "LOCATION → mdm.location · PARTNER → mdm.partner · PROCESS → mdm.process · "
+    "WORK_ORDER → production.work_order · "
+    "DISPOSAL_SITE → mdm.partner(역할 = 폐기처리 · mdm.partner_role 로 거른다). "
+    "값 목록 자체는 미확정이다 — 1차 값 목록 제안안 §5-4. "
     "⭐ destinationId 와 짝이다(A-10) — 둘 다 있거나 둘 다 없다. 한쪽만 오면 400 이다. "
     "⛔ 물리 모델은 아직 destination_type_code·destination_id 가 NOT NULL 이다. "
     "그것을 이유로 계약을 묶지 않는다 — 데이터 모델은 UI/UX 설계 결정에 맞춰 따라온다"
     "(2026-08-10 확정 작업 방식). 모델 변경 요청 = omf-mes#147(짝 제약 CHECK 포함)."
 )
 ID_DESC = (
-    "도착지 대상. destinationTypeCode 가 가리키는 테이블의 식별자다. "
+    "도착지 대상. destinationTypeCode 가 가리키는 테이블의 식별자다 — 대응표는 그 필드의 주석에 있다. "
     "⭐ 자체 폐기면 유형과 함께 비운다."
 )
 ID_NOTE = (
@@ -97,6 +102,7 @@ def relax(schema: dict) -> int:
 
 
 def main() -> int:
+    """계약을 읽어 도착지 짝을 완화하고, 바뀐 것이 있을 때만 다시 쓴다."""
     original = open(CONTRACT, encoding="utf-8").read()
     doc = json.loads(original)
     schemas = doc["components"]["schemas"]

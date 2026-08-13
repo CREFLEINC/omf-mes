@@ -115,6 +115,7 @@ def relax_partner_list(paths: dict) -> int:
 
 
 def add_role_paths(paths: dict) -> int:
+    """거래처 역할 읽기·교체 경로를 더한다. 이미 있으면 0."""
     key = "/mdm/partners/{partnerId}/roles"
     if key in paths:
         return 0
@@ -179,6 +180,7 @@ def add_role_paths(paths: dict) -> int:
 
 
 def main() -> int:
+    """06 계약을 읽어 거래처 역할을 붙이고, 바뀐 것이 있을 때만 다시 쓴다."""
     original = open(CONTRACT, encoding="utf-8").read()
     doc = json.loads(original)
     paths, schemas = doc["paths"], doc["components"]["schemas"]
