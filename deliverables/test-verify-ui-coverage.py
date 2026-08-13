@@ -174,8 +174,8 @@ class Domain03Test(unittest.TestCase):
     # 03 품질 7장. ⭐ 도메인 배지(dom=03)는 5장인데 계약 대상은 7이다 —
     # 01·02 가 「03 소관」으로 미룬 두 장이 여기서 풀린다. 그 둘이 조용히
     # 빠지면 커버리지가 「전건 다뤘다」로 부풀려진다.
-    def test_일곱_화면이_등록돼_있다(self):
-        self.assertEqual(len(cov.SCREENS_03), 7)
+    def test_여덟_화면이_등록돼_있다(self):
+        self.assertEqual(len(cov.SCREENS_03), 8)   # W-03-10 신설(DR-008 3-A)
 
     def test_이월_두_장이_들어_있다(self):
         ids = [sid for _, sid in cov.SCREENS_03]
