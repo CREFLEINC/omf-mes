@@ -21,7 +21,7 @@
 
 무엇을 검사하나
 ---------------
-① 계약에서 다형 짝을 찾는다
+① 계약에서 다형 짝을 찾는다 — **응답·요청 스키마와 쿼리 파라미터 둘 다**
 ② 그 유형 코드 필드에 **대응표가 적혀 있는가**를 본다
 ③ 없는 것을 낸다
 
@@ -106,38 +106,76 @@ def has_mapping(prop: dict) -> bool:
     return len(MAPPING.findall(text)) >= MIN_TARGETS
 
 
+def scan_schemas(doc: dict, contract: str, tables: set[str]) -> list[dict]:
+    """응답·요청 스키마에서 다형 짝을 찾는다."""
+    out = []
+    for schema_name, schema in ((doc.get("components") or {}).get("schemas") or {}).items():
+        props = schema.get("properties") or {}
+        if not props and ("allOf" in schema or "oneOf" in schema):
+            # ⚠ 조용히 넘어가지 않는다 — 가지 안에 짝을 직접 쓰면 말없이 빠진다.
+            out.append({"contract": contract, "schema": schema_name, "field": "(allOf)",
+                        "base": "", "where": "schema", "ok": True, "skipped": True})
+            continue
+        for prop_name, prop in props.items():
+            m = re.match(r"^(.*)TypeCode$", prop_name)
+            if not m or not isinstance(prop, dict):
+                continue
+            base = m.group(1)
+            if base + "Id" not in props or not is_polymorphic(base, tables):
+                continue
+            out.append({"contract": contract, "schema": schema_name, "field": prop_name,
+                        "base": base, "where": "schema", "ok": has_mapping(prop),
+                        "skipped": False})
+    return out
+
+
+def scan_params(doc: dict, contract: str, tables: set[str]) -> list[dict]:
+    """경로의 쿼리 파라미터에서 다형 짝을 찾는다.
+
+    ⭐ 스키마만 보면 여기가 통째로 빠진다. 오히려 **쿼리 쪽이 더 급하다** —
+    프런트가 값을 직접 만들어 보내므로 「무슨 값을 넣나」를 알아야 한다.
+    """
+    out = []
+    for path, ops in (doc.get("paths") or {}).items():
+        params: dict[str, dict] = {}
+        for key, op in ops.items():
+            src = op if key == "parameters" else (op.get("parameters") if isinstance(op, dict) else None)
+            for prm in (src or []):
+                if isinstance(prm, dict) and prm.get("name"):
+                    params.setdefault(prm["name"], prm)
+        for name, prm in params.items():
+            m = re.match(r"^(.*)TypeCode$", name)
+            if not m or (m.group(1) + "Id") not in params:
+                continue
+            base = m.group(1)
+            if not is_polymorphic(base, tables):
+                continue
+            merged = dict(prm)
+            merged["description"] = " ".join(
+                str(prm.get(k, "")) for k in ("description", "x-internal-note"))
+            out.append({"contract": contract, "schema": path, "field": name,
+                        "base": base, "where": "query", "ok": has_mapping(merged),
+                        "skipped": False})
+    return out
+
+
 def scan(tables: set[str]) -> list[dict]:
-    """계약 전체에서 다형 짝을 찾아 대응표 유무를 붙인다."""
+    """계약 전체 — 스키마와 쿼리 파라미터 둘 다에서 다형 짝을 모은다."""
     out = []
     for path in sorted(glob.glob(CONTRACTS)):
         name = os.path.basename(path)
         with io.open(path, encoding="utf-8") as f:
             doc = json.load(f)
-        schemas = (doc.get("components") or {}).get("schemas") or {}
-        for schema_name, schema in schemas.items():
-            props = schema.get("properties") or {}
-            for prop_name, prop in props.items():
-                m = re.match(r"^(.*)TypeCode$", prop_name)
-                if not m or not isinstance(prop, dict):
-                    continue
-                base = m.group(1)
-                if base + "Id" not in props:
-                    continue
-                if not is_polymorphic(base, tables):
-                    continue
-                out.append({
-                    "contract": name,
-                    "schema": schema_name,
-                    "field": prop_name,
-                    "base": base,
-                    "ok": has_mapping(prop),
-                })
+        out.extend(scan_schemas(doc, name, tables))
+        out.extend(scan_params(doc, name, tables))
     return out
 
 
 def main() -> int:
     tables = model_tables()
-    hits = scan(tables)
+    scanned = scan(tables)
+    skipped = [h for h in scanned if h.get("skipped")]
+    hits = [h for h in scanned if not h.get("skipped")]
     missing = [h for h in hits if not h["ok"]]
 
     by_base: dict[str, list[dict]] = collections.defaultdict(list)
@@ -146,8 +184,14 @@ def main() -> int:
 
     print(f"다형 참조 대응표 검사 — 공유계약 A-10")
     print("─" * 66)
-    print(f"  다형 짝 {len(hits)}곳 · 이름 {len(by_base)}종 "
-          f"(물리 모델 테이블 {len(tables)}개로 판별)")
+    n_q = sum(1 for h in hits if h["where"] == "query")
+    print(f"  다형 짝 {len(hits)}곳 (스키마 {len(hits)-n_q} · 쿼리 {n_q}) · "
+          f"이름 {len(by_base)}종 (물리 모델 테이블 {len(tables)}개로 판별)")
+    if skipped:
+        print(f"  ⚠ allOf/oneOf 라 properties 를 못 본 스키마 {len(skipped)}개 — "
+              f"가지 안에 짝이 있으면 못 잡는다")
+        for sk in skipped:
+            print(f"      {sk['contract'].replace('.json','')} · {sk['schema']}")
 
     if "--list" in sys.argv:
         for base, group in sorted(by_base.items()):
@@ -171,7 +215,8 @@ def main() -> int:
         same = [x for x in missing if x["field"] == h["field"]
                 and x["contract"] == h["contract"]]
         where = same[0]["schema"] + (f" 외 {len(same)-1}" if len(same) > 1 else "")
-        print(f"  {h['contract'].replace('.json',''):<22} {h['field']:<24} {where}")
+        tag = "쿼리" if h["where"] == "query" else "스키마"
+        print(f"  [{tag}] {h['contract'].replace('.json',''):<20} {h['field']:<22} {where}")
 
     print(
         "\n→ 유형 코드 필드의 description 또는 x-internal-note 에 대응표를 적는다.\n"

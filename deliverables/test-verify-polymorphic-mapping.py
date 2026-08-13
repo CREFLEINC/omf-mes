@@ -89,7 +89,8 @@ class RealContractTest(unittest.TestCase):
 
     def setUp(self):
         self.tables = poly.model_tables()
-        self.hits = poly.scan(self.tables)
+        # skipped(allOf 라 못 본 것)는 짝이 아니라 보고용 항목이다 — 계수에서 뺀다.
+        self.hits = [h for h in poly.scan(self.tables) if not h.get("skipped")]
 
     def test_물리_모델_테이블이_읽힌다(self):
         self.assertGreater(len(self.tables), 100)
@@ -111,6 +112,34 @@ class RealContractTest(unittest.TestCase):
         dest = [h for h in self.hits if h["base"] == "destination"]
         self.assertEqual(len(dest), 2)
         self.assertTrue(all(h["ok"] for h in dest))
+
+
+
+class ParamScanTest(unittest.TestCase):
+    """⚠ 스키마만 보면 쿼리·경로 파라미터가 통째로 빠진다 — 리뷰에서 Major 로 잡혔다."""
+
+    def setUp(self):
+        self.tables = poly.model_tables()
+        self.hits = [h for h in poly.scan(self.tables) if not h.get("skipped")]
+
+    def test_파라미터_쪽도_센다(self):
+        q = [h for h in self.hits if h["where"] == "query"]
+        self.assertGreaterEqual(len(q), 4)
+
+    def test_경로_파라미터도_잡힌다(self):
+        # 유형 코드가 URL 안에 있는 것 — path-level parameters 에 선언돼 있어
+        # 오퍼레이션만 훑으면 놓친다.
+        q = [h for h in self.hits if h["where"] == "query"]
+        self.assertTrue(any("document-progress" in h["schema"] for h in q))
+
+    def test_스키마와_파라미터를_함께_센다(self):
+        wheres = {h["where"] for h in self.hits}
+        self.assertEqual(wheres, {"schema", "query"})
+
+    def test_allOf_는_건너뛰되_보고한다(self):
+        skipped = [h for h in poly.scan(self.tables) if h.get("skipped")]
+        # 조용히 빠지면 커버리지가 부풀려진다 — 최소한 알려야 한다.
+        self.assertTrue(all(h["field"] == "(allOf)" for h in skipped))
 
 
 if __name__ == "__main__":
