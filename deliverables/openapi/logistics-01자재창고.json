@@ -7036,8 +7036,6 @@
      "sourceDocumentTypeCode",
      "sourceDocumentId",
      "sourceWarehouseId",
-     "destinationTypeCode",
-     "destinationId",
      "issuedAt",
      "statusCode"
     ],
@@ -7085,17 +7083,25 @@
      },
      "destinationTypeCode": {
       "x-source-column": "destination_type_code",
-      "type": "string",
+      "type": [
+       "string",
+       "null"
+      ],
       "maxLength": 50,
-      "description": "도착지 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
+      "description": "도착지 유형. 창고 내 이동은 위치, 공급사 반품은 거래처, 생산 투입은 공정이다. ⭐ 폐기 출고에서 폐기 업체가 있으면 폐기 거래처(DISPOSAL_SITE)를 가리키고, 자체 폐기면 도착지 짝을 통째로 비운다 — 나가서 없어지는 물건에는 도착지가 없다.",
       "example": "WORK_ORDER",
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "값 목록 미확정 — 1차 값 목록 제안안 §5-4(LOCATION·PARTNER·PROCESS·WORK_ORDER·DISPOSAL_SITE). ⭐ destinationId 와 짝이다(A-10) — 둘 다 있거나 둘 다 없다. 한쪽만 오면 400 이다. ⛔ 물리 모델은 아직 destination_type_code·destination_id 가 NOT NULL 이다. 그것을 이유로 계약을 묶지 않는다 — 데이터 모델은 UI/UX 설계 결정에 맞춰 따라온다(2026-08-10 확정 작업 방식). 모델 변경 요청 = omf-mes#147(짝 제약 CHECK 포함)."
      },
      "destinationId": {
       "x-source-column": "destination_id",
-      "type": "integer",
+      "type": [
+       "integer",
+       "null"
+      ],
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "도착지 대상. destinationTypeCode 가 가리키는 테이블의 식별자다. ⭐ 자체 폐기면 유형과 함께 비운다.",
+      "x-internal-note": "다형 참조(A-10) — 대응표는 destinationTypeCode 를 본다. ⛔ 물리 모델은 아직 NOT NULL 이다 → omf-mes#147."
      },
      "issuedAt": {
       "x-source-column": "issued_at",
@@ -7163,8 +7169,6 @@
      "sourceDocumentTypeCode",
      "sourceDocumentId",
      "sourceWarehouseId",
-     "destinationTypeCode",
-     "destinationId",
      "issuedAt",
      "businessDate",
      "occurredAt",
@@ -7202,17 +7206,25 @@
      },
      "destinationTypeCode": {
       "x-source-column": "destination_type_code",
-      "type": "string",
+      "type": [
+       "string",
+       "null"
+      ],
       "maxLength": 50,
-      "description": "도착지 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
+      "description": "도착지 유형. 창고 내 이동은 위치, 공급사 반품은 거래처, 생산 투입은 공정이다. ⭐ 폐기 출고에서 폐기 업체가 있으면 폐기 거래처(DISPOSAL_SITE)를 가리키고, 자체 폐기면 도착지 짝을 통째로 비운다 — 나가서 없어지는 물건에는 도착지가 없다.",
       "example": "WORK_ORDER",
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "값 목록 미확정 — 1차 값 목록 제안안 §5-4(LOCATION·PARTNER·PROCESS·WORK_ORDER·DISPOSAL_SITE). ⭐ destinationId 와 짝이다(A-10) — 둘 다 있거나 둘 다 없다. 한쪽만 오면 400 이다. ⛔ 물리 모델은 아직 destination_type_code·destination_id 가 NOT NULL 이다. 그것을 이유로 계약을 묶지 않는다 — 데이터 모델은 UI/UX 설계 결정에 맞춰 따라온다(2026-08-10 확정 작업 방식). 모델 변경 요청 = omf-mes#147(짝 제약 CHECK 포함)."
      },
      "destinationId": {
       "x-source-column": "destination_id",
-      "type": "integer",
+      "type": [
+       "integer",
+       "null"
+      ],
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "도착지 대상. destinationTypeCode 가 가리키는 테이블의 식별자다. ⭐ 자체 폐기면 유형과 함께 비운다.",
+      "x-internal-note": "다형 참조(A-10) — 대응표는 destinationTypeCode 를 본다. ⛔ 물리 모델은 아직 NOT NULL 이다 → omf-mes#147."
      },
      "issuedAt": {
       "x-source-column": "issued_at",
