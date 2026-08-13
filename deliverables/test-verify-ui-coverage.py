@@ -115,7 +115,8 @@ class Domain01Test(unittest.TestCase):
         rows = cov.extract_all(HERE, cov.SCREENS_01)
         screens = {r["screen"] for r in rows}
         self.assertIn("W-01-13", screens)
-        self.assertEqual(len(rows), 116)
+        # 118 — W-01-06 에 「자체 폐기 체크」·「폐기 거래처 선택」 2건 추가(DR-013)
+        self.assertEqual(len(rows), 118)
 
     def test_모바일_POP_화면ID도_읽는다(self):
         rows = cov.extract_actions(self.M0104)
@@ -124,7 +125,8 @@ class Domain01Test(unittest.TestCase):
     def test_기준정보_추출은_그대로다(self):
         # 공용 코드를 고쳤으므로 기존 도메인이 안 흔들리는지 함께 잠근다.
         rows = cov.extract_all(HERE)
-        self.assertEqual(len(rows), 80)
+        # 81 — W-06-06 에 「역할 편집·저장」 1건 추가(DR-013 거래처 역할 탭)
+        self.assertEqual(len(rows), 81)
         self.assertEqual(len({r["screen"] for r in rows}), 11)
 
 
