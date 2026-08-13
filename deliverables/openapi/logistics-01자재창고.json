@@ -7743,17 +7743,23 @@
       "x-source-column": "quality_status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "품질 상태. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
+      "description": "품질 상태. 정상 · 불량 · 검사 대기 · 폐기 네 가지다. ⚠ 값 집합은 확정이나 코드 문자열이 아직 정해지지 않아 enum 을 못 박지 않는다 — 서버가 내려주는 선택지를 그대로 쓴다.",
       "example": "RELEASED",
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "값 집합 출처 = 회신 E-3 확정(정상·불량·검사 대기·폐기). E-3 는 이 축이 재고의 차원임을 확인했다 — uq_inventory_balance_dim 에 quality_status_code 가 들어 있어 같은 LOT 이 같은 위치에 있어도 품질 상태가 다르면 재고 행이 갈린다. ⚠ example 'RELEASED' 는 확정 4값 어디에도 없는 잠정값이다 — 코드 문자열 확정 시 교체한다. 구 서술 「확정된 값 목록이 아직 없다(G-2)」는 오기였다."
      },
      "inventoryStatusCode": {
       "x-source-column": "inventory_status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "재고 상태. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
+      "enum": [
+       "AVAILABLE",
+       "IN_TRANSIT",
+       "ON_HOLD",
+       "BLOCKED"
+      ],
+      "description": "재고 상태. 가용(AVAILABLE) · 운송중(IN_TRANSIT) · 보류(ON_HOLD) · 차단(BLOCKED) 네 가지다.",
       "example": "AVAILABLE",
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "값 출처 = 공통코드 그룹 INVENTORY_STATUS 시드 4값([E-7] — 창고 간 이동의 shipped~received 구간을 IN_TRANSIT 으로 표현). 구 서술 「확정된 값 목록이 아직 없다(G-2)」는 오기였다 — 값을 열어 보지 않았다."
      },
      "destinationLocationId": {
       "x-source-column": "destination_location_id",
@@ -7825,17 +7831,23 @@
       "x-source-column": "quality_status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "품질 상태. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
+      "description": "품질 상태. 정상 · 불량 · 검사 대기 · 폐기 네 가지다. ⚠ 값 집합은 확정이나 코드 문자열이 아직 정해지지 않아 enum 을 못 박지 않는다 — 서버가 내려주는 선택지를 그대로 쓴다.",
       "example": "RELEASED",
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "값 집합 출처 = 회신 E-3 확정(정상·불량·검사 대기·폐기). E-3 는 이 축이 재고의 차원임을 확인했다 — uq_inventory_balance_dim 에 quality_status_code 가 들어 있어 같은 LOT 이 같은 위치에 있어도 품질 상태가 다르면 재고 행이 갈린다. ⚠ example 'RELEASED' 는 확정 4값 어디에도 없는 잠정값이다 — 코드 문자열 확정 시 교체한다. 구 서술 「확정된 값 목록이 아직 없다(G-2)」는 오기였다."
      },
      "inventoryStatusCode": {
       "x-source-column": "inventory_status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "재고 상태. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
+      "enum": [
+       "AVAILABLE",
+       "IN_TRANSIT",
+       "ON_HOLD",
+       "BLOCKED"
+      ],
+      "description": "재고 상태. 가용(AVAILABLE) · 운송중(IN_TRANSIT) · 보류(ON_HOLD) · 차단(BLOCKED) 네 가지다.",
       "example": "AVAILABLE",
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "값 출처 = 공통코드 그룹 INVENTORY_STATUS 시드 4값([E-7] — 창고 간 이동의 shipped~received 구간을 IN_TRANSIT 으로 표현). 구 서술 「확정된 값 목록이 아직 없다(G-2)」는 오기였다 — 값을 열어 보지 않았다."
      },
      "destinationLocationId": {
       "x-source-column": "destination_location_id",
@@ -9397,9 +9409,9 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "품질 상태. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
+      "description": "품질 상태. 정상 · 불량 · 검사 대기 · 폐기 네 가지다. ⚠ 값 집합은 확정이나 코드 문자열이 아직 정해지지 않아 enum 을 못 박지 않는다 — 서버가 내려주는 선택지를 그대로 쓴다.",
       "example": "RELEASED",
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "값 집합 출처 = 회신 E-3 확정(정상·불량·검사 대기·폐기). E-3 는 이 축이 재고의 차원임을 확인했다 — uq_inventory_balance_dim 에 quality_status_code 가 들어 있어 같은 LOT 이 같은 위치에 있어도 품질 상태가 다르면 재고 행이 갈린다. ⚠ example 'RELEASED' 는 확정 4값 어디에도 없는 잠정값이다 — 코드 문자열 확정 시 교체한다. 구 서술 「확정된 값 목록이 아직 없다(G-2)」는 오기였다."
      },
      "inventoryStatusCode": {
       "x-source-column": "inventory_status_code",
@@ -9408,9 +9420,16 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "재고 상태. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
+      "enum": [
+       "AVAILABLE",
+       "IN_TRANSIT",
+       "ON_HOLD",
+       "BLOCKED",
+       null
+      ],
+      "description": "재고 상태. 가용(AVAILABLE) · 운송중(IN_TRANSIT) · 보류(ON_HOLD) · 차단(BLOCKED) 네 가지다.",
       "example": "AVAILABLE",
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "값 출처 = 공통코드 그룹 INVENTORY_STATUS 시드 4값([E-7] — 창고 간 이동의 shipped~received 구간을 IN_TRANSIT 으로 표현). 구 서술 「확정된 값 목록이 아직 없다(G-2)」는 오기였다 — 값을 열어 보지 않았다."
      },
      "ownershipTypeCode": {
       "x-source-column": "ownership_type_code",
