@@ -681,9 +681,6 @@ paths["/quality/concessions/{concessionId}"] = {"get": {
 
 
 # ══════════════════════════════════════════════════════════════════
-# example 자동 부여 — 검사기가 스칼라마다 요구한다
-# ══════════════════════════════════════════════════════════════════
-# ══════════════════════════════════════════════════════════════════
 # 처분 결정 — ⭐ DR-008 확정 3-A 로 03 이 소유한다 (2026-08-13)
 #   04 계약이 읽기만 내고 있던 것을 옮겨 왔다. 쓰는 화면(W-03-10)이
 #   03 에 생겼고, 「소유는 쓰기를 가진 쪽」이 이 저장소의 규약이다.
@@ -764,6 +761,9 @@ paths["/quality/disposition-decisions/{dispositionDecisionId}"] = {
             "responses": dict(list(one("DispositionDecision").items()) + list(err("404").items()))}}
 
 
+# ══════════════════════════════════════════════════════════════════
+# example 자동 부여 — 검사기가 스칼라마다 요구한다
+# ══════════════════════════════════════════════════════════════════
 
 EX = {
     "Id": 1001, "id": 1001,
@@ -827,7 +827,6 @@ for _name, _proto in (("I64", I64), ("QTY", QTY), ("TS", TS), ("DT", DT),
 
 OUT = os.path.join(HERE, "quality-03품질.json")
 src = json.load(io.open(os.path.join(HERE, "logistics-01자재창고.json"), encoding="utf-8"))
-
 doc = {
     "openapi": "3.1.0",
     "info": {
