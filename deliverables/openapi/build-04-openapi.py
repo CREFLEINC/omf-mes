@@ -302,31 +302,8 @@ schemas["DispositionRequest"] = obj(["requestedQty", "uomId"], {
     "uomId": I64,
     "remarks": {"type": ["string", "null"]}},
     description=("판정 의뢰. ⭐ 이 화면은 판정하지 않는다 — 재작업/폐기 판정은 전 도메인에서 "
-                 "03 품질 소관으로 통일돼 있다(F04 정합 확정 2026-07-07 · W-04-07 §5-1)"))
-
-# ══════════════════════════════════════════════════════════════════
-# 처분 결정 — ⛔ 읽기만
-# ══════════════════════════════════════════════════════════════════
-schemas["DispositionDecision"] = obj(
-    ["dispositionDecisionId", "nonconformanceId", "dispositionTypeCode",
-     "decisionQty", "uomId", "reason", "decidedBy", "decidedAt"], {
-    "dispositionDecisionId": I64,
-    "nonconformanceId": I64, "nonconformanceNo": STR,
-    "dispositionTypeCode": {"type": "string",
-                            "description": ("재작업 · 폐기 · 정상 등. ⛔ 선별은 1차 범위 밖이라 값이 와도 "
-                                            "실행 화면이 없다(omf-mes#118)")},
-    "decisionQty": QTY, "uomId": I64,
-    "reason": STR,
-    "decidedBy": I64, "decidedAt": TS,
-    "approvalRequestId": {"type": ["integer", "null"], "format": "int64",
-                          "description": "승인이 붙는 처분이면 가리킨다. 승인은 공통 계약이 소유한다"},
-    "lotId": I64, "lotNo": STR, "itemId": I64},
-    description=("처분 결정. ⛔⛔ 등록 경로를 두지 않는다 — 이것을 만드는 화면이 "
-                 "인벤토리 116 전체에 0건이다. 03 요구서는 04 것이라 넘겼고 W-04-07 은 "
-                 "「03 이 만든다 · 04 는 의뢰만」이라 적었다 — 서로에게 미뤘다. "
-                 "F04 정합 확정이 「판정은 03 소관」이라 했는데 03 의 다섯 화면에 그 화면이 없다. "
-                 "세 화면(W-04-10 폐기 · W-04-11 재등록 · P-04-03 재작업)의 진입 조건이 여기 걸린다. "
-                 "화면 인벤토리 건으로 올렸다"))
+                 "03 품질 소관으로 통일돼 있다(F04 정합 확정 2026-07-07 · W-04-07 §5-1). "
+                 "받는 화면은 W-03-10 이고 처분 결정 자원은 품질 계약이 소유한다(DR-008 확정 3-A)"))
 
 # ══════════════════════════════════════════════════════════════════
 # 경로
@@ -509,27 +486,6 @@ paths["/quality/nonconformances/{nonconformanceId}:request-disposition"] = {
                  "schema": ref("DispositionRequest")}}},
              "responses": dict(list(one("Nonconformance", "200", "의뢰됨").items())
                                + list(err("400", "403", "404", "409").items()))}}
-
-paths["/quality/disposition-decisions"] = {"get": {
-    "tags": ["quality"], "summary": "처분 결정 목록",
-    "description": ("W-04-10(폐기) · W-04-11(재등록) · P-04-03(재작업)의 진입 목록이다 — "
-                    "처분 유형으로 걸러 각자의 대상을 찾는다. 근거: 세 화면 §5"),
-    "parameters": [
-        q("dispositionTypeCode", STR, "재작업 · 폐기 · 정상"),
-        q("nonconformanceId", I64), q("lotId", I64), q("itemId", I64),
-        q("decidedFrom", TS), q("decidedTo", TS)] + PAGE,
-    "responses": listed("DispositionDecision"),
-    "x-internal-note": ("⛔⛔ 등록 경로를 두지 않았다 — 처분 결정을 만드는 화면이 인벤토리 116 전체에 "
-                        "0건이다. 03 요구서는 이 테이블을 04 것이라 넘겼고 W-04-07 은 「03 이 만든다 · "
-                        "04 는 의뢰만」이라 적었다 — 서로에게 미뤘다. F04 정합 확정이 「판정은 03 소관」이라 "
-                        "했는데 03 의 다섯 화면에 그 화면이 없다(조회 2 · Lot Status 전이 1 · "
-                        "의심자재 등록 1 · 특채 승인 1). 이 목록이 비면 세 화면이 진입하지 못한다. "
-                        "화면 인벤토리 건으로 올렸다 — 04 계약 1단계 §2.")}}
-paths["/quality/disposition-decisions/{dispositionDecisionId}"] = {
-    "parameters": [pathparam("dispositionDecisionId")],
-    "get": {"tags": ["quality"], "summary": "처분 결정 한 건",
-            "description": "W-04-11 「판정 이력 보기」. 근거: W-04-11 §5",
-            "responses": dict(list(one("DispositionDecision").items()) + list(err("404").items()))}}
 
 
 # ══════════════════════════════════════════════════════════════════

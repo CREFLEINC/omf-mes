@@ -681,8 +681,90 @@ paths["/quality/concessions/{concessionId}"] = {"get": {
 
 
 # ══════════════════════════════════════════════════════════════════
+# 처분 결정 — ⭐ DR-008 확정 3-A 로 03 이 소유한다 (2026-08-13)
+#   04 계약이 읽기만 내고 있던 것을 옮겨 왔다. 쓰는 화면(W-03-10)이
+#   03 에 생겼고, 「소유는 쓰기를 가진 쪽」이 이 저장소의 규약이다.
+#   ⚠ 부적합(nonconformance) 자체는 04 가 계속 소유한다 — W-04-07 이 등록한다.
+# ══════════════════════════════════════════════════════════════════
+schemas["DispositionDecision"] = obj(
+    ["dispositionDecisionId", "nonconformanceId", "dispositionTypeCode",
+     "decisionQty", "uomId", "reason", "decidedBy", "decidedAt"], {
+    "dispositionDecisionId": I64,
+    "nonconformanceId": I64, "nonconformanceNo": STR,
+    "dispositionTypeCode": {"type": "string",
+                            "description": ("재작업 · 폐기 · 정상. ⛔ 선별은 1차 범위 밖이라 값이 와도 "
+                                            "실행 화면이 없다(omf-mes#118)"),
+                            "x-no-example": ("값 목록이 미확정이라 코드 문자열을 못 박지 않는다"
+                                             "(2차 값 목록 제안안 대상). 임의 코드를 example 로 넣으면 "
+                                             "목이 확정값처럼 보인다")},
+    "decisionQty": QTY, "uomId": I64,
+    "reason": STR,
+    "decidedBy": I64, "decidedAt": TS,
+    "approvalRequestId": {"type": ["integer", "null"], "format": "int64",
+                          "description": "승인이 붙는 처분이면 가리킨다. 승인은 공통 계약이 소유한다",
+                          "example": 1001},
+    "lotId": I64, "lotNo": STR, "itemId": I64},
+    description=("처분 결정. 부적합 하나에 여러 건이 달릴 수 있다 — 같은 부적합을 수량으로 갈라 "
+                 "일부는 재작업, 일부는 폐기로 정할 수 있다(decisionQty)"))
+
+schemas["DispositionDecisionCreate"] = obj(
+    ["dispositionTypeCode", "decisionQty", "uomId", "reason"], {
+    "dispositionTypeCode": {"type": "string",
+                            "description": "재작업 · 폐기 · 정상. ⛔ 선별은 받지 않는다(omf-mes#118)",
+                            "x-no-example": "값 목록 미확정 — 2차 값 목록 제안안 대상"},
+    "decisionQty": QTY, "uomId": I64,
+    "reason": {"type": "string",
+               "description": "⭐ 비울 수 없다 — 물리 모델이 NOT NULL 이다. 왜 그렇게 정했는지가 근거로 남는다",
+               "example": "변형 손상이 커 재작업으로 회복되지 않는다"}},
+    description=("처분 결정 등록. ⭐ decidedBy·decidedAt 은 받지 않는다 — 서버가 인증 주체와 "
+                 "수신 시각으로 채운다(공유계약 B-6)"))
+
+paths["/quality/disposition-decisions"] = {
+    "get": {"tags": ["quality"], "summary": "처분 결정 목록",
+        "description": ("W-03-10 의 처리 이력이고, 동시에 W-04-10(폐기) · W-04-11(재등록) · "
+                        "P-04-03(재작업)의 진입 목록이다 — 처분 유형으로 걸러 각자의 대상을 찾는다. "
+                        "근거: W-03-10 §3 · 네 화면 §5"),
+        "parameters": [
+            q("dispositionTypeCode", STR, "재작업 · 폐기 · 정상"),
+            q("nonconformanceId", I64), q("lotId", I64), q("itemId", I64),
+            q("decidedFrom", TS, "기간 — 이력 모드에서 필수(공유계약 L-3)"),
+            q("decidedTo", TS)] + PAGE,
+        "responses": listed("DispositionDecision")}}
+
+paths["/quality/nonconformances/{nonconformanceId}/disposition-decisions"] = {
+    "parameters": [pathparam("nonconformanceId")],
+    "get": {"tags": ["quality"], "summary": "이 부적합의 처분 결정",
+        "description": ("W-03-10 상세에서 이미 정해진 처분을 보여 준다 — 부분 처분이 되므로 "
+                        "여러 건일 수 있다. 근거: W-03-10 §3"),
+        "responses": listed("DispositionDecision")},
+    "post": {"tags": ["quality"], "summary": "처분 판정 저장",
+        "description": ("W-03-10 「판정 저장」. 부적합 하나를 수량으로 갈라 여러 번 부를 수 있다 — "
+                        "일부 재작업 · 일부 폐기가 성립한다. "
+                        "⭐ 판정 저장과 Lot Status 전이는 한 트랜잭션이다(공유계약 B-8) — "
+                        "처분만 남고 LOT 이 안 바뀌면 다음 화면이 잘못된 대상을 집는다. "
+                        "근거: W-03-10 §5-1 · DR-008 확정 3-A"),
+        "parameters": [pref("IdempotencyKey"), pref("IfMatchVersionOptional")],
+        "requestBody": {"required": True, "content": {"application/json": {
+            "schema": ref("DispositionDecisionCreate")}}},
+        "responses": dict(list(one("DispositionDecision", "201", "저장됨").items())
+                          + list(err("400", "403", "404", "409").items())),
+        "x-internal-note": ("409 는 둘이다 — 남은 수량을 넘겨 정하려 할 때, 그리고 이미 닫힌 "
+                            "부적합(status_code)일 때. 남은 수량 = nonconformance_lot.affected_qty 합 "
+                            "− 이 부적합의 decision_qty 합이고 서버가 판정한다(공유계약 L-2 — 잔액은 "
+                            "클라이언트가 계산하지 않는다). "
+                            "⚠ disposition_type_code 값 목록은 미확정이다 — 2차 값 목록 제안안 대상.")}}
+
+paths["/quality/disposition-decisions/{dispositionDecisionId}"] = {
+    "parameters": [pathparam("dispositionDecisionId")],
+    "get": {"tags": ["quality"], "summary": "처분 결정 한 건",
+            "description": "W-04-11 「판정 이력 보기」. 근거: W-04-11 §5",
+            "responses": dict(list(one("DispositionDecision").items()) + list(err("404").items()))}}
+
+
+# ══════════════════════════════════════════════════════════════════
 # example 자동 부여 — 검사기가 스칼라마다 요구한다
 # ══════════════════════════════════════════════════════════════════
+
 EX = {
     "Id": 1001, "id": 1001,
     "No": "IR-2026-0812-0412", "Code": "IQC", "code": "IQC",
@@ -713,6 +795,10 @@ def fill(sch):
     for pname, p in (sch.get("properties") or {}).items():
         if not isinstance(p, dict): continue
         if "$ref" in p or p.get("type") in ("array", "object"): continue
+        # ⛔ x-no-example 은 「일부러 안 넣었다」는 표시다 — 자동 부여가 덮으면 안 된다.
+        #    EX 는 접미사 하나로 매기므로 *Code 전부에 같은 값(여기서는 "IQC")이 붙는다.
+        #    값 목록이 미확정인 코드에 그것이 붙으면 목이 확정값처럼 보인다.
+        if "x-no-example" in p: continue
         if "example" not in p:
             e = example_for(pname, p)
             if e is not None: p["example"] = e
@@ -755,7 +841,7 @@ doc = {
             "보류는 구간 형 리소스다 — 「진행 중」을 상태 컬럼으로 두지 않고 끝 시각의 부재로 판정하며 "
             "닫는 것은 :release 액션이다. "
             "Lot Status 전이에 독립 경로를 두지 않는다 — 검사 판정 확정과 보류 등록·해제의 부수 효과로만 일어난다. "
-            "승인·반려는 공통 계약이 소유한다. 부적합과 처분 판정은 제품출하 계약 소관이다. "
+            "승인·반려는 공통 계약이 소유한다. 부적합 등록은 제품출하 계약 소관이고 처분 판정은 여기가 소유한다(DR-008 확정 3-A). "
             "현장 검사 화면 한 장이 오프라인에서 쓰이므로 검사 결과 저장은 Idempotency-Key 를 필수로 받고 "
             "If-Match 를 선택으로 둔다. 즉시 처리는 201, 큐 접수는 202 다."),
         "x-internal-note": (
