@@ -140,9 +140,9 @@ class DomainAppTest(unittest.TestCase):
     def test_액션_표_없는_화면이_없다(self):
         self.assertEqual(cov.screens_without_action_table(HERE, cov.SCREENS_APP), [])
 
-    def test_도메인_등록부에_여섯이_있다(self):
+    def test_도메인_등록부에_일곱이_있다(self):
         self.assertEqual(sorted(cov.DOMAINS),
-                         ["01", "02", "03", "app", "mdm", "print"])
+                         ["01", "02", "03", "04", "app", "mdm", "print"])
 
 
 class DomainPrintTest(unittest.TestCase):
@@ -191,6 +191,31 @@ class Domain03Test(unittest.TestCase):
         # 파일럿 서식이라 액션 표가 없다. 요구는 §5 본문에서 사람이 읽는다.
         self.assertEqual(
             cov.screens_without_action_table(HERE, cov.SCREENS_03), ["W-01-01"])
+
+class Domain04Test(unittest.TestCase):
+    # 04 제품출하 16장. ⭐ 도메인 배지는 18 인데 계약 대상은 16 이다 —
+    # P-04-02·P-04-04 는 출력물 계약이 이미 센다. 여기 들어오면 이중 계상이다.
+    def test_열여섯_화면이_등록돼_있다(self):
+        self.assertEqual(len(cov.SCREENS_04), 16)
+
+    def test_출력물_계약이_세는_둘은_없다(self):
+        ids = {sid for _, sid in cov.SCREENS_04}
+        self.assertNotIn("P-04-02", ids)
+        self.assertNotIn("P-04-04", ids)
+
+    def test_이미_다른_도메인이_세는_화면은_없다(self):
+        mine = {sid for _, sid in cov.SCREENS_04}
+        for other in (cov.SCREENS_PRINT, cov.SCREENS_02, cov.SCREENS_03, cov.SCREENS_01):
+            self.assertEqual(mine & {sid for _, sid in other}, set())
+
+    def test_결번은_등록하지_않는다(self):
+        ids = {sid for _, sid in cov.SCREENS_04}
+        for vacated in ("W-04-09", "M-04-02"):
+            self.assertNotIn(vacated, ids)
+
+    def test_액션_표가_전부_있다(self):
+        self.assertEqual(cov.screens_without_action_table(HERE, cov.SCREENS_04), [])
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
