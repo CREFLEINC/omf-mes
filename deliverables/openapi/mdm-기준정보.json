@@ -9861,6 +9861,14 @@
             "default": true,
             "description": "MES 확장 — 별도 :deactivate 없이 이 PUT 으로 바꾼다(item 은 사용 중지 액션이 화면에 없다 — ui-요구목록 W-06-05)",
             "example": true
+          },
+          "mesCategoryCode": {
+            "x-source-column": "mes_category_code",
+            "type": "string",
+            "maxLength": 50,
+            "x-no-example": true,
+            "description": "신재와 재생재를 가르는 MES 안쪽 구분. 기간계로 보내지 않는다 — 기간계에는 신재와 똑같이 처리한다. 근거: DR-006 확정 · M-01-12 §5-B. ⚠ 값 목록이 아직 확정되지 않았다 — 서버가 내려주는 선택지를 그대로 쓴다(공유계약 G-2)",
+            "x-internal-note": "물리 모델에 아직 없는 컬럼이다(M-01-12 §5-B 가 [신설] 로 표시). 함께 바뀌는 것이 유일 제약이다 — item_code 단독 UNIQUE 가 (item_code, mes_category_code) 복합 유일이 된다. 부분 유일 인덱스가 아니라 복합 유일인 이유는 구분 코드가 모든 행에 있기 때문이다(기본 NEW). W-05-07 채널 매핑과 해법이 갈리는 자리다 — 공유계약 A-19 둘째 사례. 모델 요청은 omf-mes#64 「재생재 하위 코드」 항목."
           }
         },
         "x-internal-note": "미착지 넷: 자재LOT 보관단위·생산LOT 기본크기·개발품 플래그·재생재 하위코드 — #64"

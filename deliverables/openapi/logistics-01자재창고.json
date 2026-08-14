@@ -5269,6 +5269,76 @@
     "x-internal-note": "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 도출 단계의 :temporary 를 :complete-temporary 로 다듬었다 — :complete 와 짝이라는 것이 이름에 드러나야 한다."
    }
   },
+  "/logistics/recycle-entries": {
+   "post": {
+    "tags": [
+     "logistics"
+    ],
+    "summary": "재생재 등록",
+    "description": "분쇄재가 생기면 현장이 등록한다. 새 자재 LOT 을 만들고 그 수량만큼 재고를 늘린다 — 한 트랜잭션이다. **LOT 번호는 서버가 매긴다**: 번호를 클라이언트가 정하면 오프라인 두 단말이 같은 번호를 만든다(공유계약 C-2). 그래서 화면이 「번호는 저장 후 정해집니다」를 먼저 말한다. 근거: M-01-12 §5-1·§5-3 · DR-006 확정. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다.",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersionOptional"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RecycleEntryCreate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "등록됨 — LOT 번호가 실려 온다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RecycleEntry"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-internal-note": "혼적 제약(allow_mixed_item·allow_mixed_lot)을 서버가 막지 않는다 — 화면이 경고하고 현장이 판단한다(스펙 §6). 「막지 않는다」가 설계다. ⚠ 물리 모델에 등록 건을 담을 표가 없고 mdm.item.mes_category_code 도 없다. 계약은 화면이 요구하는 것을 말하고 모델 변경은 omf-mes#64 로 나가 있다 — 「데이터 모델은 UI/UX 설계 결정에 맞춰 따라온다」(2026-08-10 확정)."
+   }
+  },
   "/logistics/shopfloor-receipts": {
    "get": {
     "tags": [
@@ -12101,6 +12171,130 @@
       "example": "2026-08-06T09:12:00+09:00"
      }
     }
+   },
+   "RecycleEntry": {
+    "type": "object",
+    "required": [
+     "recycleEntryId",
+     "lotId",
+     "lotNo",
+     "itemId",
+     "quantity"
+    ],
+    "description": "등록 결과. 서버가 매긴 LOT 번호가 실려 온다 — 화면이 그것을 보인다.",
+    "properties": {
+     "recycleEntryId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001,
+      "description": "등록 건 자체의 번호. 새로 만든 LOT 의 원천 참조가 이것을 가리킨다 — 원천 유형 코드는 RECYCLE_ENTRY 다"
+     },
+     "lotId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "lotNo": {
+      "type": "string",
+      "example": "LOT-2026-000045",
+      "description": "서버가 매긴 번호"
+     },
+     "itemId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "quantity": {
+      "type": "number",
+      "example": 12.5
+     },
+     "uomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001,
+      "description": "품목의 기본 단위가 그대로 온다"
+     },
+     "warehouseId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "locationId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "businessDate": {
+      "type": "string",
+      "format": "date",
+      "example": "2026-08-11"
+     },
+     "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     }
+    },
+    "x-internal-note": "계보를 싣지 않는다. trace.lot.parent_lot_id 와 trace.lot_relation 이 둘 다 실재하지만 DR-006 이 「어디서 어떻게 만들어졌는지 추적은 불필요」로 확정했다. ⚠ 일부만 채워진 계보가 빈 계보보다 위험하다 — 재생재에만 부모가 있으면 계보 조회 화면이 「추적 가능」으로 오해한다(스펙 §3-1 · 공유계약 G-24 의 데이터 판)."
+   },
+   "RecycleEntryCreate": {
+    "type": "object",
+    "required": [
+     "itemId",
+     "quantity",
+     "warehouseId",
+     "locationId",
+     "businessDate",
+     "occurredAt"
+    ],
+    "description": "재생재 등록. 새 자재 LOT 을 만들고 그 수량만큼 재고를 늘린다. LOT 번호는 서버가 매긴다 — 화면이 미리 보이지 못한다. 근거: M-01-12 §5-1",
+    "properties": {
+     "itemId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001,
+      "description": "재생재 품목. 신재와 다른 행이다 — 재고·투입·출고가 품목으로 서므로 품목이 갈리면 집계가 자동으로 갈린다. 근거: M-01-12 §3-2. ⚠ 이 행은 품목 마스터에 미리 있어야 한다 — 이 경로가 만들지 않는다"
+     },
+     "quantity": {
+      "x-source-table": "trace.lot",
+      "x-source-column": "initial_qty",
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "example": 12.5,
+      "description": "0 이하는 400 이다. 근거: M-01-12 §6"
+     },
+     "warehouseId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001,
+      "x-source-table": "inventory.inventory_balance",
+      "x-source-column": "warehouse_id",
+      "description": "기본값은 단말에 묶인 창고다"
+     },
+     "locationId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001,
+      "x-source-table": "inventory.inventory_balance",
+      "x-source-column": "location_id",
+      "description": "비울 수 없다. 근거: M-01-12 §6"
+     },
+     "businessDate": {
+      "type": "string",
+      "format": "date",
+      "example": "2026-08-11"
+     },
+     "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "remarks": {
+      "type": "string",
+      "example": "비고"
+     }
+    },
+    "x-internal-note": "이 본문 하나가 세 표를 만든다 — trace.lot(자재 묶음) · inventory.inventory_balance(재고) · 등록 건(표 미실재 · omf-mes#64). 단위를 본문으로 받지 않는다 — 품목의 기본 단위를 그대로 쓴다. 화면도 읽기 전용으로 보인다(스펙 §5-A). 받으면 품목과 어긋난 단위가 들어올 자리가 생긴다. ⛔ 구분(신재·재생재)도 본문에 없다 — 그것은 품목 마스터의 값이고, 화면은 품목코드 + 구분으로 «어느 품목 행인가»를 정한 뒤 itemId 하나만 보낸다."
    },
    "ShopfloorReceipt": {
     "x-source-table": "logistics.shopfloor_receipt",
