@@ -73,7 +73,9 @@ def schemas_to_add() -> dict:
     """등록 건 하나와 그 결과. 결과에 LOT 번호가 실려 온다 — 화면이 그것을 보인다."""
     return {
         "RecycleEntryCreate": {
-            "x-source-table": "trace.lot",
+            # ⛔ 스키마 수준 x-source-table 을 두지 않는다 — 이 본문 하나가
+            #    세 표에 걸친다(자재 묶음 · 재고 잔액 · 등록 건). 한 표를
+            #    가리키면 근거 추적의 뜻이 흐려진다. 필드마다 붙인다.
             "type": "object",
             "required": ["itemId", "quantity", "warehouseId", "locationId",
                          "businessDate", "occurredAt"],
@@ -89,20 +91,27 @@ def schemas_to_add() -> dict:
                         "⚠ 이 행은 품목 마스터에 미리 있어야 한다 — 이 경로가 만들지 않는다"),
                 },
                 "quantity": {
+                    "x-source-table": "trace.lot",
                     "x-source-column": "initial_qty",
                     "type": "number",
                     "exclusiveMinimum": 0,
                     "example": 12.5,
                     "description": "0 이하는 400 이다. 근거: M-01-12 §6",
                 },
-                "warehouseId": {**I64, "description": "기본값은 단말에 묶인 창고다"},
-                "locationId": {**I64, "description": "비울 수 없다. 근거: M-01-12 §6"},
+                "warehouseId": {**I64, "x-source-table": "inventory.inventory_balance",
+                                "x-source-column": "warehouse_id",
+                                "description": "기본값은 단말에 묶인 창고다"},
+                "locationId": {**I64, "x-source-table": "inventory.inventory_balance",
+                               "x-source-column": "location_id",
+                               "description": "비울 수 없다. 근거: M-01-12 §6"},
                 "businessDate": {"type": "string", "format": "date", "example": "2026-08-11"},
                 "occurredAt": {"type": "string", "format": "date-time",
                                "example": "2026-08-11T09:12:00+09:00"},
                 "remarks": {"type": "string", "example": "비고"},
             },
             "x-internal-note": (
+                "이 본문 하나가 세 표를 만든다 — trace.lot(자재 묶음) · "
+                "inventory.inventory_balance(재고) · 등록 건(표 미실재 · omf-mes#64). "
                 "단위를 본문으로 받지 않는다 — 품목의 기본 단위를 그대로 쓴다. "
                 "화면도 읽기 전용으로 보인다(스펙 §5-A). 받으면 품목과 어긋난 단위가 들어올 자리가 생긴다. "
                 "⛔ 구분(신재·재생재)도 본문에 없다 — 그것은 품목 마스터의 값이고, "
@@ -187,6 +196,21 @@ def operation() -> dict:
     }
 
 
+def detect_indent(original: str, doc: dict) -> int | None:
+    """원본이 어떤 들여쓰기로 쓰였는지 되짚는다. 못 알아내면 None 이다.
+
+    ⛔ 들여쓰기를 임의로 정하면 경로 하나를 더한 변경이 파일 전체를 다시 쓴
+    것으로 나온다 — 06 계약 패치가 실제로 24,502줄을 바꾼 적이 있다.
+    지금 이 파일이 마침 1이라 해서 박아 두면 다음 사람이 「왜 안전한가」를
+    매번 다시 확인해야 한다.
+    """
+    body = original.rstrip("\n")
+    for candidate in (1, 2, 4):
+        if json.dumps(doc, ensure_ascii=False, indent=candidate) == body:
+            return candidate
+    return None
+
+
 def main() -> int:
     original = open(CONTRACT, encoding="utf-8").read()
     doc = json.loads(original)
@@ -200,12 +224,18 @@ def main() -> int:
             print(f"⛔ 의존 파라미터가 없다: {dep}", file=sys.stderr)
             return 1
 
+    indent = detect_indent(original, doc)
+    if indent is None:
+        print("⛔ 원본 들여쓰기를 알아낼 수 없다 — 덮어쓰지 않는다", file=sys.stderr)
+        return 1
+    tail = original[len(original.rstrip("\n")):]
+
     doc["components"]["schemas"].update(schemas_to_add())
     doc["components"]["schemas"] = dict(sorted(doc["components"]["schemas"].items()))
     doc["paths"][PATH] = operation()
     doc["paths"] = dict(sorted(doc["paths"].items()))
 
-    updated = json.dumps(doc, ensure_ascii=False, indent=1)
+    updated = json.dumps(doc, ensure_ascii=False, indent=indent) + tail
     if updated == original:
         print("  이미 반영돼 있다 — 변경 없음")
         return 0

@@ -12238,7 +12238,6 @@
     "x-internal-note": "계보를 싣지 않는다. trace.lot.parent_lot_id 와 trace.lot_relation 이 둘 다 실재하지만 DR-006 이 「어디서 어떻게 만들어졌는지 추적은 불필요」로 확정했다. ⚠ 일부만 채워진 계보가 빈 계보보다 위험하다 — 재생재에만 부모가 있으면 계보 조회 화면이 「추적 가능」으로 오해한다(스펙 §3-1 · 공유계약 G-24 의 데이터 판)."
    },
    "RecycleEntryCreate": {
-    "x-source-table": "trace.lot",
     "type": "object",
     "required": [
      "itemId",
@@ -12257,6 +12256,7 @@
       "description": "재생재 품목. 신재와 다른 행이다 — 재고·투입·출고가 품목으로 서므로 품목이 갈리면 집계가 자동으로 갈린다. 근거: M-01-12 §3-2. ⚠ 이 행은 품목 마스터에 미리 있어야 한다 — 이 경로가 만들지 않는다"
      },
      "quantity": {
+      "x-source-table": "trace.lot",
       "x-source-column": "initial_qty",
       "type": "number",
       "exclusiveMinimum": 0,
@@ -12267,12 +12267,16 @@
       "type": "integer",
       "format": "int64",
       "example": 1001,
+      "x-source-table": "inventory.inventory_balance",
+      "x-source-column": "warehouse_id",
       "description": "기본값은 단말에 묶인 창고다"
      },
      "locationId": {
       "type": "integer",
       "format": "int64",
       "example": 1001,
+      "x-source-table": "inventory.inventory_balance",
+      "x-source-column": "location_id",
       "description": "비울 수 없다. 근거: M-01-12 §6"
      },
      "businessDate": {
@@ -12290,7 +12294,7 @@
       "example": "비고"
      }
     },
-    "x-internal-note": "단위를 본문으로 받지 않는다 — 품목의 기본 단위를 그대로 쓴다. 화면도 읽기 전용으로 보인다(스펙 §5-A). 받으면 품목과 어긋난 단위가 들어올 자리가 생긴다. ⛔ 구분(신재·재생재)도 본문에 없다 — 그것은 품목 마스터의 값이고, 화면은 품목코드 + 구분으로 «어느 품목 행인가»를 정한 뒤 itemId 하나만 보낸다."
+    "x-internal-note": "이 본문 하나가 세 표를 만든다 — trace.lot(자재 묶음) · inventory.inventory_balance(재고) · 등록 건(표 미실재 · omf-mes#64). 단위를 본문으로 받지 않는다 — 품목의 기본 단위를 그대로 쓴다. 화면도 읽기 전용으로 보인다(스펙 §5-A). 받으면 품목과 어긋난 단위가 들어올 자리가 생긴다. ⛔ 구분(신재·재생재)도 본문에 없다 — 그것은 품목 마스터의 값이고, 화면은 품목코드 + 구분으로 «어느 품목 행인가»를 정한 뒤 itemId 하나만 보낸다."
    },
    "ShopfloorReceipt": {
     "x-source-table": "logistics.shopfloor_receipt",
