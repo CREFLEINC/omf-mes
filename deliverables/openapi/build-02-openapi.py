@@ -475,6 +475,65 @@ doc_resource("/production/operation-handovers","production","operationHandover",
    q("handedOverFrom",TS), q("handedOverTo",TS)],
   note="물리 모델은 handed_over_at NOT NULL / received_at nullable 로 구간 형 모양이다. 그런데 받는 쪽 화면이 없어 received_at 을 채울 경로가 생기지 않는다. 화면을 따라 인계 확정 시 두 시각을 함께 찍는다 — 원칙 1(데이터 모델은 화면 설계를 따라온다). 인수 확인 화면이 나중에 생기면 :receive 를 더한다.")
 
+# ── 제품 개체(일련번호) 발번 — trace.serial_number
+#
+# ⭐ 왜 여기인가. 「소유는 쓰기를 가진 쪽」 규약대로다 — 쓰는 화면이 P-02-05
+#    인식표 발행·부착(생산실행 POP) 하나뿐이다. 경로 앞이 /trace 라 자재창고
+#    계약의 /trace/lots 와 네임스페이스를 나눠 쓰지만, 04 계약이
+#    /logistics/shipment-lot-allocations 를 소유하는 것과 같은 형태다 —
+#    네임스페이스는 물리 스키마를 따르고 소유는 쓰기를 따른다.
+#
+# ⛔ 왜 이제서야 만드나. 출력물 계약(app-공통.json)이 §3-1 에서 「개체 생성은
+#    02 생산실행 계약 소관」이라 적고 넘겼는데 이쪽에도 없었다. 2026-08-13
+#    착수 통지 발행 직전 실측에서 잡혔다 — 전 계약 6종에 serial 경로 0건.
+#    그 사이 P-02-05 는 주 기능이 실행 불가라 통지를 낼 수 없었다.
+#
+# ⛔ {serialNumberId} 한 건 조회를 두지 않는다. 부르는 화면이 0건이다 —
+#    P-02-09 의 개체 단위 재출력은 미결로 비활성이고, P-02-08 포장은
+#    handling_unit_content 에 개체 참조 컬럼이 아예 없다.
+#    /production/material-losses 를 뺀 것과 같은 기준이다.
+schemas["SerialNumber"] = obj(["serialNumberId","serialNo","itemId","lotId","statusCode"], {
+    "serialNumberId": I64,
+    "serialNo": {**STR, "x-no-example": True,
+        "description":"전역에서 유일하다 — 공장이 달라도 겹치지 않는다. 근거: P-02-05 §5-2. ⚠ 채번 규칙이 아직 정해지지 않아 예시를 두지 않는다 — 예시를 두면 자릿수·구성이 확정된 것처럼 읽힌다"},
+    "itemId": I64, "lotId": {**I64, "description":"개체는 반드시 LOT 에 속한다"},
+    "statusCode": {**STR, "x-no-example": True},
+    "producedAt": TS, "versionNo": {"type":"integer"}})
+schemas["SerialNumberBatchCreate"] = obj(["lotId","quantity"], {
+    "lotId": I64,
+    "quantity": {"type":"integer","minimum":1,"maximum":1000,
+                 "example": 480,
+                 "description":"발번할 개체 수. 미발행 양품 수를 넘으면 400 이다. 근거: P-02-05 §6"},
+    "producedAt": TS})
+schemas["SerialNumberBatchResult"] = obj(["items","issuedCount"], {
+    "items": {"type":"array","items": ref("SerialNumber")},
+    "issuedCount": {"type":"integer","example": 480,
+                    "description":"만들어진 개체 수. quantity 와 같다 — 부분 발번이 없다"}})
+
+paths["/trace/serial-numbers"] = {
+ "get": {"tags":["production"],"summary":"제품 개체 목록",
+   "description":("이미 발번된 개체를 센다. 화면이 「미발행 양품」을 계산하는 근거다 — "
+     "양품 누계에서 이 목록의 건수를 뺀다. 근거: P-02-05 §5-3·§6"),
+   "parameters":[q("lotId",I64), q("itemId",I64), q("statusCode",STR),
+                 q("producedFrom",TS), q("producedTo",TS),
+                 q("q",STR,"일련번호 검색")] + PAGE,
+   "responses": listed("SerialNumber")},
+ "post": {"tags":["production"],"summary":"제품 개체 대량 발번",
+   "description":("양품 N개에 개체 N행을 만든다 — 인식표가 개체별 1:1 이기 때문이다(R69). "
+     "번호는 서버가 매긴다. ⛔ 한 트랜잭션이고 부분 발번이 없다 — 하나라도 실패하면 전량 되돌린다. "
+     "부분 발번은 번호에 구멍을 만들고 그것을 메울 화면이 없다. 근거: P-02-05 §5-3·§6 · 공유계약 B-8. "
+     "⭐ 발행 기록은 이 경로가 만들지 않는다 — 공통 계약의 POST /app/document-issues 가 이어서 만든다. "
+     "개체가 먼저 있어야 그쪽 targets 에 담을 수 있다. " + OFFLINE),
+   "parameters":[pref("IdempotencyKey"), pref("IfMatchVersionOptional")],
+   "requestBody":{"required":True,"content":{"application/json":{"schema": ref("SerialNumberBatchCreate")}}},
+   "responses": dict(list(one("SerialNumberBatchResult","201","발번됨").items())
+                     + list(err("400","403","409").items())),
+   "x-internal-note":("409 인 이유가 자재 LOT 과 반대다. serial_no 는 서버가 채번하므로 "
+     "중복이 나도 사용자가 고칠 수 없다 — 다시 부르면 풀린다. 반면 M-01-02 의 자재 LOT 번호는 "
+     "스캔한 값이 그대로 번호라 재시도해도 안 풀려서 400 이다(01 계약 §3-1). "
+     "⚠ 채번 규칙 자체는 아직 미정이다 — app.numbering_rule 에 인식표 규칙이 정의됐는지 "
+     "확인되지 않았다(P-02-05 §8-2). 계약은 「서버가 매긴다」까지만 정하고 규칙을 정하지 않는다.")}}
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 # ── 규약 정합 1) :validate 는 상태 전이가 아니다 → GET .../validation
@@ -525,6 +584,11 @@ def fill(schema_name, sch):
             continue
         if p.get("type") == "object":
             continue
+        # ⛔ 값 목록이 미확정인 코드에는 example 을 붙이지 않는다.
+        #    접미사 하나로 매기는 자동 부여가 *Code 전부에 같은 값을 넣어
+        #    「이 값이 확정된 것」처럼 읽히게 만든다(01·03·04 계약의 선례).
+        if p.get("x-no-example"):
+            continue
         if "example" not in p:
             e = example_for(pname, p)
             if e is not None: p["example"] = e
@@ -544,15 +608,16 @@ doc = {
    "title": "omf-mes 02 생산실행 도메인 API (초안)",
    "version": "0.1.0",
    "description": ("02 생산실행 도메인 API 계약. P/O 수신에서 생산 계획·작업지시·작업 세션·자재 투입·생산 실적·공정 인계까지를 덮는다. "
-     "경로는 물리 모델의 스키마를 그대로 네임스페이스로 쓰므로 /planning 과 /production 둘로 나뉜다. "
+     "경로는 물리 모델의 스키마를 그대로 네임스페이스로 쓰므로 /planning · /production · /trace 셋으로 나뉜다. "
+     "/trace 는 자재창고 계약도 쓰지만 그쪽은 자재 LOT 이고 여기는 제품 개체다 — 네임스페이스는 물리 스키마를 따르고 소유는 쓰는 화면을 따른다. "
      "BOM·Routing 은 기준정보 계약이 소유하므로 여기서는 참조만 한다. "
      "자재 출고 요청·현장 수령·자재 LOT 은 자재창고 계약이 소유한다. 검사 결과는 품질 계약이 소유한다. "
-     "출력물(인식표·라벨) 발행은 공통 계약이 소유한다. "
+     "출력물(인식표·라벨) 발행 기록은 공통 계약이 소유한다 — 다만 인식표가 붙는 제품 개체(일련번호)를 만드는 것은 여기다. 개체가 먼저 있어야 발행 기록의 대상이 된다. "
      "작업 세션은 구간 형 리소스다 — 「진행 중」을 상태 컬럼으로 두지 않고 끝 시각의 부재로 판정하며, 닫는 것은 :end 액션이다. "
      "현장 단말 화면 다수가 오프라인에서 쓰이므로 쓰기 오퍼레이션은 Idempotency-Key 를 필수로 받고 If-Match 를 선택으로 둔다. "
-     "즉시 처리는 201, 큐 접수는 202 로 나뉜다."),
+     "쓰기 응답은 201 하나다 — 오프라인이면 요청 자체가 서버에 닿지 않으므로 서버가 「접수했다」를 말할 자리가 없다(2026-08-12 정정). 202 는 ERP 재동기처럼 서버가 실제로 뒤에 처리하는 곳에만 남는다."),
    "x-internal-note": ("설계·도출 근거는 uiux/2026-08-11-API스펙-02생산실행/ 의 00~03 단계 문서다. "
-     "리소스 11 · 액션 근거 103건(화면 액션 표 83 + 확대 3차 6장 본문 도출 20). "
+     "리소스 12 · 액션 근거 103건(화면 액션 표 83 + 확대 3차 6장 본문 도출 20). "
      "미해소 상류 셋을 계약이 드러낸다 — omf-mes#76(긴급 W/O 가 P/O NOT NULL 체인에 막힘 · 501), "
      "omf-mes#60(수량 3원↔5컬럼). DR-007(취소 시 선발행 LOT 회수)은 2026-08-12 에 확정돼 본문에 반영됐다.")
  },
