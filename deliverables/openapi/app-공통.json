@@ -1576,16 +1576,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "아이디 또는 비밀번호가 맞지 않는다",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
           }
         }
       },
@@ -1602,16 +1592,6 @@
         "responses": {
           "204": {
             "description": "끝났다"
-          },
-          "401": {
-            "description": "아이디 또는 비밀번호가 맞지 않는다",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
           }
         }
       }
@@ -1753,6 +1733,16 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "검증 실패. 고쳐야 풀린다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -1780,16 +1770,6 @@
                       "example": 3
                     }
                   }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "아이디 또는 비밀번호가 맞지 않는다",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -1877,16 +1857,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "아이디 또는 비밀번호가 맞지 않는다",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
           }
         }
       }
@@ -1916,16 +1886,6 @@
                       }
                     }
                   }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "아이디 또는 비밀번호가 맞지 않는다",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -1968,16 +1928,6 @@
                       }
                     }
                   }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "아이디 또는 비밀번호가 맞지 않는다",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -2656,16 +2606,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DashboardSummary"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "아이디 또는 비밀번호가 맞지 않는다",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }

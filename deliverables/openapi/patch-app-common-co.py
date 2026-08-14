@@ -47,6 +47,12 @@ def ref(n: str) -> dict:
     return {"$ref": f"#/components/schemas/{n}"}
 
 
+# ⛔ 401 을 경로마다 선언하지 않는다. 인증 실패는 «횡단»이라 전 경로에 오고,
+#    일부에만 적으면 「여기는 오고 저기는 안 온다」로 읽혀 클라이언트가 경로마다
+#    다른 오류 처리를 쓰게 된다. 앞선 계약 다섯도 401 선언이 0건이다.
+#    남기는 곳은 «그 자리에서만 뜻이 있는» 둘뿐이다 —
+#      POST /app/sessions            로그인 실패 자체가 결과다(남은 횟수를 낸다)
+#      …:change-password             «현재 비밀번호가 틀렸다» 를 뜻한다
 def err(*codes: str) -> dict:
     msg = {"400": "검증 실패. 고쳐야 풀린다", "401": "아이디 또는 비밀번호가 맞지 않는다",
            "403": "권한·단말 게이팅에 막혔다", "404": "없다", "409": "충돌",
@@ -302,9 +308,9 @@ def paths_to_add() -> dict:
         "/app/sessions/current": {
             "get": {"tags": TAG, "summary": "현재 세션",
                     "description": "지금 나는 누구이고 어디까지 보는가. 근거: W-CO-01 §5-3",
-                    "responses": {**one("Session"), **err("401")}},
+                    "responses": {**one("Session")}},
             "delete": {"tags": TAG, "summary": "로그아웃", "parameters": [idem()],
-                       "responses": {"204": {"description": "끝났다"}, **err("401")}}},
+                       "responses": {"204": {"description": "끝났다"}}}},
         "/app/users/me:change-password": {"post": {
             "tags": TAG, "summary": "내 비밀번호 변경",
             "description": (
@@ -325,7 +331,7 @@ def paths_to_add() -> dict:
                 q("eventCode", {**STR, "x-no-example": True}),
                 q("occurredFrom", TS, "기간 시작", required=True),
                 q("occurredTo", TS, "기간 종료", required=True)] + PAGE,
-            "responses": listed("Notification")}},
+            "responses": {**listed("Notification"), **err("400")}}},
         "/app/notifications/unread-count": {"get": {
             "tags": TAG, "summary": "안 읽은 알림 수",
             "description": (
@@ -334,8 +340,7 @@ def paths_to_add() -> dict:
                 "근거: W-CO-03 §8-4"),
             "responses": {"200": {"description": "개수", "content": {"application/json": {
                 "schema": {"type": "object", "required": ["unreadCount"],
-                           "properties": {"unreadCount": {"type": "integer", "example": 3}}}}}},
-                **err("401")}}},
+                           "properties": {"unreadCount": {"type": "integer", "example": 3}}}}}}}}},
         "/app/notifications/{notificationId}:read": {"post": {
             "tags": TAG, "summary": "알림 읽음 처리",
             "description": "목록에서 항목을 열면 자동으로 부른다. 근거: W-CO-03 §5",
@@ -349,8 +354,7 @@ def paths_to_add() -> dict:
                                   "content": {"application/json": {"schema": {
                                       "type": "object", "required": ["readCount"],
                                       "properties": {"readCount": {"type": "integer",
-                                                                   "example": 12}}}}}},
-                          **err("401")}}},
+                                                                   "example": 12}}}}}}}}},
         "/app/notification-events": {"get": {
             "tags": TAG, "summary": "알림 이벤트 목록",
             "description": (
@@ -358,8 +362,7 @@ def paths_to_add() -> dict:
                 "코드가 바뀌면 «보내는 쪽»이 조용히 깨진다. 근거: W-CO-03 §8-3 · W-CO-11 §8-3"),
             "responses": {"200": {"description": "목록", "content": {"application/json": {
                 "schema": {"type": "object", "required": ["items"], "properties": {
-                    "items": {"type": "array", "items": ref("NotificationEvent")}}}}}},
-                **err("401")}}},
+                    "items": {"type": "array", "items": ref("NotificationEvent")}}}}}}}}},
         "/app/notification-subscriptions": {
             "get": {"tags": TAG, "summary": "알림 수신자 설정 조회",
                     "description": "근거: W-CO-11 §5",
@@ -369,7 +372,7 @@ def paths_to_add() -> dict:
                             "type": "object", "required": ["items"], "properties": {
                                 "items": {"type": "array",
                                           "items": ref("NotificationSubscription")}}}}}},
-                        **err("401", "403")}},
+                        **err("403")}},
             "put": {"tags": TAG, "summary": "알림 수신자 설정 저장",
                     "description": (
                         "이벤트 하나의 수신자를 통째로 바꾼다 — 화면의 저장이 그 단위다. "
@@ -447,7 +450,7 @@ def paths_to_add() -> dict:
                 "휴일·계획 정지를 담을 자리가 아직 없다. 근거: W-CO-05 §5·§8-1"),
             "parameters": [q("baseDate", DT, "기준 날짜. 없으면 오늘"),
                            q("plantId", I64)],
-            "responses": {**one("DashboardSummary", "200", "집계"), **err("401", "403")}}},
+            "responses": {**one("DashboardSummary", "200", "집계"), **err("403")}}},
     }
 
 
