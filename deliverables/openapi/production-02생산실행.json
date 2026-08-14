@@ -3,8 +3,8 @@
  "info": {
   "title": "omf-mes 02 생산실행 도메인 API (초안)",
   "version": "0.1.0",
-  "description": "02 생산실행 도메인 API 계약. P/O 수신에서 생산 계획·작업지시·작업 세션·자재 투입·생산 실적·공정 인계까지를 덮는다. 경로는 물리 모델의 스키마를 그대로 네임스페이스로 쓰므로 /planning 과 /production 둘로 나뉜다. BOM·Routing 은 기준정보 계약이 소유하므로 여기서는 참조만 한다. 자재 출고 요청·현장 수령·자재 LOT 은 자재창고 계약이 소유한다. 검사 결과는 품질 계약이 소유한다. 출력물(인식표·라벨) 발행은 공통 계약이 소유한다. 작업 세션은 구간 형 리소스다 — 「진행 중」을 상태 컬럼으로 두지 않고 끝 시각의 부재로 판정하며, 닫는 것은 :end 액션이다. 현장 단말 화면 다수가 오프라인에서 쓰이므로 쓰기 오퍼레이션은 Idempotency-Key 를 필수로 받고 If-Match 를 선택으로 둔다. 즉시 처리는 201, 큐 접수는 202 로 나뉜다.",
-  "x-internal-note": "설계·도출 근거는 uiux/2026-08-11-API스펙-02생산실행/ 의 00~03 단계 문서다. 리소스 11 · 액션 근거 103건(화면 액션 표 83 + 확대 3차 6장 본문 도출 20). 미해소 상류 셋을 계약이 드러낸다 — omf-mes#76(긴급 W/O 가 P/O NOT NULL 체인에 막힘 · 501), omf-mes#60(수량 3원↔5컬럼). DR-007(취소 시 선발행 LOT 회수)은 2026-08-12 에 확정돼 본문에 반영됐다."
+  "description": "02 생산실행 도메인 API 계약. P/O 수신에서 생산 계획·작업지시·작업 세션·자재 투입·생산 실적·공정 인계까지를 덮는다. 경로는 물리 모델의 스키마를 그대로 네임스페이스로 쓰므로 /planning · /production · /trace 셋으로 나뉜다. /trace 는 자재창고 계약도 쓰지만 그쪽은 자재 LOT 이고 여기는 제품 개체다 — 네임스페이스는 물리 스키마를 따르고 소유는 쓰는 화면을 따른다. BOM·Routing 은 기준정보 계약이 소유하므로 여기서는 참조만 한다. 자재 출고 요청·현장 수령·자재 LOT 은 자재창고 계약이 소유한다. 검사 결과는 품질 계약이 소유한다. 출력물(인식표·라벨) 발행 기록은 공통 계약이 소유한다 — 다만 인식표가 붙는 제품 개체(일련번호)를 만드는 것은 여기다. 개체가 먼저 있어야 발행 기록의 대상이 된다. 작업 세션은 구간 형 리소스다 — 「진행 중」을 상태 컬럼으로 두지 않고 끝 시각의 부재로 판정하며, 닫는 것은 :end 액션이다. 현장 단말 화면 다수가 오프라인에서 쓰이므로 쓰기 오퍼레이션은 Idempotency-Key 를 필수로 받고 If-Match 를 선택으로 둔다. 쓰기 응답은 201 하나다 — 오프라인이면 요청 자체가 서버에 닿지 않으므로 서버가 「접수했다」를 말할 자리가 없다(2026-08-12 정정). 202 는 ERP 재동기처럼 서버가 실제로 뒤에 처리하는 곳에만 남는다.",
+  "x-internal-note": "설계·도출 근거는 uiux/2026-08-11-API스펙-02생산실행/ 의 00~03 단계 문서다. 리소스 12 · 액션 근거 103건(화면 액션 표 83 + 확대 3차 6장 본문 도출 20). 미해소 상류 셋을 계약이 드러낸다 — omf-mes#76(긴급 W/O 가 P/O NOT NULL 체인에 막힘 · 501), omf-mes#60(수량 3원↔5컬럼). DR-007(취소 시 선발행 LOT 회수)은 2026-08-12 에 확정돼 본문에 반영됐다."
  },
  "servers": [
   {
@@ -19,7 +19,7 @@
   },
   {
    "name": "production",
-   "description": "생산 실행 — 작업지시 · 세션 · 투입 · 실적 · 인계"
+   "description": "생산 실행 — 작업지시 · 세션 · 투입 · 실적 · 인계 · 제품 개체 발번"
   }
  ],
  "paths": {
@@ -3164,6 +3164,181 @@
      }
     }
    }
+  },
+  "/trace/serial-numbers": {
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "제품 개체 목록",
+    "description": "이미 발번된 개체를 센다. 화면이 「미발행 양품」을 계산하는 근거다 — 양품 누계에서 이 목록의 건수를 뺀다. 근거: P-02-05 §5-3·§6",
+    "parameters": [
+     {
+      "name": "lotId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "itemId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "statusCode",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "example": "값"
+      }
+     },
+     {
+      "name": "producedFrom",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-11T09:12:00+09:00"
+      }
+     },
+     {
+      "name": "producedTo",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-11T09:12:00+09:00"
+      }
+     },
+     {
+      "name": "q",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "example": "값"
+      },
+      "description": "일련번호 검색"
+     },
+     {
+      "name": "page",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 1
+      }
+     },
+     {
+      "name": "size",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 50
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "목록",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "items": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/SerialNumber"
+           }
+          },
+          "page": {
+           "$ref": "#/components/schemas/PageMeta"
+          }
+         },
+         "required": [
+          "items",
+          "page"
+         ]
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "제품 개체 대량 발번",
+    "description": "양품 N개에 개체 N행을 만든다 — 인식표가 개체별 1:1 이기 때문이다(R69). 번호는 서버가 매긴다. ⛔ 한 트랜잭션이고 부분 발번이 없다 — 하나라도 실패하면 전량 되돌린다. 부분 발번은 번호에 구멍을 만들고 그것을 메울 화면이 없다. 근거: P-02-05 §5-3·§6 · 공유계약 B-8. ⭐ 발행 기록은 이 경로가 만들지 않는다 — 공통 계약의 POST /app/document-issues 가 이어서 만든다. 개체가 먼저 있어야 그쪽 targets 에 담을 수 있다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다. 미확정 표식은 셸이 붙인다(공유계약 C-7 — 화면 조항).",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersionOptional"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SerialNumberBatchCreate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "발번됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SerialNumberBatchResult"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-internal-note": "409 인 이유가 자재 LOT 과 반대다. serial_no 는 서버가 채번하므로 중복이 나도 사용자가 고칠 수 없다 — 다시 부르면 풀린다. 반면 M-01-02 의 자재 LOT 번호는 스캔한 값이 그대로 번호라 재시도해도 안 풀려서 400 이다(01 계약 §3-1). itemId 를 본문으로 받지 않는 근거 — trace.lot.item_id 가 NOT NULL 이라 LOT 하나가 품목 하나를 정한다. 받으면 LOT 과 어긋난 품목이 들어올 자리가 생긴다. ⚠ 채번 규칙 자체는 아직 미정이다 — app.numbering_rule 에 인식표 규칙이 정의됐는지 확인되지 않았다(P-02-05 §8-2). 계약은 「서버가 매긴다」까지만 정하고 규칙을 정하지 않는다."
+   }
   }
  },
  "components": {
@@ -4399,6 +4574,99 @@
     "required": [
      "lotId",
      "allocatedQty"
+    ]
+   },
+   "SerialNumber": {
+    "type": "object",
+    "properties": {
+     "serialNumberId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "serialNo": {
+      "type": "string",
+      "x-no-example": true,
+      "description": "전역에서 유일하다 — 공장이 달라도 겹치지 않는다. 근거: P-02-05 §5-2. ⚠ 채번 규칙이 아직 정해지지 않아 예시를 두지 않는다 — 예시를 두면 자릿수·구성이 확정된 것처럼 읽힌다"
+     },
+     "itemId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "품목은 이 개체가 속한 LOT 에서 따라온다 — 생성 본문으로 받지 않는다",
+      "example": 1001
+     },
+     "lotId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "개체는 반드시 LOT 에 속한다",
+      "example": 1001
+     },
+     "statusCode": {
+      "type": "string",
+      "x-no-example": true
+     },
+     "producedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "versionNo": {
+      "type": "integer",
+      "example": 1
+     }
+    },
+    "required": [
+     "serialNumberId",
+     "serialNo",
+     "itemId",
+     "lotId",
+     "statusCode"
+    ]
+   },
+   "SerialNumberBatchCreate": {
+    "type": "object",
+    "properties": {
+     "lotId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "quantity": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000,
+      "example": 480,
+      "description": "발번할 개체 수. 미발행 양품 수를 넘으면 400 이다. 근거: P-02-05 §6"
+     },
+     "producedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00"
+     }
+    },
+    "required": [
+     "lotId",
+     "quantity"
+    ]
+   },
+   "SerialNumberBatchResult": {
+    "type": "object",
+    "properties": {
+     "items": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/SerialNumber"
+      }
+     },
+     "issuedCount": {
+      "type": "integer",
+      "example": 480,
+      "description": "만들어진 개체 수. quantity 와 같다 — 부분 발번이 없다"
+     }
+    },
+    "required": [
+     "items",
+     "issuedCount"
     ]
    },
    "ValidationFinding": {
