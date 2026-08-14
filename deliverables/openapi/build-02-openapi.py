@@ -496,11 +496,15 @@ schemas["SerialNumber"] = obj(["serialNumberId","serialNo","itemId","lotId","sta
     "serialNumberId": I64,
     "serialNo": {**STR, "x-no-example": True,
         "description":"전역에서 유일하다 — 공장이 달라도 겹치지 않는다. 근거: P-02-05 §5-2. ⚠ 채번 규칙이 아직 정해지지 않아 예시를 두지 않는다 — 예시를 두면 자릿수·구성이 확정된 것처럼 읽힌다"},
-    "itemId": I64, "lotId": {**I64, "description":"개체는 반드시 LOT 에 속한다"},
+    "itemId": {**I64, "description":"품목은 이 개체가 속한 LOT 에서 따라온다 — 생성 본문으로 받지 않는다"},
+    "lotId": {**I64, "description":"개체는 반드시 LOT 에 속한다"},
     "statusCode": {**STR, "x-no-example": True},
     "producedAt": TS, "versionNo": {"type":"integer"}})
 schemas["SerialNumberBatchCreate"] = obj(["lotId","quantity"], {
     "lotId": I64,
+    # ⚠ maximum 1000 은 app-공통.json 의 DocumentIssueCreate.targets.maxItems 와
+    #    같아야 한다. 한 번에 발번한 개체를 그대로 그쪽 targets 에 담기 때문이다.
+    #    한쪽만 바꾸면 조용히 어긋나고 그때 깨지는 것은 계약이 아니라 화면이다.
     "quantity": {"type":"integer","minimum":1,"maximum":1000,
                  "example": 480,
                  "description":"발번할 개체 수. 미발행 양품 수를 넘으면 400 이다. 근거: P-02-05 §6"},
@@ -531,6 +535,8 @@ paths["/trace/serial-numbers"] = {
    "x-internal-note":("409 인 이유가 자재 LOT 과 반대다. serial_no 는 서버가 채번하므로 "
      "중복이 나도 사용자가 고칠 수 없다 — 다시 부르면 풀린다. 반면 M-01-02 의 자재 LOT 번호는 "
      "스캔한 값이 그대로 번호라 재시도해도 안 풀려서 400 이다(01 계약 §3-1). "
+     "itemId 를 본문으로 받지 않는 근거 — trace.lot.item_id 가 NOT NULL 이라 LOT 하나가 품목 하나를 정한다. "
+     "받으면 LOT 과 어긋난 품목이 들어올 자리가 생긴다. "
      "⚠ 채번 규칙 자체는 아직 미정이다 — app.numbering_rule 에 인식표 규칙이 정의됐는지 "
      "확인되지 않았다(P-02-05 §8-2). 계약은 「서버가 매긴다」까지만 정하고 규칙을 정하지 않는다.")}}
 
@@ -587,6 +593,8 @@ def fill(schema_name, sch):
         # ⛔ 값 목록이 미확정인 코드에는 example 을 붙이지 않는다.
         #    접미사 하나로 매기는 자동 부여가 *Code 전부에 같은 값을 넣어
         #    「이 값이 확정된 것」처럼 읽히게 만든다(01·03·04 계약의 선례).
+        #    ⚠ 이 분기를 넣어도 기존 출력은 안 바뀐다 — 도입 시점에 이 파일의
+        #    x-no-example 사용처가 SerialNumber 의 둘뿐이었다(실측).
         if p.get("x-no-example"):
             continue
         if "example" not in p:
@@ -623,7 +631,7 @@ doc = {
  },
  "servers": [{"url": "/api", "description": "온프레미스 설치형"}],
  "tags": [{"name":"planning","description":"수주·계획 — P/O · 생산 계획"},
-          {"name":"production","description":"생산 실행 — 작업지시 · 세션 · 투입 · 실적 · 인계"}],
+          {"name":"production","description":"생산 실행 — 작업지시 · 세션 · 투입 · 실적 · 인계 · 제품 개체 발번"}],
  "paths": dict(sorted(paths.items())),
  "components": {"parameters": dict(src['components']['parameters']), "schemas": dict(sorted(schemas.items()))}
 }
