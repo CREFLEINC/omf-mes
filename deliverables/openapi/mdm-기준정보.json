@@ -6328,7 +6328,14 @@
             "required": false,
             "schema": {
               "type": "string",
-              "maxLength": 50
+              "enum": [
+                "CUSTOMER",
+                "SUPPLIER",
+                "SUBCONTRACTOR",
+                "DISPOSAL",
+                "OTHER"
+              ],
+              "example": "DISPOSAL"
             },
             "description": "역할로 거른다. ⭐ 폐기 출고 화면이 폐기처리 거래처만 고를 때 쓴다(W-01-06 · W-04-10 · DR-013)."
           },
@@ -7375,10 +7382,13 @@
           "mdm"
         ],
         "summary": "거래처 역할 교체",
-        "description": "W-06-06 「거래처 역할」 탭의 저장. ⭐ 목록을 통째로 교체한다 — 역할은 집합이고 (거래처, 역할)이 유일하다. ⛔ 거래처 본체는 고치지 않는다 — ERP 수신 마스터라 MES 는 읽기만 한다.",
+        "description": "W-06-06 「거래처 역할」 탭의 저장. ⭐ 목록을 통째로 교체한다 — 역할은 집합이고 (거래처, 역할)이 유일하다. ⛔ 거래처 본체는 고치지 않는다 — ERP 수신 마스터라 MES 는 읽기만 한다. ⭐ 2026-08-16 보완 — 저장 충돌 보호를 붙였다. 통째로 교체하는 저장이라 보호가 없으면 «남이 방금 붙인 역할»이 조용히 사라진다. 값은 상세 조회의 응답 헤더에서 받는다.",
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
           }
         ],
         "requestBody": {
@@ -7413,9 +7423,19 @@
           },
           "404": {
             "description": "없다"
+          },
+          "409": {
+            "description": "충돌 — 남이 먼저 고쳤다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
           }
         },
-        "x-internal-note": "역할 값 목록이 미확정이라 서버가 알 수 없는 코드를 400 으로 막는지는 값이 정해진 뒤에 정한다(omf-mes#145). ⛔ 거래처 본체 CRUD 는 두지 않는다 — 06 화면 12개에 거래처 마스터가 0건이고 거래처는 ERP 수신 마스터다(🔹2026-07-08 확정)."
+        "x-internal-note": "빠뜨린 것이지 의도가 아니었다(client#128 이 물어 드러났다). ⛔ 붙이면 프론트가 이미 만든 것이 틀린다 — 지금 토큰 없이 보내고 있어 ⛔ 변경 통지로 알린다. 물리 모델의 mdm.partner_role 에 버전 칸이 있는지는 확인되지 않았다 — 없으면 계약이 앞서 있는 것이고 모델이 따라온다."
       }
     },
     "/mdm/terminals": {
@@ -8098,6 +8118,50 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/partners/{partnerId}": {
+      "get": {
+        "tags": [
+          "mdm",
+          "lookup"
+        ],
+        "summary": "거래처 한 건",
+        "description": "⭐ 2026-08-16 신설. 그전에는 목록만 있어 화면의 기본 정보가 «지금 목록에 실려 있는 행»에 매여 있었다 — 목록을 다시 부르거나 검색어를 바꾸면 보고 있던 거래처가 사라진다. ⛔ 거래처 본체는 ERP 수신 마스터라 이 경로도 읽기 전용이다 — 고치는 것은 역할뿐이다. 근거: W-06-06 「거래처 역할」 탭 · client#128",
+        "parameters": [
+          {
+            "name": "partnerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "example": 1001
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "상세",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Partner"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "없다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -13327,8 +13391,16 @@
             "x-source-column": "role_type_code",
             "type": "string",
             "maxLength": 50,
-            "description": "거래처 역할. 공급사 · 고객 · 외주처 · 폐기처리 등. 한 거래처가 여러 역할을 가질 수 있다.",
-            "x-no-example": "값 목록 미확정 — 공통코드 값 목록(omf-mes#145) 대상"
+            "description": "거래처 역할. 고객사(CUSTOMER) · 공급사(SUPPLIER) · 외주 제작사(SUBCONTRACTOR) · 폐기 업체(DISPOSAL) · 기타(OTHER) 다섯이다. 한 거래처가 여러 역할을 가질 수 있다. ⭐ 2026-08-16 업무 확정 — 어휘 밖 값은 400 이다.",
+            "enum": [
+              "CUSTOMER",
+              "SUPPLIER",
+              "SUBCONTRACTOR",
+              "DISPOSAL",
+              "OTHER"
+            ],
+            "example": "SUPPLIER",
+            "x-internal-note": "값 목록이 확정돼 enum 을 못박았다(2026-08-16). 그 전에는 「미확정이면 못박지 않는다」(공유계약 G-2)로 비워 두었으나, G-2 는 «미확정일 때» 규칙이고 업무가 확정했으므로 계약이 말해야 한다. ⚠ CUSTOMER·SUBCONTRACTOR·OTHER 는 뜻이 확정이고 «철자»가 잠정이다 — 다른 표기로 확정되면 ⛔ 변경 통지 대상이다."
           },
           "roleTypeName": {
             "type": [
@@ -13353,7 +13425,14 @@
             "type": "array",
             "items": {
               "type": "string",
-              "maxLength": 50
+              "enum": [
+                "CUSTOMER",
+                "SUPPLIER",
+                "SUBCONTRACTOR",
+                "DISPOSAL",
+                "OTHER"
+              ],
+              "example": "SUPPLIER"
             },
             "description": "이 거래처가 갖는 역할 전부. ⭐ 통째로 교체한다 — 목록에 없는 역할은 해제된다. 역할은 집합이라 개별 추가·삭제로 두면 화면이 두 번 부르고 중간 상태가 생긴다.",
             "example": [

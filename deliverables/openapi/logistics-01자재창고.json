@@ -7158,9 +7158,15 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "도착지 유형. 창고 내 이동은 위치, 공급사 반품은 거래처, 생산 투입은 공정이다. ⭐ 폐기 출고에서 폐기 업체가 있으면 폐기 거래처(DISPOSAL_SITE)를 가리키고, 자체 폐기면 도착지 짝을 통째로 비운다 — 나가서 없어지는 물건에는 도착지가 없다.",
-      "example": "WORK_ORDER",
-      "x-internal-note": "⭐ A-10 대응표 — 유형 코드가 어느 테이블을 가리키는가. FK 가 없어 DB 가 무결성을 보장하지 않으므로 이 표가 유일한 근거다. LOCATION → mdm.location · PARTNER → mdm.partner · PROCESS → mdm.process · WORK_ORDER → production.work_order · DISPOSAL_SITE → mdm.partner(역할 = 폐기처리 · mdm.partner_role 로 거른다). 값 목록 자체는 미확정이다 — 1차 값 목록 제안안 §5-4. ⭐ destinationId 와 짝이다(A-10) — 둘 다 있거나 둘 다 없다. 한쪽만 오면 400 이다. ⛔ 물리 모델은 아직 destination_type_code·destination_id 가 NOT NULL 이다. 그것을 이유로 계약을 묶지 않는다 — 데이터 모델은 UI/UX 설계 결정에 맞춰 따라온다(2026-08-10 확정 작업 방식). 모델 변경 요청 = omf-mes#147(짝 제약 CHECK 포함)."
+      "description": "도착지 유형. 위치(LOCATION) → mdm.location · 거래처(PARTNER) → mdm.partner · 폐기 거래처(DISPOSAL_SITE) → mdm.partner 셋이다. 창고 내 이동과 생산 투입은 위치, 공급사 반품은 거래처, 폐기는 폐기 거래처를 가리킨다. ⭐ 자체 폐기면 도착지 짝을 통째로 비운다 — 나가서 없어지는 물건에는 도착지가 없다. ⭐ 2026-08-16 업무 확정.",
+      "example": "DISPOSAL_SITE",
+      "x-internal-note": "값 목록이 확정돼 enum 을 못박았다(2026-08-16). PARTNER 와 DISPOSAL_SITE 는 같은 표를 가리키지만 값을 나눴다 — 나누면 화면이 유형 하나만 보고 거래처 목록을 역할로 좁힐 수 있고, 합치면 출고 유형까지 봐야 한다. LOCATION 의 근거는 실측이다 — material_issue_request 가 도착지를 위치 참조 키로 갖는다. ⛔ 자체 폐기를 뜻하는 값을 만들지 않는다: 짝을 비우는 것이 사실이고, 값을 만들면 「도착지가 있는데 그 값이 없음」이라는 거짓 상태가 생긴다.",
+      "enum": [
+       "LOCATION",
+       "PARTNER",
+       "DISPOSAL_SITE",
+       null
+      ]
      },
      "destinationId": {
       "x-source-column": "destination_id",
@@ -7281,9 +7287,15 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "도착지 유형. 창고 내 이동은 위치, 공급사 반품은 거래처, 생산 투입은 공정이다. ⭐ 폐기 출고에서 폐기 업체가 있으면 폐기 거래처(DISPOSAL_SITE)를 가리키고, 자체 폐기면 도착지 짝을 통째로 비운다 — 나가서 없어지는 물건에는 도착지가 없다.",
-      "example": "WORK_ORDER",
-      "x-internal-note": "⭐ A-10 대응표 — 유형 코드가 어느 테이블을 가리키는가. FK 가 없어 DB 가 무결성을 보장하지 않으므로 이 표가 유일한 근거다. LOCATION → mdm.location · PARTNER → mdm.partner · PROCESS → mdm.process · WORK_ORDER → production.work_order · DISPOSAL_SITE → mdm.partner(역할 = 폐기처리 · mdm.partner_role 로 거른다). 값 목록 자체는 미확정이다 — 1차 값 목록 제안안 §5-4. ⭐ destinationId 와 짝이다(A-10) — 둘 다 있거나 둘 다 없다. 한쪽만 오면 400 이다. ⛔ 물리 모델은 아직 destination_type_code·destination_id 가 NOT NULL 이다. 그것을 이유로 계약을 묶지 않는다 — 데이터 모델은 UI/UX 설계 결정에 맞춰 따라온다(2026-08-10 확정 작업 방식). 모델 변경 요청 = omf-mes#147(짝 제약 CHECK 포함)."
+      "description": "도착지 유형. 위치(LOCATION) → mdm.location · 거래처(PARTNER) → mdm.partner · 폐기 거래처(DISPOSAL_SITE) → mdm.partner 셋이다. 창고 내 이동과 생산 투입은 위치, 공급사 반품은 거래처, 폐기는 폐기 거래처를 가리킨다. ⭐ 자체 폐기면 도착지 짝을 통째로 비운다 — 나가서 없어지는 물건에는 도착지가 없다. ⭐ 2026-08-16 업무 확정.",
+      "example": "DISPOSAL_SITE",
+      "x-internal-note": "값 목록이 확정돼 enum 을 못박았다(2026-08-16). PARTNER 와 DISPOSAL_SITE 는 같은 표를 가리키지만 값을 나눴다 — 나누면 화면이 유형 하나만 보고 거래처 목록을 역할로 좁힐 수 있고, 합치면 출고 유형까지 봐야 한다. LOCATION 의 근거는 실측이다 — material_issue_request 가 도착지를 위치 참조 키로 갖는다. ⛔ 자체 폐기를 뜻하는 값을 만들지 않는다: 짝을 비우는 것이 사실이고, 값을 만들면 「도착지가 있는데 그 값이 없음」이라는 거짓 상태가 생긴다.",
+      "enum": [
+       "LOCATION",
+       "PARTNER",
+       "DISPOSAL_SITE",
+       null
+      ]
      },
      "destinationId": {
       "x-source-column": "destination_id",
