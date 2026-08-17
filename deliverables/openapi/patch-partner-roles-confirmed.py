@@ -126,7 +126,10 @@ def main() -> int:
     #    파일을 또 바꿔 멱등이 깨진다 — 실제로 깨져서 잡았다.
     ADDED = (" ⭐ 2026-08-16 보완 — 저장 충돌 보호를 붙였다. 통째로 교체하는 저장이라 "
              "보호가 없으면 «남이 방금 붙인 역할»이 조용히 사라진다. "
-             "값은 상세 조회의 응답 헤더에서 받는다.")
+             "값은 «역할 목록 조회»(GET …/roles)의 ETag 응답 헤더에서 받는다. "
+             "⛔ 거래처 단건 조회 쪽이 아니다 — 거래처 본체는 기간계 수신 자료라 동기화마다 "
+             "버전이 바뀌어 «역할을 고치지 않은 사용자»까지 저장 충돌을 보게 된다. "
+             "잠그는 대상(역할 집합)과 버전 축을 일치시킨다.")
     if ADDED.strip() not in put["description"]:
         put["description"] = put["description"].rstrip() + ADDED
     put["x-internal-note"] = (
@@ -134,6 +137,24 @@ def main() -> int:
         "⛔ 붙이면 프론트가 이미 만든 것이 틀린다 — 지금 토큰 없이 보내고 있어 "
         "⛔ 변경 통지로 알린다. 물리 모델의 mdm.partner_role 에 버전 칸이 있는지는 "
         "확인되지 않았다 — 없으면 계약이 앞서 있는 것이고 모델이 따라온다.")
+
+    # ── ④ ETag 응답 헤더 선언
+    #    ⛔ 「응답 헤더에서 받는다」고 써 놓고 그 헤더를 «선언하지 않았다».
+    #       partners 전 경로에 0건이었는데 다른 자원 30곳에는 있었다 —
+    #       관행이 있는데 안 따른 것이고, 구현팀이 물어서 드러났다(client#174).
+    etag = None
+    for probe in ("/mdm/warehouses/{warehouseId}", "/mdm/locations/{locationId}"):
+        h = ((paths.get(probe, {}).get("get", {}) or {})
+             .get("responses", {}).get("200", {}) or {}).get("headers")
+        if h and "ETag" in h:
+            etag = json.loads(json.dumps(h))   # 관행을 그대로 베낀다
+            break
+    if etag is None:
+        print("⛔ 기존 ETag 선언을 못 찾았다 — 관행을 베낄 수 없다", file=sys.stderr)
+        return 1
+    roles = paths["/mdm/partners/{partnerId}/roles"]
+    roles["get"]["responses"]["200"]["headers"] = etag
+    roles["put"]["responses"]["200"]["headers"] = json.loads(json.dumps(etag))
 
     if was_sorted:
         doc["paths"] = dict(sorted(paths.items()))
