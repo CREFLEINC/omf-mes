@@ -163,8 +163,17 @@ description: omf-mes 화면 설계·계약 작업을 할 때 — 설계 소관 �
 | `scripts/check-report-language.py` | 요청서·완료보고·이슈 초안을 쓴 뒤 |
 | `deliverables/verify-*.py` | 계약·화면을 고친 뒤 전부 |
 | `deliverables/test-verify-*.py` | 검사기를 고친 뒤 |
+| `deliverables/openapi/check-lock-token-source.py` | ⭐ **저장 충돌 보호를 붙인 뒤** — 토큰을 «받을 곳»이 선언됐는지 본다 |
 | `deliverables/openapi/check-enum-narrowing.py` | ⭐ **계약을 고친 뒤 · 통지를 내기 전** — 값 목록이 좁아졌는데 통지가 없으면 잡는다 |
 | `.claude/skills/uiux-client-handoff/scripts/check-issue.py` | 구현팀 통지 **발행 전** |
+
+### ⛔ 저장 충돌 보호는 «토큰을 받을 곳»까지가 한 세트다
+
+`If-Match` 를 필수로 받아 놓고 **그 값을 어디서 받는지 선언하지 않으면 구현이 막힌다.** 실제로 그랬다 — 「응답 헤더에서 받는다」를 설명문에만 적고 헤더를 선언하지 않았다(2026-08-17 구현팀이 물어 드러났다). ⚠ **한 건이 아니라 19건이었다.**
+
+⛔ **자동으로 붙이지 않는다 — 원천은 판단이다.** 부모 자원이냐 자식 집합이냐가 갈린다. 부모가 외부 수신 자료면 동기화마다 버전이 바뀌어 **고치지도 않은 사용자가 충돌을 본다**(거래처 역할이 그 사례). ⭐ **기준 — 잠그는 「대상」과 버전 축을 일치시킨다.**
+
+---
 
 ### ⛔ 값 목록이 좁아지면 «이미 만든 것이 틀린다»
 
