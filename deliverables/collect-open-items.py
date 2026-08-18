@@ -262,7 +262,8 @@ def main() -> int:
         want = a.issue if not a.issue.isdigit() else f"#{a.issue}"
         hits = [(s["screen"], r) for s in specs for r in s["rows"]
                 if want in r["marks"] and not r["done"]]
-        print(f"`{want}` 가 걸린 살아 있는 미결 — {len(hits)}건")
+        screens = sorted({sid for sid, _ in hits})
+        print(f"`{want}` 가 걸린 살아 있는 미결 — **{len(hits)}건 / {len(screens)}화면**")
         for sid, r in hits:
             print(f"  {sid:10} {plain(r['item'])[:90]}")
         return 0
