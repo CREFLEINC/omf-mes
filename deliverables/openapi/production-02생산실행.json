@@ -4399,7 +4399,8 @@
      "shiftId": {
       "type": "integer",
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "x-internal-note": "교대는 «설계가 정의하는 값이 아니다»(2026-08-18 사용자 확정) — 작업 실적 등록 화면은 교대를 받지 않는다. 프로세스 정본의 S7 트리거가 「회차·교대 무관」이라 한 것이 맞는 쪽이고, 「교대 필수」는 물리 모델에서 거꾸로 올라온 것이었다. 서버가 자체 규칙으로 채울 수는 있으므로 속성은 남기되 «필수를 풀었다». ⛔ 화면이 이 값에 의존해서는 안 된다. 📨 모델의 NOT NULL 은 작업 통지 대상이며 우리를 막지 않는다."
      },
      "terminalId": {
       "type": "integer",
@@ -4429,7 +4430,6 @@
      "resultSourceCode",
      "occurredAt",
      "workerId",
-     "shiftId",
      "statusCode"
     ],
     "description": "수량은 다섯 컬럼 그대로 내려준다. 정본이 3원(양품/불량/손실)이라는 지적이 열려 있으나(omf-mes#60) 계약이 임의로 접지 않는다."
@@ -4546,11 +4546,6 @@
       "format": "int64",
       "example": 1001
      },
-     "shiftId": {
-      "type": "integer",
-      "format": "int64",
-      "example": 1001
-     },
      "terminalId": {
       "type": "integer",
       "format": "int64",
@@ -4573,8 +4568,7 @@
      "uomId",
      "resultSourceCode",
      "occurredAt",
-     "workerId",
-     "shiftId"
+     "workerId"
     ],
     "description": "다섯 수량의 합이 0 이면 400 이다 — ck_production_result_qty 가 물리적으로도 막는다."
    },

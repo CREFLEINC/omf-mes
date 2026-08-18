@@ -9404,10 +9404,9 @@
           "itemId",
           "routingCode",
           "routingVersion",
-          "statusCode",
-          "effectiveFrom"
+          "statusCode"
         ],
-        "description": "planning.bom 에는 is_default 와 부분 유일 인덱스가 있는데 여기엔 둘 다 없어 :set-default 오퍼레이션이 성립하지 않는다. 유효기간이 겹치는 Rev 가 둘일 때 어느 것을 쓸지 정할 수 없다. effective_from 은 결정 07 이 「선택」이라 했으나 하류가 NOT NULL 이라 하류를 따른다 — W-06-01 §8-3",
+        "description": "공정 순서(Routing) 헤더. 품목과 개정 번호로 한 건이 정해지며 상태는 작성중·확정·폐기다. 유효 시작일은 «선택»이다 — 비워 두면 시작 제한이 없다.",
         "properties": {
           "routingId": {
             "x-source-column": "routing_id",
@@ -9459,15 +9458,14 @@
             "example": "2026-08-04"
           }
         },
-        "x-internal-note": "미착지: 기본(default) Rev 플래그 부재 — #64"
+        "x-internal-note": "① 기본 개정(default Rev) 플래그가 모델에 없어 :set-default 오퍼레이션이 성립하지 않는다. 유효 기간이 겹치는 개정이 둘일 때 어느 것을 쓸지 정할 수 없다 — 📨 작업 통지 대상(#64). ② effectiveFrom 은 ✓설계확정 결정 07 이 「선택」이라 했고 «그것이 정본이다». 앞서 「모델이 NOT NULL 이니 하류를 따른다」로 필수로 두었던 것을 2026-08-18 되돌렸다 — 물리 모델은 설계 결정을 앞설 수 없다(사용자 확정). 모델의 NOT NULL 은 우리를 막지 않으며 작업 통지로 넘긴다."
       },
       "RoutingCreate": {
         "x-source-table": "planning.routing",
         "type": "object",
         "required": [
           "itemId",
-          "routingCode",
-          "effectiveFrom"
+          "routingCode"
         ],
         "description": "Routing 최초 등록(Rev 1) 요청 — 품목에 Rev 가 하나도 없을 때만 쓴다. routingVersion 은 서버가 항상 1로, statusCode 는 항상 작성중으로 채운다. 근거: W-06-01 §4-A · §5-1",
         "properties": {
@@ -9507,8 +9505,7 @@
         "x-source-table": "planning.routing",
         "type": "object",
         "required": [
-          "routingCode",
-          "effectiveFrom"
+          "routingCode"
         ],
         "description": "Routing 헤더 수정 요청. 상태=작성중일 때만 허용한다(결정 07). itemId·routingVersion·statusCode 는 이 요청에 포함하지 않는다(각각 신규만 / 시스템 채번 / 전이 전용). routingCode 의 실제 편집 가능 여부는 GET 응답의 editability(B-4)를 따른다. ck_routing_dates — effectiveTo 는 있으면 effectiveFrom 이상. 낙관적 잠금은 공유계약 B-1. 근거: W-06-01 §4-A · §5-4",
         "properties": {
@@ -11548,16 +11545,6 @@
             "description": "공통코드 — 「전수/샘플」+「제품 단위/LOT 단위」가 여기 들어간다. 값 목록 §8-2",
             "example": "STANDARD"
           },
-          "samplingQty": {
-            "x-source-column": "sampling_qty",
-            "type": [
-              "number",
-              "null"
-            ],
-            "minimum": 0,
-            "description": "⚠ 확정은 「샘플 비율(%)」인데 하류는 「수량」이다 — 단위 규약 §8-2",
-            "example": 500
-          },
           "aqlValue": {
             "x-source-column": "aql_value",
             "type": [
@@ -11620,6 +11607,18 @@
             "maxLength": 50,
             "description": "공통코드 — 값 목록 미정. W-06-01 의 작성중/확정/폐기 준용 여부 §8-2. 이 값으로 화면이 편집 잠금을 판정한다(§5-4). 이 API 로는 직접 바꾸지 않고 :new-revision·:confirm·:obsolete 로만 전이한다",
             "example": "CONFIRMED"
+          },
+          "samplingRatio": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "exclusiveMinimum": 0,
+            "maximum": 100,
+            "example": 30,
+            "description": "샘플 비율(%). 검사할 몫을 백분율로 지정한다 — 0 초과 100 이하. 실제 검사 «수량»은 검사 시점에 로트 크기로 환산되는 파생값이라 여기서 받지 않는다.",
+            "x-internal-note": "✓확정 2026-07-15 가 「샘플 비율(%)」로 정한 것이다. 앞서 물리 모델의 sampling_qty(수량)를 따라 «수량»으로 받았으나 2026-08-18 되돌렸다 — 물리 모델은 설계 결정을 앞설 수 없다(사용자 확정). ⛔ 수량으로 두면 한 번 설정한 값이 로트 크기마다 다른 검사 강도가 된다(30 이 로트 100 에서는 30%, 10,000 에서는 0.3%). 📨 모델에 비율 컬럼이 없다 — 작업 통지이며 우리를 막지 않는다. ⛔ 이미 구현된 화면이라 변경 통지 대상이다."
           }
         },
         "x-internal-note": "미착지 셋: PQC 생략 허용·생략 근거·검사기준 미비 시 단순 선택 허용 — #64"
@@ -11662,15 +11661,6 @@
             "maxLength": 50,
             "example": "STANDARD"
           },
-          "samplingQty": {
-            "x-source-column": "sampling_qty",
-            "type": [
-              "number",
-              "null"
-            ],
-            "minimum": 0,
-            "example": 500
-          },
           "aqlValue": {
             "x-source-column": "aql_value",
             "type": [
@@ -11719,6 +11709,18 @@
             ],
             "maxLength": 50,
             "example": "STANDARD"
+          },
+          "samplingRatio": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "exclusiveMinimum": 0,
+            "maximum": 100,
+            "example": 30,
+            "description": "샘플 비율(%). 검사할 몫을 백분율로 지정한다 — 0 초과 100 이하. 실제 검사 «수량»은 검사 시점에 로트 크기로 환산되는 파생값이라 여기서 받지 않는다.",
+            "x-internal-note": "✓확정 2026-07-15 가 「샘플 비율(%)」로 정한 것이다. 앞서 물리 모델의 sampling_qty(수량)를 따라 «수량»으로 받았으나 2026-08-18 되돌렸다 — 물리 모델은 설계 결정을 앞설 수 없다(사용자 확정). ⛔ 수량으로 두면 한 번 설정한 값이 로트 크기마다 다른 검사 강도가 된다(30 이 로트 100 에서는 30%, 10,000 에서는 0.3%). 📨 모델에 비율 컬럼이 없다 — 작업 통지이며 우리를 막지 않는다. ⛔ 이미 구현된 화면이라 변경 통지 대상이다."
           }
         }
       },
@@ -11753,15 +11755,6 @@
             "maxLength": 50,
             "example": "STANDARD"
           },
-          "samplingQty": {
-            "x-source-column": "sampling_qty",
-            "type": [
-              "number",
-              "null"
-            ],
-            "minimum": 0,
-            "example": 500
-          },
           "aqlValue": {
             "x-source-column": "aql_value",
             "type": [
@@ -11810,6 +11803,18 @@
             ],
             "maxLength": 50,
             "example": "STANDARD"
+          },
+          "samplingRatio": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "exclusiveMinimum": 0,
+            "maximum": 100,
+            "example": 30,
+            "description": "샘플 비율(%). 검사할 몫을 백분율로 지정한다 — 0 초과 100 이하. 실제 검사 «수량»은 검사 시점에 로트 크기로 환산되는 파생값이라 여기서 받지 않는다.",
+            "x-internal-note": "✓확정 2026-07-15 가 「샘플 비율(%)」로 정한 것이다. 앞서 물리 모델의 sampling_qty(수량)를 따라 «수량»으로 받았으나 2026-08-18 되돌렸다 — 물리 모델은 설계 결정을 앞설 수 없다(사용자 확정). ⛔ 수량으로 두면 한 번 설정한 값이 로트 크기마다 다른 검사 강도가 된다(30 이 로트 100 에서는 30%, 10,000 에서는 0.3%). 📨 모델에 비율 컬럼이 없다 — 작업 통지이며 우리를 막지 않는다. ⛔ 이미 구현된 화면이라 변경 통지 대상이다."
           }
         }
       },
