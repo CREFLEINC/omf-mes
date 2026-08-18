@@ -1652,8 +1652,9 @@
      },
      "statusCode": {
       "type": "string",
-      "description": "의뢰 전 · 판정 대기 · 판정 완료. ⭐ 세 값짜리 진행 단계라 구간 형이 아니다 — 끝 시각의 부재로는 앞의 둘을 못 가른다(04 계약 1단계 §3)",
-      "example": "SHIPPED"
+      "description": "의뢰 전 · 판정 대기 · 판정 완료. ⭐ 세 값짜리 진행 단계라 구간 형이 아니다 — 끝 시각의 부재로는 앞의 둘을 못 가른다",
+      "example": "SHIPPED",
+      "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 04 계약 1단계 §3"
      },
      "openedAt": {
       "type": "string",

@@ -6400,7 +6400,7 @@
           "lookup"
         ],
         "summary": "법인 목록",
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: 없음 — 이 10화면 중 어느 화면도 직접 쓰지 않는다(06-API-요구서 §4-3). business_unit·plant 응답의 legalEntityId 를 이름으로 풀 때만 필요하며, 「법인」 축을 부여·표시하는 화면은 아직 없다. 「법인」 축은 권한 범위에 두지 않기로 확정됐다(DR-002 2-C · 2026-08-10) — 접근범위는 창고·공정 축으로만 가른다. 따라서 이 자원은 이름 풀이 전용으로 남는다",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: 없음 — 이 10화면 중 어느 화면도 직접 쓰지 않는다. business_unit·plant 응답의 legalEntityId 를 이름으로 풀 때만 필요하며, 「법인」 축을 부여·표시하는 화면은 아직 없다. 「법인」 축은 권한 범위에 두지 않기로 확정됐다(DR-002 2-C · 2026-08-10) — 접근범위는 창고·공정 축으로만 가른다. 따라서 이 자원은 이름 풀이 전용으로 남는다",
         "parameters": [
           {
             "name": "q",
@@ -6461,7 +6461,8 @@
               }
             }
           }
-        }
+        },
+        "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 06-API-요구서 §4-3"
       }
     },
     "/mdm/business-units": {
@@ -6637,7 +6638,7 @@
           "lookup"
         ],
         "summary": "생산라인 목록",
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: 없음 — 이 10화면 중 어느 화면도 선택 목록으로 쓰지 않는다(06-API-요구서 §4-3). 라인·작업구역 마스터의 귀속 화면이 미정이다(W-06-07 §7-2 · W-06-06 §7-2 · W-CO-02 §7-2 의 계층 표시 갭 표). equipment 응답의 productionLineId 를 이름으로 풀 때만 쓴다",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: 없음 — 이 10화면 중 어느 화면도 선택 목록으로 쓰지 않는다. 라인·작업구역 마스터의 귀속 화면이 미정이다(W-06-07 §7-2 · W-06-06 §7-2 · W-CO-02 §7-2 의 계층 표시 갭 표). equipment 응답의 productionLineId 를 이름으로 풀 때만 쓴다",
         "parameters": [
           {
             "name": "q",
@@ -6706,7 +6707,8 @@
               }
             }
           }
-        }
+        },
+        "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 06-API-요구서 §4-3"
       }
     },
     "/mdm/processes": {
@@ -12810,7 +12812,7 @@
           "timezoneCode",
           "isActive"
         ],
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: 없음 — 이 10화면 중 어느 화면도 직접 쓰지 않는다(06-API-요구서 §4-3). business_unit·plant 응답의 legalEntityId 를 이름으로 풀 때만 필요하며, 「법인」 축을 부여·표시하는 화면은 아직 없다. 「법인」 축은 권한 범위에 두지 않기로 확정됐다(DR-002 2-C · 2026-08-10) — 접근범위는 창고·공정 축으로만 가른다. 따라서 이 자원은 이름 풀이 전용으로 남는다",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: 없음 — 이 10화면 중 어느 화면도 직접 쓰지 않는다. business_unit·plant 응답의 legalEntityId 를 이름으로 풀 때만 필요하며, 「법인」 축을 부여·표시하는 화면은 아직 없다. 「법인」 축은 권한 범위에 두지 않기로 확정됐다(DR-002 2-C · 2026-08-10) — 접근범위는 창고·공정 축으로만 가른다. 따라서 이 자원은 이름 풀이 전용으로 남는다",
         "properties": {
           "legalEntityId": {
             "x-source-column": "legal_entity_id",
@@ -12848,7 +12850,8 @@
             "default": true,
             "example": true
           }
-        }
+        },
+        "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 06-API-요구서 §4-3"
       },
       "BusinessUnit": {
         "x-source-table": "mdm.business_unit",
@@ -12967,7 +12970,7 @@
           "lineTypeCode",
           "isActive"
         ],
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: 없음 — 이 10화면 중 어느 화면도 선택 목록으로 쓰지 않는다(06-API-요구서 §4-3). 라인·작업구역 마스터의 귀속 화면이 미정이다(W-06-07 §7-2 · W-06-06 §7-2 · W-CO-02 §7-2 의 계층 표시 갭 표). equipment 응답의 productionLineId 를 이름으로 풀 때만 쓴다 계층(parent_line_id) — 귀속 관리 화면 미정(W-06-06 §7-2 「세 곳 규칙」 표 참고).",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: 없음 — 이 10화면 중 어느 화면도 선택 목록으로 쓰지 않는다. 라인·작업구역 마스터의 귀속 화면이 미정이다(W-06-07 §7-2 · W-06-06 §7-2 · W-CO-02 §7-2 의 계층 표시 갭 표). equipment 응답의 productionLineId 를 이름으로 풀 때만 쓴다 계층(parent_line_id) — 귀속 관리 화면 미정(W-06-06 §7-2 「세 곳 규칙」 표 참고).",
         "properties": {
           "productionLineId": {
             "x-source-column": "production_line_id",
@@ -13018,7 +13021,8 @@
             "default": true,
             "example": true
           }
-        }
+        },
+        "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 06-API-요구서 §4-3"
       },
       "Process": {
         "x-source-table": "mdm.process",
