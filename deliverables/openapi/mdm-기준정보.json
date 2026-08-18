@@ -877,7 +877,7 @@
             }
           }
         },
-        "x-internal-note": "미착지 #69 / 공유계약 B-4(참조 건수를 응답에 담는다 — 화면이 세지 않는다)"
+        "x-internal-note": "미착지 #155 §1 / 공유계약 B-4(참조 건수를 응답에 담는다 — 화면이 세지 않는다)"
       },
       "put": {
         "tags": [
@@ -1231,7 +1231,7 @@
             "x-internal-note": "§8-8(편집 권한 매트릭스는 미결)"
           }
         },
-        "x-internal-note": "미착지: 법인 축(legal_entity_id) 부재 — #69"
+        "x-internal-note": "미착지: 법인 축(legal_entity_id)을 두지 않는다 — DR-002 2-C 확정(2026-08-10). 권한 범위는 창고·공정 축으로만 가른다"
       }
     },
     "/app/roles": {
@@ -6400,7 +6400,7 @@
           "lookup"
         ],
         "summary": "법인 목록",
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: 없음 — 이 10화면 중 어느 화면도 직접 쓰지 않는다(06-API-요구서 §4-3). business_unit·plant 응답의 legalEntityId 를 이름으로 풀 때만 필요하며, 「법인」 축을 부여·표시하는 화면은 아직 없다. W-CO-02 §9-3 의 법인 축 부재(#69)가 해소되면 데이터 접근범위가 첫 사용처가 된다",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: 없음 — 이 10화면 중 어느 화면도 직접 쓰지 않는다(06-API-요구서 §4-3). business_unit·plant 응답의 legalEntityId 를 이름으로 풀 때만 필요하며, 「법인」 축을 부여·표시하는 화면은 아직 없다. 「법인」 축은 권한 범위에 두지 않기로 확정됐다(DR-002 2-C · 2026-08-10) — 접근범위는 창고·공정 축으로만 가른다. 따라서 이 자원은 이름 풀이 전용으로 남는다",
         "parameters": [
           {
             "name": "q",
@@ -9014,7 +9014,7 @@
             "example": true
           }
         },
-        "x-internal-note": "미착지: 인증 수단(password_hash·last_login_at·failed_login_count) 전무 — #69"
+        "x-internal-note": "미착지: 인증 수단(password_hash·last_login_at·failed_login_count) 전무 — #155 §1"
       },
       "AppUserCreate": {
         "x-source-table": "app.app_user",
@@ -9378,7 +9378,7 @@
             "example": 1001
           }
         },
-        "x-internal-note": "미착지: 법인 축(legal_entity_id) 부재 — #69"
+        "x-internal-note": "미착지: 법인 축(legal_entity_id)을 두지 않는다 — DR-002 2-C 확정(2026-08-10). 권한 범위는 창고·공정 축으로만 가른다"
       },
       "UserDataScopeListResponse": {
         "type": "object",
@@ -12810,7 +12810,7 @@
           "timezoneCode",
           "isActive"
         ],
-        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: 없음 — 이 10화면 중 어느 화면도 직접 쓰지 않는다(06-API-요구서 §4-3). business_unit·plant 응답의 legalEntityId 를 이름으로 풀 때만 필요하며, 「법인」 축을 부여·표시하는 화면은 아직 없다. W-CO-02 §9-3 의 법인 축 부재(#69)가 해소되면 데이터 접근범위가 첫 사용처가 된다",
+        "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 근거: 없음 — 이 10화면 중 어느 화면도 직접 쓰지 않는다(06-API-요구서 §4-3). business_unit·plant 응답의 legalEntityId 를 이름으로 풀 때만 필요하며, 「법인」 축을 부여·표시하는 화면은 아직 없다. 「법인」 축은 권한 범위에 두지 않기로 확정됐다(DR-002 2-C · 2026-08-10) — 접근범위는 창고·공정 축으로만 가른다. 따라서 이 자원은 이름 풀이 전용으로 남는다",
         "properties": {
           "legalEntityId": {
             "x-source-column": "legal_entity_id",
