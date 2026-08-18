@@ -3483,6 +3483,25 @@
       "description": "겹쳐서 한 번만 센 구간 수",
       "example": 2
      },
+     "minorStopCount": {
+      "type": "integer",
+      "description": "경미 정지 건수. 임계보다 짧은 구간이며 위 합계에 들어 있다 — 걸러서 빼지 않고 줄을 나눠 보인다. 잦다는 것 자체가 신호라 감추면 안 된다",
+      "example": 84
+     },
+     "minorStopMinutes": {
+      "type": "integer",
+      "description": "경미 정지 시간 합",
+      "example": 372
+     },
+     "minorStopThresholdMinutes": {
+      "type": [
+       "number",
+       "null"
+      ],
+      "description": "경미 정지로 본 임계. 운영 정책이 정하며 기본은 5 다. 화면이 「경미 정지(<5분)」처럼 판정 근거를 함께 보이도록 응답이 값을 함께 내린다",
+      "example": 5,
+      "x-internal-note": "저장처는 app.operation_policy 의 MINOR_STOP_THRESHOLD_MINUTES 다. 근거: W-05-08 §5-5·§8-3"
+     },
      "byReason": {
       "type": "array",
       "items": {

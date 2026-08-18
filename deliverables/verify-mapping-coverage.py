@@ -116,8 +116,24 @@ def missing(actions, sections):
 def check(domain):
     # 요구 목록은 openapi/ 아래, 요구서는 deliverables/ 바로 아래다.
     list_name, doc_name = DOMAINS[domain]
-    actions = list_actions(os.path.join(HERE, "openapi", list_name))
-    sections = doc_sections(os.path.join(HERE, doc_name))
+    list_path = os.path.join(HERE, "openapi", list_name)
+    doc_path = os.path.join(HERE, doc_name)
+
+    # ⛔ 없는 파일을 추적 역추적으로 알리지 않는다 — 「아직 안 썼다」와 「깨졌다」는
+    #    다르고, 앞은 진행 상태이지 결함이 아니다. 도메인을 게이트에 먼저 등록하고
+    #    요구서를 나중에 쓰는 순서가 정상이라 이 상태가 실제로 생긴다.
+    for label, path in (("요구 목록", list_path), ("요구서", doc_path)):
+        if not os.path.exists(path):
+            print("%s — ⛔ %s 가 아직 없다: %s"
+                  % (domain, label, os.path.relpath(path, os.path.dirname(HERE))))
+            if label == "요구 목록":
+                print("   → python3 deliverables/verify-ui-coverage.py --domain %s" % domain)
+            else:
+                print("   → 요구서를 먼저 쓴다. 게이트는 그때까지 빨간 채로 둔다.")
+            return 1
+
+    actions = list_actions(list_path)
+    sections = doc_sections(doc_path)
     gaps = missing(actions, sections)
 
     print("%s — 액션 %d · 요구서 §3 소절 %d" % (domain, len(actions), len(sections)))

@@ -40,15 +40,17 @@ class ExtractActionsTest(unittest.TestCase):
         self.assertNotIn("액션", acts)
         self.assertFalse(any(a.startswith("---") for a in acts))
 
-    def test_전체_화면을_모으면_11개다(self):
+    def test_전체_화면을_모으면_14개다(self):
         rows = cov.extract_all(HERE)
         screens = sorted({r["screen"] for r in rows})
-        self.assertEqual(len(screens), 11, screens)
+        self.assertEqual(len(screens), 14, screens)
         self.assertIn("W-CO-02", screens)
         self.assertIn("W-06-07", screens)
         self.assertIn("W-06-14", screens)  # 2026-08-07 편입 — 계약이 먼저 쓰였다
-        self.assertNotIn("W-06-13", screens)
-        self.assertNotIn("W-06-08", screens)
+        self.assertNotIn("W-06-13", screens)  # 통합 폐지 — W-06-02 에 흡수
+        # ⭐ 2026-08-18 복귀 — 셋을 뺐던 근거가 「테이블이 없다」였고 그것이 뒤집혔다.
+        for back in ("W-06-08", "W-06-09", "W-06-12"):
+            self.assertIn(back, screens)
 
 
 # §5-1 표의 열 구성이 화면마다 다르다 — 대상 10개 중 9개는
@@ -125,9 +127,9 @@ class Domain01Test(unittest.TestCase):
     def test_기준정보_추출은_그대로다(self):
         # 공용 코드를 고쳤으므로 기존 도메인이 안 흔들리는지 함께 잠근다.
         rows = cov.extract_all(HERE)
-        # 81 — W-06-06 에 「역할 편집·저장」 1건 추가(DR-013 거래처 역할 탭)
-        self.assertEqual(len(rows), 81)
-        self.assertEqual(len({r["screen"] for r in rows}), 11)
+        # 99 — 81(DR-013 거래처 역할 탭까지)에 2026-08-18 복귀 세 화면의 18건이 붙었다.
+        self.assertEqual(len(rows), 99)
+        self.assertEqual(len({r["screen"] for r in rows}), 14)
 
 
 class DomainAppTest(unittest.TestCase):
@@ -142,9 +144,15 @@ class DomainAppTest(unittest.TestCase):
     def test_액션_표_없는_화면이_없다(self):
         self.assertEqual(cov.screens_without_action_table(HERE, cov.SCREENS_APP), [])
 
-    def test_도메인_등록부에_일곱이_있다(self):
+    def test_도메인_등록부에_여덟이_있다(self):
         self.assertEqual(sorted(cov.DOMAINS),
-                         ["01", "02", "03", "04", "app", "mdm", "print"])
+                         ["01", "02", "03", "04", "05", "app", "mdm", "print"])
+
+    def test_05_설비툴은_17장이고_액션_표가_다_있다(self):
+        self.assertEqual(len(cov.SCREENS_05), 17)
+        self.assertEqual(cov.screens_without_action_table(HERE, cov.SCREENS_05), [])
+        rows = cov.extract_all(HERE, cov.SCREENS_05)
+        self.assertEqual(len({r["screen"] for r in rows}), 17)
 
 
 class DomainPrintTest(unittest.TestCase):
