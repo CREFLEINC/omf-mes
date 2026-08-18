@@ -138,7 +138,10 @@ def _strip_md(text):
     return text.replace("`", "").strip()
 
 
-_ACTION_HEADING = re.compile(r"^### §5-\d+\..*액션.*$", re.M)
+# ⛔ 절 번호를 고정하면 못 찾는다 — 05 설비툴은 §3 을 판단 절로 써서 블록이 한 칸
+#    밀렸고, 액션이 `## §6. 액션·예외`(W-05-02) · `### §6-5. 액션`(W-05-05) 에 있다.
+#    옛 정규식은 `### §5-N.` 만 봐서 «있는 표»를 없는 것으로 봤다(2026-08-18 확대).
+_ACTION_HEADING = re.compile(r"^#{2,3} §\d+(?:-\d+)?\.[^\n]*액션[^\n]*$", re.M)
 _NEXT_HEADING = re.compile(r"^#{2,3} ", re.M)
 
 
@@ -148,14 +151,20 @@ def find_action_block(text):
     # 기준정보 10장은 전부 `### §5-1. 액션` 이지만 01 자재창고는 소절 번호가
     # 화면마다 다르다(§5-2 · §5-5 · §5-6 · §5-7 · §5-8). 번호를 고정하면 조용히
     # 0건이 되어 커버리지가 부풀려진다 — 제목으로 찾는다.
-    m = _ACTION_HEADING.search(text)
-    if m is None:
-        return None
-    # 소절의 끝은 「다음 ### 」이 아니라 「다음 ## 또는 ### 」이다.
-    # 액션 소절이 §5 의 마지막 소절이면 다음 제목이 `## §6` 이라 ### 만 찾으면
-    # §6·§7·§8 의 표까지 삼킨다(01 자재창고에서 액션이 414건으로 부풀었다).
-    nxt = _NEXT_HEADING.search(text, m.end())
-    return text[m.start():nxt.start()] if nxt else text[m.start():]
+    # ⛔ 제목 하나만 보고 고르면 안 된다 — `## §5. 액션·상태` 아래에 `### §5-1. 액션`
+    #    이 오는 구성이 있다. 부모를 집으면 블록이 «바로 다음 제목»에서 끝나 표에
+    #    닿지 못하고 0 건이 된다. 그래서 **표가 실제로 든 블록**을 고른다.
+    for m in _ACTION_HEADING.finditer(text):
+        # 소절의 끝은 「다음 ### 」이 아니라 「다음 ## 또는 ### 」이다.
+        # 액션 소절이 §5 의 마지막 소절이면 다음 제목이 `## §6` 이라 ### 만 찾으면
+        # §6·§7·§8 의 표까지 삼킨다(01 자재창고에서 액션이 414건으로 부풀었다).
+        nxt = _NEXT_HEADING.search(text, m.end())
+        block = text[m.start():nxt.start()] if nxt else text[m.start():]
+        for line in block.split("\n"):
+            line = line.strip()
+            if line.startswith("|") and "액션" in line:
+                return block
+    return None
 
 
 def extract_actions(md_path):
@@ -180,6 +189,11 @@ def extract_actions(md_path):
     for line in block.split("\n"):
         line = line.strip()
         if not line.startswith("|"):
+            # ⛔ «첫» 표에서 끊는다 — 한 절에 표가 둘 있는 자리가 있다
+            #    (`## §6. 액션·예외` 는 액션 표 다음에 예외 표가 온다). 안 끊으면
+            #    뒤 표의 머리행이 «액션» 으로 읽혀 「상황」 같은 가짜 액션이 는다.
+            if header is not None:
+                break
             continue
         cells = [c.strip() for c in line.strip("|").split("|")]
         if len(cells) < 2:
