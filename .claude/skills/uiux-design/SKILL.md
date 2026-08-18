@@ -165,7 +165,7 @@ description: omf-mes 화면 설계·계약 작업을 할 때 — 설계 소관 �
 | `deliverables/test-verify-*.py` | 검사기를 고친 뒤 |
 | `deliverables/openapi/check-lock-token-source.py` | ⭐ **저장 충돌 보호를 붙인 뒤** — 토큰을 «받을 곳»이 선언됐는지 본다 |
 | `deliverables/openapi/check-enum-narrowing.py` | ⭐ **계약을 고친 뒤 · 통지를 내기 전** — 값 목록이 좁아졌는데 통지가 없으면 잡는다 |
-| `deliverables/openapi/check-generator-drift.py` | ⛔ **생성기를 돌리기 «전»** — 재생성하면 잃는 것이 있는지 본다. 2026-08-18 실측: 세 계약 전부 **저장 충돌 토큰 선언이 사라진다** |
+| — | ⛔ **계약은 JSON 이 정본이다**(2026-08-18 확정) — 생성기를 두지 않는다. 고치는 방법은 `deliverables/openapi/00-계약-작성-규약.md` |
 | `deliverables/collect-open-items.py --check` | ⭐ **화면 스펙을 고친 뒤** — 미결 대장이 스펙과 갈렸는지 본다 |
 | `.claude/skills/uiux-client-handoff/scripts/check-issue.py` | 구현팀 통지 **발행 전** |
 

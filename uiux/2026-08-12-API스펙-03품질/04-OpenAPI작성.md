@@ -58,7 +58,8 @@ example 없는 스칼라  0건   ✅
 ⛔ **02 가 한 번 속았다** — 조립부가 빠진 생성기인데 앞서 만든 JSON 이 남아 있어 검사기가 통과했다.
 
 ```
-rm quality-03품질.json && python3 build-03-openapi.py
+# ⛔⛔ 실행 금지(2026-08-18) — 생성기가 폐기됐다. 이 줄을 돌리면 계약만 지워진다
+# rm quality-03품질.json && python3 build-03-openapi.py
   → 1차 sha256  4e047f96…
   → 2차 sha256  4e047f96…     ✅ 같다
 ```
