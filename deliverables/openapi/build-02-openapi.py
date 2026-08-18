@@ -302,7 +302,7 @@ schemas["WorkSessionEvent"] = obj(["workSessionEventId","eventTypeCode","occurre
     "workSessionEventId": I64,
     "eventTypeCode": {"type":"string","description":"중단·재개·통제 우회 등. 값 목록은 공통코드가 갖는다. 근거: P-02-10 §8-1 · 공유계약 A-16"},
     "occurredAt": {**TS, "description":"단말 시계가 정한다. 근거: 공유계약 C-12"},
-    "recordedAt": {**TS, "description":"서버 수신 시각. 단말 시계와 차이가 커도 거부하지 않고 함께 보인다. 근거: 공유계약 G-20"},
+    "recordedAt": {**TS, "description":"서버 수신 시각. 단말 시계와 차이가 커도 거부하지 않고 함께 보인다 — 발생 시각은 단말이 정하고 서버는 덮지 않는다. 근거: 공유계약 C-12"},
     "reasonCode": STR, "performedBy": I64, "terminalId": I64})
 schemas["WorkSessionEventCreate"] = obj(["eventTypeCode","occurredAt"], {
     "eventTypeCode": STR, "occurredAt": TS, "reasonCode": STR,
