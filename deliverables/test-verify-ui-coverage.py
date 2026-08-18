@@ -144,9 +144,19 @@ class DomainAppTest(unittest.TestCase):
     def test_액션_표_없는_화면이_없다(self):
         self.assertEqual(cov.screens_without_action_table(HERE, cov.SCREENS_APP), [])
 
-    def test_도메인_등록부에_여덟이_있다(self):
+    def test_도메인_등록부에_아홉이_있다(self):
         self.assertEqual(sorted(cov.DOMAINS),
-                         ["01", "02", "03", "04", "05", "app", "mdm", "print"])
+                         ["01", "02", "03", "04", "05", "app", "co", "mdm", "print"])
+
+    def test_공통은_10장이고_액션_표가_다_있다(self):
+        # ⛔ 2026-08-19 까지 공통 10장이 게이트 «밖» 이었다 — 요구서 여덟 편은 매핑
+        #    절이 §3 인데 공통 한 편만 §2 라 소절 인식에 안 걸렸다. 화면 진도표를
+        #    만들자 「요구서가 다루지 않은 화면」으로 떠서 드러났다.
+        self.assertEqual(len(cov.SCREENS_CO), 10)
+        self.assertEqual(cov.screens_without_action_table(HERE, cov.SCREENS_CO), [])
+        rows = cov.extract_all(HERE, cov.SCREENS_CO)
+        self.assertEqual(len({r["screen"] for r in rows}), 10)
+        self.assertEqual(len(rows), 47)
 
     def test_05_설비툴은_17장이고_액션_표가_다_있다(self):
         self.assertEqual(len(cov.SCREENS_05), 17)
