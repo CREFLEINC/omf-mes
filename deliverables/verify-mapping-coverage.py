@@ -33,7 +33,13 @@ DOMAINS = {name: (files[1], files[2]) for name, files in _COV.DOMAINS.items()}
 DEFAULT_DOMAIN = "mdm"  # 짝인 verify-ui-coverage.py 와 같은 기본값을 쓴다
 
 _LIST_SCREEN = re.compile(r"^## ([WMP]-(?:CO|\d{2})-\d{2})\s*$", re.M)
-_DOC_SCREEN = re.compile(r"^### 3-\d+\.\s*`([WMP]-(?:CO|\d{2})-\d{2})`", re.M)
+# ⛔ 번호와 화면 ID 사이에 «꾸밈»이 들어간다 — 실제로 `### 3-8. ⭐ `W-03-10` …` 이
+#    있었고, 옛 정규식이 `\s*` 만 허용해 그 소절을 «없는 것»으로 봤다(2026-08-18).
+#    그래서 다뤄진 액션 5건이 결손으로 잡혀 게이트가 빨간 채 방치됐다.
+#    ⭐ 같은 줄에서 «첫» 백틱 화면 ID 를 집는다 — 백틱이 없는 제목(커버리지 집계)은
+#    여전히 안 잡힌다.
+_DOC_SCREEN = re.compile(
+    r"^### 3-\d+\.[^\n`]*`([WMP]-(?:CO|\d{2})-\d{2})`", re.M)
 
 # 대조에서 지우는 것 — ① 공백과 마크다운 표기(`**` `` ` `` `~~`)는 같은 액션을
 # 두 문서가 다르게 꾸며 적어서, ② 판정 기호(⚠⛔✅❌)와 괄호·중점은 요구서가

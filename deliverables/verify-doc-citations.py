@@ -90,7 +90,10 @@ def main() -> int:
         print(f"⛔ 계약을 찾지 못했습니다 — {OPENAPI_DIR}")
         return 2
 
-    targets = sorted(glob.glob(os.path.join(HERE, "06-API-요구서-*.md")))
+    # ⛔ 접미가 «없는» 06-API-요구서.md(기준정보)를 빼면 안 된다 — 옛 글로브가
+    #    `06-API-요구서-*.md` 라 그 한 장이 «한 번도» 검사받지 않았고, 그 사이
+    #    기준정보 계약이 73 → 86 경로로 바뀌었다(2026-08-18 확대).
+    targets = sorted(glob.glob(os.path.join(HERE, "06-API-요구서*.md")))
     if args.doc:
         targets = [t for t in targets if args.doc in os.path.basename(t)]
         if not targets:
