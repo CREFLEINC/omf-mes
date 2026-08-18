@@ -1669,9 +1669,15 @@
       "in": "query",
       "schema": {
        "type": "string",
+       "enum": [
+        "REASON",
+        "EQUIPMENT",
+        "PERIOD"
+       ],
+       "default": "REASON",
        "example": "EQUIPMENT"
       },
-      "description": "설비별(EQUIPMENT) 또는 사유별(REASON)"
+      "description": "사유별 · 설비별 · 추이. 화면의 세 탭에 하나씩 대응하며 응답의 by… 배열 하나만 채워진다"
      },
      {
       "name": "startedFrom",
@@ -1691,6 +1697,21 @@
        "format": "date",
        "example": "2026-08-18"
       }
+     },
+     {
+      "name": "bucket",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "enum": [
+        "DAY",
+        "WEEK",
+        "MONTH"
+       ],
+       "default": "DAY",
+       "example": "DAY"
+      },
+      "description": "groupBy=PERIOD 일 때 칸의 크기. 그 밖에는 무시된다"
      }
     ],
     "responses": {
@@ -2248,13 +2269,14 @@
     "description": "계측기의 검교정·점검 이력을 조회한다. 만료가 임박한 것을 거를 수 있다.",
     "parameters": [
      {
-      "name": "gaugeId",
+      "name": "equipmentId",
       "in": "query",
       "schema": {
        "type": "integer",
        "format": "int64",
        "example": 1001
-      }
+      },
+      "description": "계측기. 계측기는 설비의 한 종류라 /mdm/equipments 의 equipmentId 그대로다 — 계측기 전용 자원을 두지 않는다"
      },
      {
       "name": "historyTypeCode",
@@ -3012,6 +3034,15 @@
       "items": {
        "$ref": "#/components/schemas/MaintenanceOrderTrigger"
       }
+     },
+     "baseDate": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "format": "date",
+      "example": "2026-08-18",
+      "description": "주기를 세는 기준일. 다음 주기가 이 날부터 시작한다 — 예방보전 지시에 필요하고 사후 보전에는 비어 있다"
      }
     },
     "required": [
@@ -3058,6 +3089,15 @@
       "items": {
        "$ref": "#/components/schemas/MaintenanceOrderTrigger"
       }
+     },
+     "baseDate": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "format": "date",
+      "example": "2026-08-18",
+      "description": "주기를 세는 기준일. 다음 주기가 이 날부터 시작한다 — 예방보전 지시에 필요하고 사후 보전에는 비어 있다"
      }
     },
     "required": [
@@ -3507,6 +3547,25 @@
       "items": {
        "$ref": "#/components/schemas/DowntimeReasonSummary"
       }
+     },
+     "byEquipment": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/DowntimeEquipmentSummary"
+      },
+      "description": "groupBy=EQUIPMENT 일 때 채워진다"
+     },
+     "byPeriod": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/DowntimePeriodSummary"
+      },
+      "description": "groupBy=PERIOD 일 때 채워진다"
+     },
+     "sessionsWithoutEquipmentCount": {
+      "type": "integer",
+      "example": 4,
+      "description": "설비가 붙지 않은 작업 세션 수. 조업 시간에는 들어가지만 설비별 묶음에서는 빠진다 — 화면이 그 사실을 요약에 보인다. 0 과 「모른다」를 같은 모양으로 그리지 않기 위해 «건수» 로 내린다"
      }
     },
     "required": [
@@ -3792,15 +3851,6 @@
       "format": "int64",
       "example": 1001
      },
-     "gaugeId": {
-      "type": "integer",
-      "format": "int64",
-      "example": 1001
-     },
-     "gaugeCode": {
-      "type": "string",
-      "example": "GAU-0031"
-     },
      "historyTypeCode": {
       "type": "string",
       "description": "검교정(CALIBRATION) 또는 점검(CHECK)",
@@ -3849,11 +3899,21 @@
       "type": "integer",
       "format": "int64",
       "example": 1001
+     },
+     "equipmentId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001,
+      "description": "계측기. 계측기는 설비의 한 종류라 /mdm/equipments 의 equipmentId 그대로다 — 계측기 전용 자원을 두지 않는다"
+     },
+     "equipmentCode": {
+      "type": "string",
+      "example": "GAU-0031"
      }
     },
     "required": [
      "calibrationId",
-     "gaugeId",
+     "equipmentId",
      "historyTypeCode",
      "performedOn",
      "resultCode"
@@ -3862,11 +3922,6 @@
    "CalibrationCreate": {
     "type": "object",
     "properties": {
-     "gaugeId": {
-      "type": "integer",
-      "format": "int64",
-      "example": 1001
-     },
      "historyTypeCode": {
       "type": "string",
       "example": "CALIBRATION"
@@ -3908,14 +3963,91 @@
        "null"
       ],
       "example": "±0.02 mm"
+     },
+     "equipmentId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001,
+      "description": "계측기. 계측기는 설비의 한 종류라 /mdm/equipments 의 equipmentId 그대로다 — 계측기 전용 자원을 두지 않는다"
      }
     },
     "required": [
-     "gaugeId",
+     "equipmentId",
      "historyTypeCode",
      "performedOn",
      "resultCode"
     ]
+   },
+   "DowntimeEquipmentSummary": {
+    "type": "object",
+    "required": [
+     "equipmentId",
+     "equipmentCode",
+     "count",
+     "totalMinutes"
+    ],
+    "description": "설비별 묶음 한 줄. 근거: W-05-08 §4 ③ 설비별 탭",
+    "properties": {
+     "equipmentId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "equipmentCode": {
+      "type": "string",
+      "example": "PRS-01"
+     },
+     "equipmentName": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "example": "프레스 1호기"
+     },
+     "count": {
+      "type": "integer",
+      "example": 12
+     },
+     "totalMinutes": {
+      "type": "integer",
+      "example": 3130
+     },
+     "sharePercent": {
+      "type": "number",
+      "format": "double",
+      "example": 40.7
+     },
+     "averageMinutes": {
+      "type": "number",
+      "format": "double",
+      "example": 260.8
+     }
+    }
+   },
+   "DowntimePeriodSummary": {
+    "type": "object",
+    "required": [
+     "periodStart",
+     "count",
+     "totalMinutes"
+    ],
+    "description": "추이 한 칸. 칸의 크기는 요청의 bucket 이 정한다. 근거: W-05-08 §4 ③ 추이 탭",
+    "properties": {
+     "periodStart": {
+      "type": "string",
+      "format": "date",
+      "example": "2026-08-01",
+      "description": "이 칸이 시작하는 날"
+     },
+     "count": {
+      "type": "integer",
+      "example": 9
+     },
+     "totalMinutes": {
+      "type": "integer",
+      "example": 640
+     }
+    }
    }
   }
  }

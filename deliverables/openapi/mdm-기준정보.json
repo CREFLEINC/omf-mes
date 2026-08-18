@@ -6842,6 +6842,14 @@
             "description": "검교정 대상만 본다"
           },
           {
+            "name": "statusCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "자산 수명주기로 거른다 — 운용 또는 폐기. 사용 여부(includeInactive)와 «다른 축» 이다. 현장 화면은 폐기된 설비를 목록에서 뺀다"
+          },
+          {
             "name": "includeInactive",
             "in": "query",
             "schema": {
@@ -9434,6 +9442,29 @@
               "type": "boolean"
             },
             "description": "적정타수가 비어 있는 것만 본다. 비어 있으면 예방보전이 돌지 않으므로 채울 것을 한눈에 세는 자리다"
+          },
+          {
+            "name": "pmDueOnly",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "예방보전이 도래한 것만 본다. 예방보전 도래 조회 화면의 기본값이다 — 적체 화면이라 미처리 전건이 먼저 보인다"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "SHOT_USAGE_DESC",
+                "NEXT_PM_ASC",
+                "CODE"
+              ],
+              "default": "CODE",
+              "example": "SHOT_USAGE_DESC"
+            },
+            "description": "초과율 높은 순 · 다음 예정일 이른 순 · 코드 순. 적체 화면은 초과율 높은 순이 기본이다 — 경과일보다 초과율이 위험 크기다"
           },
           {
             "name": "includeInactive",
@@ -18149,6 +18180,71 @@
             "example": true,
             "default": true,
             "x-source-column": "is_active"
+          },
+          "pmTriggerTypeCode": {
+            "type": "string",
+            "maxLength": 50,
+            "default": "NONE",
+            "example": "BOTH",
+            "description": "예방보전을 무엇으로 판정하는가 — 타발수(SHOT) · 날짜(DATE) · 둘 다(BOTH) · 하지 않음(NONE). 확정이 「겸용 설정형」이라 이 칸이 그 「설정」이다"
+          },
+          "pmCycleInterval": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "example": 6,
+            "description": "날짜 주기 간격. 날짜 축을 쓰면 단위와 함께 필요하다"
+          },
+          "pmCycleUnitCode": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 50,
+            "example": "MONTH",
+            "description": "날짜 주기 단위 — 일(DAY) 또는 월(MONTH)"
+          },
+          "lastPmDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "example": "2026-05-02",
+            "description": "마지막 예방보전 시행일이자 다음 주기의 기준일. 읽기 전용이다 — 예방보전 실적 등록이 정한다"
+          },
+          "nextPmDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "example": "2026-11-02",
+            "description": "다음 예방보전 예정일 = 마지막 시행일 + 주기. 서버가 계산한다. 기준일이나 주기가 비면 null 이고 화면은 「기준 없음」으로 그린다"
+          },
+          "pmDue": {
+            "type": "boolean",
+            "example": true,
+            "description": "지금 예방보전이 도래했는가. 저장하지 않고 그때그때 계산한다 — 아무도 아무것도 하지 않아도 날짜가 지나면 바뀌는 값이라 컬럼에 넣지 않는다"
+          },
+          "pmDueAxisCode": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "SHOT",
+            "description": "먼저 도달한 축 — SHOT 또는 DATE. 둘 다 쓰는 툴이 있어 「왜 도래했는가」를 화면이 밝힌다. 도래하지 않았으면 null"
+          },
+          "shotUsageRatio": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "example": 102.5,
+            "description": "누계 ÷ 적정타수 백분율. 적정타수가 비면 null 이고 화면은 「산출 불가」로 그린다 — 0 으로 채우지 않는다"
           }
         }
       },
@@ -18199,6 +18295,31 @@
             "format": "int64",
             "minimum": 0,
             "description": "적정타수. 비어 있으면 사용 가능 타수를 산출할 수 없고 예방보전 트리거의 타발수 축이 서지 않는다 — 0 으로 채우지 않는다"
+          },
+          "pmTriggerTypeCode": {
+            "type": "string",
+            "maxLength": 50,
+            "default": "NONE",
+            "example": "BOTH",
+            "description": "예방보전을 무엇으로 판정하는가 — 타발수(SHOT) · 날짜(DATE) · 둘 다(BOTH) · 하지 않음(NONE). 확정이 「겸용 설정형」이라 이 칸이 그 「설정」이다"
+          },
+          "pmCycleInterval": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "example": 6,
+            "description": "날짜 주기 간격. 날짜 축을 쓰면 단위와 함께 필요하다"
+          },
+          "pmCycleUnitCode": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 50,
+            "example": "MONTH",
+            "description": "날짜 주기 단위 — 일(DAY) 또는 월(MONTH)"
           }
         }
       },
@@ -18243,6 +18364,31 @@
             "format": "int64",
             "minimum": 0,
             "description": "적정타수. 비어 있으면 사용 가능 타수를 산출할 수 없고 예방보전 트리거의 타발수 축이 서지 않는다 — 0 으로 채우지 않는다"
+          },
+          "pmTriggerTypeCode": {
+            "type": "string",
+            "maxLength": 50,
+            "default": "NONE",
+            "example": "BOTH",
+            "description": "예방보전을 무엇으로 판정하는가 — 타발수(SHOT) · 날짜(DATE) · 둘 다(BOTH) · 하지 않음(NONE). 확정이 「겸용 설정형」이라 이 칸이 그 「설정」이다"
+          },
+          "pmCycleInterval": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "example": 6,
+            "description": "날짜 주기 간격. 날짜 축을 쓰면 단위와 함께 필요하다"
+          },
+          "pmCycleUnitCode": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 50,
+            "example": "MONTH",
+            "description": "날짜 주기 단위 — 일(DAY) 또는 월(MONTH)"
           }
         }
       },
