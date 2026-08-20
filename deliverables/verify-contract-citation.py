@@ -74,6 +74,11 @@ PREFIX_NOT_CLAUSE = ('I-',)
 AMBIGUOUS = {'E-%d' % i for i in range(3, 30)} | {'H-%d' % i for i in range(1, 10)}
 NOT_CLAUSE = re.compile(r'회신\s*$|고객\s*$|\[\s*$')
 
+# ⭐ 이 검사기가 «권하는» 표기를 이 검사기가 인식하지 못하고 있었다.
+#    「표기를 `ds-gap G-N` 으로 구분하면 사라진다」고 안내해 놓고, 그대로 써도
+#    그대로 걸렸다 — 조언을 따를 수 없는 조언이었다(2026-08-21 · omf-mes#170).
+DSGAP_PREFIX = re.compile(r'ds-gap`?\s*$')
+
 # 글로스 대조에서 버릴 낱말 — 조사·형식어
 STOP = {
     '한다', '하지', '않는다', '있다', '없다', '것을', '것이', '되는', '위한', '대한',
@@ -83,7 +88,12 @@ STOP = {
 }
 
 CLAUSE_HEAD = re.compile(r'^### ([A-L]-\d+(?:-\d+)?)\.\s*(.+?)\s*(?:✅|⬜|⛔|\*\*\[|$)')
-DSGAP_ROW = re.compile(r'^\|\s*\*{0,2}(G-\d+)\*{0,2}\s*\|\s*\*{0,2}([^|*]+?)\*{0,2}\s*(?:\*\(|\|)')
+# ⚠ 첫 칸이 «표시 기호로 시작하는» 행을 놓치고 있었다 — `| ⛔⛔ **G-14** | …`
+#    2026-08-21 실측: 표에 있는 16개 중 11개만 읽고 있었다(G-14·G-15 가 안 보였다).
+#    G-14 는 구현팀이 실제로 헷갈린 항목이라(omf-mes#170) 안 보이면 검사기가 제 일을 못 한다.
+#    ⛔ 이름 칸 «안»에 굵게 표기가 있는 G-3 은 아직 못 읽는다 — 그 행은 표가 둘이라
+#       고치면 기존 5개의 이름이 다른 표 것으로 바뀐다(실측). 별건으로 둔다.
+DSGAP_ROW = re.compile(r'^\|\s*[^|A-Za-z0-9]*(G-\d+)\*{0,2}\s*\|\s*\*{0,2}([^|*]+?)\*{0,2}\s*(?:\*\(|\|)')
 CITE = re.compile(r'(?<![A-Za-z0-9])([A-L]-[1-9]\d*(?:-[1-9]\d*)?)(?![0-9])')
 GLOSS = re.compile(
     r'(?<![A-Za-z0-9])([A-L]-[1-9]\d*(?:-[1-9]\d*)?)\s*\(([^)]{2,60})\)')
@@ -131,7 +141,9 @@ def stems(text):
 
 def is_skipped(cid, before):
     return (cid.startswith(PREFIX_NOT_CLAUSE) or cid in AMBIGUOUS
-            or bool(NOT_CLAUSE.search(before[-6:])))
+            or bool(NOT_CLAUSE.search(before[-6:]))
+            # ⚠ 창은 6자보다 넓어야 한다 — '`ds-gap` ' 만 9자다
+            or bool(DSGAP_PREFIX.search(before[-12:])))
 
 
 def spec_files(target):
