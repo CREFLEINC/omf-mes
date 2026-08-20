@@ -421,6 +421,15 @@
          "$ref": "#/components/schemas/Breakdown"
         }
        }
+      },
+      "headers": {
+       "ETag": {
+        "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로는 내리지 않는다 — 표시하지 않되 전달한다",
+        "schema": {
+         "type": "string"
+        },
+        "x-internal-note": "본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다"
+       }
       }
      },
      "404": {
@@ -454,6 +463,9 @@
      },
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
      }
     ],
     "requestBody": {
@@ -503,6 +515,16 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "저장 충돌 — 다른 사용자가 먼저 고쳤다. 업무 규칙 위반(상태 잠김·참조 존재)은 409 가 아니라 400 이다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
         }
        }
       }
@@ -616,6 +638,9 @@
      },
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
      }
     ],
     "responses": {
@@ -648,6 +673,16 @@
         }
        }
       }
+     },
+     "409": {
+      "description": "저장 충돌 — 다른 사용자가 먼저 고쳤다. 업무 규칙 위반(상태 잠김·참조 존재)은 409 가 아니라 400 이다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
      }
     }
    }
@@ -672,6 +707,9 @@
      },
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
      }
     ],
     "requestBody": {
@@ -721,6 +759,16 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "저장 충돌 — 다른 사용자가 먼저 고쳤다. 업무 규칙 위반(상태 잠김·참조 존재)은 409 가 아니라 400 이다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
         }
        }
       }
@@ -928,6 +976,15 @@
          "$ref": "#/components/schemas/MaintenanceOrder"
         }
        }
+      },
+      "headers": {
+       "ETag": {
+        "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로는 내리지 않는다 — 표시하지 않되 전달한다",
+        "schema": {
+         "type": "string"
+        },
+        "x-internal-note": "본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다"
+       }
       }
      },
      "404": {
@@ -963,6 +1020,9 @@
      },
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
      }
     ],
     "responses": {
@@ -992,6 +1052,16 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "저장 충돌 — 다른 사용자가 먼저 고쳤다. 업무 규칙 위반(상태 잠김·참조 존재)은 409 가 아니라 400 이다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
         }
        }
       }
@@ -1192,6 +1262,15 @@
          "$ref": "#/components/schemas/MaintenanceResult"
         }
        }
+      },
+      "headers": {
+       "ETag": {
+        "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로는 내리지 않는다 — 표시하지 않되 전달한다",
+        "schema": {
+         "type": "string"
+        },
+        "x-internal-note": "본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다"
+       }
       }
      },
      "404": {
@@ -1225,6 +1304,9 @@
      },
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
      }
     ],
     "requestBody": {
@@ -1274,6 +1356,16 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "저장 충돌 — 다른 사용자가 먼저 고쳤다. 업무 규칙 위반(상태 잠김·참조 존재)은 409 가 아니라 400 이다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
         }
        }
       }
@@ -1484,6 +1576,15 @@
          "$ref": "#/components/schemas/Downtime"
         }
        }
+      },
+      "headers": {
+       "ETag": {
+        "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로는 내리지 않는다 — 표시하지 않되 전달한다",
+        "schema": {
+         "type": "string"
+        },
+        "x-internal-note": "본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다"
+       }
       }
      },
      "404": {
@@ -1517,6 +1618,9 @@
      },
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
      }
     ],
     "requestBody": {
@@ -1569,6 +1673,16 @@
         }
        }
       }
+     },
+     "409": {
+      "description": "저장 충돌 — 다른 사용자가 먼저 고쳤다. 업무 규칙 위반(상태 잠김·참조 존재)은 409 가 아니라 400 이다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
      }
     }
    }
@@ -1593,6 +1707,9 @@
      },
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
      }
     ],
     "responses": {
@@ -1622,6 +1739,16 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "저장 충돌 — 다른 사용자가 먼저 고쳤다. 업무 규칙 위반(상태 잠김·참조 존재)은 409 가 아니라 400 이다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
         }
        }
       }
@@ -2104,6 +2231,15 @@
          "$ref": "#/components/schemas/CollectionChannel"
         }
        }
+      },
+      "headers": {
+       "ETag": {
+        "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로는 내리지 않는다 — 표시하지 않되 전달한다",
+        "schema": {
+         "type": "string"
+        },
+        "x-internal-note": "본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다"
+       }
       }
      },
      "404": {
@@ -2137,6 +2273,9 @@
      },
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
      }
     ],
     "requestBody": {
@@ -2186,6 +2325,16 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "저장 충돌 — 다른 사용자가 먼저 고쳤다. 업무 규칙 위반(상태 잠김·참조 존재)은 409 가 아니라 400 이다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
         }
        }
       }
@@ -2483,48 +2632,71 @@
     },
     "description": "전 쓰기 API 필수. 같은 키로 다시 보내면 같은 기록을 두 번 만들지 않는다.",
     "x-internal-note": "근거: 공유계약 C-1 · C-8. 현장 단말 넷(M-05-01·M-05-02·P-05-01·P-05-02)이 오프라인 큐에서 재전송하므로 특히 중요하다. 저장 측 유일 제약은 모델 쪽 작업 통지 대상이다(#67)."
+   },
+   "IfMatchVersion": {
+    "name": "If-Match",
+    "in": "header",
+    "required": true,
+    "schema": {
+     "type": "string"
+    },
+    "description": "낙관적 잠금용 version_no. 값은 같은 리소스의 상세 GET 200 이 내려주는 ETag 응답 헤더에서 받는다 — version_no 는 공유계약 A-4 에 따라 본문 필드로 노출하지 않는다. 근거: 공유계약 B-1"
    }
   },
   "schemas": {
    "ErrorItem": {
     "type": "object",
+    "required": [
+     "scope",
+     "code",
+     "message"
+    ],
     "properties": {
+     "scope": {
+      "type": "string",
+      "enum": [
+       "field",
+       "screen"
+      ],
+      "description": "오류의 범위. 근거: 공유계약 G-1 — 한 필드의 문제는 인라인, 화면 수준 문제는 배너",
+      "example": "field"
+     },
      "field": {
       "type": "string",
-      "description": "어느 입력이 문제인가",
-      "example": "equipmentId"
+      "description": "scope=field 일 때 대상 프로퍼티명",
+      "example": "문자열"
+     },
+     "code": {
+      "type": "string",
+      "description": "UNIQUE_VIOLATION · REQUIRED · RANGE · PAIR · PERMISSION_DENIED · STATE_LOCKED 등. STATE_LOCKED 는 확정·폐기 상태라 수정이 잠긴 것으로, 재로드해도 풀리지 않는다 — 재로드로 풀리는 저장 충돌(409)과 구분한다(공유계약 G-1)",
+      "example": "STANDARD"
+     },
+     "uniqueScope": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "code=UNIQUE_VIOLATION 일 때 어느 유일키 범위에서 중복인지. 근거: 공유계약 A-1 — 범위 없이 「중복」만 오면 화면이 문구를 만들 수 없다"
      },
      "message": {
       "type": "string",
-      "example": "값이 필요합니다"
+      "example": "문자열"
      }
-    },
-    "required": [
-     "message"
-    ]
+    }
    },
    "ErrorResponse": {
     "type": "object",
+    "required": [
+     "errors"
+    ],
     "properties": {
-     "code": {
-      "type": "string",
-      "example": "VALIDATION_FAILED"
-     },
-     "message": {
-      "type": "string",
-      "example": "입력을 확인해 주세요"
-     },
-     "details": {
+     "errors": {
       "type": "array",
       "items": {
        "$ref": "#/components/schemas/ErrorItem"
       }
      }
-    },
-    "required": [
-     "code",
-     "message"
-    ]
+    }
    },
    "InspectionLine": {
     "type": "object",
@@ -4046,6 +4218,29 @@
      "totalMinutes": {
       "type": "integer",
       "example": 640
+     }
+    }
+   },
+   "ConflictResponse": {
+    "type": "object",
+    "required": [
+     "conflictCause",
+     "message"
+    ],
+    "properties": {
+     "conflictCause": {
+      "type": "string",
+      "enum": [
+       "user",
+       "erpSync",
+       "workerLease"
+      ],
+      "description": "충돌 원인. 근거: 공유계약 B-1 확장 — user=다른 사용자, erpSync=ERP 재동기화 배치, workerLease=워커가 처리 중. 구분 없이 내려주면 화면이 「다른 사용자가 먼저 수정했습니다」라는 사실과 다른 안내를 하게 된다",
+      "example": "user"
+     },
+     "message": {
+      "type": "string",
+      "example": "문자열"
      }
     }
    }
