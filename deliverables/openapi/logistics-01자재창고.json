@@ -77,15 +77,6 @@
       "description": "전기일 종료"
      },
      {
-      "name": "pendingApprovalOnly",
-      "in": "query",
-      "schema": {
-       "type": "boolean",
-       "default": false
-      },
-      "description": "승인 대기 탭. 근거: W-01-12 §5-6"
-     },
-     {
       "name": "page",
       "in": "query",
       "schema": {
@@ -7228,8 +7219,9 @@
        "null"
       ],
       "format": "int64",
-      "description": "기타 출고 품의의 승인 요청 식별자",
-      "example": 1001
+      "description": "이 출고가 어느 승인 요청에서 나왔는지 되짚는 식별자. 비어 있으면 승인을 타지 않은 출고다. 폐기 출고 화면이 이 값으로 승인 이력을 보이고, 승인 없이 나간 건을 가려낸다.",
+      "example": 1001,
+      "x-internal-note": "⛔ 「품의」가 아니라 «MES 내부 승인 요청» 참조다 — DR-009(2026-08-13)가 품의서 기안을 없앴지만 요청→승인은 오히려 명시했다. 📨 모델에 이 컬럼이 아직 없다(작업 통지 · #87 4번) — 계약은 화면 요구대로 쓰고 기다리지 않는다. 화면이 이 값을 «보여야 한다»는 것은 2026-08-18 사용자 확정이다: 되짚을 길이 없으면 승인 없이 나간 폐기 출고를 화면에서 찾을 수 없어 통제가 성립하지 않는다."
      },
      "erpMessageQueued": {
       "type": "boolean",

@@ -19,6 +19,20 @@
 값이 줄어든 자리**를 찾는다. 찾으면 종료 코드 1 — 통지를 냈는지 사람이
 확인하게 한다.
 
+⛔ 「새로 생긴 것」과 「좁아진 것」은 다르다 — 2026-08-18 정정
+------------------------------------------------------------
+처음 판은 **enum 이 기준에 없으면 무조건 협착**으로 셌다. 그래서 **새로 만든
+스키마·새로 더한 필드까지 ⛔ 로 울었다.** 05 설비·툴 마스터를 더할 때 다섯 건이
+그렇게 잡혔다.
+
+    없던 필드에 enum          →  ⚠ 새로 만들 것이 생긴다   (이 검사기 밖)
+    있던 자유 문자열에 enum   →  ⛔ 이미 만든 것이 틀린다   (이 검사기가 잡는다)
+    enum 에서 값이 사라짐     →  ⛔ 동상
+
+**가르는 기준은 「그 필드가 기준에 있었는가」다.** 없던 필드로는 아무도 코드를
+만들지 않았으므로 깨질 것이 없다. 거짓 경보가 쌓이면 검사기를 무시하게 되고,
+그러면 진짜 협착이 지나간다.
+
 ⚠ 이 검사기가 못 보는 것
 ------------------------
 **통지를 실제로 냈는지는 안 본다.** 「좁아진 것이 있다」까지만 말한다.
@@ -56,6 +70,15 @@ def enums(doc: dict) -> dict[str, list]:
     return out
 
 
+def fields(doc: dict) -> set[str]:
+    """스키마 프로퍼티 이름 전부 — enum 이 있든 없든."""
+    out: set[str] = set()
+    for name, schema in (doc.get("components", {}).get("schemas") or {}).items():
+        for field in (schema.get("properties") or {}):
+            out.add(f"{name}.{field}")
+    return out
+
+
 def load(ref: str, path: str) -> dict | None:
     rel = os.path.relpath(path, ROOT)
     r = subprocess.run(["git", "show", f"{ref}:{rel}"],
@@ -80,11 +103,14 @@ def main() -> int:
         with open(path, encoding="utf-8") as f:
             new_doc = json.load(f)
         old, new = enums(old_doc), enums(new_doc)
+        old_fields = fields(old_doc)
 
         for key, values in new.items():
             if key not in old:
+                if key not in old_fields:
+                    continue          # 없던 필드 — 깨질 코드가 없다(⚠ 등급)
                 findings.append(
-                    f"{name} · {key} — 값 목록이 «새로» 생겼다 {values}")
+                    f"{name} · {key} — 자유 문자열이 값 목록으로 좁아졌다 {values}")
                 continue
             gone = [v for v in old[key] if v not in values]
             if gone:

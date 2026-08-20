@@ -843,7 +843,7 @@
      "quality"
     ],
     "summary": "검사 결과 저장",
-    "description": "임시 저장(statusCode=작성중)과 즉시 확정(=확정)을 한 경로로 받는다. ⭐ 오프라인 큐는 언제나 확정으로 온다 — 임시 저장은 단말에 남는다. 재검이면 previousResultId 를 실으면 서버가 회차를 +1 한다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다. 미확정 표식은 셸이 붙인다(공유계약 C-7 — 화면 조항). 근거: W-01-01 §5-2 · P-02-13 §5-9 · 03 계약 3단계 §3-2",
+    "description": "임시 저장(statusCode=작성중)과 즉시 확정(=확정)을 한 경로로 받는다. ⭐ 오프라인 큐는 언제나 확정으로 온다 — 임시 저장은 단말에 남는다. 재검이면 previousResultId 를 실으면 서버가 회차를 +1 한다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다. 미확정 표식은 셸이 붙인다(공유계약 C-7 — 화면 조항). 근거: W-01-01 §5-2 · P-02-13 §5-9",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -904,7 +904,7 @@
       }
      }
     },
-    "x-internal-note": "확정 경로가 둘이다 — 이 경로에 statusCode=확정 으로 보내는 것과 :confirm 을 부르는 것. 부수 효과가 같아야 한다(Lot Status 전이 · confirmed_at 기록). 멱등키가 둘을 잇는다 — 같은 키면 어느 쪽으로 와도 한 건이다. idempotency_key 는 테이블 컬럼으로 실재하며 전역 UNIQUE 라 business_date 경계 문제가 없다(SQL 1856 · 공유계약 C-8)."
+    "x-internal-note": "확정 경로가 둘이다 — 이 경로에 statusCode=확정 으로 보내는 것과 :confirm 을 부르는 것. 부수 효과가 같아야 한다(Lot Status 전이 · confirmed_at 기록). 멱등키가 둘을 잇는다 — 같은 키면 어느 쪽으로 와도 한 건이다. idempotency_key 는 테이블 컬럼으로 실재하며 전역 UNIQUE 라 business_date 경계 문제가 없다(SQL 1856 · 공유계약 C-8). ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 3단계 §3-2"
    }
   },
   "/quality/inspection-results/defect-rate-trend": {
@@ -1508,7 +1508,7 @@
      "quality"
     ],
     "summary": "LOT 보류 등록",
-    "description": "의심자재 등록(C10 · 도착 보류)과 클레임·리콜 재Hold(C9 · 도착 불량)를 한 경로로 받는다 — 같은 행을 만들고 도착 상태만 다르다. ⭐ lot_hold INSERT 와 lot.status_code UPDATE 는 한 트랜잭션이다(공유계약 B-8) — 하나만 되면 재고가 안 막히거나 막힌 이유가 없다. ⛔ inventory_balance.blocked_qty 는 쓰지 않는다 — 잔액은 서버가 파생한다(L-2). 근거: W-03-03 §5-1 · W-03-02 §5-6 · 03 계약 2단계 §5",
+    "description": "의심자재 등록(C10 · 도착 보류)과 클레임·리콜 재Hold(C9 · 도착 불량)를 한 경로로 받는다 — 같은 행을 만들고 도착 상태만 다르다. ⭐ lot_hold INSERT 와 lot.status_code UPDATE 는 한 트랜잭션이다(공유계약 B-8) — 하나만 되면 재고가 안 막히거나 막힌 이유가 없다. ⛔ inventory_balance.blocked_qty 는 쓰지 않는다 — 잔액은 서버가 파생한다(L-2). 근거: W-03-03 §5-1 · W-03-02 §5-6",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -1579,7 +1579,7 @@
       }
      }
     },
-    "x-internal-note": "헤더 If-Match 를 쓰지 않는 유일한 쓰기다 — 여러 LOT 을 한 트랜잭션으로 걸어 토큰이 여럿이라 헤더로 표현할 수 없다. lots[].versionNo 로 싣는다(03 계약 3단계 §4-2). 409 는 둘이다 — DUPLICATE_HOLD(해제되지 않은 전량 보류가 이미 있다) · HOLD_QTY_EXCEEDED(부분 보류 합계가 보유를 넘는다). lot_hold 에 UNIQUE 제약이 없어 서버가 판정한다(W-03-03 §5-5)."
+    "x-internal-note": "헤더 If-Match 를 쓰지 않는 유일한 쓰기다 — 여러 LOT 을 한 트랜잭션으로 걸어 토큰이 여럿이라 헤더로 표현할 수 없다. lots[].versionNo 로 싣는다(03 계약 3단계 §4-2). 409 는 둘이다 — DUPLICATE_HOLD(해제되지 않은 전량 보류가 이미 있다) · HOLD_QTY_EXCEEDED(부분 보류 합계가 보유를 넘는다). lot_hold 에 UNIQUE 제약이 없어 서버가 판정한다(W-03-03 §5-5). ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 2단계 §5"
    }
   },
   "/quality/lot-holds/{lotHoldId}": {
@@ -2136,8 +2136,9 @@
      },
      "nonconformanceNo": {
       "type": "string",
-      "description": "⚠ 번호만 내려준다 — 부적합 상세는 04 제품출하 계약(W-04-07) 소관이라 지금은 열 경로가 없다. 근거: 03 계약 1단계 §8-2",
-      "example": "IR-2026-0812-0412"
+      "description": "⚠ 번호만 내려준다 — 부적합 상세는 04 제품출하 계약(W-04-07) 소관이라 지금은 열 경로가 없다.",
+      "example": "IR-2026-0812-0412",
+      "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 1단계 §8-2"
      },
      "lotId": {
       "type": "integer",
@@ -2208,8 +2209,9 @@
      },
      "usable": {
       "type": "boolean",
-      "description": "⭐ 서버가 파생한 3항 논리곱 — 상태가 유효하고 valid_to 가 지나지 않았고 approvedQty − consumedQty > 0 인가. 화면이 세 조건을 계산하지 않는다(공유계약 L-2). 근거: 03 계약 1단계 §2-3",
-      "example": true
+      "description": "⭐ 서버가 파생한 3항 논리곱 — 상태가 유효하고 valid_to 가 지나지 않았고 approvedQty − consumedQty > 0 인가. 화면이 세 조건을 계산하지 않는다(공유계약 L-2).",
+      "example": true,
+      "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 1단계 §2-3"
      },
      "remarks": {
       "type": "string",
@@ -2499,7 +2501,8 @@
      "detectionProcessId",
      "detectedAt"
     ],
-    "description": "불량 실적. ⛔ 등록 경로를 두지 않는다 — 03 화면 7장에 불량코드 입력이 0건이다. 만드는 화면은 M-02-02(#83 로 막힘) · P-04-03(04 계약 없음)이다. 근거: 03 계약 2단계 §6"
+    "description": "불량 실적. ⛔ 등록 경로를 두지 않는다 — 03 화면 7장에 불량코드 입력이 0건이다. 만드는 화면은 M-02-02(#83 로 막힘) · P-04-03(04 계약 없음)이다.",
+    "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 2단계 §6"
    },
    "DispositionDecision": {
     "type": "object",
@@ -2767,7 +2770,8 @@
      "judgmentCode",
      "measuredAt"
     ],
-    "description": "측정치는 자체 쓰기 경로가 없다 — 검사 결과 저장에 함께 실린다. 근거: 03 계약 1단계 §6"
+    "description": "측정치는 자체 쓰기 경로가 없다 — 검사 결과 저장에 함께 실린다.",
+    "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 1단계 §6"
    },
    "InspectionRequest": {
     "type": "object",
@@ -3004,7 +3008,8 @@
      "inspectedAt",
      "statusCode"
     ],
-    "description": "검사 결과 — 3계층의 2층. ⭐ 라인이 아니라 문서다 — 자체 번호·상태·잠금·자식·멱등키를 갖는다. 근거: 03 계약 1단계 §5"
+    "description": "검사 결과 — 3계층의 2층. ⭐ 라인이 아니라 문서다 — 자체 번호·상태·잠금·자식·멱등키를 갖는다.",
+    "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 1단계 §5"
    },
    "InspectionResultConfirm": {
     "type": "object",
@@ -3080,8 +3085,9 @@
        "작성중",
        "확정"
       ],
-      "description": "⭐ 오프라인 큐는 언제나 확정으로 보낸다 — 임시 저장은 단말에 남고 서버로 오지 않는다. 근거: 03 계약 3단계 §3-2",
-      "example": "작성중"
+      "description": "⭐ 오프라인 큐는 언제나 확정으로 보낸다 — 임시 저장은 단말에 남고 서버로 오지 않는다.",
+      "example": "작성중",
+      "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 3단계 §3-2"
      },
      "previousResultId": {
       "type": "integer",
@@ -3305,7 +3311,8 @@
      "statusCode",
      "heldAt"
     ],
-    "description": "LOT 보류. ⚠ trace.lot_hold 는 01 소유 테이블이고 01 계약은 읽기만 갖는다 — 쓰기는 품질 도메인 소관이다. 물류 축의 조회는 GET /trace/lots/{lotId}/holds 다. 근거: 01 요구서 §7 · 03 계약 2단계 §4"
+    "description": "LOT 보류. ⚠ trace.lot_hold 는 01 소유 테이블이고 01 계약은 읽기만 갖는다 — 쓰기는 품질 도메인 소관이다. 물류 축의 조회는 GET /trace/lots/{lotId}/holds 다.",
+    "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 01 요구서 §7 · 03 계약 2단계 §4"
    },
    "LotHoldCreate": {
     "type": "object",
@@ -3333,13 +3340,15 @@
      },
      "releaseCondition": {
       "type": "string",
-      "description": "targetLotStatusCode 가 보류이면 필수, 불량(Hold)이면 받지 않는다. 근거: 03 계약 2단계 §5-2",
-      "example": "값"
+      "description": "targetLotStatusCode 가 보류이면 필수, 불량(Hold)이면 받지 않는다.",
+      "example": "값",
+      "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 2단계 §5-2"
      },
      "targetLotStatusCode": {
       "type": "string",
-      "description": "⭐ 도착 상태. 의심자재 등록(C10)은 보류, 클레임·리콜 재Hold(C9)는 불량이다. 두 화면이 같은 행을 만들고 도착 상태만 다르다. 근거: 03 계약 2단계 §5",
-      "example": "IQC"
+      "description": "⭐ 도착 상태. 의심자재 등록(C10)은 보류, 클레임·리콜 재Hold(C9)는 불량이다. 두 화면이 같은 행을 만들고 도착 상태만 다르다.",
+      "example": "IQC",
+      "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 2단계 §5"
      },
      "remarks": {
       "type": "string",
@@ -3463,7 +3472,8 @@
      "lotStatusCode",
      "fullyHeld"
     ],
-    "description": "품질 축의 LOT 목록. ⚠ 01 계약의 GET /trace/lots 는 물류 축이라 창고 필터·보류 요약·최근 전이를 갖지 않는다 — 세 화면(W-03-01·02·03)이 공통으로 요구해 03 이 낸다. 근거: 03 계약 2단계 §4-1"
+    "description": "품질 축의 LOT 목록. ⚠ 01 계약의 GET /trace/lots 는 물류 축이라 창고 필터·보류 요약·최근 전이를 갖지 않는다 — 세 화면(W-03-01·02·03)이 공통으로 요구해 03 이 낸다.",
+    "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 2단계 §4-1"
    },
    "LotStatusCount": {
     "type": "object",

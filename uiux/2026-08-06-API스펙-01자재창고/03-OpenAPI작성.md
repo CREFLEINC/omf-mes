@@ -118,7 +118,7 @@ POST /trace/lots                                                   M-01-02
 
 **관리웹 전용 쓰기는 `If-Match` 를 required 로 유지**했다(`IfMatchVersion` ↔ `IfMatchVersionOptional` 두 파라미터). C-9의 완화는 **오프라인 대상에만** 적용한다는 2단계 단서를 계약이 구조로 표현한다.
 
-⚠ `occurredAt`(단말 시계)과 `recordedAt`(서버 수신)을 원장 응답에서 **분리해 내린다.** C-12(시계 오차 보정)는 아직 없다 — `occurredAt` 을 그대로 신뢰하는 것이 현재 계약이다.
+⚠ `occurredAt`(단말 시계)과 `recordedAt`(서버 수신)을 원장 응답에서 **분리해 내린다.** C-12 는 **오차 보정을 두지 않는다**(v2.7) — `occurredAt` 을 그대로 신뢰하는 것이 확정된 계약이다.
 
 ---
 

@@ -101,6 +101,16 @@ class RealContractTest(unittest.TestCase):
         self.assertEqual(bases, {"destination", "document", "source",
                                  "sourceDocument", "successor", "target"})
 
+    def test_표를_가리키지_않는_분류_코드는_다형이_아니다(self):
+        # ⛔ 05 설비·툴은 물리 표가 하나도 없어, 「점검 유형(일상·정기·보전)」 같은
+        #    순수 분류 코드까지 다형으로 읽혔다. 예외를 두지 않으면 「대응표 없음」
+        #    목록이 부풀고, 부푼 목록은 읽히지 않는다.
+        self.assertFalse(poly.is_polymorphic("inspection", self.tables))
+        self.assertIn("inspection", poly.NOT_POLYMORPHIC)
+        # ⚠ 예외가 진짜 다형까지 삼키지 않는가.
+        self.assertTrue(poly.is_polymorphic("target", self.tables))
+        self.assertTrue(poly.is_polymorphic("destination", self.tables))
+
     def test_오탐이_섞이지_않는다(self):
         bases = {h["base"] for h in self.hits}
         for wrong in ("item", "location", "warehouse", "workOrder",
