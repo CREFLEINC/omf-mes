@@ -10901,6 +10901,15 @@
       "format": "int64",
       "example": 1001
      },
+     "lotNo": {
+      "type": "string",
+      "example": "값"
+     },
+     "itemId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
      "holdQty": {
       "x-source-column": "hold_qty",
       "type": [
@@ -10987,9 +10996,14 @@
        "null"
       ],
       "example": "비고 문자열"
+     },
+     "lotStatusCode": {
+      "type": "string",
+      "description": "이 보류가 걸었을 때 LOT 이 간 상태",
+      "example": "IQC"
      }
     },
-    "x-internal-note": "해제 사유를 담을 자리가 없다 — 같은 테이블 안에서 등록 사유는 있고 해제 사유는 없다(#87 요청분)."
+    "x-internal-note": "해제 사유를 담을 자리가 없다 — 같은 테이블 안에서 등록 사유는 있고 해제 사유는 없다(#87 요청분). / ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 01 요구서 §7 · 03 계약 2단계 §4"
    },
    "LotHoldListResponse": {
     "type": "object",

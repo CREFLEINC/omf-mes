@@ -367,7 +367,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/ConflictResponse"
+         "$ref": "#/components/schemas/ShipmentConflictResponse"
         }
        }
       }
@@ -551,7 +551,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/ConflictResponse"
+         "$ref": "#/components/schemas/ShipmentConflictResponse"
         }
        }
       }
@@ -796,7 +796,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/ConflictResponse"
+         "$ref": "#/components/schemas/ShipmentConflictResponse"
         }
        }
       }
@@ -940,7 +940,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/ConflictResponse"
+         "$ref": "#/components/schemas/ShipmentConflictResponse"
         }
        }
       }
@@ -1021,7 +1021,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/ConflictResponse"
+         "$ref": "#/components/schemas/ShipmentConflictResponse"
         }
        }
       }
@@ -1112,7 +1112,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/ConflictResponse"
+         "$ref": "#/components/schemas/ShipmentConflictResponse"
         }
        }
       }
@@ -1294,7 +1294,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/ConflictResponse"
+         "$ref": "#/components/schemas/ShipmentConflictResponse"
         }
        }
       }
@@ -1438,7 +1438,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/ConflictResponse"
+         "$ref": "#/components/schemas/ShipmentConflictResponse"
         }
        }
       }
@@ -1481,36 +1481,6 @@
    }
   },
   "schemas": {
-   "ConflictResponse": {
-    "type": "object",
-    "properties": {
-     "code": {
-      "type": "string",
-      "enum": [
-       "VERSION_CONFLICT",
-       "DUPLICATE_KEY",
-       "INVALID_STATE",
-       "ALREADY_CONFIRMED",
-       "CANCEL_IN_PROGRESS"
-      ],
-      "description": "ALREADY_CONFIRMED 는 이미 확정된 출하라는 뜻이다 — 확정 취소 경로가 없으므로 되돌릴 수 없다(W-04-12 §5-3). CANCEL_IN_PROGRESS 는 취소 결재가 진행 중이라 확정할 수 없다는 뜻이다(J-7). 근거: W-04-12 §5-8",
-      "example": "VERSION_CONFLICT"
-     },
-     "message": {
-      "type": "string",
-      "example": "값"
-     },
-     "currentVersion": {
-      "type": "string",
-      "description": "VERSION_CONFLICT 일 때 서버의 현재 version_no",
-      "example": "값"
-     }
-    },
-    "required": [
-     "code",
-     "message"
-    ]
-   },
    "DispositionRequest": {
     "type": "object",
     "properties": {
@@ -1559,6 +1529,13 @@
      "code": {
       "type": "string",
       "example": "QTY_EXCEEDS_ALLOCATION"
+     },
+     "uniqueScope": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "code=UNIQUE_VIOLATION 일 때 어느 유일키 범위에서 중복인지. 근거: 공유계약 A-1 — 범위 없이 「중복」만 오면 화면이 문구를 만들 수 없다"
      },
      "message": {
       "type": "string",
@@ -2588,6 +2565,47 @@
      "uomId",
      "shippingInspectionRequired"
     ]
+   },
+   "ShipmentConflictResponse": {
+    "type": "object",
+    "properties": {
+     "code": {
+      "type": "string",
+      "enum": [
+       "VERSION_CONFLICT",
+       "DUPLICATE_KEY",
+       "INVALID_STATE",
+       "ALREADY_CONFIRMED",
+       "CANCEL_IN_PROGRESS"
+      ],
+      "description": "ALREADY_CONFIRMED 는 이미 확정된 출하라는 뜻이다 — 확정 취소 경로가 없으므로 되돌릴 수 없다(W-04-12 §5-3). CANCEL_IN_PROGRESS 는 취소 결재가 진행 중이라 확정할 수 없다는 뜻이다(J-7). 근거: W-04-12 §5-8",
+      "example": "VERSION_CONFLICT"
+     },
+     "message": {
+      "type": "string",
+      "example": "값"
+     },
+     "currentVersion": {
+      "type": "string",
+      "description": "VERSION_CONFLICT 일 때 서버의 현재 version_no",
+      "example": "값"
+     },
+     "conflictCause": {
+      "type": "string",
+      "enum": [
+       "user",
+       "erpSync",
+       "workerLease"
+      ],
+      "description": "충돌 원인. 근거: 공유계약 B-1 확장 — user=다른 사용자, erpSync=ERP 재동기화 배치, workerLease=워커가 처리 중. 구분 없이 내려주면 화면이 「다른 사용자가 먼저 수정했습니다」라는 사실과 다른 안내를 하게 된다 — code=VERSION_CONFLICT 일 때 함께 내린다",
+      "example": "user"
+     }
+    },
+    "required": [
+     "code",
+     "message"
+    ],
+    "x-internal-note": "이름을 가른 이유: 앞 계열(app-공통·logistics-01·mdm)의 ConflictResponse 는 저장 충돌의 «원인»만 말하고, 이쪽은 거부의 «업무 사유»를 말한다. 두 축은 직교하며 겹치는 지점은 VERSION_CONFLICT ↔ conflictCause=user 하나다. 한 이름으로 두면 계약 병합이 멈춘다(구현팀 회신 omf-mes#166)."
    }
   }
  }
