@@ -2565,12 +2565,23 @@
           {
             "name": "codeGroupId",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "integer",
               "format": "int64"
             },
-            "description": "필수. 코드값은 그룹을 고른 뒤에 본다"
+            "description": "코드값 그룹의 채번 식별자. ⚠ codeGroupCode 와 «둘 중 정확히 하나»를 준다 — 둘 다 없거나 둘 다 있으면 400 이다. 화면은 대개 codeGroupCode 를 쓴다(정수는 환경마다 달라 하드코딩할 수 없다). 근거: omf-mes#179"
+          },
+          {
+            "name": "codeGroupCode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 50
+            },
+            "description": "코드값 그룹을 «이름»으로 가리킨다(mdm.code_group.group_code 와 정확히 일치). ⚠ codeGroupId 와 둘 중 정확히 하나를 준다. 화면이 그룹을 안정적으로 가리킬 수 있는 유일한 수단이다 — 채번 식별자는 환경마다 다르다. 근거: omf-mes#179",
+            "x-internal-note": "그룹 이름 규칙 — 컬럼 이름에서 _code 를 뺀 것을 대문자로 쓰고, 그것만으로 무엇의 값인지 알 수 없으면 테이블 이름을 앞에 붙인다(warehouse_type_code → WAREHOUSE_TYPE · inspection_request.status_code → INSPECTION_REQUEST_STATUS). 미착지 14 의 ①을 이 파라미터가 푼다. ②(어느 그룹인가)는 그룹마다 따로 정한다."
           },
           {
             "name": "q",
@@ -2627,6 +2638,16 @@
                       "$ref": "#/components/schemas/PageMeta"
                     }
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "codeGroupId·codeGroupCode 를 둘 다 주었거나 둘 다 주지 않았다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
