@@ -2685,7 +2685,8 @@
      },
      "judgmentCode": {
       "type": "string",
-      "example": "값"
+      "example": "ACCEPTED",
+      "description": "항목별 측정치의 판정. ⛔ enum 으로 못박지 않는다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_MEASUREMENT_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격) «두 개»다. ⚠ 종합 판정과 그룹이 «다르다» — 항목 판정에는 「보류」가 없다. 보류는 검사 결과 수준의 개념이고(held_qty) 항목은 규격에 드는지 아닌지 둘뿐이다(P-02-13 §5 「항목 판정(합격/불합격)」). ⛔ 측정값이 규격 밖이어도 «자동 불합격이 아니다» — 표시하고 사람이 판정한다(P-02-13 §6). 근거: omf-mes#179"
      },
      "measuredAt": {
       "type": "string",
@@ -2739,7 +2740,8 @@
      },
      "judgmentCode": {
       "type": "string",
-      "example": "값"
+      "example": "ACCEPTED",
+      "description": "항목별 측정치의 판정. ⛔ enum 으로 못박지 않는다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_MEASUREMENT_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격) «두 개»다. ⚠ 종합 판정과 그룹이 «다르다» — 항목 판정에는 「보류」가 없다. 보류는 검사 결과 수준의 개념이고(held_qty) 항목은 규격에 드는지 아닌지 둘뿐이다(P-02-13 §5 「항목 판정(합격/불합격)」). ⛔ 측정값이 규격 밖이어도 «자동 불합격이 아니다» — 표시하고 사람이 판정한다(P-02-13 §6). 근거: omf-mes#179"
      },
      "measuredAt": {
       "type": "string",
@@ -2936,8 +2938,8 @@
      },
      "overallJudgmentCode": {
       "type": "string",
-      "description": "합격·불합격·보류 3값. ⛔ enum 으로 못박지 않는다 — 값 목록은 공통코드가 갖고 늘 수 있다(공유계약 G-2·G-6). 근거: 회신 E-3 종결 2026-08-07",
-      "example": "IQC"
+      "description": "합격·불합격·보류 3값. ⛔ enum 으로 못박지 않는다 — 값 목록은 공통코드가 갖고 늘 수 있다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_OVERALL_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격)·HELD(보류) — 검사 결과 수량 세 칸(accepted/rejected/held)과 같은 이름이다. 근거: 회신 E-3 종결 2026-08-07 · omf-mes#179",
+      "example": "ACCEPTED"
      },
      "inspectorId": {
       "type": "integer",
@@ -3006,8 +3008,8 @@
     "properties": {
      "overallJudgmentCode": {
       "type": "string",
-      "description": "비우면 저장된 값을 쓴다",
-      "example": "IQC"
+      "description": "비우면 저장된 값을 쓴다. 합격·불합격·보류 3값. ⛔ enum 으로 못박지 않는다 — 값 목록은 공통코드가 갖고 늘 수 있다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_OVERALL_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격)·HELD(보류) — 검사 결과 수량 세 칸(accepted/rejected/held)과 같은 이름이다. 근거: 회신 E-3 종결 2026-08-07 · omf-mes#179",
+      "example": "ACCEPTED"
      },
      "remarks": {
       "type": "string",
@@ -3051,8 +3053,8 @@
      },
      "overallJudgmentCode": {
       "type": "string",
-      "description": "statusCode=확정 이면 필수다",
-      "example": "IQC"
+      "description": "statusCode=확정 이면 필수다. 합격·불합격·보류 3값. ⛔ enum 으로 못박지 않는다 — 값 목록은 공통코드가 갖고 늘 수 있다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_OVERALL_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격)·HELD(보류) — 검사 결과 수량 세 칸(accepted/rejected/held)과 같은 이름이다. 근거: 회신 E-3 종결 2026-08-07 · omf-mes#179",
+      "example": "ACCEPTED"
      },
      "inspectedAt": {
       "type": "string",
@@ -3128,7 +3130,8 @@
      },
      "overallJudgmentCode": {
       "type": "string",
-      "example": "값"
+      "example": "ACCEPTED",
+      "description": "합격·불합격·보류 3값. ⛔ enum 으로 못박지 않는다 — 값 목록은 공통코드가 갖고 늘 수 있다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_OVERALL_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격)·HELD(보류) — 검사 결과 수량 세 칸(accepted/rejected/held)과 같은 이름이다. 근거: 회신 E-3 종결 2026-08-07 · omf-mes#179"
      },
      "inspectedAt": {
       "type": "string",
