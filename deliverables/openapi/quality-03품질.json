@@ -2673,15 +2673,18 @@
      "numericValue": {
       "type": "number",
       "format": "double",
-      "example": 30.0
+      "example": 30.0,
+      "description": "dataTypeCode=NUMERIC 인 항목만 채운다. 상하한(lowerLimit·upperLimit)과 단위(uomId)가 의미를 갖는 유일한 유형이다. 근거: omf-mes#179"
      },
      "textValue": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "description": "dataTypeCode=TEXT 인 항목만 채운다. 근거: omf-mes#179"
      },
      "booleanValue": {
       "type": "boolean",
-      "example": true
+      "example": true,
+      "description": "dataTypeCode=BOOLEAN 인 항목만 채운다. ⚠ 판정(judgmentCode)과 다른 축이다 — 이 칸은 «측정 결과»이고 판정은 그것을 보고 사람이 정한다(규격 밖이어도 자동 불합격이 아니다 · P-02-13 §6). 근거: omf-mes#179"
      },
      "judgmentCode": {
       "type": "string",
@@ -2711,7 +2714,8 @@
      "judgmentCode",
      "measuredAt"
     ],
-    "description": "측정치 — 3계층의 3층. ⛔ version_no 가 없다(기록 전용) — 잠금은 검사 결과로 대표한다. ⛔ 값 세 칸 중 하나만 채운다(ck_measurement_single_value 는 ≤1 이라 전부 NULL 도 통과하며 그때는 「미측정」이다)."
+    "description": "측정치 — 3계층의 3층. ⛔ version_no 가 없다(기록 전용) — 잠금은 검사 결과로 대표한다. ⛔ 값 세 칸 중 하나만 채운다(ck_measurement_single_value 는 ≤1 이라 전부 NULL 도 통과하며 그때는 「미측정」이다).",
+    "x-internal-note": "⛔ 세 칸 중 «하나만» 채운다(ck_inspection_measurement num_nonnulls ≤ 1). 어느 칸인지는 그 항목의 InspectionItemSpec.dataTypeCode 가 정한다. ⚠ 셋 다 비어도 된다 — 육안 항목은 판정만으로 성립한다(P-02-13 §5-9). 판정(judgmentCode)은 언제나 필수다."
    },
    "InspectionMeasurementInput": {
     "type": "object",
@@ -2728,15 +2732,18 @@
      "numericValue": {
       "type": "number",
       "format": "double",
-      "example": 30.0
+      "example": 30.0,
+      "description": "dataTypeCode=NUMERIC 인 항목만 채운다. 상하한(lowerLimit·upperLimit)과 단위(uomId)가 의미를 갖는 유일한 유형이다. 근거: omf-mes#179"
      },
      "textValue": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "description": "dataTypeCode=TEXT 인 항목만 채운다. 근거: omf-mes#179"
      },
      "booleanValue": {
       "type": "boolean",
-      "example": true
+      "example": true,
+      "description": "dataTypeCode=BOOLEAN 인 항목만 채운다. ⚠ 판정(judgmentCode)과 다른 축이다 — 이 칸은 «측정 결과»이고 판정은 그것을 보고 사람이 정한다(규격 밖이어도 자동 불합격이 아니다 · P-02-13 §6). 근거: omf-mes#179"
      },
      "judgmentCode": {
       "type": "string",
@@ -2761,7 +2768,7 @@
      "measuredAt"
     ],
     "description": "측정치는 자체 쓰기 경로가 없다 — 검사 결과 저장에 함께 실린다.",
-    "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 1단계 §6"
+    "x-internal-note": "⛔ 세 칸 중 «하나만» 채운다(ck_inspection_measurement num_nonnulls ≤ 1). 어느 칸인지는 그 항목의 InspectionItemSpec.dataTypeCode 가 정한다. ⚠ 셋 다 비어도 된다 — 육안 항목은 판정만으로 성립한다(P-02-13 §5-9). 판정(judgmentCode)은 언제나 필수다."
    },
    "InspectionRequest": {
     "type": "object",
