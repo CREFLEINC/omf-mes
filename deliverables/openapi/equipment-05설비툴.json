@@ -2828,7 +2828,7 @@
      },
      "inspectionTypeCode": {
       "type": "string",
-      "description": "일상(DAILY) 또는 정기(MONTHLY)",
+      "description": "점검 유형 — 일상(DAILY)·정기(MONTHLY)·보전(MAINTENANCE). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_INSPECTION_TYPE 로 받는다. ⚠ 품질 검사의 inspectionTypeCode(IQC·PQC·OQC)와 «같은 이름 다른 값» 이다 — 그룹을 가른다(공유계약 B-28 과 같은 원리). ⭐ 보전 항목은 이 마스터에 함께 있고 보전 지시(W-05-05)가 FK 로 참조한다 — 점검 입력 화면은 앞 둘만 보인다. 근거: 확정 QA #10 · omf-mes#186",
       "example": "DAILY"
      },
      "overallResultCode": {
@@ -2873,7 +2873,8 @@
      },
      "inspectionTypeCode": {
       "type": "string",
-      "example": "DAILY"
+      "example": "DAILY",
+      "description": "점검 유형 — 일상(DAILY)·정기(MONTHLY)·보전(MAINTENANCE). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_INSPECTION_TYPE 로 받는다. ⚠ 품질 검사의 inspectionTypeCode(IQC·PQC·OQC)와 «같은 이름 다른 값» 이다 — 그룹을 가른다(공유계약 B-28 과 같은 원리). ⭐ 보전 항목은 이 마스터에 함께 있고 보전 지시(W-05-05)가 FK 로 참조한다 — 점검 입력 화면은 앞 둘만 보인다. 근거: 확정 QA #10 · omf-mes#186"
      },
      "inspectedAt": {
       "type": "string",

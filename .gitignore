@@ -8,6 +8,10 @@
 .omc/
 **/settings.local.json
 
+# 파이썬 바이트코드 — 검사기·생성기가 서로를 불러오면 생긴다
+__pycache__/
+*.pyc
+
 # 대외비 외부 원본 — git 미포함 (현황은 docs/research/raw-자료-목록.md)
 docs/raw/
 
