@@ -61,9 +61,20 @@ def collect(paths: list[str]) -> dict[str, dict]:
                     and key.endswith("Code")
                     and ("type" in val or "$ref" in val)
                 ):
-                    rec = found.setdefault(key, {"enum": False, "columns": set()})
+                    rec = found.setdefault(
+                        key, {"with_enum": 0, "without_enum": 0, "columns": set()}
+                    )
+                    # ⛔ 「하나라도 enum 이면 확정」으로 세지 않는다 — 자리마다 센다.
+                    #   같은 이름이 도메인마다 «다른 값 집합»을 갖는 것이 실재한다:
+                    #     inspectionTypeCode  품질 IQC/PQC/OQC  ↔  설비 DAILY/MONTHLY/보전
+                    #     eventTypeCode       감사 이벤트       ↔  보류 사건 HELD/RELEASED
+                    #   한 자리에 enum 을 넣었다고 나머지가 정해진 것이 아니다.
+                    #   실제로 2026-08-21 LotHoldEvent.eventTypeCode 에 enum 을 넣자
+                    #   AuditEvent·WorkSessionEvent 까지 확정으로 집계돼 46 → 45 가 됐다.
                     if "enum" in val:
-                        rec["enum"] = True
+                        rec["with_enum"] += 1
+                    else:
+                        rec["without_enum"] += 1
                     if "x-source-column" in val:
                         rec["columns"].add(val["x-source-column"])
                 walk(val)
@@ -80,7 +91,9 @@ def main() -> int:
     paths = sorted(p for p in glob.glob(CONTRACT_GLOB) if "ui-요구목록" not in p)
     found = collect(paths)
 
-    undecided = {k: v for k, v in found.items() if not v["enum"]}
+    # 한 자리라도 값 목록이 없으면 «아직 정할 것이 남았다»
+    undecided = {k: v for k, v in found.items() if v["without_enum"]}
+    partial = sorted(k for k, v in undecided.items() if v["with_enum"])
     landed = {k: v for k, v in undecided.items() if v["columns"]}
     unlanded = sorted(set(undecided) - set(landed))
 
@@ -98,6 +111,14 @@ def main() -> int:
     print(f"        ├ 표준값                   {len(standard)}   대상 아님")
     print(f"        ├ 상태값                   {len(status)}   상태 기계와 함께")
     print(f"        └ ⭐ 업무 코드              {len(business)}   ← 정해야 할 것")
+    if partial:
+        print()
+        print(f"⚠ 일부 자리만 값 목록을 갖는 이름 {len(partial)}종 — «남은 자리»가 있다")
+        print("   같은 이름이 도메인마다 다른 값 집합을 갖는 자리일 수 있다(B-28 과 같은 형태).")
+        for k in partial:
+            v = found[k]
+            print("   %-26s enum 있음 %d자리 · 없음 %d자리"
+                  % (k, v["with_enum"], v["without_enum"]))
 
     print("\n⭐ 업무 코드")
     for i in range(0, len(business), 3):

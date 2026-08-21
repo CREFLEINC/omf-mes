@@ -3016,7 +3016,7 @@
      },
      "inspectionTypeCode": {
       "type": "string",
-      "description": "IQC · PQC · OQC. ⭐ 결정 09 의 「원천 축」을 유도하는 유일한 근거다. 근거: W-03-05 §5-2",
+      "description": "IQC · PQC · OQC. ⭐ 결정 09 의 「원천 축」을 유도하는 유일한 근거다. 근거: W-03-05 §5-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=QUALITY_INSPECTION_TYPE 로 받는다(IQC·PQC·OQC). ⚠ 설비 점검의 inspectionTypeCode(DAILY·MONTHLY·MAINTENANCE)와 «같은 이름 다른 값» 이라 그룹을 가른다. 근거: omf-mes#186",
       "example": "IQC"
      },
      "inspectionPlanVersionId": {
@@ -3132,7 +3132,7 @@
      },
      "inspectionTypeCode": {
       "type": "string",
-      "description": "의뢰에서 따온 읽기 전용",
+      "description": "의뢰에서 따온 읽기 전용 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=QUALITY_INSPECTION_TYPE 로 받는다(IQC·PQC·OQC). ⚠ 설비 점검의 inspectionTypeCode(DAILY·MONTHLY·MAINTENANCE)와 «같은 이름 다른 값» 이라 그룹을 가른다. 근거: omf-mes#186",
       "example": "IQC"
      },
      "itemId": {
