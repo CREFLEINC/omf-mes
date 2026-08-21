@@ -1132,6 +1132,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/WorkerNoOptional"
           }
         ],
         "requestBody": {
@@ -2988,6 +2991,17 @@
           "type": "string"
         },
         "description": "낙관적 잠금용 version_no. 값은 같은 리소스의 상세 GET 200 이 내려주는 ETag 응답 헤더에서 받는다. 근거: 공유계약 B-1"
+      },
+      "WorkerNoOptional": {
+        "name": "X-Worker-No",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "description": "관리웹도 같은 오퍼레이션을 부르는 자리에서는 선택이다 — 관리웹은 계정 토큰으로 오므로 서버가 인증 주체에서 행위자를 푼다. 단말 토큰으로 온 요청에 이 헤더가 없으면 서버가 거부한다. 근거: 공유계약 D-5 · F-2",
+        "x-internal-note": "현장 단말·모바일 전용 오퍼레이션에는 WorkerNo(required)를 그대로 쓴다 — 이 완화는 두 셸이 함께 부르는 오퍼레이션에만 적용한다. OpenAPI 로는 「단말 토큰이면 필수」를 표현할 수 없어 선택으로 두고 규칙을 설명에 적는다. 판정 근거는 인증 토큰의 종류(app_user / mdm.terminal)이지 헤더의 유무가 아니다. 이슈 #178."
       }
     },
     "schemas": {

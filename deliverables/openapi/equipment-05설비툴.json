@@ -130,6 +130,9 @@
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/WorkerNo"
      }
     ],
     "requestBody": {
@@ -347,6 +350,9 @@
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/WorkerNo"
      }
     ],
     "requestBody": {
@@ -552,6 +558,9 @@
      },
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/WorkerNo"
      }
     ],
     "requestBody": {
@@ -1502,6 +1511,9 @@
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/WorkerNo"
      }
     ],
     "requestBody": {
@@ -1710,6 +1722,9 @@
      },
      {
       "$ref": "#/components/parameters/IfMatchVersion"
+     },
+     {
+      "$ref": "#/components/parameters/WorkerNo"
      }
     ],
     "responses": {
@@ -1976,6 +1991,9 @@
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/WorkerNo"
      }
     ],
     "requestBody": {
@@ -2641,6 +2659,17 @@
      "type": "string"
     },
     "description": "낙관적 잠금용 version_no. 값은 같은 리소스의 상세 GET 200 이 내려주는 ETag 응답 헤더에서 받는다 — version_no 는 공유계약 A-4 에 따라 본문 필드로 노출하지 않는다. 근거: 공유계약 B-1"
+   },
+   "WorkerNo": {
+    "name": "X-Worker-No",
+    "in": "header",
+    "required": true,
+    "schema": {
+     "type": "string",
+     "maxLength": 50
+    },
+    "description": "귀속용 사번 — 이 쓰기를 「누가 한 일」로 기록할 것인가. 인증이 아니다. 현장 단말·모바일은 계정 로그인이 없어 서버가 행위자를 풀 근거가 이 헤더뿐이다. 없으면 서버가 거부한다. 값은 작업자 사번(전역 유일). 근거: 공유계약 D-5 · F-2",
+    "x-internal-note": "⛔ 귀속을 인증으로 승격시키지 않는다 — 사번에 비밀번호·실패 잠금·세션 만료를 붙이면 REQ-PR-0023 이 요구한 「로그인 생략」을 우회로 되살리는 것이다(공유계약 F-2 단서 · P-CO-01 §5-1). 도용 리스크는 수용하고, 화면이 현재 귀속 대상을 상시 보이는 것으로 방어한다(D-5). 원천 컬럼은 mdm.worker.worker_no. 이슈 #178."
    }
   },
   "schemas": {
