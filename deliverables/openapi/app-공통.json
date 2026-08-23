@@ -2909,6 +2909,15 @@
                   "$ref": "#/components/schemas/OperationPolicy"
                 }
               }
+            },
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로는 내리지 않는다",
+                "schema": {
+                  "type": "string"
+                },
+                "x-internal-note": "본문 비노출은 공유계약 A-4, 전송 자체는 B-1 구현에 필요하다."
+              }
             }
           }
         }
@@ -2922,6 +2931,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
           }
         ],
         "requestBody": {
@@ -2942,6 +2954,15 @@
                 "schema": {
                   "$ref": "#/components/schemas/OperationPolicy"
                 }
+              }
+            },
+            "headers": {
+              "ETag": {
+                "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로는 내리지 않는다",
+                "schema": {
+                  "type": "string"
+                },
+                "x-internal-note": "본문 비노출은 공유계약 A-4, 전송 자체는 B-1 구현에 필요하다."
               }
             }
           },
@@ -2964,9 +2985,19 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "저장 충돌. 다시 읽어 오면 풀린다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
           }
         },
-        "x-internal-note": "저장 충돌 보호를 붙이지 않았다 — 2단계 §7 이 정한 여섯 곳에 정책이 없다. 목록에서 한 행씩 고치는 형태이고 대상을 오가며 묶음을 교체하지 않아 공유계약 G-30 의 두 조건에 닿지 않는다."
+        "x-internal-note": "저장 충돌 보호를 붙였다(omf-mes#210). app.operation_policy 에 version_no 가 실재하므로 공유계약 B-1(version_no 를 가진 «모든» 화면)의 주어에 그대로 들어간다. ⚠ 이전 주석은 G-30 의 두 조건을 근거로 붙이지 않았는데 «주어가 다른 조항»이었다 — G-30 은 「나가는 중인 저장」의 화면 잠금 범위를 정하는 조항이고 낙관적 잠금의 정본은 B-1 이다. 정책은 설비담당·생산관리가 «같은 표»를 보고 고치며 이 값이 타발수 계산의 입력이라, 없으면 나중 저장이 앞 사람 값을 조용히 덮는다. 근거: W-05-01 §5-5·§6"
       }
     }
   },
