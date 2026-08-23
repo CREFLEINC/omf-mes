@@ -53,7 +53,7 @@ SPEC = "production-02생산실행.json"
 SESSION_NO_DESC = (
     "그 작업지시에서 세션을 «새로 열 때마다» 는다(작업 완료·교대 마감으로 :end 한 뒤 다시 시작하는 경우). "
     "⛔ 중단·재개로는 늘지 않는다 — 재개는 같은 세션에 RESUME 사건을 적재하고 status_code 를 되돌린다. "
-    "uq(workOrderId, sessionNo). 근거: 공유계약 G-16"
+    "uq(workOrderId, sessionNo). 근거: 공유계약 G-16 의 보완(구간을 닫는 사건과 구간 안의 사건) · P-02-01 §5-4"
 )
 
 STOP_REASON_DESC = "⛔ 쓰지 않는다 — 비운다. 값 목록을 못 정한 것이 아니라 «비우기로 정했다». 근거: 공유계약 A-21 · A-25"
@@ -68,7 +68,37 @@ STOP_REASON_NOTE = (
 
 # ④ G-16 은 「진행 중을 상태 컬럼으로 두지 않는다」인데 이 표는 둘 다 갖는다.
 #    v2.0 보완이 「이미 있는 것은 고치라는 뜻이 아니다」로 길을 내 뒀으므로 그 단서를 단다.
-G16_CAVEAT = " ⚠ 다만 이 표는 status_code 를 함께 갖는다 — 이미 있는 구조라 화면은 둘 다 쓴다(공유계약 G-16 의 보완)."
+#
+# ⛔ 1차 반영에서 이 문자열을 «근거: 뒤에» 덧붙였다가 2차 리뷰에서 잡혔다 — 이 저장소의
+#    description 은 「근거: …」로 끝난다. 뒤에 붙이면 앞 조항이 그 내용을 정한 것처럼 읽힌다.
+#    ⇒ 이제 insert_before_evidence() 로 «근거: 앞»에 넣는다.
+OLD_G16_CAVEAT = " ⚠ 다만 이 표는 status_code 를 함께 갖는다 — 이미 있는 구조라 화면은 둘 다 쓴다(공유계약 G-16 의 보완)."
+
+ENDED_AT_CAVEAT = (
+    "⚠ 다만 이 표는 status_code 를 함께 갖는다 — 「진행 중」을 상태 컬럼으로 두지 않는 것이 원칙이나 "
+    "이미 있는 구조라 화면은 둘 다 읽는다."
+)
+
+# 「두지 않는다」를 단언한 뒤 곧바로 뒤집으면 읽는 쪽이 어느 쪽인지 모른다.
+# 원칙은 단서가 함께 말하므로 첫 문장에서는 뺀다.
+ENDED_AT_OLD_SENTENCE = "비어 있으면 진행 중이다 — 상태 컬럼을 두지 않는다."
+ENDED_AT_NEW_SENTENCE = "비어 있으면 진행 중이다."
+
+# ⛔ 2차 리뷰 — 「상태 컬럼을 바꾸는 것이 아니다」가 statusCode 설명(「END 가 「종료」로 옮긴다」)과
+#    정면으로 갈렸다. 세션을 닫는 유일한 오퍼레이션이 여기이고 END 사건도 이 트랜잭션이 만드니,
+#    status_code 를 옮기는 것도 여기다. 「화면은 둘 다 쓴다」는 «읽는 쪽» 이야기라 답이 아니었다.
+END_OLD_SENTENCE = "상태 컬럼을 바꾸는 것이 아니다."
+END_NEW_SENTENCE = (
+    "⚠ 이 표는 status_code 를 함께 갖는다 — 끝 시각을 찍으면서 status_code 도 「종료」로 옮긴다"
+    "(공유계약 G-16 의 보완)."
+)
+
+# ⛔ 2차 리뷰 — 첫 문장이 「통제 우회를 기록한다」인데 덧붙인 설명은 「따로 보내지 않는다」였다.
+#    덧붙인 쪽이 맞다 — CONTROL_OVERRIDE 는 WorkSessionCreate.controlOverride 로 들어온다
+#    (계약 설계 3단계가 :override 액션을 지우며 세션 생성의 인자로 확정했다).
+#    즉 첫 문장이 처음부터 틀려 있었고 이번 추가가 그것을 드러냈다.
+EVENTS_OLD_SENTENCE = "중단·재개·통제 우회를 기록한다."
+EVENTS_NEW_SENTENCE = "중단·재개를 기록한다."
 
 STATUS_CODE_DESC = (
     "세션이 지금 어떤 상태인가 — 진행·중단·종료. START·RESUME 이 「진행」, STOP 이 「중단」, "
@@ -77,7 +107,7 @@ STATUS_CODE_DESC = (
 )
 
 EVENTS_TYPES = (
-    " 사건 유형은 다섯이다 — START(시작)·STOP(중단)·RESUME(재개)·END(종료)·CONTROL_OVERRIDE(통제 우회). "
+    "사건 유형은 다섯이다 — START(시작)·STOP(중단)·RESUME(재개)·END(종료)·CONTROL_OVERRIDE(통제 우회). "
     "⭐ 이 오퍼레이션으로 단말이 적재하는 것은 구간 «안의» 사건인 STOP·RESUME 뿐이다. "
     "구간의 «경계»(START·END)와 통제 우회는 세션을 열고 닫는 오퍼레이션이 같은 트랜잭션으로 만든다 — "
     "따로 보내지 않는다. 유형별로 reasonCode 에 어느 코드 그룹을 쓰는지는 공유계약 A-25 가 정한다."
@@ -87,6 +117,36 @@ EVENTS_TYPES = (
 def set_desc(node: dict, key: str, value: str, label: str, changed: list) -> None:
     if key in node and node[key].get("description") != value:
         node[key]["description"] = value
+        changed.append(label)
+
+
+def insert_before_evidence(desc: str, fragment: str) -> str:
+    """「근거: …」 앞에 끼워 넣는다. 뒤에 붙이면 그 조항이 정한 내용처럼 읽힌다."""
+    idx = desc.rfind("근거:")
+    if idx == -1:
+        return desc.rstrip() + " " + fragment
+    return desc[:idx].rstrip() + " " + fragment + " " + desc[idx:]
+
+
+def apply_fragment(node: dict, desc_key: str, fragment: str, marker: str,
+                   label: str, changed: list) -> None:
+    """조각을 「근거:」 앞에 한 번만 둔다. 이전 판이 뒤에 붙여 놨으면 걷어낸다."""
+    d = node.get(desc_key, "")
+    new = d.replace(OLD_G16_CAVEAT, "")
+    if marker in new:
+        if new != d:
+            node[desc_key] = new
+            changed.append(label + "(옛 위치 정리)")
+        return
+    node[desc_key] = insert_before_evidence(new, fragment)
+    changed.append(label)
+
+
+def replace_sentence(node: dict, desc_key: str, old: str, new: str,
+                     label: str, changed: list) -> None:
+    d = node.get(desc_key, "")
+    if old in d:
+        node[desc_key] = d.replace(old, new, 1)
         changed.append(label)
 
 
@@ -116,29 +176,39 @@ def main() -> int:
             p["x-internal-note"] = STOP_REASON_NOTE
             changed.append(f"{name}.stopReasonCode.x-internal-note")
 
-    # ④ endedAt · :end 에 G-16 보완 단서
+    # ④ endedAt 에 G-16 보완 단서 · :end 는 틀린 문장 자체를 고친다
     if "endedAt" in ws:
-        d = ws["endedAt"].get("description", "")
-        if G16_CAVEAT.strip() not in d:
-            ws["endedAt"]["description"] = d.rstrip() + G16_CAVEAT
-            changed.append("WorkSession.endedAt")
+        replace_sentence(ws["endedAt"], "description",
+                         ENDED_AT_OLD_SENTENCE, ENDED_AT_NEW_SENTENCE,
+                         "WorkSession.endedAt 문장 정정", changed)
+        apply_fragment(ws["endedAt"], "description", ENDED_AT_CAVEAT,
+                       "「진행 중」을 상태 컬럼으로 두지 않는 것이 원칙이나",
+                       "WorkSession.endedAt", changed)
 
     end_op = paths.get("/production/work-sessions/{workSessionId}:end", {}).get("post")
     if end_op:
+        # 1차 반영이 뒤에 덧붙여 둔 옛 단서를 걷어낸다
         d = end_op.get("description", "")
-        if G16_CAVEAT.strip() not in d:
-            end_op["description"] = d.rstrip() + G16_CAVEAT
-            changed.append(":end")
+        if OLD_G16_CAVEAT in d:
+            end_op["description"] = d.replace(OLD_G16_CAVEAT, "")
+            changed.append(":end(옛 단서 정리)")
+        replace_sentence(end_op, "description", END_OLD_SENTENCE, END_NEW_SENTENCE,
+                         ":end 문장 정정", changed)
 
-    # ⑤ statusCode 설명 · events 오퍼레이션에 사건 유형과 적재 주체
+    # ⑤ statusCode 설명 · events 오퍼레이션 첫 문장 정정 + 사건 유형과 적재 주체
     set_desc(ws, "statusCode", STATUS_CODE_DESC, "WorkSession.statusCode", changed)
 
     ev_op = paths.get("/production/work-sessions/{workSessionId}/events", {}).get("post")
     if ev_op:
-        d = ev_op.get("description", "")
-        if "사건 유형은 다섯이다" not in d:
-            ev_op["description"] = d.rstrip() + EVENTS_TYPES
-            changed.append("events POST")
+        replace_sentence(ev_op, "description", EVENTS_OLD_SENTENCE, EVENTS_NEW_SENTENCE,
+                         "events POST 첫 문장 정정", changed)
+        # 1차 반영이 「근거:」 뒤에 붙여 둔 것을 걷어내고 앞으로 옮긴다
+        d = ev_op.get("description", "").rstrip()
+        if d.endswith(EVENTS_TYPES.rstrip()):
+            ev_op["description"] = d[: -len(EVENTS_TYPES.rstrip())].rstrip()
+            changed.append("events POST(옛 위치 정리)")
+        apply_fragment(ev_op, "description", EVENTS_TYPES, "사건 유형은 다섯이다",
+                       "events POST", changed)
 
     if not changed:
         print("이미 반영돼 있다 — 바꾼 것 없음(멱등)")
