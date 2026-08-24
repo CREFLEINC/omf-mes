@@ -2171,7 +2171,7 @@
      "maintenance"
     ],
     "summary": "수집 채널 등록",
-    "description": "채널을 손으로 더하거나, 최근 수신 목록에서 골라 더한다.",
+    "description": "채널을 손으로 더하거나, 최근 수신 목록에서 골라 더한다.\n\n⭐유일 범위는 (설비 + 채널명 + 품목 조건 + 공정 조건)이다 — 조건이 비어 있을 수 있어 일반 UNIQUE 가 아니라 부분 유일 인덱스 형태다(공유계약 A-7 · COALESCE). 같은 채널에 조건이 다른 행이 여럿 설 수 있다 — 「품목 A 면 외경, 품목 B 면 두께」. 409 문구에 유일 범위를 담는다(A-1): 「이 설비의 <채널명> 채널에 품목·공정 조건이 같은 매핑이 이미 있습니다」. 근거: W-05-07 §5-3·§6 · omf-mes#203 질문1",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -2277,7 +2277,7 @@
      "maintenance"
     ],
     "summary": "수집 채널 수정",
-    "description": "신호 이름·단위·검사 항목 연결을 고치고 사용 여부를 내린다. 지우는 길은 없다.",
+    "description": "신호 이름·단위·검사 항목 연결을 고치고 사용 여부를 내린다. 지우는 길은 없다.\n\n⭐유일 범위는 (설비 + 채널명 + 품목 조건 + 공정 조건)이다 — 조건이 비어 있을 수 있어 일반 UNIQUE 가 아니라 부분 유일 인덱스 형태다(공유계약 A-7 · COALESCE). 같은 채널에 조건이 다른 행이 여럿 설 수 있다 — 「품목 A 면 외경, 품목 B 면 두께」. 409 문구에 유일 범위를 담는다(A-1): 「이 설비의 <채널명> 채널에 품목·공정 조건이 같은 매핑이 이미 있습니다」. 근거: W-05-07 §5-3·§6 · omf-mes#203 질문1\n\n⭐ isActive = false 의 뜻 — 매핑이 «적용되지 않는다». 이 채널로 들어오는 값은 저장되지 않고 버려진다(미매핑과 같아진다 · W-05-07 §5-2). ⛔ 「목록에서만 빠지고 값은 그대로 담긴다」가 아니다 — 이 행이 곧 「이 신호를 어느 검사항목에 담는가」의 규칙이라, 끄면 담을 곳이 정해지지 않는다. 이어 둔 검사 항목은 지워지지 않으며 같은 요청으로 다시 켤 수 있다 — 끄는 것도 켜는 것도 이 PUT 하나다(:activate 를 따로 두지 않는 이유). B-4 는 물리 삭제를 금지하는 조항이지 되살리기를 금지하지 않는다. 근거: omf-mes#203 질문4",
     "parameters": [
      {
       "name": "collectionChannelId",
@@ -3948,6 +3948,89 @@
       "description": "연결된 검사 항목",
       "example": 1001
      },
+     "itemId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "example": 1001,
+      "description": "품목 조건 — 비면 「전체」다(이 설비의 이 채널은 언제나 그 항목으로 간다). 지정하면 그 품목을 생산할 때만 적용된다. 유일 범위를 이룬다. 근거: W-05-07 §5-3 · omf-mes#203"
+     },
+     "itemCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "품목 조건의 표시용 코드 — 비면 「전체」",
+      "example": "ABC-123"
+     },
+     "processId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "example": 1001,
+      "description": "공정 조건 — 비면 「전체」다. 지정하면 그 공정에서만 적용된다. 유일 범위를 이룬다. 근거: W-05-07 §5-3 · omf-mes#203"
+     },
+     "processCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "공정 조건의 표시용 코드 — 비면 「전체」",
+      "example": "PRS"
+     },
+     "inspectionItemName": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "연결된 검사 항목의 이름. inspectionItemId 가 비면 함께 빈다(「미매핑」). ⭐ 이 값이 없으면 화면이 「연결됨」까지만 말할 수 있어 무엇에 이었는지 보일 수 없다. 근거: W-05-07 §4 · omf-mes#203 질문2",
+      "example": "사이클타임"
+     },
+     "inspectionItemCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "연결된 검사 항목의 코드",
+      "example": "CYCLE_TIME"
+     },
+     "inspectionItemUnitCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "연결된 검사 항목의 «저장» 단위. 이 행의 unitCode(수신값의 단위)와 다르면 화면이 경고한다 — ⛔ 자동 변환하지 않는다(W-05-07 §5-5 · A-8). 이 값이 없으면 그 경고를 판정할 수 없다",
+      "example": "SECOND"
+     },
+     "inspectionPlanVersionId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "example": 1001,
+      "description": "연결된 검사 항목이 속한 검사기준 버전(Rev). 검사기준 Rev 가 오르면 매핑은 옛 항목을 가리킨 채 남는다(W-05-07 §5-2)"
+     },
+     "inspectionPlanVersion": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "description": "그 버전의 Rev 번호 — 경고 문구에 함께 보인다",
+      "example": 2
+     },
+     "inspectionItemIsCurrentRevision": {
+      "type": [
+       "boolean",
+       "null"
+      ],
+      "description": "연결된 검사 항목이 «최신» Rev 의 것인가. ⛔ 서버가 판정한다 — 화면이 버전을 따로 불러 statusCode 를 해석하면 판정 규칙을 화면이 소유하게 된다. 거짓이면 화면이 「이 검사항목은 이전 Rev 입니다」를 경고한다. ⛔ 자동으로 옮기지 않는다 — 새 Rev 의 어느 항목에 대응하는지 기계가 모른다(W-05-07 §6·§8-2). inspectionItemId 가 비면 함께 빈다",
+      "example": true
+     },
      "isActive": {
       "type": "boolean",
       "example": true
@@ -3987,6 +4070,24 @@
       ],
       "format": "int64",
       "example": 1001
+     },
+     "itemId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "example": 1001,
+      "description": "품목 조건 — 비면 「전체」다(이 설비의 이 채널은 언제나 그 항목으로 간다). 지정하면 그 품목을 생산할 때만 적용된다. 유일 범위를 이룬다. 근거: W-05-07 §5-3 · omf-mes#203"
+     },
+     "processId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "example": 1001,
+      "description": "공정 조건 — 비면 「전체」다. 지정하면 그 공정에서만 적용된다. 유일 범위를 이룬다. 근거: W-05-07 §5-3 · omf-mes#203"
      }
     },
     "required": [
@@ -4012,6 +4113,24 @@
       ],
       "format": "int64",
       "example": 1001
+     },
+     "itemId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "example": 1001,
+      "description": "품목 조건 — 비면 「전체」다(이 설비의 이 채널은 언제나 그 항목으로 간다). 지정하면 그 품목을 생산할 때만 적용된다. 유일 범위를 이룬다. 근거: W-05-07 §5-3 · omf-mes#203"
+     },
+     "processId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "example": 1001,
+      "description": "공정 조건 — 비면 「전체」다. 지정하면 그 공정에서만 적용된다. 유일 범위를 이룬다. 근거: W-05-07 §5-3 · omf-mes#203"
      },
      "isActive": {
       "type": "boolean",

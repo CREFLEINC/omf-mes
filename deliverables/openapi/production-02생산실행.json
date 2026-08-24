@@ -1796,6 +1796,15 @@
        "type": "integer",
        "default": 50
       }
+     },
+     {
+      "name": "withPreIssuedLots",
+      "in": "query",
+      "schema": {
+       "type": "boolean",
+       "default": false
+      },
+      "description": "선발행 생산LOT 슬롯 집계를 함께 받는다. 마감 화면(W-02-05)이 쓴다 — 목록에서는 W/O 마다 세게 되므로 기본은 끈다"
      }
     ],
     "responses": {
@@ -1919,6 +1928,24 @@
        "format": "int64",
        "example": 1001
       }
+     },
+     {
+      "name": "withProgress",
+      "in": "query",
+      "schema": {
+       "type": "boolean",
+       "default": true
+      },
+      "description": "실적 누계를 함께 받는다"
+     },
+     {
+      "name": "withPreIssuedLots",
+      "in": "query",
+      "schema": {
+       "type": "boolean",
+       "default": false
+      },
+      "description": "선발행 생산LOT 슬롯 집계를 함께 받는다. 마감 화면(W-02-05)이 쓴다 — 목록에서는 W/O 마다 세게 되므로 기본은 끈다"
      }
     ],
     "responses": {
@@ -2188,7 +2215,7 @@
      "production"
     ],
     "summary": "마감 · ERP 실적 송신",
-    "description": "잔량 처분을 함께 정한다. 미달 슬롯은 이 시점에 자동 폐번된다. ERP 실제 전송만 트랜잭션 밖이다. 근거: W-02-05 §5 · R27·R82",
+    "description": "잔량 처분을 함께 정한다. 미달 슬롯은 이 시점에 자동 폐번된다. ERP 실제 전송만 트랜잭션 밖이다. 근거: W-02-05 §5 · R27·R82\n\n⭐ 저장 충돌 보호 — If-Match 는 필수다. 토큰은 GET /production/work-orders/{workOrderId} 의 ETag 를 그대로 싣는다. 마감은 관리웹 온라인 전제이고 되돌릴 수 없는 전이라(재오픈 금지 · R83) 형제 전이 :hold·:resume 처럼 선택으로 두지 않는다 — 그 둘은 POP 오프라인 대상이라 큐가 토큰을 싣지 못해 선택이다(공유계약 C-9). 근거: W-02-05 §6\n\n⭐ 본문 검증 — 서버가 스스로 낸 마감 3분류 판정과 본문을 대조한다(판정은 WorkOrderProgress.completionJudgmentCode 와 같은 식이다).\n  · 미달인데 remainderDispositionCode 가 없다 → 400\n  · 정상·초과인데 remainderDispositionCode 가 있다 → 400 (넘길 잔량도 없앨 잔량도 없다)\n  · 미달·초과인데 reasonCode 가 없다 → 400 (미달·초과 사유는 R80 이 요구한다)\n  · 정상은 두 칸을 다 비운다\n⚠ 「정상」의 폭(허용 오차)은 서버 정책이 정한다 — 규칙은 그대로고 미달의 경계만 움직인다(W-02-05 §5-1·§8-1)",
     "parameters": [
      {
       "name": "workOrderId",
@@ -2202,6 +2229,9 @@
      },
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
      }
     ],
     "requestBody": {
@@ -4906,6 +4936,12 @@
      "versionNo": {
       "type": "integer",
       "example": 1
+     },
+     "progress": {
+      "$ref": "#/components/schemas/WorkOrderProgress"
+     },
+     "preIssuedLots": {
+      "$ref": "#/components/schemas/PreIssuedLotSummary"
      }
     },
     "required": [
@@ -4947,12 +4983,13 @@
        "CARRY_OVER",
        "WRITE_OFF"
       ],
-      "description": "잔량 처분 — 이월 / 소멸. 근거: W-02-05 §5",
+      "description": "잔량 처분 — 이월 / 소멸. ⭐ 미달 판정일 때만 보낸다(조건부 필수). 정상·초과 마감에서는 이 칸을 «비운다» — 넘길 잔량도 없앨 잔량도 없어 두 값 중 어느 것도 뜻이 맞지 않는다. ⛔ 그래서 정상·초과용 세 번째 값을 두지 않았다 — 없는 업무 개념을 만들게 된다(공유계약 A-21 · R81 은 「미달 잔량 = 이월/소멸」 둘만 정했다 · ✓확정 QA #27). 평면적인 required 로는 「미달일 때만」을 적을 수 없어 목록에서 뺐고 서버가 판정과 대조해 검증한다. 근거: W-02-05 §5-2·§5-7 · omf-mes#209",
       "example": "CARRY_OVER"
      },
      "reasonCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "description": "미달·초과 사유 — work_order.completion_variance_reason_code 에 실린다. ⭐ 미달·초과일 때 조건부 필수이고 정상이면 비운다(W-02-05 §5-7 · R80)"
      },
      "erpSendItems": {
       "type": "array",
@@ -4962,10 +4999,7 @@
       },
       "description": "송신 항목 토글 결과"
      }
-    },
-    "required": [
-     "remainderDispositionCode"
-    ]
+    }
    },
    "WorkOrderCreate": {
     "type": "object",
@@ -5501,6 +5535,95 @@
      "message"
     ],
     "x-internal-note": "이름을 가른 이유: 앞 계열(app-공통·logistics-01·mdm)의 ConflictResponse 는 저장 충돌의 «원인»만 말하고, 이쪽은 거부의 «업무 사유»를 말한다. 두 축은 직교하며 겹치는 지점은 VERSION_CONFLICT ↔ conflictCause=user 하나다. 한 이름으로 두면 계약 병합이 멈춘다(구현팀 회신 omf-mes#166)."
+   },
+   "WorkOrderProgress": {
+    "type": "object",
+    "description": "실적 누계 — 이 W/O 의 생산 실적 «전체» 합계다. 쪽(page)과 무관하며 정정(상쇄) 실적이 반영된 값이다. withProgress=true 일 때만 채워진다. 근거: W-02-05 §4-B · W-02-08 §4-A",
+    "properties": {
+     "goodQty": {
+      "type": "number",
+      "format": "double",
+      "description": "양품 합계 — production_result.good_qty 의 합",
+      "example": 2850.0
+     },
+     "defectQty": {
+      "type": "number",
+      "format": "double",
+      "description": "불량 합계",
+      "example": 120.0
+     },
+     "holdQty": {
+      "type": "number",
+      "format": "double",
+      "description": "보류 합계",
+      "example": 0.0
+     },
+     "scrapQty": {
+      "type": "number",
+      "format": "double",
+      "description": "스크랩 합계",
+      "example": 20.0
+     },
+     "reworkQty": {
+      "type": "number",
+      "format": "double",
+      "description": "재작업 합계",
+      "example": 10.0
+     },
+     "achievementRate": {
+      "type": "number",
+      "format": "double",
+      "description": "달성률 = 양품 합계 / 지시 수량. ⛔ 서버가 계산한다 — 화면이 각자 계산하면 조회 화면과 마감 화면의 값이 갈린다(W-02-08 §5-2). 분모는 지시 수량이다(R14 · R80)",
+      "example": 0.95
+     },
+     "varianceQty": {
+      "type": "number",
+      "format": "double",
+      "description": "지시 수량 − 양품 합계. 양수면 미달분, 음수면 초과분이다",
+      "example": 150.0
+     },
+     "completionJudgmentCode": {
+      "type": "string",
+      "enum": [
+       "UNDER",
+       "NORMAL",
+       "OVER"
+      ],
+      "description": "마감 3분류 판정 — 미달 · 정상 · 초과. ⛔ 서버가 판정한다(W-02-08 §5-2 — 조회와 마감이 다른 값을 내면 안 된다). ⚠ 「정상」의 폭(허용 오차)은 아직 미정이라 서버 정책이 정해지면 그 기준을 따른다 — 계약과 화면은 그대로다(W-02-05 §5-1·§8-1). 초과도 실적으로 인정한다(R81)",
+      "example": "UNDER"
+     }
+    },
+    "required": [
+     "goodQty",
+     "achievementRate",
+     "completionJudgmentCode"
+    ]
+   },
+   "PreIssuedLotSummary": {
+    "type": "object",
+    "description": "선발행 생산LOT 슬롯 집계 — 건수만 내린다. 목록은 넣지 않는다. 「그 슬롯들을 보여 달라」는 GET /trace/lots?workOrderId=… 로 간다. withPreIssuedLots=true 일 때만 채워진다. 근거: W-02-05 §3·§5-3",
+    "properties": {
+     "slotCount": {
+      "type": "integer",
+      "description": "선발행된 슬롯 전체",
+      "example": 6
+     },
+     "withResultCount": {
+      "type": "integer",
+      "description": "실적이 붙은 슬롯 — 마감 후 유지된다",
+      "example": 5
+     },
+     "withoutResultCount": {
+      "type": "integer",
+      "description": "실적이 없는 슬롯 — 마감 시점에 자동 폐번 대상이다(R82 · 마감 시점 «전용»이라 취소 경로는 해당 없다)",
+      "example": 1
+     }
+    },
+    "required": [
+     "slotCount",
+     "withResultCount",
+     "withoutResultCount"
+    ]
    }
   }
  }
