@@ -5543,32 +5543,32 @@
      "goodQty": {
       "type": "number",
       "format": "double",
-      "example": 2850.0,
-      "description": "양품 합계 — production_result.good_qty 의 합"
+      "description": "양품 합계 — production_result.good_qty 의 합",
+      "example": 2850.0
      },
      "defectQty": {
       "type": "number",
       "format": "double",
-      "example": 2850.0,
-      "description": "불량 합계"
+      "description": "불량 합계",
+      "example": 120.0
      },
      "holdQty": {
       "type": "number",
       "format": "double",
-      "example": 2850.0,
-      "description": "보류 합계"
+      "description": "보류 합계",
+      "example": 0.0
      },
      "scrapQty": {
       "type": "number",
       "format": "double",
-      "example": 2850.0,
-      "description": "스크랩 합계"
+      "description": "스크랩 합계",
+      "example": 20.0
      },
      "reworkQty": {
       "type": "number",
       "format": "double",
-      "example": 2850.0,
-      "description": "재작업 합계"
+      "description": "재작업 합계",
+      "example": 10.0
      },
      "achievementRate": {
       "type": "number",
@@ -5579,8 +5579,8 @@
      "varianceQty": {
       "type": "number",
       "format": "double",
-      "example": 2850.0,
-      "description": "지시 수량 − 양품 합계. 양수면 미달분, 음수면 초과분이다"
+      "description": "지시 수량 − 양품 합계. 양수면 미달분, 음수면 초과분이다",
+      "example": 150.0
      },
      "completionJudgmentCode": {
       "type": "string",

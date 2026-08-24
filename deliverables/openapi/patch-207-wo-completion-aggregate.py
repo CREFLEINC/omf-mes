@@ -87,13 +87,14 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 PRODUCTION = os.path.join(HERE, "production-02생산실행.json")
 LOGISTICS = os.path.join(HERE, "logistics-01자재창고.json")
 
-QTY = {"type": "number", "format": "double", "example": 2850.0}
-
-
-def qty(desc: str) -> dict:
-    d = dict(QTY)
-    d["description"] = desc
-    return d
+# ⭐ 예시값은 «한 W/O 의 한 장면»으로 맞춘다 — 구현팀이 여기서 목업을 뜬다.
+#    W-02-05 §3 레이아웃의 수치를 그대로 쓴다:
+#        지시 3,000 · 양품 2,850 · 불량 120 · 손실 30(스크랩 20 + 재작업 10)
+#        → 달성률 0.95 · 잔량 150 · 판정 미달
+#    ⛔ 하나의 예시를 모든 칸에 복사하지 않는다 — 서로 모순된 목업이 나간다.
+def qty(desc: str, example: float) -> dict:
+    return {"type": "number", "format": "double",
+            "description": desc, "example": example}
 
 
 WORK_ORDER_PROGRESS = {
@@ -104,11 +105,11 @@ WORK_ORDER_PROGRESS = {
         "근거: W-02-05 §4-B · W-02-08 §4-A"
     ),
     "properties": {
-        "goodQty": qty("양품 합계 — production_result.good_qty 의 합"),
-        "defectQty": qty("불량 합계"),
-        "holdQty": qty("보류 합계"),
-        "scrapQty": qty("스크랩 합계"),
-        "reworkQty": qty("재작업 합계"),
+        "goodQty": qty("양품 합계 — production_result.good_qty 의 합", 2850.0),
+        "defectQty": qty("불량 합계", 120.0),
+        "holdQty": qty("보류 합계", 0.0),
+        "scrapQty": qty("스크랩 합계", 20.0),
+        "reworkQty": qty("재작업 합계", 10.0),
         "achievementRate": {
             "type": "number",
             "format": "double",
@@ -120,7 +121,7 @@ WORK_ORDER_PROGRESS = {
             "example": 0.95,
         },
         "varianceQty": qty(
-            "지시 수량 − 양품 합계. 양수면 미달분, 음수면 초과분이다"
+            "지시 수량 − 양품 합계. 양수면 미달분, 음수면 초과분이다", 150.0
         ),
         "completionJudgmentCode": {
             "type": "string",
@@ -201,7 +202,8 @@ def detect_indent(original: str, doc: dict):
 
 
 def load(path: str):
-    original = open(path, encoding="utf-8").read()
+    with open(path, encoding="utf-8") as f:
+        original = f.read()
     doc = json.loads(original)
     indent = detect_indent(original, doc)
     if indent is None:
@@ -215,7 +217,8 @@ def save(path: str, original: str, doc: dict, indent: int, tail: str) -> bool:
     updated = json.dumps(doc, ensure_ascii=False, indent=indent) + tail
     if updated == original:
         return False
-    open(path, "w", encoding="utf-8").write(updated)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(updated)
     return True
 
 

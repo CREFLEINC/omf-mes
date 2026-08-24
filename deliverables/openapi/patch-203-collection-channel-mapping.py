@@ -144,7 +144,7 @@ RESPONSE_FIELDS = {
             "소유하게 된다. 거짓이면 화면이 「이 검사항목은 이전 Rev 입니다」를 "
             "경고한다. ⛔ 자동으로 옮기지 않는다 — 새 Rev 의 어느 항목에 "
             "대응하는지 기계가 모른다(W-05-07 §6·§8-2). "
-            "inspectionItemId 가 비면 함께 빈다",
+            "inspectionItemId 가 비면 함께 빈다"
         ),
         "example": True,
     },
@@ -206,7 +206,8 @@ def append_note(op: dict, note: str) -> None:
 
 
 def main() -> int:
-    original = open(CONTRACT, encoding="utf-8").read()
+    with open(CONTRACT, encoding="utf-8") as f:
+        original = f.read()
     doc = json.loads(original)
     indent = detect_indent(original, doc)
     if indent is None:
@@ -235,7 +236,8 @@ def main() -> int:
     if updated == original:
         print("  이미 반영돼 있다 — 변경 없음")
         return 0
-    open(CONTRACT, "w", encoding="utf-8").write(updated)
+    with open(CONTRACT, "w", encoding="utf-8") as f:
+        f.write(updated)
     print("  ✅ 조건 축(품목·공정) 되돌림 — 응답·등록·수정 (질문1)")
     print("  ✅ 연결된 검사항목 이름·코드·단위·버전 (질문2·곁들여)")
     print("  ✅ 옛 Rev 판정을 서버가 내린다 (질문3)")

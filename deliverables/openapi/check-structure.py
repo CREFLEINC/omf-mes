@@ -139,10 +139,51 @@ def check_paths(spec: dict) -> list:
     return errors
 
 
+# 설명문 자리에 쓰이는 낱말 — OpenAPI·JSON Schema 의 «주석» 키워드다.
+ANNOTATION_KEYS = ('description', 'summary', 'title')
+
+# 이 키«아래»의 이름들은 사용자가 지은 것이다 — 키워드로 읽지 않는다.
+NAME_MAPS = ('properties', 'headers', 'schemas', 'parameters', 'responses',
+             'requestBodies', 'securitySchemes', 'examples', 'paths')
+
+
+def check_annotations(node: object, path: str = '$', in_names: bool = False) -> list:
+    """주석 키워드가 «문자열»인가.
+
+    ⛔ 왜 필요한가 — 파이썬 괄호 안에 후행 쉼표를 하나 남기면 문자열이 튜플이
+    되고, 계약에는 문자열 대신 **배열**이 실린다(2026-08-24 실제 발생).
+    OpenAPI 3.1 은 JSON Schema 2020-12 라 이 자리는 반드시 문자열이며,
+    구현팀의 타입 생성기가 이 값을 주석으로 그대로 옮긴다.
+
+    ⚠ 공개 안전성 검사기가 이것을 못 잡는다 — `isinstance(v, str)` 인 것만
+    걷으므로 **문자열이 아니면 검사 자체를 건너뛴다.** 「통과했다」와
+    「검사를 받았다」가 갈리는 자리라 여기서 막는다.
+
+    ⛔⛔ 「이름」과 「키워드」를 가른다 — 이것을 안 가르면 오탐이 쏟아진다.
+    `properties` · `headers` 아래의 키는 **사용자가 지은 이름**이라
+    `description` 이라는 «필드»가 있으면 그 값은 스키마 객체(dict)가 정상이다.
+    실측 — 그렇게 생긴 자리가 계약 일곱 벌에 **12곳** 있다
+    (`Role.properties.description` · `Notice.properties.title` 등).
+    """
+    out = []
+    if isinstance(node, dict):
+        for key, value in node.items():
+            # 이 자리의 키가 «이름»이면 주석 키워드로 보지 않는다.
+            if not in_names and key in ANNOTATION_KEYS and not isinstance(value, str):
+                out.append('%s.%s 가 문자열이 아니다 — %s'
+                           % (path, key, type(value).__name__))
+            out += check_annotations(value, '%s.%s' % (path, key),
+                                     in_names=key in NAME_MAPS)
+    elif isinstance(node, list):
+        for index, value in enumerate(node):
+            out += check_annotations(value, '%s[%d]' % (path, index))
+    return out
+
+
 def check(path: str) -> int:
     spec = json.load(io.open(path, encoding='utf-8'))
     used = collect_refs(spec, set())
-    errors = check_schemas(spec, used) + check_paths(spec)
+    errors = check_schemas(spec, used) + check_paths(spec) + check_annotations(spec)
 
     operations = sum(1 for item in spec['paths'].values() for m in item if m in ALL_METHODS)
     print('%s — 경로 %d · 오퍼레이션 %d · 스키마 %d'

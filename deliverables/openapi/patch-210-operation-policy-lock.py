@@ -106,7 +106,8 @@ def detect_indent(original: str, doc: dict):
 
 
 def main() -> int:
-    original = open(CONTRACT, encoding="utf-8").read()
+    with open(CONTRACT, encoding="utf-8") as f:
+        original = f.read()
     doc = json.loads(original)
     indent = detect_indent(original, doc)
     if indent is None:
@@ -141,7 +142,8 @@ def main() -> int:
     if updated == original:
         print("  이미 반영돼 있다 — 변경 없음")
         return 0
-    open(CONTRACT, "w", encoding="utf-8").write(updated)
+    with open(CONTRACT, "w", encoding="utf-8") as f:
+        f.write(updated)
     print("  ✅ app-공통.json — 운영 정책 조회·수정에 ETag · If-Match · 409")
     return 0
 
