@@ -40,6 +40,15 @@
       }
      },
      {
+      "name": "businessUnitId",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "사업부 필터 — 화면 정본(W-02-01 §3)의 첫 필터. 근거: omf-mes#196"
+     },
+     {
       "name": "plantId",
       "in": "query",
       "schema": {
@@ -93,7 +102,7 @@
        "type": "boolean",
        "default": false
       },
-      "description": "하위 레벨 함께. 계층 펼침용"
+      "description": "하위 레벨 함께(계층 펼침용). 참이면 필터·page·size·total 은 «루트 P/O» 기준으로 세고, 각 루트의 하위 전체를 같은 페이지에 함께 내린다 — 부모와 자식이 페이지로 갈리지 않는다. 트리는 parentProductionOrderId·bomLevel 로 만든다(별도 hasChildren 불요 — 하위가 같은 응답에 있다). 기본 표시는 전체 펼침(W-02-01 §3 레이아웃). 근거: omf-mes#196"
      },
      {
       "name": "page",
@@ -1705,6 +1714,15 @@
     "summary": "W/O 목록·진행현황",
     "description": "집계 열(실적 누계)을 함께 내려준다. 근거: W-02-08 §3·§5",
     "parameters": [
+     {
+      "name": "productionOrderId",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "P/O 로 거른다(서버가 계획을 경유해 잇는다) — W-02-01 상세 「전개」 구획용. 근거: omf-mes#196"
+     },
      {
       "name": "productionPlanId",
       "in": "query",
@@ -4131,6 +4149,16 @@
      "versionNo": {
       "type": "integer",
       "example": 1
+     },
+     "expandedWorkOrderCount": {
+      "type": "integer",
+      "description": "파생 — 서버가 계산한다(공유계약 L-2). 이 P/O 아래 생성된 W/O 수. 목록 「W/O n/m」 열의 n. 근거: W-02-01 §3 · omf-mes#196",
+      "example": 3
+     },
+     "plannedWorkOrderCount": {
+      "type": "integer",
+      "description": "파생 — 서버가 계산한다(공유계약 L-2). 계획 전건이 전개되면 생기는 W/O 총수(계획별 Routing 공정 수의 합). 목록 「W/O n/m」 열의 m — 0 이면 계획이 아직 없다. 근거: W-02-01 §3 · omf-mes#196",
+      "example": 3
      }
     },
     "required": [
