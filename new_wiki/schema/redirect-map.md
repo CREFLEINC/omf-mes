@@ -209,3 +209,12 @@ Phase 3에서 검토·재작성 후 개별적으로 이 표에 추가된다.
 | 날짜 | 변경 |
 | --- | --- |
 | 2026-08-24 | Phase 0(삭제)·Phase 2(Raw 이관) 기계적 생성 |
+docs/research/2026-07-03-현장검증-질문지-v2-요구사항통합.md  →  new_wiki/raw/decisions/2026-07-03-현장검증-질문지-v2-요구사항통합.md
+
+### requirements 카테고리 후속 이관
+```
+docs/research/2026-07-03-MES-요구사항-명세서-v1-정리.md  →  new_wiki/raw/customer/2026-07-03-MES-요구사항-명세서-v1-정리.md
+docs/research/2026-07-03-요구사항-기존기획-통합분석.md  →  new_wiki/raw/process/docs/research/2026-07-03-요구사항-기존기획-통합분석.md
+docs/research/2026-07-03-현장검증-질문지-v2-요구사항통합.md  →  new_wiki/raw/decisions/2026-07-03-현장검증-질문지-v2-요구사항통합.md
+deliverables/01-요구사항명세서.md  →  new_wiki/wiki/requirements/00-요구사항명세서.md
+```
