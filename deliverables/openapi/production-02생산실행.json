@@ -2128,7 +2128,7 @@
      "production"
     ],
     "summary": "W/O 취소",
-    "description": "취소 상태로 옮기고 선발행된 생산LOT 슬롯을 자동 폐번한다. 마감 시 미달 슬롯을 폐번하는 것과 같은 규칙이다. 근거: 예외 E-4 ④(2026-08-12 종결) · R27·R82 · W-02-06 §5-5",
+    "description": "취소 상태로 옮기고 선발행된 생산LOT 슬롯을 자동 폐번한다. 마감 시 미달 슬롯을 폐번하는 것과 같은 규칙이다. 근거: 예외 E-4 ④(2026-08-12 종결) · R27·R82 · W-02-06 §5-5\n\n⭐ 저장 충돌 보호 — If-Match 는 필수다. 토큰은 GET /production/work-orders/{workOrderId} 의 ETag 를 그대로 싣는다. 취소는 관리웹(W-02-06) 온라인 전제이고 선발행 슬롯 자동 폐번이 붙는 되돌릴 수 없는 전이라 :close·:release 와 같은 정책이다. 근거: 형제 전이 정책 정렬 · omf-mes#205",
     "parameters": [
      {
       "name": "workOrderId",
@@ -2142,6 +2142,9 @@
      },
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
      }
     ],
     "requestBody": {
@@ -2396,7 +2399,7 @@
      "production"
     ],
     "summary": "확정·배포 · 생산LOT 선발행",
-    "description": "확정과 배포와 선발행이 한 트랜잭션이다. 선발행은 번호 슬롯 예약이며 완료 전에는 실물에 귀속되지 않는다. 근거: W-02-04 §5 · R26·R27",
+    "description": "확정과 배포와 선발행이 한 트랜잭션이다. 선발행은 번호 슬롯 예약이며 완료 전에는 실물에 귀속되지 않는다. 근거: W-02-04 §5 · R26·R27\n\n⭐ 저장 충돌 보호 — If-Match 는 필수다. 토큰은 GET /production/work-orders/{workOrderId} 의 ETag 를 그대로 싣는다. 확정·배포는 관리웹 온라인 전제이고 배포 후에는 현장으로 내려가 되돌리기 어려운 전이라 :close 와 같은 정책이다 — :hold·:resume 처럼 선택으로 두지 않는다(그 둘은 POP 오프라인 대상 · 공유계약 C-9). 두 관리자가 같은 W/O 를 동시에 확정하면 늦은 쪽이 409 를 받는다. 근거: W-02-04 §6(동시 확정 — version_no 낙관적 잠금 B-1) · omf-mes#205",
     "parameters": [
      {
       "name": "workOrderId",
@@ -2410,6 +2413,9 @@
      },
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
      }
     ],
     "requestBody": {
