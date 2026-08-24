@@ -745,6 +745,15 @@
       }
      },
      {
+      "name": "processId",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "공정 필터 — 요약과 같은 축. 현장검사만 직접 컬럼이고 PQC·OQC 는 2단 조인이므로 잇는 것은 서버 몫이다(W-03-05 §5-2). 근거: omf-mes#192 문1"
+     },
+     {
       "name": "itemId",
       "in": "query",
       "schema": {
@@ -795,6 +804,16 @@
       "description": "교정 만료 장비 측정분만 보거나 뺀다. ⛔ 기본은 섞어서 낸다 — 자동 제외는 정책이 미정이다(E-9 ①)"
      },
      {
+      "name": "sort",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "default": "inspectedAt,desc"
+      },
+      "description": "정렬 키는 제한한다(공유계약 L-4) — 허용: inspectionRequestNo · inspectedAt · rejectedQty (W-03-05 §5-7 지정 3열). 형식 \"키,asc|desc\". 기본 inspectedAt,desc — 동률은 inspectionResultId 로 안정 정렬. 근거: omf-mes#192 문2"
+     },
+     {
       "name": "page",
       "in": "query",
       "schema": {
@@ -835,6 +854,16 @@
           "items",
           "page"
          ]
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "요청 오류 — 기간 누락 등 검증 실패. 주소 조작·서버 검증 실패를 표준 오류로 보인다(omf-mes#192 문7)",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
         }
        }
       }
@@ -939,6 +968,33 @@
       }
      },
      {
+      "name": "overallJudgmentCode",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      },
+      "description": "판정 필터 — 목록·요약과 같은 축. 근거: omf-mes#192 문1"
+     },
+     {
+      "name": "processId",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "공정 필터 — 목록·요약과 같은 축. 근거: omf-mes#192 문1"
+     },
+     {
+      "name": "finalRoundOnly",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "boolean"
+      },
+      "description": "목록·요약과 같은 축. 근거: omf-mes#192 문1"
+     },
+     {
       "name": "inspectedFrom",
       "in": "query",
       "schema": {
@@ -977,6 +1033,16 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/DefectRateTrend"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "요청 오류 — 기간 누락 등 검증 실패. 주소 조작·서버 검증 실패를 표준 오류로 보인다(omf-mes#192 문7)",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
         }
        }
       }
@@ -1047,6 +1113,15 @@
       }
      },
      {
+      "name": "finalRoundOnly",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "boolean"
+      },
+      "description": "목록과 같은 축 — 한 화면의 필터가 모든 뷰에 같은 모집단으로 적용된다. 근거: omf-mes#192 문1"
+     },
+     {
       "name": "calibrationExpired",
       "in": "query",
       "schema": {
@@ -1066,6 +1141,16 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/InspectionSummary"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "요청 오류 — 기간 누락 등 검증 실패. 주소 조작·서버 검증 실패를 표준 오류로 보인다(omf-mes#192 문7)",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
         }
        }
       }
@@ -2319,6 +2404,66 @@
     },
     "x-internal-note": "409 는 둘이다 — 남은 수량을 넘겨 정하려 할 때, 그리고 이미 닫힌 부적합(status_code)일 때. 남은 수량 = nonconformance_lot.affected_qty 합 − 이 부적합의 decision_qty 합이고 서버가 판정한다(공유계약 L-2 — 잔액은 클라이언트가 계산하지 않는다). ⚠ disposition_type_code 값 목록은 미확정이다 — 2차 값 목록 제안안 대상."
    }
+  },
+  "/quality/inspection-results/{inspectionResultId}/measurement-summary": {
+   "get": {
+    "tags": [
+     "quality"
+    ],
+    "summary": "검사 결과의 항목별 측정 요약",
+    "description": "드로어의 「항목별 요약」용 — 결과 하나의 측정치 전건(수만 행일 수 있다)을 서버가 항목 단위로 요약한다. 페이지 단위 원시 행을 브라우저에서 합산하면 틀린 요약이 되고, 항목·장비를 건별 조회하면 N+1 이다(공유계약 L-1·L-2). 원시 행이 필요한 「전체 보기」는 기존 /measurements 페이지 조회를 그대로 쓴다. 근거: W-03-05 §3·§5-1 · omf-mes#192 문6",
+    "parameters": [
+     {
+      "name": "inspectionResultId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "항목별 요약",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "required": [
+          "asOf",
+          "items"
+         ],
+         "properties": {
+          "asOf": {
+           "type": "string",
+           "format": "date-time",
+           "description": "서버 집계 기준 시각(공유계약 L-5)"
+          },
+          "items": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/MeasurementItemSummary"
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "결과 없음",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    }
+   }
   }
  },
  "components": {
@@ -2498,11 +2643,18 @@
       "type": "string",
       "description": "occurrenceProcess 로 묶어야 개선 대상이 나온다. 근거: W-03-05 §5-5",
       "example": "값"
+     },
+     "asOf": {
+      "type": "string",
+      "format": "date-time",
+      "description": "서버 집계 기준 시각 — 화면이 「기준 HH:MM」 으로 보인다(공유계약 L-5). 브라우저 수신 시각이 아니다. 근거: omf-mes#192 문3",
+      "example": "2026-08-24T09:12:00+09:00"
      }
     },
     "required": [
      "nodes",
-     "groupBy"
+     "groupBy",
+     "asOf"
     ]
    },
    "DefectDistributionNode": {
@@ -2590,10 +2742,17 @@
       "items": {
        "$ref": "#/components/schemas/DefectRatePoint"
       }
+     },
+     "asOf": {
+      "type": "string",
+      "format": "date-time",
+      "description": "서버 집계 기준 시각 — 화면이 「기준 HH:MM」 으로 보인다(공유계약 L-5). 브라우저 수신 시각이 아니다. 근거: omf-mes#192 문3",
+      "example": "2026-08-24T09:12:00+09:00"
      }
     },
     "required": [
-     "points"
+     "points",
+     "asOf"
     ]
    },
    "DefectRecord": {
@@ -3222,6 +3381,30 @@
      "versionNo": {
       "type": "integer",
       "example": 1
+     },
+     "lotNo": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "파생 — 서버가 lotId 를 풀어 내린다(표시용 · 행별 상세 조회 없이 목록을 그린다). 근거: omf-mes#192 문5",
+      "example": "LOT-SAMPLE-0001"
+     },
+     "processId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "description": "파생 — 검사가 귀속된 공정. 현장검사만 직접 컬럼이고 PQC·OQC 는 서버가 2단 조인으로 잇는다. 근거: omf-mes#192 문5",
+      "example": 3
+     },
+     "processName": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "파생 — processId 의 표시명. 근거: omf-mes#192 문5",
+      "example": "사출"
      }
     },
     "required": [
@@ -3433,6 +3616,12 @@
       "type": "boolean",
       "description": "검사 건수·수량은 최종 회차만 센다. 재검 합격분은 합격으로 세지만 1회차 불량 실적은 그대로 남아 두 수가 다르다. 근거: W-03-05 §5-3 · 결정 09 ①",
       "example": true
+     },
+     "asOf": {
+      "type": "string",
+      "format": "date-time",
+      "description": "서버 집계 기준 시각 — 화면이 「기준 HH:MM」 으로 보인다(공유계약 L-5). 브라우저 수신 시각이 아니다. 근거: omf-mes#192 문3",
+      "example": "2026-08-24T09:12:00+09:00"
      }
     },
     "required": [
@@ -3440,7 +3629,8 @@
      "inspectedQty",
      "acceptedQty",
      "rejectedQty",
-     "defectRate"
+     "defectRate",
+     "asOf"
     ],
     "description": "L-1 — 요약은 필터 전체 기준이고 목록은 페이지다. 파생은 서버가 계산한다(L-2)"
    },
@@ -4038,6 +4228,91 @@
      "message"
     ],
     "x-internal-note": "이름을 가른 이유: 앞 계열(app-공통·logistics-01·mdm)의 ConflictResponse 는 저장 충돌의 «원인»만 말하고, 이쪽은 거부의 «업무 사유»를 말한다. 두 축은 직교하며 겹치는 지점은 VERSION_CONFLICT ↔ conflictCause=user 하나다. 한 이름으로 두면 계약 병합이 멈춘다(구현팀 회신 omf-mes#166)."
+   },
+   "MeasurementItemSummary": {
+    "type": "object",
+    "description": "검사 항목 하나의 측정 요약 — 드로어 「① 외관 30/30 합격 · ⛔ 2건 상한 초과 (12.07 · 12.09) · ⚠ 캘리퍼 교정 만료」 행을 그리는 데 필요한 전부. 근거: W-03-05 §3 · omf-mes#192 문6",
+    "required": [
+     "inspectionItemSpecId",
+     "itemName",
+     "measuredCount",
+     "acceptedCount",
+     "rejectedCount"
+    ],
+    "properties": {
+     "inspectionItemSpecId": {
+      "type": "integer",
+      "example": 12
+     },
+     "itemName": {
+      "type": "string",
+      "description": "항목 표시명",
+      "example": "치수 A"
+     },
+     "specText": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "규격 표시 문자열 — 하한·상한·단위를 서버가 조립한다",
+      "example": "11.95 ~ 12.05 mm"
+     },
+     "measuredCount": {
+      "type": "integer",
+      "description": "측정 수",
+      "example": 30
+     },
+     "acceptedCount": {
+      "type": "integer",
+      "description": "합격 수",
+      "example": 28
+     },
+     "rejectedCount": {
+      "type": "integer",
+      "description": "불합격 수",
+      "example": 2
+     },
+     "unmeasuredCount": {
+      "type": "integer",
+      "description": "미측정 수 — 값 세 칸이 전부 NULL 인 행(W-03-05 §6 「미측정」)",
+      "example": 0
+     },
+     "outOfSpecValues": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "규격 밖 측정값 예시 — 최대 10건까지만 내린다(넘치면 화면은 「외 N건」으로 보인다 · 잘림을 명시). 근거: omf-mes#192 문6",
+      "example": [
+       "12.07",
+       "12.09"
+      ]
+     },
+     "equipmentName": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "측정 장비 표시명",
+      "example": "캘리퍼 CAL-03"
+     },
+     "equipmentCalibrationExpired": {
+      "type": [
+       "boolean",
+       "null"
+      ],
+      "description": "측정 장비의 검교정 만료 여부 — 참이면 화면이 ⚠ 로 보인다(W-03-05 §5-6 분리 보기 근거)",
+      "example": true
+     },
+     "equipmentCalibrationDueDate": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "차기 검교정 예정일 — 만료 경고 문구용",
+      "example": "2026-07-28"
+     }
+    }
    }
   }
  }

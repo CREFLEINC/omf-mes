@@ -40,6 +40,15 @@
       }
      },
      {
+      "name": "businessUnitId",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "사업부 필터 — 화면 정본(W-02-01 §3)의 첫 필터. 근거: omf-mes#196"
+     },
+     {
       "name": "plantId",
       "in": "query",
       "schema": {
@@ -93,7 +102,7 @@
        "type": "boolean",
        "default": false
       },
-      "description": "하위 레벨 함께. 계층 펼침용"
+      "description": "하위 레벨 함께(계층 펼침용). 참이면 필터·page·size·total 은 «루트 P/O» 기준으로 세고, 각 루트의 하위 전체를 같은 페이지에 함께 내린다 — 부모와 자식이 페이지로 갈리지 않는다. 트리는 parentProductionOrderId·bomLevel 로 만든다(별도 hasChildren 불요 — 하위가 같은 응답에 있다). 기본 표시는 전체 펼침(W-02-01 §3 레이아웃). 근거: omf-mes#196"
      },
      {
       "name": "page",
@@ -678,7 +687,7 @@
      "planning"
     ],
     "summary": "전개 확정",
-    "description": "계획을 확정해 W/O 전개를 연다. 근거: W-02-02 §5 · :동사 규약",
+    "description": "계획을 확정하고 «전개»까지 서버 한 트랜잭션으로 수행한다 — 확정된 계획의 Routing 공정별 W/O 생성과 공정 의존(work_order_dependency) 생성까지가 안이다(공유계약 B-8 규칙 1 — 업무 엔티티는 전부 안. 부분 성공을 만들지 않는다). 클라이언트는 전개를 위해 W/O 를 따로 POST 하지 않는다. 전개 결과는 GET /production/work-orders?productionPlanId= 로 본다. 생성 규칙 — 수량: 각 공정 W/O 의 orderQty = 계획 수량(planned_qty) · 유형: 기본 양산(개발품 판정 축은 품목 — omf-mes#215 진행 중 · 긴급은 이 경로가 아니라 W-02-07 직접 생성) · 기본 위치: 생성 후 W-02-03·W-02-04 의 PUT 으로 채운다. 재시도: 같은 Idempotency-Key 재전송은 새 전개를 만들지 않는다.\n\n⭐ 저장 충돌 보호 — If-Match 는 필수다. 토큰은 GET /planning/production-plans/{productionPlanId} 의 ETag 를 그대로 싣는다. 관리웹 온라인 전제의 되돌릴 수 없는 확정 전이라 W/O 전이(:release·:close)와 같은 정책이다. 근거: W-02-02 §5-1(3단 체인)·§5-7 · 공유계약 B-8 · omf-mes#199",
     "parameters": [
      {
       "name": "productionPlanId",
@@ -692,6 +701,9 @@
      },
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
      }
     ],
     "responses": {
@@ -1703,6 +1715,15 @@
     "description": "집계 열(실적 누계)을 함께 내려준다. 근거: W-02-08 §3·§5",
     "parameters": [
      {
+      "name": "productionOrderId",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "P/O 로 거른다(서버가 계획을 경유해 잇는다) — W-02-01 상세 「전개」 구획용. 근거: omf-mes#196"
+     },
+     {
       "name": "productionPlanId",
       "in": "query",
       "schema": {
@@ -1840,7 +1861,7 @@
      "production"
     ],
     "summary": "W/O 발행",
-    "description": "전개로 만들거나 긴급으로 직접 만든다. 근거: W-02-02 §5 · W-02-07 §5",
+    "description": "긴급 W/O(W-02-07)를 직접 만든다 — 전개 생성분은 계획 :confirm 이 서버 트랜잭션으로 만들므로 이 경로를 쓰지 않는다(omf-mes#199). 근거: W-02-07 §5",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -2128,7 +2149,7 @@
      "production"
     ],
     "summary": "W/O 취소",
-    "description": "취소 상태로 옮기고 선발행된 생산LOT 슬롯을 자동 폐번한다. 마감 시 미달 슬롯을 폐번하는 것과 같은 규칙이다. 근거: 예외 E-4 ④(2026-08-12 종결) · R27·R82 · W-02-06 §5-5",
+    "description": "취소 상태로 옮기고 선발행된 생산LOT 슬롯을 자동 폐번한다. 마감 시 미달 슬롯을 폐번하는 것과 같은 규칙이다. 근거: 예외 E-4 ④(2026-08-12 종결) · R27·R82 · W-02-06 §5-5\n\n⭐ 저장 충돌 보호 — If-Match 는 필수다. 토큰은 GET /production/work-orders/{workOrderId} 의 ETag 를 그대로 싣는다. 취소는 관리웹(W-02-06) 온라인 전제이고 선발행 슬롯 자동 폐번이 붙는 되돌릴 수 없는 전이라 :close·:release 와 같은 정책이다. 근거: 형제 전이 정책 정렬 · omf-mes#205",
     "parameters": [
      {
       "name": "workOrderId",
@@ -2142,6 +2163,9 @@
      },
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
      }
     ],
     "requestBody": {
@@ -2396,7 +2420,7 @@
      "production"
     ],
     "summary": "확정·배포 · 생산LOT 선발행",
-    "description": "확정과 배포와 선발행이 한 트랜잭션이다. 선발행은 번호 슬롯 예약이며 완료 전에는 실물에 귀속되지 않는다. 근거: W-02-04 §5 · R26·R27",
+    "description": "확정과 배포와 선발행이 한 트랜잭션이다. 선발행은 번호 슬롯 예약이며 완료 전에는 실물에 귀속되지 않는다. 근거: W-02-04 §5 · R26·R27\n\n⭐ 저장 충돌 보호 — If-Match 는 필수다. 토큰은 GET /production/work-orders/{workOrderId} 의 ETag 를 그대로 싣는다. 확정·배포는 관리웹 온라인 전제이고 배포 후에는 현장으로 내려가 되돌리기 어려운 전이라 :close 와 같은 정책이다 — :hold·:resume 처럼 선택으로 두지 않는다(그 둘은 POP 오프라인 대상 · 공유계약 C-9). 두 관리자가 같은 W/O 를 동시에 확정하면 늦은 쪽이 409 를 받는다. 근거: W-02-04 §6(동시 확정 — version_no 낙관적 잠금 B-1) · omf-mes#205",
     "parameters": [
      {
       "name": "workOrderId",
@@ -2410,6 +2434,9 @@
      },
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
      }
     ],
     "requestBody": {
@@ -4122,6 +4149,16 @@
      "versionNo": {
       "type": "integer",
       "example": 1
+     },
+     "expandedWorkOrderCount": {
+      "type": "integer",
+      "description": "파생 — 서버가 계산한다(공유계약 L-2). 이 P/O 아래 생성된 W/O 수. 목록 「W/O n/m」 열의 n. 근거: W-02-01 §3 · omf-mes#196",
+      "example": 3
+     },
+     "plannedWorkOrderCount": {
+      "type": "integer",
+      "description": "파생 — 서버가 계산한다(공유계약 L-2). 계획 전건이 전개되면 생기는 W/O 총수(계획별 Routing 공정 수의 합). 목록 「W/O n/m」 열의 m — 0 이면 계획이 아직 없다. 근거: W-02-01 §3 · omf-mes#196",
+      "example": 3
      }
     },
     "required": [
@@ -4334,13 +4371,21 @@
       "example": 1001
      },
      "plannedLineId": {
-      "type": "integer",
+      "type": [
+       "integer",
+       "null"
+      ],
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "명시적 null = 해제(비움으로 되돌림) · 필드 생략 = 기존 값 유지. 근거: omf-mes#200·#201"
      },
      "remarks": {
-      "type": "string",
-      "example": "값"
+      "type": [
+       "string",
+       "null"
+      ],
+      "example": "값",
+      "description": "명시적 null = 해제(비움으로 되돌림) · 필드 생략 = 기존 값 유지. 근거: omf-mes#200·#201"
      }
     }
    },
@@ -5086,17 +5131,20 @@
    "WorkOrderRelease": {
     "type": "object",
     "properties": {
-     "lotSlotCount": {
-      "type": "integer",
-      "description": "선발행할 생산LOT 슬롯 수. 비우면 계획값 N. 근거: R26·R27",
-      "example": 1
+     "lotSize": {
+      "type": "number",
+      "description": "LOT 크기 — 슬롯 하나의 계획 수량. 사용자가 화면에서 입력한다(품목별 기본값이 없어 매번 입력 — W-02-04 §8-2). 슬롯 수는 서버가 파생한다: N = 올림(지시수량 orderQty ÷ lotSize). 각 슬롯의 trace.lot.initial_qty 는 lotSize 로, 마지막 슬롯은 나머지가 있으면 나머지로 채운다 — 슬롯 계획 수량의 합이 지시수량과 같아야 마감 3분류(미달/정상/초과) 판정이 어긋나지 않는다. lotSize ≥ 지시수량이면 슬롯 1개(initial_qty = 지시수량 · 화면은 경고하되 막지 않는다 — W-02-04 §6). N 은 계획값이지 상한이 아니다 — 초과 생산은 추가 발번, 미달 슬롯은 마감 자동 폐번(R27). 근거: W-02-04 §4-B(initial_qty ← LOT 크기)·§5-3 · WF02 S4(N=양품목표÷LOT크기 ✓확정 2026-07-29) · omf-mes#206",
+      "example": 500
      },
      "handoverNote": {
       "type": "string",
       "description": "전달사항. 공지 확인 이력이 별도로 받는다 — 근거: DR-005",
       "example": "비고"
      }
-    }
+    },
+    "required": [
+     "lotSize"
+    ]
    },
    "WorkOrderResume": {
     "type": "object",
@@ -5129,39 +5177,67 @@
       "example": 1
      },
      "plannedStartAt": {
-      "type": "string",
+      "type": [
+       "string",
+       "null"
+      ],
       "format": "date-time",
-      "example": "2026-08-11T09:12:00+09:00"
+      "example": "2026-08-11T09:12:00+09:00",
+      "description": "명시적 null = 해제(비움으로 되돌림) · 필드 생략 = 기존 값 유지. 근거: omf-mes#200·#201"
      },
      "plannedEndAt": {
-      "type": "string",
+      "type": [
+       "string",
+       "null"
+      ],
       "format": "date-time",
-      "example": "2026-08-11T09:12:00+09:00"
+      "example": "2026-08-11T09:12:00+09:00",
+      "description": "명시적 null = 해제(비움으로 되돌림) · 필드 생략 = 기존 값 유지. 근거: omf-mes#200·#201"
      },
      "plannedEquipmentId": {
-      "type": "integer",
+      "type": [
+       "integer",
+       "null"
+      ],
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "명시적 null = 해제(비움으로 되돌림) · 필드 생략 = 기존 값 유지. 근거: omf-mes#200·#201"
      },
      "plannedMoldId": {
-      "type": "integer",
+      "type": [
+       "integer",
+       "null"
+      ],
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "명시적 null = 해제(비움으로 되돌림) · 필드 생략 = 기존 값 유지. 근거: omf-mes#200·#201"
      },
      "plannedShiftId": {
-      "type": "integer",
+      "type": [
+       "integer",
+       "null"
+      ],
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "명시적 null = 해제(비움으로 되돌림) · 필드 생략 = 기존 값 유지. 근거: omf-mes#200·#201"
      },
      "productionLineId": {
-      "type": "integer",
+      "type": [
+       "integer",
+       "null"
+      ],
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "명시적 null = 해제(비움으로 되돌림) · 필드 생략 = 기존 값 유지. 근거: omf-mes#200·#201"
      },
      "responsibleWorkerId": {
-      "type": "integer",
+      "type": [
+       "integer",
+       "null"
+      ],
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "명시적 null = 해제(비움으로 되돌림) · 필드 생략 = 기존 값 유지. 근거: omf-mes#200·#201"
      },
      "defaultWipLocationId": {
       "type": "integer",
@@ -5179,8 +5255,12 @@
       "example": 1001
      },
      "remarks": {
-      "type": "string",
-      "example": "값"
+      "type": [
+       "string",
+       "null"
+      ],
+      "example": "값",
+      "description": "명시적 null = 해제(비움으로 되돌림) · 필드 생략 = 기존 값 유지. 근거: omf-mes#200·#201"
      }
     },
     "description": "4M 자원배정이 이 경로로 들어온다. 근거: W-02-03 §5"
