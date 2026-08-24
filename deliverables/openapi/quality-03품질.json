@@ -2647,7 +2647,8 @@
      "asOf": {
       "type": "string",
       "format": "date-time",
-      "description": "서버 집계 기준 시각 — 화면이 「기준 HH:MM」 으로 보인다(공유계약 L-5). 브라우저 수신 시각이 아니다. 근거: omf-mes#192 문3"
+      "description": "서버 집계 기준 시각 — 화면이 「기준 HH:MM」 으로 보인다(공유계약 L-5). 브라우저 수신 시각이 아니다. 근거: omf-mes#192 문3",
+      "example": "2026-08-24T09:12:00+09:00"
      }
     },
     "required": [
@@ -2745,7 +2746,8 @@
      "asOf": {
       "type": "string",
       "format": "date-time",
-      "description": "서버 집계 기준 시각 — 화면이 「기준 HH:MM」 으로 보인다(공유계약 L-5). 브라우저 수신 시각이 아니다. 근거: omf-mes#192 문3"
+      "description": "서버 집계 기준 시각 — 화면이 「기준 HH:MM」 으로 보인다(공유계약 L-5). 브라우저 수신 시각이 아니다. 근거: omf-mes#192 문3",
+      "example": "2026-08-24T09:12:00+09:00"
      }
     },
     "required": [
@@ -3393,7 +3395,8 @@
        "integer",
        "null"
       ],
-      "description": "파생 — 검사가 귀속된 공정. 현장검사만 직접 컬럼이고 PQC·OQC 는 서버가 2단 조인으로 잇는다. 근거: omf-mes#192 문5"
+      "description": "파생 — 검사가 귀속된 공정. 현장검사만 직접 컬럼이고 PQC·OQC 는 서버가 2단 조인으로 잇는다. 근거: omf-mes#192 문5",
+      "example": 3
      },
      "processName": {
       "type": [
@@ -3617,7 +3620,8 @@
      "asOf": {
       "type": "string",
       "format": "date-time",
-      "description": "서버 집계 기준 시각 — 화면이 「기준 HH:MM」 으로 보인다(공유계약 L-5). 브라우저 수신 시각이 아니다. 근거: omf-mes#192 문3"
+      "description": "서버 집계 기준 시각 — 화면이 「기준 HH:MM」 으로 보인다(공유계약 L-5). 브라우저 수신 시각이 아니다. 근거: omf-mes#192 문3",
+      "example": "2026-08-24T09:12:00+09:00"
      }
     },
     "required": [
@@ -4237,7 +4241,8 @@
     ],
     "properties": {
      "inspectionItemSpecId": {
-      "type": "integer"
+      "type": "integer",
+      "example": 12
      },
      "itemName": {
       "type": "string",
@@ -4296,7 +4301,8 @@
        "boolean",
        "null"
       ],
-      "description": "측정 장비의 검교정 만료 여부 — 참이면 화면이 ⚠ 로 보인다(W-03-05 §5-6 분리 보기 근거)"
+      "description": "측정 장비의 검교정 만료 여부 — 참이면 화면이 ⚠ 로 보인다(W-03-05 §5-6 분리 보기 근거)",
+      "example": true
      },
      "equipmentCalibrationDueDate": {
       "type": [
