@@ -678,7 +678,7 @@
      "planning"
     ],
     "summary": "전개 확정",
-    "description": "계획을 확정해 W/O 전개를 연다. 근거: W-02-02 §5 · :동사 규약",
+    "description": "계획을 확정하고 «전개»까지 서버 한 트랜잭션으로 수행한다 — 확정된 계획의 Routing 공정별 W/O 생성과 공정 의존(work_order_dependency) 생성까지가 안이다(공유계약 B-8 규칙 1 — 업무 엔티티는 전부 안. 부분 성공을 만들지 않는다). 클라이언트는 전개를 위해 W/O 를 따로 POST 하지 않는다. 전개 결과는 GET /production/work-orders?productionPlanId= 로 본다. 생성 규칙 — 수량: 각 공정 W/O 의 orderQty = 계획 수량(planned_qty) · 유형: 기본 양산(개발품 판정 축은 품목 — omf-mes#215 진행 중 · 긴급은 이 경로가 아니라 W-02-07 직접 생성) · 기본 위치: 생성 후 W-02-03·W-02-04 의 PUT 으로 채운다. 재시도: 같은 Idempotency-Key 재전송은 새 전개를 만들지 않는다.\n\n⭐ 저장 충돌 보호 — If-Match 는 필수다. 토큰은 GET /planning/production-plans/{productionPlanId} 의 ETag 를 그대로 싣는다. 관리웹 온라인 전제의 되돌릴 수 없는 확정 전이라 W/O 전이(:release·:close)와 같은 정책이다. 근거: W-02-02 §5-1(3단 체인)·§5-7 · 공유계약 B-8 · omf-mes#199",
     "parameters": [
      {
       "name": "productionPlanId",
@@ -692,6 +692,9 @@
      },
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
      }
     ],
     "responses": {
@@ -1840,7 +1843,7 @@
      "production"
     ],
     "summary": "W/O 발행",
-    "description": "전개로 만들거나 긴급으로 직접 만든다. 근거: W-02-02 §5 · W-02-07 §5",
+    "description": "긴급 W/O(W-02-07)를 직접 만든다 — 전개 생성분은 계획 :confirm 이 서버 트랜잭션으로 만들므로 이 경로를 쓰지 않는다(omf-mes#199). 근거: W-02-07 §5",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
