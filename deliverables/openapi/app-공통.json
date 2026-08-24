@@ -1680,7 +1680,7 @@
               "format": "date-time",
               "example": "2026-08-13T09:12:00+09:00"
             },
-            "description": "기간 시작",
+            "description": "기간 시작 — 이 시각 «이상»(occurredAt ≥ occurredFrom). 경계 규약은 공유계약 L-3",
             "required": true
           },
           {
@@ -1691,7 +1691,7 @@
               "format": "date-time",
               "example": "2026-08-13T09:12:00+09:00"
             },
-            "description": "기간 종료",
+            "description": "기간 끝 — 이 시각 «미만»(occurredAt < occurredTo). 반열림 구간이라 「그날까지」는 23:59:59 가 아니라 «익일 00:00:00» 을 보낸다 — 마지막 1초 안의 알림이 빠지지 않는다. 경계 규약은 공유계약 L-3",
             "required": true
           },
           {
