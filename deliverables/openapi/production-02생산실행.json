@@ -5092,17 +5092,20 @@
    "WorkOrderRelease": {
     "type": "object",
     "properties": {
-     "lotSlotCount": {
-      "type": "integer",
-      "description": "선발행할 생산LOT 슬롯 수. 비우면 계획값 N. 근거: R26·R27",
-      "example": 1
+     "lotSize": {
+      "type": "number",
+      "description": "LOT 크기 — 슬롯 하나의 계획 수량. 사용자가 화면에서 입력한다(품목별 기본값이 없어 매번 입력 — W-02-04 §8-2). 슬롯 수는 서버가 파생한다: N = 올림(지시수량 orderQty ÷ lotSize). 각 슬롯의 trace.lot.initial_qty 는 lotSize 로, 마지막 슬롯은 나머지가 있으면 나머지로 채운다 — 슬롯 계획 수량의 합이 지시수량과 같아야 마감 3분류(미달/정상/초과) 판정이 어긋나지 않는다. lotSize ≥ 지시수량이면 슬롯 1개(initial_qty = 지시수량 · 화면은 경고하되 막지 않는다 — W-02-04 §6). N 은 계획값이지 상한이 아니다 — 초과 생산은 추가 발번, 미달 슬롯은 마감 자동 폐번(R27). 근거: W-02-04 §4-B(initial_qty ← LOT 크기)·§5-3 · WF02 S4(N=양품목표÷LOT크기 ✓확정 2026-07-29) · omf-mes#206",
+      "example": 500
      },
      "handoverNote": {
       "type": "string",
       "description": "전달사항. 공지 확인 이력이 별도로 받는다 — 근거: DR-005",
       "example": "비고"
      }
-    }
+    },
+    "required": [
+     "lotSize"
+    ]
    },
    "WorkOrderResume": {
     "type": "object",
