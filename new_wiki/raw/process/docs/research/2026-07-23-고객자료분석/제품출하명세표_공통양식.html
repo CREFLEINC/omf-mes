@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>제품 출하 명세표 — 공통 양식</title>
+<style>
+  :root { --accent:#144a3a; --accent2:#1f7a4d; --border:#555; --muted:#666; --soft:#eaf2ee; }
+  * { box-sizing:border-box; }
+  body { font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif; color:#1a1a1a; background:#f0f0f0; margin:0; padding:24px; }
+  .sheet { background:#fff; width:210mm; min-height:297mm; margin:0 auto; padding:14mm 12mm; box-shadow:0 1px 8px rgba(0,0,0,.18); }
+  .head { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid var(--accent); padding-bottom:8px; }
+  .head .company { font-size:12px; color:var(--muted); }
+  .head .company .name { font-size:15px; font-weight:800; color:#111; }
+  .title { text-align:center; flex:1; }
+  .title h1 { margin:0; font-size:25px; letter-spacing:5px; color:var(--accent); }
+  .title .sub { font-size:11px; color:var(--muted); letter-spacing:1px; }
+  .approval { border:1px solid var(--border); border-collapse:collapse; font-size:10px; }
+  .approval td { border:1px solid var(--border); text-align:center; padding:2px 6px; }
+  .approval td.h { background:var(--soft); font-weight:700; }
+  .approval td.box { height:36px; width:50px; }
+  .docmeta { display:flex; justify-content:flex-end; gap:22px; margin:8px 0 4px; font-size:12px; }
+  .docmeta b { color:var(--muted); font-weight:600; margin-right:6px; }
+  .u { display:inline-block; min-width:100px; border-bottom:1px solid #999; }
+  .parties { display:flex; gap:0; border:1px solid var(--border); margin-top:8px; }
+  .parties .col { flex:1; padding:9px 12px; font-size:12px; }
+  .parties .col + .col { border-left:1px solid var(--border); }
+  .parties .lbl { font-weight:800; color:var(--accent); margin-bottom:6px; font-size:12px; border-bottom:1px dashed #ccc; padding-bottom:4px; }
+  .parties .fld { display:flex; margin:5px 0; }
+  .parties .fld .k { color:var(--muted); min-width:66px; }
+  .parties .fld .v { flex:1; border-bottom:1px dotted #bbb; min-height:16px; }
+  .terms { border:1px solid var(--border); border-top:none; padding:8px 12px; font-size:11.5px; display:grid; grid-template-columns:repeat(4,1fr); gap:6px 12px; }
+  .terms .t { display:flex; }
+  .terms .t .k { color:var(--muted); min-width:64px; }
+  .terms .t .v { flex:1; border-bottom:1px dotted #bbb; }
+  table.items { width:100%; border-collapse:collapse; margin-top:12px; font-size:11px; }
+  table.items th, table.items td { border:1px solid var(--border); padding:5px 4px; text-align:center; }
+  table.items th { background:var(--soft); color:var(--accent); }
+  table.items td { height:24px; }
+  table.items tr.total td { background:#f2f6f4; font-weight:700; }
+  .summary { display:flex; gap:0; border:1px solid var(--border); border-top:none; font-size:11.5px; }
+  .summary .s { flex:1; padding:7px 8px; text-align:center; }
+  .summary .s + .s { border-left:1px solid var(--border); }
+  .summary .s .k { color:var(--muted); font-size:10.5px; }
+  .summary .s .v { font-weight:700; font-size:13px; }
+  .sign { display:flex; margin-top:14px; border:1px solid var(--border); }
+  .sign .cell { flex:1; text-align:center; font-size:11px; }
+  .sign .cell + .cell { border-left:1px solid var(--border); }
+  .sign .cell .r { background:var(--soft); padding:5px; font-weight:700; color:var(--accent); border-bottom:1px solid var(--border); }
+  .sign .cell .s { height:52px; }
+  .note { font-size:10.5px; color:var(--muted); margin-top:8px; }
+  .toolbar { width:210mm; margin:0 auto 14px; text-align:right; }
+  .toolbar button { font-size:13px; padding:7px 16px; border:1px solid var(--accent); background:var(--accent); color:#fff; border-radius:6px; cursor:pointer; }
+  @media print { body{background:#fff;padding:0;} .sheet{box-shadow:none;width:auto;min-height:auto;padding:10mm;} .toolbar{display:none;} }
+</style>
+</head>
+<body>
+
+<div class="toolbar"><button onclick="window.print()">🖨 인쇄 / PDF 저장</button></div>
+
+<div class="sheet">
+  <div class="head">
+    <div class="company">
+      <div class="name">SAMJIN LND VINA CO., LTD</div>
+      <div>Lô A12-1, KCN Bá Thiện II, Bình Xuyên, Phú Thọ · TEL 02113-880101</div>
+    </div>
+    <div class="title">
+      <h1>제품 출하 명세표</h1>
+      <div class="sub">PRODUCT DELIVERY / SHIPPING NOTE · PHIẾU GIAO HÀNG</div>
+    </div>
+    <table class="approval">
+      <tr><td class="h">담당</td><td class="h">검사</td><td class="h">부서장</td><td class="h">승인</td></tr>
+      <tr><td class="box"></td><td class="box"></td><td class="box"></td><td class="box"></td></tr>
+    </table>
+  </div>
+
+  <div class="docmeta">
+    <span><b>출하전표 No.</b><span class="u"></span></span>
+    <span><b>발행일 Date</b><span class="u"></span></span>
+    <span><b>출하일 Ship</b><span class="u"></span></span>
+  </div>
+
+  <div class="parties">
+    <div class="col">
+      <div class="lbl">공급자 (송하인) · Supplier / Shipper</div>
+      <div class="fld"><span class="k">상 호</span><span class="v">SAMJIN LND VINA CO., LTD</span></div>
+      <div class="fld"><span class="k">주 소</span><span class="v">Lô A12-1, KCN Bá Thiện II, Bình Xuyên</span></div>
+      <div class="fld"><span class="k">담당/연락</span><span class="v"></span></div>
+    </div>
+    <div class="col">
+      <div class="lbl">고객 (수하인) · Customer / Consignee</div>
+      <div class="fld"><span class="k">상 호</span><span class="v"></span></div>
+      <div class="fld"><span class="k">주 소</span><span class="v"></span></div>
+      <div class="fld"><span class="k">공장/담당</span><span class="v"></span></div>
+    </div>
+  </div>
+
+  <div class="terms">
+    <div class="t"><span class="k">발주번호</span><span class="v"></span></div>
+    <div class="t"><span class="k">인보이스</span><span class="v"></span></div>
+    <div class="t"><span class="k">인도조건</span><span class="v">DAP</span></div>
+    <div class="t"><span class="k">통 화</span><span class="v">USD / VND</span></div>
+    <div class="t"><span class="k">결제조건</span><span class="v"></span></div>
+    <div class="t"><span class="k">운송방법</span><span class="v"></span></div>
+    <div class="t"><span class="k">출하사유</span><span class="v">완제품 판매 출고</span></div>
+    <div class="t"><span class="k">차량/기사</span><span class="v"></span></div>
+  </div>
+
+  <table class="items">
+    <thead>
+      <tr>
+        <th style="width:5%">No</th>
+        <th style="width:14%">발주번호<br>(P/O)</th>
+        <th style="width:14%">자재코드<br>(Material)</th>
+        <th style="width:23%">품명 / 규격<br>(Description)</th>
+        <th style="width:8%">모델</th>
+        <th style="width:5%">단위</th>
+        <th style="width:9%">수량<br>(Qty)</th>
+        <th style="width:6%">박스</th>
+        <th style="width:8%">단가</th>
+        <th style="width:8%">금액</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>2</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>3</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>4</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>5</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>6</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>7</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>8</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr class="total"><td colspan="6">합계 · TOTAL</td><td></td><td></td><td></td><td></td></tr>
+    </tbody>
+  </table>
+
+  <div class="summary">
+    <div class="s"><div class="k">총수량 Total Qty</div><div class="v">&nbsp;</div></div>
+    <div class="s"><div class="k">총박스 PKG</div><div class="v">&nbsp;</div></div>
+    <div class="s"><div class="k">팔레트 Pallet</div><div class="v">&nbsp;</div></div>
+    <div class="s"><div class="k">총중량 G.W (KG)</div><div class="v">&nbsp;</div></div>
+    <div class="s"><div class="k">순중량 N.W (KG)</div><div class="v">&nbsp;</div></div>
+    <div class="s"><div class="k">총금액 Amount</div><div class="v">&nbsp;</div></div>
+  </div>
+
+  <div class="sign">
+    <div class="cell"><div class="r">인도자<br><small>Người giao</small></div><div class="s"></div></div>
+    <div class="cell"><div class="r">검사<br><small>Inspection</small></div><div class="s"></div></div>
+    <div class="cell"><div class="r">부서장<br><small>Trưởng phòng</small></div><div class="s"></div></div>
+    <div class="cell"><div class="r">운전기사<br><small>Lái xe</small></div><div class="s"></div></div>
+    <div class="cell"><div class="r">고객(수령)<br><small>Khách hàng</small></div><div class="s"></div></div>
+  </div>
+  <div class="note">※ 서명 후 성명을 정자로 기재 · Ký và ghi rõ họ và tên &nbsp;|&nbsp; 선적표시(Shipping Mark)·원산지(Origin)·HS코드는 수출 건에 한해 별도 표기</div>
+</div>
+
+</body>
+</html>
