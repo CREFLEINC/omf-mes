@@ -4371,13 +4371,21 @@
       "example": 1001
      },
      "plannedLineId": {
-      "type": "integer",
+      "type": [
+       "integer",
+       "null"
+      ],
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "명시적 null = 해제(비움으로 되돌림) · 필드 생략 = 기존 값 유지. 근거: omf-mes#200·#201"
      },
      "remarks": {
-      "type": "string",
-      "example": "값"
+      "type": [
+       "string",
+       "null"
+      ],
+      "example": "값",
+      "description": "명시적 null = 해제(비움으로 되돌림) · 필드 생략 = 기존 값 유지. 근거: omf-mes#200·#201"
      }
     }
    },
@@ -5169,39 +5177,67 @@
       "example": 1
      },
      "plannedStartAt": {
-      "type": "string",
+      "type": [
+       "string",
+       "null"
+      ],
       "format": "date-time",
-      "example": "2026-08-11T09:12:00+09:00"
+      "example": "2026-08-11T09:12:00+09:00",
+      "description": "명시적 null = 해제(비움으로 되돌림) · 필드 생략 = 기존 값 유지. 근거: omf-mes#200·#201"
      },
      "plannedEndAt": {
-      "type": "string",
+      "type": [
+       "string",
+       "null"
+      ],
       "format": "date-time",
-      "example": "2026-08-11T09:12:00+09:00"
+      "example": "2026-08-11T09:12:00+09:00",
+      "description": "명시적 null = 해제(비움으로 되돌림) · 필드 생략 = 기존 값 유지. 근거: omf-mes#200·#201"
      },
      "plannedEquipmentId": {
-      "type": "integer",
+      "type": [
+       "integer",
+       "null"
+      ],
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "명시적 null = 해제(비움으로 되돌림) · 필드 생략 = 기존 값 유지. 근거: omf-mes#200·#201"
      },
      "plannedMoldId": {
-      "type": "integer",
+      "type": [
+       "integer",
+       "null"
+      ],
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "명시적 null = 해제(비움으로 되돌림) · 필드 생략 = 기존 값 유지. 근거: omf-mes#200·#201"
      },
      "plannedShiftId": {
-      "type": "integer",
+      "type": [
+       "integer",
+       "null"
+      ],
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "명시적 null = 해제(비움으로 되돌림) · 필드 생략 = 기존 값 유지. 근거: omf-mes#200·#201"
      },
      "productionLineId": {
-      "type": "integer",
+      "type": [
+       "integer",
+       "null"
+      ],
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "명시적 null = 해제(비움으로 되돌림) · 필드 생략 = 기존 값 유지. 근거: omf-mes#200·#201"
      },
      "responsibleWorkerId": {
-      "type": "integer",
+      "type": [
+       "integer",
+       "null"
+      ],
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "명시적 null = 해제(비움으로 되돌림) · 필드 생략 = 기존 값 유지. 근거: omf-mes#200·#201"
      },
      "defaultWipLocationId": {
       "type": "integer",
@@ -5219,8 +5255,12 @@
       "example": 1001
      },
      "remarks": {
-      "type": "string",
-      "example": "값"
+      "type": [
+       "string",
+       "null"
+      ],
+      "example": "값",
+      "description": "명시적 null = 해제(비움으로 되돌림) · 필드 생략 = 기존 값 유지. 근거: omf-mes#200·#201"
      }
     },
     "description": "4M 자원배정이 이 경로로 들어온다. 근거: W-02-03 §5"
