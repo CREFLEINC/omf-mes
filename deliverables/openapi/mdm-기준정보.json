@@ -11527,6 +11527,88 @@
         },
         "x-internal-note": "저장 충돌 보호를 붙이지 않았다 — 항목이 다섯인 고정 목록이고 행을 오가며 편집하는 형태가 아니다. 「개발품 제외」의 판정 축(품목이냐 작업지시 유형이냐)은 이 계약이 정하지 않는다 — 확정 문구가 갈려 있고 omf-mes#70 에서 사용자 결정을 기다린다."
       }
+    },
+    "/mdm/shifts": {
+      "get": {
+        "tags": [
+          "mdm",
+          "lookup"
+        ],
+        "summary": "교대 목록",
+        "description": "교대(mdm.shift) 선택 목록 — 4M 자원배정(W-02-03)의 plannedShiftId 원천. 교대는 공장 단위 정의라(uq_shift = plant_id + shift_code) 공장으로 거른다 — 라인·계획일시 축은 테이블에 없다. 근거: omf-mes#202",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "코드·이름 검색"
+          },
+          {
+            "name": "plantId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "공장 필터"
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "비활성 포함"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "page"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Shift"
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PageMeta"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -19469,6 +19551,60 @@
             ],
             "example": 1001,
             "format": "int64"
+          }
+        }
+      },
+      "Shift": {
+        "type": "object",
+        "description": "교대 — mdm.shift. 공장 단위 정의(uq_shift = plant_id + shift_code). 근거: omf-mes#202",
+        "required": [
+          "shiftId",
+          "plantId",
+          "shiftCode",
+          "shiftName",
+          "startTime",
+          "endTime",
+          "crossesMidnight",
+          "isActive"
+        ],
+        "properties": {
+          "shiftId": {
+            "type": "integer",
+            "example": 1
+          },
+          "plantId": {
+            "type": "integer",
+            "description": "공장",
+            "example": 1
+          },
+          "shiftCode": {
+            "type": "string",
+            "description": "교대 코드(공장 내 유일)",
+            "example": "D"
+          },
+          "shiftName": {
+            "type": "string",
+            "description": "교대명",
+            "example": "주간"
+          },
+          "startTime": {
+            "type": "string",
+            "description": "시작 시각(time)",
+            "example": "08:00:00"
+          },
+          "endTime": {
+            "type": "string",
+            "description": "끝 시각(time)",
+            "example": "20:00:00"
+          },
+          "crossesMidnight": {
+            "type": "boolean",
+            "description": "자정을 넘는 교대인가 — 야간 교대의 끝 시각이 다음 날에 있다",
+            "example": false
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true
           }
         }
       }
