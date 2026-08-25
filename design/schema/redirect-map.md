@@ -573,6 +573,40 @@ deliverables/openapi/ui-요구목록-공통.md  →  (재이관 불필요 — de
 deliverables/openapi/ui-요구목록.md  →  (재이관 불필요 — design/schema/generators/openapi/ui-요구목록.md로 재생성해 byte 단위 일치 확인)
 ```
 
+## PR #231 병합 — main 신규 uiux/ 배치 이관 (2026-08-25)
+
+> main 이 branch 분기 이후 `uiux/`에 새로 쌓은 배치 3개(결정서 2건 + 통지·회신 묶음 2건)를
+> git merge 전에 미리 Raw 로 이관했다 — 이 branch 는 이미 `uiux/`를 삭제해 두어서
+> 일반 git 병합으로는 새 파일이 반영되지 않기 때문이다. §00-제안안.md(결정 주체: 팀 리더 ·
+> 상태: ✅ 확정) 는 `raw/decisions/`로 평탄화하고, 통지·회신·보고류는 `raw/process/uiux/`에
+> 원 폴더 그대로 보존한다(기존 분류 규칙과 동일).
+
+### decisions/
+```
+uiux/2026-08-24-계측기유형-제안안/00-제안안.md  →  design/raw/decisions/2026-08-24-계측기유형-제안안.md
+uiux/2026-08-25-설비유형-제안안/00-제안안.md  →  design/raw/decisions/2026-08-25-설비유형-제안안.md
+```
+
+### process/ (uiux/ 원경로 보존)
+```
+uiux/2026-08-24-구현팀-질의-2건-회신/00-보고.md  →  design/raw/process/uiux/2026-08-24-구현팀-질의-2건-회신/00-보고.md
+uiux/2026-08-24-구현팀-질의-2건-회신/통지-04-W-05-11-계열그룹.md  →  design/raw/process/uiux/2026-08-24-구현팀-질의-2건-회신/통지-04-W-05-11-계열그룹.md
+uiux/2026-08-24-구현팀-질의-2건-회신/회신-219-W-05-11-계열필터.md  →  design/raw/process/uiux/2026-08-24-구현팀-질의-2건-회신/회신-219-W-05-11-계열필터.md
+uiux/2026-08-24-구현팀-질의-2건-회신/회신-220-W-05-12-점검항목마스터.md  →  design/raw/process/uiux/2026-08-24-구현팀-질의-2건-회신/회신-220-W-05-12-점검항목마스터.md
+uiux/2026-08-24-구현팀-질의-2건-회신/회신-222-W-05-12-순서필드.md  →  design/raw/process/uiux/2026-08-24-구현팀-질의-2건-회신/회신-222-W-05-12-순서필드.md
+uiux/2026-08-25-설비유형-제안안/시드-182-코멘트.md  →  design/raw/process/uiux/2026-08-25-설비유형-제안안/시드-182-코멘트.md
+uiux/2026-08-25-설비유형-제안안/통지-05-W-05-12-설비유형값.md  →  design/raw/process/uiux/2026-08-25-설비유형-제안안/통지-05-W-05-12-설비유형값.md
+```
+
+### 내용 병합 (Wiki, 새 git 커밋 없이 손으로 재적용)
+```
+uiux/화면상세스펙-공통/공유계약.md (A-5·G-32 보완 + v4.2·v4.3)  →  design/wiki/decisions-policy/공유계약.md (기 이관본에 동일 본문 삽입, byte 대조 완료)
+uiux/화면상세스펙-확대/…/W-05-11-계측기마스터관리.md (§3 신설 소절)  →  design/wiki/screens/05/W-05-11-계측기마스터관리.md (동일 삽입)
+uiux/화면상세스펙-확대/…/W-05-12-설비설비그룹마스터.md (§4-C-1·§5-1-1 등)  →  design/wiki/screens/05/W-05-12-설비설비그룹마스터.md (동일 삽입)
+uiux/화면상세스펙-공통/06-API-요구서-05설비툴.md (§3-1 4행 + KPI 갱신)  →  design/wiki/api-contracts/06-API-요구서-05설비툴.md (동일 삽입)
+deliverables/openapi/mdm-기준정보.json (equipmentTypeCode 배열화)  →  design/wiki/api-contracts/openapi/mdm-기준정보.json (JSON 구조적 동일성 확인)
+```
+
 ## 변경 이력
 
 | 날짜 | 변경 |
@@ -583,3 +617,4 @@ deliverables/openapi/ui-요구목록.md  →  (재이관 불필요 — design/sc
 | 2026-08-25 | Phase 5 커버리지 점검 — redirect-map 미등록분 62건 발견·이관(90-원본자료-정리보고·ui-적합성-점검표·docs/research 느슨한 파일 11건·uiux 배치 폴더 역사적 산출물 20여 건·patch 스크립트 38건 등록 보강). Tier 0 JSON과 구 생성물은 재이관 불필요로 명시. |
 | 2026-08-25 | Tier 0 컷오버 완료 — openapi/*.json 7파일을 deliverables/openapi/에서 design/wiki/api-contracts/openapi/로 git mv(복제 아님, 단 한 번 이동). 의존 스크립트 9개의 경로 상수 갱신 후 전건 재검증. |
 | 2026-08-25 | 최상위 디렉터리명 변경 — `new_wiki/` → `design/`(정본 전환 후 "new"라는 임시성 표현이 더 이상 맞지 않아 개명, 사용자 확정). 내부 참조 전건(스크립트 경로 상수·문서 내 링크) 일괄 치환. |
+| 2026-08-25 | PR #231 병합 — main 이 분기 이후 쌓은 신규 `uiux/` 배치 3개(결정서 2 + 통지·회신 5 + 시드코멘트 1 + 통지 1)를 Raw 로 이관, 내용 충돌 5파일(공유계약·W-05-11·W-05-12·API요구서 05·mdm-기준정보.json)을 병합 후 생성물 재생성(`미결-대장.md`·`ui-요구목록-05설비툴.md`)·전체 검사기 재검증. |
