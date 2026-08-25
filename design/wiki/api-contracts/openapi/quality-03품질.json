@@ -709,7 +709,7 @@
      "quality"
     ],
     "summary": "검사 결과 목록",
-    "description": "재검 사슬을 previousResultId 로 잇는다 — 숨기지 않고 들여쓰기로 보인다. 근거: W-03-05 §5-3 ⛔ inspectionRequestId 도 기간(inspectedFrom·inspectedTo)도 없으면 400 이다 — 둘 중 하나로 반드시 유계여야 한다(공유계약 L-3 · omf-mes#170).",
+    "description": "재검 사슬을 previousResultId 로 잇는다 — 숨기지 않고 들여쓰기로 보인다. finalRoundOnly=false 면 page/size/total 은 뿌리 결과(1회차) 기준으로 세고, 사슬 전체가 뿌리와 같은 페이지에 동거한다 — 부모·자식이 페이지로 갈리지 않는다. 정렬은 뿌리 기준, 사슬 안은 회차 순이다. 사슬이 한 페이지에 온전히 있으므로 previousResultId 만으로 들여쓰기가 가능해 별도 rootResultId·depth 는 내리지 않는다. 근거: W-03-05 §5-3 · omf-mes#192 문4. ⛔ inspectionRequestId 도 기간(inspectedFrom·inspectedTo)도 없으면 400 이다 — 둘 중 하나로 반드시 유계여야 한다(공유계약 L-3 · omf-mes#170).",
     "parameters": [
      {
       "name": "inspectionRequestId",
@@ -2194,6 +2194,26 @@
        "example": true
       },
       "description": "이미 전량 보류인 것을 뺀다 — W-03-03 대상 선택용"
+     },
+     {
+      "name": "transitionFrom",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-01T00:00:00+09:00"
+      },
+      "description": "기간 시작 — latestTransitionAt 기준. transitionTo 와 한 쌍이다(함께 보내거나 함께 생략한다) — 현재 페이지의 latestTransitionAt 만 클라이언트에서 거르면 서버 페이지네이션의 total·다음 페이지와 어긋난다. 근거: W-03-02 §3 · omf-mes#225"
+     },
+     {
+      "name": "transitionTo",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-06T23:59:59+09:00"
+      },
+      "description": "기간 끝. transitionFrom 과 한 쌍이다. 근거: W-03-02 §3 · omf-mes#225"
      },
      {
       "name": "q",
@@ -3788,14 +3808,14 @@
      },
      "releaseCondition": {
       "type": "string",
-      "description": "targetLotStatusCode 가 보류이면 필수, 불량(Hold)이면 받지 않는다.",
+      "description": "targetLotStatusCode 가 INSPECTION_PENDING(검사 대기)이면 필수, DEFECTIVE(불량)면 받지 않는다.",
       "example": "값",
       "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 2단계 §5-2"
      },
      "targetLotStatusCode": {
       "type": "string",
-      "description": "⭐ 도착 상태. 의심자재 등록(C10)은 보류, 클레임·리콜 재Hold(C9)는 불량이다. 두 화면이 같은 행을 만들고 도착 상태만 다르다.",
-      "example": "NORMAL",
+      "description": "⭐ 도착 상태. 의심자재 등록(C10)은 INSPECTION_PENDING(검사 대기), 클레임·리콜 재Hold(C9)는 DEFECTIVE(불량)다. 두 화면이 같은 행을 만들고 도착 상태만 다르다. 「보류」는 lot.status_code 축에 없는 값이다 — Hold(보류 «문서»의 진행 상태)는 lot_hold.status_code 가 별도로 갖고 서버가 자동으로 채운다(공유계약 §I-32 · omf-mes#227).",
+      "example": "INSPECTION_PENDING",
       "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 2단계 §5"
      },
      "remarks": {
@@ -4101,6 +4121,30 @@
       "type": "string",
       "description": "갈 수 없으면 화면이 그대로 보일 문장을 담는다. 근거: 공유계약 G-3",
       "example": "값"
+     },
+     "impact": {
+      "type": [
+       "object",
+       "null"
+      ],
+      "description": "이 전이가 지금 막 걸릴 것에 미치는 영향 미리보기 — «대상 수량·위치»는 GET /quality/lot-statuses 응답(L-2 파생)에 이미 있어 여기 다시 안 낸다. Hold 계열(진행 중 피킹·이미 출고분)만 채운다 — Release 계열 전이는 null. 근거: W-03-02 §5-3·§6 · omf-mes#225",
+      "properties": {
+       "openPickingCount": {
+        "type": "integer",
+        "description": "진행 중인 피킹 요청 건수 — 이 전이로 함께 막힌다. 화면 문구: 「피킹 중인 요청 N건이 막힙니다」(§6)",
+        "example": 2
+       },
+       "shippedQty": {
+        "type": "number",
+        "format": "double",
+        "description": "이미 출고된 수량 — 이 전이로 회수되지 않는다. 화면 문구: 「이미 출고된 N EA는 이 전이로 회수되지 않습니다」(§6) — ⛔ 되돌릴 수 없음을 알리는 것이지 막는 것이 아니다",
+        "example": 300.0
+       }
+      },
+      "example": {
+       "openPickingCount": 2,
+       "shippedQty": 300.0
+      }
      }
     },
     "required": [
@@ -4212,6 +4256,11 @@
       "description": "VERSION_CONFLICT 일 때 서버의 현재 version_no",
       "example": "값"
      },
+     "currentLotStatusCode": {
+      "type": "string",
+      "description": "VERSION_CONFLICT 일 때 서버의 현재 lot.status_code — 충돌 문구에 최신 상태를 담는다(「다른 사용자가 먼저 전이했습니다. 현재 상태는 Hold입니다」 W-03-02 §6). ⛔ message 자유 텍스트에서 파싱하지 않는다 — 이 구조화 필드가 정본이다. 근거: W-03-02 §6 · omf-mes#225",
+      "example": "DEFECTIVE"
+     },
      "conflictCause": {
       "type": "string",
       "enum": [
@@ -4237,7 +4286,8 @@
      "itemName",
      "measuredCount",
      "acceptedCount",
-     "rejectedCount"
+     "rejectedCount",
+     "outOfSpecTotalCount"
     ],
     "properties": {
      "inspectionItemSpecId": {
@@ -4287,6 +4337,11 @@
        "12.07",
        "12.09"
       ]
+     },
+     "outOfSpecTotalCount": {
+      "type": "integer",
+      "description": "규격 밖 측정값 «전체» 건수 — outOfSpecValues(최대 10건 예시)와 별개로 서버가 낸다. 화면의 「외 N건」은 이 값에서 outOfSpecValues.length 를 뺀 수다. ⛔ rejectedCount 로 역산하지 않는다 — 규격 밖이어도 자동 불합격이 아니라(사람이 판정) 두 집합이 같다고 보장되지 않는다. 근거: omf-mes#228",
+      "example": 2
      },
      "equipmentName": {
       "type": [
