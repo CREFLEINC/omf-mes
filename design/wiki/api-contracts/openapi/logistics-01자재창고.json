@@ -10631,9 +10631,18 @@
       "x-source-column": "status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "전표의 진행 상태. 확정된 값 목록이 아직 없으므로 화면은 서버가 내려주는 값을 그대로 표시하고 값 자체로 분기하지 않는다. 근거: 공유계약 G-2",
-      "example": "HOLD",
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "description": "품질 판정 축 — 정상·불량·검사 대기·폐기(공유계약 G-2 표기: NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다. ⚠ 보류 건의 진행 상태(lot_hold.status_code)·생산LOT 생명주기(lifecycleStatusCode)와는 다른 축이다. 근거: 회신 E-3 종결 2026-08-07 · 공유계약 §I-32 · omf-mes#227",
+      "example": "NORMAL"
+     },
+     "lifecycleStatusCode": {
+      "x-source-column": "lifecycle_status_code",
+      "type": [
+       "string",
+       "null"
+      ],
+      "maxLength": 50,
+      "description": "⭐ 생명주기 축(대기·활성·폐번 — 영문 표기 미정, 후보 WAITING·ACTIVE·VOIDED) — statusCode(품질 판정)와는 다른 축이다. 생산LOT 선발행(W-02-04)에서만 쓴다 — 대기: 번호 슬롯만 예약(R26 「완료 전 실물 미귀속」) · 활성: 실적이 붙어 실물에 귀속 · 폐번: 마감 시 미달 슬롯 자동 폐번(R27). 자재·제품 LOT 은 null. ⛔ 물리 컬럼 신설 대상 — 값 목록도 함께 확정 필요. 근거: 02-SW설계사양서 §4.6 · W-02-04 §5-3 · W-02-05 §5-3 · omf-mes#46",
+      "example": "WAITING"
      },
      "parentLotId": {
       "x-source-column": "parent_lot_id",
