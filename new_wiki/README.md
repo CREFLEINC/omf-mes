@@ -1,8 +1,8 @@
 # new_wiki — omf-mes 설계 자료 (Raw / Wiki / Schema)
 
-> 🚧 **재구성 진행 중** — 기존 `uiux/`·`deliverables/`·`docs/`가 아직 정본이다. 이 구조는
-> 검증이 끝나기 전까지 병행 운영되는 시범 구조다. 자세한 배경은 `schema/00-authoring-rules.md`
-> 및 저장소 루트 계획 문서를 참고한다.
+> ✅ **정본 전환 완료(2026-08-25)** — 기존 `uiux/`·`deliverables/`·`docs/research/`는
+> 5단계 검증(커버리지·회귀·탐색 속도·노이즈·staleness) 통과 후 삭제했다. 이 구조가
+> 이제 유일한 정본이다. 구경로→신경로는 `schema/redirect-map.md`에 영구 보존한다.
 
 이 프로젝트 자료를 세 영역으로 나눈다([karpathy의 LLM wiki 패턴](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) 참조):
 
