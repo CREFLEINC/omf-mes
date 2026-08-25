@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>프로그램 배지 작업 문서 목록 (2026-07-24)</title>
+<link rel="stylesheet" href="./crefle-doc/crefle-doc.css">
+<style>
+  :root {
+    --doc-running-title: '프로그램 배지 작업 문서 목록';
+  }
+</style>
+</head>
+<body class="doc">
+
+<header class="doc-cover">
+  <p class="eyebrow">CREFLE · OMF UI/UX · 문서 목록</p>
+  <h1>프로그램 배지 작업 문서 (2026-07-24)</h1>
+  <p class="lede">FigJam v2 워크플로우 도식 전 섹션에 사용 프로그램(관리웹·POP·모바일) 배지를 표시한 작업의 산출물 모음 — 배치 계획부터 지시서·작화 보고·검토 판정까지.</p>
+
+  <table>
+    <caption>문서 정보</caption>
+    <tbody>
+      <tr><th>작성 주체</th><td>CREFLE OMF 팀 (figjam-workflow-team 하네스)</td></tr>
+      <tr><th>작성일</th><td>2026-07-24</td></tr>
+      <tr><th>대상</th><td>CREFLE OMF 팀 내부 (내부 대외비)</td></tr>
+      <tr><th>캔버스</th><td>FigJam 보드 <code>Sgy5IKD4aWuzpKtJAbMyWz</code> · 페이지 <code>system workflow v2</code> (<code>219:4509</code>)</td></tr>
+    </tbody>
+  </table>
+</header>
+
+<h2>요약</h2>
+
+<p>
+  개발 대상 사용자 프로그램은 <strong>3종</strong>(관리웹 · POP · 모바일 — React 코드 1벌·셸 3종, 결정 16)이며,
+  각 프로그램을 <strong>누가 · 언제</strong> 사용하는지를 FigJam v2 도식 63개 지점에 배지로 표시했다.
+  작화는 Wave A(범례·01·02·03) · Wave B(04·05·06) 2회로 나눠 진행했고, 이후 <strong>이슈 <code>#11</code> 확정</strong>으로
+  미정(<code>?</code>)이던 7개 지점의 단말을 확정 배지로 교체했다. 세 차례 검토 모두 판정 PASS다.
+</p>
+
+<div class="kpi">
+  <div><span class="big">66</span><span class="lbl">배지 칩<br>(웹32·POP17·모바일17·미정0)</span></div>
+  <div><span class="big">3/3</span><span class="lbl">검토 PASS<br>(Wave A·B·단말확정)</span></div>
+  <div><span class="big">0</span><span class="lbl">C·M 결함 · 미정 지점</span></div>
+</div>
+
+<h2>문서 목록</h2>
+
+<table>
+  <caption>산출물 6종 — 작업 순서대로</caption>
+  <thead>
+    <tr><th>#</th><th>문서</th><th>성격</th><th>요지</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td><a href="./placement-plan.html">프로그램 배지 배치 계획</a></td>
+      <td>계획 (정본)</td>
+      <td>배치 63건·배지 스펙·사용자 표기 정책 4건</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td><a href="./01_designer_brief_프로그램배지.html">작업 지시서</a></td>
+      <td>지시서</td>
+      <td>앵커 63건 노드 ID 확정 · 마스터 칩 4종 · 좌표 · Wave 분할 · 검토 기준</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td><a href="./02_drawer_report_프로그램배지_waveA.html">작화 산출 보고 — 프로그램 배지 Wave A</a></td>
+      <td>작화 보고</td>
+      <td>범례 마스터 4종 + 배지 34건 (01=17 · 02=13 · 03=4)</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td><a href="./02_drawer_report_프로그램배지_waveB.html">작화 산출 보고 — 프로그램 배지 Wave B</a></td>
+      <td>작화 보고</td>
+      <td>배지 29앵커/칩 30개 (04=11 · 05=11 · 06=8) · 스택 1건</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td><a href="./03_review_프로그램배지_waveA_r1.html">검토 보고 — 프로그램 배지 Wave A r1</a></td>
+      <td>검토 (PASS)</td>
+      <td>34칩 전수 실측 대조 · C/M 0 · 비차단 관찰 2건</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td><a href="./03_review_프로그램배지_waveB_r1.html">검토 보고 — 프로그램 배지 Wave B r1</a></td>
+      <td>검토 (PASS)</td>
+      <td>30칩 전수 실측 대조 · 전역 68개 집계 확증 · C/M 0</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td><a href="./04_followup_단말확정_minibrief.html">미니 지시서 — 미정 배지 7곳 확정 반영</a></td>
+      <td>지시서 (경량)</td>
+      <td>#11 확정 8건 → ? 배지 7개 교체(단일 5 + 스택 2)</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td><a href="./04_followup_단말확정_review_r1.html">검토 보고 — 단말확정 r1</a></td>
+      <td>검토 (PASS)</td>
+      <td>9칩 전수 대조 · ? 소거 · 전역 66배치 확증 · C/M 0</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <p><strong>정본 안내.</strong> 같은 폴더의 <code>.md</code> 파일이 작업 정본이고, 이 HTML은 열람·인쇄용 정리본이다.
+  docs/(기획·설계 문서) 반영이 필요한 사항은 uiux 규칙에 따라 GitHub 이슈로 위임했다 —
+  <code>#10</code> 배지 레이어 문서 반영(처리 완료) · <code>#11</code> 단말 미정 7개 지점 확정(처리 완료).</p>
+</div>
+
+<h2>남은 일</h2>
+
+<ol>
+  <li><strong>완료</strong> — 이슈 <code>#11</code> 확정 8건으로 미정(<code>?</code>) 배지 7곳을 확정 배지로 교체(단일 5 + 2단말 스택 2). 검토 PASS(<code>04_followup_단말확정_review_r1.md</code>).</li>
+  <li><strong>완료</strong> — 이슈 <code>#10</code>: 도식스펙 정본화는 하지 않기로 확정(<code>#10-2</code>), 배지 정본은 이 폴더의 <code>placement-plan.md</code>.</li>
+  <li>고객 회신 대기 2건 회신 시 배지 추가 — 03 미확정 3상태(한도승인·특채·폐기) 승인 매체 · 설치 위치(REQ-PR-0017).</li>
+</ol>
+
+<script src="./crefle-doc/crefle-chart.js"></script>
+</body>
+</html>

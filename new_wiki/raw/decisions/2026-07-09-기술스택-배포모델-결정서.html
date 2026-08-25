@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OMF MES 기술 스택 · 배포 모델 결정서</title>
+<style>
+/* CREFLE Presentation Design System — 토큰 내장(자체 완결형). 원본: crefle_designer/colors_and_type.css */
+:root{
+  --brand-red:#C9252C; --brand-charcoal:#3E4146; --brand-charcoal-deep:#1F2125;
+  --surface:#FBF8FD; --surface-bright:#FFFFFF; --surface-container-low:#F5F2F7;
+  --surface-container:#EFEDF1; --surface-container-high:#E9E7EB;
+  --on-surface:#1B1B1F; --on-surface-variant:#2D2C33; --on-surface-muted:#77767F;
+  --primary:#4758A9; --on-primary:#FFFFFF; --primary-container:#DDE1FF; --on-primary-container:#001257;
+  --outline:#767680; --outline-variant:#C6C5D0;
+  --semantic-success:#1F883D; --semantic-error:#B3261E; --semantic-warning:#E8A100;
+  --semantic-info:#0B57D0; --semantic-idle:#6E7781;
+  --success-container:#DCEFE2; --error-container:#F9DEDC; --warning-container:#FDECC8; --info-container:#DCE5FA;
+  --font-sans:"Spoqa Han Sans Neo","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --font-mono:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;
+  --text-title:20px; --text-body:16px; --text-small:12px; --text-table:13px;
+  --w-regular:400; --w-medium:500; --w-bold:700;
+  --leading-snug:1.35; --leading-body:1.55; --tracking-tight:-0.02em;
+  --radius-sm:8px; --radius-md:12px; --radius-pill:9999px;
+  --elev-1:0 1px 2px 0 rgba(0,0,0,.10),0 1px 3px 1px rgba(0,0,0,.06);
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:20px; --s-6:24px; --s-8:32px; --s-10:40px;
+}
+*{box-sizing:border-box}
+html{-webkit-print-color-adjust:exact;print-color-adjust:exact;scroll-behavior:smooth}
+body{margin:0;background:var(--surface);color:var(--on-surface);
+  font:var(--w-regular) var(--text-body)/var(--leading-body) var(--font-sans)}
+.wrap{max-width:1000px;margin:0 auto;padding:var(--s-8) var(--s-6) var(--s-10)}
+
+/* ── 머리 ── */
+.badge-conf{display:inline-block;border:1.5px solid var(--brand-red);color:var(--brand-red);
+  font-weight:var(--w-bold);font-size:var(--text-small);padding:2px 10px;border-radius:var(--radius-sm);letter-spacing:.06em}
+h1{font-size:26px;font-weight:var(--w-bold);letter-spacing:var(--tracking-tight);line-height:var(--leading-snug);margin:var(--s-3) 0 var(--s-1)}
+.sub{color:var(--on-surface-muted);font-size:var(--text-small);margin:0 0 var(--s-4)}
+.note{background:var(--surface-container-low);border:1px solid var(--outline-variant);border-radius:var(--radius-md);
+  padding:var(--s-3) var(--s-4);margin:var(--s-3) 0;font-size:var(--text-table);line-height:var(--leading-body)}
+.note b{font-weight:var(--w-bold)}
+.note .lbl{display:inline-block;min-width:66px;font-weight:var(--w-bold);color:var(--on-surface-variant)}
+
+/* ── 섹션 ── */
+h2{font-size:var(--text-title);font-weight:var(--w-bold);letter-spacing:var(--tracking-tight);
+  margin:var(--s-10) 0 var(--s-3);padding-bottom:var(--s-2);border-bottom:2px solid var(--brand-charcoal);scroll-margin-top:14px}
+h2 .no{color:var(--primary);margin-right:var(--s-2)}
+h3{font-size:var(--text-body);font-weight:var(--w-bold);margin:var(--s-6) 0 var(--s-2)}
+h4{font-size:var(--text-table);font-weight:var(--w-bold);color:var(--on-surface-variant);
+  letter-spacing:.1em;text-transform:uppercase;margin:var(--s-4) 0 var(--s-1)}
+p{margin:var(--s-2) 0}
+.small{font-size:var(--text-small);color:var(--on-surface-variant)}
+.muted{color:var(--on-surface-muted)}
+code,.mono{font-family:var(--font-mono);font-size:.86em;background:var(--surface-container);padding:1px 5px;border-radius:4px}
+ul,ol{margin:var(--s-2) 0;padding-left:var(--s-6)}
+li{margin:var(--s-1) 0;line-height:var(--leading-body)}
+a{color:var(--primary)}
+
+/* ── 칩·태그 ── */
+.tag{display:inline-block;font-size:11px;font-weight:var(--w-medium);padding:2px 8px;border-radius:var(--radius-sm);line-height:1.5;white-space:nowrap}
+.tag-ok{background:var(--success-container);color:#0b5223;font-weight:var(--w-bold)}
+.tag-est{background:var(--warning-container);color:#5c4300}
+.tag-open{background:var(--info-container);color:#0a3d91}
+.tag-hyp{background:var(--surface-container-high);color:var(--on-surface-muted)}
+.tag-req{background:var(--surface-container);color:var(--on-surface-variant);font-family:var(--font-mono);font-size:10.5px}
+.tag-cto{background:var(--brand-charcoal);color:#fff;font-size:10.5px}
+.star{color:var(--brand-red);font-weight:var(--w-bold)}
+
+/* ── 결정 총괄 카드 ── */
+.deck{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--s-3);margin:var(--s-4) 0 var(--s-6)}
+.dcard{background:var(--surface-bright);border:1px solid var(--outline-variant);border-radius:var(--radius-md);
+  box-shadow:var(--elev-1);padding:var(--s-3) var(--s-4);text-decoration:none;color:inherit;display:block}
+.dcard:hover{border-color:var(--primary)}
+.dcard .dh{display:flex;align-items:center;gap:var(--s-2);margin-bottom:var(--s-1)}
+.dcard .dn{background:var(--primary);color:#fff;font-size:11px;font-weight:var(--w-bold);
+  padding:3px 8px;border-radius:var(--radius-sm);font-family:var(--font-mono)}
+.dcard .dt{font-weight:var(--w-bold);font-size:var(--text-table)}
+.dcard .dd{font-size:var(--text-small);color:var(--on-surface-variant);line-height:1.5;margin:var(--s-1) 0 var(--s-2)}
+
+/* ── 결정 블록 ── */
+.dec{background:var(--surface-bright);border:1px solid var(--outline-variant);border-radius:var(--radius-md);
+  box-shadow:var(--elev-1);padding:var(--s-5) var(--s-5) var(--s-4);margin:var(--s-4) 0 var(--s-6)}
+.dec-h{display:flex;align-items:baseline;gap:var(--s-3);flex-wrap:wrap;
+  border-bottom:1px solid var(--outline-variant);padding-bottom:var(--s-3);margin-bottom:var(--s-3)}
+.dec-h .num{background:var(--brand-charcoal);color:#fff;font-family:var(--font-mono);font-size:var(--text-small);
+  font-weight:var(--w-bold);padding:4px 10px;border-radius:var(--radius-sm);white-space:nowrap}
+.dec-h .ttl{font-size:var(--text-title);font-weight:var(--w-bold);letter-spacing:var(--tracking-tight);flex:1;min-width:220px}
+.field{margin:var(--s-3) 0}
+.field .k{font-size:var(--text-small);font-weight:var(--w-bold);color:var(--primary);
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:var(--s-1)}
+.field .v{font-size:var(--text-table);line-height:var(--leading-body)}
+
+/* ── 확정안 박스 ── */
+.rec{background:var(--success-container);border:1px solid var(--semantic-success);border-radius:var(--radius-sm);
+  padding:var(--s-3) var(--s-4);margin:var(--s-3) 0}
+.rec .rh{font-size:var(--text-small);font-weight:var(--w-bold);color:#0b5223;
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:var(--s-1)}
+.rec .rv{font-size:var(--text-body);font-weight:var(--w-bold);color:#0b5223;line-height:var(--leading-snug)}
+.rec .rn{font-size:var(--text-table);color:#0b5223;margin-top:var(--s-2);opacity:.92}
+
+/* ── 표 ── */
+table{border-collapse:collapse;width:100%;font-size:var(--text-table);margin:var(--s-3) 0;background:var(--surface-bright)}
+th,td{border:1px solid var(--outline-variant);padding:7px 10px;text-align:left;vertical-align:top;line-height:1.5}
+thead th{background:var(--brand-charcoal);color:#fff;font-weight:var(--w-medium);border-color:var(--brand-charcoal)}
+tbody tr:nth-child(even) td{background:var(--surface-container-low)}
+td.center,th.center{text-align:center}
+td.code{font-family:var(--font-mono);font-size:11.5px;white-space:nowrap;text-align:center;font-weight:var(--w-bold);color:var(--primary)}
+tr.pick td{background:var(--success-container)!important}
+tr.pick td:first-child{font-weight:var(--w-bold);box-shadow:inset 3px 0 0 0 var(--semantic-success)}
+tr.hot td{background:var(--error-container)!important}
+tr.hot td:first-child{box-shadow:inset 3px 0 0 0 var(--brand-red)}
+tr.done td{color:var(--on-surface-muted)}
+tr.done td:first-child{box-shadow:inset 3px 0 0 0 var(--semantic-success)}
+tr.drop td{color:var(--on-surface-muted)}
+tr.drop td:first-child{font-weight:var(--w-medium);color:var(--on-surface-variant)}
+.tw{overflow-x:auto;margin:var(--s-3) 0}
+.tw table{margin:0;min-width:640px}
+
+/* ── 콜아웃 ── */
+.callout{border-left:3px solid var(--primary);background:var(--surface-container-low);
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:var(--s-3) var(--s-4);margin:var(--s-3) 0;font-size:var(--text-table);line-height:var(--leading-body)}
+.callout .ch{font-weight:var(--w-bold);font-size:var(--text-small);margin-bottom:var(--s-1);letter-spacing:.04em}
+.callout.warn{border-left-color:var(--semantic-warning);background:var(--warning-container)}
+.callout.crit{border-left-color:var(--brand-red);background:var(--error-container)}
+.callout.info{border-left-color:var(--semantic-info);background:var(--info-container)}
+.callout.key{border-left-color:var(--semantic-success);background:var(--success-container)}
+
+/* ── 순서 다이어그램 ── */
+.flow{display:flex;align-items:center;gap:var(--s-2);flex-wrap:wrap;margin:var(--s-3) 0;font-size:var(--text-table)}
+.flow .n{background:var(--surface-bright);border:1.5px solid var(--primary);color:var(--primary);
+  font-weight:var(--w-bold);padding:6px 12px;border-radius:var(--radius-sm);white-space:nowrap}
+.flow .n.g{border-color:var(--outline-variant);color:var(--on-surface-muted);font-weight:var(--w-regular)}
+.flow .ar{color:var(--outline);font-weight:var(--w-bold)}
+
+.foot{margin-top:var(--s-10);padding-top:var(--s-4);border-top:1px solid var(--outline-variant);
+  color:var(--on-surface-muted);font-size:var(--text-small);line-height:1.7}
+
+@media print{
+  html{scroll-behavior:auto}
+  body{background:#fff}
+  .wrap{max-width:none;padding:0}
+  h1,h2,h3,h4{page-break-after:avoid;break-after:avoid}
+  thead{display:table-header-group}
+  tr{page-break-inside:avoid;break-inside:avoid}
+  .dcard,.callout,.note,.rec,.field,.flow{page-break-inside:avoid;break-inside:avoid}
+  .dec{border:none;box-shadow:none;padding:0;margin:var(--s-3) 0 var(--s-6)}
+  .dec-h{page-break-after:avoid;break-after:avoid}
+  .tw{overflow-x:visible}.tw table{min-width:0}
+  .dcard:hover{border-color:var(--outline-variant)}
+  a{text-decoration:none;color:inherit}
+  .callout a{color:var(--primary)}
+}
+@page{size:A4;margin:14mm 12mm}
+</style>
+</head>
+<body><div class="wrap">
+
+<!-- ═══════════ 머리 ═══════════ -->
+<div><span class="badge-conf">CONFIDENTIAL · 대외비</span></div>
+<h1>내부 설계 결정서 — 기술 스택 · 배포 모델 <span class="muted" style="font-weight:400">(결정 15~19)</span></h1>
+<div class="sub">삼진엘앤디 비나 법인 · 작성일 2026-07-09 (v0.2 — <b>2026-07-10 CTO 검토 반영, 결정 15~19 확정 전환</b>) · 작성 CREFLE OMF 팀 · 원본: research/2026-07-09-기술스택-배포모델-결정서.md</div>
+
+<div class="note">
+  <div><span class="lbl">성격</span> WBS §8의 결정 필요 사항 8건 중 <b>#1(기술 스택) · #2(배포 모델) · #3(AI 1차 범위)</b>를 종결하는 문서다. <code>설계결정서 14건</code>의 계보를 잇는 결정 15~19번(<b>ADR</b>).</div>
+  <div style="margin-top:var(--s-2)"><span class="lbl">표기 원칙</span> 요구·QA 확정 사실은 <span class="tag tag-req">REQ-…</span> <span class="tag tag-req">QA #n</span>, CTO 검토 확정은 <span class="tag tag-cto">확정 2026-07-10</span>, 근거 없는 값은 <span class="tag tag-est">가설</span> / <span class="tag tag-open">확인 필요</span>.</div>
+  <div style="margin-top:var(--s-2)"><span class="lbl">근거 자료</span> <span class="muted"><b>2026-07-10 CTO 검토 의견(v0.2 확정 원천)</b> · planning/2026-07-08-OMF-MES-개발-WBS.md(§8-1·2·3) · research/2026-07-06-설계결정서-14건.md(결정 08·10, 패턴 P1~P4) · research/2026-07-04-현장검증-QA-확정기록.md(#8·#16·#18·#20·#24·#29·#32·#33) · research/2026-07-03-MES-요구사항-명세서-v1-정리.md · research/2026-07-08-ERP-MES-수신정보-정리.md(§3) · research/2026-07-07-하드웨어-구성-스펙.md(<b>v0.3 — 동시 개정</b>) · planning/2026-06-11-OMF-프로젝트-기획서.md(§4.3·§11-2) · planning/2026-06-15-OMF-MES-개발제안서/(인프라 약속 부재 확인)</span></div>
+</div>
+
+<!-- ═══════════ 총괄 ═══════════ -->
+<h2 id="s0"><span class="no">0.</span>총괄</h2>
+
+<h3>0.1 결정 총괄표</h3>
+<div class="deck">
+  <a class="dcard" href="#d15">
+    <div class="dh"><span class="dn">결정 15</span><span class="dt">배포·운영 모델</span></div>
+    <div class="dd"><b>공장 내부 설치형 서버 — 웜 스탠바이 이중화(2대 구성은 설계안) + 백업 NAS.</b> 인터넷=설치·유지보수 시만 일시 보장. 컨테이너 이식성 보존</div>
+    <span class="tag tag-ok">확정 2026-07-10</span> <span class="tag tag-open">NAS 위치 = 고객 선택 잔여</span>
+  </a>
+  <a class="dcard" href="#d16">
+    <div class="dh"><span class="dn">결정 16</span><span class="dt">기술 스택</span></div>
+    <div class="dd">DB=<b>PostgreSQL</b> · BE=<b>TypeScript(NestJS)</b> · FE=<b>React 1벌</b> — 관리 웹 / POP=<b>Electron 앱</b>(패널 PC) / 모바일=<b>Capacitor</b>(Android) · Ubuntu+Docker Compose · <b>오프라인 설치 패키지 배포</b></div>
+    <span class="tag tag-ok">확정 2026-07-10</span> <span class="tag tag-open">ORM 잔여</span>
+  </a>
+  <a class="dcard" href="#d17">
+    <div class="dh"><span class="dn">결정 17</span><span class="dt">오프라인 내성</span></div>
+    <div class="dd"><b>광범위 적용 아님 — 최소 운영 한정.</b> 확정 시나리오 2건: ① W/O 선배포로 생산 계속 ② 자재 입·출고 단일 단말 스캔. outbox·멱등 키 유지</div>
+    <span class="tag tag-ok">확정 2026-07-10 · 범위 재정의</span>
+  </a>
+  <a class="dcard" href="#d18">
+    <div class="dh"><span class="dn">결정 18</span><span class="dt">라벨 출력 경로</span></div>
+    <div class="dd"><b>서버 렌더링 인쇄 채택</b> + 인쇄는 <b>POP 앱 내장</b>(별도 에이전트 불요). 베트남어 폰트=서버 폰트로 종결 — <b>실기 검증 불요</b></div>
+    <span class="tag tag-ok">확정 2026-07-10</span>
+  </a>
+  <a class="dcard" href="#d19">
+    <div class="dh"><span class="dn">결정 19</span><span class="dt">AI 1차 범위</span></div>
+    <div class="dd"><b>AI Agent 전면 제외.</b> 거래명세서=<b>온프레 OCR</b>(로컬 실행) · 출하지시=엑셀 파서 · <b>RAG 조회=포함 여지</b>(미정)</div>
+    <span class="tag tag-ok">확정 2026-07-10</span> <span class="tag tag-open">OCR 엔진·RAG 잔여</span>
+  </a>
+</div>
+
+<div class="callout key">
+  <div class="ch">0.1.1 CTO 검토 결과 (2026-07-10)</div>
+  <b>v0.1 ★ 검토 포인트 4건 전건 해소</b> — ① 백엔드 언어: 팀 보유 스택 확인(§0.4)으로 TS 확정 · ② 단일 서버 SPOF: <b>이중화 구성 필요</b>로 확정 · ③ 라벨 서버 렌더링: 채택(폰트 실기 검증 불요) · ④ AI 최소화: <b>AI Agent 전면 제외</b>로 확정(긴장 종결).
+  <div style="margin-top:var(--s-2)"><b>추가 질의 4건 확정(2026-07-10)</b>: POP·모바일 앱 스택=<b>Electron+Capacitor(React 유지)</b> · 백업 NAS 위치·격리=<b>고객사 선택 사항(미정)</b> · 이중화 방식=<b>웜 스탠바이</b> · 알림 채널=<b>사내망 정본 + 메신저 best-effort</b>.</div>
+  <div style="margin-top:var(--s-2)"><b>하드웨어 기준정보 변경</b>: 모듈 D = PC+모니터 → <b>산업용 패널 PC</b>(C7) — <code>하드웨어-구성-스펙</code> v0.3으로 병행 개정.</div>
+</div>
+
+<!-- 0.2 제약 -->
+<h3 id="s02">0.2 이 결정을 지배하는 제약 <span class="muted small">(전부 기확정 사실)</span></h3>
+<div class="tw">
+<table>
+<thead><tr><th style="width:52px">#</th><th style="width:36%">제약</th><th style="width:22%">근거</th><th>결정에 미치는 영향</th></tr></thead>
+<tbody>
+<tr><td class="code">C1</td><td>네트워크 불안정으로 <b>현행 생산 중단이 빈번</b>. 인프라 책임=고객, 단절 내성 설계=CREFLE</td><td><span class="tag tag-req">REQ-OA-0005</span> <span class="tag tag-req">QA #32</span></td><td>정상 운영 경로에 인터넷을 두면 요구사항 위반 → <a href="#d15">결정 15</a></td></tr>
+<tr><td class="code">C2</td><td>ERP 연계 = UNIERP <b>DB 중계 테이블, MES 측 pull</b></td><td><span class="tag tag-req">QA #18</span> ERP 수신정리 §3</td><td>MES 서버가 ERP DB에 상시 접근 → 동일 사내망이 최단 경로</td></tr>
+<tr><td class="code">C3</td><td>설비 표준 I/F = <b>설비 → MES 직접 수집</b>(ERP 경유 아님)</td><td><span class="tag tag-req">QA #8</span> ERP 수신정리 §5</td><td>사내망 전제</td></tr>
+<tr><td class="code">C4</td><td>백업·보존 <b>최소 5년, 최대 10년</b> <span class="muted">(47건 중 유일 '중요' 기재)</span></td><td><span class="tag tag-req">REQ-PR-0018</span> <span class="tag tag-req">REQ-OA-0006</span></td><td>원본 단독 보관 불가 → 백업 NAS + 재해 격리 보강(<a href="#d15">§1</a>)</td></tr>
+<tr><td class="code">C5</td><td>다국어 <b>전범위</b>(UI · 마스터 · <b>라벨 출력물</b>, 한/베)</td><td><span class="tag tag-req">REQ-PR-0012</span> <span class="tag tag-req">QA #33</span> HW스펙 §6</td><td>라벨 폰트 → <a href="#d18">결정 18</a>(서버 폰트로 종결)</td></tr>
+<tr><td class="code">C6</td><td>POP <b>로컬 버퍼링 + 복구 시 자동 동기화</b></td><td><span class="tag tag-req">QA #32</span></td><td>후부착 불가 아키텍처 → <a href="#d17">결정 17</a></td></tr>
+<tr><td class="code">C7</td><td>라벨 프린터 TSC TTP-247 = <b>USB/시리얼</b>(이더넷 옵션). <b>현장 단말 = 모듈 D 산업용 패널 PC</b> — 비엔텍씨앤씨 <b>N100 올인원 터치</b>(예상 76.7만 = 63 + OS 7.7 + 무선랜 6), <b>Win11 IoT Entry·터치 중심</b>. 인쇄는 POP 앱 내장</td><td>HW스펙 v0.3 §2.4 <span class="tag tag-cto">🔹07-10</span></td><td>POP=패널 PC 설치형 앱 → <a href="#d16">결정 16</a>·<a href="#d18">18</a></td></tr>
+<tr><td class="code">C8</td><td>폼팩터 3종 — 관리 Desktop(웹) / <b>POP 패널 PC</b>(터치·사번 인증) / 모바일 스캐너(<b>Android</b>·문서 촬영). <b>모듈 D = 현장 단말기(POP 디바이스)이지 관리자 데스크탑이 아니다</b></td><td><span class="tag tag-req">REQ-PR-0023·0006·0017</span> <span class="tag tag-cto">🔹07-10</span></td><td>코드 1벌 + 셸 3종 → <a href="#d16">결정 16</a></td></tr>
+<tr><td class="code">C9</td><td>개발 <b>7주</b>(07-13~08-28), Agent coding 병렬, 계약 우선</td><td>WBS §2·§4.1</td><td>학습 곡선·운영 복잡도가 이론적 적합도보다 비싸다</td></tr>
+<tr><td class="code">C10</td><td><b>수불 원장이 정본, 잔량은 파생, 상태 캐시 없음</b></td><td>설계결정 08·10</td><td>관계형 DB 트랜잭션 필수 + 오프라인 병합 가능(<a href="#d17">결정 17</a>)</td></tr>
+<tr class="hot"><td class="code">C11</td><td><b>인터넷 = 설치·유지보수 시점에만 일시 보장, 운영 중 비보장.</b> 운영은 사내망 전용. 네트워크 인프라 구축 책임은 CREFLE가 지지 않음(고객 책임)</td><td><span class="tag tag-cto">🔹2026-07-10 CTO</span> <span class="tag tag-req">QA #32</span></td><td>상시 원격 채널·클라우드 백업·외부 AI API <b>전면 배제</b> → 결정 15·16(§2.4)·19</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout warn">
+  <div class="ch">운영 전제 확인 (🔹2026-07-10 CTO)</div>
+  서버는 <b>설치형</b>, 운영 환경은 <b>내부 네트워크(사내망)</b> 다. 제안서(2026-06-15)에 인프라 기재가 없음은 v0.1에서 확인했고, 이번 검토로 운영 전제가 위 C11로 확정됐다. <b>v0.1이 설계했던 상시 아웃바운드 터널 · 클라우드 오프사이트 백업 · 레지스트리 pull 자동 배포는 C11에 의해 전부 폐기</b>되고 본 v0.2의 체계로 대체된다.
+</div>
+
+<!-- 0.3 -->
+<h3 id="s03">0.3 결정 순서 — 왜 배포가 스택에 선행하는가</h3>
+<div class="flow">
+  <span class="n">배포 위치</span><span class="ar">→</span>
+  <span class="n g">네트워크 경로 · 백업 구조 · 인터넷 의존 허용 범위(C11)</span><span class="ar">→</span>
+  <span class="n">런타임 · DB 선택</span>
+</div>
+<p class="small">역순으로 결정하면 스택이 배포를 사후 정당화하게 된다.</p>
+
+<!-- 0.4 -->
+<h3 id="s04">0.4 지배 변수 — 해소 (2026-07-10)</h3>
+<p class="small">v0.1은 "팀 보유 기술 스택이 문서 어디에도 없다"를 지배 변수로 공개했다. <b>CTO 검토로 확인 완료:</b></p>
+<div class="tw">
+<table>
+<thead><tr><th style="width:28%">구분</th><th>팀 보유 스택</th></tr></thead>
+<tbody>
+<tr><td>프로그래밍 언어</td><td><b>Python · TypeScript · React · Flutter</b></td></tr>
+<tr><td>Database</td><td><b>PostgreSQL · MariaDB</b></td></tr>
+<tr><td>운영</td><td><b>Ubuntu 서버 운영 · Docker · Docker Compose</b></td></tr>
+</tbody>
+</table>
+</div>
+<p class="small">→ v0.1 권고(TypeScript·React·PostgreSQL·Ubuntu·Docker Compose)와 <b>전 항목 정합</b> — v0.1 §0.4의 메타 규칙(보유 스택 우선) 발동 없이 권고안 그대로 확정. <b>Python</b>은 결정 19의 온프레 OCR 서비스에 활용. <b>Flutter</b>는 이번 구축 미채용(질의 확정 — §2.3). MariaDB 대비 PostgreSQL 유지 근거는 §2.1.</p>
+
+<!-- ═══════════ 결정 15 ═══════════ -->
+<h2 id="d15"><span class="no">1.</span>결정 15 — 배포·운영 모델</h2>
+
+<div class="dec">
+  <div class="dec-h">
+    <span class="num">결정 15</span>
+    <span class="ttl">배포·운영 모델</span>
+    <span class="tag tag-ok">확정 2026-07-10</span>
+  </div>
+
+  <h4>CTO 확정 세부 4항 (2026-07-10)</h4>
+  <div class="tw">
+  <table>
+  <thead><tr><th style="width:42px">#</th><th style="width:26%">항목</th><th>확정 내용</th></tr></thead>
+  <tbody>
+  <tr><td class="code">1</td><td>서버 위치</td><td><b>고객사 공장 내부</b></td></tr>
+  <tr><td class="code">2</td><td>백업</td><td><b>백업용 NAS 설치</b></td></tr>
+  <tr><td class="code">3</td><td>인터넷 의존도</td><td><b>설치·유지보수 시에만 일시적으로 보장</b> (운영 중 비보장 = C11)</td></tr>
+  <tr><td class="code">4</td><td>서버 이중화</td><td><b>이중화 구성 필요</b> → 방식 = <b>웜 스탠바이</b> (질의 확정)</td></tr>
+  </tbody>
+  </table>
+  </div>
+
+  <p class="small"><b>대안 비교(v0.1 이력)</b> — (a) 온프레 단일 / (b) 클라우드 단일 / (c) 클라우드+엣지 / (d) 온프레+백업 격리·원격 채널 중 <b>(d) 채택</b>. 단, v0.1의 (d)는 상시 인터넷 채널을 전제했으나 <b>C11 확인으로 조정</b>: 백업 격리=사내 NAS(+선택적 반출), 원격 운영=유지보수 창구 한정. (b)·(c) 배제는 C11로 <b>확인된 사실</b>이 됨 — 운영 중 인터넷이 없으므로 클라우드 정본은 성립하지 않는다.</p>
+
+  <h4>운영 규격</h4>
+  <ul class="small">
+    <li><b>서버</b> — 공장 내 서버 <b>이중화 — 웜 스탠바이</b> <span class="tag tag-ok">확정</span>. 구성안(설계 제안 — 사양 협의와 함께 확정): 동일 사양 2대 + PostgreSQL 스트리밍 복제(주→예비) + 장애 시 <b>수동 전환</b>(목표 수십 분, 절차서+리허설). 자동 failover는 복잡도 대비 이득 없어 배제 — 전환 판단에 사람을 두는 것이 오동작(split-brain)보다 싸다. 사양·설치 위치·UPS·RTO/RPO = 고객 협의 <span class="tag tag-open">미결 #3</span></li>
+    <li><b>백업(C4)</b> — 일 단위 논리 백업 + WAL 연속 아카이빙(PITR) → <b>사내망 NAS로 연속 복제</b>(주 단위 제약은 인터넷 대역폭 전제였음 — NAS는 사내망이라 제약 없음) → 연 단위 콜드 아카이브. 5~10년 보존 = <b>파티셔닝 + 콜드 아카이브 분리</b>(유지)</li>
+    <li><b>NAS 위치·재해 격리 = 고객사 선택 대기</b> <span class="tag tag-open">🔹질의 — 미정</span>: ① 서버와 물리 분리 설치(CREFLE 권장) ② 암호화 외장 매체 반출 로테이션 ③ 유지보수 창구 외부 복제 ④ 동일 공간 수용. <b>④ 선택 시 국지 재해에서 원본·백업 동시 소실 위험이 C4의 갭으로 남는다</b> — 고객 고지 필수(리스크 8)</li>
+    <li><b>원격 운영</b> — <b>상시 원격 채널 없음</b>(C11). 유지보수 = <b>방문 기본</b> + 유지보수 창구(고객 승인 하 일시 인터넷 개통) 원격 세션 보조. 인바운드 상시 개방 금지. 배포는 §2.4 오프라인 설치 패키지</li>
+    <li><b>알림 채널(QA #24 조정)</b> <span class="tag tag-ok">확정</span> — 정본 = <b>사내망 채널</b>(대시보드·알림센터·POP 표시, 고객사 지정 담당자 수신). 카카오톡/Zalo = <b>인터넷 가용 시 best-effort 보조 채널</b>로 격하 — 고객 고지 필요 <span class="tag tag-open">미결 #12</span></li>
+    <li><b>인터넷 의존 기능 전면 배제</b> — 외부 AI API 없음(결정 19)·원격 관측 없음(§2.4)·상시 터널 없음. <b>운영 중 인터넷이 0이어도 전 기능이 동작한다</b></li>
+    <li><b>이식성 보존</b> — 컨테이너 패키징 유지(기획서 §11-2 SaaS 티어 옵션)</li>
+  </ul>
+
+  <div class="field">
+    <div class="k">영향</div>
+    <div class="v">WBS §8-2 종결. 조달에 <b>서버 2대 + NAS</b> 추가 — HW스펙 v0.3 §2.6 신설. P0.2 배포 타깃 확정(§2.4). 데이터 국외 이전 논점은 외장 반출 선택 시에만 발생(미결 #4 조건부 격하).</div>
+  </div>
+</div>
+
+<!-- ═══════════ 결정 16 ═══════════ -->
+<h2 id="d16"><span class="no">2.</span>결정 16 — 기술 스택</h2>
+
+<div class="dec">
+  <div class="dec-h">
+    <span class="num">결정 16</span>
+    <span class="ttl">기술 스택 (FE / BE / DB / 인프라)</span>
+    <span class="tag tag-ok">확정 2026-07-10</span>
+  </div>
+
+  <h3 id="d16db">2.1 데이터베이스 — PostgreSQL <span class="tag tag-ok">확정 2026-07-10</span></h3>
+  <p class="small">CTO "특이사항 없음" + 팀 보유(§0.4)로 확정. <b>결정적 논거 유지 — MS-SQL 유인은 성립하지 않는다</b>: ERP 연계는 중계 테이블 pull <span class="tag tag-req">QA #18</span>이라 중계 테이블은 ERP 측 DB에 있고 MES는 읽어갈 뿐 — 필요한 것은 MS-SQL <b>클라이언트 드라이버뿐</b>. 팀 보유 MariaDB 대비로는 파티셔닝(C4)·머티리얼라이즈드 뷰(P4)·PITR 성숙도에서 우위 — 웜 스탠바이의 스트리밍 복제(결정 15)도 PostgreSQL 표준 기능이다. <span class="muted">ERP DB 엔진·버전은 요청서 시트2 회신 대기(드라이버·문자셋 입력값).</span></p>
+
+  <h3 id="d16be">2.2 백엔드 — TypeScript / NestJS <span class="tag tag-ok">확정 2026-07-10 · ★해소</span></h3>
+  <p class="small">CTO "특이사항 없음" + <b>팀 TS 보유 확인</b>으로 v0.1 ★(보유 스택 변수)이 해소되어 확정. 근거 유지: FE와 언어 통일로 OpenAPI 생성 타입·검증 규칙·도메인 상수를 <b>한 벌로 공유</b> — 계약 위반이 컴파일에서 걸리고 계약 변경이 한 레인에서 종결(WBS §4.1 계약 우선 정합). ORM은 P0.3에서 택일 <span class="tag tag-est">가설 — Prisma/Drizzle</span>. 대량 배치는 SQL 우선. <b>Python은 결정 19 OCR 서비스</b>(별도 컨테이너)로 활용.</p>
+
+  <h3 id="d16fe">2.3 프론트엔드 — React 코드 1벌 · 셸 3종 <span class="tag tag-ok">확정 · 구성 변경</span></h3>
+  <div class="callout info">
+    <div class="ch">v0.1 대비 변경 (🔹CTO)</div>
+    POP를 웹 브라우저(PWA)로 두려던 계획을 <b>폐기</b>하고 <b>설치형 응용프로그램</b>으로 전환 — "생산·실적·LOT 라벨 출력이 오프라인에서 원활해야 하고 프린터 제어를 포함해야 하므로 웹 브라우저 동작은 부적합". 구현 스택은 질의 확정: <b>React 유지 — Electron + Capacitor.</b>
+  </div>
+  <div class="tw">
+  <table>
+  <thead><tr><th style="width:15%">폼팩터</th><th style="width:20%">형태</th><th style="width:24%">대상 장비</th><th>요점</th></tr></thead>
+  <tbody>
+  <tr><td><b>관리 Desktop</b></td><td>React + TS <b>웹</b>(브라우저)</td><td>사무 PC</td><td>마스터 CRUD·대시보드·그리드. 계정 로그인. 온라인 전제(오프라인 금지 작업 대부분이 여기)</td></tr>
+  <tr class="pick"><td><b>POP(현장)</b></td><td><b>Electron 설치형 앱</b></td><td>모듈 D <b>산업용 패널 PC</b>(N100 올인원 터치, <b>Win11 IoT Entry</b> — C7)</td><td>키오스크 전용 창(자동 시작·전체 화면·브라우저 UI 없음) · <b>터치 중심</b> · 사번 경량 인증 <span class="tag tag-req">REQ-PR-0023</span> · 한/베 토글 · <b>로컬 SQLite</b>(선배포 캐시+outbox — 브라우저 저장소 회수 문제 원천 제거) · <b>라벨 인쇄 내장</b>(결정 18) · <b>제한적 오프라인</b>(결정 17 시나리오 1) · 오프라인/미동기 상시 표시</td></tr>
+  <tr class="pick"><td><b>모바일 스캐너</b></td><td><b>Capacitor Android 앱</b></td><td>모바일/PDA — 기종 미정(베트남 현지 구매), <b>OS=Android 확정</b> 🔹 + <b>무선 바코드 스캐너 결합</b>(모듈 A — HW스펙 §2.1)</td><td>스캔 퍼스트(<b>결합 스캐너 입력 연동</b>) · 카메라(거래명세서 촬영→OCR <span class="tag tag-req">REQ-PR-0006</span>) · 로컬 저장소 · 제한적 오프라인(결정 17 시나리오 2)</td></tr>
+  </tbody>
+  </table>
+  </div>
+  <ul class="small">
+    <li><b>코드 1벌 유지</b> — 동일 React 코드베이스에서 셸 3종(브라우저/Electron/Capacitor)으로 빌드. 공유물 = 도메인 타입·검증 규칙·API 클라이언트(OpenAPI 생성)·디자인 토큰·i18n·outbox 모듈.</li>
+    <li><b>Flutter 미채용 근거</b> <span class="tag tag-ok">질의 확정</span> — FE 레인 단일 프레임워크가 7주 병렬(6 도메인 × 관리+현장)의 조율 비용을 최소화하고 TS 단일 원본을 현장 앱까지 연장. Flutter 채택 시 도메인 타입·검증이 Dart에 중복.</li>
+    <li><b>N100 실기 확인</b> — Electron 구동·터치·무선랜 안정성을 트랙 H 실기 1세트에서 조기 확인 <span class="tag tag-open">미결 #11</span>. 패널 PC의 <b>무선랜 옵션</b>은 무선 구간 오프라인 빈도(결정 17 실효 부하)와 직결.</li>
+  </ul>
+
+  <h3 id="d16infra">2.4 인프라·배포 파이프라인 <span class="tag tag-ok">확정 · 배포 3조건 반영</span></h3>
+  <ul class="small">
+    <li><b>서버 런타임</b> — Ubuntu LTS + <b>Docker Compose</b> <span class="tag tag-ok">팀 보유</span>. K8s 배제 유지.</li>
+    <li><b>CI/CD (🔹CTO 배포 조건 3건)</b>:
+      ① <b>고객사 서버는 절대 자동 배포하지 않는다</b> — v0.1 '현장 서버 레지스트리 pull' 폐기.
+      ② CI(빌드·테스트)의 <b>배포 타깃 = 개발사 자체 운영 서버(추후 지정)</b> — 레지스트리·스테이징·검증 환경은 전부 CREFLE 측.
+      ③ CI 산출물로 <b>오프라인 설치 패키지</b> 빌드: 컨테이너 이미지 tar + Compose 정의 + DB 마이그레이션 + 설정 템플릿 + <b>클라이언트 설치본(Electron 인스톨러·Android APK)</b> + 체크섬 + 설치/롤백 스크립트.</li>
+    <li><b>현장 적용</b> — 반입=물리 매체(USB) 기본·유지보수 창구 일시 인터넷 보조. 적용=<b>수동 절차</b>: 사전 점검 → 백업 확인 → <b>스탠바이 우선 적용·검증 → 전환</b>(웜 스탠바이 활용) → 롤백 경로 유지.</li>
+    <li><b>관측</b> — <b>원격 실시간 관측 불가</b>(C11 — 🔹CTO). 로컬 관측(구조화 로그·헬스체크·디스크/백업 실패 감지)이 <b>고객사 지정 담당자에게 사내망 채널로 알림</b>. 유지보수 시 진단용 스냅샷 반출. APM 1차 제외.</li>
+  </ul>
+
+  <div class="field">
+    <div class="k">영향</div>
+    <div class="v">WBS §8-1 종결. P0.2는 배포 3조건 기준으로 설계. P0.3·P0.4 즉시 착수 조건 성립.</div>
+  </div>
+</div>
+
+<!-- ═══════════ 부속 결정 ═══════════ -->
+<h2 id="s3"><span class="no">3.</span>부속 결정 — 스택에서 파생하나 후부착이 불가능한 것</h2>
+
+<!-- 결정 17 -->
+<div class="dec" id="d17">
+  <div class="dec-h">
+    <span class="num">결정 17</span>
+    <span class="ttl">오프라인 내성 아키텍처</span>
+    <span class="tag tag-ok">확정 2026-07-10 · 범위 재정의</span>
+  </div>
+
+  <div class="callout warn">
+    <div class="ch">원칙 (🔹CTO 확정)</div>
+    오프라인 내성은 <b>전체 기능에 대한 광범위한 적용이 절대 아니다.</b> 기본 전제는 서버와의 상시 통신 보장이며, 부득이한 오프라인 발생 시 <b>최소한의 운영</b> — 생산 공정 가동에 직접 영향을 주는 부분 — 만 유지한다.
+    <div style="margin-top:var(--s-2)"><b>오프라인의 정의</b>: 사내망에서 단말이 서버와 통신할 수 없는 상태. <b>인터넷은 이 시스템에서 전혀 고려 대상이 아니다</b>(운영 경로에 없음 — C11과 별개 축).</div>
+  </div>
+
+  <h4>확정 시나리오 2건 (🔹CTO — 오프라인 동작의 확정 계획)</h4>
+  <div class="tw">
+  <table>
+  <thead><tr><th style="width:42px">#</th><th style="width:30%">시나리오</th><th>동작 구조</th></tr></thead>
+  <tbody>
+  <tr class="pick"><td class="code">1</td><td><b>생산 실행</b> — 자재 투입 → 생산 실적 → 생산LOT 등록</td><td><b>W/O(제조 지시서) 발행 시점에 서버가 대상 POP에 W/O 내용 + 기발행 LOT 라벨(서버 렌더링 완료 이미지 — 결정 18 접점)을 선배포(로컬 보관)</b> → 통신 두절 시에도 해당 W/O의 생산 진행·실적 입력·라벨 출력 계속</td></tr>
+  <tr class="pick"><td class="code">2</td><td><b>생산 자재 입·출고</b></td><td><b>단일 단말기로 입측·출측 스캔을 모두 수행</b> — 이동 짝(출고↔도착, QA #16 양방향)의 정합이 한 단말의 큐 안에서 유지된 채 복구 시 일괄 동기화</td></tr>
+  </tbody>
+  </table>
+  </div>
+  <p class="small"><b>그 외 전 기능 = 오프라인 미지원.</b> v0.1의 금지 목록(품질 판정 Lot Status 전이·출하 확정 PGI·ERP 송신·실사 조정)은 이 일반 원칙의 예시 — 서버 통신 필수, 오프라인 시 버튼 비활성화+사유 표시. v0.1의 "화이트리스트 잔여"는 <b>시나리오 2건 확정으로 해소.</b></p>
+
+  <h4>메커니즘 (v0.1 유지·축소)</h4>
+  <ul class="small">
+    <li><b>선배포(pre-sync)</b> — W/O 발행 이벤트 → 대상 POP에 W/O·Routing Rev 스냅샷·기발행 라벨 push 배포. <b>라벨은 서버 렌더링 완료 이미지로 선배포</b> — 렌더링이 서버 소관(결정 18)이라 오프라인 단말에는 렌더링 수단이 없다. v0.1 '범용 사전발행 풀' → <b>W/O 단위 선발행·선배포로 축소</b>(P3 패턴 정합).</li>
+    <li><b>outbox</b> — 실적·스캔 로컬 큐 = <b>앱 관리 SQLite</b>(Electron/Capacitor — 브라우저 IndexedDB 회수 위험 원천 제거). 순서 보존(seq)·지수 백오프·복구 시 순차 재생.</li>
+    <li><b>멱등성</b> — 전 쓰기 API <code>Idempotency-Key</code>(클라이언트 UUID) 필수 — 계약 표준 헤더(P0.4).</li>
+    <li><b>시각 분리</b> — <code>occurredAt</code>(단말 사건 시각) / <code>receivedAt</code>(서버 수신 시각) — P0.3 스키마 반영(후부착 불가).</li>
+    <li><b>실패 3분류</b> — 네트워크(재시도) / 검증 4xx(즉시 수동 검토 큐) / 충돌 409(사람 판단). 수동 검토 큐 담당자 배정 필수(조용한 유실 금지).</li>
+    <li><b>표시 의무</b> — <code>오프라인 · 미동기 N건</code> 상시 표시.</li>
+  </ul>
+
+  <div class="callout key">
+    <div class="ch">정합 확인 (v0.1 핵심 통찰 유지)</div>
+    ① 오프라인 채번은 <b>P3(선발행)</b>가 해결 — CORE-1(발번)·CORE-4(라벨)는 <b>W/O 발행 시 일괄 발번+선배포 API</b>를 처음부터 갖춘다. ② 충돌 병합은 <b>결정 08</b>(원장 append-only·잔량 파생·캐시 없음)이 전제 — 재생 순서가 달라도 잔량은 재계산으로 수렴.
+  </div>
+
+  <div class="field">
+    <div class="k">영향</div>
+    <div class="v">CORE-1·CORE-4 명세에 선배포 API. P0.4 계약에 멱등 키·에러 3분류. P0.3 스키마에 시각 분리·선배포 상태.</div>
+  </div>
+</div>
+
+<!-- 결정 18 -->
+<div class="dec" id="d18">
+  <div class="dec-h">
+    <span class="num">결정 18</span>
+    <span class="ttl">라벨 출력 경로</span>
+    <span class="tag tag-ok">확정 2026-07-10 · 채택</span>
+  </div>
+
+  <div class="rec">
+    <div class="rh">확정 (🔹CTO)</div>
+    <div class="rv">서버에서 렌더링을 마친 라벨 이미지를 인쇄하는 방식 채택</div>
+    <div class="rn">서버에 한국어·베트남어 지원 폰트를 탑재 — 프린터 내장 폰트 비의존. <b>베트남어 라벨 실기 검증 불요</b>(🔹CTO 확인, v0.1 ★해소).</div>
+  </div>
+
+  <ul class="small">
+    <li><b>인쇄 경로 보완(§2.3 연동)</b> — v0.1 '로컬 프린트 에이전트(별도 상주 프로그램)'는 <b>POP 응용프로그램에 인쇄 기능 내장</b>으로 대체 — 기존 '라벨 셋팅 프로그램' 계획이 POP 앱으로 흡수된다. 프린터(B) 배치 스테이션(조합 1·3)의 D 패널 PC가 POP 앱을 구동하므로 인쇄 지점=앱 지점. Electron 네이티브 권한으로 USB 프린터 제어(Windows 스풀러 또는 TSPL raw).</li>
+    <li><b>오프라인 접점(결정 17)</b> — 서버 렌더링 방식에서 오프라인 라벨 출력(시나리오 1)이 성립하려면 <b>선배포 페이로드가 렌더링 완료 이미지</b>여야 한다 — 결정 17 선배포 메커니즘에 명시.</li>
+    <li><b>잔여</b> — 인쇄 속도·데이터량은 <b>개발 중 자연 확인으로 격하</b>(별도 실기 검증 일정 불요 — 🔹CTO). 성능 미달 시 텍스트 커맨드 부분 회귀 옵션 유지. TTP-247 EoL 확인은 조달 트랙(트랙 H) 유지.</li>
+  </ul>
+</div>
+
+<!-- 결정 19 -->
+<div class="dec" id="d19">
+  <div class="dec-h">
+    <span class="num">결정 19</span>
+    <span class="ttl">AI 계층의 위치와 1차 범위</span>
+    <span class="tag tag-ok">확정 2026-07-10 · AI Agent 전면 제외</span>
+  </div>
+
+  <div class="rec">
+    <div class="rh">확정 (🔹CTO)</div>
+    <div class="rv">이번 계획에서 AI Agent 사용은 완전히 제외한다</div>
+    <div class="rn">v0.1의 "확정 2종 한정"에서 한 단계 더 축소 — 해당 2종도 AI Agent가 아닌 통상 기술로 구현.</div>
+  </div>
+
+  <ul class="small">
+    <li><b>거래명세서 분석(<span class="tag tag-req">QA #29</span>) = OCR</b>(CV/딥러닝 모델/VLM 중 선정) — <b>온프레미스 로컬 실행 전제</b>(C11: 운영 중 인터넷 비보장 → 외부 API 불가). 구현 = <b>Python 서비스</b>(별도 컨테이너, §2.2 — 팀 보유). 프리필 → 작업자 확인 후 저장, 인식 실패·저신뢰 시 <b>수기 입력 폴백</b>(<span class="tag tag-req">REQ-PR-0006</span> To-Be 정합). 엔진 선정·한/베 인식률 검증 <span class="tag tag-open">미결 #9</span></li>
+    <li><b>출하지시 = 결정론적 엑셀 파서</b>(고객사 지정 양식 <span class="tag tag-req">REQ-PR-0029</span>). LLM 불사용. 샘플(E5) 수령 후 매핑 확정.</li>
+    <li><b>RAG 정보 조회 = 포함 여지 있음</b>(🔹CTO 주의 표기) — 범위·방식 미정. 포함 시 온프레 실행 전제(C11)로 <b>서버 사양(GPU 등)에 영향</b> → 서버 조달 확정 전 판단 필요 <span class="tag tag-open">미결 #10</span></li>
+    <li>NLQ·일일 브리핑·FEFO 제안·자동 발행류 = OMF-AI 페이즈 이연(변동 없음 — <span class="tag tag-req">QA #20</span> Analytics 이연과 정합).</li>
+  </ul>
+
+  <div class="callout key">
+    <div class="ch">긴장 종결 (v0.1 ★해소)</div>
+    기획서 §4.2 축1('AI 네이티브')과의 긴장은 <b>본 프로젝트 = 제품 1호 구축(레퍼런스), AI = 후속 OMF-AI 페이즈</b>로 정리 — AI Agent 전면 제외 확정이 그 명문화다. 축적되는 실데이터가 OMF-AI의 입력이 된다.
+  </div>
+
+  <div class="field">
+    <div class="k">영향</div>
+    <div class="v">WBS §8-3 종결. WBS §4.2 <b>트랙 AI 삭제</b> — OCR·엑셀 파서는 D01(입하)·D04(출하지시) 도메인 기능으로 이관.</div>
+  </div>
+</div>
+
+<!-- ═══════════ 리스크 ═══════════ -->
+<h2 id="s4"><span class="no">4.</span>리스크 · 트레이드오프 <span class="muted" style="font-size:var(--text-table);font-weight:400">(v0.2 갱신)</span></h2>
+<div class="tw">
+<table>
+<thead><tr><th style="width:42px">#</th><th style="width:27%">리스크</th><th style="width:22%">성격</th><th>상태 · 대응</th></tr></thead>
+<tbody>
+<tr class="done"><td class="code">1</td><td>팀 보유 스택 미확인</td><td>v0.1 최대 변수</td><td>✅ <b>해소</b> — 2026-07-10 확인(§0.4), 권고안과 전 항목 정합</td></tr>
+<tr class="done"><td class="code">2</td><td>온프레 단일 서버 SPOF</td><td>v0.1 수용 비용</td><td>✅ <b>해소</b> — 웜 스탠바이 이중화 확정. 잔여: 전환 절차서+리허설(WBS 5.2)</td></tr>
+<tr><td class="code">3</td><td>PostgreSQL 인수 후 유지보수</td><td>고객 전산 역량 <span class="tag tag-open">확인 필요</span></td><td>완화 — 팀 PG 보유·런북·백업 자동화. 웜 스탠바이 전환 교육 포함</td></tr>
+<tr><td class="code">4</td><td>모바일 기종 미정 + Capacitor 결합</td><td>결합 리스크</td><td>유지 — OS=Android 확정(🔹)으로 축소. 실기 1세트 선확보(W3)</td></tr>
+<tr><td class="code">5</td><td>프린터 EoL (+폰트는 해소)</td><td>라벨 트랙</td><td>폰트 ✅해소(서버 렌더링·서버 폰트). EoL 확인은 조달 트랙 유지</td></tr>
+<tr class="done"><td class="code">6</td><td>AI 최소화 ↔ 기획서 차별화 축</td><td>포지셔닝 긴장</td><td>✅ <b>해소</b> — AI Agent 전면 제외 확정, '제품 1호 구축(레퍼런스)·AI=후속 OMF-AI 페이즈' 명문화(결정 19)</td></tr>
+<tr><td class="code">7</td><td><b>하드웨어 기준정보 개정 파급</b></td><td>조달·비용</td><td>확대 — 모듈 D 패널 PC(50만→76.7만, 10식)·서버 2대·NAS 추가. <b>HW스펙 v0.3 병행 개정 완료</b>(조합1 162.7만/조합2 126.7만)</td></tr>
+<tr class="hot"><td class="code">8</td><td><b>NAS 미격리 시 C4 갭</b></td><td>고객 선택 대기</td><td>신규 — 동일 공간 설치 선택 시 국지 재해에서 원본·백업 동시 소실. 권장안(물리 분리) 고지</td></tr>
+<tr><td class="code">9</td><td><b>OCR 온프레 인식률</b></td><td>결정 19 파생</td><td>신규 — 한/베 혼재 거래명세서의 로컬 모델 인식률 미검증. 수기 폴백이 하한 방어</td></tr>
+<tr><td class="code">10</td><td><b>패널 PC 무선랜 구간 단절</b></td><td>결정 17 실효 부하</td><td>신규 — 무선 스테이션은 오프라인 빈도가 유선보다 높음. N100 실기에서 무선 안정성 확인(#11)</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ═══════════ 반영 계획 ═══════════ -->
+<h2 id="s5"><span class="no">5.</span>확정 후 반영 계획</h2>
+<ol>
+  <li>본 문서 v0.2 = CTO 검토 반영본. <b>v1.0 전환 조건</b>: NAS 위치·격리(고객 선택)·서버/NAS 사양 협의 결과 반영.</li>
+  <li><b>WBS v1.0 승격 입력</b> — §8-1·2·3 종결 표기. <b>트랙 AI 삭제</b>(OCR·파서는 D01·D04 이관). 트랙 H 조정 — 폰트 실기 검증 삭제·서버 2대/NAS 조달·N100 실기 확인 추가. §7 폼팩터 표기 'POP·태블릿' → <b>'POP 패널 PC'</b> 정정.</li>
+  <li><b>하드웨어 구성 스펙 v0.3</b> — 모듈 D 패널 PC 교체·조합 단가 재산정·§2.6 서버/백업 신설: <b>본 결정과 동시 개정 완료.</b></li>
+  <li><b>P0 즉시 착수</b> — P0.2 저장소·CI/CD(배포 3조건 기준) → P0.3 물리 스키마 v0(63엔티티 DDL + 멱등 키 저장소·시각 분리·선배포 상태) → P0.4 API 계약 v0 + 목업 서버(<code>Idempotency-Key</code> 표준 헤더·에러 3분류·선배포 API).</li>
+  <li><b>CORE-1·CORE-4 명세 보강</b> — W/O 발행 시 일괄 발번·라벨 선발행 + POP 선배포 API(결정 17).</li>
+  <li><b>QA #24 알림 채널 조정 고객 고지</b> — 사내망 정본 + 메신저 best-effort(미결 #12).</li>
+</ol>
+
+<!-- ═══════════ 미결 ═══════════ -->
+<h2 id="s6"><span class="no">6.</span>미결 · 확인 필요 <span class="muted" style="font-size:var(--text-table);font-weight:400">(v0.2 갱신)</span></h2>
+<div class="tw">
+<table>
+<thead><tr><th style="width:52px">#</th><th style="width:30%">항목</th><th style="width:26%">성격</th><th>상태 · 기한·경로</th></tr></thead>
+<tbody>
+<tr class="done"><td class="code">1 ✅</td><td>CREFLE 팀 보유 기술 스택</td><td>v0.1 지배 변수</td><td><b>해소</b> — 2026-07-10 확인(§0.4)</td></tr>
+<tr><td class="code">2</td><td>ERP(UNIERP) DB 엔진·버전</td><td>드라이버·문자셋 입력값</td><td>고객 요청서 시트2 회신</td></tr>
+<tr class="hot"><td class="code">3</td><td>서버 2대·NAS 사양·설치 위치·UPS·RTO/RPO</td><td>결정 15 운영 규격</td><td>고객 협의 — <b>NAS 위치·격리 = 고객사 선택 대기</b>(🔹질의)</td></tr>
+<tr><td class="code">4</td><td>데이터 국외 이전 정책</td><td>조건부 격하</td><td><b>외장 매체 반출 채택 시에만</b> 해당 — NAS 사내 보관이면 논점 소멸</td></tr>
+<tr><td class="code">5</td><td>고객 전산의 DB·OS 운용 역량</td><td>리스크 3</td><td>고객 확인 — 웜 스탠바이 전환 교육 포함</td></tr>
+<tr><td class="code">6</td><td>ORM 택일 (Prisma / Drizzle)</td><td><span class="tag tag-est">가설</span></td><td>P0.3 스키마 작성 중 판정</td></tr>
+<tr class="done"><td class="code">7 ✅</td><td>오프라인 허용·금지 화이트리스트</td><td>결정 17 잔여</td><td><b>해소</b> — 시나리오 2건 확정(🔹CTO), 그 외 전부 미지원</td></tr>
+<tr class="done"><td class="code">8 ▼</td><td>서버 렌더링 인쇄 속도·데이터량</td><td>결정 18 잔여</td><td><b>격하</b> — 개발 중 자연 확인(별도 검증 일정 불요, 🔹CTO)</td></tr>
+<tr><td class="code">9 🔹</td><td><b>OCR 엔진 선정·인식률 검증</b></td><td>결정 19 신규</td><td>CV/딥러닝/VLM 중 선정(온프레) — 한/베 혼재 명세서 실물 검증, W3~4 <span class="tag tag-est">가설</span></td></tr>
+<tr><td class="code">10 🔹</td><td><b>RAG 정보 조회 포함 여부·방식</b></td><td>결정 19 신규</td><td>포함 시 온프레 LLM → 서버 사양(GPU) 영향 — <b>서버 조달 확정 전 판단</b></td></tr>
+<tr><td class="code">11 🔹</td><td><b>N100 패널 PC 실기 확인</b></td><td>결정 16 신규</td><td>Electron 구동·터치·무선랜 안정성 — 트랙 H 실기 1세트(W3 목표)</td></tr>
+<tr><td class="code">12 🔹</td><td><b>QA #24 알림 채널 조정 고객 고지</b></td><td>결정 15 신규</td><td>사내망 정본 + 메신저 best-effort — 고객 합의 기록 필요</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ═══════════ 변경 이력 ═══════════ -->
+<h2 id="s7"><span class="no">7.</span>변경 이력</h2>
+<table>
+<thead><tr><th style="width:80px">버전</th><th style="width:110px">날짜</th><th>변경 요지</th></tr></thead>
+<tbody>
+<tr><td class="code">v0.2</td><td>2026-07-10</td><td><b>CTO 검토 반영 — 결정 15~19 전건 확정 전환.</b> C7 개정(모듈 D=산업용 패널 PC N100·Win11 IoT Entry, 76.7만) · C8 명확화(모듈 D=현장 단말기) · <b>C11 신설(인터넷=설치·유지보수 시 일시 보장)</b> → 상시 터널·클라우드 백업·pull 자동 배포 폐기. 결정 15: 세부 4항 확정 + 웜 스탠바이 + NAS 위치=고객 선택 대기 + 알림 사내망 정본/메신저 best-effort. 결정 16: 팀 스택 확인으로 DB·BE 확정, <b>POP=Electron 설치형 앱</b>(웹 폐기)·모바일=Capacitor(Android), 배포 3조건 반영. 결정 17: <b>최소 운영 재정의 — 확정 시나리오 2건.</b> 결정 18: 채택 — 폰트 실기 검증 불요, 인쇄=POP 앱 내장. 결정 19: <b>AI Agent 전면 제외</b> — OCR 온프레(Python)·엑셀 파서·RAG 여지. ★ 4건 전건 해소. HW스펙 v0.3 병행 개정.</td></tr>
+<tr><td class="code">v0.1</td><td>2026-07-09</td><td>최초 작성 — WBS §8-1·2·3 종결용 결정 15~19 초안. 제약 C1~C10, 배포 4안·백엔드 4안·DB 3안·모바일 3안 비교, 부속 결정 3건. §0.4 지배 변수(팀 보유 스택 미확인) 공개. CTO 검토 포인트 ★ 4건.</td></tr>
+</tbody>
+</table>
+
+<div class="foot">
+  <b>CREFLE INC. · OMF 팀</b> — 내부 대외비 문서. 외부 공유·게시 금지.<br>
+  원본 Markdown: <code>research/2026-07-09-기술스택-배포모델-결정서.md</code> · 계보: <code>research/2026-07-06-설계결정서-14건.md</code>(결정 01~14) → 본 문서(결정 15~19) · 동시 개정: <code>research/2026-07-07-하드웨어-구성-스펙.md</code> v0.3<br>
+  상태: <b>v0.2 — 2026-07-10 CTO 검토 반영, 결정 15~19 확정.</b> v1.0 전환 조건: NAS 위치·격리(고객 선택) + 서버/NAS 사양 협의 반영.
+</div>
+
+</div></body>
+</html>

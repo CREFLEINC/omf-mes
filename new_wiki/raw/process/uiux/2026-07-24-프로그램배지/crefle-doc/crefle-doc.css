@@ -1,0 +1,1626 @@
+/* CREFLE 문서 디자인 시스템 — 생성물. 직접 수정하지 마세요.
+   출처: CREFLEINC/design-system-v2-doc  ·  scripts/build.mjs 가 생성합니다.
+   이 파일은 평평합니다 — @import 가 없습니다. 그건 의도입니다(전신의 @import 순서
+   버그로 아이콘이 죽은 적이 있습니다). 여기에 @import 를 추가하지 마세요. */
+
+/* ───── foundation/tokens.css ───── */
+/* ============================================================================
+   CREFLE Design System — Stage 1 Foundation Tokens
+   Brand + Colors only (1단계 공통 기반)
+
+   회사: 크레플 주식회사 / CREFLE Inc.
+   출처: CREFLE Presentation Design System (viskit_killer / Material Design 3 파생)
+   기본 강조(primary) = 브랜드 레드 #C9252C  ← RangKim 확정 (2026-06-25)
+
+   사용법: 빌드하는 모든 HTML/CSS에서 이 파일을 import 하고,
+   하드코딩된 hex 대신 var(--token) 만 사용한다. (raw hex 금지)
+   ============================================================================ */
+
+:root {
+
+  /* ==========================================================================
+     1. BRAND IDENTITY  — CREFLE 로고에서 샘플링
+     ========================================================================== */
+
+  /* 브랜드 레드 — 회사 공통 기본 강조색 */
+  --brand-red:        #C9252C;   /* 기본 / primary           */
+  --brand-red-dark:   #A81E24;   /* hover                    */
+  --brand-red-deep:   #7D161B;   /* on-dark accent / press   */
+  --brand-red-soft:   #F4DDDE;   /* container, subtle bg     */
+
+  /* 차콜 */
+  --brand-charcoal:      #3E4146; /* 기본 차콜               */
+  --brand-charcoal-deep: #1F2125; /* full-bleed dark        */
+
+  /* 다크 배경 그라디언트 (섹션 구분 / 타이틀 슬라이드)
+     차콜 → 레드 램프. 정확한 stop은 큐레이션 카드 기준으로 추후 조정 가능. */
+  --brand-gradient-dark: linear-gradient(135deg,
+                           #1F2125 0%,
+                           #7D161B 60%,
+                           #C9252C 100%);
+
+  /* ==========================================================================
+     2. PRIMARY  — 공통 주색 별칭 (= 브랜드 레드)
+     모든 UI/슬라이드 강조는 --brand-* 가 아니라 이 별칭을 통해 참조하면
+     향후 주색 변경 시 한 곳만 고치면 된다.
+     ========================================================================== */
+
+  --primary:            var(--brand-red);
+  --primary-hover:      var(--brand-red-dark);
+  --primary-press:      var(--brand-red-deep);
+  --primary-container:  var(--brand-red-soft);
+  --on-primary:         #FFFFFF;
+
+  /* ==========================================================================
+     3. PRODUCT UI PRIMARY  — viskit_killer 제품 전용
+     M3 파생 인디고. 제품 목업 안에서만 사용하고,
+     슬라이드·발표·공통 자료의 강조색으로는 쓰지 않는다.
+     ========================================================================== */
+
+  --product-primary: #4758A9;
+
+  /* ==========================================================================
+     4. NEUTRAL SURFACES  — surface ladder + foreground + outline
+     순수 #FFFFFF 금지. 약한 마젠타 기 도는 warm-cool white 사용.
+     ========================================================================== */
+
+  --surface:                 #FBF8FD;  /* 기본 표면              */
+  --surface-container-low:   #F5F2F7;
+  --surface-container:       #EFEDF1;
+  --surface-container-high:  #E9E7EB;
+
+  --on-surface:          #1B1B1F;  /* 본문 텍스트            */
+  --on-surface-variant:  #2D2C33;  /* 보조 텍스트            */
+  --on-surface-muted:    #77767F;  /* 약한 텍스트 / 라벨     */
+  --outline-variant:     #C6C5D0;  /* 카드 1px 보더          */
+
+  /* ==========================================================================
+     5. SEMANTIC  — 개념 동등 = 색 동등 (라이트/다크 고정)
+     "양품"은 어디서나 success, "불량"은 어디서나 error.
+     장식용으로 새 hex 만들지 말 것.
+     ========================================================================== */
+
+  --semantic-success:  #1F883D;  /* 양품 / Pass / OK       */
+  --semantic-error:    #B3261E;  /* 불량 / Fail / NG       */
+  --semantic-warning:  #E8A100;  /* 주의 / Attention       */
+  --semantic-info:     #0B57D0;  /* 정보 / Info            */
+  --semantic-idle:     #6E7781;  /* 대기 / Idle            */
+
+  /* ==========================================================================
+     6. STATE LAYERS  — M3 상태 레이어 알파 (overlay 용)
+     hover 8% · focus 12% + 2px ring · press 12% · disabled 38%
+     darken/lighten 이나 shrink-on-press 금지. 상태 레이어 패턴만 사용.
+     ========================================================================== */
+
+  --state-hover:    rgba(201, 37, 44, 0.08);  /* primary @ 8%   */
+  --state-focus:    rgba(201, 37, 44, 0.12);  /* primary @ 12%  */
+  --state-press:    rgba(201, 37, 44, 0.12);  /* primary @ 12%  */
+  --state-disabled-fill: rgba(27, 27, 31, 0.12);  /* on-surface @ 12% */
+  --state-disabled-text: rgba(27, 27, 31, 0.38);  /* on-surface @ 38% */
+}
+
+/* ───── doc-tokens.css ───── */
+/* ============================================================================
+   CREFLE 문서 DS — 도메인 토큰 레이어
+
+   파운데이션(styles/foundation/tokens.css)이 **색**의 단일 진실원이다.
+   이 파일은 파운데이션 Stage 1 에 없는 것만 채운다: 타입 · 공간 · 형태 · 고도 · 모션 · 차트.
+
+   ┌─ 이 파일의 첫 번째 규칙 ────────────────────────────────────────────────┐
+   │  --primary 를 정의하지 않는다. --surface 도, --semantic-* 도, --brand-* 도.  │
+   │  전부 잠긴 미러에서 온다.                                                  │
+   │                                                                          │
+   │  왜: CREFLE 문서의 브랜드 강조색은 한때 네 갈래였다 —                       │
+   │    파운데이션 #C9252C · crefle_designer 스킬 #4758A9 · 그 손복사본 #4758A9 ·  │
+   │    그리고 토큰조차 없이 CDN Pretendard 를 쓴 실제 발행 문서들.               │
+   │  원인은 하나: 복사본이 있었고 원본과 이어져 있지 않았다.                      │
+   │  여기서 --primary 를 정의하고 싶어지는 순간이 다섯 번째 갈래가 생기는 순간이다. │
+   │  scripts/check-tokens.mjs 가 막는다.                                       │
+   └──────────────────────────────────────────────────────────────────────────┘
+
+   출처: colors_and_type.css (CREFLE Presentation Design System) 의 타입·형태 계보를
+         잇는다. 그 파일의 문서 스케일은 문서화된 spec mandate 다 —
+         "제목 20 / 본문 16 / 본문 작은 12". 아래에서 그 세 앵커를 보존한 채 확장한다.
+   ============================================================================ */
+
+:root {
+  /* ==========================================================================
+     1. 파운데이션 보정 — 최소한으로, 근거를 남기고
+     ========================================================================== */
+
+  /* --on-surface-muted 오버라이드.
+     파운데이션 값 #77767F 는 WCAG AA 미달이다. 실측(2026-07-17):
+        --surface(#FBF8FD)              4.26:1  ❌
+        --surface-container-low         4.04:1  ❌
+        --surface-container             3.86:1  ❌
+        --surface-container-high        3.65:1  ❌   ← 네 표면 전부 미달
+     본문 AA 기준은 4.5:1. 문서는 읽고 인쇄하는 물건이라 UI 보다 더 아프다.
+     #65646D 는 네 표면 전부 AA 를 통과하는(최악 4.75:1) **최소 변경**이다.
+     → 파운데이션 업스트림 이슈 대상. 승격되면 이 줄을 지운다. */
+  --on-surface-muted: #65646D;
+
+  /* --outline: 파운데이션엔 --outline-variant(#C6C5D0) 만 있고 --outline 이 없다.
+     web-ui 도 같은 구멍을 보고했다(가이드 §"웹에서 나온 승격 후보").
+     값은 colors_and_type.css 계보를 따른다. 승격 후보. */
+  --outline: #767680;
+
+  /* --semantic-error-strong: 파운데이션엔 --semantic-error(#B3261E) 하나뿐이라
+     파괴적 액션의 hover 상태를 표현할 수 없다. M3 error-strong 값이고
+     colors_and_type.css 계보를 따른다(거기서도 같은 이름·값). 승격 후보.
+     쓰는 곳: deck-stage 의 삭제 확인 다이얼로그 danger 버튼 hover. */
+  --semantic-error-strong: #93000A;
+
+  /* ── 다크 표면 위의 오버레이 ──────────────────────────────────────────
+     dark/divider 슬라이드 위에 얹는 중립 알파. "얼마나 투명한가"는 디자인
+     결정이므로 토큰이어야 한다 — 컴포넌트에 rgba() 를 흩뿌리지 않는다.
+     파운데이션의 --state-* 는 primary 틴트(상호작용용)라 여기 쓸 수 없다.
+     중립인 이유: 다크 위 장식은 브랜드색을 쓰면 의미 요소와 경쟁한다.
+     web-ui 도 --scrim 으로 같은 구멍을 메웠다 → 승격 후보. */
+  --overlay-subtle: rgba(255, 255, 255, 0.05);  /* 격자 패턴          */
+  --overlay-ghost:  rgba(255, 255, 255, 0.08);  /* 섹션 번호 워터마크 */
+  --overlay-soft:   rgba(255, 255, 255, 0.08);  /* 캡슐 배경          */
+  --overlay-line:   rgba(255, 255, 255, 0.14);  /* 캡슐 보더          */
+
+  /* ── 슬라이드 설계 캔버스 ─────────────────────────────────────────────
+     deck-stage.js 의 DESIGN_W/H_DEFAULT(1920×1080)와 같은 값. deck-stage 는
+     런타임에 --deck-design-w/h 를 setProperty 로 주입하지만, 슬라이드를 단독으로
+     열어볼 때(저작 중)는 그게 없으므로 이 값이 폴백이 된다. */
+  --slide-canvas-w: 1920px;
+  --slide-canvas-h: 1080px;
+
+  /* ==========================================================================
+     2. TYPE — 서체
+     폰트 패밀리는 styles/fonts.css 가 @font-face 로 선언한다.
+     ⚠️ 폴백에 OS 의존 서체(Menlo/Consolas/SFMono/ui-monospace)를 두지 않는다 —
+        Ubuntu 엔 없어 DejaVu 로 떨어진다. 발행된 OhMyFactory_PoC_기획서_v2.pdf 에
+        Menlo-Bold(macOS 전용)가 임베드된 것이 그 증거다 = 재현 불가능한 PDF.
+        번들한 서체만 명명한다. check-fonts.mjs 가 강제한다.
+     ========================================================================== */
+
+  --font-sans: 'Spoqa Han Sans Neo', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-icon: 'Material Symbols Rounded';
+
+  /* ── 문서 스케일 ────────────────────────────────────────────────────────
+     spec mandate 세 앵커(20/16/12)를 보존하고 6단계로 확장한다.
+     3단계는 표지·장·절·본문·캡션·각주를 가진 보고서엔 부족하다.
+     비율 ~1.25 (12 → 16 → 20 → 24 → 30).
+
+     시맨틱 HTML 매핑 (styles/doc.css 가 기본값으로 적용):
+        <h1> 문서 제목   30px      <h2> 장   24px
+        <h3> 절   20px  ← 앵커     <h4> 항   17px
+        <p>  본문 16px  ← 앵커     <small>·<figcaption>·각주  12px  ← 앵커 */
+
+  --text-doc-title: 30px;   /* h1 — 문서 제목 (한 문서에 하나)   */
+  --text-chapter:   24px;   /* h2 — 장                          */
+  --text-section:   20px;   /* h3 — 절   ← spec mandate "제목"   */
+  --text-sub:       17px;   /* h4 — 항                          */
+  --text-body:      16px;   /*      본문 ← spec mandate "본문"   */
+  --text-small:     12px;   /*      캡션·각주 ← spec mandate "본문 작은" */
+  --text-label:     14px;   /*      라벨·버튼 (M3 label-large)   */
+
+  /* 아이콘 크기 — M3 (styles/fonts.css 의 .material-symbols-rounded 가 --icon-md 를 쓴다) */
+  --icon-sm: 20px;   /* 버튼 안        */
+  --icon-md: 24px;   /* 기본 · 본문 옆 */
+  --icon-lg: 40px;   /* 히어로         */
+
+  /* ── 슬라이드 스케일 (1920×1080 투사) ──────────────────────────────────
+     20/16/12 는 투사하면 읽을 수 없다. colors_and_type.css 의 검증된 값 그대로.
+     .doc 과 deck-stage 스코프로 격리되므로 한 페이지에 공존해도 안전하다. */
+
+  --slide-display: 96px;   /* 히어로 / 타이틀 슬라이드 */
+  --slide-h1:      64px;   /* 슬라이드 제목            */
+  --slide-h2:      40px;   /* 섹션 헤더                */
+  --slide-h3:      28px;   /* 서브섹션                 */
+  --slide-body:    24px;   /* 본문 — 투사 최소 가독    */
+  --slide-small:   18px;   /* 캡션 · 각주              */
+  --slide-eyebrow: 16px;   /* 대문자 eyebrow           */
+  --slide-ghost:  560px;   /* 섹션 번호 워터마크 — 장식이므로 스케일 밖의 별도 값 */
+
+  /* ── 굵기 — Spoqa 는 100/300/400/500/700 만 제공한다 ─────────────────
+     600·800 을 쓰면 브라우저가 합성(faux bold)해 인쇄에서 뭉갠다. */
+  --w-thin:    100;
+  --w-light:   300;
+  --w-regular: 400;
+  --w-medium:  500;
+  --w-bold:    700;
+
+  /* ── 행간 · 자간 ────────────────────────────────────────────────────── */
+  --leading-tight: 1.15;   /* 큰 제목            */
+  --leading-snug:  1.35;   /* 작은 제목 · 캡션   */
+  --leading-body:  1.6;    /* 본문 — 문서는 읽는 물건이라 UI(1.5)보다 넉넉히 */
+  --leading-loose: 1.75;   /* 긴 인용 · 각주     */
+  --tracking-tight:   -0.02em;   /* 큰 제목  */
+  --tracking-normal:  0;
+  --tracking-eyebrow: 0.14em;    /* 대문자   */
+
+  /* ==========================================================================
+     3. SHAPE — M3 코너 시스템 (README §Rule 3 계보)
+     무거운 보더와 깊은 그림자를 함께 쓰지 않는다 — 하나만 고른다.
+     ========================================================================== */
+  --radius-none: 0;
+  --radius-xs:   4px;
+  --radius-sm:   8px;     /* 뱃지 · 칩 · 상태 태그      */
+  --radius-md:   12px;    /* 카드 · 콘텐츠 블록 (기본)  */
+  --radius-lg:   16px;    /* 큰 미디어 · 일러스트       */
+  --radius-xl:   28px;    /* 히어로 카드 · 전면 시트    */
+  --radius-pill: 9999px;  /* 버튼 · 필 칩               */
+
+  /* ==========================================================================
+     4. ELEVATION — M3 Level 0–5
+     ========================================================================== */
+  --elev-0: none;
+  --elev-1: 0 1px 2px 0 rgba(0,0,0,0.10), 0 1px 3px 1px rgba(0,0,0,0.06);
+  --elev-2: 0 1px 2px 0 rgba(0,0,0,0.10), 0 2px 6px 2px rgba(0,0,0,0.08);
+  --elev-3: 0 4px 8px 3px rgba(0,0,0,0.08), 0 1px 3px 0 rgba(0,0,0,0.12);
+  --elev-4: 0 6px 10px 4px rgba(0,0,0,0.10), 0 2px 3px 0 rgba(0,0,0,0.14);
+  --elev-5: 0 8px 12px 6px rgba(0,0,0,0.10), 0 4px 4px 0 rgba(0,0,0,0.16);
+
+  /* 이미지 웰 · 코드 블록처럼 "페이지에 파인" 표면 */
+  --inset-1: inset 0 1px 0 0 rgba(255,255,255,0.6),
+             inset 0 -1px 0 0 rgba(0,0,0,0.04);
+
+  /* ==========================================================================
+     5. SPACING — 4pt 그리드. 눈대중으로 조합하지 않는다.
+     ========================================================================== */
+  --s-1: 4px;   --s-2: 8px;   --s-3: 12px;  --s-4: 16px;
+  --s-5: 20px;  --s-6: 24px;  --s-8: 32px;  --s-10: 40px;
+  --s-12: 48px; --s-16: 64px; --s-20: 80px; --s-24: 96px;
+
+  /* 슬라이드 안전 영역 (1920×1080) */
+  --slide-gutter:  80px;   /* 가장자리 최소 여백 */
+  --slide-min-gap: 24px;   /* 의미 있는 요소 사이 최소 간격 (README §3) */
+
+  /* 문서 지면 */
+  --doc-measure: 78ch;     /* 본문 최대 줄길이 — 넘으면 읽기 어렵다 */
+
+  /* 자동 배치 그리드의 열 최소폭. "몇 px 부터 한 열로 접히나"는 설계 결정이므로
+     토큰이어야 한다 — 컴포넌트에 흩뿌린 매직 넘버가 아니라. */
+  --grid-min-2: 240px;     /* 2열 그리드가 접히는 폭 */
+  --grid-min-3: 180px;     /* 3열 그리드 · KPI 가 접히는 폭 */
+  --doc-page-margin: 20mm; /* @page 여백 (styles/print.css) */
+
+  /* ==========================================================================
+     6. MOTION — M3 표준 이징
+     문서는 대부분 정적이다. 모션은 흐름 설명(워크플로우 다이어그램)에만.
+     인쇄·PDF 에선 전부 무의미하므로 print.css 가 죽인다.
+     ========================================================================== */
+  --ease-standard:   cubic-bezier(0.2, 0.0, 0, 1.0);
+  --ease-decelerate: cubic-bezier(0.0, 0.0, 0, 1.0);
+  --ease-accelerate: cubic-bezier(0.3, 0.0, 1.0, 1.0);
+  --dur-short:  150ms;
+  --dur-medium: 250ms;
+  --dur-long:   400ms;
+  --dur-emph:   500ms;
+
+  /* ==========================================================================
+     7. CHART — categorical 시리즈 팔레트
+
+     ┌─ 눈으로 고르지 않았다. 계산했다. ─────────────────────────────────────┐
+     │ 전부 dataviz 스킬의 validate_palette.js 로 검증한 값이다.              │
+     │   node scripts/validate_palette.js "<slots>" --mode light \           │
+     │        --surface "#FBF8FD" [--pairs all]                              │
+     │ 팔레트를 바꾸려면 **다시 돌려라.** 값만 고치고 넘어가지 말 것.          │
+     └───────────────────────────────────────────────────────────────────────┘
+
+     ## 왜 web-ui 팔레트를 버렸나 (실측 2026-07-17)
+
+     web-ui 의 --chart-1..5 는 primary 레드 + 차콜 사다리였다. 검증 결과 **3개 FAIL**:
+        Lightness band  ❌ #3E4146(0.374) · #B4B6BC(0.776) 이 밴드 밖
+        Chroma floor    ❌ 4개가 "회색으로 읽힘" (C < 0.10 → identity 일을 못 함)
+        Normal-vision   ❌ #8A8D94↔#63666D ΔE 13.3 < 15 — **hard FAIL**.
+                           정상 시력으로도 구분이 안 된다.
+     근본 원인: **단색 사다리는 sequential(크기) 구조인데 categorical(정체성)에 썼다.**
+     제품 UI 에선 시리즈가 1~2개라 안 드러났지만, 문서의 5조각 원형 차트에선 무너진다.
+
+     ## 확정된 8슬롯 — 고정 순서. 순환 금지. 건너뛰기 금지.
+
+     순서 자체가 CVD 안전 장치다(dataviz §"The slot ordering is the CVD-safety
+     mechanism, not cosmetic"). 9번째 시리즈는 새 색을 만드는 게 아니라 "기타"로
+     접거나 facet 으로 쪼갠다.
+
+     slot 1 이 브랜드 레드인 것이 중요하다: **단일 시리즈 차트는 모든 막대가 slot-1 색**을
+     쓴다(dataviz §"each bar takes the same slot-1 hue"). 보고서 차트 대부분이 단일
+     시리즈이므로, 그게 CREFLE 차트의 기본 인상이 된다.
+
+     2~8 은 dataviz 레퍼런스 인스턴스(references/palette.md)의 검증된 색을 쓴다
+     — 검사 6("Documented palette only — no eyeballed values")을 지키기 위해서다.
+     레퍼런스 순서에서 **green 을 5번으로 미뤘다**: green(#008300)↔브랜드레드 ΔE 2.7
+     (deuteranopia) 로 원형 차트(all-pairs)에서 충돌한다. 전형적인 적록 문제다.
+
+     검증 결과:
+       (a) 막대·꺾은선·누적 (adjacent pairs, 8슬롯 전부) → ALL PASS
+       (b) 원형 (all-pairs, 앞 4슬롯)                  → ALL PASS
+                                                 최악 ΔE 13.0 deutan / 16.3 normal
+     ========================================================================== */
+
+  --chart-1: var(--primary);   /* #C9252C 브랜드 레드 — 단일 시리즈의 기본색       */
+  --chart-2: #2a78d6;          /* 블루                                            */
+  --chart-3: #eda100;          /* 옐로                                            */
+  --chart-4: #4a3aa7;          /* 바이올렛  ← 여기까지가 원형(all-pairs) 안전 상한  */
+  --chart-5: #008300;          /* 그린 — 레드와 적록 충돌해 5번으로 밀렸다          */
+  --chart-6: #e87ba4;          /* 마젠타                                          */
+  --chart-7: #1baf7a;          /* 아쿠아                                          */
+  --chart-8: #eb6834;          /* 오렌지                                          */
+
+  --chart-grid: var(--outline-variant);
+  --chart-axis: var(--on-surface-muted);
+  /* 마크 사이 간격 — 인접 채움이 붙으면 경계가 사라진다 (dataviz §marks: 2px surface gap) */
+  --chart-gap: var(--surface);
+
+  /* ── 이 팔레트가 지우지 못한 의무 세 가지 ────────────────────────────────
+     차트 컴포넌트가 **반드시** 함께 제공해야 한다. 색만으로는 부족하다.
+
+     1. CVD floor band — slot 6↔7 (마젠타↔아쿠아) ΔE 6.1 (deutan). 6~8 구간은
+        **2차 인코딩이 있을 때만 합법**이다(직접 라벨 · 간격 · 텍스처).
+        시리즈 7개 이상일 때만 해당.
+
+     2. 대비 relief — slot 3(옐로 2.06:1) · 6(마젠타 2.56) · 7(아쿠아 2.67) 이
+        표면 대비 3:1 미만. WARN 은 무시 가능한 게 아니라 **의무**다:
+        값이 다른 방법으로 읽혀야 한다(보이는 라벨 또는 표 대체).
+
+     3. **흑백 인쇄** — dataviz 스킬 밖의, 문서 DS 고유 요구다. 보고서는 흑백으로
+        인쇄된다. 실측 상대명도: 레드 0.139 · 블루 0.188 · 옐로 0.435 · 바이올렛 0.073.
+        레드↔블루 명도차 **0.049** — 흑백에선 거의 같은 회색이다.
+        → 색만으로 시리즈를 구분하게 두면 인쇄본에서 정보가 사라진다.
+
+     세 의무가 전부 같은 답을 가리킨다: **범례(2시리즈 이상 항상) + 직접 라벨 +
+     마크 간 간격 + 시각적 숨김 표.** crefle-chart.js 가 전부 제공한다.
+
+     ## light 표면 전용 — 다크는 검증하지 않았다
+     다크(#1F2125)에서 이 8색은 lightness band 를 4개 벗어난다. dataviz 는 다크가
+     자동 반전이 아니라 **별도로 고른 스텝**이어야 한다고 명시한다(레퍼런스도 다크
+     전용 값을 따로 갖는다). 문서는 light 전용이고, 덱의 .slide.dark 는 타이틀·섹션용
+     이라 차트가 올라갈 자리가 아니다(참조 덱 49슬라이드에도 차트는 0개였다).
+     → **차트는 light 슬라이드/문서에만.** 다크 차트가 실제로 필요해지면 그때
+        레퍼런스의 다크 스텝으로 재검증한다. 지금 만들면 검증 안 된 색만 늘어난다.
+     ========================================================================== */
+}
+
+/* ───── fonts.css ───── */
+/* ============================================================================
+   CREFLE 문서 DS — 폰트
+
+   ⚠️ 이 파일에는 `@import` 가 하나도 없다. 앞으로도 넣지 말 것.
+
+   왜: 이 시스템의 전신인 `colors_and_type.css` 는 8행에
+       "@import rules must precede @font-face per CSS spec" 이라고 적어놓고
+       36행에서 그 규칙을 어겼다(@font-face 5개 뒤에 @import). CSS 스펙상 무효라
+       파서가 조용히 버렸고, 그 결과 Material Symbols 는 **한 번도 로드된 적이 없다**.
+       실측(Chrome, 네트워크 있음): 페이스 0개 등록, <span class="material-symbols-rounded">
+       photo_camera</span> 가 글리프 대신 literal 문자열(94px 폭)로 렌더.
+       규칙을 알고 적어둔 사람조차 27줄 뒤에 어겼다 → 규율이 아니라 구조로 막는다.
+
+   두 겹으로 막는다:
+     1) 이 파일에 @import 를 쓰지 않는다 (src: url() 로 로컬 파일만 직접 참조)
+     2) `scripts/check-fonts.mjs` 가 @import 가 @font-face 뒤에 오면 게이트를 실패시킨다
+     3) `scripts/build.mjs` 가 CSS 를 평평하게 concat 한다 — 산출물에 @import 자체가 없다
+
+   ⚠️ 네트워크 URL 금지. 모든 src 는 로컬 woff2 여야 한다.
+
+   왜: CREFLE reports 의 업로드 PDF 렌더러는 `network_mode: "none"` 격리 컨테이너에서
+       `file://` 로 렌더한다(docker-compose.yml 실측). CDN 폰트는 거기서 100% 실패한다.
+       그리고 OS 폴백 스택(ui-monospace, Menlo, Consolas …)도 답이 아니다 — Ubuntu 엔
+       셋 다 없어 DejaVu 로 떨어진다. 실제로 발행된 OhMyFactory_PoC_기획서_v2.pdf 에는
+       **Menlo-Bold(macOS 전용)** 가 임베드돼 있다 = 그 PDF 는 재현 불가능하다.
+       명명하는 모든 서체를 번들하고, OS 별로 다르게 해석될 폴백을 두지 않는다.
+   ============================================================================ */
+
+/* ── Spoqa Han Sans Neo — 파운데이션 잠긴 미러 (본문·제목 전부) ────────────
+   font-display: block 을 쓴다 (swap 아님).
+   swap 은 FOUT 를 만들고, Playwright 가 그 폴백 프레임을 PDF 로 찍을 수 있다.
+   block 은 폰트를 기다린다 — 화면 UX 보다 인쇄 결정성이 우선인 문서에선 이게 맞다. */
+
+@font-face {
+  font-family: 'Spoqa Han Sans Neo';
+  font-weight: 100;
+  font-style: normal;
+  font-display: block;
+  src: url('./fonts/SpoqaHanSansNeo-Thin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Spoqa Han Sans Neo';
+  font-weight: 300;
+  font-style: normal;
+  font-display: block;
+  src: url('./fonts/SpoqaHanSansNeo-Light.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Spoqa Han Sans Neo';
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  src: url('./fonts/SpoqaHanSansNeo-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Spoqa Han Sans Neo';
+  font-weight: 500;
+  font-style: normal;
+  font-display: block;
+  src: url('./fonts/SpoqaHanSansNeo-Medium.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Spoqa Han Sans Neo';
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+  src: url('./fonts/SpoqaHanSansNeo-Bold.woff2') format('woff2');
+}
+
+/* ── JetBrains Mono — 도메인 번들 (코드·수치·eyebrow) ──────────────────────
+   파운데이션엔 mono 가 없다. 두 번째 도메인이 요구하면 그때 승격한다
+   (docs/domain-ds-guide.md §"신규 토큰의 자리"). 굵기는 문서에 실제로 쓰는 3종만:
+   400 본문 코드 / 500 라벨·eyebrow / 700 강조. */
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  src: url('./fonts/JetBrainsMono-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-weight: 500;
+  font-style: normal;
+  font-display: block;
+  src: url('./fonts/JetBrainsMono-Medium.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+  src: url('./fonts/JetBrainsMono-Bold.woff2') format('woff2');
+}
+
+/* ── Material Symbols Rounded — 파운데이션 잠긴 미러 ───────────────────────
+   전신에서 이 폰트가 실제로 깨져 있던 바로 그 지점이다. 이제 로컬 woff2 를
+   @font-face 로 직접 선언하므로 @import 순서 문제가 존재하지 않는다. */
+
+@font-face {
+  font-family: 'Material Symbols Rounded';
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  src: url('./fonts/MaterialSymbolsRounded.woff2') format('woff2');
+}
+
+/* Material Symbols 는 리거처로 글리프를 찾는다 — 리거처가 꺼지면 아이콘 이름이
+   그대로 텍스트로 렌더된다(전신의 증상과 똑같이 보이지만 원인은 다르다).
+   `.ms` 는 짧은 별칭. */
+.material-symbols-rounded,
+.ms {
+  font-family: 'Material Symbols Rounded';
+  font-weight: normal;
+  font-style: normal;
+  font-size: var(--icon-md);
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ───── doc.css ───── */
+/* ============================================================================
+   CREFLE 문서 DS — 문서 레이어
+
+   스코프: `.doc` 안에서만 문서 스케일이 적용된다. deck.css 의 `.slide` 와 같은
+   스타일시트에 있어도 충돌하지 않는다 — 서로의 스코프에 들어가지 않기 때문이다.
+
+   ┌─ 이 파일의 설계 원칙 ─────────────────────────────────────────────────┐
+   │  **시맨틱 HTML 이 클래스 없이 맞는다.**                                │
+   │                                                                        │
+   │  이 문서들을 쓰는 건 Claude 다. LLM 은 <h2>배경</h2><p>본문…</p> 을     │
+   │  자연스럽게 쓴다. DS 가 <p class="t-body"> 를 요구하면 누락 하나하나가   │
+   │  조용한 드리프트이고, 모델은 반드시 누락한다.                            │
+   │                                                                        │
+   │  → h1~h4 · p · small · strong · em · blockquote · ul/ol · table ·      │
+   │    figure/figcaption · code/pre 가 .doc 안에서 **기본값으로** 맞는다.   │
+   │    **LLM 의 기본 출력이 이미 정답이다.**                                │
+   │                                                                        │
+   │  역할 클래스는 HTML 에 대응 엘리먼트가 **없는 것**에만 둔다:            │
+   │    .eyebrow · .lede · .kpi · .callout · .capsule · .label-pill         │
+   └────────────────────────────────────────────────────────────────────────┘
+
+   실증: 참조 덱(49슬라이드)은 `section`(42회) · `sub`(9회) · `title-xl`(7회) 클래스를
+   썼는데, 이 설계에선 **전부 필요 없다** — h2/h3 와 .display 가 대신한다.
+   클래스 58개 중 셋이 통째로 사라진다.
+   ============================================================================ */
+
+/* ── 문서 루트 ────────────────────────────────────────────────────────────
+   .doc 를 <body> 나 <article> 에 붙인다. 스코프 루트이자 지면이다. */
+.doc {
+  background: var(--surface);
+  color: var(--on-surface);
+  font: var(--w-regular) var(--text-body) / var(--leading-body) var(--font-sans);
+  /* 본문 줄길이 상한 — 넘으면 눈이 다음 줄을 못 찾는다. 표·차트는 아래에서 푼다. */
+  max-width: var(--doc-measure);
+  margin: 0 auto;
+  padding: var(--s-12) var(--s-6);
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+/* 표·차트·코드는 줄길이 제약을 벗어난다 — 데이터는 넓어야 읽힌다. */
+.doc > table,
+.doc > figure,
+.doc > pre,
+.doc > .kpi,
+.doc > crefle-chart {
+  max-width: none;
+}
+
+/* ── 타이포 — 클래스 없이 ────────────────────────────────────────────────
+   spec mandate(제목 20 / 본문 16 / 본문 작은 12)를 앵커로 6단계로 확장했다.
+   매핑: h1 문서제목 30 · h2 장 24 · h3 절 20(앵커) · h4 항 17 · p 16(앵커) · small 12(앵커) */
+
+.doc h1 {
+  font-size: var(--text-doc-title);
+  font-weight: var(--w-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  margin: 0 0 var(--s-6);
+}
+
+.doc h2 {
+  font-size: var(--text-chapter);
+  font-weight: var(--w-bold);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-tight);
+  margin: var(--s-12) 0 var(--s-4);
+}
+
+.doc h3 {
+  font-size: var(--text-section); /* 20px — spec mandate "제목" */
+  font-weight: var(--w-medium);
+  line-height: var(--leading-snug);
+  margin: var(--s-8) 0 var(--s-3);
+}
+
+.doc h4 {
+  font-size: var(--text-sub);
+  font-weight: var(--w-medium);
+  line-height: var(--leading-snug);
+  margin: var(--s-6) 0 var(--s-2);
+}
+
+/* 제목이 문단 바로 뒤에 오면 위 여백이 이중이 된다 — 첫 제목은 붙인다. */
+.doc > :first-child {
+  margin-top: 0;
+}
+
+.doc p {
+  margin: 0 0 var(--s-4);
+}
+
+.doc small,
+.doc figcaption {
+  font-size: var(--text-small); /* 12px — spec mandate "본문 작은" */
+  line-height: var(--leading-snug);
+  color: var(--on-surface-muted);
+}
+
+.doc strong {
+  font-weight: var(--w-bold);
+}
+.doc em {
+  font-style: italic;
+}
+
+.doc a {
+  color: var(--primary);
+  text-underline-offset: 2px;
+}
+/* 인쇄본에서 링크는 클릭할 수 없다 — URL 을 보여준다. */
+@media print {
+  .doc a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: var(--text-small);
+    color: var(--on-surface-muted);
+    word-break: break-all;
+  }
+}
+
+/* ── 목록 ───────────────────────────────────────────────────────────────── */
+.doc ul,
+.doc ol {
+  margin: 0 0 var(--s-4);
+  padding-left: var(--s-6);
+}
+.doc li {
+  margin-bottom: var(--s-2);
+}
+.doc li > ul,
+.doc li > ol {
+  margin-top: var(--s-2);
+  margin-bottom: 0;
+}
+
+/* ── 인용 ───────────────────────────────────────────────────────────────── */
+.doc blockquote {
+  margin: var(--s-6) 0;
+  padding: 0 0 0 var(--s-5);
+  border-left: 2px solid var(--primary);
+  color: var(--on-surface-variant);
+}
+.doc blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── 코드 ───────────────────────────────────────────────────────────────── */
+.doc code {
+  font-family: var(--font-mono);
+  font-size: 0.92em; /* 상대값 — 주변 텍스트 크기를 따라간다 */
+  background: var(--surface-container);
+  padding: 0.1em 0.4em;
+  border-radius: var(--radius-xs);
+}
+
+.doc pre {
+  margin: var(--s-5) 0;
+  padding: var(--s-5);
+  border-radius: var(--radius-md);
+  background: var(--brand-charcoal-deep);
+  color: var(--surface);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  line-height: var(--leading-body);
+  overflow-x: auto;
+  /* 코드 블록은 페이지 중간에서 잘리면 못 읽는다. */
+  break-inside: avoid;
+}
+.doc pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* ── 표 — 클래스 없이 ────────────────────────────────────────────────────
+   참조 덱은 `table.kv` 클래스를 12번 썼다. 여기선 <table> 이 그냥 맞는다. */
+.doc table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--s-5) 0;
+  font-size: var(--text-body);
+}
+
+.doc th,
+.doc td {
+  padding: var(--s-3) var(--s-4);
+  text-align: left;
+  border-bottom: 1px solid var(--outline-variant);
+  vertical-align: top;
+}
+
+.doc thead th {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  font-weight: var(--w-bold);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--on-surface);
+  background: var(--surface-container-low);
+  border-bottom: 1px solid var(--outline);
+}
+
+/* 행 머리(첫 열이 <th>)는 라벨이다 — 대문자로 만들지 않는다. */
+.doc tbody th {
+  font-weight: var(--w-medium);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  text-transform: none;
+  letter-spacing: normal;
+  background: none;
+}
+
+.doc tbody tr:last-child td,
+.doc tbody tr:last-child th {
+  border-bottom: none;
+}
+
+.doc tfoot td,
+.doc tfoot th {
+  border-top: 1px solid var(--outline);
+  border-bottom: none;
+  font-weight: var(--w-bold);
+  background: var(--surface-container-low);
+}
+
+.doc caption {
+  caption-side: top;
+  text-align: left;
+  font-size: var(--text-small);
+  color: var(--on-surface-muted);
+  padding-bottom: var(--s-2);
+}
+
+/* 수치 열 — 오른쪽 정렬 + 등폭. 자릿수가 맞아야 크기를 비교할 수 있다.
+   <td class="num"> 또는 <td data-num>. HTML 에 "이건 숫자다"를 표현할 방법이 없다. */
+.doc td.num,
+.doc td[data-num],
+.doc th.num {
+  font-family: var(--font-mono);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.doc td.num strong {
+  color: var(--primary); /* 5.27:1 on --surface — AA 통과 */
+}
+
+/* 인쇄 시 표가 페이지를 넘으면 머리를 반복한다 (Chromium 이 thead 를 자동 반복). */
+@media print {
+  .doc thead {
+    display: table-header-group;
+  }
+  .doc tr {
+    break-inside: avoid;
+  }
+}
+
+/* ── figure ─────────────────────────────────────────────────────────────── */
+.doc figure {
+  margin: var(--s-6) 0;
+  break-inside: avoid;
+}
+.doc figure img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+}
+.doc figcaption {
+  margin-top: var(--s-2);
+}
+
+.doc hr {
+  border: none;
+  border-top: 1px solid var(--outline-variant);
+  margin: var(--s-10) 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   역할 클래스 — HTML 에 대응 엘리먼트가 **없는** 것만.
+   여기에 뭔가 추가하기 전에: "정말 시맨틱 HTML 로 표현할 수 없나?" 를 먼저 묻는다.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* eyebrow — 제목 위의 분류 라벨. <h5> 로 쓰면 문서 개요가 오염된다. */
+.doc .eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  font-weight: var(--w-medium);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--primary);
+  margin: 0 0 var(--s-2);
+}
+
+/* lede — 제목 아래 요약. <p> 지만 크기가 다르다. */
+.doc .lede {
+  font-size: var(--text-sub);
+  line-height: var(--leading-snug);
+  color: var(--on-surface-variant);
+  margin: 0 0 var(--s-6);
+}
+
+/* ── 카드 4종 ─────────────────────────────────────────────────────────────
+   참조 덱은 카드를 53회 썼다(filled 18 · elev 17 · outline 10 · primary 8).
+   원본은 배경에 `#fff` 를 썼지만 파운데이션이 **순수 흰색을 금지**한다
+   ("순수 #FFFFFF 금지. 약한 마젠타 기 도는 warm-cool white 사용").
+   → M3 방식으로 **톤으로 띄운다**: surface-container 사다리를 쓴다. */
+.doc .card {
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-md);
+  padding: var(--s-6) var(--s-8);
+  background: var(--surface-container-low);
+  break-inside: avoid;
+}
+.doc .card-filled {
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--s-6) var(--s-8);
+  background: var(--surface-container);
+  break-inside: avoid;
+}
+.doc .card-elev {
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--s-6) var(--s-8);
+  background: var(--surface-container-low);
+  /* 무거운 보더와 깊은 그림자를 함께 쓰지 않는다 — 하나만 고른다 (README §Rule 3). */
+  box-shadow: var(--elev-2);
+  break-inside: avoid;
+}
+.doc .card-outline {
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-md);
+  padding: var(--s-5) var(--s-6);
+  background: transparent;
+  break-inside: avoid;
+}
+.doc .card-primary {
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--s-6) var(--s-8);
+  background: var(--primary-container);
+  /* 파운데이션엔 --on-primary-container 가 없다(가이드의 승격 후보).
+     새 hex 를 만들 필요가 없다 — --brand-red-deep 이 이미 8.11:1 로 AA 를 통과한다.
+     참조 덱은 #3B0608 을 발명했지만 불필요했다. */
+  color: var(--brand-red-deep);
+  break-inside: avoid;
+}
+.doc .card > :first-child,
+.doc .card-filled > :first-child,
+.doc .card-elev > :first-child,
+.doc .card-outline > :first-child,
+.doc .card-primary > :first-child { margin-top: 0; }
+.doc .card > :last-child,
+.doc .card-filled > :last-child,
+.doc .card-elev > :last-child,
+.doc .card-outline > :last-child,
+.doc .card-primary > :last-child { margin-bottom: 0; }
+
+/* ── 콜아웃 — 개념 동등 = 색 동등 (파운데이션 Rule 1) ──────────────────────
+   semantic 색은 **판정·상태·델타**에만. 장식으로 쓰지 않는다. */
+.doc .callout {
+  margin: var(--s-5) 0;
+  padding: var(--s-4) var(--s-5);
+  border-left: 2px solid var(--semantic-info);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--surface-container-low);
+  break-inside: avoid;
+}
+.doc .callout > :first-child { margin-top: 0; }
+.doc .callout > :last-child { margin-bottom: 0; }
+.doc .callout-success { border-left-color: var(--semantic-success); }
+.doc .callout-warning { border-left-color: var(--semantic-warning); }
+.doc .callout-error { border-left-color: var(--semantic-error); }
+
+/* ── KPI 넘버 콜아웃 ──────────────────────────────────────────────────────
+   참조 덱에서 11회. 큰 숫자 하나가 문장 열 개보다 강하다. */
+.doc .kpi {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--grid-min-3), 1fr));
+  gap: var(--s-5);
+  margin: var(--s-6) 0;
+}
+.doc .kpi > * {
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-md);
+  padding: var(--s-5) var(--s-6);
+  background: var(--surface-container-low);
+  break-inside: avoid;
+}
+.doc .kpi .big {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--text-doc-title);
+  /* 참조 덱은 800 을 썼지만 번들 JetBrains Mono 는 400/500/700 뿐이다 —
+     800 은 브라우저가 합성(faux bold)해 인쇄에서 뭉갠다. lint:tokens 규칙E 가 막는다. */
+  font-weight: var(--w-bold);
+  line-height: 1;
+  letter-spacing: var(--tracking-tight);
+  color: var(--primary); /* 5.00:1 on --surface-container-low — AA 통과 */
+  margin-bottom: var(--s-2);
+}
+.doc .kpi .lbl {
+  display: block;
+  font-size: var(--text-small);
+  line-height: var(--leading-snug);
+  color: var(--on-surface-muted);
+}
+
+/* ── 캡슐 · 라벨 필 ─────────────────────────────────────────────────────── */
+.doc .capsule,
+.doc .label-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-1) var(--s-3);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  font-weight: var(--w-medium);
+  border: 1px solid var(--outline-variant);
+  background: var(--surface-container-low);
+  color: var(--on-surface-variant);
+}
+.doc .label-pill {
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+}
+/* before/after 대조 — 참조 덱에서 6회. */
+.doc .label-before {
+  background: var(--surface-container-high);
+  color: var(--on-surface-muted);
+}
+.doc .label-after {
+  background: var(--primary-container);
+  color: var(--brand-red-deep);
+  border-color: transparent;
+}
+
+/* ── bigquote — 한 문장이 슬라이드 하나를 차지할 때 ────────────────────── */
+.doc .bigquote {
+  font-size: var(--text-chapter);
+  font-weight: var(--w-bold);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-tight);
+  margin: var(--s-8) 0;
+  padding: 0;
+  border: none;
+  color: var(--on-surface);
+}
+.doc .bigquote .accent {
+  color: var(--primary);
+}
+
+/* ── 그리드 — 4pt 그리드 위에서만 ───────────────────────────────────────── */
+.doc .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--grid-min-2), 1fr)); gap: var(--s-5); }
+.doc .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--grid-min-3), 1fr)); gap: var(--s-5); }
+
+/* ── 인쇄 ───────────────────────────────────────────────────────────────── */
+@media print {
+  .doc {
+    /* 인쇄 지면은 @page 가 관리한다 — 화면용 여백·줄길이 제약을 푼다. */
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+  /* 제목이 페이지 맨 아래 홀로 남지 않게. */
+  .doc h1,
+  .doc h2,
+  .doc h3,
+  .doc h4 {
+    break-after: avoid;
+  }
+  .doc p,
+  .doc li {
+    orphans: 3;
+    widows: 3;
+  }
+}
+
+/* ───── deck.css ───── */
+/* ============================================================================
+   CREFLE 문서 DS — 덱(발표) 레이어
+
+   스코프: `.slide` 안에서만 슬라이드 스케일이 적용된다. 문서 레이어(.doc)와
+   같은 스타일시트에 있어도 충돌하지 않는다 — 문서엔 .slide 가 없기 때문이다.
+
+   사용:
+     <deck-stage>                        ← src/deck-stage.js 가 업그레이드한다
+       <section class="slide">…</section>
+       <section class="slide dark">…</section>
+     </deck-stage>
+     <script src="./deck-stage.js"></script>   ← 이 한 줄을 빠뜨리면 덱이 아니다
+
+   ⚠️ deck-stage.js 를 로드하지 않으면:
+      · 자동 스케일링 없음 (1920 캔버스가 뷰포트를 넘침)
+      · 스피커노트·썸네일 레일·키보드 nav 없음
+      · **@page 주입이 없어 PDF 가 1페이지로 깨진다** — 비활성 슬라이드가
+        opacity:0 이므로 render_pdf.py 가 활성 슬라이드 하나만 A4 로 찍는다
+      첨부된 참조 덱(49슬라이드)이 정확히 이 상태였다. <deck-stage> 를 선언만 하고
+      JS 를 로드하지 않아 자체 nav 를 재구현했고 print CSS 가 0개였다.
+      examples/deck-minimal.html 을 복사해 쓰면 이 실수가 불가능하다.
+   ============================================================================ */
+
+/* ── 슬라이드 캔버스 ────────────────────────────────────────────────────────
+   deck-stage 안에서는 ::slotted(*) 가 inset:0/100% 로 덮어쓴다. 아래 width/height
+   는 deck-stage 없이 슬라이드 하나를 단독으로 열어볼 때(저작 중)를 위한 것이다. */
+.slide {
+  width: var(--deck-design-w, var(--slide-canvas-w));
+  height: var(--deck-design-h, var(--slide-canvas-h));
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: var(--s-16) var(--slide-gutter);
+
+  background: var(--surface);
+  color: var(--on-surface);
+  font: var(--w-regular) var(--slide-body) / var(--leading-body) var(--font-sans);
+
+  /* 인쇄 시 배경을 살린다 — 없으면 dark/divider 슬라이드가 흰 종이로 나온다. */
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+/* ── 슬라이드 변형 ──────────────────────────────────────────────────────────
+   dark/divider 는 파운데이션 --brand-gradient-dark(차콜→레드 램프)를 쓴다.
+   crefle_designer 스킬의 슬라이드 템플릿은 인디고 램프(#1A1C2E→#2E4090→#4758A9)를
+   썼는데, 그건 파운데이션이 --product-primary 로 강등한 제품 UI 색이다. */
+.slide.dark,
+.slide.divider {
+  background: var(--brand-gradient-dark);
+  color: var(--on-primary);
+}
+
+/* 격자 패턴 — viskit 배너 DNA. 장식이므로 의미 요소 위에 오지 않는다. */
+.slide.dark::before,
+.slide.divider::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--overlay-subtle) 1px, transparent 1px),
+    linear-gradient(90deg, var(--overlay-subtle) 1px, transparent 1px);
+  background-size: var(--slide-gutter) var(--slide-gutter);
+  pointer-events: none;
+}
+
+/* 채운 슬라이드 — 본문 대비를 낮춰 섹션 안의 리듬을 만든다. */
+.slide.filled {
+  background: var(--surface-container-low);
+}
+
+/* ── 스테이지: 슬라이드 안의 콘텐츠 영역 ───────────────────────────────────
+   footer 위로 뜨고(z-index), 격자 패턴 위에 놓인다. */
+.slide > .stage {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+}
+.slide > .stage.top { justify-content: flex-start; }
+.slide > .stage.middle { justify-content: center; }
+
+/* ── 타이포 — 시맨틱 HTML 이 기본값으로 맞는다 ─────────────────────────────
+   Claude 는 <h1>제목</h1><p>본문</p> 을 자연스럽게 쓴다. 클래스를 요구하면
+   누락 하나하나가 조용한 드리프트다. 역할 클래스는 HTML 에 대응 엘리먼트가
+   없는 것(eyebrow/lede)에만 둔다. */
+.slide h1 {
+  font-size: var(--slide-h1);
+  font-weight: var(--w-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  margin: 0 0 var(--s-6) 0;
+}
+.slide h2 {
+  font-size: var(--slide-h2);
+  font-weight: var(--w-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  margin: 0 0 var(--s-6) 0;
+}
+.slide h3 {
+  font-size: var(--slide-h3);
+  font-weight: var(--w-medium);
+  line-height: var(--leading-snug);
+  margin: 0 0 var(--s-3) 0;
+}
+.slide p {
+  font-size: var(--slide-body);
+  line-height: var(--leading-body);
+  margin: 0 0 var(--s-5) 0;
+}
+.slide p:last-child { margin-bottom: 0; }
+.slide strong { font-weight: var(--w-bold); }
+.slide small { font-size: var(--slide-small); }
+
+/* 히어로 — 타이틀 슬라이드용. h1 보다 크다. */
+.slide .display {
+  font-size: var(--slide-display);
+  font-weight: var(--w-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  margin: 0 0 var(--s-8) 0;
+}
+
+/* eyebrow — HTML 에 대응 엘리먼트가 없다. */
+.slide .eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--slide-eyebrow);
+  font-weight: var(--w-medium);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--primary);
+  margin: 0 0 var(--s-4) 0;
+}
+/* 다크 위에서 --primary(#C9252C)는 대비가 부족하다 — 밝은 틴트를 쓴다. */
+.slide.dark .eyebrow,
+.slide.divider .eyebrow {
+  color: var(--primary-container);
+}
+
+/* lede — 제목 아래 요약 한 줄. */
+.slide .lede {
+  font-size: var(--slide-h3);
+  line-height: var(--leading-snug);
+  color: var(--on-surface-muted);
+  max-width: 55ch;
+  margin: 0 0 var(--s-6) 0;
+}
+.slide.dark .lede,
+.slide.divider .lede { color: var(--on-primary); opacity: 0.9; }
+
+/* ── 푸터 — 슬라이드 하단 고정. deck-stage 가 pageno 를 채우지 않으므로
+   저자가 쓰거나 비워둔다(장식). ───────────────────────────────────────── */
+.slide > .footer {
+  position: absolute;
+  left: var(--slide-gutter);
+  right: var(--slide-gutter);
+  bottom: var(--s-8);
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: var(--slide-small);
+  font-weight: var(--w-medium);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--on-surface-muted);
+}
+.slide.dark > .footer,
+.slide.divider > .footer { color: var(--on-primary); opacity: 0.6; }
+
+/* ── 섹션 번호 워터마크 — 순수 장식. 의미 요소를 가리지 않는다. ─────────── */
+.slide .ghost-num {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  font-family: var(--font-mono);
+  font-size: var(--slide-ghost);
+  font-weight: var(--w-bold);
+  line-height: 0.8;
+  color: var(--overlay-ghost);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── 캡슐 — 메타 정보 칩(날짜·발표자·참조). ────────────────────────────── */
+.slide .capsule-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-top: var(--s-6);
+}
+.slide .capsule {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-2) var(--s-4);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--outline-variant);
+  background: var(--surface-container-low);
+  color: var(--on-surface-variant);
+  font-family: var(--font-mono);
+  font-size: var(--slide-small);
+  font-weight: var(--w-medium);
+}
+.slide.dark .capsule,
+.slide.divider .capsule {
+  background: var(--overlay-soft);
+  border-color: var(--overlay-line);
+  color: var(--on-primary);
+}
+
+/* ── 레이아웃 그리드 — 4pt 그리드 위에서만. 눈대중 금지. ───────────────── */
+.slide .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-8); }
+.slide .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-6); }
+.slide .split { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: var(--s-12); align-items: start; }
+
+/* ── 인쇄 ───────────────────────────────────────────────────────────────────
+   deck-stage.js 가 @media print 로 화면 레이아웃을 되돌리고(position:static,
+   transform 없음), <head> 에 @page{size: 1920px 1080px; margin:0} 을 주입한다
+   (@page 는 shadow DOM 안에서 무효라서). 그 결과 슬라이드당 1페이지가 된다.
+   여기서는 슬라이드 자체가 페이지 안에서 온전히 보이도록만 보장한다. */
+@media print {
+  .slide {
+    break-inside: avoid;
+    break-after: page;
+  }
+  .slide:last-child { break-after: auto; }
+  /* 애니메이션은 인쇄에서 무의미하고, 캡처 시점에 따라 중간 프레임이 찍힌다. */
+  .slide *,
+  .slide *::before,
+  .slide *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ── 모션 감소 선호 ────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .slide *,
+  .slide *::before,
+  .slide *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ───── chart.css ───── */
+/* ============================================================================
+   CREFLE 문서 DS — 차트 레이어
+
+   <crefle-chart> 가 만든 SVG 를 칠한다. 색은 전부 doc-tokens.css 의 검증된
+   categorical 팔레트(--chart-1..8)에서 온다 — 여기서 색을 발명하지 않는다.
+
+   ## 슬롯 매핑
+   컴포넌트가 data-slot="1".."8" 을 붙이고, 여기서 그걸 색으로 바꾼다.
+   JS 가 색을 직접 넣지 않는 이유: 색은 디자인 결정이고 CSS 가 그 자리다.
+   (그리고 lint:tokens 규칙F 가 JS 의 유채색을 막는다.)
+
+   ## 색만으로 구분하지 않는다
+   팔레트 검증이 남긴 의무 — 대비 relief(slot 3·6·7 이 3:1 미만), CVD floor
+   band(slot 6↔7 ΔE 6.1), 흑백 인쇄(레드↔블루 명도차 0.049). 전부 같은 답:
+   범례 + 직접 라벨 + 마크 간 간격 + 표 대체. 아래 스타일이 그것을 지원한다.
+   ============================================================================ */
+
+.crefle-chart {
+  margin: var(--s-6) 0;
+  /* 차트도 인쇄된다 — 페이지 중간에서 잘리면 못 읽는다. */
+  break-inside: avoid;
+}
+
+.crefle-chart-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* viewBox 논리 크기 안에서 반응형. 폭에 맞춰 늘어난다. */
+}
+
+.crefle-chart-title {
+  font-size: var(--text-sub);
+  font-weight: var(--w-medium);
+  color: var(--on-surface);
+  margin-bottom: var(--s-3);
+}
+
+.crefle-chart-caption {
+  font-size: var(--text-small);
+  color: var(--on-surface-muted);
+  margin-top: var(--s-2);
+}
+
+/* ── 슬롯 → 색 ─────────────────────────────────────────────────────────────
+   --series-color 는 시리즈별 오버라이드용(컴포넌트가 인라인 style 로 세팅).
+   없으면 슬롯 색으로 떨어진다. */
+[data-slot='1'] { --series-color: var(--chart-1); }
+[data-slot='2'] { --series-color: var(--chart-2); }
+[data-slot='3'] { --series-color: var(--chart-3); }
+[data-slot='4'] { --series-color: var(--chart-4); }
+[data-slot='5'] { --series-color: var(--chart-5); }
+[data-slot='6'] { --series-color: var(--chart-6); }
+[data-slot='7'] { --series-color: var(--chart-7); }
+[data-slot='8'] { --series-color: var(--chart-8); }
+
+/* ── 마크 ───────────────────────────────────────────────────────────────── */
+.crefle-chart-bar {
+  fill: var(--series-color);
+}
+
+.crefle-chart-slice {
+  fill: var(--series-color);
+  /* 조각 사이 간격 — 표면색 stroke 로 만든다. path 를 줄이면 각도가 왜곡되어
+     면적이 값과 어긋난다(차트가 거짓말을 한다). */
+  stroke: var(--chart-gap);
+}
+
+.crefle-chart-line {
+  fill: none;
+  stroke: var(--series-color);
+  stroke-width: 2; /* dataviz §marks: 2px lines */
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.crefle-chart-point {
+  fill: var(--series-color);
+  /* 겹치는 마크에 2px 표면 링 — 두 점이 포개져도 경계가 남는다. */
+  stroke: var(--chart-gap);
+  stroke-width: 2;
+}
+
+/* ── 격자·축 — 눈에 띄지 않아야 한다 (dataviz §recessive grid/axes) ─────── */
+.crefle-chart-grid {
+  stroke: var(--chart-grid);
+  stroke-width: 1;
+}
+
+.crefle-chart-axis {
+  stroke: var(--chart-axis);
+  stroke-width: 1;
+}
+
+/* ── 텍스트는 **텍스트 토큰**을 입는다. 시리즈 색이 아니라 ────────────────
+   dataviz non-negotiable: "Text wears text tokens, never the series color —
+   values, labels, and legends stay in primary/secondary/muted ink; a colored
+   mark beside them carries identity." */
+.crefle-chart-tick,
+.crefle-chart-axis-label {
+  fill: var(--on-surface-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+}
+.crefle-chart-tick { text-anchor: end; }
+.crefle-chart-axis-label { text-anchor: middle; }
+
+/* 직접 라벨 — 대비 relief 와 흑백 인쇄 의무를 갚는 핵심. 값이 색과 무관하게 읽힌다. */
+.crefle-chart-value {
+  fill: var(--on-surface);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  font-weight: var(--w-medium);
+  text-anchor: middle;
+}
+
+/* ── 범례 — 시리즈 2개 이상이면 항상 ────────────────────────────────────── */
+.crefle-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-5);
+  list-style: none;
+  margin: var(--s-3) 0 0 0;
+  padding: 0;
+  font-size: var(--text-small);
+  color: var(--on-surface-variant);
+}
+.crefle-chart-legend li {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+.crefle-chart-swatch {
+  flex: 0 0 auto;
+  width: var(--s-3);
+  height: var(--s-3);
+  border-radius: var(--radius-xs);
+  background: var(--series-color);
+}
+
+/* ── 시각적 숨김 — **클립이지 display:none 이 아니다** ──────────────────────
+   display:none 은 접근성 트리에서 통째로 사라진다. 클립하면 스크린리더는 읽는다.
+   이 표가 대비 relief 의무의 "table view" 다. */
+.crefle-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── 오류 — 조용히 죽지 않는다 ─────────────────────────────────────────── */
+.crefle-chart-error {
+  padding: var(--s-4);
+  border: 1px solid var(--semantic-error);
+  border-radius: var(--radius-sm);
+  background: var(--surface-container-low);
+  color: var(--semantic-error);
+  font-size: var(--text-small);
+  font-family: var(--font-mono);
+}
+
+/* ── 인쇄 ───────────────────────────────────────────────────────────────── */
+@media print {
+  .crefle-chart {
+    break-inside: avoid;
+  }
+  /* 차트 색은 데이터 인코딩이다 — 배경 인쇄가 꺼지면 정보가 사라진다. */
+  .crefle-chart-svg {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
+
+/* ───── print.css ───── */
+/* ============================================================================
+   CREFLE 문서 DS — 인쇄 / PDF 레이어
+
+   ┌─ 이 파일의 근거는 전부 **실측**이다 (Chromium 148, 2026-07-17) ────────┐
+   │  계획 단계에서 나는 "Chromium 은 @page 마진 박스와 counter(page) 를     │
+   │  지원하지 않는다" 고 적었다. **틀렸다.** 오래된 제약을 그대로 들고 온    │
+   │  것이었고, 진짜 PDF 를 뽑아보니 전부 동작했다.                          │
+   │  → 추측하지 말고 실측한다. 아래 표가 그 결과다.                          │
+   └─────────────────────────────────────────────────────────────────────────┘
+
+   | 기능                                    | Chromium 148 | 근거            |
+   |----------------------------------------|--------------|-----------------|
+   | @page { size · margin }                 | ✅           | PDF MediaBox    |
+   |                                         |              | 595×842pt 확인  |
+   | 마진 박스 (top/bottom/left-middle/right) | ✅ 매 페이지 반복 |            |
+   | counter(page) · counter(pages)          | ✅ 증가함     | "2/3","3/3"     |
+   | @page :first (표지엔 번호 없음)          | ✅           | 1p 에서 비워짐   |
+   | 마진 박스 안에서 content 가 var() 를 읽음 | ✅          | 러닝 헤더의 해법 |
+   | break-before/after/inside · orphans/widows | ✅        |                 |
+   | thead 페이지 넘김 반복                    | ✅ 자동      |                 |
+   | **string-set + string()**                | ❌ **미지원** | TL:/TR: 이 출력에 없었다 |
+   | position: running() + element()          | ❌ **미지원** | 흐름에 1회만 나옴 |
+
+   ## 러닝 헤더 — string-set 이 없어서 var() 로 한다
+
+   표준(CSS GCPM)은 `h1 { string-set: doctitle content() }` + `content: string(doctitle)`
+   이지만 Chromium 이 지원하지 않는다. 대신 **`content: var(--doc-running-title)`** 이
+   동작한다. 저자는 :root 에 한 줄만 쓰면 된다:
+
+       :root { --doc-running-title: "삼진엘앤디 DX 진행계획서"; }
+
+   문자열이어야 하므로 **따옴표를 포함**해 넣는다. 비우면 헤더가 사라진다(기본값 "").
+   ============================================================================ */
+
+:root {
+  /* 저자가 덮어쓰는 러닝 헤더 문자열. 반드시 따옴표 포함.
+     비워두면 헤더에 아무것도 안 찍힌다 — 조용히 "undefined" 가 나오지 않는다. */
+  --doc-running-title: '';
+  --doc-running-org: 'CREFLE';
+}
+
+@media print {
+  /* ── 지면 ────────────────────────────────────────────────────────────────
+     A4. render_pdf.py 는 prefer_css_page_size=True 라 이 @page 를 그대로 쓴다
+     (덱은 deck-stage.js 가 1920×1080 을 주입하고, 문서는 여기가 A4 를 준다). */
+  @page {
+    size: A4;
+    margin: var(--doc-page-margin) 18mm;
+
+    /* 마진 박스는 매 페이지에 반복된다 — 실측 확인. */
+    @top-left {
+      content: var(--doc-running-org);
+      font-family: var(--font-mono);
+      font-size: 8pt;
+      letter-spacing: var(--tracking-eyebrow);
+      color: var(--on-surface-muted);
+    }
+    @top-right {
+      /* string-set 이 없어서 var() 로 받는다. 저자가 :root 에 세팅. */
+      content: var(--doc-running-title);
+      font-family: var(--font-sans);
+      font-size: 8pt;
+      color: var(--on-surface-muted);
+    }
+    @bottom-center {
+      content: counter(page) ' / ' counter(pages);
+      font-family: var(--font-mono);
+      font-size: 8pt;
+      color: var(--on-surface-muted);
+    }
+  }
+
+  /* 표지엔 머리·번호를 넣지 않는다 — 관례. :first 가 동작한다(실측). */
+  @page :first {
+    @top-left { content: ''; }
+    @top-right { content: ''; }
+    @bottom-center { content: ''; }
+  }
+
+  /* ── 배경 인쇄 ───────────────────────────────────────────────────────────
+     차트 색·콜아웃 보더·카드 톤은 **데이터와 의미**다 — 배경 인쇄가 꺼지면
+     정보가 사라진다. Playwright 는 printBackground:true, 사람은 브라우저 설정. */
+  html,
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* **종이가 곧 표면이다.** --surface 를 칠하지 않는다.
+     실측(report.pdf 2페이지 픽셀): @page 여백은 순백 (255,255,255) 인데 문서 배경은
+     --surface (251,248,253) 라, 98% 흰색 사각형이 매 페이지에 찍히고 **경계선이 보였다**.
+     토너를 낭비하고 인쇄물답지 않다.
+     카드·콜아웃의 --surface-container-* 는 여전히 종이 대비로 뜬다 — 오히려 조금 더
+     또렷하다(#F5F2F7 이 #FBF8FD 위보다 흰 종이 위에서 대비가 크다).
+
+     ⚠️ 셀렉터가 `body` 가 아니라 `.doc` 인 이유: 템플릿은 <body class="doc"> 를 쓴다.
+        `.doc`(특이성 0-1-0)가 `body`(0-0-1)를 이기므로, print.css 가 뒤에 와도
+        `body { background: transparent }` 로는 **못 이긴다.** 실측으로 확인했다 —
+        computed 가 rgb(251,248,253) 그대로였다. 배경을 소유한 셀렉터를 재정의한다. */
+  .doc {
+    background: transparent;
+  }
+
+  /* 화면 전용 크롬은 인쇄하지 않는다. */
+  .screen-only {
+    display: none !important;
+  }
+
+  /* ── 페이지 나눔 ─────────────────────────────────────────────────────────
+     .page-break 를 쓰면 저자가 명시적으로 끊을 수 있다. 표지·장 시작에 쓴다. */
+  .page-break {
+    break-before: page;
+  }
+  .page-break-avoid {
+    break-inside: avoid;
+  }
+
+  /* 표지는 항상 한 장을 다 쓴다. */
+  .doc-cover {
+    break-after: page;
+  }
+
+  /* ── 모션 없음 ───────────────────────────────────────────────────────────
+     인쇄에 애니메이션은 무의미하고, 캡처 시점에 따라 중간 프레임이 찍힌다. */
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   섹션 · 그림 · 표 번호 — CSS counters
+   화면에서도 인쇄에서도 같아야 하므로 @media print 밖에 둔다.
+   .doc-numbered 를 붙인 문서에서만 켜진다 — 회의록처럼 번호가 필요 없는 문서도 있다.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.doc-numbered {
+  counter-reset: chapter figure table;
+}
+
+.doc-numbered h2 {
+  counter-increment: chapter;
+  counter-reset: section;
+}
+.doc-numbered h2::before {
+  content: counter(chapter) '. ';
+  color: var(--on-surface-muted);
+}
+
+.doc-numbered h3 {
+  counter-increment: section;
+}
+.doc-numbered h3::before {
+  content: counter(chapter) '.' counter(section) ' ';
+  color: var(--on-surface-muted);
+}
+
+/* 그림·표 번호는 캡션에 붙는다. figure 안의 figcaption 만 — 차트의 caption 은
+   crefle-chart 가 따로 관리하므로 건드리지 않는다. */
+.doc-numbered figure > figcaption {
+  counter-increment: figure;
+}
+.doc-numbered figure > figcaption::before {
+  content: '그림 ' counter(figure) '. ';
+  font-weight: var(--w-medium);
+  color: var(--on-surface-variant);
+}
+
+.doc-numbered table > caption {
+  counter-increment: table;
+}
+.doc-numbered table > caption::before {
+  content: '표 ' counter(table) '. ';
+  font-weight: var(--w-medium);
+  color: var(--on-surface-variant);
+}
+
+/* ── 각주 ─────────────────────────────────────────────────────────────────
+   Chromium 은 CSS GCPM 의 float:footnote 를 지원하지 않는다(실측 대상이 아니라
+   알려진 사실이지만, 지원했다면 여기가 그 자리다). 문서 끝 미주로 처리한다. */
+.doc .footnotes {
+  margin-top: var(--s-10);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--outline-variant);
+  font-size: var(--text-small);
+  color: var(--on-surface-variant);
+  break-inside: avoid;
+}
+.doc .footnotes ol {
+  padding-left: var(--s-5);
+}
+.doc a.fn-ref {
+  font-size: 0.75em;
+  vertical-align: super;
+  text-decoration: none;
+  color: var(--primary);
+  padding: 0 0.15em;
+}

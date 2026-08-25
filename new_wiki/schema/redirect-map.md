@@ -438,6 +438,141 @@ uiux/2026-07-25-화면목록-IA/crefle-doc/  →  new_wiki/raw/process/uiux/2026
 ```
 
 
+
+## Phase 5 커버리지 점검 보강 (2026-08-25 — 누락분 일괄 이관)
+
+### raw/process/deliverables/ (후속)
+```
+deliverables/90-원본자료-정리보고.md  →  new_wiki/raw/process/deliverables/90-원본자료-정리보고.md
+```
+
+### schema/templates/ (후속)
+```
+deliverables/openapi/ui-적합성-점검표.md  →  new_wiki/schema/templates/ui-적합성-점검표.md
+uiux/CLAUDE.md  →  new_wiki/schema/00-authoring-rules.md (Tier 1 요약 승계 — 원문은 삭제 전까지 uiux/CLAUDE.md가 정본)
+uiux/화면상세스펙-공통/00-서식.md  →  new_wiki/schema/templates/00-화면스펙서식.md
+```
+
+### raw/process/docs/research/ (후속 — 느슨한 개별 파일)
+```
+docs/research/2026-06-05-MES-AI-Agent-시장조사.md  →  new_wiki/raw/process/docs/research/2026-06-05-MES-AI-Agent-시장조사.md
+docs/research/2026-06-22-UNIMES-제안서-기능워크플로우-추출.md  →  new_wiki/raw/process/docs/research/2026-06-22-UNIMES-제안서-기능워크플로우-추출.md
+docs/research/2026-06-23-기능분해도.md  →  new_wiki/raw/process/docs/research/2026-06-23-기능분해도.md
+docs/research/2026-06-23-용어표준사전.md  →  new_wiki/raw/process/docs/research/2026-06-23-용어표준사전.md
+docs/research/2026-07-07-하드웨어-구성-스펙.html  →  new_wiki/raw/process/docs/research/2026-07-07-하드웨어-구성-스펙.html
+docs/research/2026-07-07-하드웨어-구성-스펙.md  →  new_wiki/raw/process/docs/research/2026-07-07-하드웨어-구성-스펙.md
+docs/research/2026-07-08-ERP-MES-연계-데이터-제공요청서.xlsx  →  new_wiki/raw/process/docs/research/2026-07-08-ERP-MES-연계-데이터-제공요청서.xlsx
+docs/research/2026-07-08-ERP-MES-수신정보-정리.md  →  new_wiki/raw/process/docs/research/2026-07-08-ERP-MES-수신정보-정리.md
+docs/research/gen_checklist.py  →  new_wiki/raw/process/docs/research/gen_checklist.py
+docs/research/gen_coderef.py  →  new_wiki/raw/process/docs/research/gen_coderef.py
+docs/research/raw-자료-목록.md  →  new_wiki/raw/process/docs/research/raw-자료-목록.md
+```
+
+### raw/decisions/ (후속 — 이미 이관된 결정서의 HTML·PDF 파생)
+```
+docs/research/2026-07-09-기술스택-배포모델-결정서.html  →  new_wiki/raw/decisions/2026-07-09-기술스택-배포모델-결정서.html
+docs/research/2026-07-09-기술스택-배포모델-결정서.pdf  →  new_wiki/raw/decisions/2026-07-09-기술스택-배포모델-결정서.pdf
+```
+
+### raw/superseded/ (후속 — 같은 계열 후행 파일)
+```
+docs/research/2026-07-03-현장점검-체크리스트.html  →  new_wiki/raw/superseded/2026-07-03-현장점검-체크리스트.html
+docs/research/2026-07-03-현장점검-코드참조-미결코드·클러스터.html  →  new_wiki/raw/superseded/2026-07-03-현장점검-코드참조-미결코드·클러스터.html
+```
+
+### raw/process/uiux/ (후속 — 배치 폴더별 역사적 산출물)
+```
+uiux/2026-07-25-화면목록-IA/build-도식본.py  →  new_wiki/raw/process/uiux/2026-07-25-화면목록-IA/build-도식본.py
+uiux/2026-07-25-화면목록-IA/build-정식본.py  →  new_wiki/raw/process/uiux/2026-07-25-화면목록-IA/build-정식본.py
+uiux/2026-07-25-화면목록-IA/screen-inventory-ia.html  →  new_wiki/raw/process/uiux/2026-07-25-화면목록-IA/screen-inventory-ia.html
+uiux/2026-07-25-화면목록-IA/보류결정-권고안.html  →  new_wiki/raw/process/uiux/2026-07-25-화면목록-IA/보류결정-권고안.html
+uiux/2026-07-25-화면목록-IA/보류결정-권고안.pdf  →  new_wiki/raw/process/uiux/2026-07-25-화면목록-IA/보류결정-권고안.pdf
+uiux/2026-07-25-화면목록-IA/화면목록-IA-도식본.html  →  new_wiki/raw/process/uiux/2026-07-25-화면목록-IA/화면목록-IA-도식본.html
+uiux/2026-07-24-프로그램배지/01_designer_brief_프로그램배지.html  →  new_wiki/raw/process/uiux/2026-07-24-프로그램배지/01_designer_brief_프로그램배지.html
+uiux/2026-07-24-프로그램배지/02_drawer_report_프로그램배지_waveA.html  →  new_wiki/raw/process/uiux/2026-07-24-프로그램배지/02_drawer_report_프로그램배지_waveA.html
+uiux/2026-07-24-프로그램배지/02_drawer_report_프로그램배지_waveB.html  →  new_wiki/raw/process/uiux/2026-07-24-프로그램배지/02_drawer_report_프로그램배지_waveB.html
+uiux/2026-07-24-프로그램배지/03_review_프로그램배지_waveA_r1.html  →  new_wiki/raw/process/uiux/2026-07-24-프로그램배지/03_review_프로그램배지_waveA_r1.html
+uiux/2026-07-24-프로그램배지/03_review_프로그램배지_waveB_r1.html  →  new_wiki/raw/process/uiux/2026-07-24-프로그램배지/03_review_프로그램배지_waveB_r1.html
+uiux/2026-07-24-프로그램배지/04_followup_단말확정_minibrief.html  →  new_wiki/raw/process/uiux/2026-07-24-프로그램배지/04_followup_단말확정_minibrief.html
+uiux/2026-07-24-프로그램배지/04_followup_단말확정_review_r1.html  →  new_wiki/raw/process/uiux/2026-07-24-프로그램배지/04_followup_단말확정_review_r1.html
+uiux/2026-07-24-프로그램배지/index.html  →  new_wiki/raw/process/uiux/2026-07-24-프로그램배지/index.html
+uiux/2026-07-24-프로그램배지/placement-plan.html  →  new_wiki/raw/process/uiux/2026-07-24-프로그램배지/placement-plan.html
+uiux/2026-07-24-프로그램배지/crefle-doc/  →  new_wiki/raw/process/uiux/2026-07-24-프로그램배지/crefle-doc/ (폰트·CSS 번들, 디렉터리 전체)
+uiux/2026-07-31-화면상세스펙-파일럿/화면상세스펙-파일럿-검토요청.html  →  new_wiki/raw/process/uiux/2026-07-31-화면상세스펙-파일럿/화면상세스펙-파일럿-검토요청.html
+uiux/2026-07-31-화면상세스펙-파일럿/P-02-04-레이아웃검증-1024x768.png  →  new_wiki/raw/process/uiux/2026-07-31-화면상세스펙-파일럿/P-02-04-레이아웃검증-1024x768.png
+uiux/2026-07-31-화면상세스펙-파일럿/P-02-04-레이아웃검증.html  →  new_wiki/raw/process/uiux/2026-07-31-화면상세스펙-파일럿/P-02-04-레이아웃검증.html
+uiux/2026-08-03-화면상세스펙-확대1차/화면상세스펙-확대1차-검토요청.html  →  new_wiki/raw/process/uiux/2026-08-03-화면상세스펙-확대1차/화면상세스펙-확대1차-검토요청.html
+```
+
+### raw/process/openapi-patches/ (후속 등록 — 실제 이관은 2026-08-25 완료, 등록 누락분 보강)
+```
+deliverables/openapi/patch-01-destination-type-values.py  →  new_wiki/raw/process/openapi-patches/patch-01-destination-type-values.py
+deliverables/openapi/patch-01-disposal-destination.py  →  new_wiki/raw/process/openapi-patches/patch-01-disposal-destination.py
+deliverables/openapi/patch-01-goods-receipt-etag.py  →  new_wiki/raw/process/openapi-patches/patch-01-goods-receipt-etag.py
+deliverables/openapi/patch-01-missing-ops.py  →  new_wiki/raw/process/openapi-patches/patch-01-missing-ops.py
+deliverables/openapi/patch-01-recycle-entry.py  →  new_wiki/raw/process/openapi-patches/patch-01-recycle-entry.py
+deliverables/openapi/patch-01-status-code-values.py  →  new_wiki/raw/process/openapi-patches/patch-01-status-code-values.py
+deliverables/openapi/patch-02-shift-not-a-design-input.py  →  new_wiki/raw/process/openapi-patches/patch-02-shift-not-a-design-input.py
+deliverables/openapi/patch-05-app-operation-policies.py  →  new_wiki/raw/process/openapi-patches/patch-05-app-operation-policies.py
+deliverables/openapi/patch-05-fit-fixes.py  →  new_wiki/raw/process/openapi-patches/patch-05-fit-fixes.py
+deliverables/openapi/patch-05-mdm-masters.py  →  new_wiki/raw/process/openapi-patches/patch-05-mdm-masters.py
+deliverables/openapi/patch-06-interface-definitions.py  →  new_wiki/raw/process/openapi-patches/patch-06-interface-definitions.py
+deliverables/openapi/patch-06-item-mes-category.py  →  new_wiki/raw/process/openapi-patches/patch-06-item-mes-category.py
+deliverables/openapi/patch-06-partner-roles.py  →  new_wiki/raw/process/openapi-patches/patch-06-partner-roles.py
+deliverables/openapi/patch-06-routing-effective-from-optional.py  →  new_wiki/raw/process/openapi-patches/patch-06-routing-effective-from-optional.py
+deliverables/openapi/patch-06-sampling-ratio.py  →  new_wiki/raw/process/openapi-patches/patch-06-sampling-ratio.py
+deliverables/openapi/patch-06-terminal-layout.py  →  new_wiki/raw/process/openapi-patches/patch-06-terminal-layout.py
+deliverables/openapi/patch-166-schema-clash.py  →  new_wiki/raw/process/openapi-patches/patch-166-schema-clash.py
+deliverables/openapi/patch-170-inspection-request-query.py  →  new_wiki/raw/process/openapi-patches/patch-170-inspection-request-query.py
+deliverables/openapi/patch-170-inspection-request-status.py  →  new_wiki/raw/process/openapi-patches/patch-170-inspection-request-status.py
+deliverables/openapi/patch-173-inspector-server-derived.py  →  new_wiki/raw/process/openapi-patches/patch-173-inspector-server-derived.py
+deliverables/openapi/patch-175-176-lot-status-query.py  →  new_wiki/raw/process/openapi-patches/patch-175-176-lot-status-query.py
+deliverables/openapi/patch-178-worker-no.py  →  new_wiki/raw/process/openapi-patches/patch-178-worker-no.py
+deliverables/openapi/patch-179-code-group-by-name.py  →  new_wiki/raw/process/openapi-patches/patch-179-code-group-by-name.py
+deliverables/openapi/patch-179-data-type-code.py  →  new_wiki/raw/process/openapi-patches/patch-179-data-type-code.py
+deliverables/openapi/patch-185-186-equipment-codes.py  →  new_wiki/raw/process/openapi-patches/patch-185-186-equipment-codes.py
+deliverables/openapi/patch-188-cycle-type.py  →  new_wiki/raw/process/openapi-patches/patch-188-cycle-type.py
+deliverables/openapi/patch-190-lot-status-transition.py  →  new_wiki/raw/process/openapi-patches/patch-190-lot-status-transition.py
+deliverables/openapi/patch-203-collection-channel-mapping.py  →  new_wiki/raw/process/openapi-patches/patch-203-collection-channel-mapping.py
+deliverables/openapi/patch-207-wo-completion-aggregate.py  →  new_wiki/raw/process/openapi-patches/patch-207-wo-completion-aggregate.py
+deliverables/openapi/patch-208-209-wo-close.py  →  new_wiki/raw/process/openapi-patches/patch-208-209-wo-close.py
+deliverables/openapi/patch-210-operation-policy-lock.py  →  new_wiki/raw/process/openapi-patches/patch-210-operation-policy-lock.py
+deliverables/openapi/patch-69-pointer-move.py  →  new_wiki/raw/process/openapi-patches/patch-69-pointer-move.py
+deliverables/openapi/patch-70-development-item.py  →  new_wiki/raw/process/openapi-patches/patch-70-development-item.py
+deliverables/openapi/patch-app-common-co.py  →  new_wiki/raw/process/openapi-patches/patch-app-common-co.py
+deliverables/openapi/patch-lock-token-sources.py  →  new_wiki/raw/process/openapi-patches/patch-lock-token-sources.py
+deliverables/openapi/patch-partner-roles-confirmed.py  →  new_wiki/raw/process/openapi-patches/patch-partner-roles-confirmed.py
+deliverables/openapi/patch-public-doc-refs.py  →  new_wiki/raw/process/openapi-patches/patch-public-doc-refs.py
+deliverables/openapi/patch-session-no-not-per-stop.py  →  new_wiki/raw/process/openapi-patches/patch-session-no-not-per-stop.py
+```
+
+### Tier 0 — 미이관(의도적, Phase 5 컷오버 시 처리)
+```
+deliverables/openapi/*.json (7파일)  →  (미이관 · Tier 0 · new_wiki/wiki/api-contracts/openapi/로 컷오버 예정)
+```
+
+### 구조 삭제로 함께 사라지는 것 — 생성물(재이관 불필요)
+```
+deliverables/00-용어사전.html  →  (재이관 불필요 — new_wiki 쪽에서 이미 이관된 생성기로 재생성 완료)
+deliverables/01-요구사항명세서.html  →  (재이관 불필요 — new_wiki 쪽에서 이미 이관된 생성기로 재생성 완료)
+deliverables/02-SW설계사양서.html  →  (재이관 불필요 — new_wiki 쪽에서 이미 이관된 생성기로 재생성 완료)
+deliverables/03-HW구성안.html  →  (재이관 불필요 — new_wiki 쪽에서 이미 이관된 생성기로 재생성 완료)
+deliverables/04-통합-IA-도식본.html  →  (재이관 불필요 — new_wiki 쪽에서 이미 이관된 생성기로 재생성 완료)
+deliverables/04-통합-IA.html  →  (재이관 불필요 — new_wiki 쪽에서 이미 이관된 생성기로 재생성 완료)
+deliverables/05-사용자-프로세스-태스크플로우.html  →  (재이관 불필요 — new_wiki 쪽에서 이미 이관된 생성기로 재생성 완료)
+deliverables/06-API-요구서.html  →  (재이관 불필요 — new_wiki 쪽에서 이미 이관된 생성기로 재생성 완료)
+deliverables/07-웹프론트-착수안내.html  →  (재이관 불필요 — new_wiki 쪽에서 이미 이관된 생성기로 재생성 완료)
+deliverables/openapi/ui-요구목록-01자재창고.md  →  (재이관 불필요 — new_wiki/schema/generators/openapi/ui-요구목록-01자재창고.md로 재생성해 byte 단위 일치 확인)
+deliverables/openapi/ui-요구목록-02생산실행.md  →  (재이관 불필요 — new_wiki/schema/generators/openapi/ui-요구목록-02생산실행.md로 재생성해 byte 단위 일치 확인)
+deliverables/openapi/ui-요구목록-03품질.md  →  (재이관 불필요 — new_wiki/schema/generators/openapi/ui-요구목록-03품질.md로 재생성해 byte 단위 일치 확인)
+deliverables/openapi/ui-요구목록-04제품출하.md  →  (재이관 불필요 — new_wiki/schema/generators/openapi/ui-요구목록-04제품출하.md로 재생성해 byte 단위 일치 확인)
+deliverables/openapi/ui-요구목록-05설비툴.md  →  (재이관 불필요 — new_wiki/schema/generators/openapi/ui-요구목록-05설비툴.md로 재생성해 byte 단위 일치 확인)
+deliverables/openapi/ui-요구목록-app공통승인.md  →  (재이관 불필요 — new_wiki/schema/generators/openapi/ui-요구목록-app공통승인.md로 재생성해 byte 단위 일치 확인)
+deliverables/openapi/ui-요구목록-app공통출력물.md  →  (재이관 불필요 — new_wiki/schema/generators/openapi/ui-요구목록-app공통출력물.md로 재생성해 byte 단위 일치 확인)
+deliverables/openapi/ui-요구목록-공통.md  →  (재이관 불필요 — new_wiki/schema/generators/openapi/ui-요구목록-공통.md로 재생성해 byte 단위 일치 확인)
+deliverables/openapi/ui-요구목록.md  →  (재이관 불필요 — new_wiki/schema/generators/openapi/ui-요구목록.md로 재생성해 byte 단위 일치 확인)
+```
+
 ## 변경 이력
 
 | 날짜 | 변경 |
@@ -445,3 +580,4 @@ uiux/2026-07-25-화면목록-IA/crefle-doc/  →  new_wiki/raw/process/uiux/2026
 | 2026-08-24 | Phase 0(삭제)·Phase 2(Raw 이관) 기계적 생성 |
 | 2026-08-25 | Phase 3(Wiki 이관·재작성) 완료분 전건 추가 — 용어사전·요구사항명세서·프로젝트스펙 5·도메인워크플로우 13·API계약 11·의사결정정책 2·화면 상세 스펙 118(도메인01~06+공통). openapi/*.json은 Tier 0 원칙에 따라 Phase 5 컷오버 시까지 미이관. |
 | 2026-08-25 | Phase 4(Schema 이관) 완료분 추가 — 생성·검증 스크립트 23건 + 은퇴 2건 + 생성물 출력 위치 이동. |
+| 2026-08-25 | Phase 5 커버리지 점검 — redirect-map 미등록분 62건 발견·이관(90-원본자료-정리보고·ui-적합성-점검표·docs/research 느슨한 파일 11건·uiux 배치 폴더 역사적 산출물 20여 건·patch 스크립트 38건 등록 보강). Tier 0 JSON과 구 생성물은 재이관 불필요로 명시. |

@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>검토 보고 — 프로그램 배지 Wave B r1 (판정 PASS)</title>
+
+<link rel="stylesheet" href="./crefle-doc/crefle-doc.css">
+
+<style>
+  :root {
+    --doc-running-title: '검토 보고 — 프로그램 배지 Wave B r1 (판정 PASS)';
+  }
+</style>
+</head>
+
+<body class="doc doc-numbered">
+
+<header class="doc-cover">
+  <p class="eyebrow">CREFLE · OMF UI/UX · 검토 보고</p>
+  <h1>검토 보고 — 프로그램 배지 Wave B r1 (판정 PASS)</h1>
+  <p class="lede">30칩 전수 실측 대조 — C/M 결함 0, 전역 배지 68개 집계 확증(스트레이 0), 비차단 관찰 2건.</p>
+
+  <table>
+    <caption>문서 정보</caption>
+    <tbody>
+      <tr><th>작성자</th><td>workflow-reviewer (CREFLE OMF 팀)</td></tr>
+      <tr><th>작성일</th><td>2026-07-24</td></tr>
+      <tr><th>버전</th><td>r1</td></tr>
+      <tr><th>대상</th><td>CREFLE OMF 팀 내부</td></tr>
+    </tbody>
+  </table>
+</header>
+
+<h2>문서 개요</h2>
+
+<ul>
+  <li><strong>지시서(정본)</strong>: <code>01_designer_brief_프로그램배지.md</code> §3 배치표(Wave B분)·§5 검토 기준 · 작업자 보고: <code>02_drawer_report_프로그램배지_waveB.md</code></li>
+  <li><strong>검토 방법</strong>: <code>use_figma</code> 좌표·스타일 실측 덤프(정본) + <code>get_screenshot</code> 육안 교차(보조). fileKey <code>Sgy5IKD4aWuzpKtJAbMyWz</code> · 작업 페이지 v2 <code>219:4509</code>(매 콜 setCurrentPageAsync 확인 — v1 오염 0) · <strong>조회 전용, 캔버스 무수정</strong></li>
+  <li><strong>범위</strong>: Wave B만(04 메인 <code>819:8194</code> · 04 사이드 <code>845:8641</code> · 05 메인 <code>746:7514</code> · 05 사이드 <code>780:7745</code> · 06 메인 <code>675:6942</code> · 06 사이드 <code>710:7241</code>) + <strong>전역 최종 집계</strong>. Wave A(범례·01·02·03)는 <code>03_review_프로그램배지_waveA_r1.md</code>에서 PASS 완료 — 재검증 불요.</li>
+  <li><strong>검토자</strong>: workflow-reviewer · 2026-07-24</li>
+</ul>
+
+<h2>판정 요약</h2>
+
+<div class="callout callout-success">
+  <p><strong>PASS.</strong> C/M 결함 0건. 지시서 §3 Wave B <strong>29앵커/30칩 전수</strong>를 캔버스 노드 ID로 실측 대조한 결과, <strong>30칩 전량이 (앵커·칩유형·로컬좌표·마스터 스타일·라벨) 100% 일치</strong>했다(좌표는 ±2px 허용 대비 전건 정확 일치, 스타일은 마스터 4종 clone과 크기·fill·stroke·dashPattern·라벨 완전 동일). 앵커 상단 걸침은 단일칩 v=10px·스택 v=8px로 전건 8~12px 범위 준수. 커넥터를 제외한 실 겹침은 전 구간 <strong>0</strong>. 04-S-D 스택은 좌표(간격 4px·L→R=[POP][모바일])·육안 모두 정확. 배지 부재 대상(06 ERP 6노드·추적관리시스템 1노드) 전량 배지 없음.</p>
+</div>
+
+<div class="kpi">
+  <div><span class="big">PASS</span><span class="lbl">30칩 전수<br>100% 일치</span></div>
+  <div><span class="big">0</span><span class="lbl">C/M 결함<br>실 겹침 0</span></div>
+  <div><span class="big">68</span><span class="lbl">전역 배지 집계<br>스트레이·미검출 0</span></div>
+</div>
+
+<p>
+  <strong>전역 최종 집계 확증</strong>: 페이지 전역 배지 개체(SHAPE_WITH_TEXT, 텍스트∈{웹,POP,모바일,?}) = <strong>정확히 68개</strong>
+  (마스터 4 + Wave A 34 + Wave B 30). 스트레이(초과분) 0 · 미검출(부족분) 0.
+  유형별(마스터 포함) = 웹 30·POP 17·모바일 13·미정 8 → 배치분만 = <strong>웹 29·POP 16·모바일 12·미정 7</strong>로 지시서 §5-1 정본과 완전 일치.
+</p>
+
+<p>
+  비차단 관찰 2건(결함 목록 장)은 모두 <strong>지시서가 §3에 명시한 좌표를 작업자가 그대로 구현</strong>한 결과(설계 지정)이며 실 겹침이 아니다 — 작업자 결함 아님.
+</p>
+
+<h2>검증 방법 요약</h2>
+
+<ol>
+  <li><strong>좌표·스타일 정본 실측</strong>(콜1): 마스터 4종(<code>877:8916</code>/<code>8920</code>/<code>8924</code>/<code>8928</code>) 스타일을 기준선으로 로드 → Wave B 30칩 각각에 대해 (a) 마스터 대비 크기·fill(0–255 환산)·stroke·strokeWeight·dashPattern·라벨 텍스트 일치, (b) 섹션 로컬좌표(<code>node.x/node.y</code>) vs 지시서 §3 정확 일치(±2px), (c) <code>absoluteBoundingBox</code> 기반 앵커 오버랩(v/h px), (d) parent=SECTION 확인을 자동 계산.</li>
+  <li><strong>전역 배지 전수 열거</strong>(콜1): 페이지 전역 <code>findAll(SHAPE_WITH_TEXT · 텍스트∈{웹,POP,모바일,?})</code> → 인가 68개 ID 집합(마스터4+WaveA34+WaveB30)과 대조. 스트레이·미검출 자동 검출 + 라벨별 집계.</li>
+  <li><strong>겹침·간격 판정</strong>(콜2·콜3): 각 대상 섹션 직속 자식의 <code>absoluteBoundingBox</code>로 칩↔이웃 쌍별 분리도 계산. <strong>CONNECTOR는 bbox 오보고이므로 계산에서 제외</strong>(콜3) — 커넥터 제외 후 실 이웃(노드·라벨·스티키·타 칩) 대비 겹침·최소간격 산출.</li>
+  <li><strong>04-S-D 스택 실측</strong>(콜2): 두 칩 간 간격, L→R 순서, 우측 이웃 「포장 스캔」(<code>849:8903</code>) 이격 측정.</li>
+  <li><strong>배지 부재 근접 스캔</strong>(콜2): 금지 7노드 각각에 대해 전역 68배지 중 최근접 배지 거리 산출.</li>
+  <li><strong>육안 교차</strong>(보조): 04 메인 밴드(1600px)·04 사이드 섹션(3060px)·Wave B 칩 3종 격리(미정 dashed·스택 모바일·스택 POP) 스크린샷. 05·06 섹션 통짜 스샷은 커넥터 바운딩박스 오보고로 세로 팽창(05 사이드 원본 19,452px 확인) → <strong>좌표 판정 정본 + 칩 격리 스샷</strong>으로 대체(지시서 지침 준수).</li>
+</ol>
+
+<h2>결함 목록</h2>
+
+<div class="callout callout-success">
+  <p><strong>C/M 결함: 없음.</strong></p>
+</div>
+
+<p>비차단 관찰(m 이하 · 설계 지정 좌표의 결과 · 작업자 결함 아님):</p>
+
+<table>
+  <caption>비차단 관찰 목록</caption>
+  <thead>
+    <tr><th>#</th><th>심각도</th><th>항목</th><th>노드 ID</th><th>현상</th><th>판단</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>O1</th>
+      <td>m(비차단)</td>
+      <td>간격</td>
+      <td><code>891:9016</code> ↔ <code>847:8801</code></td>
+      <td>04-S-C 「완제품창고담당」웹칩과 우측 이웃 「반품입고 등록」Desktop 노드가 <strong>18px</strong> 이격(겹침 아님)</td>
+      <td>칩 좌표 (260,1960)은 지시서 §3 명시값 정확 일치(coordOK). 밀집은 기저 도식의 노드 간격에서 기인. 실 겹침 0·라벨 가독 정상 → <strong>작업자 결함 아님</strong>(§2.4 좌표 임의변경 금지)</td>
+    </tr>
+    <tr>
+      <th>O2</th>
+      <td>m(비차단)</td>
+      <td>간격</td>
+      <td><code>891:9019</code> ↔ <code>847:8888</code></td>
+      <td>04-S-C 「품질담당」웹칩과 「판정 → 03 도식」헥사곤이 <strong>19px</strong> 이격(겹침 아님)</td>
+      <td>칩 좌표 (260,2340) §3 정확 일치. ≥16px 도형↔라벨 하한 충족. 실 겹침 0 → <strong>작업자 결함 아님</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>규칙(workflow-review-checklist): C·M 하나라도 있으면 FAIL, m만 남으면 PASS(비고 명시). 본 검토는 C·M 0, 상기 2건은 설계 지정 좌표의 부수 결과이며 실 겹침 아님 → <strong>PASS</strong>. (Wave A의 O1·O2와 동일 성격.)</p>
+</blockquote>
+
+<h2>전역 최종 집계 결과 (요구 항목 — 초과·부족 확증)</h2>
+
+<table>
+  <caption>전역 최종 집계</caption>
+  <thead>
+    <tr><th>구분</th><th>값</th><th>기대</th><th>판정</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>페이지 전역 배지 총수</th><td class="num"><strong>68</strong></td><td>마스터4 + WaveA34 + WaveB30 = 68</td><td>✅</td></tr>
+    <tr><th>스트레이(인가 68 밖)</th><td class="num"><strong>0</strong></td><td class="num">0</td><td>✅</td></tr>
+    <tr><th>미검출(인가 68 중 누락)</th><td class="num"><strong>0</strong></td><td class="num">0</td><td>✅</td></tr>
+    <tr><th>라벨별(마스터 포함)</th><td>웹30·POP17·모바일13·?8</td><td>30·17·13·8</td><td>✅</td></tr>
+    <tr><th>라벨별(배치분, −마스터4)</th><td><strong>웹29·POP16·모바일12·미정7</strong></td><td>29·16·12·7</td><td>✅</td></tr>
+    <tr><th>Wave B 소계(배치분)</th><td>웹17·POP7·모바일2·미정4 = 30</td><td>17·7·2·4 = 30</td><td>✅</td></tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>인가 68 ID 집합 = 마스터(<code>877:8916</code>/<code>8920</code>/<code>8924</code>/<code>8928</code>) + Wave A 34칩 + Wave B 30칩. 전역 열거 결과가 이 집합과 <strong>완전 일치</strong>(대칭차 0). 무근거 추가 칩·Wave 밖 스트레이·중복 스택 오생성 0을 전역 확증.</li>
+  <li>유형별 정본(웹29·POP16·모바일12·미정7)이 지시서 §5-1과 일치 → 계획 §5의 「웹 30」 오기(30번째 웹 창작)로 인한 결함 없음 확인.</li>
+</ul>
+
+<h2>항목별 체크 결과</h2>
+
+<table>
+  <caption>검토 기준별 체크 결과</caption>
+  <thead>
+    <tr><th>검토 기준(§)</th><th>결과</th><th>근거(실측)</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th><strong>5-1 수량</strong> — Wave B 30칩(04=11·05=11·06=8)</th>
+      <td>✅ PASS</td>
+      <td>섹션별 배지: <code>819:8194</code>=5·<code>845:8641</code>=6·<code>746:7514</code>=2·<code>780:7745</code>=9·<code>675:6942</code>=3·<code>710:7241</code>=5 = <strong>30</strong>. 29앵커(04-S-D 스택 +1칩)</td>
+    </tr>
+    <tr>
+      <th><strong>5-1 스트레이 없음(전역)</strong></th>
+      <td>✅ PASS</td>
+      <td>페이지 전역 배지 = <strong>68</strong> = 4+34+30. 인가 집합과 대칭차 0</td>
+    </tr>
+    <tr>
+      <th><strong>5-2 앵커·유형·좌표 일치(전수 30)</strong></th>
+      <td>✅ PASS</td>
+      <td>30행 전부 coordOK=true(로컬좌표 정확 일치, ±2px 여유 대비 전건 정확) · 칩유형·앵커 노드ID 일치 · parent=SECTION</td>
+    </tr>
+    <tr>
+      <th><strong>5-2 마스터 clone 스타일(전수 30)</strong></th>
+      <td>✅ PASS</td>
+      <td>30칩 전부 크기(52/56/68/44×40)·fill(<code>#2F6FED</code>/<code>#F2994A</code>/<code>#27AE60</code>/흰)·stroke(미정만 <code>#9AA0A6</code> w1.5 dash[5,3])·라벨 = 마스터 동일. 직접 그린 칩·색편차 0</td>
+    </tr>
+    <tr>
+      <th><strong>5-2 앵커 8~12px 걸침</strong></th>
+      <td>✅ PASS</td>
+      <td>단일칩 수직 오버랩 v=10px 전건 · 스택 2칩 v=8px(범위 내)</td>
+    </tr>
+    <tr>
+      <th><strong>5-2 텍스트 클리핑(「…」)</strong></th>
+      <td>✅ PASS</td>
+      <td>전 칩 마스터 clone(텍스트 mutation 0) → 클리핑 불가 by construction. 격리 스샷(미정 dashed「?」·스택「모바일」·「POP」) + 04밴드(웹/모바일/POP 전문) 육안 무클리핑</td>
+    </tr>
+    <tr>
+      <th><strong>5-2 이웃 겹침 0 · 도형↔라벨 ≥16</strong></th>
+      <td>✅ PASS</td>
+      <td>커넥터 제외 30칩 실 겹침 <strong>0</strong>. 최소 이웃 간격 18px(O1)·19px(O2) — 겹침 아님·≥16 충족. 그 외 26~60px+</td>
+    </tr>
+    <tr>
+      <th><strong>대안 04-S-D 스택</strong> <code>849:8890</code></th>
+      <td>✅ PASS</td>
+      <td>간격 4px(POP우변2048↔모바일좌변2052) · L→R=[POP][모바일](좌표+육안) · 모바일 우변=앵커 우변(h걸침) v8px · 「포장 스캔」(<code>849:8903</code>) 60px 이격(비침범)</td>
+    </tr>
+    <tr>
+      <th><strong>5-4 06 ERP 배지 부재(정책3)</strong></th>
+      <td>✅ PASS</td>
+      <td><code>675:6968</code>·<code>676:7039</code>·<code>676:7052</code>·<code>676:7023</code>·<code>710:7254</code>·<code>717:7522</code> 전부 최근접 배지 178~1038px(무배지)</td>
+    </tr>
+    <tr>
+      <th><strong>5-4 추적관리시스템 배지 부재</strong></th>
+      <td>✅ PASS</td>
+      <td><code>718:7498</code> 최근접 배지 291px(무배지)</td>
+    </tr>
+    <tr>
+      <th><strong>5-4 05 Database/ERP 특칙(무배지)</strong></th>
+      <td>✅ PASS</td>
+      <td>전역 스트레이 0 + 30칩 전량 지정 앵커(User/Desktop/File/Mobile)에만 부착 → Database/ERP 노드 무배지 by construction</td>
+    </tr>
+    <tr>
+      <th><strong>5-4 스택 정확 1건</strong></th>
+      <td>✅ PASS</td>
+      <td>04-S-D 외 다중 칩 0. 그 외 전역 단일칩</td>
+    </tr>
+    <tr>
+      <th><strong>v2 오염</strong></th>
+      <td>✅ PASS</td>
+      <td>전 콜 currentPage=<code>219:4509</code> 확인. v1(<code>0:1</code>) 미조회 · 캔버스 무수정(조회 전용)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>정합 대조표 (§3 Wave B 29앵커/30칩 전수)</h2>
+
+<p>
+  <code>loc==exp</code>=로컬좌표 정확 일치 · <code>style</code>=크기·fill·stroke·dash·라벨 마스터 동일 ·
+  <code>ovl v/h</code>=앵커 바운딩박스 교차(px) · <code>이웃</code>=커넥터 제외 최근접 실이웃 간격.
+</p>
+
+<h3>04 메인 819:8194 (5)</h3>
+
+<table>
+  <caption>04 메인 정합 대조 (5칩)</caption>
+  <thead>
+    <tr><th>앵커</th><th>칩</th><th>유형</th><th>loc==exp</th><th>style</th><th>ovl v/h</th><th>이웃(커넥터 제외)</th><th>판정</th></tr>
+  </thead>
+  <tbody>
+    <tr><th><code>819:8226</code> 물류출하담당 M2</th><td><code>891:8995</code></td><td>웹</td><td>(550,390)✓</td><td>✓</td><td class="num">10/10</td><td>≥60(없음)</td><td>일치</td></tr>
+    <tr><th><code>819:8252</code> 물류출하담당 M4</th><td><code>891:8998</code></td><td>모바일</td><td>(1510,390)✓</td><td>✓</td><td class="num">10/30</td><td>≥60(없음)</td><td>일치</td></tr>
+    <tr><th><code>819:8278</code> 품질담당 M6 OQC</th><td><code>891:9001</code></td><td>웹</td><td>(2500,390)✓</td><td>✓</td><td class="num">10/10</td><td>≥60(없음)</td><td>일치</td></tr>
+    <tr><th><code>819:8310</code> 물류출하담당 M8</th><td><code>891:9004</code></td><td>POP</td><td>(3830,390)✓</td><td>✓</td><td class="num">10/30</td><td>≥60(없음)</td><td>일치</td></tr>
+    <tr><th><code>819:8336</code> 물류출하담당 M10</th><td><code>891:9007</code></td><td>웹</td><td>(5250,390)✓</td><td>✓</td><td class="num">10/10</td><td>≥60(없음)</td><td>일치</td></tr>
+  </tbody>
+</table>
+
+<h3>04 사이드 845:8641 (6 · 스택 1건)</h3>
+
+<table>
+  <caption>04 사이드 정합 대조 (6칩 · 스택 1건)</caption>
+  <thead>
+    <tr><th>코드</th><th>앵커</th><th>칩</th><th>유형</th><th>loc==exp</th><th>style</th><th>ovl v/h</th><th>이웃</th><th>판정</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>04-S-A</th><td><code>845:8688</code> 물류담당</td><td><code>891:9010</code></td><td>미정</td><td>(260,420)✓</td><td>✓</td><td class="num">10/10</td><td>Desktop 26px</td><td>일치</td></tr>
+    <tr><th>04-S-B</th><td><code>846:8739</code> 생산담당</td><td><code>891:9013</code></td><td>POP</td><td>(2140,420)✓</td><td>✓</td><td class="num">10/30</td><td>File 34px</td><td>일치</td></tr>
+    <tr><th>04-S-C</th><td><code>847:8788</code> 완제품창고담당</td><td><code>891:9016</code></td><td>웹</td><td>(260,1960)✓</td><td>✓</td><td class="num">10/10</td><td>Desktop <strong>18px</strong>(O1)</td><td>일치</td></tr>
+    <tr><th>04-S-C</th><td><code>847:8878</code> 품질담당</td><td><code>891:9019</code></td><td>웹</td><td>(260,2340)✓</td><td>✓</td><td class="num">10/10</td><td>헥사곤 <strong>19px</strong>(O2)</td><td>일치</td></tr>
+    <tr><th>04-S-D</th><td><code>849:8890</code> (스택·우/첫칩)</td><td><code>891:9022</code></td><td>모바일</td><td>(2052,1948)✓</td><td>✓</td><td class="num">8/68</td><td>Archive 28·포장스캔 60px</td><td>일치</td></tr>
+    <tr><th>04-S-D</th><td><code>849:8890</code> (스택·좌·4px)</td><td><code>891:9025</code></td><td>POP</td><td>(1992,1948)✓</td><td>✓</td><td class="num">8/48</td><td>Archive 28px</td><td>일치</td></tr>
+  </tbody>
+</table>
+
+<h3>05 메인 746:7514 (2)</h3>
+
+<table>
+  <caption>05 메인 정합 대조 (2칩)</caption>
+  <thead>
+    <tr><th>앵커</th><th>칩</th><th>유형</th><th>loc==exp</th><th>style</th><th>ovl v/h</th><th>이웃</th><th>판정</th></tr>
+  </thead>
+  <tbody>
+    <tr><th><code>746:7540</code> 점검자</th><td><code>892:9017</code></td><td>미정</td><td>(540,190)✓</td><td>✓</td><td class="num">10/10</td><td>≥60(없음)</td><td>일치</td></tr>
+    <tr><th><code>746:7579</code> 작업자</th><td><code>892:9020</code></td><td>POP</td><td>(1700,190)✓</td><td>✓</td><td class="num">10/30</td><td>≥60(없음)</td><td>일치</td></tr>
+  </tbody>
+</table>
+
+<h3>05 사이드 780:7745 (9)</h3>
+
+<table>
+  <caption>05 사이드 정합 대조 (9칩)</caption>
+  <thead>
+    <tr><th>코드</th><th>앵커</th><th>칩</th><th>유형</th><th>loc==exp</th><th>style</th><th>ovl v/h</th><th>이웃</th><th>판정</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>05-S-A</th><td><code>780:7774</code> 작업자(금형QR)</td><td><code>892:9023</code></td><td>POP</td><td>(460,170)✓</td><td>✓</td><td class="num">10/10</td><td>≥60(없음)</td><td>일치</td></tr>
+    <tr><th>05-S-A</th><td><code>780:7850</code> 환산옵션</td><td><code>892:9026</code></td><td>웹</td><td>(640,400)✓</td><td>✓</td><td class="num">10/10</td><td>≥60(없음)</td><td>일치</td></tr>
+    <tr><th>05-S-A</th><td><code>780:7792</code> 설비담당</td><td><code>892:9029</code></td><td>웹</td><td>(1020,170)✓</td><td>✓</td><td class="num">10/10</td><td>≥60(없음)</td><td>일치</td></tr>
+    <tr><th>05-S-B</th><td><code>784:7953</code> 설비담당</td><td><code>892:9032</code></td><td>웹</td><td>(2800,170)✓</td><td>✓</td><td class="num">10/10</td><td>≥60(없음)</td><td>일치</td></tr>
+    <tr><th>05-S-B</th><td><code>784:7996</code> 고장기록</td><td><code>892:9035</code></td><td>미정</td><td>(2230,400)✓</td><td>✓</td><td class="num">10/30</td><td>≥60(없음)</td><td>일치</td></tr>
+    <tr><th>05-S-C</th><td><code>791:8053</code> POP버퍼링</td><td><code>892:9038</code></td><td>POP</td><td>(200,1510)✓</td><td>✓</td><td class="num">10/30</td><td>≥60(없음)</td><td>일치</td></tr>
+    <tr><th>05-S-D</th><td><code>793:8115</code> 비가동기록</td><td><code>892:9041</code></td><td>미정</td><td>(2100,1310)✓</td><td>✓</td><td class="num">10/30</td><td>TEXT 91px</td><td>일치</td></tr>
+    <tr><th>05-S-D</th><td><code>793:8131</code> 캘린더설정</td><td><code>892:9044</code></td><td>웹</td><td>(2360,1310)✓</td><td>✓</td><td class="num">10/10</td><td>TEXT 109px</td><td>일치</td></tr>
+    <tr><th>05-S-E</th><td><code>797:8142</code> 품질담당(검교정)</td><td><code>892:9047</code></td><td>웹</td><td>(220,2350)✓</td><td>✓</td><td class="num">10/10</td><td>Desktop 58px</td><td>일치</td></tr>
+  </tbody>
+</table>
+
+<h3>06 메인 675:6942 (3)</h3>
+
+<table>
+  <caption>06 메인 정합 대조 (3칩)</caption>
+  <thead>
+    <tr><th>앵커</th><th>칩</th><th>유형</th><th>loc==exp</th><th>style</th><th>ovl v/h</th><th>이웃</th><th>판정</th></tr>
+  </thead>
+  <tbody>
+    <tr><th><code>675:7007</code> 생산관리자(B4)</th><td><code>893:9039</code></td><td>웹</td><td>(1840,110)✓</td><td>✓</td><td class="num">10/10</td><td>≥60(없음)</td><td>일치</td></tr>
+    <tr><th><code>675:7033</code> 품질담당(B5·B6)</th><td><code>893:9042</code></td><td>웹</td><td>(2660,110)✓</td><td>✓</td><td class="num">10/10</td><td>≥60(없음)</td><td>일치</td></tr>
+    <tr><th><code>676:7065</code> 확장속성편집(B3)</th><td><code>893:9045</code></td><td>웹</td><td>(1500,390)✓</td><td>✓</td><td class="num">10/10</td><td>≥60(없음)</td><td>일치</td></tr>
+  </tbody>
+</table>
+
+<h3>06 사이드 710:7241 (5)</h3>
+
+<table>
+  <caption>06 사이드 정합 대조 (5칩)</caption>
+  <thead>
+    <tr><th>코드</th><th>앵커</th><th>칩</th><th>유형</th><th>loc==exp</th><th>style</th><th>ovl v/h</th><th>이웃</th><th>판정</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>06-S-A</th><td><code>711:7282</code> 전산담당(B8)</td><td><code>894:9045</code></td><td>웹</td><td>(420,460)✓</td><td>✓</td><td class="num">10/10</td><td>≥60(없음)</td><td>일치</td></tr>
+    <tr><th>06-S-B</th><td><code>712:7422</code> 작성중편집(B9·B10)</td><td><code>894:9048</code></td><td>웹</td><td>(2960,580)✓</td><td>✓</td><td class="num">10/10</td><td>Archive 50px</td><td>일치</td></tr>
+    <tr><th>06-S-C</th><td><code>715:7414</code> 운영자·전산(B11)</td><td><code>894:9051</code></td><td>웹</td><td>(220,1680)✓</td><td>✓</td><td class="num">10/10</td><td>TEXT 51·Server 58px</td><td>일치</td></tr>
+    <tr><th>06-S-C</th><td><code>715:7475</code> 현장작업자(B12=POP)</td><td><code>894:9054</code></td><td>POP</td><td>(1020,1680)✓</td><td>✓</td><td class="num">10/10</td><td>≥60(없음)</td><td>일치</td></tr>
+    <tr><th>06-S-D</th><td><code>717:7490</code> 송신ONOFF(B13)</td><td><code>894:9057</code></td><td>웹</td><td>(2600,1760)✓</td><td>✓</td><td class="num">10/10</td><td>TEXT 43px</td><td>일치</td></tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>ovl h=30/68은 앵커 아이콘 폭120 대비 칩이 우측에 얹힌 값(모바일 폭보정·스택 전폭 걸침)으로 §3 명시 좌표의 부수값이며 시각 충돌 없음. v=8~10은 상단 스트립 걸침(8~12px 규약 준수).</p>
+</blockquote>
+
+<h2>04-S-D 스택 상세 (요구 항목)</h2>
+
+<table>
+  <caption>04-S-D 스택 실측</caption>
+  <thead>
+    <tr><th>항목</th><th>실측</th><th>기대</th><th>판정</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>모바일 칩 좌표</th><td>(2052,1948)</td><td>(2052,1948)</td><td>✅</td></tr>
+    <tr><th>POP 칩 좌표</th><td>(1992,1948)</td><td>(1992,1948)</td><td>✅</td></tr>
+    <tr><th>간격 (POP우변2048 → 모바일좌변2052)</th><td class="num"><strong>4px</strong></td><td class="num">4px</td><td>✅</td></tr>
+    <tr><th>L→R 순서</th><td><strong>[POP][모바일]</strong> (POP 좌·모바일 우)</td><td>[POP][모바일]</td><td>✅ (좌표+육안)</td></tr>
+    <tr><th>모바일 우변 걸침</th><td>앵커 우변(2120)과 일치, v=8px</td><td>8~12px</td><td>✅</td></tr>
+    <tr><th>우측 이웃 「포장 스캔」(<code>849:8903</code>) 침범</th><td>60px 이격</td><td>비침범</td><td>✅</td></tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>육안(04 사이드 3060px 스샷): 「완제품창고담당」User 우상단에 <strong>[POP(주황)][모바일(초록)]</strong> 두 칩이 나란히, POP가 좌·모바일이 우. 「포장 스캔」Desktop과 명확 분리. 클리핑 0.</li>
+</ul>
+
+<h2>배지 부재 확인 (§5-4 Wave B 해당분) — 전수 통과</h2>
+
+<table>
+  <caption>배지 부재 대상 근접 스캔 결과</caption>
+  <thead>
+    <tr><th>노드 ID</th><th>라벨</th><th>규칙</th><th>최근접 배지 거리</th><th>판정</th></tr>
+  </thead>
+  <tbody>
+    <tr><th><code>675:6968</code></th><td>전산담당(User)</td><td>06 ERP 정책3</td><td class="num">1038px</td><td>없음 ✓</td></tr>
+    <tr><th><code>676:7039</code></th><td>품목등록(Desktop, B1)</td><td>06 ERP 정책3</td><td class="num">790px</td><td>없음 ✓</td></tr>
+    <tr><th><code>676:7052</code></th><td>BOM등록(Desktop, B2)</td><td>06 ERP 정책3</td><td class="num">610px</td><td>없음 ✓</td></tr>
+    <tr><th><code>676:7023</code></th><td>UNIERP(Database)</td><td>06 ERP 정책3</td><td class="num">430px</td><td>없음 ✓</td></tr>
+    <tr><th><code>710:7254</code></th><td>UNIERP(Database)</td><td>06 ERP 정책3</td><td class="num">210px</td><td>없음 ✓</td></tr>
+    <tr><th><code>717:7522</code></th><td>UNIERP(Database)</td><td>06 ERP 정책3</td><td class="num">178px</td><td>없음 ✓</td></tr>
+    <tr><th><code>718:7498</code></th><td>추적관리시스템</td><td>06 사이드 특칙</td><td class="num">291px</td><td>없음 ✓</td></tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>05 Database/ERP 무배지(특칙)는 전역 스트레이 0 + 30칩 전량 지정 앵커 부착으로 확증(별도 노드ID 미지정이나 무배지 by construction).</li>
+</ul>
+
+<h2>이관·후속</h2>
+
+<ul>
+  <li><strong>drawer 조치 불요</strong>: O1·O2 모두 지시서 §3 명시 좌표를 정확 구현한 결과이며 실 겹침 아님(§2.4 좌표 임의변경 금지). Wave B 재작업 지시 없음.</li>
+  <li><strong>designer 선택 이관(O1/O2, 경미)</strong>: 04-S-C 두 웹칩의 이웃 간격 18/19px는 기저 도식 노드 간격 + 명시 좌표의 부수 결과. 시각·가독 정상이라 수정 불요이나, 엄격 적용을 원하면 §3 04-S-C 칩 y를 소폭 조정하거나 기저 노드 간격을 넓히는 후속 검토 가능. <strong>선택 사항 — 재작업 없이 PASS.</strong></li>
+  <li><strong>전역 최종 확인 완료</strong>: 페이지 전역 배지 68개(마스터4+WaveA34+WaveB30), 스트레이·미검출 0, 유형별 정본 일치. <strong>프로그램 배지 오버레이 전 도메인(01~06) 작업 전역 정합 확증.</strong></li>
+</ul>
+
+<h2>개정 이력</h2>
+
+<table>
+  <caption>개정 이력</caption>
+  <thead>
+    <tr><th>버전</th><th>날짜</th><th>변경 요지</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>r1</th>
+      <td>2026-07-24</td>
+      <td>Wave B(04·05·06) 최초 검토 — 판정 <strong>PASS</strong>. 30칩 전수 좌표·마스터 스타일·라벨 정확 일치, 앵커 걸침 8~12px, 커넥터 제외 실겹침 0, 04-S-D 스택(간격4·[POP][모바일]·포장스캔 60px) 정확, 배지 부재 7노드 전량 확인. <strong>전역 집계 68 확증</strong>(스트레이·미검출 0, 유형별 웹29·POP16·모바일12·미정7). 비차단 관찰 2건(O1·O2, 04-S-C 웹칩 이웃 18/19px 이격) 기록 — 설계 지정 좌표 결과, 작업자 결함 아님</td>
+    </tr>
+  </tbody>
+</table>
+
+<script src="./crefle-doc/crefle-chart.js"></script>
+</body>
+</html>

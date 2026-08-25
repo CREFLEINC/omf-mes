@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>미니 지시서 — 미정 배지 7곳 확정 반영</title>
+
+<link rel="stylesheet" href="./crefle-doc/crefle-doc.css">
+
+<style>
+  :root {
+    --doc-running-title: '미니 지시서 — 미정 배지 7곳 확정 반영';
+  }
+</style>
+</head>
+
+<body class="doc doc-numbered">
+
+<header class="doc-cover">
+  <p class="eyebrow">CREFLE · OMF UI/UX · 지시서(경량)</p>
+  <h1>미니 지시서 — 미정 배지 7곳 확정 반영</h1>
+  <p class="lede">GitHub 이슈 #11 확정 8건에 따라 FigJam v2 캔버스의 미정(?) 배지 7개를 확정 단말 배지로 교체하는 경량 경로 지시서.</p>
+
+  <table>
+    <caption>문서 정보</caption>
+    <tbody>
+      <tr><th>작성자</th><td>리더(workflow-reviewer) — 리더 직접 수정 + 검토자 1회</td></tr>
+      <tr><th>작성일</th><td>2026-07-24</td></tr>
+      <tr><th>버전</th><td>r1</td></tr>
+      <tr><th>대상</th><td>CREFLE OMF 팀 내부</td></tr>
+    </tbody>
+  </table>
+</header>
+
+<h2>개요</h2>
+
+<p>
+  기존 <code>?</code>(미정) 배지 7개를 확정 단말 배지로 교체한다. 5건은 단일 swap, 2건은 2단말 스택 신설이다.
+  경량 경로(리더 직접 수정 + 검토자 1회)로 진행한다.
+</p>
+
+<ul>
+  <li>대상 보드: fileKey <code>Sgy5IKD4aWuzpKtJAbMyWz</code> · 페이지 v2 <code>219:4509</code></li>
+  <li>근거: <code>docs/research/2026-07-24-프로그램배지-단말확정-확정기록.md</code>(#11 확정 8건) · placement-plan §1 배지 스펙</li>
+</ul>
+
+<div class="kpi">
+  <div><span class="big">7</span><span class="lbl">교체 대상<br>미정(?) 배지</span></div>
+  <div><span class="big">5 + 2</span><span class="lbl">단일 swap<br>+ 2단말 스택</span></div>
+  <div><span class="big">66</span><span class="lbl">수정 후<br>전역 배지 총계</span></div>
+</div>
+
+<h2>변경 목록 (노드 ID · 조치)</h2>
+
+<p>
+  마스터(클론 소스): 웹 <code>877:8916</code>(w52) · POP <code>877:8920</code>(w56) · 모바일 <code>877:8924</code>(w68) · 미정 <code>877:8928</code>(w44).
+</p>
+
+<p>
+  방식: 마스터 clone → 대상 섹션 appendChild → 좌표 설정(섹션 로컬) → 기존 <code>?</code> 칩 remove. 텍스트 mutation 없음(마스터 clone이라 폰트 로드 불요).
+</p>
+
+<h3>단일 swap 5건 — <code>?</code> 칩의 (x,y) 그대로 유지</h3>
+
+<p>§2: chip.x = anchor.right−10, 폭 무관.</p>
+
+<table>
+  <caption>단일 swap 5건</caption>
+  <thead>
+    <tr><th>지점</th><th>기존 ? 칩</th><th>섹션</th><th>확정</th><th>새 칩 좌표</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>01-S-A 입하 오류 등록</th><td><code>881:8937</code></td><td><code>219:5450</code></td><td>모바일</td><td><code>(170, 2850)</code></td></tr>
+    <tr><th>02 현장반장 WIP 이동 스캔</th><td><code>882:8973</code></td><td><code>297:5370</code></td><td>모바일</td><td><code>(2408, 400)</code></td></tr>
+    <tr><th>02-S-I 수리 스캔</th><td><code>883:8991</code></td><td><code>297:6292</code></td><td>모바일</td><td><code>(5910, 492)</code></td></tr>
+    <tr><th>04-S-A 긴급 직행 처리</th><td><code>891:9010</code></td><td><code>845:8641</code></td><td>웹</td><td><code>(260, 420)</code></td></tr>
+    <tr><th>05 점검자 점검 입력</th><td><code>892:9017</code></td><td><code>746:7514</code></td><td>모바일</td><td><code>(540, 190)</code></td></tr>
+  </tbody>
+</table>
+
+<h3>2단말 스택 2건 — 필드 단말 우측·관리웹 좌측·간격 4px (04-S-D 규약)</h3>
+
+<p>앵커 위치 유지.</p>
+
+<table>
+  <caption>2단말 스택 2건</caption>
+  <thead>
+    <tr><th>지점</th><th>기존 ? 칩</th><th>섹션</th><th>확정</th><th>우측 칩</th><th>좌측 칩</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>05-S-B 고장 기록</th><td><code>892:9035</code></td><td><code>780:7745</code></td><td>모바일+웹</td><td>모바일 <code>(2230, 400)</code></td><td>웹 <code>(2174, 400)</code></td></tr>
+    <tr><th>05-S-D 비가동 기록</th><td><code>892:9041</code></td><td><code>780:7745</code></td><td>POP+웹</td><td>POP <code>(2100, 1310)</code></td><td>웹 <code>(2044, 1310)</code></td></tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>좌측 칩 x = 우측칩.x − 좌측칩폭 − 4. 05-S-B: 2230−52−4=2174. 05-S-D: 2100−52−4=2044.</li>
+  <li>시각 L→R: 05-S-B=[웹][모바일] · 05-S-D=[웹][POP]. 필드 즉시 캡처 단말이 우측(현장), 사무 처리=관리웹이 좌측.</li>
+</ul>
+
+<h2>수정 후 기대 상태 (검토 기준)</h2>
+
+<ol>
+  <li>전역 <code>?</code>(미정) 배지 = <strong>0개</strong> (7개 전량 교체).</li>
+  <li>신규 칩 유형·좌표가 위 표와 일치, 마스터 clone 스타일(색·크기·라벨) 동일, 텍스트 클리핑 0.</li>
+  <li>스택 2건: 우측=필드 단말·좌측=웹·간격 4px·좌측 성장이 이웃 노드/라벨과 겹침 0(도형↔라벨 ≥16).</li>
+  <li>전역 배지 총계 <strong>66칩</strong> (기존 64 − 미정 7 + 신규 9). 유형별 웹 32·POP 17·모바일 17·미정 0. 스택 총 3건(04-S-D + 05-S-B + 05-S-D).</li>
+  <li>확정기록 8건과 정합(#8 오프라인 축퇴는 배지 아님 — 반영 대상 아님, #9·#10 보류는 배지 없음 유지).</li>
+</ol>
+
+<div class="callout callout-success">
+  <p><strong>PASS 기준.</strong> 위 5개 항목을 모두 충족하면 검토 PASS. 특히 전역 미정 배지 0개·총계 66칩이 핵심 판정 조건이다.</p>
+</div>
+
+<h2>근거</h2>
+
+<p>
+  GitHub 이슈 #11 사용자 확정 8건 — 도식스펙/WF는 main 반영 완료(<code>0e5692d</code>), 배지 반영은 확정기록 §6에서 uiux 몫으로 명시.
+</p>
+
+<h2>개정 이력</h2>
+
+<table>
+  <caption>개정 이력</caption>
+  <thead>
+    <tr><th>버전</th><th>날짜</th><th>변경</th><th>작성자</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>r1</th><td>2026-07-24</td><td>최초 작성 — 미정 배지 7곳 확정 반영 경량 경로 지시서</td><td>리더(workflow-reviewer)</td></tr>
+  </tbody>
+</table>
+
+<script src="./crefle-doc/crefle-chart.js"></script>
+</body>
+</html>
