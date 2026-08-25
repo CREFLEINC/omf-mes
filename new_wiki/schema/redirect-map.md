@@ -388,9 +388,60 @@ uiux/2026-08-11-화면상세스펙-확대16차/W-CO-10-비밀번호변경.md  �
 uiux/2026-08-11-화면상세스펙-확대16차/W-CO-11-알람수신자설정.md  →  new_wiki/wiki/screens/공통/W-CO-11-알람수신자설정.md
 ```
 
+## Schema 이관 (Phase 4 — 생성·검증 스크립트, 기계적 이관 + 경로 상수 수정)
+
+### schema/generators/
+```
+deliverables/build-04-ia-html.py  →  new_wiki/schema/generators/build-04-ia-html.py
+deliverables/build-04-ia-도식본.py  →  new_wiki/schema/generators/build-04-ia-도식본.py
+deliverables/build-doc-html.py  →  new_wiki/schema/generators/build-doc-html.py
+deliverables/build-handover-ledger.py  →  new_wiki/schema/generators/build-handover-ledger.py
+deliverables/build-screen-progress.py  →  new_wiki/schema/generators/build-screen-progress.py
+deliverables/collect-open-items.py  →  new_wiki/schema/generators/collect-open-items.py
+deliverables/count-decisions.py  →  new_wiki/schema/generators/count-decisions.py
+deliverables/test-verify-doc-citations.py  →  new_wiki/schema/generators/test-verify-doc-citations.py
+deliverables/test-verify-mapping-coverage.py  →  new_wiki/schema/generators/test-verify-mapping-coverage.py
+deliverables/test-verify-ui-coverage.py  →  new_wiki/schema/generators/test-verify-ui-coverage.py
+deliverables/verify-contract-citation.py  →  new_wiki/schema/generators/verify-contract-citation.py
+deliverables/verify-counts.py  →  new_wiki/schema/generators/verify-counts.py
+deliverables/verify-doc-citations.py  →  new_wiki/schema/generators/verify-doc-citations.py
+deliverables/verify-generated-fresh.py  →  new_wiki/schema/generators/verify-generated-fresh.py
+deliverables/verify-mapping-coverage.py  →  new_wiki/schema/generators/verify-mapping-coverage.py
+deliverables/verify-screen-inventory.py  →  new_wiki/schema/generators/verify-screen-inventory.py
+deliverables/verify-ui-coverage.py  →  new_wiki/schema/generators/verify-ui-coverage.py
+```
+
+### schema/generators/openapi/
+```
+deliverables/openapi/check-enum-narrowing.py  →  new_wiki/schema/generators/openapi/check-enum-narrowing.py
+deliverables/openapi/check-lock-token-source.py  →  new_wiki/schema/generators/openapi/check-lock-token-source.py
+deliverables/openapi/check-public-safe.py  →  new_wiki/schema/generators/openapi/check-public-safe.py
+deliverables/openapi/check-structure.py  →  new_wiki/schema/generators/openapi/check-structure.py
+deliverables/openapi/check-worker-no.py  →  new_wiki/schema/generators/openapi/check-worker-no.py
+deliverables/openapi/count-undecided-codes.py  →  new_wiki/schema/generators/openapi/count-undecided-codes.py
+```
+
+### 은퇴 (Phase 0 삭제로 이미 깨진 검사기 — 물리 모델 소관이 백엔드팀으로 이동)
+```
+deliverables/verify-polymorphic-mapping.py  →  new_wiki/raw/process/deliverables/verify-polymorphic-mapping.py (은퇴)
+deliverables/test-verify-polymorphic-mapping.py  →  new_wiki/raw/process/deliverables/test-verify-polymorphic-mapping.py (은퇴)
+```
+
+### 생성물 출력 위치 이동
+```
+deliverables/화면-진도표.md  →  new_wiki/wiki/handover/화면-진도표.md
+deliverables/미결-대장.md  →  new_wiki/wiki/handover/미결-대장.md
+deliverables/99-인계대장.md  →  new_wiki/wiki/handover/99-인계대장.md
+deliverables/openapi/ui-요구목록*.md  →  new_wiki/schema/generators/openapi/ui-요구목록*.md
+deliverables/README.md  →  new_wiki/wiki/00-index.md
+uiux/2026-07-25-화면목록-IA/crefle-doc/  →  new_wiki/raw/process/uiux/2026-07-25-화면목록-IA/crefle-doc/ (Phase 2 누락분 보강)
+```
+
+
 ## 변경 이력
 
 | 날짜 | 변경 |
 | --- | --- |
 | 2026-08-24 | Phase 0(삭제)·Phase 2(Raw 이관) 기계적 생성 |
 | 2026-08-25 | Phase 3(Wiki 이관·재작성) 완료분 전건 추가 — 용어사전·요구사항명세서·프로젝트스펙 5·도메인워크플로우 13·API계약 11·의사결정정책 2·화면 상세 스펙 118(도메인01~06+공통). openapi/*.json은 Tier 0 원칙에 따라 Phase 5 컷오버 시까지 미이관. |
+| 2026-08-25 | Phase 4(Schema 이관) 완료분 추가 — 생성·검증 스크립트 23건 + 은퇴 2건 + 생성물 출력 위치 이동. |
