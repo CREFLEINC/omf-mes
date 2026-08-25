@@ -2894,7 +2894,7 @@
      "detectedAt"
     ],
     "description": "불량 실적. ⛔ 등록 경로를 두지 않는다 — 03 화면 7장에 불량코드 입력이 0건이다. 만드는 화면은 M-02-02(#83 로 막힘) · P-04-03(04 계약 없음)이다.",
-    "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 2단계 §6"
+    "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 2단계 §6 · ⚠ quality.defect_record 에 updated_at·version_no 가 없다(created_at 만 있는 기록 전용) — 재판정(원 불량 레코드 갱신, 결정 09 규칙 ⓒ)에 B-1 낙관적 잠금을 걸 수 없고 언제 누가 고쳤는지 audit_event 규약도 없다(§I-5). 근거: 공유계약 §I-21 · M-02-02 §8-2 · omf-mes#83"
    },
    "DispositionDecision": {
     "type": "object",

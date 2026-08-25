@@ -2230,7 +2230,7 @@
       }
      }
     },
-    "x-internal-note": "DR-007(2026-08-12 확정)로 부수 효과가 정해졌다 — R27 과 같게 즉시 폐번. 선발행은 번호 슬롯 예약이고 완료 전에는 실물에 귀속되지 않으므로(R26) 폐번해도 현장에 라벨이 남지 않는다. 신설 0 — trace.lot.status_code 의 「폐번」 값을 그대로 쓴다."
+    "x-internal-note": "DR-007(2026-08-12 확정)로 부수 효과가 정해졌다 — R27 과 같게 즉시 폐번. 선발행은 번호 슬롯 예약이고 완료 전에는 실물에 귀속되지 않으므로(R26) 폐번해도 현장에 라벨이 남지 않는다. ⚠ trace.lot.status_code 에 「폐번」 값을 두기로 2026-08-07 확정했으나(omf-mes#46 · W-02-05 §5-3 — 수명주기 축 대기/활성/폐번 3값 가정), quality-03 품질 계약이 2026-08-21 이후 확정한 LOT_STATUS 값 목록(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED — 품질 판정 축)에는 「폐번」이 없다. 같은 컬럼을 가리키는 두 확정이 서로 다른 값 집합을 전제해 정리가 먼저 필요하다 — 물리 반영 전 재확인 대상."
    }
   },
   "/production/work-orders/{workOrderId}:close": {
@@ -4910,7 +4910,8 @@
      "plannedEquipmentId": {
       "type": "integer",
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "x-internal-note": "⚠ 계획 자원배정 전용 엔티티가 없다 — 결정 04(배정 키=배정 No + 논리 유니크(W/O·자원유형·자원ID) · 계획·실적 2엔티티 분리)의 계획 쪽이 이 컬럼 5개(plannedEquipmentId·plannedMoldId·plannedShiftId·productionLineId·responsibleWorkerId)로 눌려 있다 — 자원 유형당 1개만 배정 가능해 실적(N 배정 가능)과 표현력이 비대칭이다. 근거: 공유계약 §I-23 · W-02-03 §5-1 · omf-mes#86"
      },
      "plannedMoldId": {
       "type": "integer",
@@ -4945,6 +4946,7 @@
      "operationSettingsSnapshot": {
       "type": "object",
       "description": "확정 시점의 공정 설정을 굳혀 둔 것. 근거: 공유계약 A-18",
+      "x-internal-note": "⚠ 이 스냅샷은 work_order 단위다 — R42·R43(W/O 무분할·생산LOT만 BOM 스냅샷별 분할)이 요구하는 「생산LOT 별 BOM 스냅샷」에 대응하는 trace.lot 쪽 컬럼이 없다(실측). 러닝체인지(P-02-11)에서 신·구 BOM이 갈릴 때 이 W/O 스냅샷 하나로는 LOT마다 다른 BOM을 표현할 수 없다 — R43 투입 Validation 은 W/O BOM 기준으로 물러난 상태(A-11). 근거: 공유계약 §I-16 · P-02-11 §5-3 · omf-mes#76",
       "example": {
        "standardCycleTimeSec": 42,
        "standardYieldRate": 0.98
@@ -5134,7 +5136,8 @@
      "lotSize": {
       "type": "number",
       "description": "LOT 크기 — 슬롯 하나의 계획 수량. 사용자가 화면에서 입력한다(품목별 기본값이 없어 매번 입력 — W-02-04 §8-2). 슬롯 수는 서버가 파생한다: N = 올림(지시수량 orderQty ÷ lotSize). 각 슬롯의 trace.lot.initial_qty 는 lotSize 로, 마지막 슬롯은 나머지가 있으면 나머지로 채운다 — 슬롯 계획 수량의 합이 지시수량과 같아야 마감 3분류(미달/정상/초과) 판정이 어긋나지 않는다. lotSize ≥ 지시수량이면 슬롯 1개(initial_qty = 지시수량 · 화면은 경고하되 막지 않는다 — W-02-04 §6). N 은 계획값이지 상한이 아니다 — 초과 생산은 추가 발번, 미달 슬롯은 마감 자동 폐번(R27). 근거: W-02-04 §4-B(initial_qty ← LOT 크기)·§5-3 · WF02 S4(N=양품목표÷LOT크기 ✓확정 2026-07-29) · omf-mes#206",
-      "example": 500
+      "example": 500,
+      "x-internal-note": "⭐ 이 필드가 §I-17(선발행 「실물 미귀속」을 수량 0 으로 담을 수 없다 — trace.lot CHECK(initial_qty > 0))의 실제 해법이다. R26의 「완료 전 실물 미귀속」을 initial_qty=0 으로 표현하지 않고 계획 수량(lotSize)으로 채운 뒤 상태로 미귀속 여부를 구분한다. 근거: omf-mes#76"
      },
      "handoverNote": {
       "type": "string",
