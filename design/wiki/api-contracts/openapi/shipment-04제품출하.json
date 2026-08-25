@@ -2460,9 +2460,11 @@
       "enum": [
        "NOT_REQUIRED",
        "PENDING",
-       "PASSED"
+       "PASSED",
+       "REJECTED",
+       "HELD"
       ],
-      "description": "⭐ W-04-02 「검사」 열의 판정 근거 — 라인 전체(shippingInspectionRequired + 03 품질 inspection-results)를 서버가 롤업해 하나로 낸다. NOT_REQUIRED=대상 라인 없음(「—」) · PENDING=대상인데 결과 없음(「● 대기」) · PASSED=전 대상 라인 합격(「✅ 합격」). ⛔ 화면이 라인을 순회해 판정하지 않는다(공유계약 G-8과 같은 결 — W-04-02 §5-3) — 03 계약과의 조인은 서버 몫이다. 근거: W-04-02 §5-3·§5-4 · omf-mes#232",
+      "description": "⭐ W-04-02 「검사」 열의 판정 근거 — 라인 전체(shippingInspectionRequired + 03 품질 inspection-results)를 서버가 롤업해 하나로 낸다. NOT_REQUIRED=대상 라인 없음(「—」) · PENDING=대상인데 결과 없음(「● 대기」) · PASSED=전 대상 라인 합격(「✅ 합격」) · REJECTED=불합격 라인 존재(「⛔ 불합격」) · HELD=보류 라인 존재, 불합격 없음(「⚠ 보류」). ⭐ 롤업 우선순위(가장 나쁜 것이 이긴다): REJECTED > HELD > PENDING > PASSED > NOT_REQUIRED. ⛔ 화면이 라인을 순회해 판정하지 않는다(공유계약 G-8과 같은 결 — W-04-02 §5-3) — 03 계약과의 조인은 서버 몫이다. ⚠ 이 필드를 이미 소비 중인 코드는 PASSED 외 값을 몰라도 PENDING과 동일하게(대기 취급) 두면 당장은 안전하다. 근거: W-04-02 §5-3·§5-4 · omf-mes#232 · omf-mes#235",
       "example": "PENDING"
      },
      "lines": {
