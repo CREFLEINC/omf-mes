@@ -22,11 +22,11 @@
 
 | 무엇 | 정본 | 규모 | 세는 명령 |
 | --- | --- | :-: | --- |
-| **계약** | `deliverables/openapi/*.json` **7파일** | **경로 306 · 오퍼레이션 434 · 스키마 458** | `python3 deliverables/openapi/check-structure.py` |
-| **근거** — 화면 액션이 어느 경로에 대응하나 | `deliverables/06-API-요구서*.md` **9장** | 인용 **540** 전건 계약에 실재 | `python3 deliverables/verify-doc-citations.py` |
-| **덮은 화면** | 요구서 §3 소절 | **116 / 117** | `python3 deliverables/build-screen-progress.py` |
+| **계약** | `deliverables/openapi/*.json` **7파일** | **경로 309 · 오퍼레이션 437 · 스키마 464** | `python3 new_wiki/schema/generators/openapi/check-structure.py` |
+| **근거** — 화면 액션이 어느 경로에 대응하나 | `new_wiki/wiki/api-contracts/06-API-요구서*.md` **9장** | 인용 **555** 전건 계약에 실재 | `python3 new_wiki/schema/generators/verify-doc-citations.py` |
+| **덮은 화면** | 요구서 §3 소절 | **116 / 117** | `python3 new_wiki/schema/generators/build-screen-progress.py` |
 
-**실측일: 2026-08-19.**
+**실측일: 2026-08-25**(new_wiki 이관 시 verify-counts.py 재측정으로 정정 — 아래 변경 이력 참조).
 
 ### 1-1. 계약 파일 일곱 — 도메인이 아니라 **소유**로 갈린다
 
@@ -65,7 +65,7 @@
 클라이언트 저장소가 이 계약으로 타입을 만들고 **그 생성물을 공개 저장소에 커밋한다.** `description` 은 주석으로 그대로 옮겨진다.
 
 ```
-python3 deliverables/openapi/check-public-safe.py
+python3 new_wiki/schema/generators/openapi/check-public-safe.py
 ```
 
 ⛔ **그래서 내부 서술은 `x-internal-note` 에 둔다.** 비공개 문서 경로 · 설계 진행 상태 · 조항 요약이 여기 해당한다.
@@ -75,7 +75,7 @@ python3 deliverables/openapi/check-public-safe.py
 `If-Match` 를 필수로 받아 놓고 **그 값을 어디서 받는지 선언하지 않으면 구현이 막힌다.** 실제로 19곳이 그랬다.
 
 ```
-python3 deliverables/openapi/check-lock-token-source.py
+python3 new_wiki/schema/generators/openapi/check-lock-token-source.py
 ```
 
 **토큰은 같은 자원의 상세 조회가 내려주는 `ETag` 응답 헤더**에서 받는다. 본문 필드로는 내리지 않는다 — 화면에 표시하지 않되 전달해야 하기 때문이다.
@@ -96,11 +96,12 @@ python3 deliverables/openapi/check-lock-token-source.py
 
 ### 3-4. 한 칸이 상황에 따라 여러 표를 가리키는 자리가 있다
 
-참조 무결성 제약이 없어 **대응표가 유일한 근거**다. ⚠ **아직 비어 있는 곳이 있다** — 인계 대장 §3 이 목록을 낸다.
+참조 무결성 제약이 없어 **대응표가 유일한 근거**다.
 
-```
-python3 deliverables/verify-polymorphic-mapping.py
-```
+⚠ **이 대응표를 검사하던 `verify-polymorphic-mapping.py`는 은퇴했다(2026-08-25)** — 물리 모델
+소관이 백엔드팀으로 넘어가면서 이 저장소 안에는 그 검사기가 참조할 물리 모델 원본이 없다
+(`docs/research/2026-07-23-데이터모델링/` 삭제, `schema/data-model-boundary.md` 참조). 대응표
+결손 확인은 백엔드팀 소관 저장소에서 한다.
 
 ---
 
@@ -141,7 +142,7 @@ python3 deliverables/verify-polymorphic-mapping.py
 | 무엇 | 왜 |
 | --- | --- |
 | **공유계약 조항 ↔ 계약 필드 대조표** | `06-API-요구서.md` §4-1 이 **기준정보 편만** 덮는다. 나머지 여덟 편은 없다 |
-| **한 칸이 여러 표를 가리키는 자리의 대응표** | 아직 비어 있는 곳이 있다 — 인계 대장 §3 |
+| **한 칸이 여러 표를 가리키는 자리의 대응표** | 검사기 은퇴(§3-4) — 백엔드팀 소관 저장소에서 확인 |
 | **`M-01-13` 의 계약** | 화면은 있는데 요구서 §3 소절도 계약도 없다 — 진도표가 유일한 구멍으로 잡는다 |
 | **목 서버로 화면이 실제로 그려지는가** | 계약이 성립하는 것과 화면이 그려지는 것은 다르다. **한 번도 돌려 보지 않았다** |
 
@@ -151,5 +152,6 @@ python3 deliverables/verify-polymorphic-mapping.py
 
 | 판 | 날짜 | 요지 |
 | :-: | --- | --- |
+| v0.3 | 2026-08-25 | **new_wiki 이관 + 수치 재실측.** 경로 306→**309**·오퍼레이션 434→**437**·스키마 458→**464**·인용 540→**555**(계약이 v0.2 이후 자연 증가한 것을 `verify-counts.py` 재실측으로 따라잡음 — 계약 자체를 이번에 고치지 않았다). §3-4 대응표 검사기(`verify-polymorphic-mapping.py`)는 물리 모델 소관이 백엔드팀으로 넘어가며 은퇴했다. 명령 경로를 `new_wiki/schema/generators/`로 갱신. |
 | v0.2 | 2026-08-21 | **인용 수 정정 — 537 → 540.** 03 품질 요구서 v0.4(검사자·단말을 서버 파생으로 되돌린 건 · 구현팀 질의 #173)가 **근거로 경로 3건을 새로 인용**해 등록부와 갈렸다(`verify-counts.py` 가 잡았다). ⚠ **이번 수정은 계약 계수를 건드리지 않는다** — **쓰기 본문의 속성 3개를 뺀 것**이라 경로·스키마 수가 그대로다(실측: `quality-03품질.json` 스키마 수 `origin/main` 29 ↔ 작업분 29). ⛔ **그런데 `verify-counts.py` 가 두 건을 더 잡는다 — 둘 다 이번 건과 무관한 기존 불일치라 손대지 않았다.** ① **계약 스키마 적힘 458 · 실물 459** — v0.1(2026-08-19) 이후 계약이 자랐는데 이 표가 안 따라왔다 ② **공유계약 조항 적힘 151 · 실물 152**(`08-의사결정정책-명세.md`) — 공유계약 v3.0 이 `B-28` 을 신설해 151 → 152 가 됐다. **각각 소관 문서에서 함께 정리한다.** |
 | v0.1 | 2026-08-19 | 표지 초판. ⭐ **본문을 갖지 않는다** — 계약 7파일(경로 306 · 오퍼레이션 434 · 스키마 458)과 요구서 9장(인용 537)을 가리키기만 한다. ⭐ **계약 파일은 도메인이 아니라 「누가 읽는가」로 갈린다** — 05 는 파일 셋에 걸친다. 읽을 때 알아야 하는 것 넷(공개 경계 · 잠금 토큰 · 「없음」 다섯 갈래 · 다형 대응표)과 고치는 방법을 적었다. ⚠ **못 센 것 넷** — 그중 「목 서버로 화면이 그려지는가」는 **한 번도 돌려 보지 않았다.** |
