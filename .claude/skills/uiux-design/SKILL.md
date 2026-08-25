@@ -5,7 +5,7 @@ description: omf-mes 화면 설계·계약 작업을 할 때 — 설계 소관 �
 
 # omf-mes UI/UX 설계 하네스
 
-**규칙 원문은 `uiux/CLAUDE.md` 「설계 소관과 보고 방식」에 있다.** 여기는 **그것을 실제로 지키게 하는 절차**다.
+**규칙 원문은 `design/schema/00-authoring-rules.md`(구 `uiux/CLAUDE.md` 승계, 2026-08-25 구조 삭제로 유일한 정본이 됨) 「설계 소관과 보고 방식」에 있다.** 여기는 **그것을 실제로 지키게 하는 절차**다.
 
 ⚠ **규칙을 아는 것으로는 안 막힌다.** 이 하네스가 담는 실패는 전부 **규칙이 이미 있는 상태에서** 일어났다.
 
@@ -82,7 +82,7 @@ description: omf-mes 화면 설계·계약 작업을 할 때 — 설계 소관 �
 ⛔  "값 목록 없는 코드 51종"
 ✅  "값 목록 없는 업무 코드 44종
      — 기준: 저장 컬럼에 착지한 것 중 인스턴스 식별·표준값·상태값 제외
-     — 정본: deliverables/openapi/count-undecided-codes.py"
+     — 정본: design/schema/generators/openapi/count-undecided-codes.py"
 ```
 
 **두 번 이상 인용될 수치는 스크립트를 정본으로 둔다.** 문서 셋이 같은 수를 베끼면 하나 틀릴 때 셋이 함께 틀린다.
@@ -161,13 +161,13 @@ description: omf-mes 화면 설계·계약 작업을 할 때 — 설계 소관 �
 | 무엇 | 언제 |
 | --- | --- |
 | `scripts/check-report-language.py` | 요청서·완료보고·이슈 초안을 쓴 뒤 |
-| `deliverables/verify-*.py` | 계약·화면을 고친 뒤 전부 |
-| `deliverables/test-verify-*.py` | 검사기를 고친 뒤 |
-| `deliverables/openapi/check-lock-token-source.py` | ⭐ **저장 충돌 보호를 붙인 뒤** — 토큰을 «받을 곳»이 선언됐는지 본다 |
-| `deliverables/openapi/check-enum-narrowing.py` | ⭐ **계약을 고친 뒤 · 통지를 내기 전** — 값 목록이 좁아졌는데 통지가 없으면 잡는다 |
-| — | ⛔ **계약은 JSON 이 정본이다**(2026-08-18 확정) — 생성기를 두지 않는다. 고치는 방법은 `deliverables/openapi/00-계약-작성-규약.md` |
-| `deliverables/collect-open-items.py --check` | ⭐ **화면 스펙을 고친 뒤** — 미결 대장이 스펙과 갈렸는지 본다 |
-| `deliverables/verify-generated-fresh.py` | ⭐⭐ **화면 스펙 §5 액션 표를 고친 뒤** — 커버리지 스냅숏이 낡았는지 본다. **저장소를 안 바꾸고 되돌린다** |
+| `design/schema/generators/verify-*.py` | 계약·화면을 고친 뒤 전부 |
+| `design/schema/generators/test-verify-*.py` | 검사기를 고친 뒤 |
+| `design/schema/generators/openapi/check-lock-token-source.py` | ⭐ **저장 충돌 보호를 붙인 뒤** — 토큰을 «받을 곳»이 선언됐는지 본다 |
+| `design/schema/generators/openapi/check-enum-narrowing.py` | ⭐ **계약을 고친 뒤 · 통지를 내기 전** — 값 목록이 좁아졌는데 통지가 없으면 잡는다 |
+| — | ⛔ **계약은 JSON 이 정본이다**(2026-08-18 확정) — 생성기를 두지 않는다. 고치는 방법은 `design/wiki/api-contracts/00-계약-작성-규약.md` |
+| `design/schema/generators/collect-open-items.py --check` | ⭐ **화면 스펙을 고친 뒤** — 미결 대장이 스펙과 갈렸는지 본다 |
+| `design/schema/generators/verify-generated-fresh.py` | ⭐⭐ **화면 스펙 §5 액션 표를 고친 뒤** — 커버리지 스냅숏이 낡았는지 본다. **저장소를 안 바꾸고 되돌린다** |
 | `.claude/skills/uiux-client-handoff/scripts/check-issue.py` | 구현팀 통지 **발행 전** |
 
 ### ⛔ 커버리지 게이트가 **거짓 초록을 낸 적이 있다**

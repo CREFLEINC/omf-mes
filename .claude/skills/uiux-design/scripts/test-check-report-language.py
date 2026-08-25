@@ -134,7 +134,7 @@ class SkipTest(unittest.TestCase):
         self.assertEqual(chk.scan_text("근거: W-01-06 · A-10\n"), [])
 
     def test_파일_경로_목록은_건너뛴다(self):
-        self.assertEqual(chk.scan_text("- `deliverables/04-통합-IA.md`\n"), [])
+        self.assertEqual(chk.scan_text("- `design/wiki/project-spec/04-통합-IA.md`\n"), [])
 
 
 class RealDocTest(unittest.TestCase):
@@ -144,7 +144,7 @@ class RealDocTest(unittest.TestCase):
 
     def test_확정_요청서가_통과한다(self):
         path = os.path.join(
-            self.ROOT, "uiux", "2026-08-10-의사결정요청",
+            self.ROOT, "design", "raw", "decision-requests",
             "DR-013-폐기거래처와-역할관리.md")
         if not os.path.exists(path):
             self.skipTest("문서 없음")

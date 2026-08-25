@@ -112,9 +112,9 @@ ADVISORY = [
      re.compile(r'「[^」]{40,}」'),
      '문서 본문 발췌인지 확인한다. 화면에 실제로 표시할 문구면 허용'),
 
-    ('docs/research 경로',
-     re.compile(r'docs/research/'),
-     '경로는 포인터라 허용이나, research 는 원본 자료라 파일명 자체가 내용을 드러낼 수 있다'),
+    ('원본 자료 경로',
+     re.compile(r'docs/research/|design/raw/(?:customer|decisions|process)/'),
+     '경로는 포인터라 허용이나, 원본 자료는 파일명 자체가 내용을 드러낼 수 있다'),
 ]
 
 PLACEHOLDER = re.compile(r'<[가-힣][^>]*>|W-00-00|omf-mes#00|YYYY-MM-DD|v0\.0|<해시>')

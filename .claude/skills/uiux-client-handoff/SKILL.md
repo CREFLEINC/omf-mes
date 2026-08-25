@@ -22,7 +22,7 @@ UI/UX 설계가 끝난 화면을 **프론트 개발팀에 넘기는** 절차다.
 ```
 화면 상세 스펙 §1·§4~§9  ─┐
 공유계약.md (버전·§I)     ├─→  폼 6항목  →  금지어 검사  →  발행
-deliverables/openapi/     │
+OpenAPI 계약(*.json)      │
 ds-gap.md (실물 확인)     ─┘
 ```
 
@@ -87,7 +87,7 @@ python3 .claude/skills/uiux-client-handoff/scripts/check-issue.py <초안.md> --
 
 세 가지를 함께 본다 — **구조**(필수 8절·처리 방법 3종·자리표시 잔존) · **공개 저장소 금지어** · **중복·금지 화면**. 통과하면 `gh` 명령을 출력한다.
 
-⚠ **순서를 바꾸지 않는다.** `uiux/CLAUDE.md` 가 「본문 작성 → 금지어 검사 → 발행」으로 못박았고, 이 순서를 어겨 DS 저장소에 제품 용어 2건을 흘린 적이 있다(2026-08-04).
+⚠ **순서를 바꾸지 않는다.** `design/schema/00-authoring-rules.md` 가 「본문 작성 → 금지어 검사 → 발행」으로 못박았고, 이 순서를 어겨 DS 저장소에 제품 용어 2건을 흘린 적이 있다(2026-08-04).
 
 ### ③ 발행한다
 
@@ -120,7 +120,7 @@ gh issue create --repo CREFLEINC/omf-mes-client \
 | **⚠** | 새로 만들 것이 생긴다. 기존은 안 깨진다 | **차수 마감 때 묶어서 1건** |
 | ℹ | 문서만 바뀜 | **내지 않는다** |
 
-본문은 세 토막이면 된다(`uiux/CLAUDE.md` 규정).
+본문은 세 토막이면 된다(`design/schema/00-authoring-rules.md` 규정).
 
 ```
 ## 무엇이 바뀌었나        ← 한두 줄. 화면 ID·제품 용어는 써도 된다
@@ -147,7 +147,7 @@ CREFLE 표준 `issue-management` 스킬과 **네 곳에서 규칙이 다르다.*
 
 **그대로 따르는 것도 있다** — 발행 전 중복 검색, 「어디서 발견했는지 맥락 포함」, 교차 저장소 추적 태도.
 
-`omf-mes`(우리 저장소) 안의 이슈 — `[uiux→docs]` · `[docs→데이터모델]` — 는 **이 스킬 소관이 아니다.** 그쪽은 `issue-management` 와 `uiux/CLAUDE.md` 를 따른다.
+`omf-mes`(우리 저장소) 안의 이슈 — `[uiux→docs]` · `[docs→데이터모델]` — 는 **이 스킬 소관이 아니다.** 그쪽은 `issue-management` 와 `design/schema/00-authoring-rules.md` 를 따른다.
 
 ## 참고 파일
 
