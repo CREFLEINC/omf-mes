@@ -2660,7 +2660,8 @@
               "enum": [
                 "SHOT_CONVERSION_ENABLED",
                 "SHOT_CONVERSION_RATIO",
-                "MINOR_STOP_THRESHOLD_MINUTES"
+                "MINOR_STOP_THRESHOLD_MINUTES",
+                "PRECHECK_CONTROL_LEVEL"
               ]
             }
           },
@@ -2822,7 +2823,8 @@
               "enum": [
                 "SHOT_CONVERSION_ENABLED",
                 "SHOT_CONVERSION_RATIO",
-                "MINOR_STOP_THRESHOLD_MINUTES"
+                "MINOR_STOP_THRESHOLD_MINUTES",
+                "PRECHECK_CONTROL_LEVEL"
               ]
             }
           },
@@ -4620,7 +4622,7 @@
           "effectiveFrom"
         ],
         "description": "운영 정책 한 건. 표 하나를 여러 화면이 쓰고 뜻은 policyCode 가 정한다. 범위 축은 넷 다 비울 수 있고 비면 전체를 뜻한다. 여럿이 동시에 맞으면 더 좁은 것이 이기며 축 우선순위는 품목 · 공정 · 공장 · 사업부 차례다. 이 판정은 서버가 하고 화면은 effective 경로로 결과를 받는다. 값 칸은 셋 중 하나만 쓴다. 물리 제약은 「셋 중 하나 이상」이라 셋 다 채워도 통과하지만, 어느 칸을 쓰는지는 정책 코드가 정한다 — 쓰지 않는 칸을 채우면 읽는 쪽이 헷갈린다. 근거: W-05-01 §5-A",
-        "x-internal-note": "코드 목록이 계약 자산이다 — W-05-01 §9-1. 작업 전 점검 통제 3단계도 이 표를 쓰기로 돼 있으나 소유 화면이 정해지지 않아 코드를 아직 넣지 않았다(P-02-02 소관 · W-05-12 §8-7).",
+        "x-internal-note": "코드 목록이 계약 자산이다 — W-05-01 §9-1. 작업 전 점검 통제 3단계(PRECHECK_CONTROL_LEVEL)를 2026-08-26 에 넣었다 — 소유 화면이 P-02-02 로 확정됐다(P-02-02 §5-1 · W-05-12 §8-7). 설정 전용 화면은 신설하지 않고 시드로 넣는다(P-02-02 §5-3).",
         "properties": {
           "operationPolicyId": {
             "type": "integer",
@@ -4635,9 +4637,10 @@
             "enum": [
               "SHOT_CONVERSION_ENABLED",
               "SHOT_CONVERSION_RATIO",
-              "MINOR_STOP_THRESHOLD_MINUTES"
+              "MINOR_STOP_THRESHOLD_MINUTES",
+              "PRECHECK_CONTROL_LEVEL"
             ],
-            "description": "무엇을 정하는 정책인가. SHOT_CONVERSION_ENABLED = 생산 수량으로 타발수를 환산할지(valueBoolean). SHOT_CONVERSION_RATIO = 수량 대비 타발수 비율(valueNumeric · 0 보다 커야 한다). MINOR_STOP_THRESHOLD_MINUTES = 경미 정지로 볼 시간 임계(valueNumeric · 기본 5). 코드는 화면이 붙인다 — 사용자가 만들지 않는다",
+            "description": "무엇을 정하는 정책인가. SHOT_CONVERSION_ENABLED = 생산 수량으로 타발수를 환산할지(valueBoolean). SHOT_CONVERSION_RATIO = 수량 대비 타발수 비율(valueNumeric · 0 보다 커야 한다). MINOR_STOP_THRESHOLD_MINUTES = 경미 정지로 볼 시간 임계(valueNumeric · 기본 5). PRECHECK_CONTROL_LEVEL = 작업 전 점검 통제 수준(valueText · BLOCK | WARN | OFF). ⭐ resolved 가 거짓이면 화면이 기본값을 지어내지 않고 WARN 으로 다룬다 — 통제 수준이 없다고 무통제로 열지 않는다(P-02-02 §6 확정). 코드는 화면이 붙인다 — 사용자가 만들지 않는다",
             "x-source-column": "policy_code"
           },
           "businessUnitId": {
@@ -4734,9 +4737,10 @@
             "enum": [
               "SHOT_CONVERSION_ENABLED",
               "SHOT_CONVERSION_RATIO",
-              "MINOR_STOP_THRESHOLD_MINUTES"
+              "MINOR_STOP_THRESHOLD_MINUTES",
+              "PRECHECK_CONTROL_LEVEL"
             ],
-            "description": "무엇을 정하는 정책인가. SHOT_CONVERSION_ENABLED = 생산 수량으로 타발수를 환산할지(valueBoolean). SHOT_CONVERSION_RATIO = 수량 대비 타발수 비율(valueNumeric · 0 보다 커야 한다). MINOR_STOP_THRESHOLD_MINUTES = 경미 정지로 볼 시간 임계(valueNumeric · 기본 5). 코드는 화면이 붙인다 — 사용자가 만들지 않는다"
+            "description": "무엇을 정하는 정책인가. SHOT_CONVERSION_ENABLED = 생산 수량으로 타발수를 환산할지(valueBoolean). SHOT_CONVERSION_RATIO = 수량 대비 타발수 비율(valueNumeric · 0 보다 커야 한다). MINOR_STOP_THRESHOLD_MINUTES = 경미 정지로 볼 시간 임계(valueNumeric · 기본 5). PRECHECK_CONTROL_LEVEL = 작업 전 점검 통제 수준(valueText · BLOCK | WARN | OFF). ⭐ resolved 가 거짓이면 화면이 기본값을 지어내지 않고 WARN 으로 다룬다 — 통제 수준이 없다고 무통제로 열지 않는다(P-02-02 §6 확정). 코드는 화면이 붙인다 — 사용자가 만들지 않는다"
           },
           "businessUnitId": {
             "type": [
@@ -4882,7 +4886,8 @@
             "enum": [
               "SHOT_CONVERSION_ENABLED",
               "SHOT_CONVERSION_RATIO",
-              "MINOR_STOP_THRESHOLD_MINUTES"
+              "MINOR_STOP_THRESHOLD_MINUTES",
+              "PRECHECK_CONTROL_LEVEL"
             ]
           },
           "resolved": {
