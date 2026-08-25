@@ -6850,9 +6850,21 @@
             "name": "equipmentTypeCode",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "maxLength": 50
+              }
             },
-            "description": "설비 유형으로 거른다 — 계측기 화면이 이것을 쓴다"
+            "style": "form",
+            "explode": false,
+            "example": [
+              "CALIPER",
+              "MICROMETER",
+              "GAUGE"
+            ],
+            "description": "설비 유형으로 거른다 — 값 여럿을 쉼표로 이어 보낸다. 한 화면이 «계열 전체»를 한 번에 걸러야 해서 여럿을 받는다. 계측기 마스터 관리(W-05-11)는 계측기 계열 그룹(INSTRUMENT_TYPE)의 값 전체를, 설비·설비그룹 마스터(W-05-12)는 설비 계열 그룹(EQUIPMENT_TYPE)의 값 전체를 싣는다. 걸지 않으면 두 계열이 함께 나온다."
           },
           {
             "name": "calibrationRequired",
@@ -16537,8 +16549,8 @@
             "x-source-column": "equipment_type_code",
             "type": "string",
             "maxLength": 50,
-            "description": "공통코드 — 값 목록 미정",
-            "example": "STANDARD"
+            "description": "공통코드 — 계열마다 그룹이 다르다. ⭐ 계측기 계열은 GET /mdm/code-values?codeGroupCode=INSTRUMENT_TYPE 로 받는다(CALIPER·MICROMETER·GAUGE). 설비 계열은 codeGroupCode=EQUIPMENT_TYPE 이며 값 목록은 아직 미정이다. ⚠ 한 컬럼에 두 계열이 착지하므로 화면은 «자기 계열의 그룹만» 부른다",
+            "example": "CALIPER"
           },
           "processId": {
             "x-source-column": "process_id",
@@ -17489,9 +17501,9 @@
           },
           "equipmentTypeCode": {
             "type": "string",
-            "example": "PRESS",
+            "example": "CALIPER",
             "maxLength": 50,
-            "description": "공통코드 — 계측기 화면은 이 값으로 거른다"
+            "description": "공통코드 — 계열마다 그룹이 다르다. ⭐ 계측기 계열은 GET /mdm/code-values?codeGroupCode=INSTRUMENT_TYPE 로 받는다(CALIPER·MICROMETER·GAUGE). 설비 계열은 codeGroupCode=EQUIPMENT_TYPE 이며 값 목록은 아직 미정이다. ⚠ 한 컬럼에 두 계열이 착지하므로 화면은 «자기 계열의 그룹만» 부른다 — 합치면 계측기 등록 선택칸에 설비 유형이 뜬다"
           },
           "productionLineId": {
             "type": [
@@ -17575,9 +17587,9 @@
           },
           "equipmentTypeCode": {
             "type": "string",
-            "example": "PRESS",
+            "example": "CALIPER",
             "maxLength": 50,
-            "description": "공통코드 — 계측기 화면은 이 값으로 거른다"
+            "description": "공통코드 — 계열마다 그룹이 다르다. ⭐ 계측기 계열은 GET /mdm/code-values?codeGroupCode=INSTRUMENT_TYPE 로 받는다(CALIPER·MICROMETER·GAUGE). 설비 계열은 codeGroupCode=EQUIPMENT_TYPE 이며 값 목록은 아직 미정이다. ⚠ 한 컬럼에 두 계열이 착지하므로 화면은 «자기 계열의 그룹만» 부른다 — 합치면 계측기 등록 선택칸에 설비 유형이 뜬다"
           },
           "productionLineId": {
             "type": [
