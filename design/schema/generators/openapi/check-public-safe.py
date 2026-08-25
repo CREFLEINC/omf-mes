@@ -11,7 +11,7 @@
   내부용 서술은 그쪽에 둔다.
 
 무엇을 막나
-  ① 비공개 문서 경로 — deliverables/… · docs/…
+  ① 비공개 문서 경로 — design/… · docs/…
   ② 설계 규칙 요약 — 「공유계약 X-N(요약문)」의 괄호. 식별자만 남긴다
   ③ 설계 진행 상태 — 미결 · 미착지
   ④ 사내 운영 용어 — WBS · 통합 Agent · SQL NNN 주석
@@ -33,7 +33,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 CONTRACTS_DIR = os.path.join(HERE, "..", "..", "..", "wiki", "api-contracts", "openapi")
 
 RULES = [
-    ('비공개 문서 경로', re.compile(r'\b(?:deliverables|docs|uiux)/'),
+    ('비공개 문서 경로', re.compile(r'\b(?:design|docs|deliverables|uiux)/'),
      'x-internal-note 로 옮기거나 이슈 번호로 대체한다'),
     # 절 기호는 공유계약이 늘면 함께 늘린다 — 2026-08-06 현재 §A~§L
     ('설계 규칙 요약', re.compile(r'공유계약\s+[A-L]-\d+\s*\('),

@@ -30,7 +30,7 @@
 
 ⚠ 이 검사기가 못 보는 것
 ------------------------
-**대화로 하는 보고는 못 본다.** 파일만 본다. 대화 쪽은 `uiux/CLAUDE.md`
+**대화로 하는 보고는 못 본다.** 파일만 본다. 대화 쪽은 `design/schema/00-authoring-rules.md`
 규칙 4 가 맡는다.
 
 그리고 **뜻이 「맞는가」는 못 본다.** 옆에 한글이 있으면 통과한다.
@@ -38,7 +38,7 @@
 쓰기
 ----
     python3 check-report-language.py <파일...>
-    python3 check-report-language.py --track uiux/2026-08-13-…/   # 폴더 전체
+    python3 check-report-language.py --track design/raw/decision-requests/   # 폴더 전체
 
 ⛔ 위반이 있으면 종료 코드 1. --warn 을 주면 종료 코드 0(보고만).
 """
