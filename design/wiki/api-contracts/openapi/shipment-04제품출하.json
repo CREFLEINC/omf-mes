@@ -284,7 +284,7 @@
       }
      }
     },
-    "x-internal-note": "등록 경로를 두지 않았다 — shipment_lot_allocation.shipment_line_id 가 NOT NULL 이라 출하보다 먼저 생길 수 없고, 출하 처리가 한 트랜잭션으로 만든다(W-04-04 §4-B). 제품 피킹(M-04-01)은 배분이 아니라 inventory.inventory_reservation 에 쓴다 — 그 경로는 01 자재창고 계약 소관이다. ⛔ 2026-08-13 실측 — 01 계약에 POST /inventory/reservations 가 없다. M-04-01 착수 통지가 그것에 걸린다."
+    "x-internal-note": "등록 경로를 두지 않았다 — shipment_lot_allocation.shipment_line_id 가 NOT NULL 이라 출하보다 먼저 생길 수 없고, 출하 처리가 한 트랜잭션으로 만든다(W-04-04 §4-B). 제품 피킹(M-04-01)은 배분을 만들지 않는다 — 2026-08-26 에 :pick 액션(POST /logistics/shipment-requests/{shipmentRequestId}/lines/{shipmentRequestLineId}:pick)을 이 계약에 세웠고, 서버가 그 결과로 inventory.inventory_reservation 을 건다. 01 자재창고 계약의 「예약은 화면이 직접 쓰지 않는다」 규약을 그대로 지킨다."
    }
   },
   "/logistics/shipment-lot-allocations/{shipmentLotAllocationId}": {
@@ -681,6 +681,106 @@
      }
     },
     "x-internal-note": "편성 취소 경로를 두지 않았다 — 화면이 「⛔ 두지 않는다 — 출하작업지시 취소는 범위 밖」이라 적었다(W-04-01 §5-7)."
+   }
+  },
+  "/logistics/shipment-requests/{shipmentRequestId}/lines/{shipmentRequestLineId}:pick": {
+   "post": {
+    "tags": [
+     "shipment"
+    ],
+    "summary": "제품 LOT 피킹 확정",
+    "description": "현장이 집은 제품 LOT 과 수량을 이 라인에 기록한다. ⭐ 화면이 예약을 직접 쓰지 않는다 — 서버가 이 피킹의 결과로 inventory_reservation 을 걸고 푼다(01 자재창고 계약 · M-01-08 §5-5 와 같은 규약). 자재 피킹의 :pick 과 대칭이다. ⛔ 오프라인 대상이 아니다 — Release 판정값을 캐시할 수 없어 이 화면은 온라인에서만 돈다(공유계약 C-6 · M-04-01 §5-6). 권장 외 LOT 을 집어도 막지 않는다 — 경고 후 통과이고 사유는 남기지 않는다(M-04-01 §5-5). 근거: M-04-01 §5-7",
+    "parameters": [
+     {
+      "name": "shipmentRequestId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "shipmentRequestLineId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/WorkerNo"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ShipmentLinePick"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "피킹됨 — 갱신된 라인",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ShipmentRequestLine"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "라인이 없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌 — LOT 이 Hold 이거나 가용이 모자라거나 배정을 넘는다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ShipmentConflictResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-internal-note": "서버가 막는 것 셋 — ① lot_hold 가 걸린 LOT ② 가용 수량 초과 ③ allocatedQty − pickedQty 초과. 잔여 유효기간 하한(minimumRemainingShelfLifeDays)도 서버가 판정한다. customerLotRequirement 는 자유 텍스트라 서버도 화면도 해석하지 않는다(M-04-01 §5-3 · 공유계약 A-12 읽는 쪽 판)."
    }
   },
   "/logistics/shipments": {
@@ -2627,6 +2727,12 @@
       "description": "배정 수량. 요청 수량을 넘을 수 없다(W-04-01 §5-1)",
       "example": 120.0
      },
+     "pickedQty": {
+      "type": "number",
+      "example": 120,
+      "x-source-column": "picked_qty",
+      "description": "누적 피킹 수량. ⭐ 서버가 유지한다 — 화면이 더하지 않는다(공유계약 L-2). 배정 잔여 = allocatedQty − pickedQty"
+     },
      "shippedQty": {
       "type": "number",
       "format": "double",
@@ -2667,7 +2773,8 @@
      "allocatedQty",
      "shippedQty",
      "uomId",
-     "shippingInspectionRequired"
+     "shippingInspectionRequired",
+     "pickedQty"
     ]
    },
    "ShipmentRequestLineCreate": {
@@ -2768,6 +2875,33 @@
      "message"
     ],
     "x-internal-note": "이름을 가른 이유: 앞 계열(app-공통·logistics-01·mdm)의 ConflictResponse 는 저장 충돌의 «원인»만 말하고, 이쪽은 거부의 «업무 사유»를 말한다. 두 축은 직교하며 겹치는 지점은 VERSION_CONFLICT ↔ conflictCause=user 하나다. 한 이름으로 두면 계약 병합이 멈춘다(구현팀 회신 omf-mes#166)."
+   },
+   "ShipmentLinePick": {
+    "type": "object",
+    "description": "피킹 확정 요청. 사번은 본문이 아니라 X-Worker-No 헤더로 보낸다",
+    "required": [
+     "lotId",
+     "pickedQty",
+     "uomId"
+    ],
+    "properties": {
+     "lotId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001,
+      "description": "현장이 실제로 집은 제품 LOT. 권장 1순위가 아니어도 된다"
+     },
+     "pickedQty": {
+      "type": "number",
+      "example": 180,
+      "description": "이번에 집은 수량. 0 보다 커야 한다"
+     },
+     "uomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     }
+    }
    }
   }
  }

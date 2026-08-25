@@ -1074,7 +1074,7 @@
      "production"
     ],
     "summary": "자재 반출 등록",
-    "description": "근거: M-02-02 §5 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다. 미확정 표식은 셸이 붙인다(공유계약 C-7 — 화면 조항).",
+    "description": "⚠ 2026-08-26 — 근거였던 M-02-02(수리 왕복)가 이 경로를 쓰지 않는 것으로 정정됐다. 수리 반출은 자재 반납이 아니라서 전용 자원(/production/repair-executions:return)으로 갔다. 이 경로는 「W/O 잔여 자재를 창고로 반납」이라는 실재 업무이나 부르는 화면이 아직 매핑되지 않았다 — 소유 화면이 정해지면 근거를 다시 적는다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다. 미확정 표식은 셸이 붙인다(공유계약 C-7 — 화면 조항).",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -1395,6 +1395,165 @@
     }
    }
   },
+  "/production/precheck-decisions": {
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "작업 전 점검 통제 판정 이력 조회",
+    "description": "작업 전 점검 게이트가 내린 판정을 조회한다. ⭐ 통과도 남는다 — 안 보이는 것과 안 남기는 것은 다르다(P-02-02 §9-3). 근거: P-02-02 §5-8",
+    "parameters": [
+     {
+      "name": "workOrderId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "equipmentId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "decisionCode",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "enum": [
+        "PASSED",
+        "BLOCKED",
+        "WARNED",
+        "OVERRIDDEN"
+       ]
+      }
+     },
+     {
+      "name": "decidedFrom",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-11T09:12:00+09:00"
+      }
+     },
+     {
+      "name": "decidedTo",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-11T09:12:00+09:00"
+      }
+     },
+     {
+      "name": "page",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "minimum": 1,
+       "default": 1
+      }
+     },
+     {
+      "name": "size",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 200,
+       "default": 50
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "목록",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PrecheckDecisionList"
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "작업 전 점검 통제 판정 기록",
+    "description": "작업 전 점검 게이트의 판정을 기록한다. 화면이 통제 수준을 읽어 판정하고 그 결과를 네 값 중 하나로 남긴다. ⭐ 차단도 기록된다 — 차단이면 세션이 열리지 않으므로 work_session_event 로는 남길 수 없다(P-02-02 §5-8). 통과·우회면 이 기록 뒤에 POST /production/work-sessions 로 세션을 연다. ⛔ 오프라인 대상이 아니다 — 이 화면은 온라인에서만 판정한다(P-02-02 §6-1). 근거: P-02-02 §5-8·§9-3",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/WorkerNo"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/PrecheckDecisionCreate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "기록됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PrecheckDecision"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProductionConflictResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-internal-note": "우회는 긴급 W/O 일 때만 허용한다 — 서버가 work_order_type_code 로 판정하고 아니면 400 이다(P-02-02 §5-8). ⛔ 우회 사유를 자유 텍스트로 받지 않는다 — 긴급 W/O 자체가 사유다."
+   }
+  },
   "/production/production-results": {
    "get": {
     "tags": [
@@ -1695,6 +1854,241 @@
      },
      "409": {
       "description": "충돌",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProductionConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/repair-executions": {
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "수리 실행 목록",
+    "description": "수리 왕복의 실행 기록을 조회한다. ⭐ open=true 가 「투입 대기 목록」이다 — 반출 시각이 없는 것이 아직 수리 중인 건이다. 작업 세션과 같은 구간 형 리소스라 「진행 중」을 상태 컬럼으로 두지 않는다. 근거: M-02-02 §5-3",
+    "parameters": [
+     {
+      "name": "open",
+      "in": "query",
+      "schema": {
+       "type": "boolean",
+       "default": true
+      },
+      "description": "반출 시각이 없는 것만. 기본 true — 이것이 투입 대기 목록이다"
+     },
+     {
+      "name": "defectRecordId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "lotId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      },
+      "description": "원 불량이 매인 LOT 으로 거른다"
+     },
+     {
+      "name": "startedFrom",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-11T09:12:00+09:00"
+      }
+     },
+     {
+      "name": "startedTo",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date-time",
+       "example": "2026-08-11T09:12:00+09:00"
+      }
+     },
+     {
+      "name": "page",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "minimum": 1,
+       "default": 1
+      }
+     },
+     {
+      "name": "size",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 200,
+       "default": 50
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "목록",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RepairExecutionList"
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "수리 투입 등록",
+    "description": "불량 LOT 을 수리에 투입한 사실을 기록한다. 왕복의 앞쪽이다 — 반출은 :return 이 닫는다. ⛔ 오프라인 대상이 아니다 — 이 화면은 온라인 전용이다(M-02-02 §5-6). 근거: M-02-02 §5-3·§5-6",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/WorkerNo"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RepairExecutionCreate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "투입됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RepairExecution"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "단말·권한 게이팅에 막혔다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌 — 같은 불량에 열린 수리 건이 이미 있다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProductionConflictResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-internal-note": "원 불량(defect_record)은 기록 전용이라 갱신하지 않는다 — 수리 사실은 이 테이블에 쌓고 원 레코드는 건드리지 않는다(M-02-02 §5-2 · 결정 09 ⓒ). 자재 불량은 대상이 아니다 — defect_record.work_order_id 가 NOT NULL 이라 애초에 생산 불량만 들어온다(M-02-02 §5-5)."
+   }
+  },
+  "/production/repair-executions/{repairExecutionId}:return": {
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "수리 반출 등록",
+    "description": "수리를 마치고 반출한 사실을 기록해 왕복을 닫는다. 반출 시각이 생기면 투입 대기 목록에서 빠진다. ⭐ 재투입은 이 화면이 하지 않는다 — 수리된 물건은 원 LOT 으로 돌아가지 않고 그때 진행 중인 생산LOT 에 합류하며, 그 등록은 P-02-03·P-02-04 소관이다(M-02-02 §5-4). 근거: M-02-02 §5-3",
+    "parameters": [
+     {
+      "name": "repairExecutionId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/WorkerNo"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RepairExecutionReturn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "반출됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RepairExecution"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "수리 건이 없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "충돌 — 이미 반출됐다",
       "content": {
        "application/json": {
         "schema": {
@@ -4081,6 +4475,385 @@
      "size",
      "total"
     ]
+   },
+   "PrecheckDecision": {
+    "type": "object",
+    "x-source-table": "production.precheck_decision",
+    "description": "작업 전 점검 통제 게이트의 판정 1건. P-02-02 §5-8 이 정의했다",
+    "required": [
+     "precheckDecisionId",
+     "workOrderId",
+     "equipmentId",
+     "decidedAt",
+     "controlLevelCode",
+     "decisionCode"
+    ],
+    "properties": {
+     "precheckDecisionId": {
+      "type": "integer",
+      "format": "int64",
+      "x-source-column": "precheck_decision_id",
+      "example": 1001
+     },
+     "workOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "x-source-column": "work_order_id",
+      "example": 1001
+     },
+     "equipmentId": {
+      "type": "integer",
+      "format": "int64",
+      "x-source-column": "equipment_id",
+      "example": 1001
+     },
+     "decidedAt": {
+      "type": "string",
+      "format": "date-time",
+      "x-source-column": "decided_at",
+      "description": "단말 시계가 정한다. 서버 수신 시각으로 덮지 않는다. 근거: 공유계약 C-12",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "controlLevelCode": {
+      "type": "string",
+      "maxLength": 50,
+      "enum": [
+       "BLOCK",
+       "WARN",
+       "OFF"
+      ],
+      "x-source-column": "control_level_code",
+      "description": "판정 시점에 적용된 통제 수준의 스냅샷. app.operation_policy 의 PRECHECK_CONTROL_LEVEL 을 읽은 값이다 — 정책이 나중에 바뀌어도 이 기록은 바뀌지 않는다",
+      "example": "WARN"
+     },
+     "decisionCode": {
+      "type": "string",
+      "maxLength": 50,
+      "enum": [
+       "PASSED",
+       "BLOCKED",
+       "WARNED",
+       "OVERRIDDEN"
+      ],
+      "x-source-column": "decision_code",
+      "description": "PASSED = 통과 · BLOCKED = 차단 · WARNED = 경고 후 진행 · OVERRIDDEN = 긴급 W/O 우회",
+      "example": "PASSED"
+     },
+     "basisInspectionId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "x-source-column": "basis_inspection_id",
+      "description": "⚠ 비어도 된다 — 점검 이력이 없는 채로 판정한 경우 비운다(P-02-02 §5-8)",
+      "example": 1001
+     },
+     "overrideReasonCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "maxLength": 50,
+      "x-source-column": "override_reason_code",
+      "description": "⚠ decisionCode 가 OVERRIDDEN 일 때만 값이 있다",
+      "example": "EMERGENCY_WORK_ORDER"
+     },
+     "workerNo": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "maxLength": 50,
+      "x-source-column": "worker_no",
+      "description": "판정 시점의 귀속 사번. 쓰기 요청의 X-Worker-No 를 서버가 옮겨 적는다",
+      "example": "100027"
+     }
+    }
+   },
+   "PrecheckDecisionCreate": {
+    "type": "object",
+    "description": "통제 판정 기록 요청. 사번은 본문이 아니라 X-Worker-No 헤더로 보낸다",
+    "required": [
+     "workOrderId",
+     "equipmentId",
+     "decidedAt",
+     "controlLevelCode",
+     "decisionCode"
+    ],
+    "properties": {
+     "workOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "equipmentId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "decidedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "단말 시계가 정한다. 근거: 공유계약 C-12",
+      "example": "2026-08-11T09:12:00+09:00"
+     },
+     "controlLevelCode": {
+      "type": "string",
+      "enum": [
+       "BLOCK",
+       "WARN",
+       "OFF"
+      ],
+      "description": "화면이 읽은 통제 수준. 적용 정책이 없으면 WARN 이다(P-02-02 §6)",
+      "example": "WARN"
+     },
+     "decisionCode": {
+      "type": "string",
+      "enum": [
+       "PASSED",
+       "BLOCKED",
+       "WARNED",
+       "OVERRIDDEN"
+      ],
+      "example": "PASSED"
+     },
+     "basisInspectionId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "description": "근거로 삼은 점검 헤더. 이력이 없으면 비운다",
+      "example": 1001
+     },
+     "overrideReasonCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "OVERRIDDEN 일 때만 보낸다. 자유 텍스트가 아니라 코드다",
+      "example": "EMERGENCY_WORK_ORDER"
+     }
+    }
+   },
+   "PrecheckDecisionList": {
+    "type": "object",
+    "required": [
+     "items",
+     "page"
+    ],
+    "properties": {
+     "items": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/PrecheckDecision"
+      }
+     },
+     "page": {
+      "$ref": "#/components/schemas/PageMeta"
+     }
+    }
+   },
+   "RepairExecution": {
+    "type": "object",
+    "x-source-table": "production.repair_execution",
+    "description": "수리 왕복 실행 1건. 투입에서 반출까지를 한 행으로 담는다. M-02-02 §4-A 가 정의했다",
+    "required": [
+     "repairExecutionId",
+     "defectRecordId",
+     "startedAt",
+     "repairQty",
+     "uomId"
+    ],
+    "properties": {
+     "repairExecutionId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001,
+      "x-source-column": "repair_execution_id"
+     },
+     "defectRecordId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001,
+      "x-source-column": "defect_record_id",
+      "description": "원 불량. 기록 전용 테이블이라 이쪽을 갱신하지 않고 여기에 쌓는다"
+     },
+     "repairProcessId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "example": 1001,
+      "x-source-column": "repair_process_id",
+      "description": "⚠ 비어도 된다 — 수리를 공정으로 둘지가 아직 정해지지 않았다(M-02-02 §8-5)"
+     },
+     "startedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00",
+      "x-source-column": "started_at",
+      "description": "투입 시각. 단말 시계가 정한다. 근거: 공유계약 C-12"
+     },
+     "returnedAt": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "format": "date-time",
+      "example": "2026-08-11T11:40:00+09:00",
+      "x-source-column": "returned_at",
+      "description": "⭐ 반출 시각. 비어 있으면 아직 수리 중이다 — 이것이 「투입 대기 목록」의 판정 축이다"
+     },
+     "repairQty": {
+      "type": "number",
+      "example": 40,
+      "x-source-column": "repair_qty",
+      "description": "수리에 투입한 수량. 0 보다 커야 한다"
+     },
+     "uomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001,
+      "x-source-column": "uom_id"
+     },
+     "repairResultCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "maxLength": 50,
+      "enum": [
+       "SUCCEEDED",
+       "FAILED",
+       null
+      ],
+      "example": "SUCCEEDED",
+      "x-source-column": "repair_result_code",
+      "description": "⚠ 반출할 때 정해진다 — 투입 시점에는 비어 있다"
+     },
+     "reintroducedLotId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "example": 1001,
+      "x-source-column": "reintroduced_lot_id",
+      "description": "⭐ 재투입 참조 필드 — 수리분이 합류한 생산LOT. 원 LOT 이 아니다(M-02-02 §5-4). 재투입 등록 화면이 나중에 채운다"
+     },
+     "terminalId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "example": 1001,
+      "x-source-column": "terminal_id"
+     },
+     "workerNo": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "maxLength": 50,
+      "example": "100027",
+      "x-source-column": "worker_no",
+      "description": "투입한 사람. 쓰기 요청의 X-Worker-No 를 서버가 옮겨 적는다"
+     }
+    }
+   },
+   "RepairExecutionCreate": {
+    "type": "object",
+    "description": "수리 투입 요청. 사번은 본문이 아니라 X-Worker-No 헤더로 보낸다",
+    "required": [
+     "defectRecordId",
+     "startedAt",
+     "repairQty",
+     "uomId"
+    ],
+    "properties": {
+     "defectRecordId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "repairProcessId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "example": 1001
+     },
+     "startedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T09:12:00+09:00",
+      "description": "단말 시계가 정한다. 근거: 공유계약 C-12"
+     },
+     "repairQty": {
+      "type": "number",
+      "example": 40
+     },
+     "uomId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "terminalId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "example": 1001
+     }
+    }
+   },
+   "RepairExecutionReturn": {
+    "type": "object",
+    "description": "수리 반출 요청",
+    "required": [
+     "returnedAt",
+     "repairResultCode"
+    ],
+    "properties": {
+     "returnedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-11T11:40:00+09:00",
+      "description": "단말 시계가 정한다. 근거: 공유계약 C-12"
+     },
+     "repairResultCode": {
+      "type": "string",
+      "enum": [
+       "SUCCEEDED",
+       "FAILED"
+      ],
+      "example": "SUCCEEDED"
+     }
+    }
+   },
+   "RepairExecutionList": {
+    "type": "object",
+    "required": [
+     "items",
+     "page"
+    ],
+    "properties": {
+     "items": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/RepairExecution"
+      }
+     },
+     "page": {
+      "$ref": "#/components/schemas/PageMeta"
+     }
+    }
    },
    "ProductionOrder": {
     "type": "object",
