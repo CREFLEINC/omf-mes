@@ -562,6 +562,83 @@
     }
    }
   },
+  "/logistics/shipment-requests/summary": {
+   "get": {
+    "tags": [
+     "shipment"
+    ],
+    "summary": "출하작업지시 요약",
+    "description": "W-04-02 요약 구획(작업지시 건수·요청/배정/출하 합계·미배정·검사 대기·피킹 미완) — 필터 전체 기준. 목록(GET /logistics/shipment-requests)과 같은 필터를 쓰되 page/size/sort 는 없다. ⛔ 화면이 페이지를 모아 더하지 않는다 — 필터 전체와 다른 수가 나온다(공유계약 L-2). 근거: W-04-02 §4-B · omf-mes#232",
+    "parameters": [
+     {
+      "name": "customerId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "shipToPartnerId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "statusCode",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "example": "값"
+      }
+     },
+     {
+      "name": "shippingInspectionRequired",
+      "in": "query",
+      "schema": {
+       "type": "boolean",
+       "example": true
+      },
+      "description": "검사 상태 필터"
+     },
+     {
+      "name": "shipDateFrom",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date",
+       "example": "2026-08-13"
+      },
+      "description": "필수 — 공유계약 L-3. 목록과 같은 기준을 쓴다"
+     },
+     {
+      "name": "shipDateTo",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date",
+       "example": "2026-08-13"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "요약",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ShipmentRequestSummary"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
   "/logistics/shipment-requests/{shipmentRequestId}": {
    "parameters": [
     {
@@ -2378,6 +2455,16 @@
       "type": "string",
       "example": "값"
      },
+     "shippingInspectionStatusCode": {
+      "type": "string",
+      "enum": [
+       "NOT_REQUIRED",
+       "PENDING",
+       "PASSED"
+      ],
+      "description": "⭐ W-04-02 「검사」 열의 판정 근거 — 라인 전체(shippingInspectionRequired + 03 품질 inspection-results)를 서버가 롤업해 하나로 낸다. NOT_REQUIRED=대상 라인 없음(「—」) · PENDING=대상인데 결과 없음(「● 대기」) · PASSED=전 대상 라인 합격(「✅ 합격」). ⛔ 화면이 라인을 순회해 판정하지 않는다(공유계약 G-8과 같은 결 — W-04-02 §5-3) — 03 계약과의 조인은 서버 몫이다. 근거: W-04-02 §5-3·§5-4 · omf-mes#232",
+      "example": "PENDING"
+     },
      "lines": {
       "type": "array",
       "items": {
@@ -2395,9 +2482,68 @@
      "customerId",
      "shipToPartnerId",
      "requestedShipDate",
-     "statusCode"
+     "statusCode",
+     "shippingInspectionStatusCode"
     ],
     "description": "MES 출하작업지시. W-04-01 「편성」·「단독 생성」이 만든다"
+   },
+   "ShipmentRequestSummary": {
+    "type": "object",
+    "properties": {
+     "requestCount": {
+      "type": "integer",
+      "description": "필터 전체 기준 작업지시 건수",
+      "example": 24
+     },
+     "requestedQtyTotal": {
+      "type": "number",
+      "format": "double",
+      "example": 12400.0
+     },
+     "allocatedQtyTotal": {
+      "type": "number",
+      "format": "double",
+      "example": 11900.0
+     },
+     "shippedQtyTotal": {
+      "type": "number",
+      "format": "double",
+      "example": 3200.0
+     },
+     "unallocatedQtyTotal": {
+      "type": "number",
+      "format": "double",
+      "description": "요청 − 배정. ⭐ 서버가 계산한다(공유계약 L-2) — 화면이 requestedQtyTotal·allocatedQtyTotal 을 받아 다시 빼지 않는다",
+      "example": 500.0
+     },
+     "pendingInspectionCount": {
+      "type": "integer",
+      "description": "shippingInspectionStatusCode=PENDING 인 작업지시 건수",
+      "example": 4
+     },
+     "incompletePickingCount": {
+      "type": "integer",
+      "description": "피킹이 끝나지 않은 작업지시 건수",
+      "example": 9
+     },
+     "asOf": {
+      "type": "string",
+      "format": "date-time",
+      "description": "서버 집계 기준 시각(공유계약 L-5) — 화면 헤더 「기준 …」에 쓴다",
+      "example": "2026-08-07T14:32:00+09:00"
+     }
+    },
+    "required": [
+     "requestCount",
+     "requestedQtyTotal",
+     "allocatedQtyTotal",
+     "shippedQtyTotal",
+     "unallocatedQtyTotal",
+     "pendingInspectionCount",
+     "incompletePickingCount",
+     "asOf"
+    ],
+    "description": "W-04-02 요약 구획 — 필터 전체 기준(목록 페이지와 다른 모집단). 근거: W-04-02 §4-B · omf-mes#232"
    },
    "ShipmentRequestCreate": {
     "type": "object",
