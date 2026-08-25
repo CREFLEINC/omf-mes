@@ -161,6 +161,12 @@ docs/research/2026-07-23-고객자료분석/제품출하명세표_공통양식.h
 docs/research/2026-07-23-고객자료분석/제품출하명세표_한국어번역.html  →  new_wiki/raw/process/docs/research/2026-07-23-고객자료분석/제품출하명세표_한국어번역.html
 docs/research/2026-07-23-고객자료분석/품질검사_기준_IQC_PQC_OQC.html  →  new_wiki/raw/process/docs/research/2026-07-23-고객자료분석/품질검사_기준_IQC_PQC_OQC.html
 docs/research/2026-07-16-03품질섹션-구조논의-진행메모.md  →  new_wiki/raw/process/docs/research/2026-07-16-03품질섹션-구조논의-진행메모.md
+docs/research/2026-07-03-요구사항-기존기획-통합분석.md  →  new_wiki/raw/process/docs/research/2026-07-03-요구사항-기존기획-통합분석.md
+```
+
+### customer/
+```
+docs/research/2026-07-03-MES-요구사항-명세서-v1-정리.md  →  new_wiki/raw/customer/2026-07-03-MES-요구사항-명세서-v1-정리.md
 ```
 
 ### decisions/
@@ -183,6 +189,7 @@ docs/research/2026-07-20-자재LOT관리-재정의-확정기록.md  →  new_wik
 docs/research/2026-07-24-프로그램배지-단말확정-확정기록.md  →  new_wiki/raw/decisions/2026-07-24-프로그램배지-단말확정-확정기록.md
 docs/research/2026-07-28-POP-단말인증-설계검토.md  →  new_wiki/raw/decisions/2026-07-28-POP-단말인증-설계검토.md
 docs/research/2026-07-29-생산LOT-발번-폐번-확정기록.md  →  new_wiki/raw/decisions/2026-07-29-생산LOT-발번-폐번-확정기록.md
+docs/research/2026-07-03-현장검증-질문지-v2-요구사항통합.md  →  new_wiki/raw/decisions/2026-07-03-현장검증-질문지-v2-요구사항통합.md
 ```
 
 ### superseded/
@@ -199,22 +206,191 @@ docs/research/2026-06-28-현장점검-체크리스트.html  →  new_wiki/raw/su
 docs/research/2026-06-29-현장점검-코드참조-미결코드·클러스터.html  →  new_wiki/raw/superseded/2026-06-29-현장점검-코드참조-미결코드·클러스터.html
 ```
 
-## 아직 이관하지 않은 것 (Phase 3 대상 — Wiki 소스, 이 표에 없다고 누락이 아니다)
+## Wiki 이관 (Phase 3 — 검토·재작성 후 이관, Tier 1/2)
 
-화면 상세 스펙 118장·API 계약(openapi/*.json)·요구사항/워크플로우/도식스펙·deliverables/ 5권 세트는
-Phase 3에서 검토·재작성 후 개별적으로 이 표에 추가된다.
+### requirements/
+```
+deliverables/01-요구사항명세서.md  →  new_wiki/wiki/requirements/00-요구사항명세서.md
+```
+
+### glossary/
+```
+deliverables/00-용어사전.md  →  new_wiki/wiki/glossary/00-용어사전.md
+```
+
+### project-spec/
+```
+deliverables/02-SW설계사양서.md  →  new_wiki/wiki/project-spec/02-SW설계사양서.md
+deliverables/03-HW구성안.md  →  new_wiki/wiki/project-spec/03-HW구성안.md
+deliverables/04-통합-IA.md  →  new_wiki/wiki/project-spec/04-통합-IA.md
+deliverables/05-사용자-프로세스-태스크플로우.md  →  new_wiki/wiki/project-spec/05-사용자-프로세스-태스크플로우.md
+deliverables/07-웹프론트-착수안내.md  →  new_wiki/wiki/project-spec/07-웹프론트-착수안내.md
+```
+
+### domain-workflow/
+```
+docs/research/2026-07-03-개념데이터모델-v2-요구사항통합.md  →  new_wiki/wiki/domain-workflow/2026-07-03-개념데이터모델-v2-요구사항통합.md
+docs/research/2026-07-03-워크플로우-요구사항반영-01-자재창고관리.md  →  new_wiki/wiki/domain-workflow/2026-07-03-워크플로우-요구사항반영-01-자재창고관리.md
+docs/research/2026-07-03-워크플로우-요구사항반영-02-생산실행.md  →  new_wiki/wiki/domain-workflow/2026-07-03-워크플로우-요구사항반영-02-생산실행.md
+docs/research/2026-07-03-워크플로우-요구사항반영-03-품질관리.md  →  new_wiki/wiki/domain-workflow/2026-07-03-워크플로우-요구사항반영-03-품질관리.md
+docs/research/2026-07-03-워크플로우-요구사항반영-04-제품출하.md  →  new_wiki/wiki/domain-workflow/2026-07-03-워크플로우-요구사항반영-04-제품출하.md
+docs/research/2026-07-03-워크플로우-요구사항반영-05-설비툴관리.md  →  new_wiki/wiki/domain-workflow/2026-07-03-워크플로우-요구사항반영-05-설비툴관리.md
+docs/research/2026-07-03-워크플로우-요구사항반영-06-기준정보연계.md  →  new_wiki/wiki/domain-workflow/2026-07-03-워크플로우-요구사항반영-06-기준정보연계.md
+docs/research/2026-07-06-도식스펙-02-생산실행.md  →  new_wiki/wiki/domain-workflow/2026-07-06-도식스펙-02-생산실행.md
+docs/research/2026-07-06-도식스펙-03-품질관리.md  →  new_wiki/wiki/domain-workflow/2026-07-06-도식스펙-03-품질관리.md
+docs/research/2026-07-06-도식스펙-04-제품출하.md  →  new_wiki/wiki/domain-workflow/2026-07-06-도식스펙-04-제품출하.md
+docs/research/2026-07-06-도식스펙-05-설비툴관리.md  →  new_wiki/wiki/domain-workflow/2026-07-06-도식스펙-05-설비툴관리.md
+docs/research/2026-07-07-도식스펙-01-자재창고관리.md  →  new_wiki/wiki/domain-workflow/2026-07-07-도식스펙-01-자재창고관리.md
+docs/research/2026-07-07-도식스펙-06-기준정보연계.md  →  new_wiki/wiki/domain-workflow/2026-07-07-도식스펙-06-기준정보연계.md
+```
+
+### api-contracts/
+```
+deliverables/06-API-요구서-01자재창고.md  →  new_wiki/wiki/api-contracts/06-API-요구서-01자재창고.md
+deliverables/06-API-요구서-02생산실행.md  →  new_wiki/wiki/api-contracts/06-API-요구서-02생산실행.md
+deliverables/06-API-요구서-03품질.md  →  new_wiki/wiki/api-contracts/06-API-요구서-03품질.md
+deliverables/06-API-요구서-04제품출하.md  →  new_wiki/wiki/api-contracts/06-API-요구서-04제품출하.md
+deliverables/06-API-요구서-05설비툴.md  →  new_wiki/wiki/api-contracts/06-API-요구서-05설비툴.md
+deliverables/06-API-요구서-app공통승인.md  →  new_wiki/wiki/api-contracts/06-API-요구서-app공통승인.md
+deliverables/06-API-요구서-app공통출력물.md  →  new_wiki/wiki/api-contracts/06-API-요구서-app공통출력물.md
+deliverables/06-API-요구서-공통.md  →  new_wiki/wiki/api-contracts/06-API-요구서-공통.md
+deliverables/06-API-요구서.md  →  new_wiki/wiki/api-contracts/06-API-요구서.md
+deliverables/09-API-계약서.md  →  new_wiki/wiki/api-contracts/09-API-계약서.md
+deliverables/openapi/00-계약-작성-규약.md  →  new_wiki/wiki/api-contracts/00-계약-작성-규약.md
+deliverables/openapi/*.json  →  (미이관 — Tier 0, Phase 5 컷오버 시 new_wiki/wiki/api-contracts/openapi/로 이동 예정)
+```
+
+### decisions-policy/
+```
+deliverables/08-의사결정정책-명세.md  →  new_wiki/wiki/decisions-policy/00-index.md (표지 성격 — 구조만 승계, Tier 2)
+uiux/화면상세스펙-공통/공유계약.md  →  new_wiki/wiki/decisions-policy/공유계약.md
+```
+
+### screens/ (118장)
+```
+uiux/2026-08-04-화면상세스펙-확대2차/M-01-01-입하등록.md  →  new_wiki/wiki/screens/01/M-01-01-입하등록.md
+uiux/2026-07-31-화면상세스펙-파일럿/M-01-02-자재LOT스캔등록.md  →  new_wiki/wiki/screens/01/M-01-02-자재LOT스캔등록.md
+uiux/2026-08-05-화면상세스펙-확대4차/M-01-04-자재위치확인.md  →  new_wiki/wiki/screens/01/M-01-04-자재위치확인.md
+uiux/2026-08-05-화면상세스펙-확대4차/M-01-05-적치입고완료.md  →  new_wiki/wiki/screens/01/M-01-05-적치입고완료.md
+uiux/2026-08-04-화면상세스펙-확대2차/M-01-06-입하오류등록.md  →  new_wiki/wiki/screens/01/M-01-06-입하오류등록.md
+uiux/2026-08-05-화면상세스펙-확대4차/M-01-07-임시위치적재.md  →  new_wiki/wiki/screens/01/M-01-07-임시위치적재.md
+uiux/2026-08-05-화면상세스펙-확대4차/M-01-08-자재출고피킹.md  →  new_wiki/wiki/screens/01/M-01-08-자재출고피킹.md
+uiux/2026-08-05-화면상세스펙-확대4차/M-01-09-생산창고입고호퍼잔량.md  →  new_wiki/wiki/screens/01/M-01-09-생산창고입고호퍼잔량.md
+uiux/2026-08-05-화면상세스펙-확대4차/M-01-10-재고이동불량반출.md  →  new_wiki/wiki/screens/01/M-01-10-재고이동불량반출.md
+uiux/2026-08-05-화면상세스펙-확대4차/M-01-11-실물카운트.md  →  new_wiki/wiki/screens/01/M-01-11-실물카운트.md
+uiux/2026-08-11-화면상세스펙-확대17차/M-01-12-재생재등록.md  →  new_wiki/wiki/screens/01/M-01-12-재생재등록.md
+uiux/2026-08-12-화면상세스펙-신설1/M-01-13-긴급IQC생략요청.md  →  new_wiki/wiki/screens/01/M-01-13-긴급IQC생략요청.md
+uiux/2026-08-04-화면상세스펙-확대2차/P-01-01-자재LOT등록라벨발행.md  →  new_wiki/wiki/screens/01/P-01-01-자재LOT등록라벨발행.md
+uiux/2026-08-05-화면상세스펙-확대4차/P-01-02-출고QR발행.md  →  new_wiki/wiki/screens/01/P-01-02-출고QR발행.md
+uiux/2026-07-31-화면상세스펙-파일럿/W-01-01-IQC수입검사판정.md  →  new_wiki/wiki/screens/01/W-01-01-IQC수입검사판정.md
+uiux/2026-08-04-화면상세스펙-확대2차/W-01-02-긴급IQC생략한도승인.md  →  new_wiki/wiki/screens/01/W-01-02-긴급IQC생략한도승인.md
+uiux/2026-08-04-화면상세스펙-확대2차/W-01-03-초과입하분리.md  →  new_wiki/wiki/screens/01/W-01-03-초과입하분리.md
+uiux/2026-08-05-화면상세스펙-확대4차/W-01-04-재고실사.md  →  new_wiki/wiki/screens/01/W-01-04-재고실사.md
+uiux/2026-08-05-화면상세스펙-확대5차/W-01-05-공급사반품처리.md  →  new_wiki/wiki/screens/01/W-01-05-공급사반품처리.md
+uiux/2026-08-05-화면상세스펙-확대5차/W-01-06-폐기요청기타출고.md  →  new_wiki/wiki/screens/01/W-01-06-폐기요청기타출고.md
+uiux/2026-08-05-화면상세스펙-확대5차/W-01-07-재고현황상태조회.md  →  new_wiki/wiki/screens/01/W-01-07-재고현황상태조회.md
+uiux/2026-08-04-화면상세스펙-확대2차/W-01-09-입하예정조회.md  →  new_wiki/wiki/screens/01/W-01-09-입하예정조회.md
+uiux/2026-08-04-화면상세스펙-확대2차/W-01-10-정상품입하처리.md  →  new_wiki/wiki/screens/01/W-01-10-정상품입하처리.md
+uiux/2026-08-04-화면상세스펙-확대2차/W-01-11-신규PO등록.md  →  new_wiki/wiki/screens/01/W-01-11-신규PO등록.md
+uiux/2026-08-05-화면상세스펙-확대5차/W-01-12-재고조정.md  →  new_wiki/wiki/screens/01/W-01-12-재고조정.md
+uiux/2026-08-07-화면상세스펙-확대7차/W-01-13-물류문서진행현황취소.md  →  new_wiki/wiki/screens/01/W-01-13-물류문서진행현황취소.md
+uiux/2026-08-05-화면상세스펙-확대4차/M-02-01-WIP공정이동스캔.md  →  new_wiki/wiki/screens/02/M-02-01-WIP공정이동스캔.md
+uiux/2026-08-05-화면상세스펙-확대4차/M-02-02-수리왕복투입반출스캔.md  →  new_wiki/wiki/screens/02/M-02-02-수리왕복투입반출스캔.md
+uiux/2026-08-11-화면상세스펙-확대15차/P-02-01-작업시작작업지시선택.md  →  new_wiki/wiki/screens/02/P-02-01-작업시작작업지시선택.md
+uiux/2026-08-11-화면상세스펙-확대15차/P-02-02-작업전점검이력확인통제.md  →  new_wiki/wiki/screens/02/P-02-02-작업전점검이력확인통제.md
+uiux/2026-08-04-화면상세스펙-확대3차/P-02-03-자재투입스캔오투입검증.md  →  new_wiki/wiki/screens/02/P-02-03-자재투입스캔오투입검증.md
+uiux/2026-07-31-화면상세스펙-파일럿/P-02-04-작업실적등록.md  →  new_wiki/wiki/screens/02/P-02-04-작업실적등록.md
+uiux/2026-08-04-화면상세스펙-확대3차/P-02-05-인식표발행부착.md  →  new_wiki/wiki/screens/02/P-02-05-인식표발행부착.md
+uiux/2026-08-04-화면상세스펙-확대3차/P-02-06-생산LOT완료처리.md  →  new_wiki/wiki/screens/02/P-02-06-생산LOT완료처리.md
+uiux/2026-08-04-화면상세스펙-확대3차/P-02-07-LOT라벨출력부착.md  →  new_wiki/wiki/screens/02/P-02-07-LOT라벨출력부착.md
+uiux/2026-08-04-화면상세스펙-확대3차/P-02-08-포장작업.md  →  new_wiki/wiki/screens/02/P-02-08-포장작업.md
+uiux/2026-08-04-화면상세스펙-확대3차/P-02-09-포장라벨인식표재출력.md  →  new_wiki/wiki/screens/02/P-02-09-포장라벨인식표재출력.md
+uiux/2026-08-04-화면상세스펙-확대3차/P-02-10-작업중단홀드등록.md  →  new_wiki/wiki/screens/02/P-02-10-작업중단홀드등록.md
+uiux/2026-08-04-화면상세스펙-확대3차/P-02-11-러닝체인지부품교체.md  →  new_wiki/wiki/screens/02/P-02-11-러닝체인지부품교체.md
+uiux/2026-08-04-화면상세스펙-확대3차/P-02-12-긴급WO현장투입실적.md  →  new_wiki/wiki/screens/02/P-02-12-긴급WO현장투입실적.md
+uiux/2026-08-05-화면상세스펙-확대5차/P-02-13-PQC제품검사.md  →  new_wiki/wiki/screens/02/P-02-13-PQC제품검사.md
+uiux/2026-08-05-화면상세스펙-확대5차/W-02-01-PO수신조회.md  →  new_wiki/wiki/screens/02/W-02-01-PO수신조회.md
+uiux/2026-08-05-화면상세스펙-확대5차/W-02-02-WO전개편성.md  →  new_wiki/wiki/screens/02/W-02-02-WO전개편성.md
+uiux/2026-08-05-화면상세스펙-확대5차/W-02-03-4M자원배정유효성점검.md  →  new_wiki/wiki/screens/02/W-02-03-4M자원배정유효성점검.md
+uiux/2026-08-04-화면상세스펙-확대3차/W-02-04-WO확정배포생산LOT선발행.md  →  new_wiki/wiki/screens/02/W-02-04-WO확정배포생산LOT선발행.md
+uiux/2026-08-05-화면상세스펙-확대5차/W-02-05-WO마감ERP실적송신.md  →  new_wiki/wiki/screens/02/W-02-05-WO마감ERP실적송신.md
+uiux/2026-08-05-화면상세스펙-확대5차/W-02-06-PO변경관리자확인.md  →  new_wiki/wiki/screens/02/W-02-06-PO변경관리자확인.md
+uiux/2026-08-05-화면상세스펙-확대5차/W-02-07-긴급WO발행.md  →  new_wiki/wiki/screens/02/W-02-07-긴급WO발행.md
+uiux/2026-08-05-화면상세스펙-확대5차/W-02-08-WO진행현황조회.md  →  new_wiki/wiki/screens/02/W-02-08-WO진행현황조회.md
+uiux/2026-08-05-화면상세스펙-확대5차/W-02-10-추가자재출고요청.md  →  new_wiki/wiki/screens/02/W-02-10-추가자재출고요청.md
+uiux/2026-08-06-화면상세스펙-확대6차/W-03-01-LotStatus현황변경이력조회.md  →  new_wiki/wiki/screens/03/W-03-01-LotStatus현황변경이력조회.md
+uiux/2026-08-06-화면상세스펙-확대6차/W-03-02-LotStatus판정전이처리.md  →  new_wiki/wiki/screens/03/W-03-02-LotStatus판정전이처리.md
+uiux/2026-08-06-화면상세스펙-확대6차/W-03-03-의심자재등록.md  →  new_wiki/wiki/screens/03/W-03-03-의심자재등록.md
+uiux/2026-08-06-화면상세스펙-확대6차/W-03-05-검사실적검사결과조회.md  →  new_wiki/wiki/screens/03/W-03-05-검사실적검사결과조회.md
+uiux/2026-08-07-화면상세스펙-확대10차/W-03-09-특채한도승인처리.md  →  new_wiki/wiki/screens/03/W-03-09-특채한도승인처리.md
+uiux/2026-08-13-화면상세스펙-신설2/W-03-10-처분판정처리.md  →  new_wiki/wiki/screens/03/W-03-10-처분판정처리.md
+uiux/2026-08-07-화면상세스펙-확대8차/M-04-01-제품LOT피킹스캔.md  →  new_wiki/wiki/screens/04/M-04-01-제품LOT피킹스캔.md
+uiux/2026-08-07-화면상세스펙-확대9차/M-04-03-포장재구성스캔.md  →  new_wiki/wiki/screens/04/M-04-03-포장재구성스캔.md
+uiux/2026-08-07-화면상세스펙-확대8차/M-04-04-제품입고적치.md  →  new_wiki/wiki/screens/04/M-04-04-제품입고적치.md
+uiux/2026-08-07-화면상세스펙-확대8차/P-04-01-Packing실적등록.md  →  new_wiki/wiki/screens/04/P-04-01-Packing실적등록.md
+uiux/2026-08-07-화면상세스펙-확대8차/P-04-02-납품포장라벨출력.md  →  new_wiki/wiki/screens/04/P-04-02-납품포장라벨출력.md
+uiux/2026-08-07-화면상세스펙-확대9차/P-04-03-재작업실적등록.md  →  new_wiki/wiki/screens/04/P-04-03-재작업실적등록.md
+uiux/2026-08-07-화면상세스펙-확대9차/P-04-04-재구성신규라벨발행.md  →  new_wiki/wiki/screens/04/P-04-04-재구성신규라벨발행.md
+uiux/2026-08-07-화면상세스펙-확대8차/W-04-01-출하지시서Import작업지시생성.md  →  new_wiki/wiki/screens/04/W-04-01-출하지시서Import작업지시생성.md
+uiux/2026-08-07-화면상세스펙-확대8차/W-04-02-출하예정목록.md  →  new_wiki/wiki/screens/04/W-04-02-출하예정목록.md
+uiux/2026-08-07-화면상세스펙-확대8차/W-04-03-OQC출하검사판정.md  →  new_wiki/wiki/screens/04/W-04-03-OQC출하검사판정.md
+uiux/2026-08-07-화면상세스펙-확대8차/W-04-04-출하확정PGI송신.md  →  new_wiki/wiki/screens/04/W-04-04-출하확정PGI송신.md
+uiux/2026-08-07-화면상세스펙-확대8차/W-04-05-긴급직행출하처리.md  →  new_wiki/wiki/screens/04/W-04-05-긴급직행출하처리.md
+uiux/2026-08-07-화면상세스펙-확대9차/W-04-06-반품클레임입고등록.md  →  new_wiki/wiki/screens/04/W-04-06-반품클레임입고등록.md
+uiux/2026-08-07-화면상세스펙-확대9차/W-04-07-재작업폐기판정의뢰.md  →  new_wiki/wiki/screens/04/W-04-07-재작업폐기판정의뢰.md
+uiux/2026-08-07-화면상세스펙-확대8차/W-04-08-완제품재고LotStatus조회.md  →  new_wiki/wiki/screens/04/W-04-08-완제품재고LotStatus조회.md
+uiux/2026-08-07-화면상세스펙-확대9차/W-04-10-제품폐기요청.md  →  new_wiki/wiki/screens/04/W-04-10-제품폐기요청.md
+uiux/2026-08-07-화면상세스펙-확대8차/W-04-11-재고재등록.md  →  new_wiki/wiki/screens/04/W-04-11-재고재등록.md
+uiux/2026-08-07-화면상세스펙-확대8차/W-04-12-출하확정취소.md  →  new_wiki/wiki/screens/04/W-04-12-출하확정취소.md
+uiux/2026-08-11-화면상세스펙-확대12차/M-05-01-설비점검입력.md  →  new_wiki/wiki/screens/05/M-05-01-설비점검입력.md
+uiux/2026-08-11-화면상세스펙-확대12차/M-05-02-설비고장현장보고.md  →  new_wiki/wiki/screens/05/M-05-02-설비고장현장보고.md
+uiux/2026-08-11-화면상세스펙-확대12차/P-05-01-툴사용실적타발수입력.md  →  new_wiki/wiki/screens/05/P-05-01-툴사용실적타발수입력.md
+uiux/2026-08-11-화면상세스펙-확대12차/P-05-02-비가동실적입력.md  →  new_wiki/wiki/screens/05/P-05-02-비가동실적입력.md
+uiux/2026-08-11-화면상세스펙-확대14차/W-05-01-타발수환산파라미터설정.md  →  new_wiki/wiki/screens/05/W-05-01-타발수환산파라미터설정.md
+uiux/2026-08-11-화면상세스펙-확대13차/W-05-02-툴보전오더생성.md  →  new_wiki/wiki/screens/05/W-05-02-툴보전오더생성.md
+uiux/2026-08-11-화면상세스펙-확대13차/W-05-03-툴PM실적등록.md  →  new_wiki/wiki/screens/05/W-05-03-툴PM실적등록.md
+uiux/2026-08-11-화면상세스펙-확대13차/W-05-04-설비고장상세처리.md  →  new_wiki/wiki/screens/05/W-05-04-설비고장상세처리.md
+uiux/2026-08-11-화면상세스펙-확대13차/W-05-05-보전지시발행.md  →  new_wiki/wiki/screens/05/W-05-05-보전지시발행.md
+uiux/2026-08-11-화면상세스펙-확대13차/W-05-06-보전실적예비품출고등록.md  →  new_wiki/wiki/screens/05/W-05-06-보전실적예비품출고등록.md
+uiux/2026-08-11-화면상세스펙-확대14차/W-05-07-수집채널매핑관리.md  →  new_wiki/wiki/screens/05/W-05-07-수집채널매핑관리.md
+uiux/2026-08-11-화면상세스펙-확대14차/W-05-08-비가동집계조회.md  →  new_wiki/wiki/screens/05/W-05-08-비가동집계조회.md
+uiux/2026-08-11-화면상세스펙-확대14차/W-05-09-작업캘린더설정.md  →  new_wiki/wiki/screens/05/W-05-09-작업캘린더설정.md
+uiux/2026-08-11-화면상세스펙-확대14차/W-05-10-계측기검교정이력등록.md  →  new_wiki/wiki/screens/05/W-05-10-계측기검교정이력등록.md
+uiux/2026-08-10-화면상세스펙-확대11차/W-05-11-계측기마스터관리.md  →  new_wiki/wiki/screens/05/W-05-11-계측기마스터관리.md
+uiux/2026-08-10-화면상세스펙-확대11차/W-05-12-설비설비그룹마스터.md  →  new_wiki/wiki/screens/05/W-05-12-설비설비그룹마스터.md
+uiux/2026-08-10-화면상세스펙-확대11차/W-05-13-툴금형지그마스터.md  →  new_wiki/wiki/screens/05/W-05-13-툴금형지그마스터.md
+uiux/2026-08-03-화면상세스펙-확대1차/W-06-01-Routing공정등록관리.md  →  new_wiki/wiki/screens/06/W-06-01-Routing공정등록관리.md
+uiux/2026-08-03-화면상세스펙-확대1차/W-06-02-검사기준등록.md  →  new_wiki/wiki/screens/06/W-06-02-검사기준등록.md
+uiux/2026-08-03-화면상세스펙-확대1차/W-06-03-불량코드2계층마스터.md  →  new_wiki/wiki/screens/06/W-06-03-불량코드2계층마스터.md
+uiux/2026-08-03-화면상세스펙-확대1차/W-06-04-판정유형코드마스터.md  →  new_wiki/wiki/screens/06/W-06-04-판정유형코드마스터.md
+uiux/2026-08-03-화면상세스펙-확대1차/W-06-05-수신본확장속성편집.md  →  new_wiki/wiki/screens/06/W-06-05-수신본확장속성편집.md
+uiux/2026-08-03-화면상세스펙-확대1차/W-06-06-공통코드조직작업자마스터.md  →  new_wiki/wiki/screens/06/W-06-06-공통코드조직작업자마스터.md
+uiux/2026-07-31-화면상세스펙-파일럿/W-06-07-창고Location마스터.md  →  new_wiki/wiki/screens/06/W-06-07-창고Location마스터.md
+uiux/2026-08-03-화면상세스펙-확대1차/W-06-08-예비품마스터.md  →  new_wiki/wiki/screens/06/W-06-08-예비품마스터.md
+uiux/2026-08-03-화면상세스펙-확대1차/W-06-09-ERP-MES-IF연계정의관리.md  →  new_wiki/wiki/screens/06/W-06-09-ERP-MES-IF연계정의관리.md
+uiux/2026-08-03-화면상세스펙-확대1차/W-06-10-연계동기화현황실패재처리.md  →  new_wiki/wiki/screens/06/W-06-10-연계동기화현황실패재처리.md
+uiux/2026-08-03-화면상세스펙-확대1차/W-06-11-마스터변경관리.md  →  new_wiki/wiki/screens/06/W-06-11-마스터변경관리.md
+uiux/2026-08-03-화면상세스펙-확대1차/W-06-12-MES-ERP송신IF정의.md  →  new_wiki/wiki/screens/06/W-06-12-MES-ERP송신IF정의.md
+uiux/2026-08-03-화면상세스펙-확대1차/W-06-13-검사정책설정.md  →  new_wiki/wiki/screens/06/W-06-13-검사정책설정.md
+uiux/2026-08-07-화면상세스펙-확대7차/W-06-14-적치규칙마스터.md  →  new_wiki/wiki/screens/06/W-06-14-적치규칙마스터.md
+uiux/2026-08-07-화면상세스펙-확대7차/W-06-15-결재선정의.md  →  new_wiki/wiki/screens/06/W-06-15-결재선정의.md
+uiux/2026-08-06-화면상세스펙-확대6차/M-CO-01-기기등록사번인증.md  →  new_wiki/wiki/screens/공통/M-CO-01-기기등록사번인증.md
+uiux/2026-08-06-화면상세스펙-확대6차/P-CO-01-사번경량인증.md  →  new_wiki/wiki/screens/공통/P-CO-01-사번경량인증.md
+uiux/2026-08-11-화면상세스펙-확대16차/W-CO-01-계정로그인.md  →  new_wiki/wiki/screens/공통/W-CO-01-계정로그인.md
+uiux/2026-08-03-화면상세스펙-확대1차/W-CO-02-사용자역할권한관리.md  →  new_wiki/wiki/screens/공통/W-CO-02-사용자역할권한관리.md
+uiux/2026-08-11-화면상세스펙-확대16차/W-CO-03-알림센터.md  →  new_wiki/wiki/screens/공통/W-CO-03-알림센터.md
+uiux/2026-08-11-화면상세스펙-확대17차/W-CO-04-공지전달게시조회.md  →  new_wiki/wiki/screens/공통/W-CO-04-공지전달게시조회.md
+uiux/2026-08-11-화면상세스펙-확대17차/W-CO-05-통합대시보드.md  →  new_wiki/wiki/screens/공통/W-CO-05-통합대시보드.md
+uiux/2026-08-06-화면상세스펙-확대6차/W-CO-06-단말기공정매핑설정.md  →  new_wiki/wiki/screens/공통/W-CO-06-단말기공정매핑설정.md
+uiux/2026-08-11-화면상세스펙-확대17차/W-CO-08-창고적재위치배치도.md  →  new_wiki/wiki/screens/공통/W-CO-08-창고적재위치배치도.md
+uiux/2026-08-07-화면상세스펙-확대7차/W-CO-09-결재함.md  →  new_wiki/wiki/screens/공통/W-CO-09-결재함.md
+uiux/2026-08-11-화면상세스펙-확대16차/W-CO-10-비밀번호변경.md  →  new_wiki/wiki/screens/공통/W-CO-10-비밀번호변경.md
+uiux/2026-08-11-화면상세스펙-확대16차/W-CO-11-알람수신자설정.md  →  new_wiki/wiki/screens/공통/W-CO-11-알람수신자설정.md
+```
 
 ## 변경 이력
 
 | 날짜 | 변경 |
 | --- | --- |
 | 2026-08-24 | Phase 0(삭제)·Phase 2(Raw 이관) 기계적 생성 |
-docs/research/2026-07-03-현장검증-질문지-v2-요구사항통합.md  →  new_wiki/raw/decisions/2026-07-03-현장검증-질문지-v2-요구사항통합.md
-
-### requirements 카테고리 후속 이관
-```
-docs/research/2026-07-03-MES-요구사항-명세서-v1-정리.md  →  new_wiki/raw/customer/2026-07-03-MES-요구사항-명세서-v1-정리.md
-docs/research/2026-07-03-요구사항-기존기획-통합분석.md  →  new_wiki/raw/process/docs/research/2026-07-03-요구사항-기존기획-통합분석.md
-docs/research/2026-07-03-현장검증-질문지-v2-요구사항통합.md  →  new_wiki/raw/decisions/2026-07-03-현장검증-질문지-v2-요구사항통합.md
-deliverables/01-요구사항명세서.md  →  new_wiki/wiki/requirements/00-요구사항명세서.md
-```
+| 2026-08-25 | Phase 3(Wiki 이관·재작성) 완료분 전건 추가 — 용어사전·요구사항명세서·프로젝트스펙 5·도메인워크플로우 13·API계약 11·의사결정정책 2·화면 상세 스펙 118(도메인01~06+공통). openapi/*.json은 Tier 0 원칙에 따라 Phase 5 컷오버 시까지 미이관. |
