@@ -45,6 +45,7 @@ import sys
 
 REPO = 'CREFLEINC/omf-mes-client'
 LABELS = 'uiux→client,ready'
+CHANGE_NOTICE_LABELS = 'uiux→client'  # ⛔ ready 는 착수 이슈 전용 — 변경 통지에는 붙이지 않는다
 
 REQUIRED_SECTIONS = [
     '1. 화면 ID · 이름',
@@ -425,10 +426,10 @@ def main():
         print('   자동 부착하지 않았습니다 — --team T{n} 을 직접 주거나, 배정이 아직이면')
         print('   design-work-assignment 로 먼저 확정하세요.')
 
-    labels = LABELS
+    labels = CHANGE_NOTICE_LABELS if change_notice else LABELS
     if team:
         team_label = 'Agent : %s' % team
-        labels = LABELS + ',' + team_label
+        labels = labels + ',' + team_label
         print('\n💡 --team %s → 라벨에 「%s」를 병기합니다.' % (team, team_label))
 
     if title:
