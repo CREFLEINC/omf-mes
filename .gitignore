@@ -14,9 +14,9 @@ __pycache__/
 
 # 대외비 외부 원본 — git 미포함 (현황은 docs/research/raw-자료-목록.md)
 docs/raw/
-# new_wiki/ 이관 대상 — 위 docs/raw/와 동일한 대외비 원자료 사본 자리 (현황은 new_wiki/raw/customer/00-목록.md)
-new_wiki/raw/customer/*
-!new_wiki/raw/customer/00-목록.md
+# design/ 이관 대상 — 위 docs/raw/와 동일한 대외비 원자료 사본 자리 (현황은 design/raw/customer/00-목록.md)
+design/raw/customer/*
+!design/raw/customer/00-목록.md
 
 # 대용량 바이너리 — 로컬 전용 / 추후 Git LFS 검토
 **/assets/fonts/
