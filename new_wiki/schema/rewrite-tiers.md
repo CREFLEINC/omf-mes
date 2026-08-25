@@ -51,3 +51,4 @@
 | 날짜 | 변경 |
 | --- | --- |
 | 2026-08-24 | 신설 |
+| 2026-08-25 | Tier 0 컷오버 완료 — `openapi/*.json`을 `deliverables/openapi/`에서 `wiki/api-contracts/openapi/`로 단 한 번 이동(복제 아님). 구 위치는 구조 삭제와 함께 사라진다. |

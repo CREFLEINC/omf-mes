@@ -195,7 +195,7 @@ def main() -> int:
         for i in range(0, len(code_names), 4):
             lines.append("  " + "  ".join("%-30s" % n for n in code_names[i:i + 4]).rstrip())
         lines += ["```", "",
-                  "> 다시 세려면 `python3 deliverables/openapi/count-undecided-codes.py`", ""]
+                  "> 다시 세려면 `python3 new_wiki/schema/generators/openapi/count-undecided-codes.py`", ""]
 
     lines += [
         "## 3. 화면 축의 구멍",

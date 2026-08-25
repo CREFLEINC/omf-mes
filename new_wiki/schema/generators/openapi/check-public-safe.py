@@ -29,8 +29,8 @@ import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-# ⚠ Tier 0 — OpenAPI JSON 정본은 Phase 5 컷오버 전까지 deliverables/openapi/에 그대로 있다.
-CONTRACTS_DIR = os.path.join(HERE, "..", "..", "..", "..", "deliverables", "openapi")
+# Tier 0 — OpenAPI JSON 정본. Phase 5 컷오버(2026-08-25)로 new_wiki/wiki/api-contracts/openapi/가 정본 위치다.
+CONTRACTS_DIR = os.path.join(HERE, "..", "..", "..", "wiki", "api-contracts", "openapi")
 
 RULES = [
     ('비공개 문서 경로', re.compile(r'\b(?:deliverables|docs|uiux)/'),

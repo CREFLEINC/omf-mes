@@ -28,8 +28,8 @@ from collections.abc import Iterator
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, "..", "..", ".."))
-# ⚠ Tier 0 — OpenAPI JSON 정본은 Phase 5 컷오버 전까지 deliverables/openapi/에 그대로 있다.
-OPENAPI_DIR = os.path.join(ROOT, "deliverables", "openapi")
+# Tier 0 — OpenAPI JSON 정본. Phase 5 컷오버(2026-08-25)로 new_wiki/wiki/api-contracts/openapi/가 정본 위치다.
+OPENAPI_DIR = os.path.join(ROOT, "new_wiki", "wiki", "api-contracts", "openapi")
 API_CONTRACTS_DIR = os.path.join(ROOT, "new_wiki", "wiki", "api-contracts")
 
 METHODS = ("get", "post", "put", "patch", "delete")

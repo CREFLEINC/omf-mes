@@ -2,11 +2,10 @@
 
 > 작성일: 2026-08-19 · 작성 주체: CREFLE OMF 팀 (UI/UX)
 > **성격**: 이 권은 **표지다.** 본문을 갖지 않고 **어디를 봐야 하는지**만 말한다.
-> ⚠ **new_wiki 이관 노트(2026-08-25)**: 아래 §1의 `deliverables/openapi/*.json`은 **Tier 0**
-> (`schema/rewrite-tiers.md`)라 아직 복제하지 않았다 — 활발히 패치되는 정본을 지금 복제하면
-> 즉시 낡는다(선례: `uiux/2026-08-18-최종산출물-문서구성/00-설계.md`). 구조 삭제(Phase 5)
-> 직전에 **단 한 번** `wiki/api-contracts/openapi/`로 최종 이관한다. 그때까지는 아래 경로가
-> 현재도 정본이다.
+> ⚠ **new_wiki 컷오버 완료(2026-08-25)**: OpenAPI JSON 7파일을 `deliverables/openapi/`에서
+> `wiki/api-contracts/openapi/`로 최종 이관했다(Tier 0 — 활발히 패치되는 정본이라 구조
+> 삭제 직전 단 한 번만 옮긴다는 원칙, `schema/rewrite-tiers.md` 참조). 이제부터
+> `wiki/api-contracts/openapi/*.json`이 유일한 정본이다.
 
 ## 이 권이 답하는 물음
 
@@ -22,7 +21,7 @@
 
 | 무엇 | 정본 | 규모 | 세는 명령 |
 | --- | --- | :-: | --- |
-| **계약** | `deliverables/openapi/*.json` **7파일** | **경로 309 · 오퍼레이션 437 · 스키마 464** | `python3 new_wiki/schema/generators/openapi/check-structure.py` |
+| **계약** | `wiki/api-contracts/openapi/*.json` **7파일** | **경로 309 · 오퍼레이션 437 · 스키마 464** | `python3 new_wiki/schema/generators/openapi/check-structure.py` |
 | **근거** — 화면 액션이 어느 경로에 대응하나 | `new_wiki/wiki/api-contracts/06-API-요구서*.md` **9장** | 인용 **555** 전건 계약에 실재 | `python3 new_wiki/schema/generators/verify-doc-citations.py` |
 | **덮은 화면** | 요구서 §3 소절 | **116 / 117** | `python3 new_wiki/schema/generators/build-screen-progress.py` |
 

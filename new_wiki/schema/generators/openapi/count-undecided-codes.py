@@ -34,9 +34,9 @@ import json
 import os
 import re
 
-# ⚠ Tier 0 — OpenAPI JSON 정본은 Phase 5 컷오버 전까지 deliverables/openapi/에 그대로 있다.
-CONTRACT_GLOB = os.path.join(os.path.dirname(__file__), "..", "..", "..", "..",
-                             "deliverables", "openapi", "*.json")
+# Tier 0 — OpenAPI JSON 정본. Phase 5 컷오버(2026-08-25)로 new_wiki/wiki/api-contracts/openapi/가 정본 위치다.
+CONTRACT_GLOB = os.path.join(os.path.dirname(__file__), "..", "..", "..",
+                             "wiki", "api-contracts", "openapi", "*.json")
 
 # 값이 마스터 레코드를 가리키는 것 — 코드 목록이 아니다
 INSTANCE = {

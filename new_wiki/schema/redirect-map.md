@@ -257,7 +257,7 @@ deliverables/06-API-요구서-공통.md  →  new_wiki/wiki/api-contracts/06-API
 deliverables/06-API-요구서.md  →  new_wiki/wiki/api-contracts/06-API-요구서.md
 deliverables/09-API-계약서.md  →  new_wiki/wiki/api-contracts/09-API-계약서.md
 deliverables/openapi/00-계약-작성-규약.md  →  new_wiki/wiki/api-contracts/00-계약-작성-규약.md
-deliverables/openapi/*.json  →  (미이관 — Tier 0, Phase 5 컷오버 시 new_wiki/wiki/api-contracts/openapi/로 이동 예정)
+deliverables/openapi/*.json (7파일)  →  new_wiki/wiki/api-contracts/openapi/*.json (Tier 0, 2026-08-25 컷오버 완료 — git mv, 복제 아님)
 ```
 
 ### decisions-policy/
@@ -546,9 +546,9 @@ deliverables/openapi/patch-public-doc-refs.py  →  new_wiki/raw/process/openapi
 deliverables/openapi/patch-session-no-not-per-stop.py  →  new_wiki/raw/process/openapi-patches/patch-session-no-not-per-stop.py
 ```
 
-### Tier 0 — 미이관(의도적, Phase 5 컷오버 시 처리)
+### Tier 0 — 컷오버 완료(2026-08-25)
 ```
-deliverables/openapi/*.json (7파일)  →  (미이관 · Tier 0 · new_wiki/wiki/api-contracts/openapi/로 컷오버 예정)
+deliverables/openapi/*.json (7파일)  →  new_wiki/wiki/api-contracts/openapi/*.json (git mv, 복제 아님)
 ```
 
 ### 구조 삭제로 함께 사라지는 것 — 생성물(재이관 불필요)
@@ -581,3 +581,4 @@ deliverables/openapi/ui-요구목록.md  →  (재이관 불필요 — new_wiki/
 | 2026-08-25 | Phase 3(Wiki 이관·재작성) 완료분 전건 추가 — 용어사전·요구사항명세서·프로젝트스펙 5·도메인워크플로우 13·API계약 11·의사결정정책 2·화면 상세 스펙 118(도메인01~06+공통). openapi/*.json은 Tier 0 원칙에 따라 Phase 5 컷오버 시까지 미이관. |
 | 2026-08-25 | Phase 4(Schema 이관) 완료분 추가 — 생성·검증 스크립트 23건 + 은퇴 2건 + 생성물 출력 위치 이동. |
 | 2026-08-25 | Phase 5 커버리지 점검 — redirect-map 미등록분 62건 발견·이관(90-원본자료-정리보고·ui-적합성-점검표·docs/research 느슨한 파일 11건·uiux 배치 폴더 역사적 산출물 20여 건·patch 스크립트 38건 등록 보강). Tier 0 JSON과 구 생성물은 재이관 불필요로 명시. |
+| 2026-08-25 | Tier 0 컷오버 완료 — openapi/*.json 7파일을 deliverables/openapi/에서 new_wiki/wiki/api-contracts/openapi/로 git mv(복제 아님, 단 한 번 이동). 의존 스크립트 9개의 경로 상수 갱신 후 전건 재검증. |
