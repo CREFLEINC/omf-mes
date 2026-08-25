@@ -2255,7 +2255,7 @@
      "production"
     ],
     "summary": "W/O 발행",
-    "description": "긴급 W/O(W-02-07)를 직접 만든다 — 전개 생성분은 계획 :confirm 이 서버 트랜잭션으로 만들므로 이 경로를 쓰지 않는다(omf-mes#199). ⭐ productionPlanId 를 비우고 부른다 — 긴급 W/O 는 생산 계획을 거치지 않는 것이 업무 실체다(2026-08-26 확정). 근거: W-02-07 §5",
+    "description": "긴급 W/O(W-02-07)를 직접 만든다 — 전개 생성분은 계획 :confirm 이 서버 트랜잭션으로 만들므로 이 경로를 쓰지 않는다(omf-mes#199). ⭐ productionPlanId 를 비우고 부르면 서버가 내부 P/O 와 계획을 함께 만든다 — P/O·계획·W/O 생성이 한 트랜잭션이고, 중간에 끊기면 전체를 되돌린다(공유계약 B-8). 그 P/O 는 erp_order_no 가 비어 있다 — ERP 가 보내지 않은 P/O 는 반제품 전개에서 이미 쓰는 개념이다. 근거: W-02-07 §5-2",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -2313,7 +2313,7 @@
       }
      }
     },
-    "x-internal-note": "2026-08-26 — 501(상류 미해소)을 걷었다. 긴급 W/O 가 productionPlanId 없이 서야 하는데 물리 모델의 NOT NULL 체인에 막혀 있던 건이다(omf-mes#76). ⭐ 설계가 정본이고 데이터 모델이 설계를 따르므로, 없는 계획을 지어내 붙이는 우회(내부 P/O 자동 생성 · W-02-07 §8-1 ①안)를 택하지 않고 참조를 비울 수 있게 하는 쪽으로 확정했다. 업무 실체가 「계획 없는 지시」이므로 데이터도 그래야 한다. ⛔ 하류는 계획 참조가 비어 있을 수 있음을 전제해야 한다."
+    "x-internal-note": "2026-08-26 — 501(상류 미해소)을 걷었다. 긴급 W/O 가 계획 없이 서야 하는데 물리 모델의 NOT NULL 체인에 막혀 있던 건이다(omf-mes#76). ⭐ W-02-07 §5-2 의 ①안(내부 P/O 자동 생성)으로 확정했다 — 「P/O 비귀속」은 「ERP P/O 에 귀속되지 않는다」는 뜻이고, erp_order_no 가 nullable 이라 데이터가 이미 허용한다. ②안(계획 참조 nullable 화)은 택하지 않았다 — 「계획이 없을 수 있다」가 모든 W/O 조회의 예외가 되어 비용이 하류 전체로 퍼진다. ①은 비용을 발행 트랜잭션 한 곳에 가둔다."
    }
   },
   "/production/work-orders/{workOrderId}": {
@@ -5601,13 +5601,10 @@
       "example": "값"
      },
      "productionPlanId": {
-      "type": [
-       "integer",
-       "null"
-      ],
+      "type": "integer",
       "format": "int64",
       "example": 1001,
-      "description": "⚠ 비어도 된다 — 긴급 W/O(W-02-07)는 생산 계획을 거치지 않고 바로 선다. 전개로 만들어진 W/O 는 항상 값이 있고, 긴급 발행분만 비어 있다. ⛔ 「계획이 있다」를 전제로 조인하지 않는다(W-02-07 §5)."
+      "description": "⭐ 항상 값이 있다. 긴급 W/O(W-02-07)도 마찬가지다 — 서버가 내부 P/O 와 계획을 함께 만들어 붙이기 때문이다. ⛔ 「계획이 없을 수 있다」를 전제로 분기하지 않는다(W-02-07 §5-2 ①안)."
      },
      "routingOperationId": {
       "type": "integer",
@@ -5761,6 +5758,7 @@
     "required": [
      "workOrderId",
      "workOrderNo",
+     "productionPlanId",
      "routingOperationId",
      "itemId",
      "orderQty",
@@ -5824,7 +5822,7 @@
       ],
       "format": "int64",
       "example": 1001,
-      "description": "⚠ 비어도 된다 — 긴급 W/O(W-02-07)는 생산 계획을 거치지 않고 바로 선다. 전개로 만들어진 W/O 는 항상 값이 있고, 긴급 발행분만 비어 있다. ⛔ 「계획이 있다」를 전제로 조인하지 않는다(W-02-07 §5)."
+      "description": "⚠ 긴급 W/O(W-02-07)는 비우고 부른다 — 서버가 내부 P/O(erp_order_no 없음)와 생산 계획을 한 트랜잭션으로 만들어 붙인다(공유계약 B-8). 전개 경로에서는 이 경로 자체를 쓰지 않는다."
      },
      "routingOperationId": {
       "type": "integer",
