@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "deny": [
+      "Write(/design/raw/**)",
+      "Write(design/raw/**)",
+      "Edit(/design/raw/**)",
+      "Edit(design/raw/**)",
+      "NotebookEdit(/design/raw/**)",
+      "NotebookEdit(design/raw/**)",
+      "Write(/design/wiki/handover/*.md)",
+      "Write(design/wiki/handover/*.md)",
+      "Edit(/design/wiki/handover/*.md)",
+      "Edit(design/wiki/handover/*.md)",
+      "Write(/design/schema/generators/openapi/ui-요구목록*.md)",
+      "Write(design/schema/generators/openapi/ui-요구목록*.md)",
+      "Edit(/design/schema/generators/openapi/ui-요구목록*.md)",
+      "Edit(design/schema/generators/openapi/ui-요구목록*.md)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect_readonly.py\""
+          }
+        ]
+      }
+    ]
+  }
+}

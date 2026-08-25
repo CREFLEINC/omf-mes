@@ -25,8 +25,16 @@
   python3 check-issue.py <초안.md>                  # 착수 가능 통지
   python3 check-issue.py <초안.md> --change-notice  # ⛔/⚠ 변경 통지 (구조 검증 생략)
   python3 check-issue.py <초안.md> --title "..."    # 통과 시 gh 명령까지 출력
+  python3 check-issue.py <초안.md> --team T4        # 통과 시 gh 명령의 라벨에 Agent : T4 를 병기
   python3 check-issue.py --status                   # 발행 현황만 조회
   python3 check-issue.py <초안.md> --no-remote      # 원격 조회 생략 (오프라인)
+
+팀 라벨 병기 (team-issue-protocol §2)
+  omf-mes-client 는 uiux→client·ready 두 라벨만 써 왔지만, multi-agent-team-workflow-v2.md
+  체계에서는 어느 개발팀이 담당인지 Agent : T{n} 라벨로도 식별한다. --team 을 주면 그 값을
+  --label 병기에 반영하고, 주지 않으면 같은 화면·같은 도메인의 기존 이슈에서 이미 쓰인
+  Agent : T{n} 라벨을 조회해 「이런 값이 보인다」로만 제안한다(자동 부착하지 않는다 — 팀
+  배정은 design-work-assignment 의 승인을 거친 결정이어야 한다).
 """
 import io
 import json
@@ -147,8 +155,41 @@ def gh_issues():
         return None
 
 
-def check_duplicate(screen_id, change_notice):
-    """(errs, warns, 조회했는가)"""
+TEAM_LABEL = re.compile(r'^Agent\s*:\s*T\d+$')
+
+
+def suggest_team(screen_id, issues):
+    """같은 화면·같은 도메인 이슈에서 이미 쓰인 Agent : T{n} 라벨을 세어 제안한다.
+
+    자동 부착이 아니라 제안이다 — 팀 배정은 design-work-assignment 의 승인을 거친
+    결정이어야 하고, 이 스크립트는 그 결정을 대신하지 않는다.
+    """
+    if not issues or not screen_id:
+        return []
+    domain = screen_id.split('-')[1] if '-' in screen_id else None
+    same_screen, same_domain = [], []
+    for i in issues:
+        title = i.get('title', '')
+        labels = [l['name'] for l in i.get('labels', []) if TEAM_LABEL.match(l['name'])]
+        if not labels:
+            continue
+        if screen_id in title:
+            same_screen += labels
+        elif domain and re.search(r'\b[WPM]-%s-\d{2}\b' % re.escape(domain), title):
+            same_domain += labels
+    pool = same_screen or same_domain
+    if not pool:
+        return []
+    counts = {}
+    for l in pool:
+        counts[l] = counts.get(l, 0) + 1
+    ranked = sorted(counts.items(), key=lambda kv: -kv[1])
+    scope = '같은 화면' if same_screen else '같은 도메인'
+    return [(l, n, scope) for l, n in ranked]
+
+
+def check_duplicate(screen_id, change_notice, issues=None):
+    """(errs, warns, 조회했는가, issues) — issues 를 넘기면 재조회하지 않는다."""
     errs, warns = [], []
 
     if not change_notice and screen_id in ALREADY_BUILT:
@@ -157,12 +198,13 @@ def check_duplicate(screen_id, change_notice):
                      '이미 구현·병합된 화면이다. 「착수 가능」으로 오면 프론트가 그냥 닫는다. '
                      '전할 것이 있으면 ⛔/⚠ 변경 통지로 보낸다'))
 
-    issues = gh_issues()
+    if issues is None:
+        issues = gh_issues()
     if issues is None:
         warns.append(('원격 조회 실패', 'gh issue list — %s' % REPO,
                       '중복 여부를 확인하지 못했다. gh auth status 를 보고 다시 돌리거나 '
                       '웹에서 직접 확인한 뒤 발행한다'))
-        return errs, warns, False
+        return errs, warns, False, None
 
     same = [i for i in issues if screen_id and screen_id in i['title']]
     for i in same:
@@ -185,7 +227,7 @@ def check_duplicate(screen_id, change_notice):
             warns.append(('같은 화면의 다른 이슈', '%s %s' % (num, i['title'][:50]),
                           '변경 통지로 보인다. 착수 이슈가 이 화면에 처음이면 그대로 진행한다'))
 
-    return errs, warns, True
+    return errs, warns, True, issues
 
 
 def print_status():
@@ -312,6 +354,13 @@ def main():
         i = sys.argv.index('--title')
         if i + 1 < len(sys.argv):
             title = sys.argv[i + 1]
+    team = None
+    if '--team' in sys.argv:
+        i = sys.argv.index('--team')
+        if i + 1 < len(sys.argv):
+            team = sys.argv[i + 1].strip()
+            if not team.upper().startswith('T'):
+                team = 'T' + team
 
     text = io.open(path, encoding='utf-8').read()
     secs = sections(text)
@@ -321,6 +370,7 @@ def main():
         errs, warns = check_structure(text, secs)
 
     checked_remote = False
+    team_suggestions = []
     if '--no-remote' in sys.argv:
         warns.append(('원격 조회 생략', '--no-remote',
                       '중복 발행 여부를 확인하지 않았다. 발행 전에 반드시 직접 본다'))
@@ -330,9 +380,12 @@ def main():
             warns.append(('화면 ID 인식 실패', '1번 칸',
                           '화면 ID 형식(W-06-03)을 못 찾아 중복 검사를 건너뛰었다'))
         else:
-            de, dw, checked_remote = check_duplicate(m.group(1), change_notice)
+            issues = gh_issues()
+            de, dw, checked_remote, issues = check_duplicate(m.group(1), change_notice, issues)
             errs += de
             warns += dw
+            if not team and issues:
+                team_suggestions = suggest_team(m.group(1), issues)
 
     left = PLACEHOLDER.findall(text)
     if left:
@@ -365,12 +418,25 @@ def main():
     print('\n✅ 발행해도 되는 상태입니다.%s'
           % ('' if checked_remote else '  (⚠ 중복 검사는 못 했습니다)'))
 
+    if team_suggestions:
+        top = team_suggestions[0]
+        print('\n💡 팀 라벨 제안 — %s 기존 이슈에 Agent : %s 가 %d건 보입니다.'
+              % (top[2], top[0].split(':')[-1].strip(), top[1]))
+        print('   자동 부착하지 않았습니다 — --team T{n} 을 직접 주거나, 배정이 아직이면')
+        print('   design-work-assignment 로 먼저 확정하세요.')
+
+    labels = LABELS
+    if team:
+        team_label = 'Agent : %s' % team
+        labels = LABELS + ',' + team_label
+        print('\n💡 --team %s → 라벨에 「%s」를 병기합니다.' % (team, team_label))
+
     if title:
         print('\n─ 발행 명령 ' + '─' * 52)
         print('gh issue create --repo %s \\' % REPO)
         print('  --title %s \\' % _q(title))
         print('  --body-file %s \\' % _q(path))
-        print('  --label %s' % _q(LABELS))
+        print('  --label %s' % _q(labels))
         print('\n⚠ --label 을 빼지 마세요 — CLI 는 폼을 거치지 않아 라벨이 자동으로 붙지 않습니다.')
     else:
         print('\n(--title "…" 을 주면 gh 명령까지 만들어 줍니다)')

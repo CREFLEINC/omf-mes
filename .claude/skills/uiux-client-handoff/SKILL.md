@@ -6,7 +6,9 @@ description: >-
   "착수 가능 통지 발행", "프론트에 넘겨줘", "이 화면 착수 이슈 올려줘", "클라이언트 레포에
   이슈 발행" 같은 요청에 쓴다. 설계가 이미 전달된 뒤 바뀐 것을 알리는 ⛔/⚠ 변경 통지도
   이 스킬이 다룬다. ⚠ 이 스킬은 omf-mes → omf-mes-client 한 방향 전용이며, 일반 GitHub
-  이슈 등록·분류·추적은 issue-management 스킬 소관이다.
+  이슈 등록·분류·추적은 team-issue-protocol 스킬(공통 지식 베이스) 소관이며, 개발팀이
+  omf-mes로 보내는 검토 요청 처리는 design-review-intake 스킬 소관이다(이 스킬과는 방향이
+  반대다 — 그쪽은 인바운드, 이 스킬은 아웃바운드).
 ---
 
 # 착수 가능 통지 — 설계에서 프론트로
@@ -82,10 +84,14 @@ python3 .claude/skills/uiux-client-handoff/scripts/check-issue.py --status
 ### ② 검사한다 — 발행 **전에**
 
 ```bash
-python3 .claude/skills/uiux-client-handoff/scripts/check-issue.py <초안.md> --title "…"
+python3 .claude/skills/uiux-client-handoff/scripts/check-issue.py <초안.md> --title "…" [--team T4]
 ```
 
 세 가지를 함께 본다 — **구조**(필수 8절·처리 방법 3종·자리표시 잔존) · **공개 저장소 금지어** · **중복·금지 화면**. 통과하면 `gh` 명령을 출력한다.
+
+**`--team`** — `Agent : T{n}` 라벨을 `--label`에 병기한다. 주지 않으면 같은 화면·같은 도메인의
+기존 이슈에서 이미 쓰인 `Agent : T{n}`을 조회해 「이런 값이 보인다」로만 제안한다(자동 부착하지
+않는다 — 팀 배정 자체는 `design-work-assignment`의 승인을 거친 결정이어야 한다).
 
 ⚠ **순서를 바꾸지 않는다.** `design/schema/00-authoring-rules.md` 가 「본문 작성 → 금지어 검사 → 발행」으로 못박았고, 이 순서를 어겨 DS 저장소에 제품 용어 2건을 흘린 적이 있다(2026-08-04).
 
@@ -132,22 +138,25 @@ gh issue create --repo CREFLEINC/omf-mes-client \
 
 ⚠ 공개 저장소 검사는 착수 이슈와 **똑같이 적용**한다. `check-issue.py` 에 `--change-notice` 를 주면 구조 검증만 건너뛰고 금지어 검사는 그대로 돈다.
 
-## ⚠ 다른 스킬과의 경계 — `issue-management`
+## ⚠ 다른 스킬과의 경계 — `team-issue-protocol` · `design-review-intake`
 
-CREFLE 표준 `issue-management` 스킬과 **네 곳에서 규칙이 다르다.** 이 스킬이 다루는 두 채널에서는 **이 스킬이 이긴다.**
+라벨·제목 접두·저장소 경계의 **정본은 `team-issue-protocol`**(공통 지식 베이스)이다. 이 스킬은
+그 규칙을 `omf-mes-client`(아웃바운드) 발행에 구체화한 것이고, 규칙 자체를 복제하지 않는다 —
+갈리면 `team-issue-protocol`을 따른다.
 
-| | `issue-management` 표준 | **이 스킬(착수 가능·변경 통지)** |
+| | 아웃바운드(이 스킬 — 착수 가능·변경 통지) | 인바운드(`design-review-intake`) |
 | --- | --- | --- |
-| **제목** | `<type>: <제목>` | **`[uiux→client] 착수 가능 — <화면 ID> · <이름>`** (폼이 정한 접두) |
-| **라벨** | `type:*` · `priority:*` · `status:*` 3축 | **`uiux→client` · `ready` 두 개만** |
-| **추적** | 진행에 맞춰 `status:*` 갱신 | ⛔ **갱신하지 않는다** — 진행 상태는 프론트의 코멘트로 남는다 |
-| **종료** | 해결되면 우리가 닫는다 | ⛔ **우리가 닫지 않는다** — 닫는 것은 프론트다 |
+| **방향** | `omf-mes` → `omf-mes-client`(공개) | `omf-mes-client`/개발팀 → `omf-mes`(비공개) |
+| **제목** | `[uiux→client] 착수 가능 — <화면 ID> · <이름>`(폼이 정한 접두) | `[검토 요청]`·`[client→uiux]` |
+| **라벨** | `uiux→client`·`ready` + `Agent : T{n}` 병기(`check-issue.py --team`) | `Agent : T{n}`·`Agent : {type}`·`in progress`/`help wanted` |
+| **추적** | ⛔ 갱신하지 않는다 — 진행 상태는 프론트의 코멘트로 남는다 | `in progress`↔`help wanted` 전이 |
+| **종료** | ⛔ 우리가 닫지 않는다 — 닫는 것은 프론트다 | 4중 잠금 통과 후 설계팀이 닫는다 |
 
-**모순이 아니다.** `issue-management` 자신이 「저장소에 이미 라벨 컨벤션이 있으면 그 컨벤션을 우선한다」·「남의 저장소 이슈를 마음대로 닫지 않는다」고 적어 두었다. 이 스킬은 그 예외 규정을 **`omf-mes-client` 에 대해 구체화한 것**이다.
+**"프론트가 스펙과 어긋났다고 이슈를 올렸다"는 이 스킬이 아니라 `design-review-intake` 소관이다**
+— 그 방향이 반대다. 이 스킬은 우리가 먼저 프론트로 내보내는 통지만 다룬다.
 
-**그대로 따르는 것도 있다** — 발행 전 중복 검색, 「어디서 발견했는지 맥락 포함」, 교차 저장소 추적 태도.
-
-`omf-mes`(우리 저장소) 안의 이슈 — `[uiux→docs]` · `[docs→데이터모델]` — 는 **이 스킬 소관이 아니다.** 그쪽은 `issue-management` 와 `design/schema/00-authoring-rules.md` 를 따른다.
+`omf-mes`(우리 저장소) 안의 이슈 — `[uiux→docs]`·`[docs→데이터모델]` — 는 이 스킬 소관이 아니다.
+그쪽은 `design/schema/00-authoring-rules.md`를 따른다.
 
 ## 참고 파일
 
@@ -155,6 +164,7 @@ CREFLE 표준 `issue-management` 스킬과 **네 곳에서 규칙이 다르다.*
 | --- | --- |
 | `references/field-sources.md` | **핵심** — 폼 6항목을 우리 산출물 어디에서 가져오나. 미결 등급 ↔ 처리 방법 대응표 |
 | `references/public-boundary.md` | 공개 저장소에 적어도 되는 것과 안 되는 것 · 실수했을 때 |
+| `../team-issue-protocol/SKILL.md` | 라벨·제목 접두·회신 서식의 정본(공통 지식 베이스) |
 | `templates/착수가능-초안.md` | 폼 렌더 모양 그대로의 빈 초안 — **이것을 복사해 쓴다** |
 | `templates/착수가능-예시-W-06-03.md` | 채워진 예시. ⚠ **이미 발행된 화면(#9)이라 검사기가 중복으로 막는다** — 모양을 보는 용도다 |
 | `scripts/check-issue.py` | 구조 검증 + 금지어 검사 + **중복·금지 화면 조회** + `gh` 명령 출력. `--status` 로 발행 현황 |
