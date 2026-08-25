@@ -147,10 +147,10 @@ work_order.completion_variance_reason_code   app.code_t
 **R82**: 「선발행 미등록 슬롯 **자동 폐번**(재사용 금지·**마감 시점 전용**)」
 
 ```
-trace.lot.status_code   app.code_t NOT NULL DEFAULT 'ACTIVE'
+trace.lot.lifecycleStatusCode   app.code_t NULL(생산LOT 한정) DEFAULT 'WAITING'(안)
 ```
 
-~~**「폐번」 값이 정의되지 않았다**~~ ✅ **2026-08-07 확정 — 「폐번」 값을 둔다**(#46). ⭐ **축이 정합한다** — `trace.lot.status_code` 는 **수명주기 축**(DEFAULT `ACTIVE`)이고, 품질 판정 축은 별개(`inventory_balance.quality_status_code` = `정상`·`불량`·`검사 대기`·`폐기`). 결정 10 의 「한 필드에 섞지 않는다」가 지켜진다. **물리 모델 반영은 `wooju-shin` 소관.**
+~~**「폐번」 값이 정의되지 않았다**~~ ⚠ **정정(2026-08-25 · 공유계약 §I-49)** — 2026-08-07에는 「폐번」을 `trace.lot.status_code`에 둔다고 확정했으나(#46), 그 컬럼은 이후 품질 판정 축(정상·불량·검사 대기·폐기)으로 확정돼(2026-08-21 이후 quality-03 계약) 두 확정이 부딪쳤다. **결정 10의 「한 필드에 섞지 않는다」를 지키는 방법은 컬럼을 나누는 것이다** — 「폐번」은 별도 신설 컬럼 `trace.lot.lifecycleStatusCode`(생명주기 축 — 대기/활성/폐번, 생산LOT 한정)에 둔다. §I-32가 이미 품질 판정(`lot.status_code`)과 보류 문서 진행(`lot_hold.status_code`)을 나눈 것과 같은 형태로, 세 번째 축이 갈린 것이다. **물리 컬럼 신설은 데이터모델 담당 소관.**
 
 **화면 설계**: 폐번 대상을 **집계해 보이고**(§3의 「실적 없음 1 → 자동 폐번」) 값이 정해지면 서버가 전이한다. **값이 없으면 마감은 되고 폐번만 안 된다.**
 
@@ -284,7 +284,7 @@ production_result.corrects_production_result_id
 
 | # | 항목 | 성격 | 등급 | 처리 |
 | --- | --- | --- | :-: | --- |
-| 3 | ~~**폐번 값 미정**(#46)~~ ✅ **해소 2026-08-07 — 값을 둔다** | **확정** | — | 수명주기 축(`trace.lot.status_code`)에 들어간다. 품질 판정 축과 섞이지 않는다. 물리 모델 반영 대기(`wooju-shin`) |
+| 3 | ~~**폐번 값 미정**(#46)~~ ✅ **축 확정(공유계약 §I-49, 2026-08-25)** | **확정** | — | 생명주기 축(신설 `trace.lot.lifecycleStatusCode`)에 들어간다 — `trace.lot.status_code`(품질 판정 축)와는 다른 컬럼이다. 물리 컬럼 신설·영문 값 표기 확정은 데이터모델 담당 대기(#46) |
 
 ### 변경 이력
 

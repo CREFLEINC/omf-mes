@@ -71,6 +71,14 @@
             }
           },
           {
+            "name": "isDefect",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "불량창고만 거른다 — W-01-06 §3의 창고 선택(「불량창고」)이 이 조건으로 건다. 근거: DR-012 확정 3-C · omf-mes#147"
+          },
+          {
             "name": "includeInactive",
             "in": "query",
             "schema": {
@@ -11837,6 +11845,7 @@
           "warehouseTypeCode",
           "managementLevelCode",
           "isExternal",
+          "isDefect",
           "isActive"
         ],
         "description": "창고.",
@@ -11889,15 +11898,12 @@
             "default": false,
             "example": false
           },
-          "partnerId": {
-            "x-source-column": "partner_id",
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int64",
-            "description": "ck_external_warehouse_partner — isExternal 이 참이면 필수",
-            "example": 1001
+          "isDefect": {
+            "x-source-column": "is_defect",
+            "type": "boolean",
+            "default": false,
+            "description": "불량창고 여부. isExternal 을 대체하지 않고 보완한다 — 창고 유형(자재·제품·반제품·상품·생산) 축과 별개로, 불량은 자재 불량창고도 제품 불량창고도 받을 수 있는 세 번째(품질) 축이다. W-01-06 §3의 창고 선택이 isDefect=true 로 걸러진다. 근거: DR-012 확정 3-C(2026-08-13) · 공유계약 §I-42 · omf-mes#147",
+            "example": false
           },
           "isActive": {
             "x-source-column": "is_active",
@@ -11965,6 +11971,13 @@
             "default": false,
             "example": false
           },
+          "isDefect": {
+            "x-source-column": "is_defect",
+            "type": "boolean",
+            "default": false,
+            "description": "불량창고 여부. 근거: DR-012 확정 3-C · omf-mes#147",
+            "example": false
+          },
           "partnerId": {
             "x-source-column": "partner_id",
             "type": [
@@ -11986,7 +11999,8 @@
           "warehouseName",
           "warehouseTypeCode",
           "managementLevelCode",
-          "isExternal"
+          "isExternal",
+          "isDefect"
         ],
         "description": "창고 수정 요청. plantId 는 신규만(편집 불가) — 근거: W-06-07 §4-A 편집 열. isActive 는 별도 사용 중지 액션(:deactivate)으로만 바꾼다 — 근거: W-06-07 §5-1. 낙관적 잠금은 공유계약 B-1.",
         "properties": {
@@ -12025,6 +12039,12 @@
           "isExternal": {
             "x-source-column": "is_external",
             "type": "boolean",
+            "example": false
+          },
+          "isDefect": {
+            "x-source-column": "is_defect",
+            "type": "boolean",
+            "description": "불량창고 여부. 근거: DR-012 확정 3-C · omf-mes#147",
             "example": false
           },
           "partnerId": {
