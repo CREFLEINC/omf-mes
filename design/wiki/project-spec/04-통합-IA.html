@@ -2107,7 +2107,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tbody>
 <tr><th class="nw">관리웹</th><td>React+TS 웹(브라우저)</td><td>사무 PC</td><td>마스터 CRUD·대시보드·지시 발행·판정·전표. 계정 로그인·온라인 전제</td></tr>
 <tr><th class="nw">POP</th><td>Electron 키오스크 앱</td><td>산업용 패널 PC(N100 터치, Win11 IoT)</td><td>실적 입력·투입 스캔·라벨 인쇄 내장·사번 경량 인증·한/베 토글·제한적 오프라인(W/O 선배포)</td></tr>
-<tr><th class="nw">모바일</th><td>Capacitor Android 앱</td><td>PDA + BLE 바코드 스캐너(8식)</td><td>스캔 퍼스트·거래명세서 촬영→온프레 OCR·제한적 오프라인(입출고 단일 단말)</td></tr>
+<tr><th class="nw">모바일</th><td>Capacitor Android 앱</td><td>스캐너 일체형 PDA(8식)</td><td>스캔 퍼스트·거래명세서 촬영→온프레 OCR·제한적 오프라인(입출고 단일 단말)</td></tr>
 </tbody></table>
 <h3>2-2. 배지 표기 정책 4건 (사용자 확정 2026-07-24 · <code>uiux/2026-07-24-프로그램배지/placement-plan.md</code> §1)</h3>
 <ol><li><strong>미정 지점 = 회색 점선 <code>?</code> 배지로 표시</strong>(생략하지 않음 — 고객 협의 유도).</li><li><strong>IQC·OQC 검사 결과 입력 = 관리웹</strong>(결정 16 「오프라인 금지 작업(판정)=관리웹 온라인 전제」 해석 우선). <strong>PQC만 결정 12로 POP 확정</strong>.</li><li><strong>ERP 화면 소관 지점(06 품목·BOM 등록 등) = 배지 없음</strong>(MES 3종 배지만 운용).</li><li><strong>03 상태 전이도 = 판정 지점 4곳에 배지 부착</strong>(의심자재등록·검사 판정·보류·Release — 전부 관리웹). ※미확정 3상태(한도승인·특채·폐기)도 관리웹 확정(2026-07-27·#11 #9) — 도식화 후 부착 대상 4→7곳 확장 예정.</li></ol>
@@ -2307,7 +2307,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 </figure>
 <h2>§5. 모바일 IA — 스캔 타일 + 화면 19건</h2>
 <h3>5-1. 스캔 퍼스트 홈 타일 (정본 §2.3)</h3>
-<ul><li><strong>진입</strong>: 기기 등록·사번 인증(M-CO-01 — <strong>단말 토큰 기기 등록·사번 입력(계정 로그인 없음)</strong>·무선 스캐너 페어링·언어 선택) «(정정 2026-08-02 — 인벤토리 v1.4)»</li><li><strong>📦 입하 타일</strong>: 입하 등록(M-01-01 — 부착 여부 분기→[사전부착] LOT 스캔·P/O 후보 자동 필터/[미부착] P/O 직접 선택→거래명세서 촬영 OCR→품목·수량 대조, #16) → 자재LOT 번호 스캔·등록(M-01-02 — 발번 단계) → (예외) 입하 오류 등록(M-01-06)</li><li><strong>📥 적치 타일</strong>: 자재 위치 확인(M-01-04) → 적치·입고 완료(M-01-05) → (포화) 임시 위치 적재(M-01-07)</li><li><strong>📤 피킹/출고 타일</strong>: 자재 출고·피킹(M-01-08 — FEFO/FIFO·Hold 차단) → 생산창고 입고·호퍼 잔량 입력(M-01-09)</li><li><strong>♻️ 재생재 타일</strong>: 재생재 등록(M-01-12 — 품목코드+하위코드 2단·독립 사건이라 별도 타일)</li><li><strong>🚨 긴급 요청 타일</strong> <em>(v2.2 신설)</em>: 긴급 IQC 생략 요청(M-01-13 — 입하 LOT 스캔 → <strong>사유 필수</strong> → 요청. 승인은 관리웹 <code>W-01-02</code>)</li><li><strong>🔀 이동 타일</strong>: 재고이동·불량 반출(M-01-10)</li><li><strong>🧮 실사 타일</strong>: 실물 카운트(M-01-11 — 조정은 관리웹 W-01-04)</li><li><strong>🏭 생산 이동/수리 타일(02)</strong>: WIP 공정 이동 스캔(M-02-01) / 수리 왕복 투입·반출 스캔(M-02-02)</li><li><strong>🚚 출하 스캔 타일(04)</strong>: 제품LOT 피킹 스캔(M-04-01 — 피킹 목록 화면 내 포함) / 제품입고·적치(M-04-04) / 포장 재구성 스캔(M-04-03 — 신규 라벨은 POP P-04-04)</li><li><strong>🛠 설비 타일(05)</strong>: 설비 점검 입력(M-05-01) / 설비 고장 현장 보고(M-05-02)</li></ul>
+<ul><li><strong>진입</strong>: 기기 등록·사번 인증(M-CO-01 — <strong>단말 토큰 기기 등록·사번 입력(계정 로그인 없음)</strong>·스캐너 준비 상태 표시·언어 선택) «(정정 2026-08-02 — 인벤토리 v1.4)»</li><li><strong>📦 입하 타일</strong>: 입하 등록(M-01-01 — 부착 여부 분기→[사전부착] LOT 스캔·P/O 후보 자동 필터/[미부착] P/O 직접 선택→거래명세서 촬영 OCR→품목·수량 대조, #16) → 자재LOT 번호 스캔·등록(M-01-02 — 발번 단계) → (예외) 입하 오류 등록(M-01-06)</li><li><strong>📥 적치 타일</strong>: 자재 위치 확인(M-01-04) → 적치·입고 완료(M-01-05) → (포화) 임시 위치 적재(M-01-07)</li><li><strong>📤 피킹/출고 타일</strong>: 자재 출고·피킹(M-01-08 — FEFO/FIFO·Hold 차단) → 생산창고 입고·호퍼 잔량 입력(M-01-09)</li><li><strong>♻️ 재생재 타일</strong>: 재생재 등록(M-01-12 — 품목코드+하위코드 2단·독립 사건이라 별도 타일)</li><li><strong>🚨 긴급 요청 타일</strong> <em>(v2.2 신설)</em>: 긴급 IQC 생략 요청(M-01-13 — 입하 LOT 스캔 → <strong>사유 필수</strong> → 요청. 승인은 관리웹 <code>W-01-02</code>)</li><li><strong>🔀 이동 타일</strong>: 재고이동·불량 반출(M-01-10)</li><li><strong>🧮 실사 타일</strong>: 실물 카운트(M-01-11 — 조정은 관리웹 W-01-04)</li><li><strong>🏭 생산 이동/수리 타일(02)</strong>: WIP 공정 이동 스캔(M-02-01) / 수리 왕복 투입·반출 스캔(M-02-02)</li><li><strong>🚚 출하 스캔 타일(04)</strong>: 제품LOT 피킹 스캔(M-04-01 — 피킹 목록 화면 내 포함) / 제품입고·적치(M-04-04) / 포장 재구성 스캔(M-04-03 — 신규 라벨은 POP P-04-04)</li><li><strong>🛠 설비 타일(05)</strong>: 설비 점검 입력(M-05-01) / 설비 고장 현장 보고(M-05-02)</li></ul>
 <h3>5-2. 화면 19건 전건 (정본 §3.3)</h3>
 <p><strong>01 자재창고관리 (11)</strong></p>
 <figure class="table-wide">
@@ -2361,7 +2361,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <table>
 <thead><tr><th class="nw">ID</th><th>화면명</th><th class="nw">유형</th><th>행위자</th><th>핵심 데이터</th><th class="nw">신뢰도</th><th>근거 요지</th></tr></thead>
 <tbody>
-<tr><th class="nw"><code>M-CO-01</code></th><td><strong>기기 등록·사번 인증</strong></td><td class="nw">입력</td><td>입하·자재·창고·출하 담당자</td><td>사용자/역할/권한(app_user)·<strong>단말기</strong>·작업자</td><td class="nw">추정</td><td>결정16 모바일 Capacitor·무선 스캐너·WBS §7 폼팩터③·기기 등록·스캐너 페어링·언어 선택(05 B1 사번입력 749:7621 여기 귀속) · <strong>인증 방식 정정(인벤토리 v1.4)</strong> — <strong>POP인증 §6-③ 「모바일=POP과 동일(단말 토큰+사번 귀속·로그인 생략)」</strong>(✓확정 2026-07-28). <strong>(기존 서술 폐기: 「계정 로그인」 — 결정 16 원문 단말표 모바일 행에 인증 서술 없음)</strong></td></tr>
+<tr><th class="nw"><code>M-CO-01</code></th><td><strong>기기 등록·사번 인증</strong></td><td class="nw">입력</td><td>입하·자재·창고·출하 담당자</td><td>사용자/역할/권한(app_user)·<strong>단말기</strong>·작업자</td><td class="nw">추정</td><td>결정16 모바일 Capacitor·<strong>스캐너 일체형</strong>(#442)·WBS §7 폼팩터③·기기 등록·스캐너 준비 상태·언어 선택(05 B1 사번입력 749:7621 여기 귀속) · <strong>인증 방식 정정(인벤토리 v1.4)</strong> — <strong>POP인증 §6-③ 「모바일=POP과 동일(단말 토큰+사번 귀속·로그인 생략)」</strong>(✓확정 2026-07-28). <strong>(기존 서술 폐기: 「계정 로그인」 — 결정 16 원문 단말표 모바일 행에 인증 서술 없음)</strong></td></tr>
 </tbody></table>
 </figure>
 <h2>§6. 집계·변동</h2>
