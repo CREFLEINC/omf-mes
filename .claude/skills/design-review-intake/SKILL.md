@@ -153,8 +153,31 @@ gh pr view <PR> --json mergedAt
 `team-issue-protocol` §7 템플릿으로 `03_reply.md`를 확정하고 게시한다. 첫 줄은 정확히
 `## 개발팀 전달사항`. 게시 전:
 - `python3 .claude/skills/uiux-design/scripts/check-report-language.py $RUN/03_reply.md`
+- `python3 .claude/skills/uiux-client-handoff/scripts/check-issue.py $RUN/03_reply.md --reply`
+  — 머리 표기·공개 안전·자리표시자를 본다. ⛔ **`--reply` 없이 돌리지 마라** — 폼 6항목
+  구조와 중복 발행을 검사해 「막지 않아도 되는 ⛔」가 무더기로 뜬다(2026-08-26 #442에서 9건).
 - 근거 블록의 모든 경로를 `test -f`로 확인, 실재하지 않으면 그 줄을 제거하거나 대체 경로로 교체.
-- 회신에 반영 PR 번호 + **병합 커밋 sha**(Phase 5b에서 확인)를 명시.
+- 회신에 반영 PR 번호 + **병합 커밋 sha**(Phase 5b에서 확인)를 명시 — 자리표시자를 남기지 않는다.
+
+**게시 수단은 코멘트다:**
+```
+gh issue comment <요청 이슈 번호> --repo <요청이 온 저장소> --body-file $RUN/03_reply.md
+```
+
+⛔ **`gh issue create`를 쓰지 않는다.** 회신은 언제나 **요청 이슈의 코멘트**다. 새 이슈로 내면
+개발팀이 ⚠ 이상의 변경 통지로 읽어 **재작업으로 오해한다.** 이 명령을 여기 박아 둔 이유는,
+하네스 전체에서 `gh issue` 예시가 `uiux-client-handoff`의 `gh issue create`뿐이라
+「게시한다」만 적혀 있으면 **가장 가까운 실행 패턴이 "새 이슈를 만든다"**가 되기 때문이다
+(2026-08-26 실측 — 사고는 없었으나 규약이 막고 있던 것이 아니었다).
+
+⚠ **요청이 공개 저장소에서 올 수 있다.** `team-issue-protocol` §1은 「인바운드=비공개
+`omf-mes`이므로 금지어 검사 불요」로 적혀 있으나, `omf-mes-client#442`처럼 **우리가 발행한
+아웃바운드 이슈의 코멘트로 검토 요청이 올 수 있다.** 그때는 회신도 공개로 나가므로
+**금지어 검사가 필수**이고, 이 Phase가 §8의 「공개 저장소 발행 = 승인 필수」에 걸린다.
+회신 대상 저장소의 가시성을 먼저 확인한다:
+```
+gh repo view <저장소> --json isPrivate -q .isPrivate
+```
 
 ⛔ **이 Phase에서 이슈를 닫지 않는다.** 통지가 아직이면 닫을 이유가 없다.
 

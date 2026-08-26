@@ -13,6 +13,14 @@
   ① 구조 — 폼 6항목이 다 있는가 · 4번 처리 방법이 3종 중 하나인가 · 미기입 자리표시가 남았는가
   ② 공개 안전 — 이미지 · 조항 요약 · 확정 기록 마커 · 실 운영값 · 인프라 · 금액
 
+  ⚠ --reply 는 ①과 중복 검사를 «끄고» ②만 본다 + 머리 표기(「## 개발팀 전달사항」)를 본다.
+     회신은 새 이슈가 아니라 «요청 이슈의 코멘트»라 폼 6항목도, 「같은 화면의 착수 이슈가
+     이미 있다」는 중복 판정도 성립하지 않는다(답하는 대상이 바로 그 이슈다).
+
+     2026-08-26 omf-mes-client#442 회신에서 드러났다 — 폼 검사로 돌려 ⛔ 9건이 떴는데
+     전부 [구조]·[중복 발행]이었고 공개 안전 위반은 0건이었다. 모드가 없어 사람이
+     「막지 않아도 되는 위반」을 매번 손으로 갈라야 했다.
+
   ⛔ 위반은 종료 코드 1. ⚠ 확인은 사람이 판단할 것이라 막지 않는다.
 
   ③ 중복·금지 화면 — 같은 화면에 이미 착수 이슈가 있는가 · 발행 금지 화면인가
@@ -350,6 +358,10 @@ def main():
         return 2
     path = args[0]
     change_notice = '--change-notice' in sys.argv
+    # 회신 코멘트 — 기존 이슈에 «코멘트»로 답하는 글이다. 새 이슈를 만들지 않으므로
+    # 폼 6항목 구조도, 「같은 화면의 착수 이슈가 이미 있다」는 중복 발행 검사도 적용되지
+    # 않는다(답하는 대상이 바로 그 이슈다). 공개 안전 검사만 남긴다.
+    reply = '--reply' in sys.argv
     title = None
     if '--title' in sys.argv:
         i = sys.argv.index('--title')
@@ -367,12 +379,15 @@ def main():
     secs = sections(text)
 
     errs, warns = ([], [])
-    if not change_notice:
+    if not change_notice and not reply:
         errs, warns = check_structure(text, secs)
 
     checked_remote = False
     team_suggestions = []
-    if '--no-remote' in sys.argv:
+    if reply:
+        # 회신은 이미 있는 이슈에 다는 코멘트라 중복 발행이라는 개념이 없다.
+        checked_remote = True
+    elif '--no-remote' in sys.argv:
         warns.append(('원격 조회 생략', '--no-remote',
                       '중복 발행 여부를 확인하지 않았다. 발행 전에 반드시 직접 본다'))
     else:
@@ -396,7 +411,14 @@ def main():
     errs += scan(text, BLOCKING)
     warns += scan(text, ADVISORY)
 
-    kind = '변경 통지' if change_notice else '착수 가능 통지'
+    if reply:
+        first = (text.lstrip().split('\n') or [''])[0].strip()
+        if first != '## 개발팀 전달사항':
+            errs.append(('머리 표기', first[:60] or '(빈 줄)',
+                         'team-issue-protocol §7 — 첫 줄은 정확히 「## 개발팀 전달사항」이다. '
+                         '실측에서 #232 는 「##」이 빠졌고 #222 는 구 표기를 썼다'))
+
+    kind = '회신 코멘트' if reply else ('변경 통지' if change_notice else '착수 가능 통지')
     print('%s 검사 — %s' % (kind, os.path.basename(path)))
     print('─' * 66)
 
@@ -415,6 +437,15 @@ def main():
             print('    → %s' % fix)
         print('\n공개 저장소입니다. 고치고 다시 검사하세요.')
         return 1
+
+    if reply:
+        print('\n✅ 게시해도 되는 상태입니다.')
+        print('\n─ 게시 명령 ' + '─' * 52)
+        print('gh issue comment <요청 이슈 번호> --repo <저장소> \\')
+        print('  --body-file %s' % _q(path))
+        print('\n⛔ gh issue create 를 쓰지 않는다 — 회신은 «요청 이슈의 코멘트»다.')
+        print('   새 이슈로 내면 개발팀이 ⚠ 이상의 변경 통지로 읽어 재작업으로 오해한다.')
+        return 0
 
     print('\n✅ 발행해도 되는 상태입니다.%s'
           % ('' if checked_remote else '  (⚠ 중복 검사는 못 했습니다)'))
