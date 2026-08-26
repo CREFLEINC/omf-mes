@@ -10,6 +10,7 @@
 | --- | --- | :-: | --- |
 | 2026-08-25 | Phase 3 전체 이관(카테고리 8종 신설) | 0 | 전 카테고리 |
 | 2026-08-25 | 계약 JSON 자연 증가(경로 306→309 등, 정확한 변경일 미상) | — | `api-contracts/09-API-계약서.md` |
+| 2026-08-26 | 단말 형태 확정 「부착형 세트」→「스캐너 일체형 PDA」 + **지원 OS 범위 「Android 13」→「Android 13+」**(`minSdk` = API 33 · `targetSdk` = 작업 시점 최신 안정판) — 둘 다 omf-mes-client#442 · 2026-08-25. 공유계약 v4.3 → **v4.4**(`D-2` 조건부 해제 · §H-6 재정의 · 조항 155 유지) | 1 | 화면 스펙 11 · `decisions-policy/공유계약.md` · `api-contracts/06-API-요구서-공통.md` · `project-spec/04-통합-IA.md`·`02-SW설계사양서.md`·`03-HW구성안.md` · `schema/templates/00-화면스펙서식.md` |
 
 ## 감시 방법
 
