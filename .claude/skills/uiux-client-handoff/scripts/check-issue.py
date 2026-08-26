@@ -13,13 +13,23 @@
   ① 구조 — 폼 6항목이 다 있는가 · 4번 처리 방법이 3종 중 하나인가 · 미기입 자리표시가 남았는가
   ② 공개 안전 — 이미지 · 조항 요약 · 확정 기록 마커 · 실 운영값 · 인프라 · 금액
 
-  ⚠ --reply 는 ①과 중복 검사를 «끄고» ②만 본다 + 머리 표기(「## 개발팀 전달사항」)를 본다.
-     회신은 새 이슈가 아니라 «요청 이슈의 코멘트»라 폼 6항목도, 「같은 화면의 착수 이슈가
-     이미 있다」는 중복 판정도 성립하지 않는다(답하는 대상이 바로 그 이슈다).
+  ③ 회신 규약 — 첫 줄이 「## 개발팀 전달사항」으로 시작하는가 (--reply 전용)
+
+  ⚠ --reply 는 ①과 중복 검사를 «끄고» ②③을 본다. 회신은 새 이슈가 아니라 «요청 이슈의
+     코멘트»라 폼 6항목도, 「같은 화면의 착수 이슈가 이미 있다」는 중복 판정도 성립하지
+     않는다(답하는 대상이 바로 그 이슈다).
 
      2026-08-26 omf-mes-client#442 회신에서 드러났다 — 폼 검사로 돌려 ⛔ 9건이 떴는데
      전부 [구조]·[중복 발행]이었고 공개 안전 위반은 0건이었다. 모드가 없어 사람이
      「막지 않아도 되는 위반」을 매번 손으로 갈라야 했다.
+
+  ⚠ --reply --private 는 ②를 «끄고» ③만 본다. 검토 요청의 다수는 비공개 omf-mes 로 오고,
+     거기서는 단가·조항 요약·내부 주소가 막을 이유가 없는데 막힌다. 반대로 ③은 «비공개
+     회신에도» 필요하다 — 머리 표기 위반 실측 2건(#232·#222)이 둘 다 비공개 회신이었다.
+     그래서 ②와 ③을 한 모드에 묶지 않고 갈랐다.
+
+     기본은 ② 켜짐이다. 끄는 것을 잊으면 과하게 막힐 뿐이지만, 켜는 것을 잊으면 흘러나간다.
+     --private 는 --reply 와 함께만 쓴다(착수·변경 통지는 언제나 공개 저장소로 나간다).
 
   ⛔ 위반은 종료 코드 1. ⚠ 확인은 사람이 판단할 것이라 막지 않는다.
 
@@ -137,6 +147,13 @@ ADVISORY = [
 PLACEHOLDER = re.compile(r'<[가-힣][^>]*>|W-00-00|omf-mes#00|YYYY-MM-DD|v0\.0|<해시>')
 
 SCREEN_ID = re.compile(r'\b([WPM]-(?:CO|\d{2})-\d{2})\b')
+
+# 회신 코멘트 첫 줄 — team-issue-protocol §7.
+# ⛔ 완전 일치로 잡지 않는다. §7 템플릿 자신이 「## 개발팀 전달사항 — <한 줄 결론>」이고,
+#    실측에서 정본을 지킨 유일한 회신(omf-mes#206)이 바로 그 대시 형태였다.
+#    완전 일치로 두면 «규약을 지킨 사람»이 막히고, 막힌 사람은 검사기를 끈다.
+# 뒤가 붙으려면 공백으로 끊겨야 한다 — 「## 개발팀 전달사항입니다」 같은 변형은 막는다.
+REPLY_HEAD = re.compile(r'^##[ \t]+개발팀 전달사항(?:[ \t]|$)')
 
 # 이미 구현·병합된 화면. 「착수 가능」으로 오면 프론트가 그냥 닫는다.
 # 전할 것이 있으면 ⛔/⚠ 변경 통지로 간다.
@@ -360,8 +377,17 @@ def main():
     change_notice = '--change-notice' in sys.argv
     # 회신 코멘트 — 기존 이슈에 «코멘트»로 답하는 글이다. 새 이슈를 만들지 않으므로
     # 폼 6항목 구조도, 「같은 화면의 착수 이슈가 이미 있다」는 중복 발행 검사도 적용되지
-    # 않는다(답하는 대상이 바로 그 이슈다). 공개 안전 검사만 남긴다.
+    # 않는다(답하는 대상이 바로 그 이슈다).
     reply = '--reply' in sys.argv
+    # 공개 안전 스캔은 «기본 켜짐»이다. 회신이 비공개 저장소(omf-mes)로 갈 때만 끈다 —
+    # 거기서는 단가·조항 요약·내부 주소가 막을 이유가 없는데 막힌다. 기본을 켜 두는 쪽이
+    # 안전한 이유는, 끄는 것을 잊으면 과하게 막힐 뿐이고 켜는 것을 잊으면 흘러나가기 때문이다.
+    private = '--private' in sys.argv
+    if private and not reply:
+        print('⛔ --private 는 --reply 와 함께만 쓴다.')
+        print('   착수·변경 통지는 언제나 공개 저장소(omf-mes-client)로 나가므로')
+        print('   공개 안전 스캔을 끌 수 있는 자리가 아니다.')
+        return 2
     title = None
     if '--title' in sys.argv:
         i = sys.argv.index('--title')
@@ -375,7 +401,8 @@ def main():
             if not team.upper().startswith('T'):
                 team = 'T' + team
 
-    text = io.open(path, encoding='utf-8').read()
+    with io.open(path, encoding='utf-8') as f:
+        text = f.read()
     secs = sections(text)
 
     errs, warns = ([], [])
@@ -386,7 +413,9 @@ def main():
     team_suggestions = []
     if reply:
         # 회신은 이미 있는 이슈에 다는 코멘트라 중복 발행이라는 개념이 없다.
-        checked_remote = True
+        # checked_remote 는 비-reply 경로의 안내 문구 전용이라 손대지 않는다 —
+        # 여기서 True 로 두면 「확인했다」는 거짓을 남기게 된다.
+        pass
     elif '--no-remote' in sys.argv:
         warns.append(('원격 조회 생략', '--no-remote',
                       '중복 발행 여부를 확인하지 않았다. 발행 전에 반드시 직접 본다'))
@@ -408,17 +437,25 @@ def main():
         errs.append(('미기입 자리표시', ' · '.join(sorted(set(left))[:6]),
                      '초안 자리표시가 남아 있다. 전부 채운다'))
 
-    errs += scan(text, BLOCKING)
-    warns += scan(text, ADVISORY)
+    if not private:
+        errs += scan(text, BLOCKING)
+        warns += scan(text, ADVISORY)
 
     if reply:
-        first = (text.lstrip().split('\n') or [''])[0].strip()
-        if first != '## 개발팀 전달사항':
+        if change_notice:
+            warns.append(('모드 충돌', '--reply --change-notice',
+                          '두 모드를 함께 줬다. --reply 로 검사했다 — '
+                          '변경 통지를 검사하려면 --reply 를 뺀다'))
+        first = text.lstrip().split('\n')[0].strip()
+        if not REPLY_HEAD.match(first):
             errs.append(('머리 표기', first[:60] or '(빈 줄)',
-                         'team-issue-protocol §7 — 첫 줄은 정확히 「## 개발팀 전달사항」이다. '
+                         'team-issue-protocol §7 — 첫 줄은 「## 개발팀 전달사항」으로 «시작»한다. '
+                         '뒤에 「 — <한 줄 결론>」을 붙여도 된다(§7 템플릿·#206 이 그 형태다). '
                          '실측에서 #232 는 「##」이 빠졌고 #222 는 구 표기를 썼다'))
 
     kind = '회신 코멘트' if reply else ('변경 통지' if change_notice else '착수 가능 통지')
+    if reply and private:
+        kind += '(비공개 — 공개 안전 스캔 끔)'
     print('%s 검사 — %s' % (kind, os.path.basename(path)))
     print('─' * 66)
 
@@ -435,7 +472,8 @@ def main():
             print('  [%s]' % name)
             print('    …%s…' % snippet[:110])
             print('    → %s' % fix)
-        print('\n공개 저장소입니다. 고치고 다시 검사하세요.')
+        print('\n%s 고치고 다시 검사하세요.'
+              % ('회신 규약 위반입니다.' if private else '공개 저장소입니다.'))
         return 1
 
     if reply:
