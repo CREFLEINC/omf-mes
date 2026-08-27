@@ -4136,8 +4136,11 @@
       "example": 1001
      },
      "consumptionTypeCode": {
+      "x-source-column": "consumption_type_code",
       "type": "string",
-      "example": "값"
+      "description": "투입 유형이며 물리 컬럼은 production.material_consumption.consumption_type_code 다. 보내지 않으면 서버가 기본 투입 유형으로 기록한다 — 화면이 값을 지어내지 않는다. 값 목록은 아직 확정 전이고, 확정 전에는 이 칸을 보내지 않는다.",
+      "example": "값",
+      "x-internal-note": "뜻 목록 세 값 중 「재생재」는 품목 축(mdm.item.mes_category_code = NEW/RECYCLED · 확정 기록 DR-006 2026-08-10 · 재생재 등록 화면 M-01-12)에, 「대체·교체」는 구조 축(replacedConsumptionId + changeReasonCode · 러닝체인지 화면 P-02-11 §5-2)에 이미 자리가 있어 한 칸이 두 축을 겸하려는 상태다. 축을 정합화한 뒤에 문자열을 정한다(공유계약 A-21 — 일부만 채워진 것이 빈 것보다 위험하다). 추적은 P-02-03 §8 미결 1 이 갖는다(omf-mes#252)."
      },
      "actualUseProcessId": {
       "type": "integer",
@@ -4183,16 +4186,6 @@
       "type": "string",
       "example": "값"
      },
-     "workerId": {
-      "type": "integer",
-      "format": "int64",
-      "example": 1001
-     },
-     "terminalId": {
-      "type": "integer",
-      "format": "int64",
-      "example": 1001
-     },
      "remarks": {
       "type": "string",
       "example": "값"
@@ -4202,12 +4195,9 @@
      "workOrderId",
      "itemId",
      "lotId",
-     "consumptionTypeCode",
      "inputQty",
      "uomId",
-     "occurredAt",
-     "workerId",
-     "terminalId"
+     "occurredAt"
     ]
    },
    "MaterialReturn": {
@@ -5392,22 +5382,12 @@
       "type": "string",
       "example": "값"
      },
-     "workerId": {
-      "type": "integer",
-      "format": "int64",
-      "example": 1001
-     },
      "equipmentId": {
       "type": "integer",
       "format": "int64",
       "example": 1001
      },
      "moldId": {
-      "type": "integer",
-      "format": "int64",
-      "example": 1001
-     },
-     "terminalId": {
       "type": "integer",
       "format": "int64",
       "example": 1001
@@ -5428,8 +5408,7 @@
      "workOrderId",
      "uomId",
      "resultSourceCode",
-     "occurredAt",
-     "workerId"
+     "occurredAt"
     ],
     "description": "다섯 수량의 합이 0 이면 400 이다 — ck_production_result_qty 가 물리적으로도 막는다."
    },
@@ -6149,11 +6128,6 @@
       "format": "int64",
       "example": 1001
      },
-     "terminalId": {
-      "type": "integer",
-      "format": "int64",
-      "example": 1001
-     },
      "startedAt": {
       "type": "string",
       "format": "date-time",
@@ -6176,7 +6150,6 @@
     "required": [
      "workOrderId",
      "shiftId",
-     "terminalId",
      "startedAt"
     ]
    },
