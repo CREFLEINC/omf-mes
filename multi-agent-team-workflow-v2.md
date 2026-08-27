@@ -63,7 +63,7 @@ Github repo : https://github.com/CREFLEINC/omf-mes
 
 [ 예시 ]
 ```
-개발팀 전달사항
+개발팀에 전달사항
 - 상태 : 처리 완료
 - 내용 : ....
 ```

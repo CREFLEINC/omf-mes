@@ -151,8 +151,8 @@ gh pr view <PR> --json mergedAt
 ## Phase 6a — 회신 게시 (닫지 않는다)
 
 `team-issue-protocol` §7 템플릿으로 `03_reply.md`를 확정하고 게시한다. 첫 줄은
-`## 개발팀 전달사항`으로 **시작**한다 — 뒤에 `— <한 줄 결론>`을 붙이는 것이 §7 템플릿의
-골격이다(실측 `omf-mes#206`이 그 형태다). 게시 전:
+`개발팀에 전달사항`으로 **시작**한다(`##`은 선택 — 강제하지 않는다) — 뒤에 `— <한 줄 결론>`을
+붙여도 된다(선택). 정본·회귀 사례는 `team-issue-protocol` §7 참고. 게시 전:
 - `python3 .claude/skills/uiux-design/scripts/check-report-language.py $RUN/03_reply.md`
 - **회신 대상 저장소의 가시성을 먼저 확인하고** 그 결과로 플래그를 고른다:
   ```
