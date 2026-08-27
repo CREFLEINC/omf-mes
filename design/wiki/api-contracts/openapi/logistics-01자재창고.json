@@ -3453,7 +3453,13 @@
       "schema": {
        "type": "boolean"
       },
-      "description": "라벨이 발행된 건을 뺄지. 근거: P-01-01 §5-1"
+      "description": "라벨이 발행된 건을 뺄지. 근거: P-01-01 §6"
+     },
+     {
+      "name": "supplierLotMissing",
+      "in": "query",
+      "schema": { "type": "boolean" },
+      "description": "라인 중 supplier_lot_missing 이 이 값인 라인을 하나 이상 가진 건만. true = 미부착 건(MES 가 채번한다) · false = 사전부착 건. ⚠ 헤더 목록인데 판정은 라인 단위다 — 건 안에 두 종류가 섞여 있을 수 있으므로 라인을 고를 때 GET .../lines 의 같은 이름 필터를 함께 쓴다. 근거: P-01-01 §6"
      },
      {
       "name": "q",
@@ -3735,6 +3741,20 @@
     ],
     "summary": "입하 라인 목록",
     "description": "근거: W-01-03 §3",
+    "parameters": [
+     {
+      "name": "supplierLotMissing",
+      "in": "query",
+      "schema": { "type": "boolean" },
+      "description": "미부착 라인만 거른다. LOT 발번 단위가 라인이기 때문이다 — 한 건에 미부착 라인이 여럿이면 LOT 도 여럿이다. 근거: P-01-01 §4-B·§6"
+     },
+     {
+      "name": "labelIssued",
+      "in": "query",
+      "schema": { "type": "boolean" },
+      "description": "라벨이 발행된 라인을 뺄지. false 이면서 lotId 가 채워진 라인 = 「LOT 은 생겼는데 발행 기록이 없는」 상태다 — 화면은 그 라인에 「인쇄」만 보인다. 근거: P-01-01 §5-2·§6"
+     }
+    ],
     "responses": {
      "200": {
       "description": "라인",
@@ -6133,7 +6153,7 @@
      "trace"
     ],
     "summary": "LOT 등록",
-    "description": "스캔한 값이 그대로 번호가 된다. 같은 공장에 같은 번호가 있으면 400 이다. 근거: M-01-02 §5-2",
+    "description": "번호 출처가 둘이다 — numberSourceCode 로 가른다.\n\nSUPPLIER(사전부착) — 스캔한 값이 그대로 번호가 된다. 같은 공장에 같은 번호가 있으면 400 이다. 재시도해도 안 풀린다 — 사람이 스캔값을 고쳐야 한다. 근거: M-01-02 §5-1 [사전부착]\n\nMES(미부착) — 번호는 서버가 매긴다. 화면은 lotNo 를 보내지 않고 201 응답으로 받는다. ⛔ 채번 충돌은 서버가 스스로 재시도한다 — 그래도 실패하면 409 이고, 다시 부르면 풀린다. 400 을 내지 않는다: 사용자가 고칠 수 있는 값이 아니기 때문이다(POST /trace/serial-numbers 와 같은 이유). 계약은 「서버가 매긴다」까지만 정하고 도출·검증 규칙은 정하지 않는다 — 34자리 고정폭만 확정이다(MLOT #16). 근거: M-01-02 §5-1 [미부착] · P-01-01 §5-2\n\n⭐ 발행 기록은 이 경로가 만들지 않는다 — 공통 계약의 POST /app/document-issues 가 이어서 만든다. LOT 이 먼저 있어야 그쪽 targets 에 담을 수 있다. 두 호출 사이가 끊기면 「LOT 은 있고 라벨 기록은 없는」 상태가 남는데, 그것은 오류가 아니라 표현 가능한 상태다 — InboundReceiptLine.lotId 가 채워지고 labelIssued 가 false 로 남는다. 근거: P-01-01 §5-2\n\n⭐ 자재 LOT 은 등록 즉시 검사 대기로 보류된다 — 화면이 보내지 않고 서버가 건다. lot_hold 행이 함께 생기고 재고는 즉시 잡히되 가용이 아니다. Release 는 IQC 합격 시점이다. 근거: MLOT #5 · M-01-02 §4",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -6176,7 +6196,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "검증 실패. 고쳐야 풀린다. numberSourceCode 와 lotNo 의 조합이 어긋난 경우를 포함한다 — SUPPLIER 인데 lotNo 가 없거나, MES 인데 lotNo 를 보냈다",
       "content": {
        "application/json": {
         "schema": {
@@ -6196,7 +6216,7 @@
       }
      },
      "409": {
-      "description": "저장 충돌. 다시 읽어 오면 풀린다",
+      "description": "저장 충돌 — 다시 부르면 풀린다. numberSourceCode = MES 에서 서버 채번이 거듭 충돌한 경우를 포함한다",
       "content": {
        "application/json": {
         "schema": {
@@ -6206,7 +6226,7 @@
       }
      }
     },
-    "x-internal-note": "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9)."
+    "x-internal-note": "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). ⚠ production-02 계약의 POST /trace/serial-numbers x-internal-note 가 「자재 LOT 번호는 스캔한 값이 그대로 번호」라고 일반화했는데, 그것은 사전부착 경로만 맞다. 미부착(P-01-01)은 서버 채번이다 — omf-mes#245 에서 정정."
    }
   },
   "/trace/lots/{lotId}": {
@@ -10559,8 +10579,8 @@
       "x-source-column": "lot_no",
       "type": "string",
       "maxLength": 100,
-      "description": "공장 안에서 유일하다",
-      "example": "LOT-2026-000045"
+      "description": "공장 안에서 유일하다. 자재 LOT 은 34자리·전부 숫자다(MLOT #16)",
+      "example": "0001234500000012002607310001230007"
      },
      "itemId": {
       "x-source-column": "item_id",
@@ -10713,7 +10733,7 @@
     "x-source-table": "trace.lot",
     "type": "object",
     "required": [
-     "lotNo",
+     "numberSourceCode",
      "itemId",
      "lotTypeCode",
      "plantId",
@@ -10726,11 +10746,18 @@
     ],
     "description": "LOT 등록. 스캔한 값이 그대로 번호가 되며, 같은 공장에 같은 번호가 있으면 409 가 아니라 400 으로 막는다. 근거: M-01-02",
     "properties": {
+     "numberSourceCode": {
+      "type": "string",
+      "enum": ["SUPPLIER", "MES"],
+      "description": "번호를 누가 매기는가. ⛔ 이 한 경로가 두 업무를 받으므로 화면이 반드시 밝힌다.\n\nSUPPLIER = 사전부착. 공급사가 MES 표준 양식대로 부여한 번호를 스캔해 수용한다. lotNo 가 필수이고, 같은 공장에 같은 번호가 있으면 400 이다 — 스캔값이 틀린 것이므로 사람이 고쳐야 풀린다.\n\nMES = 미부착. 서버가 채번한다. lotNo 를 주면 400 이다 — 빈 값이 조용히 서버 채번으로 흘러가는 것을 막기 위해 「안 준 것」과 「못 정한 것」을 가르지 않고 «누가 매기는가»를 직접 받는다(공유계약 G-9 의 계약 판).\n\n근거: MLOT #4(발번 경로 이원화 ✓확정 2026-07-20) · M-01-02 §5-1 · P-01-01 §1",
+      "example": "SUPPLIER"
+     },
      "lotNo": {
       "x-source-column": "lot_no",
       "type": "string",
       "maxLength": 100,
-      "example": "LOT-2026-000045"
+      "description": "numberSourceCode = SUPPLIER 일 때만 준다. ⚠ 자재 LOT 은 34자리·전부 숫자·구분문자 없음이다(제품코드9 · 수량 스냅샷9 · 날짜6 YYMMDD · 공급사 성분6 · 번호4 — MLOT #16 ✓확정 2026-07-27). 자릿수·숫자 검증은 화면이 한다 — DB 에 제약이 없다(M-01-02 §4-1). 생산 LOT 의 패턴 문자열은 미정이다.",
+      "example": "0001234500000012002607310001230007"
      },
      "itemId": {
       "x-source-column": "item_id",

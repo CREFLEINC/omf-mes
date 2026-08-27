@@ -8005,7 +8005,7 @@
           "mdm"
         ],
         "summary": "단말 기능 구성 조회",
-        "description": "이 단말에서 어떤 공정의 무엇이 열려 있나. POP 셸이 화면을 그리기 전에 읽는다. 근거: W-CO-06 §5 · P-CO-01 §5-1",
+        "description": "이 단말에서 어떤 공정의 무엇이 열려 있나. POP 셸이 화면을 그리기 전에 읽는다. 근거: W-CO-06 §5 · P-CO-01 §5-1\n\n⭐ 0건이 정상인 단말이 있다 — 창고 전용 단말은 공정 행이 없다. 셸은 0건을 「전부 금지」로도 「전부 허용」으로도 읽지 않는다. 기능 구성 축이 이 단말에 걸리지 않는다는 뜻이고, 게이팅은 서버의 403 이 맡는다. 근거: 공유계약 F-1·F-5 · omf-mes#245",
         "parameters": [
           {
             "name": "terminalId",
@@ -17143,7 +17143,8 @@
         "required": [
           "processId"
         ],
-        "description": "이 단말에서 이 공정의 무엇을 열어 둘 것인가. ⭐ 이것은 «인증이 아니라 기능 구성»이다 — 오조작을 막는 것이지 보안 경계가 아니다. 보안 경계는 단말 토큰 하나뿐이다. 근거: P-CO-01 §5-1",
+        "description": "이 단말에서 이 공정의 무엇을 열어 둘 것인가. ⭐ 이것은 «인증이 아니라 기능 구성»이다 — 오조작을 막는 것이지 보안 경계가 아니다. 보안 경계는 단말 토큰 하나뿐이다. 근거: P-CO-01 §5-1\n\n⛔ 적용 범위 = 생산·품질 단말이다. 창고 전용 단말은 이 표에서 공정 행 0건으로 남는 것이 정상이다 — 게이팅해도 어느 단말에서 했는지 기록될 곳이 없다. 근거: 공유계약 F-1 · W-CO-06 §5-1",
+        "x-internal-note": "적용 범위 정정 경위 — 공유계약 F-1 은 v0.9(2026-08-06)에서 적용 범위를 「생산·품질 단말」로 정정했다. omf-mes#245 에서 P-01-01·P-01-02(창고 POP)가 이 정정보다 이틀 앞서 쓰여 반영을 못 받았던 것을 확인하고 정정했다.",
         "properties": {
           "processId": {
             "type": "integer",
@@ -17154,45 +17155,53 @@
             "type": "string",
             "example": "사출"
           },
-          "canScanIn": {
+          "canStartWork": {
+            "x-source-column": "can_start_work",
             "type": "boolean",
             "example": false,
-            "description": "입고 스캔을 이 단말에서 할 수 있나. 기본은 닫힘이다"
+            "description": "작업 시작을 이 단말에서 할 수 있나. 기본은 닫힘이다"
           },
-          "canScanOut": {
+          "canCompleteWork": {
+            "x-source-column": "can_complete_work",
             "type": "boolean",
             "example": false,
-            "description": "출고 스캔을 이 단말에서 할 수 있나. 기본은 닫힘이다"
+            "description": "작업 완료를 이 단말에서 할 수 있나. 기본은 닫힘이다"
           },
-          "canRegisterResult": {
+          "canInputMaterial": {
+            "x-source-column": "can_input_material",
             "type": "boolean",
             "example": false,
-            "description": "실적 등록을 이 단말에서 할 수 있나. 기본은 닫힘이다"
+            "description": "자재 투입을 이 단말에서 할 수 있나. 기본은 닫힘이다"
           },
-          "canInspect": {
+          "canInputResult": {
+            "x-source-column": "can_input_result",
+            "type": "boolean",
+            "example": false,
+            "description": "실적 입력을 이 단말에서 할 수 있나. 기본은 닫힘이다"
+          },
+          "canInputInspection": {
+            "x-source-column": "can_input_inspection",
             "type": "boolean",
             "example": false,
             "description": "검사 입력을 이 단말에서 할 수 있나. 기본은 닫힘이다"
           },
           "canPrintLabel": {
+            "x-source-column": "can_print_label",
             "type": "boolean",
             "example": false,
             "description": "라벨 발행을 이 단말에서 할 수 있나. 기본은 닫힘이다"
           },
-          "canMoveStock": {
+          "canCancelInput": {
+            "x-source-column": "can_cancel_input",
             "type": "boolean",
             "example": false,
-            "description": "재고 이동을 이 단말에서 할 수 있나. 기본은 닫힘이다"
+            "description": "투입 취소를 이 단말에서 할 수 있나. 기본은 닫힘이다"
           },
-          "canHold": {
+          "canReturnMaterial": {
+            "x-source-column": "can_return_material",
             "type": "boolean",
             "example": false,
-            "description": "작업 중단 등록을 이 단말에서 할 수 있나. 기본은 닫힘이다"
-          },
-          "canApprove": {
-            "type": "boolean",
-            "example": false,
-            "description": "현장 승인을 이 단말에서 할 수 있나. 기본은 닫힘이다"
+            "description": "자재 반납을 이 단말에서 할 수 있나. 기본은 닫힘이다"
           }
         }
       },
@@ -17222,35 +17231,43 @@
             "format": "int64",
             "example": 1001
           },
-          "canScanIn": {
+          "canStartWork": {
+            "x-source-column": "can_start_work",
             "type": "boolean",
             "example": false
           },
-          "canScanOut": {
+          "canCompleteWork": {
+            "x-source-column": "can_complete_work",
             "type": "boolean",
             "example": false
           },
-          "canRegisterResult": {
+          "canInputMaterial": {
+            "x-source-column": "can_input_material",
             "type": "boolean",
             "example": false
           },
-          "canInspect": {
+          "canInputResult": {
+            "x-source-column": "can_input_result",
+            "type": "boolean",
+            "example": false
+          },
+          "canInputInspection": {
+            "x-source-column": "can_input_inspection",
             "type": "boolean",
             "example": false
           },
           "canPrintLabel": {
+            "x-source-column": "can_print_label",
             "type": "boolean",
             "example": false
           },
-          "canMoveStock": {
+          "canCancelInput": {
+            "x-source-column": "can_cancel_input",
             "type": "boolean",
             "example": false
           },
-          "canHold": {
-            "type": "boolean",
-            "example": false
-          },
-          "canApprove": {
+          "canReturnMaterial": {
+            "x-source-column": "can_return_material",
             "type": "boolean",
             "example": false
           }
