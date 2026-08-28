@@ -1359,7 +1359,8 @@
        "type": "string",
        "format": "date-time",
        "example": "2026-08-13T10:22:00+09:00"
-      }
+      },
+      "description": "기간 필수 — 공유계약 L-3"
      },
      {
       "name": "openedTo",
@@ -1820,9 +1821,9 @@
      },
      "statusCode": {
       "type": "string",
-      "description": "의뢰 전 · 판정 대기 · 판정 완료. ⭐ 세 값짜리 진행 단계라 구간 형이 아니다 — 끝 시각의 부재로는 앞의 둘을 못 가른다",
-      "example": "SHIPPED",
-      "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 04 계약 1단계 §3"
+      "description": "의뢰 전 · 판정 대기 · 판정 완료. ⭐ 세 값짜리 진행 단계라 구간 형이 아니다 — 끝 시각의 부재로는 앞의 둘을 못 가른다. ⭐ 코드 문자열이 아직 확정되지 않아 예시를 못 박지 않는다(omf-mes#145). ⚠ 판정 진행은 이 값으로 가르지 않는다 — dispositionProgressCode 가 그 자리다",
+      "example": "값",
+      "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 04 계약 1단계 §3. 값 목록 확정 추적은 W-03-10 §8 이 갖는다."
      },
      "openedAt": {
       "type": "string",
@@ -1838,11 +1839,34 @@
       "description": "종료 시각. 개시보다 빠를 수 없다",
       "example": "2026-08-13T10:22:00+09:00"
      },
+     "affectedQtyTotal": {
+      "type": "number",
+      "format": "double",
+      "description": "대상 LOT 영향 수량 합(nonconformance_lot.affected_qty). ⭐ 서버가 센다 — 화면이 lots 를 순회해 더하지 않는다(공유계약 L-2). 근거: W-03-10 §4-A",
+      "example": 320.0
+     },
+     "uomId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "affectedQtyTotal 의 단위",
+      "example": 1001
+     },
+     "dispositionProgressCode": {
+      "type": "string",
+      "enum": [
+       "NOT_STARTED",
+       "PARTIAL",
+       "COMPLETED"
+      ],
+      "description": "⭐ W-03-10 ① 「판정 진행」 열의 판정 근거 — 대상 수량 합(04 nonconformance_lot)과 처분 결정 수량 합(03 품질 disposition-decisions)을 서버가 롤업해 하나로 낸다. NOT_STARTED=처분 결정 0건(「미판정」) · PARTIAL=결정이 있고 남은 수량 > 0(「⚠ 일부 판정」) · COMPLETED=남은 수량 0(「완료」). ⛔ 화면이 처분 결정을 세어 판정하지 않는다 — 03 계약과의 조인은 서버 몫이다. ⚠ statusCode 와 축이 다르다 — statusCode 의 「판정 대기」 한 값이 NOT_STARTED 와 PARTIAL 을 함께 담아 이 열을 대신할 수 없다. 근거: W-03-10 §4-A · omf-mes#253",
+      "example": "PARTIAL"
+     },
      "lots": {
       "type": "array",
       "items": {
        "$ref": "#/components/schemas/NonconformanceLot"
-      }
+      },
+      "description": "영향 LOT. 상세와 목록이 이 한 스키마를 공유하므로 필수로 둔다 — 상세(W-04-07 · W-03-10 ②)가 대상 LOT 표를 그리는 데 보장이 필요하다. ⛔ 목록의 「수량」 열은 이 배열을 세어 만들지 않는다 — affectedQtyTotal 이 그 자리다. 근거: W-03-10 §3 · §4-A · omf-mes#253"
      },
      "versionNo": {
       "type": "integer",
@@ -1856,9 +1880,13 @@
      "severityCode",
      "description",
      "statusCode",
-     "openedAt"
+     "openedAt",
+     "affectedQtyTotal",
+     "uomId",
+     "dispositionProgressCode",
+     "lots"
     ],
-    "description": "부적합. W-04-07 「부적합 등록」과 W-04-06 반품 등록이 만든다"
+    "description": "부적합. W-04-07 「부적합 등록」과 W-04-06 반품 등록이 만든다. 판정은 W-03-10 이 한다 — affectedQtyTotal·dispositionProgressCode 는 그 화면의 목록이 쓰는 서버 집계다"
    },
    "NonconformanceCreate": {
     "type": "object",
