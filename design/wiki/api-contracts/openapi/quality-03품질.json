@@ -2426,7 +2426,7 @@
       }
      }
     },
-    "x-internal-note": "409 는 둘이다 — 남은 수량을 넘겨 정하려 할 때, 그리고 이미 닫힌 부적합(status_code)일 때. 남은 수량 = nonconformance_lot.affected_qty 합 − 이 부적합의 decision_qty 합이고 서버가 판정한다(공유계약 L-2 — 잔액은 클라이언트가 계산하지 않는다). ⚠ disposition_type_code 값 목록은 미확정이다 — 2차 값 목록 제안안 대상. 토큰을 선택에서 필수로 조였다 — 이 화면은 관리웹 전용이고 오프라인 대상이 아니라(W-03-10 §6) IfMatchVersionOptional 의 완화 조건에 해당하지 않았다. 두 사람이 같은 부적합을 동시에 판정하는 경합을 이 토큰이 잡는다(W-03-03 §5-5 와 같은 형태). 근거: omf-mes#253"
+    "x-internal-note": "409 는 둘이다 — 남은 수량을 넘겨 정하려 할 때, 그리고 이미 닫힌 부적합(status_code)일 때. 남은 수량 = nonconformance_lot.affected_qty 합 − 이 부적합의 decision_qty 합이고 서버가 판정한다(공유계약 L-2 — 잔액은 클라이언트가 계산하지 않는다). ⚠ disposition_type_code 값 목록은 미확정이다 — 2차 값 목록 제안안 대상. 토큰을 선택에서 필수로 조였다 — 이 화면은 관리웹 전용이고 오프라인 대상이 아니라(W-03-10 §6) IfMatchVersionOptional 의 완화 조건에 해당하지 않았다. 두 사람이 같은 부적합을 동시에 판정하는 경합을 이 토큰이 잡는다(W-03-03 §5-5 와 같은 형태). ⭐ 토큰을 받는 곳은 부적합 상세다 — 04 제품출하 계약 GET /quality/nonconformances/{nonconformanceId} 의 ETag 를 그대로 담는다. 잠그는 대상은 처분 결정 한 건이 아니라 부적합이다(잔량이 부적합 단위로 정해지기 때문). ⚠ 그래서 판정 저장은 nonconformance.version_no 를 올려야 한다 — 올리지 않으면 이 토큰이 경합을 못 잡는다. 📨 데이터 모델 통지 대상이고 추적은 W-03-10 §8 이 갖는다. ⚠ 토큰 원천 검사기는 한 파일 안에서만 후보를 찾아 이 자리를 못 본다 — 원천이 다른 계약에 있는 첫 사례다. 근거: omf-mes#253"
    }
   },
   "/quality/inspection-results/{inspectionResultId}/measurement-summary": {
