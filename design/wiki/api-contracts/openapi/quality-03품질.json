@@ -665,7 +665,7 @@
      "quality"
     ],
     "summary": "검사 의뢰 한 건",
-    "description": "P-02-13 진입 시 기준 버전·대상 수량을 읽는다. 근거: P-02-13 §4-A",
+    "description": "P-02-13 진입 시 기준 버전·대상 수량을 읽는다. ⭐ 이 화면의 진입 인자는 inspectionRequestId 하나이고 화면 안에 대상 목록을 두지 않는다 — 인자가 없으면 「작업 화면에서 진입하세요」 안내만 그린다(P-02-13 §5-10). ⚠ 검사 대기 큐(GET /quality/inspection-requests 의 pendingOnly)는 W-01-01 의 것이다 — 이 화면이 부르지 않는다. 근거: P-02-13 §4-A·§5-10 · omf-mes#257",
     "parameters": [
      {
       "name": "inspectionRequestId",
@@ -3140,12 +3140,12 @@
      "booleanValue": {
       "type": "boolean",
       "example": true,
-      "description": "dataTypeCode=BOOLEAN 인 항목만 채운다. ⚠ 판정(judgmentCode)과 다른 축이다 — 이 칸은 «측정 결과»이고 판정은 그것을 보고 사람이 정한다(규격 밖이어도 자동 불합격이 아니다 · P-02-13 §6). 근거: omf-mes#179"
+      "description": "dataTypeCode=BOOLEAN 인 항목만 채운다. ⚠ 판정(judgmentCode)과 다른 축이다 — 이 칸은 «측정 결과»이고 판정은 그것을 보고 사람이 정한다. ⭐ 불리언 항목에는 상·하한이 없어 자동 판정이 설 수 없다 — 판정은 언제나 사람이 고른다(P-02-13 §5-11). 근거: omf-mes#179 · omf-mes#257"
      },
      "judgmentCode": {
       "type": "string",
       "example": "ACCEPTED",
-      "description": "항목별 측정치의 판정. ⛔ enum 으로 못박지 않는다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_MEASUREMENT_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격) «두 개»다. ⚠ 종합 판정과 그룹이 «다르다» — 항목 판정에는 「보류」가 없다. 보류는 검사 결과 수준의 개념이고(held_qty) 항목은 규격에 드는지 아닌지 둘뿐이다(P-02-13 §5 「항목 판정(합격/불합격)」). ⛔ 측정값이 규격 밖이어도 «자동 불합격이 아니다» — 표시하고 사람이 판정한다(P-02-13 §6). 근거: omf-mes#179"
+      "description": "항목별 측정치의 판정. ⛔ enum 으로 못박지 않는다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_MEASUREMENT_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격) «두 개»다. ⚠ 종합 판정과 그룹이 «다르다» — 항목 판정에는 「보류」가 없다. 보류는 검사 결과 수준의 개념이고(held_qty) 항목은 규격에 드는지 아닌지 둘뿐이다(P-02-13 §5 「항목 판정(합격/불합격)」). ⛔ 측정값이 규격 밖이어도 판정이 «확정»되지는 않는다 — 항목 규격의 automaticJudgment 가 참이고 데이터 유형이 NUMERIC 이며 상·하한 중 하나 이상이 있으면 화면이 이 칸을 «채운 채로» 시작하되 사람이 바꿀 수 있고, 그 밖의 경우에는 비운 채로 사람이 고른다(P-02-13 §5-11). ⛔ 종합 판정(overallJudgmentCode)은 어떤 경우에도 자동으로 내리지 않는다(P-02-13 §6). 근거: omf-mes#179 · omf-mes#257"
      },
      "measuredAt": {
       "type": "string",
@@ -3199,12 +3199,12 @@
      "booleanValue": {
       "type": "boolean",
       "example": true,
-      "description": "dataTypeCode=BOOLEAN 인 항목만 채운다. ⚠ 판정(judgmentCode)과 다른 축이다 — 이 칸은 «측정 결과»이고 판정은 그것을 보고 사람이 정한다(규격 밖이어도 자동 불합격이 아니다 · P-02-13 §6). 근거: omf-mes#179"
+      "description": "dataTypeCode=BOOLEAN 인 항목만 채운다. ⚠ 판정(judgmentCode)과 다른 축이다 — 이 칸은 «측정 결과»이고 판정은 그것을 보고 사람이 정한다. ⭐ 불리언 항목에는 상·하한이 없어 자동 판정이 설 수 없다 — 판정은 언제나 사람이 고른다(P-02-13 §5-11). 근거: omf-mes#179 · omf-mes#257"
      },
      "judgmentCode": {
       "type": "string",
       "example": "ACCEPTED",
-      "description": "항목별 측정치의 판정. ⛔ enum 으로 못박지 않는다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_MEASUREMENT_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격) «두 개»다. ⚠ 종합 판정과 그룹이 «다르다» — 항목 판정에는 「보류」가 없다. 보류는 검사 결과 수준의 개념이고(held_qty) 항목은 규격에 드는지 아닌지 둘뿐이다(P-02-13 §5 「항목 판정(합격/불합격)」). ⛔ 측정값이 규격 밖이어도 «자동 불합격이 아니다» — 표시하고 사람이 판정한다(P-02-13 §6). 근거: omf-mes#179"
+      "description": "항목별 측정치의 판정. ⛔ enum 으로 못박지 않는다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_MEASUREMENT_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격) «두 개»다. ⚠ 종합 판정과 그룹이 «다르다» — 항목 판정에는 「보류」가 없다. 보류는 검사 결과 수준의 개념이고(held_qty) 항목은 규격에 드는지 아닌지 둘뿐이다(P-02-13 §5 「항목 판정(합격/불합격)」). ⛔ 측정값이 규격 밖이어도 판정이 «확정»되지는 않는다 — 항목 규격의 automaticJudgment 가 참이고 데이터 유형이 NUMERIC 이며 상·하한 중 하나 이상이 있으면 화면이 이 칸을 «채운 채로» 시작하되 사람이 바꿀 수 있고, 그 밖의 경우에는 비운 채로 사람이 고른다(P-02-13 §5-11). ⛔ 종합 판정(overallJudgmentCode)은 어떤 경우에도 자동으로 내리지 않는다(P-02-13 §6). 근거: omf-mes#179 · omf-mes#257"
      },
      "measuredAt": {
       "type": "string",
@@ -3244,8 +3244,9 @@
       "example": "IQC"
      },
      "inspectionPlanVersionId": {
-      "type": "integer",
+      "type": ["integer", "null"],
       "format": "int64",
+      "description": "이 의뢰가 따르는 검사 기준 버전. ⚠ 비어 있을 수 있다 — 검사 기준이 등록되지 않은 상태에서도 검사를 진행한다는 고객 확정이 있어(2026-07-15), 기준 없이 만들어진 의뢰가 이 칸을 비운 채 온다. 비면 화면은 항목별 규격 표 대신 판정 선택과 자유 입력만 그린다(P-02-13 §5-2). ⛔ 비어 있음을 「값을 못 읽었다」와 같은 모양으로 그리지 않는다 — 공유계약 G-9. ⚠ IQC·OQC 의뢰는 서버가 언제나 채워 내린다(W-01-01 §4 · W-04-03 §4) — 그 두 화면은 비는 경우를 방어만 하면 된다. 근거: P-02-13 §5-2 · omf-mes#251",
       "example": 1001
      },
      "targetTypeCode": {
@@ -3321,7 +3322,6 @@
      "inspectionRequestId",
      "inspectionRequestNo",
      "inspectionTypeCode",
-     "inspectionPlanVersionId",
      "targetTypeCode",
      "targetId",
      "itemId",
@@ -3330,7 +3330,8 @@
      "statusCode",
      "requestedAt"
     ],
-    "description": "검사 의뢰. ⛔ 등록 경로를 두지 않는다 — 화면 7장에 「의뢰 등록」 버튼이 0건이고 P-02-13 §4-A 가 「대개 자동 생성」이라 한다. 서버가 입고·생산 실적에서 만든다."
+    "description": "검사 의뢰. ⛔ 등록 경로를 두지 않는다 — 화면 7장에 「의뢰 등록」 버튼이 0건이고 P-02-13 §4-A 가 「대개 자동 생성」이라 한다. 서버가 입고·생산 실적에서 만든다.",
+    "x-internal-note": "⚠ 물리 모델의 inspection_request.inspection_plan_version_id 는 아직 NOT NULL 이다. 계약을 화면대로 먼저 썼다 — schema/00-authoring-rules 규칙 2. 데이터 모델 담당 작업 통지 omf-mes#280. 소비자 3화면 P-02-13·W-01-01·W-04-03 · 근거 omf-mes#251"
    },
    "InspectionResult": {
     "type": "object",
@@ -3572,10 +3573,12 @@
       "type": "array",
       "items": {
        "$ref": "#/components/schemas/InspectionMeasurementInput"
-      }
+      },
+      "description": "항목별 측정치. ⭐ 필수가 아니다 — 검사 기준이 없는 의뢰(inspectionPlanVersionId 가 빈 의뢰)에는 항목 자체가 없으므로 이 배열을 생략하거나 빈 배열로 보낸다. 그때 검사는 수량 세 칸과 종합 판정, 그리고 remarks 의 자유 입력만으로 성립한다(P-02-13 §5-2). 근거: omf-mes#251"
      },
      "remarks": {
       "type": "string",
+      "description": "검사 비고. ⭐ 검사 기준이 없는 의뢰에서는 이 칸이 「자유 입력」의 자리다 — 항목별 규격이 없으므로 무엇을 어떻게 보았는지가 여기에만 남는다(P-02-13 §5-2). 기준이 있는 정상 갈래에서는 선택 입력이다. 근거: omf-mes#251",
       "example": "값"
      }
     },
