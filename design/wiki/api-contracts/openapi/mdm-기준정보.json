@@ -1679,6 +1679,14 @@
               "format": "int64"
             },
             "description": "필수. Rev 목록은 품목을 고른 뒤에 본다 — W-06-01 §3"
+          },
+          {
+            "name": "usableOnly",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "지금 새 작업지시에 걸 수 있는 개정만 낸다. 판정은 서버가 한다 — 화면은 상태 문자열을 알 필요가 없고 알아서도 안 된다(공유계약 G-8). 보내지 않으면 종전대로 전부 낸다 — Routing 관리 화면(W-06-01)은 폐기 개정까지 보여야 하므로 이 파라미터를 쓰지 않는다. 긴급 발행 화면(W-02-07)이 쓴다. 근거: W-02-07 §5-9 · omf-mes#259"
           }
         ],
         "responses": {
@@ -4094,6 +4102,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "usableOnly",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "지금 새 작업지시에 걸 수 있는 개정만 낸다. 판정은 서버가 한다 — 화면은 상태 문자열을 알 필요가 없고 알아서도 안 된다(공유계약 G-8). 보내지 않으면 종전대로 전부 낸다 — 자재 명세 헤더 목록(W-06-05)은 폐기 개정까지 보여야 하므로 이 파라미터를 쓰지 않는다. 긴급 발행 화면(W-02-07)이 쓴다. 근거: W-02-07 §5-9 · omf-mes#259"
           }
         ],
         "responses": {
@@ -12875,7 +12891,8 @@
             "type": "string",
             "maxLength": 50,
             "description": "공통코드 — 결정 07 이 작성중/확정/폐기 세 값으로 확정했다(코드 문자열 등록은 W-06-06 소관 §8-4). 이 값으로 화면이 편집 잠금을 판정한다(§5-4). 이 API 로는 직접 바꾸지 않고 :new-revision·:confirm·:obsolete 로만 전이한다",
-            "example": "ACTIVE"
+            "example": "값",
+            "x-internal-note": "example 이 'ACTIVE' 였다 — 결정 07 이 확정한 뜻은 작성중·확정·폐기 셋이고 그중 어느 것도 아니다. 공유계약 G-32 가 설비 자산 상태에서 같은 결함을 잡아 「사용 여부(is_active)와 수명주기에 같은 낱말을 쓰지 않는다」로 고쳤다(ACTIVE → IN_SERVICE·DISPOSED). 여기도 코드 문자열이 정해질 때까지 자리표시로 되돌린다 — 등록은 W-06-06 소관이고 폐기 전이 액션 이름 :obsolete 와 짝을 맞추는 것이 후보다. omf-mes#259 요청 밖 확인에서 드러났다."
           },
           "effectiveFrom": {
             "x-source-column": "effective_from",
@@ -14458,7 +14475,8 @@
             "type": "string",
             "maxLength": 50,
             "description": "공통코드 — 값 목록 미정. W-06-11 「작성중만 편집」 규칙의 판정 컬럼",
-            "example": "ACTIVE"
+            "example": "값",
+            "x-internal-note": "example 이 'ACTIVE' 였다 — 공유계약 G-32 가 설비 자산 상태에서 같은 결함을 잡아 「사용 여부(is_active)와 수명주기에 같은 낱말을 쓰지 않는다」로 고쳤다(ACTIVE → IN_SERVICE·DISPOSED). 여기도 코드 문자열이 정해질 때까지 자리표시로 되돌린다 — 등록은 W-06-06 소관이고 폐기 전이 액션 이름 :obsolete 와 짝을 맞추는 것이 후보다. omf-mes#259 요청 밖 확인에서 드러났다."
           },
           "isDefault": {
             "x-source-column": "is_default",

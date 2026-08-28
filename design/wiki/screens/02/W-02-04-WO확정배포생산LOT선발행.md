@@ -69,7 +69,7 @@
 | W/O 번호 | `work_order_no` | `business_no_t` | ✅ UNIQUE | | 자동 |
 | 공정 | `routing_operation_id` | FK → `routing_operation` | ✅ | Rev가 여기 걸린다 §5-2 | 자동 |
 | 품목 · 지시수량 | `item_id` · `order_qty` | FK · `qty_t` > 0 | ✅ | | 자동 |
-| 유형 | `work_order_type_code` | `code_t` 기본 `NORMAL` | ✅ | 긴급은 `P-02-12` | 자동 |
+| 유형 | `work_order_type_code` | `code_t` 기본 `NORMAL`(`EMERGENCY`·`REWORK`) | ✅ | ⚠ **긴급 W/O 는 `W-02-07` 이 발행하며 배포까지 그 화면이 한다** — 이 화면의 확정 대기 목록에는 오지 않는다. 배포에 실패한 긴급 W/O 도 `W-02-07` 이 이어받는다(§5-8) | 자동 |
 | **Rev 스냅샷** | `operation_settings_snapshot` | **jsonb** | — | ⚠ **확정 시 고정된다** §5-2 | 자동 |
 | 라인 · 설비 · 금형 · 교대 | `production_line_id` · `planned_equipment_id` · `planned_mold_id` · `planned_shift_id` | FK | — | `W-02-03`에서 배정 | 자동 |
 | 계획 시각 | `planned_start_at` · `planned_end_at` | timestamptz | — | | 자동 |
@@ -168,7 +168,7 @@ default_scrap_location_id    불량 위치
 
 **공유계약 B-8 적용.** ③이 부분 실패하면 슬롯 수가 계획과 어긋나고, ④가 빠지면 자재가 라인에 안 온다.
 
-> ⚠ **④는 「BOM 소요량 자동 산정」**인데 **긴급 W/O는 제외**된다(R29). `P-02-12`가 그 경로다.
+> ⚠ **④는 「BOM 소요량 자동 산정」**인데 **긴급 W/O는 제외**된다(R29). `P-02-12`가 그 경로다. ⛔ **긴급 W/O 제외(R29) — 계약에도 앉혔다.**
 
 ### §5-6. 「자동 배포」는 밀어내기가 아니다
 
