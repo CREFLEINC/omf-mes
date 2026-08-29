@@ -95,6 +95,7 @@ python3 design/schema/generators/verify-counts.py     ← 이 문서의 숫자�
 | 화면 수가 두 곳에서 같나 | `verify-screen-inventory.py` |
 | 화면 액션을 요구서가 다 다뤘나 | `verify-ui-coverage.py` → `verify-mapping-coverage.py --domain <도메인>` |
 | 생성물이 정본과 갈렸나 | `verify-generated-fresh.py` |
+| 폐기한 옛 표기가 아직 남아 있나 *(막지 않는다 — 회차 단위 ref 로 돌린다)* | `verify-stale-terms.py <기준 ref>` |
 | 요구서가 인용한 경로가 계약에 있나 | `verify-doc-citations.py` |
 | 계약이 가리킨 코드그룹 이름이 등록부에 있나 | `openapi/check-code-group-pointer.py` |
 | 계약의 오프라인 표기가 화면 판정과 같나 | `openapi/check-offline-consistency.py` |
@@ -107,6 +108,7 @@ python3 design/schema/generators/verify-counts.py     ← 이 문서의 숫자�
 | 저장 충돌 토큰을 받을 곳이 있나 | `openapi/check-lock-token-source.py` |
 | 값 목록이 좁아졌나 | `openapi/check-enum-narrowing.py` |
 | 확정되지 않은 업무 코드 | `openapi/count-undecided-codes.py` |
+| `example` 이 확정값 목록 밖인가 | `openapi/check-example-placeholder.py` |
 
 명령은 전부 `design/schema/generators/`(openapi 검사기는 그 아래 `openapi/`) 기준이다.
 

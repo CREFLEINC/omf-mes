@@ -1498,7 +1498,8 @@
               }
             }
           }
-        }
+        },
+        "x-envelope-exempt": "짝 목록의 «요약»이 아니라 targetIds 로 여러 대상을 한 번에 조회하는 «배치»다 — 발행한 적 없는 대상도 issueCount:0 으로 돌려주므로 목록의 필터 축(issuedFrom·lotId·printOutcome)이 뜻을 갖지 않는다."
       }
     },
     "/app/sessions": {

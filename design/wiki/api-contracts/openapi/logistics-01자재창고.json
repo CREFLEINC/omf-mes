@@ -3524,7 +3524,9 @@
      {
       "name": "supplierLotMissing",
       "in": "query",
-      "schema": { "type": "boolean" },
+      "schema": {
+       "type": "boolean"
+      },
       "description": "라인 중 supplier_lot_missing 이 이 값인 라인을 하나 이상 가진 건만. true = 미부착 건(MES 가 채번한다) · false = 사전부착 건. ⚠ 헤더 목록인데 판정은 라인 단위다 — 건 안에 두 종류가 섞여 있을 수 있으므로 라인을 고를 때 GET .../lines 의 같은 이름 필터를 함께 쓴다. 근거: P-01-01 §6"
      },
      {
@@ -3811,13 +3813,17 @@
      {
       "name": "supplierLotMissing",
       "in": "query",
-      "schema": { "type": "boolean" },
+      "schema": {
+       "type": "boolean"
+      },
       "description": "미부착 라인만 거른다. LOT 발번 단위가 라인이기 때문이다 — 한 건에 미부착 라인이 여럿이면 LOT 도 여럿이다. 근거: P-01-01 §4-B·§6"
      },
      {
       "name": "labelIssued",
       "in": "query",
-      "schema": { "type": "boolean" },
+      "schema": {
+       "type": "boolean"
+      },
       "description": "라벨이 발행된 라인을 뺄지. false 이면서 lotId 가 채워진 라인 = 「LOT 은 생겼는데 발행 기록이 없는」 상태다 — 화면은 그 라인에 「인쇄」만 보인다. 근거: P-01-01 §5-2·§6"
      }
     ],
@@ -4239,7 +4245,7 @@
      "logistics"
     ],
     "summary": "추가 자재 출고 요청 발행",
-    "description": "현장이 BOM 소요량 밖의 자재를 수동으로 요청한다. 라인 1건 이상이고 각 수량이 0 보다 커야 한다. BOM 밖 품목도 담을 수 있다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다(공유계약 C-9). 근거: W-02-10 §5-6",
+    "description": "현장이 BOM 소요량 밖의 자재를 수동으로 요청한다. 라인 1건 이상이고 각 수량이 0 보다 커야 한다. BOM 밖 품목도 담을 수 있다. ⛔ 오프라인 대상이 아니다 — 이 오퍼레이션을 부르는 추가 자재 출고 요청(W-02-10)은 관리웹이고, 관리웹 셸에는 오프라인이 없다(공유계약 C-5 · W-02-10 §1). Idempotency-Key 는 필수이나 오프라인 큐 때문이 아니라 재시도 중복을 막기 위해서다(C-8) — Idempotency-Key 는 필수이고 If-Match 는 선택이다(공유계약 C-9). 근거: W-02-10 §5-6",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -11218,7 +11224,10 @@
     "properties": {
      "numberSourceCode": {
       "type": "string",
-      "enum": ["SUPPLIER", "MES"],
+      "enum": [
+       "SUPPLIER",
+       "MES"
+      ],
       "description": "번호를 누가 매기는가. ⛔ 이 한 경로가 두 업무를 받으므로 화면이 반드시 밝힌다.\n\nSUPPLIER = 사전부착. 공급사가 MES 표준 양식대로 부여한 번호를 스캔해 수용한다. lotNo 가 필수이고, 같은 공장에 같은 번호가 있으면 400 이다 — 스캔값이 틀린 것이므로 사람이 고쳐야 풀린다.\n\nMES = 미부착. 서버가 채번한다. lotNo 를 주면 400 이다 — 빈 값이 조용히 서버 채번으로 흘러가는 것을 막기 위해 「안 준 것」과 「못 정한 것」을 가르지 않고 «누가 매기는가»를 직접 받는다(공유계약 G-9 의 계약 판).\n\n근거: MLOT #4(발번 경로 이원화 ✓확정 2026-07-20) · M-01-02 §5-1 · P-01-01 §1",
       "example": "SUPPLIER"
      },

@@ -193,7 +193,7 @@ def main() -> int:
                     ops.append((name, path, method, item[method], item))
 
     off_shape, bad_page = [], []                          # ①②  ⚠
-    query_gap, unpaired = [], []                          # ③    ⛔ / 목록
+    query_gap, unpaired, exempt = [], [], []               # ③    ⛔ / 목록 / 선언된 면제
     no_asof, banned = [], []                              # ④    ⚠ / ⛔
     sort_free, sort_style_odd = [], []                    # ⑤    ⚠ / ℹ
     unbounded, boundary = [], []                          # ⑥    ⚠ / ⛔
@@ -267,6 +267,14 @@ def main() -> int:
         sop = sitem.get("get")
         if not isinstance(sop, dict):
             continue
+        # ⛔ 「모집단이 애초에 다르다」고 계약이 «선언한» 자리는 대조 밖이다.
+        #    선례: /quality/defect-records/distribution — 원천이 검사 결과가 아니라
+        #    불량 레코드라 판정·최종회차·교정만료 축이 없다(omf-mes#192·#229 확정).
+        #    질의 축을 맞추면 그 확정을 뒤집는다.
+        #    ⚠ 검사기에 목록을 박지 않는다 — 계약이 x-envelope-exempt 로 사유를 적는다.
+        if sop.get("x-envelope-exempt"):
+            exempt.append((sname, path, str(sop["x-envelope-exempt"])))
+            continue
         pair = pair_path(path)
         if pair is None or pair not in merged:
             unpaired.append((sname, path, "짝을 기계로 못 찾음" if pair is None
@@ -310,6 +318,12 @@ def main() -> int:
             if only_sum:
                 print("   %-26s   요약에만: %s" % ("", " · ".join(only_sum)))
         print("\n   ⭐ 목록에 질의를 더할 때 짝을 «같은 판»에서 고친다.\n")
+    if exempt:
+        print("ℹ  ③ 계약이 «모집단이 다르다»를 선언해 대조 밖인 경로 %d건" % len(exempt))
+        for sname, path, why in exempt:
+            print("   %-28s %-46s %s" % (sname[:28], path[:46], why[:70]))
+        print()
+
     if unpaired:
         print("ℹ  ③ 짝을 기계로 못 찾은 요약 전용 경로 %d건 (대조 밖 · 사람이 본다)"
               % len(unpaired))

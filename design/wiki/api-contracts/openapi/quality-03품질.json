@@ -373,7 +373,8 @@
        }
       }
      }
-    }
+    },
+    "x-envelope-exempt": "모집단이 다르다 — 이 뷰는 검사 결과가 아니라 «불량 레코드»를 센다. 판정·최종회차·교정만료 축이 애초에 없다(omf-mes#192·#229 확정 · W-03-05 §5-2). 질의 축을 맞추면 그 확정을 뒤집는다."
    }
   },
   "/quality/disposition-decisions": {
@@ -1161,6 +1162,23 @@
        ]
       },
       "description": "교정 만료 장비 측정분만 보거나 뺀다. ⛔ 기본은 섞어서 낸다 — 자동 제외는 정책이 미정이다(E-9 ①)"
+     },
+     {
+      "name": "inspectionRequestId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "statusCode",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "example": "값"
+      }
      }
     ],
     "responses": {
@@ -2109,9 +2127,9 @@
       "schema": {
        "type": "string",
        "format": "date-time",
-       "example": "2026-08-06T23:59:59+09:00"
+       "example": "2026-08-07T00:00:00+09:00"
       },
-      "description": "기간 끝. transitionFrom 과 한 쌍이다. 근거: W-03-01 §5-7 · omf-mes#225"
+      "description": "기간 끝. transitionFrom 과 한 쌍이다. 근거: W-03-01 §5-7 · omf-mes#225 ⛔ 끝 경계는 «미만»이다(반열림 · 공유계약 L-3-1) — 「그날까지」는 23:59:59 가 아니라 «익일 00:00:00» 을 보낸다. 23:59:59 로 보내면 그 1초 안의 기록이 빠진다"
      }
     ],
     "responses": {
@@ -2260,9 +2278,9 @@
       "schema": {
        "type": "string",
        "format": "date-time",
-       "example": "2026-08-06T23:59:59+09:00"
+       "example": "2026-08-07T00:00:00+09:00"
       },
-      "description": "기간 끝. transitionFrom 과 한 쌍이다. 근거: W-03-02 §3 · omf-mes#225"
+      "description": "기간 끝. transitionFrom 과 한 쌍이다. 근거: W-03-02 §3 · omf-mes#225 ⛔ 끝 경계는 «미만»이다(반열림 · 공유계약 L-3-1) — 「그날까지」는 23:59:59 가 아니라 «익일 00:00:00» 을 보낸다. 23:59:59 로 보내면 그 1초 안의 기록이 빠진다"
      },
      {
       "name": "q",

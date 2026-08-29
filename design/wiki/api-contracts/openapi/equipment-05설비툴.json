@@ -2077,7 +2077,8 @@
        }
       }
      }
-    }
+    },
+    "x-envelope-exempt": "집계 축(groupBy·bucket)을 갖는 뷰라 목록과 질의 축이 다르다 — 끝나지 않은 구간·겹친 구간은 건수만 내고 목록을 담지 않으므로(openOnly·overlappingOnly) 그 축이 요약에 뜻이 없다."
    }
   },
   "/maintenance/tool-usages": {

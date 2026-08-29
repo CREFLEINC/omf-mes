@@ -150,7 +150,7 @@ def main() -> int:
     fix = "--fix" in sys.argv
     exact, prefixes = load_map()
 
-    fixable = collections.defaultdict(list)   # 파일 → [(구, 신)]
+    fixable = collections.defaultdict(list)   # 파일 → [(줄번호, 구, 신)]
     generated = collections.defaultdict(list)  # 생성물 → [(구, 신)] · --fix 대상 밖
     kept = collections.Counter()              # 예외 사유 → 건수
     unmapped = collections.Counter()          # 구경로 → 건수
@@ -178,7 +178,7 @@ def main() -> int:
             if rel.startswith(GENERATED_DIRS):
                 generated[rel].append((cited, new))
             else:
-                fixable[rel].append((cited, new))
+                fixable[rel].append((no, cited, new))
 
     n_fix = sum(len(v) for v in fixable.values())
 
@@ -224,7 +224,7 @@ def main() -> int:
 
     print("⛔ 치환 가능한 죽은 인용 %d건 · 파일 %d개" % (n_fix, len(fixable)))
     for rel in sorted(fixable):
-        pairs = collections.Counter(fixable[rel])
+        pairs = collections.Counter((old, new) for _no, old, new in fixable[rel])
         print("   %s — %d건" % (rel, sum(pairs.values())))
         for (old, new), n in sorted(pairs.items()):
             print("      %-52s → %-52s %d" % (old[:52], new[:52], n))
@@ -239,16 +239,27 @@ def main() -> int:
     for rel in sorted(fixable):
         path = os.path.join(ROOT, rel)
         with io.open(path, encoding="utf-8") as fh:
-            text = fh.read()
-        before = text
-        for old, new in sorted(set(fixable[rel]), key=lambda p: -len(p[0])):
-            text = text.replace(old, new)
-        if text != before:
+            lines = fh.readlines()
+        # ⛔ 파일 전체 str.replace 를 쓰지 않는다 — 스캔의 «경계»(CITE 의 뒤돌아보기)와
+        #    «예외»(출처 꼬리표·변경 이력)가 둘 다 무시돼 이미 옮긴 경로를 다시 옮기고
+        #    보존해야 할 이력까지 다시 쓴다. 2026-08-29 에 실제로 중첩 경로 18건이 났다.
+        #    스캔이 이미 (줄번호, 구, 신) 을 냈으므로 «그 줄에서만» CITE.sub 로 바꾼다.
+        table = {old: new for _no, old, new in fixable[rel]}
+        touched = sorted({no for no, _o, _n in fixable[rel]})
+        hit = 0
+        for no in touched:
+            src = lines[no - 1]
+            out = CITE.sub(lambda m: table.get(m.group(0), m.group(0)), src)
+            if out != src:
+                lines[no - 1] = out
+                hit += 1
+        if hit:
             with io.open(path, "w", encoding="utf-8") as fh:
-                fh.write(text)
+                fh.writelines(lines)
             changed += 1
     print("\n✅ --fix — 파일 %d개를 고쳤습니다. ⛔ git diff 를 훑고 커밋하세요." % changed)
-    print("   ⚠ 예외(출처 꼬리표·변경 이력)와 미등재·와일드카드는 손대지 않았습니다.")
+    print("   ⚠ 예외(출처 꼬리표·변경 이력)와 미등재·와일드카드는 손대지 않았습니다 — \n"
+          "      스캔이 판정한 줄에서만 CITE.sub 로 바꾸므로 경계와 예외가 함께 지켜집니다.")
     return 0
 
 

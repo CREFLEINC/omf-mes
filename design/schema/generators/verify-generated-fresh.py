@@ -53,6 +53,7 @@
 """
 from __future__ import annotations
 
+import filecmp
 import argparse
 import importlib
 import os
@@ -122,9 +123,15 @@ def check_html() -> int:
                 bak = os.path.join(keep, "%02d.bak" % i)
                 shutil.copy2(dst, bak)
                 saved[dst] = bak
-                subprocess.run(cmd, cwd=HERE, check=True,
-                               stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-                if open(dst, "rb").read() != open(bak, "rb").read():
+                try:
+                    subprocess.run(cmd, cwd=HERE, check=True,
+                                   stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+                except subprocess.CalledProcessError as e:
+                    # ⛔ 기본 메시지는 stderr 를 담지 않는다 — 「returned non-zero exit
+                    #    status 1」만 남으면 생성기가 왜 깨졌는지 알 수 없다.
+                    sys.stderr.write((e.stderr or b"").decode("utf-8", "replace"))
+                    raise SystemExit("⛔ 생성기가 실패했습니다: %s" % " ".join(cmd))
+                if not filecmp.cmp(dst, bak, shallow=False):
                     stale.append(dst)
                     print("⛔ 배포본이 낡았다 — %s  (원본 %s)"
                           % (os.path.relpath(dst, _DOC.ROOT), os.path.basename(src)))
@@ -146,8 +153,12 @@ def regenerate(domain: str) -> None:
     cmd = [sys.executable, GENERATOR]
     if domain != "mdm":  # mdm 은 생성기의 기본값이라 --domain 을 주지 않는다
         cmd += ["--domain", domain]
-    subprocess.run(cmd, cwd=HERE, check=True,
-                   stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+    try:
+        subprocess.run(cmd, cwd=HERE, check=True,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+    except subprocess.CalledProcessError as e:
+        sys.stderr.write((e.stderr or b"").decode("utf-8", "replace"))
+        raise SystemExit("⛔ 배포본 생성기가 실패했습니다: %s" % " ".join(cmd))
 
 
 def main() -> int:
@@ -156,6 +167,11 @@ def main() -> int:
     ap.add_argument("--kind", choices=("md", "html"),
                     help="생략하면 둘 다 — md=ui-요구목록 9건 · html=배포본 9건")
     args = ap.parse_args()
+    # ⛔ --kind html 은 도메인 개념이 없다. 둘을 함께 주면 md 축도 html 축도 돌지 않아
+    #    «아무것도 검사하지 않고 EXIT=0» 이 난다 — 이 저장소가 O-1 에서 겪은 거짓 초록과
+    #    같은 형태다(PR #288 리뷰 지적).
+    if args.domain and args.kind == "html":
+        ap.error("--domain 은 md 축(ui-요구목록) 개념입니다 — html 배포본에는 도메인이 없습니다.")
 
     run_md = args.kind in (None, "md")
     run_html = args.kind in (None, "html") and not args.domain   # --domain 은 md 축 개념

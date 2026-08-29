@@ -75,6 +75,16 @@ sys.path.insert(0, GEN)
 _MC = importlib.import_module("verify-mapping-coverage")
 
 MARK = "오프라인 대상 오퍼레이션이다"
+# ⛔ 「…」 안에 든 것은 «인용»이지 표기가 아니다. 2026-08-29 PR #288 리뷰에서 드러났다 —
+#    /production/operation-handovers 는 description 이 이미 「⛔ 오프라인 대상이 아니다」
+#    인데, x-internal-note 가 client#102 근거를 옮겨 적으며 상용구를 「」 안에 인용했고
+#    검사기가 그것을 표기로 세어 위반으로 냈다(오탐).
+QUOTED_MARK = "「" + MARK + "」"
+
+
+def marked(text: str) -> bool:
+    """상용구가 «표기»로 쓰였나 — 인용은 세지 않는다."""
+    return MARK in text.replace(QUOTED_MARK, "")
 OPTIONAL_LOCK = "IfMatchVersionOptional"
 HTTP_METHODS = ("get", "post", "put", "patch", "delete", "head", "options")
 
@@ -109,7 +119,7 @@ def contract_ops():
                         if isinstance(p, dict)}
                 out[(norm(path), method.upper())] = {
                     "file": name, "path": path,
-                    "marked": MARK in text,
+                    "marked": marked(text),
                     "relaxed": OPTIONAL_LOCK in refs,
                 }
     return out
