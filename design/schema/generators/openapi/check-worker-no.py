@@ -34,13 +34,15 @@
   - 사번 값이 **맞는 사람인지** — 계약이 답할 수 있는 물음이 아니다(도용 리스크
     수용, 공유계약 D-1). 검사기는 «받을 자리»가 있는지만 본다
   - 관리웹 전용 오퍼레이션의 헤더 선언 — **막지 않고 알리기만** 한다
+  - 요구서가 **한글 자리표시**로 여러 리소스를 접어 적은 줄(`/logistics/{문서}/…`) — 경로가 잘린 채 잡힌다
+  - **`…` 로 앞을 줄인 경로**(`POST …:report-print`) — 못 본다. ⛔ #178 이 `:report-print` 를 놓친 자리가 여기다
 
 ⇒ 그래서 이 수치는 **하한**이다. 「전부 덮었다」가 아니라 「여기까지는 덮었다」.
 
 쓰기
 ----
-    python3 deliverables/openapi/check-worker-no.py
-    python3 deliverables/openapi/check-worker-no.py --list   실측 목록만 찍는다
+    python3 design/schema/generators/openapi/check-worker-no.py
+    python3 design/schema/generators/openapi/check-worker-no.py --list   실측 목록만 찍는다
 """
 from __future__ import annotations
 
@@ -105,11 +107,13 @@ def scope(real: dict) -> tuple[dict, dict]:
             raw = raw.rstrip(".,·")
             key = norm(raw)
             if key not in real:
-                unresolved[raw].update(ids)
+                if field:
+                    unresolved[raw].update(ids)
                 continue
             fname, path, methods = real[key]
             if method not in methods:
-                unresolved["%s %s" % (method, path)].update(ids)
+                if field:
+                    unresolved["%s %s" % (method, path)].update(ids)
                 continue
             op = (fname, path, method)
             calls[op]["field"] |= field

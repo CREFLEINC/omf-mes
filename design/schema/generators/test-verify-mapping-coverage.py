@@ -121,6 +121,29 @@ class RealArtifactTest(unittest.TestCase):
         cov = importlib.import_module("verify-ui-coverage")
         self.assertEqual(sorted(mc.DOMAINS), sorted(cov.DOMAINS))
 
+    def test_인자_없이_부르면_전_도메인을_본다(self):
+        # ⛔ 거짓 초록 잠금 — 2026-08-29 이전에는 mdm 하나만 보고 EXIT=0 을 냈다.
+        #    한 도메인만 보는 코드로 되돌아가면 이 테스트가 깨진다(O-1).
+        called = []
+        real_check, real_argv = mc.check, sys.argv
+        try:
+            mc.check = lambda domain: called.append(domain) or 0
+            sys.argv = ["verify-mapping-coverage.py"]
+            self.assertEqual(mc.main(), 0)
+        finally:
+            mc.check, sys.argv = real_check, real_argv
+        self.assertEqual(len(called), len(mc.DOMAINS))
+        self.assertEqual(sorted(called), sorted(mc.DOMAINS))
+
+    def test_한_도메인이_결손이면_전체가_결손이다(self):
+        real_check, real_argv = mc.check, sys.argv
+        try:
+            mc.check = lambda domain: 1 if domain == sorted(mc.DOMAINS)[0] else 0
+            sys.argv = ["verify-mapping-coverage.py"]
+            self.assertEqual(mc.main(), 1)
+        finally:
+            mc.check, sys.argv = real_check, real_argv
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
