@@ -28,8 +28,8 @@ python3 design/schema/generators/verify-counts.py     ← 이 문서의 숫자�
 | **Ⅰ** | **이 기능이 왜 있나** — 고객이 무엇을 요구했나 | [요구사항명세서](requirements/00-요구사항명세서.md) | 요구 47건 · 추적성 47행 |
 | **Ⅱ** | **어떤 구조 위에 만드나** — 어느 단말에서 도나 | [SW 설계사양서](project-spec/02-SW설계사양서.md) · [HW 구성안](project-spec/03-HW구성안.md) | 제약 C1~C11 · 프로그램 3종 · ⛔ HW 는 미확정 |
 | **Ⅲ** | **왜 그렇게 정해졌나** — 만들 때 무슨 규약을 지키나 | ⭐ [**의사결정·정책**](decisions-policy/00-index.md) *(표지)* | 결정 대장 **142행** · 의사결정 요청서 **13건** · 조항 **155** |
-| **Ⅳ** | **이 화면이 무엇을 보이고 무엇을 저장하나** | [통합 정보구조](project-spec/04-통합-IA.md) · [사용자 프로세스](project-spec/05-사용자-프로세스-태스크플로우.md) · [화면 상세 스펙](screens/) | 화면 **117** · 상세 스펙 **118장** |
-| **Ⅴ** | **서버와 무슨 말을 주고받나** | ⭐ [**API 계약서**](api-contracts/09-API-계약서.md) *(표지)* | 계약 **7파일** · 경로 **309** · 오퍼레이션 **437** · 스키마 **464** · 요구서 **9장** |
+| **Ⅳ** | **이 화면이 무엇을 보이고 무엇을 저장하나** | [통합 정보구조](project-spec/04-통합-IA.md) · [사용자 프로세스](project-spec/05-사용자-프로세스-태스크플로우.md) · [화면 상세 스펙](screens/) | 화면 **117** · 상세 스펙 **118장**(폐지본 `W-06-13` 1장 포함 — `W-06-02` 로 통합됐고 폐지 근거로 남겼다) |
+| **Ⅴ** | **서버와 무슨 말을 주고받나** | ⭐ [**API 계약서**](api-contracts/09-API-계약서.md) *(표지)* | 계약 **7파일** · 경로 **335** · 오퍼레이션 **466** · 스키마 **485** · 요구서 **9장** |
 
 | | 무엇 | 왜 |
 | :-: | --- | --- |
@@ -96,6 +96,10 @@ python3 design/schema/generators/verify-counts.py     ← 이 문서의 숫자�
 | 화면 액션을 요구서가 다 다뤘나 | `verify-ui-coverage.py` → `verify-mapping-coverage.py --domain <도메인>` |
 | 생성물이 정본과 갈렸나 | `verify-generated-fresh.py` |
 | 요구서가 인용한 경로가 계약에 있나 | `verify-doc-citations.py` |
+| 계약이 가리킨 코드그룹 이름이 등록부에 있나 | `openapi/check-code-group-pointer.py` |
+| 계약의 오프라인 표기가 화면 판정과 같나 | `openapi/check-offline-consistency.py` |
+| 목록·요약 응답이 표준형인가 | `openapi/check-query-envelope.py` |
+| 정본 본문이 구조 삭제 전 경로를 인용하나 | `check-dead-path-citations.py` |
 | 결정 대장이 몇 행인가 | `count-decisions.py --check` |
 | 미결이 스펙과 갈렸나 | `collect-open-items.py --check` |
 | **계약이 계약으로 성립하나** | `openapi/check-structure.py` |

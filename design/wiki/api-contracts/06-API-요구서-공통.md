@@ -6,7 +6,7 @@
 | 작성일 | 2026-08-13 |
 | 계약 | `deliverables/openapi/app-공통.json`(경로 31) · `deliverables/openapi/mdm-기준정보.json`(경로 85) |
 | 대상 화면 | **10장** — `W-CO-01`·`W-CO-03`·`W-CO-04`·`W-CO-05`·`W-CO-06`·`W-CO-08`·`W-CO-10`·`W-CO-11`·`M-CO-01`·`P-CO-01` |
-| 설계 근거 | `uiux/2026-08-13-API스펙-공통/00-설계.md` |
+| 설계 근거 | `design/raw/process/uiux/2026-08-13-API스펙-공통/00-설계.md` |
 
 ---
 
@@ -26,9 +26,9 @@ POP·모바일 셸            ⛔ 없음 (apps/web 하나)
 
 | 층 | 무엇을 묻나 | 수단 | 어디에 |
 | --- | --- | --- | --- |
-| **인증** | 우리가 설치한 단말·계정에서 온 요청인가 | 단말 토큰 / 로그인 세션 | `:issue-token` · `/app/sessions` |
-| **기능 구성** | 이 단말에 이 기능을 열어 둘 것인가 | 8플래그 | `/mdm/terminals/{id}/processes` |
-| **귀속** | 누가 한 일로 기록할 것인가 | 사번 | ⛔ **경로를 만들지 않았다** — 작업자 조회로 족하다 |
+| **인증** | 우리가 설치한 단말·계정에서 온 요청인가 | 단말 토큰 = `Authorization: Bearer` (계약 `securitySchemes.terminalToken`) / 관리웹 로그인 세션 = ⚠ **운반 수단 미확정**(F-2 · §I-3) | `:issue-token` · `/app/sessions` |
+| **기능 구성** | 이 단말/이 사람에게 이 기능을 열어 둘 것인가 | 현장 8플래그 · 관리웹 권한 코드 | `/mdm/terminals/{id}/processes`(현장·모바일) · **`GET /app/sessions/current` 의 `permissions`(관리웹 기능 권한)** |
+| **귀속** | 누가 한 일로 기록할 것인가 | 사번(`X-Worker-No` 헤더) | ⛔ **전용 경로를 만들지 않았다** — 작업자 조회로 족하다. ⚠ 다만 쓰기 오퍼레이션은 이 헤더를 받는 자리를 «선언»해야 한다 — 공지 확인(`:acknowledge`)과 인쇄 결과 보고(`:report-print`)가 그 예다 |
 
 ⛔ **POP-사번-경량-인증(`P-CO-01`)은 인증 화면이 아니다.** 셋째 층만 한다 — 단말은 이미 토큰으로 통과한 상태다. 그래서 **사번 세션을 만들지 않는다.**
 
@@ -59,7 +59,7 @@ POP·모바일 셸            ⛔ 없음 (apps/web 하나)
 | 화면 액션 | 엔드포인트 | 근거 |
 | --- | --- | --- |
 | 로그인 | `POST /app/sessions` | §5-4 |
-| 로그인 후 권한 범위 확인 | `GET /app/sessions/current` — 사업부·공장 두 축 | §5-3 |
+| 로그인 후 권한 범위 확인 | `GET /app/sessions/current` — **데이터 범위**는 `scopes`(사업부·공장 두 축) · **기능 권한**은 `permissions`(코드 배열) | §5-3 · F-2 |
 | 로그아웃 | `DELETE /app/sessions/current` | §5-4 |
 | 언어 전환 | **API 불필요** — 단말 로컬 | §5-4 |
 
@@ -82,7 +82,7 @@ POP·모바일 셸            ⛔ 없음 (apps/web 하나)
 | 화면 액션 | 엔드포인트 | 근거 |
 | --- | --- | --- |
 | 숫자 입력·지움·백스페이스 | **API 불필요** — 화면 안의 입력이다. ⛔ **자릿수를 강제하지 않는다** | §5-2 |
-| 확인 · 사번 확인 | **기준정보 계약** `GET /mdm/workers?q=` | §5-2 |
+| 확인 · 사번 확인 | **기준정보 계약** `GET /mdm/workers?workerNo=<사번>&includeInactive=true` — 정확 일치이며 0건 또는 1건이다. 퇴사자와 미등록을 가르려면 `includeInactive` 를 켠다 | §5-2 |
 | 단말 정보 표시 | **기준정보 계약** `GET /mdm/terminals/{terminalId}` | §5-8 |
 | 교대(사번 바꾸기) | **API 불필요** — 단말이 들고 있는 값을 바꾼다. **세션을 만들지 않는다** | §5-4 |
 | 작업 화면으로 → | **API 불필요** — 화면 전이다 | §5-4 |
@@ -97,7 +97,7 @@ POP·모바일 셸            ⛔ 없음 (apps/web 하나)
 | QR 스캔(등록) | ⭐ **API 불필요** — 관리웹이 발급한 토큰을 **읽기만** 한다 | §5-2 B안 |
 | 등록 코드 직접 입력 | ⛔ **없음 — 채택하지 않은 안.** 스캔 실패 대비로 검토했으나 **토큰을 손으로 옮겨 적게 되어** 스캔만 남겼다 | §5-2 C안 |
 | (관리웹 쪽) 등록 토큰 발급 | **기준정보 계약** `POST /mdm/terminals/{terminalId}:issue-token` | §5-2 |
-| 숫자 입력·확인 · 사번 확인 | **기준정보 계약** `GET /mdm/workers?q=` | §5-8 |
+| 숫자 입력·확인 · 사번 확인 | **기준정보 계약** `GET /mdm/workers?workerNo=<사번>&includeInactive=true` — 정확 일치이며 0건 또는 1건이다. 퇴사자와 미등록을 가르려면 `includeInactive` 를 켠다 | §5-8 |
 | 교대(사번 바꾸기) | **API 불필요** — 단말이 들고 있는 사번을 바꾼다. **세션을 만들지 않는다** | §5-4 |
 | 작업 목록으로 → | **API 불필요** — 화면 전이다 | §5-4 |
 | 언어 전환 · 스캐너 준비 상태 | ⛔ **저장하지 않는 것이 맞다** — 언어는 **공용 장비**라 기기별 설정이고(§5-3), 스캐너는 **일체형이라 저장할 연결 상태 자체가 없다**(§5-4 · omf-mes-client#442) | §5-3·§5-4 |
@@ -116,8 +116,10 @@ POP·모바일 셸            ⛔ 없음 (apps/web 하나)
 | 모두 읽음 | `POST /app/notifications:read-all` | §5 |
 | 셸 종 배지 | `GET /app/notifications/unread-count` | §8-4 |
 | 대상으로 이동 | **API 불필요** — 대상 유형·번호로 화면 전이 | §5 · A-10 |
+| 유형 필터 선택지 · 항목 제목 표기 | `GET /app/notification-events` — `eventCode` → `eventName` | §5-1 · §8-3 |
+| 알람 위치(계층 텍스트) | 같은 응답의 `locationPath` — 통합 대시보드(`W-CO-05`)가 둘째 줄로 그린다 | §5-1 · DR-004 4-A |
 
-- ⭐ **대상 유형에 대응표를 달았다** — `LOT` → 자재 묶음 · `WORK_ORDER` → 작업지시 · `NONCONFORMANCE` → 부적합 · `APPROVAL_REQUEST` → 승인 요청. **대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다** — 어디로 갈지 모르기 때문이다.
+- ⭐ **대상 유형 대응표를 화면 §5-1 의 이벤트 6종에 맞췄다**(2026-08-29) — 설비 고장 · 적정타수 초과 · 검교정 만료 임박 · P/O 변경 수신 · 연계 실패 · 승인 요청·결재 도착. 옛 4값(`LOT`·`WORK_ORDER`·`NONCONFORMANCE`·`APPROVAL_REQUEST`)은 지우지 않고 남겼다 — 겹치는 것은 승인 요청 하나뿐이었다. **대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다** — 어디로 갈지 모르기 때문이다. ⚠ 어느 화면을 열지는 이제 서버가 응답의 `screenId`·`openable` 로 내려 준다 — 프런트가 표를 갖지 않는다.
 - **기간을 필수로 받는다** — 알림은 계속 쌓여 범위 없이 열면 목록이 끝나지 않는다.
 
 ### 3-6. `W-CO-11` 알람 수신자 설정 *(관리웹)*
@@ -125,9 +127,12 @@ POP·모바일 셸            ⛔ 없음 (apps/web 하나)
 | 화면 액션 | 엔드포인트 | 근거 |
 | --- | --- | --- |
 | 이벤트 선택 | `GET /app/notification-events` — 목록에서 고른다 | §8-3 |
-| 수신자 조회 | `GET /app/notification-subscriptions?eventCode=` | §5 |
+| 수신자 조회 | `GET /app/notification-subscriptions?eventCode=` — ⚠ **저장 직전 잠금 토큰은 `?eventCode=` 를 붙인 조회에서만 온다** | §5 |
 | 조직×역할 추가 · 개인 추가 · 해제 · 저장 | `PUT /app/notification-subscriptions` — **이벤트 단위 치환** | §5 |
 | Zalo 토글 | ⛔ **없음 — 선행 미결.** 채널을 켜도 **보낼 곳이 없다** — 수신처를 담을 자리가 사용자 정보에 없다. 화면은 토글을 그리고 그 사실을 함께 보인다 | §5 · 아래 주 |
+| 이벤트별 수신자 수 표시 | `GET /app/notification-subscriptions`(`eventCode` 생략) 응답 `recipients` 의 길이 | §4 · G-12 |
+| 지금 받는 사람 미리보기 | `POST /app/notification-subscriptions/recipients:preview` — 저장 «전» 규칙을 본문에 실어 보낸다 | §5-3 · B-17 보완 |
+| 이벤트 목록의 정본·발생 지점 | `GET /app/notification-events` — 목록도 「무엇이 일어나면 나는가」도 계약이 갖는다(마스터가 아니다). ⛔ 발생 지점 표는 아직 비어 있고 검교정 만료 임박 한 행은 트리거 자체가 미확정이다 | §5-1 · DR-003 3-B·3-C |
 
 - ⭐ **이벤트 목록의 정본은 계약이다.** 공통코드 마스터에 두면 편집 가능해지고, **코드가 바뀌면 보내는 쪽이 조용히 깨진다.**
 - ⚠ **알림 채널 토글을 켜도 보낼 곳이 아직 없다** — 수신처(전화번호)를 담을 자리가 사용자 정보에 없다. 화면이 그 사실을 보인다.
@@ -143,9 +148,12 @@ POP·모바일 셸            ⛔ 없음 (apps/web 하나)
 | 종료일 당기기 | `POST …/{id}:close` | §5 |
 | 확인 | `POST …/{id}:acknowledge` | §5 |
 | 미확인자 보기 | `GET …/{id}/acknowledgements?pendingOnly=true` | §5 |
+| 범위 선택(전사 / 작업지시) | `POST`·`PUT` 본문의 `scopeCode`·`targetWorkOrderId` · 목록 필터는 `GET /app/notices?scopeCode=` | §5-A · B-24 |
+| 대상 작업지시 검색 | **02 생산실행 계약** `GET /production/work-orders` — 소관 이동 | §5-A |
 
 - ⛔ **게시된 공지에 수정이 오면 409 다.** 본문을 고치면 **이미 확인한 사람이 다른 것을 본 것**이 되고, 확인 이력이 무엇에 대한 확인인지 알 수 없어진다.
 - **종료는 지우는 것이 아니라 종료일을 당기는 것**이다 — 확인 이력이 남아야 한다.
+- ⚠ **기간은 선택이다** — 기간 필수 규약은 원장·파티션 테이블 조항이라 공지에 걸지 않는다(§5-4). 알림(`GET /app/notifications`)은 필수라 **두 자리가 다르다**. 질의는 `overlapFrom`·`overlapTo` 이고 «겹침» 기준이다.
 
 ### 3-8. `W-CO-06` 단말기-공정 매핑 설정 *(관리웹)*
 
@@ -157,7 +165,7 @@ POP·모바일 셸            ⛔ 없음 (apps/web 하나)
 | **토큰 발급·재발급** | `POST /mdm/terminals/{id}:issue-token` | §5-4 |
 | 공정 추가 · 공정 삭제 · 플래그 토글 · 저장 | `PUT /mdm/terminals/{terminalId}/processes` — **단말 단위 한 트랜잭션.** 추가·삭제에 각각 경로를 두지 않는다 — 묶음이 통째로 교체된다 | §5-3 |
 | 사용 중지 | `POST /mdm/terminals/{id}:deactivate` | §5·§6 |
-| 변경 이력 | ⛔ **없다** — 횡단 감사 조회의 키 규약이 아직 없다 | §I-5 |
+| 변경 이력 | ⛔ **없다** — 횡단 경로(`GET /audit/events`)는 실재하나 대상 유형 값 목록과 변경 전후 키 규약이 없어 사람이 읽을 수 없다 | §I-5 |
 
 - ⭐ **실측 — 단말 경로가 0건이었다.** 기준정보 계약 79경로에 하나도 없어 이 화면이 **통째로 신설**이다.
 - ⚠ **기능 구성 표에 버전 칸이 없다** — 낙관적 잠금(저장할 때 버전을 대조해 남이 먼저 고쳤는지 잡는다)은 **단말 쪽 버전**으로 받는다. 저장 단위가 단말이기 때문이다.
@@ -166,14 +174,15 @@ POP·모바일 셸            ⛔ 없음 (apps/web 하나)
 
 | 화면 액션 | 엔드포인트 | 근거 |
 | --- | --- | --- |
-| 창고 선택 · 위치 계층 | **기준정보 계약** `GET /mdm/warehouses` · `GET /mdm/locations` — **이미 있다** | §5 |
+| 창고 선택 · 위치 계층 | **기준정보 계약** `GET /mdm/warehouses` · `GET /mdm/locations` — **이미 있다** ⚠ 위치가 둘 이상인 창고만 보이려면 `?dividedOnly=true` 를 보낸다 — 판정을 화면이 세지 않는다(L-2). | §5 |
 | 배치도 조회 | `GET /mdm/warehouses/{warehouseId}/layout` | §5 |
 | 편집 | **API 불필요** — 화면 안의 모드 전환이다. 권한은 조회 응답이 아니라 사용자 권한이 정한다 | §5 |
-| 도면 올리기 · 점 찍기·옮기기 · 저장 | `PUT /mdm/warehouses/{warehouseId}/layout` | §5 |
-| 재고 조회 | **자재창고 계약** `GET /inventory/balances?locationId=` | §5 |
+| 도면 올리기 | `POST /app/attachments`(대상=창고 · `targetId`=`warehouseId`) → 받은 `attachmentId` 를 `PUT …/layout` 의 `drawingAttachmentId` 로 넣는다 | §5 |
+| 점 찍기·옮기기 · 저장 | `PUT /mdm/warehouses/{warehouseId}/layout` — 토큰은 같은 경로 `GET` 200 의 `ETag` 다 | §5 · B-1 |
+| 재고 조회 | **자재창고 계약** — 행별 ●/○ 판정은 `GET /inventory/balances?warehouseId=&groupBy=LOCATION&includeZero=true` **한 번**, 선택 위치 상세는 `?locationId=` | §5 |
 
 - ⭐ **좌표는 픽셀이 아니라 비율이다**(0~1). 픽셀로 두면 도면을 갈 때 점이 전부 어긋난다.
-- **도면 파일은 첨부의 다형 참조를 그대로 쓴다** — 대상 유형이 창고다.
+- **도면 파일은 첨부의 다형 참조를 그대로 쓴다** — 대상 유형이 창고다. 이미지는 `GET /app/attachments/{attachmentId}/content` 로 받는다.
 
 ### 3-10. `W-CO-05` 통합 대시보드 *(관리웹)*
 
@@ -183,10 +192,25 @@ POP·모바일 셸            ⛔ 없음 (apps/web 하나)
 | 알람 항목 클릭 | 같은 응답의 알람 묶음에서 알림센터로 전이 — **API 불필요** | §5 |
 | 자세히 | **API 불필요** — 알림센터(`W-CO-03`)로 전이만 한다 | §5 |
 | 카드 클릭 | **API 불필요** — 소유 화면으로 기준 날짜·공장을 넘긴다 | §5 |
+| 일일 생산실적 추이 | `GET /app/dashboard-summary` 응답 `trend`(`points[]` · `targetValue`) | §4 · §7-1 |
+| 진행 중 작업지시 | **02 생산실행 계약** `GET /production/work-orders?statusCode=<진행중>&withProgress=true&size=N` — **이미 있다.** 라인명은 `GET /mdm/production-lines` 로 푼다 | §4 · L-2 |
+| 지표 주석 · 제외 건수 · 미집계 구분 | 같은 응답 `cards[].note` · `.excludedCount` · `.valueStatusCode` | §5-3 · L-16·G-20 |
+| 집계 기준 시각 | 같은 응답 `asOf` — 화면이 「기준 HH:MM」으로 적는다 | §5-4 · L-5 |
 
 - ⭐ **카드마다 소유 화면이 따로 있고 이 경로는 「숫자만」 모은다.**
 - ⛔ **자동 갱신을 두지 않는다** — 사람이 「갱신」을 누른다.
 - ⛔⛔ **설비종합효율(OEE)을 내지 않는다.** 계획 조업 시간의 **분모**가 되는 휴일·계획 정지를 담을 자리가 없다. 정책 코드는 시드에 있는데 **어느 날이 휴일인지가 없다.** 화면은 교대 기준으로 그리고 주석을 단다 — 자리가 생기면 주석만 뗀다.
+
+### 3-11. G-14 현장 진입 공지 (화면 없음 — 셸 책임)
+
+| 셸 동작 | 엔드포인트 | 근거 |
+| --- | --- | --- |
+| 진입 시 미확인 공지 조회 | `GET /app/notices?unacknowledgedByMe=true` — `X-Worker-No` 로 주체를 싣는다 | G-14 |
+| 확인 | `POST /app/notices/{noticeId}:acknowledge` — `X-Worker-No` 선택판 | G-14 규칙 1 |
+| 확인하지 않고 닫음 | `POST /app/notices/{noticeId}:dismiss` — 확인 요구가 켜진 공지에는 400 | §5-2 · G-13 |
+
+⚠ **화면이 없다고 매핑이 없어도 되는 것이 아니다.** 이 세 호출은 현장 셸이 부르고 어느 화면 스펙에도
+적히지 않아, 지금까지 어느 검사기도 이 자리를 보지 못했다.
 
 ---
 

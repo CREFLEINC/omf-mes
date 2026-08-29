@@ -2,7 +2,7 @@
 
 > 작성일: 2026-08-19 · 작성 주체: CREFLE OMF 팀 (UI/UX)
 > **성격**: 이 권은 **표지다.** 본문을 갖지 않고 **어디를 봐야 하는지**만 말한다.
-> ⚠ **design 컷오버 완료(2026-08-25)**: OpenAPI JSON 7파일을 `deliverables/openapi/`에서
+> ⚠ **design 컷오버 완료(2026-08-25)**: OpenAPI JSON 7파일을 `design/wiki/api-contracts`에서
 > `wiki/api-contracts/openapi/`로 최종 이관했다(Tier 0 — 활발히 패치되는 정본이라 구조
 > 삭제 직전 단 한 번만 옮긴다는 원칙, `schema/rewrite-tiers.md` 참조). 이제부터
 > `wiki/api-contracts/openapi/*.json`이 유일한 정본이다.
@@ -21,9 +21,9 @@
 
 | 무엇 | 정본 | 규모 | 세는 명령 |
 | --- | --- | :-: | --- |
-| **계약** | `wiki/api-contracts/openapi/*.json` **7파일** | **경로 309 · 오퍼레이션 437 · 스키마 464** | `python3 design/schema/generators/openapi/check-structure.py` |
-| **근거** — 화면 액션이 어느 경로에 대응하나 | `design/wiki/api-contracts/06-API-요구서*.md` **9장** | 인용 **560** 전건 계약에 실재 | `python3 design/schema/generators/verify-doc-citations.py` |
-| **덮은 화면** | 요구서 §3 소절 | **116 / 117** | `python3 design/schema/generators/build-screen-progress.py` |
+| **계약** | `wiki/api-contracts/openapi/*.json` **7파일** | **경로 335 · 오퍼레이션 466 · 스키마 485** | `python3 design/schema/generators/openapi/check-structure.py` |
+| **근거** — 화면 액션이 어느 경로에 대응하나 | `design/wiki/api-contracts/06-API-요구서*.md` **9장** | 인용 **673** 전건 계약에 실재 | `python3 design/schema/generators/verify-doc-citations.py` |
+| **덮은 화면** | 요구서 §3 소절 | **117 / 117** | `python3 design/schema/generators/build-screen-progress.py` |
 
 **실측일: 2026-08-25**(design 이관 시 verify-counts.py 재측정으로 정정 — 아래 변경 이력 참조).
 
@@ -68,6 +68,7 @@ python3 design/schema/generators/openapi/check-public-safe.py
 ```
 
 ⛔ **그래서 내부 서술은 `x-internal-note` 에 둔다.** 비공개 문서 경로 · 설계 진행 상태 · 조항 요약이 여기 해당한다.
+⭐ **판정은 위 명령이 한다** — 화면 ID(`W-06-02 §4-A`) · 조항 번호(`공유계약 B-1`) · 이슈 번호(`omf-mes#147`)는 **잡지 않는다.** 비공개 문서 경로를 지울 때 이슈 번호로 대체하는 것이 규약이 지정한 처방이다(`check-public-safe.py` 37·47·56행).
 
 ### 3-2. 저장 충돌 토큰은 **받을 곳까지가 한 세트**
 
