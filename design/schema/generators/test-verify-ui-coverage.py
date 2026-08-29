@@ -114,8 +114,10 @@ class Domain01Test(unittest.TestCase):
         rows = cov.extract_all(SCREENS_ROOT, cov.SCREENS_01)
         screens = {r["screen"] for r in rows}
         self.assertIn("W-01-13", screens)
-        # 118 — W-01-06 에 「자체 폐기 체크」·「폐기 거래처 선택」 2건 추가(DR-013)
-        self.assertEqual(len(rows), 118)
+        # 119 — W-01-06 에 「자체 폐기 체크」·「폐기 거래처 선택」 2건 추가(DR-013) +
+        #       P-01-01 「인쇄(등록 완료분)」 1건. ⚠ 118 은 2026-08-29 실측에서 이미 낡아
+        #       있었다 — 이 수치는 verify-counts 등록부와 달리 아무도 감시하지 않는다.
+        self.assertEqual(len(rows), 119)
 
     def test_모바일_POP_화면ID도_읽는다(self):
         rows = cov.extract_actions(self.M0104)
@@ -153,7 +155,9 @@ class DomainAppTest(unittest.TestCase):
         self.assertEqual(cov.screens_without_action_table(SCREENS_ROOT, cov.SCREENS_CO), [])
         rows = cov.extract_all(SCREENS_ROOT, cov.SCREENS_CO)
         self.assertEqual(len({r["screen"] for r in rows}), 10)
-        self.assertEqual(len(rows), 47)
+        # 48 — W-CO-04 에 「게시」 1건 추가(2026-08-29 · 공지 상태 모델을 계약과 맞추며
+        #      기간이 정하는 3값 대신 명시적 게시 액션을 세웠다)
+        self.assertEqual(len(rows), 48)
 
     def test_05_설비툴은_17장이고_액션_표가_다_있다(self):
         self.assertEqual(len(cov.SCREENS_05), 17)

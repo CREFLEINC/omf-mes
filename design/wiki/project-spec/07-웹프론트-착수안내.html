@@ -2187,7 +2187,7 @@ partnerName     "(주)대한부품"          workerName  "홍길동"</code></pre
 <p><strong>문구를 한 곳에 정의</strong>하고 6화면이 같은 말을 쓰게 한다. 지금 <code>RECEIVED_FROM_ERP</code> 는 <strong>서버가 판정하지 못한다</strong>(§7-1) — 값은 오지만 실제 잠금은 미구현이다.</p>
 <hr>
 <h2>§5. 반드시 지킬 공통 규약</h2>
-<p><strong>공유계약</strong>(<code>uiux/화면상세스펙-공통/공유계약.md</code> v0.6)이 정본이고, 여기는 <strong>프런트가 자주 틀리는 것만</strong> 뽑았다. API 쪽 대응은 <code>06-API-요구서.md</code> <strong>§4-1 공통 규약 대조표</strong>에 조항별로 정리돼 있다 — <strong>화면 만들기 전에 그 표를 한 번 읽어라.</strong></p>
+<p><strong>공유계약</strong>(<code>design/wiki/decisions-policy/공유계약.md</code> v0.6)이 정본이고, 여기는 <strong>프런트가 자주 틀리는 것만</strong> 뽑았다. API 쪽 대응은 <code>06-API-요구서.md</code> <strong>§4-1 공통 규약 대조표</strong>에 조항별로 정리돼 있다 — <strong>화면 만들기 전에 그 표를 한 번 읽어라.</strong></p>
 <h3>§5-1. 리소스 패턴이 셋이다 — 109개를 규칙으로 읽는다</h3>
 <table>
 <thead><tr><th class="nw">패턴</th><th>판별</th><th>화면이 하는 일</th></tr></thead>
@@ -2267,13 +2267,13 @@ PUT  /mdm/warehouses/{id}     →  요청 헤더  If-Match: "7"     ← 필수</
 <table>
 <thead><tr><th>무엇이 궁금한가</th><th>어디</th></tr></thead>
 <tbody>
-<tr><th><strong>이 말이 무슨 뜻이지?</strong></th><td><code>deliverables/00-용어사전.md</code></td></tr>
+<tr><th><strong>이 말이 무슨 뜻이지?</strong></th><td><code>design/wiki/glossary/00-용어사전.md</code></td></tr>
 <tr><th>이 화면이 무엇을 하나 · 필드는 · 예외는</th><td><code>uiux/2026-08-03-화면상세스펙-확대1차/W-06-*.md</code> (파일럿 <code>W-06-07</code>은 <code>2026-07-31-화면상세스펙-파일럿/</code>)</td></tr>
-<tr><th><strong>이 화면이 어느 API를 쓰나</strong></th><td><code>deliverables/06-API-요구서.md</code> <strong>§3</strong> 화면→API 매핑</td></tr>
-<tr><th><strong>공통 규약이 어느 필드로 오나</strong></th><td><code>deliverables/06-API-요구서.md</code> <strong>§4-1</strong> ← <strong>먼저 읽어라</strong></td></tr>
-<tr><th>규약의 원문·이유</th><td><code>uiux/화면상세스펙-공통/공유계약.md</code> v0.6</td></tr>
-<tr><th>DS에 없는 것 · 대체 방법</th><td><code>uiux/화면상세스펙-공통/ds-gap.md</code></td></tr>
-<tr><th>무엇이 왜 막혀 있나</th><td><code>deliverables/06-API-요구서.md</code> <strong>§5</strong> 미착지 표 · <strong>§6</strong> API 없는 화면</td></tr>
+<tr><th><strong>이 화면이 어느 API를 쓰나</strong></th><td><code>design/wiki/api-contracts/06-API-요구서.md</code> <strong>§3</strong> 화면→API 매핑</td></tr>
+<tr><th><strong>공통 규약이 어느 필드로 오나</strong></th><td><code>design/wiki/api-contracts/06-API-요구서.md</code> <strong>§4-1</strong> ← <strong>먼저 읽어라</strong></td></tr>
+<tr><th>규약의 원문·이유</th><td><code>design/wiki/decisions-policy/공유계약.md</code> v0.6</td></tr>
+<tr><th>DS에 없는 것 · 대체 방법</th><td><code>design/raw/process/uiux/화면상세스펙-공통/ds-gap.md</code></td></tr>
+<tr><th>무엇이 왜 막혀 있나</th><td><code>design/wiki/api-contracts/06-API-요구서.md</code> <strong>§5</strong> 미착지 표 · <strong>§6</strong> API 없는 화면</td></tr>
 </tbody></table>
 <p><strong>화면 스펙 §3은 구조 기술이다</strong> — ASCII 배치도로 「무엇이 어느 구획에 있는가」까지만 정했다. <strong>픽셀 단위 레이아웃은 프런트 재량</strong>이다.</p>
 <hr>
@@ -2300,12 +2300,12 @@ PUT  /mdm/warehouses/{id}     →  요청 헤더  If-Match: "7"     ← 필수</
 <tr><th>색·간격·라운드 <strong>값</strong>이 없다</th><td>파운데이션 <code>design-system-v2</code> 이슈</td></tr>
 </tbody></table>
 <h3>발행돼 있는 DS 이슈 9건</h3>
-<figure><pre><code>#38 터치 타겟 큰 크기 변형(xl)      #43 검색·필터 바
-#39 Table 행 순서 재배치            #44 파일 선택·업로드
-#40 DatePicker                     #45 변경 이력 값 대비
-#41 NumberPad                      #46 인쇄물 미리보기
-#42 읽기 전용 구획 + 사유</code></pre></figure>
-<p><strong>회신 전까지 전부 대체 구현으로 간다</strong>(§4). 진행 상황은 그 저장소에서 본다.</p>
+<figure><pre><code>#38 터치 타겟 큰 크기 변형(xl) — CLOSED    #43 검색·필터 바 — CLOSED
+#39 Table 행 순서 재배치 — CLOSED          #44 파일 선택·업로드 — OPEN
+#40 DatePicker — CLOSED                    #45 변경 이력 값 대비 — CLOSED
+#41 NumberPad — CLOSED                     #46 인쇄물 미리보기 — OPEN
+#42 읽기 전용 구획 + 사유 — CLOSED</code></pre></figure>
+<p><strong>9건 중 7건이 이미 CLOSED 다</strong>(2026-08-28 실측 — OPEN 은 <code>#44</code> 파일 선택·업로드 · <code>#46</code> 인쇄물 미리보기 둘뿐). ⛔ <strong>대체 구현으로 가기 전에 디자인 시스템 «본선»을 확인한다</strong> — 고정 커밋에 없다고 본선에 없는 것이 아니다(§4 · <code>omf-mes#284</code>). 진행 상황은 그 저장소에서 본다.</p>
 <hr>
 <h2>변경 이력</h2>
 <table>

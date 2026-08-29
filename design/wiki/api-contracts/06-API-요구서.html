@@ -2092,7 +2092,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <p>작성일: 2026-08-03 · 작성 주체: CREFLE OMF 팀 (UI/UX)</p>
 <p><strong>성격</strong>: 「<strong>어떤 API를 어디서 왜 쓰는가</strong>」를 설명하는 문서다. 무엇(필드·타입·제약)은 적지 않는다 — 그것은 <code>openapi/mdm-기준정보.json</code>에만 둔다.</p>
 <p><strong>정본 관계</strong>: 필드 정의의 정본은 <strong>물리 모델</strong>(<code>docs/research/2026-07-23-데이터모델링/mes_postgresql_physical_model.sql</code>)이다. OpenAPI는 그것을 옮긴 것이고, 이 문서는 화면 → API 매핑과 근거만 담는다. 셋이 어긋나면 <strong>물리 모델이 우선</strong>한다.</p>
-<p><strong>상호 참조</strong>: <code>01-요구사항명세서.md</code>(REQ 원문) · <code>02-SW설계사양서.md</code>(§3.2 인증 계층·§3.3 멱등·실패 3분류) · <code>04-통합-IA.md</code>(화면 인벤토리) · <code>05-사용자-프로세스-태스크플로우.md</code>(화면이 딛는 프로세스) · <code>uiux/화면상세스펙-공통/공유계약.md</code> v0.4.1(횡단 규약).</p>
+<p><strong>상호 참조</strong>: <code>01-요구사항명세서.md</code>(REQ 원문) · <code>02-SW설계사양서.md</code>(§3.2 인증 계층·§3.3 멱등·실패 3분류) · <code>04-통합-IA.md</code>(화면 인벤토리) · <code>05-사용자-프로세스-태스크플로우.md</code>(화면이 딛는 프로세스) · <code>design/wiki/decisions-policy/공유계약.md</code> v0.4.1(횡단 규약).</p>
 <p>⚠ <strong>E-번호 이중 체계 주의</strong>: 본 문서의 <strong>회신 E-3·E-9</strong>는 고객 회신 대기 코드이고, 공유계약 <strong>§E-1~E-3</strong>은 폼팩터 규격 조항이다. 표기가 같고 의미가 다르다(<code>04-통합-IA.md</code> 머리말과 같은 주의).</p>
 <div class="kpi"><div><span class="big">71</span><span class="lbl">화면→API 매핑 액션<br>대응 54 · 없음+이유 17</span></div><div><span class="big">50</span><span class="lbl">적합성 판정 셀<br>✅ 36 · ⚠ 14 · ❌ 0</span></div><div><span class="big">16</span><span class="lbl">미착지 건<br>전건 발행 · 미발행 0</span></div></div>
 
@@ -2186,7 +2186,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 <tbody>
 <tr><th>사용자 추가 / 역할 추가</th><td><code>POST /app/users</code> · <code>POST /app/roles</code></td><td>§5-1 · A-1</td></tr>
 <tr><th>저장 / 취소</th><td><code>PUT /app/users/{id}</code> · <code>PUT /app/roles/{id}</code> (취소는 <strong>API 불필요</strong> — 로컬 폐기)</td><td>§5-2 · B-1</td></tr>
-<tr><th>사용 중지</th><td><code>POST /app/users/{id}:deactivate</code> · <code>POST /app/roles/{id}:deactivate</code></td><td>§5-1 · B-4</td></tr>
+<tr><th>사용 중지 / 다시 사용</th><td><code>POST /app/users/{id}:deactivate</code> · <code>:activate</code> · <code>POST /app/roles/{id}:deactivate</code> · <code>:activate</code> — ⚠ 역할 쪽은 상세 응답의 <code>assignedUserCount</code> 로 확인 다이얼로그를 만든다(§6)</td><td>§5-1 · B-4</td></tr>
 <tr><th>역할 체크·해제</th><td><code>PUT /app/users/{id}/roles</code> — 전체 치환</td><td>§4-C · B-6</td></tr>
 <tr><th>접근범위 추가 / ⊖</th><td><code>PUT /app/users/{id}/data-scopes</code> — 전체 치환</td><td>§4-D · B-6 · A-7</td></tr>
 <tr><th>기능 권한 체크·해제</th><td><code>PUT /app/roles/{id}/permissions</code> — <strong>엔드포인트는 있으나 화면이 비활성</strong>(<code>permission_code</code> 값 목록이 회신 <strong>E-9</strong> 대기)</td><td>§4-E · G-2·G-6</td></tr>
@@ -2270,9 +2270,9 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 <tr><th>사용 중지</th><td><code>POST …:deactivate</code> 3종(코드그룹·코드값·부서)</td><td>§5-1 · B-4</td></tr>
 <tr><th>자격 추가 / 삭제</th><td><code>PUT /mdm/workers/{id}/qualifications</code> — 전체 치환</td><td>§4-E · B-6 · A-7</td></tr>
 <tr><th>변경 이력</th><td><code>GET /audit/events</code></td><td>§5-1 · B-5</td></tr>
-<tr><th>수신 동기화 상태 보기</th><td><strong>없음 — 소관 이동.</strong> <code>W-06-10</code>의 <code>GET /integration/messages?targetTypeCode=…</code>로 이동한다(중복 구현 금지)</td><td>§5-1 원문 · B-4-1 ④</td></tr>
+<tr><th>수신 동기화 상태 보기</th><td><strong>없음 — 소관 이동.</strong> <code>W-06-10</code>의 <code>GET /integration/messages?targetTypeCode=…</code>로 이동한다(중복 구현 금지). ⚠ <code>targetTypeCode</code> 에 넣을 문자열이 아직 없다(다형 참조 대응표 미정) — 그때까지 <code>GET /integration/interface-definitions?directionCode=INBOUND</code> 로 정의를 받아 그 <code>interfaceCode</code> 로 거른다. §3-13 이 같은 경로를 이미 쓴다</td><td>§5-1 원문 · B-4-1 ④</td></tr>
 </tbody></table>
-<ul><li><strong>작업자 기본 정보는 쓰기 경로 자체가 없다.</strong> 테이블 <strong>전체</strong>가 ERP 수신본이라 행 단위 식별 플래그(#65) 없이도 판정에 모호함이 없다 → <code>editability.reason</code>을 <code>RECEIVED_FROM_ERP</code>로 고정했다. 편집 가능한 것은 <strong>MES 확장인 자격·인증</strong>뿐이다.</li><li>⚠ <strong><code>code_group</code>·<code>code_value</code>·<code>department</code>는 그 판정을 할 수 없다</strong> — §5 미착지 8. 지금 API는 이 셋의 <strong>쓰기를 열어 두고 있다.</strong></li></ul>
+<ul><li><strong>작업자 기본 정보는 쓰기 경로 자체가 없다.</strong> 테이블 <strong>전체</strong>가 ERP 수신본이라 행 단위 식별 플래그(#65) 없이도 판정에 모호함이 없다 → <code>editability.reason</code>을 <code>RECEIVED_FROM_ERP</code>로 고정했다. 편집 가능한 것은 <strong>MES 확장인 자격·인증</strong>뿐이다.</li><li>⚠ <strong><code>department</code>가 그 판정을 할 수 없다</strong> — §5 미착지 8. 지금 API는 부서의 <strong>쓰기를 열어 두고 있다.</strong> <code>code_group</code>·<code>code_value</code>는 2026-08-22 확정으로 수신 대상에서 빠져 이 시스템이 정본이라 쓰기가 열려 있는 것이 옳다.</li></ul>
 <h3>3-8. <code>W-06-10</code> 연계 동기화 현황·실패 재처리</h3>
 <table>
 <thead><tr><th>화면 액션(§5-1)</th><th>엔드포인트</th><th>근거</th></tr></thead>
@@ -2308,7 +2308,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 <tr><th>취소</th><td><strong>없음 — API 불필요.</strong> 변경 파기 확인 후 로컬 폐기</td><td>§5-1</td></tr>
 <tr><th>사용 중지</th><td><code>POST /mdm/warehouses/{id}:deactivate</code> · <code>POST /mdm/locations/{id}:deactivate</code></td><td>§5-1·§8-6 · B-4</td></tr>
 <tr><th>Location 추가 / 하위 추가</th><td><code>POST /mdm/locations</code> — 하위는 <code>parentLocationId</code> 지정</td><td>§5-1</td></tr>
-<tr><th>라벨 이미지 생성</th><td><strong>없음 — 범위 밖.</strong> 서버 렌더링 호출은 <strong>라벨 도메인 소관</strong>(결정 18)이며 물리 인쇄는 그보다 더 밖이다</td><td>§5-1</td></tr>
+<tr><th>라벨 이미지 생성</th><td><code>POST /app/document-issues</code> → 이미지는 <code>GET /app/document-issues/{documentIssueLogId}/rendition</code>(<code>app-공통.json</code>). 대상 유형은 위치(Location) 이고 <code>targetId</code> 는 <code>locationId</code> 다 — <strong>값 문자열은 출력물 요구서 §3-7 이 정한다</strong>. ⛔ <strong>물리 인쇄는 범위 밖</strong></td><td>§5-1 · K-1·K-5</td></tr>
 <tr><th>변경 이력</th><td><code>GET /audit/events</code></td><td>§5-1 · ✅REQ-PR-0021</td></tr>
 </tbody></table>
 <ul><li>외부창고 토글이 켜지면 거래처가 <strong>조건부 필수</strong>가 된다(<code>ck_external_warehouse_partner</code>) — 위반은 400, 오류는 <strong>거래처 필드에 인라인</strong>(A-2).</li><li><code>location</code>에는 <strong>자기참조 CHECK가 없다</strong>(§5 미착지 11) — 계층 순환을 서버가 막는다.</li></ul>
@@ -2325,7 +2325,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 <tr><th>규칙 삭제</th><td><strong>없음 — API 불필요.</strong> 물리 삭제를 두지 않는다(B-4)</td><td>§5-7</td></tr>
 <tr><th>위치 선택</th><td><code>GET /mdm/locations?warehouseId=</code> — 다른 창고의 위치는 오지 않는다</td><td>§5-3</td></tr>
 <tr><th>규칙 없는 품목 보기</th><td><strong><code>GET /logistics/putaway-rules/uncovered-items?warehouseId=</code>(2026-08-07 신설)</strong></td><td>§5-1 · <strong>G-12</strong></td></tr>
-<tr><th>변경 이력</th><td><code>GET /audit/events</code> — ⚠ 키 규약 부재(#68)로 실제 조회는 막혀 있다</td><td>§5-7 · §I-5</td></tr>
+<tr><th>변경 이력</th><td><strong>없음 — 미착지.</strong> 횡단 경로(<code>GET /audit/events</code>)는 실재하나 대상 유형 값 목록과 변경 전후 키 규약이 없어 사람이 읽을 수 없다</td><td>§5-7 · §I-5</td></tr>
 </tbody></table>
 <p><strong>이 화면이 드러낸 계약 결손 2건</strong></p>
 <table>
@@ -2374,17 +2374,17 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 <tr><th>변경 이력</th><td><code>GET /audit/events</code></td><td>§5-1 · B-5</td></tr>
 </tbody></table>
 <p>⛔ <strong><code>app.operation_policy</code> 에 욱여넣지 않았다</strong> — §3-2 가 「범위 축이 맞지 않는다」로 이미 판정했고 그 판정은 <strong>모델 부재와 무관하게 옳다</strong>. 송신 on/off 의 범위는 <strong>연계 정의 단위</strong>인데 그쪽은 사업부·공장·품목·공정이라 유일 인덱스가 뜻을 잃는다.</p>
-<p>⏳ <strong>「개발품 제외」의 판정 축은 계약이 정하지 않는다</strong> — 품목 속성인지 작업지시 유형인지 <strong>확정 문구가 갈려 있고</strong>(§4-B), 그것은 두 문서가 다르게 읽히는 문제라 계약이 임의로 고를 수 없다. <code>#70</code> 에서 결정을 기다린다.</p>
+<p>⭐ <strong>「개발품 제외」의 판정 축은 «품목»으로 닫혔다</strong>(사용자 확정 2026-08-24 · <code>omf-mes#70</code> 종료) — 계약이 <code>Item.developmentItem</code> 을 앉혔고 편집은 <code>W-06-05</code> 소관이다. 📨 남은 것은 <code>mdm.item</code> 에 담을 컬럼 하나이고 작업 통지(<code>omf-mes#215</code> — 계약 흡수로 종료 · <code>omf-mes#236</code>)라 우리를 막지 않는다.</p>
 <h3>3-15. 커버리지 집계</h3>
 <p>⛔ <strong>수치를 손으로 세지 않는다.</strong> 옛 집계는 「액션 총계 80」이라 적었는데 그때 검사기가 센 값은 <strong>81</strong> 이었다 — 한 건이 조용히 어긋나 있었다. <strong>두 번 이상 인용될 수치는 스크립트를 정본으로 둔다.</strong></p>
 <table>
 <thead><tr><th>무엇</th><th class="nw">값</th><th>명령</th></tr></thead>
 <tbody>
-<tr><th><strong>화면</strong></th><td class="num nw"><strong>14</strong></td><td><code>python3 deliverables/verify-ui-coverage.py</code></td></tr>
+<tr><th><strong>화면</strong></th><td class="num nw"><strong>14</strong></td><td><code>python3 design/schema/generators/verify-ui-coverage.py</code></td></tr>
 <tr><th><strong>액션</strong>(화면 스펙에서 실측)</th><td class="num nw"><strong>99</strong></td><td>동상</td></tr>
 <tr><th><strong>§3 매핑 행</strong></th><td class="num nw"><strong>108</strong></td><td>아래 주</td></tr>
 <tr><th><strong>「없음 + 이유」로 명시한 행</strong></th><td class="num nw"><strong>22</strong></td><td>동상</td></tr>
-<tr><th><strong>전건 대조</strong></th><td class="nw">✅ 통과</td><td><code>python3 deliverables/verify-mapping-coverage.py</code></td></tr>
+<tr><th><strong>전건 대조</strong></th><td class="nw">✅ 통과</td><td><code>python3 design/schema/generators/verify-mapping-coverage.py</code></td></tr>
 </tbody></table>
 <p>⚠ <strong>행이 액션보다 많다</strong> — 요구서가 한 액션을 <strong>대상별로 나눠</strong> 적는 자리가 있어서다(「저장 / 취소」를 코드그룹·코드값·부서 셋으로 쪼갠 곳). <strong>덜 적어서 생긴 차이가 아니다</strong>, 대조는 검사기가 전건 확인한다.</p>
 <p><strong>「없음」 22건의 내역</strong></p>
@@ -2400,7 +2400,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 <div class="callout"><p><strong>막힌 것은 5건이다</strong> — 미착지 2 + 선행 미결 3. 나머지 17건은 <strong>없는 것이 정상</strong>이다.</p></div>
 <hr>
 <h2>§4. UI 적합성 판정 — 「이 API로 이 화면을 그릴 수 있는가」</h2>
-<p>기준은 <code>openapi/ui-적합성-점검표.md</code>(설계 §5-2)다. <strong>화면 10개 × 5항목 = 50셀</strong>을 판정했다.</p>
+<p>기준은 <code>design/schema/templates/ui-적합성-점검표.md</code>(설계 §5-2)다. <strong>대상 14화면 중 10화면 × 5항목 = 50셀</strong>을 판정했다. ⛔ <strong>나머지 4화면은 아직 판정하지 않았다</strong> — <code>W-06-14</code>(2026-08-07 편입 · §3-11) · <code>W-06-08</code>·<code>W-06-09</code>·<code>W-06-12</code>(2026-08-18 복귀 · §3-12~3-14). 네 절은 <strong>매핑 대조까지만</strong> 했고 5항목 격자를 돌린 적이 없다.</p>
 <table>
 <thead><tr><th class="nw">항목</th><th>무엇을 보나</th></tr></thead>
 <tbody>
@@ -2426,9 +2426,13 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 <tr><th><code>W-06-07</code> 창고·Location</th><td class="nw">⚠</td><td class="nw">✅¹</td><td class="nw">✅</td><td class="nw">⚠⁸</td><td class="nw">✅</td></tr>
 <tr><th><code>W-06-10</code> 연계 동기화</th><td class="nw">✅</td><td class="nw">✅</td><td class="nw">✅⁹</td><td class="nw">✅</td><td class="nw">✅</td></tr>
 <tr><th><code>W-06-11</code> 마스터 변경관리</th><td class="nw">⚠</td><td class="nw">⚠¹⁰</td><td class="nw">✅</td><td class="nw">✅</td><td class="nw">✅</td></tr>
+<tr><th><code>W-06-08</code> 예비품</th><td class="nw">—</td><td class="nw">—</td><td class="nw">—</td><td class="nw">—</td><td class="nw">—</td></tr>
+<tr><th><code>W-06-09</code> 연계정의</th><td class="nw">—</td><td class="nw">—</td><td class="nw">—</td><td class="nw">—</td><td class="nw">—</td></tr>
+<tr><th><code>W-06-12</code> 송신 항목</th><td class="nw">—</td><td class="nw">—</td><td class="nw">—</td><td class="nw">—</td><td class="nw">—</td></tr>
+<tr><th><code>W-06-14</code> 적치 규칙</th><td class="nw">—</td><td class="nw">—</td><td class="nw">—</td><td class="nw">—</td><td class="nw">—</td></tr>
 </tbody></table>
 </figure>
-<p><strong>✅ 36 · ⚠ 14 · ❌ 0(전건 수정 완료).</strong> 위첨자는 4-2의 각주다.</p>
+<p><strong>✅ 36 · ⚠ 14 · ❌ 0 · 미판정 20</strong>(50/70셀 판정). 위첨자는 4-2의 각주다.</p>
 <h3>4-1. ❌ 6건 — 발견하고 그 자리에서 고쳤다</h3>
 <p><strong>「결함 있음」이라고만 적고 넘어가지 않았다.</strong> 여섯 건 모두 OpenAPI 안에서 끝나는 것이라 이번에 반영했다.</p>
 <table>
@@ -2522,24 +2526,34 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 <table>
 <thead><tr><th class="nw">#</th><th>미착지</th><th>무엇을 막는가</th><th>이슈</th></tr></thead>
 <tbody>
-<tr><th class="nw"><strong>1</strong></th><td>다국어(한/베) 명칭 컬럼</td><td><strong>전 마스터의 명칭 필드.</strong> <code>W-06-06</code>의 존재 근거 절반이 다국어인데 전부 <code>name_t</code> 단일이다 → §6의 「한쪽 언어만 등록」 예외가 <strong>발생할 수 없다</strong></td><td><strong>#64</strong></td></tr>
-<tr><th class="nw"><strong>2</strong></th><td>품목 확장속성 4종</td><td><code>W-06-05</code>의 품목 확장 저장 — 자재LOT 보관단위·생산LOT 기본크기·개발품 플래그·재생재 하위코드</td><td><strong>#64</strong></td></tr>
-<tr><th class="nw"><strong>3</strong></th><td>Routing <strong>기본(default) Rev 플래그</strong></td><td><strong><code>:set-default</code> 오퍼레이션이 Routing에 성립하지 않는다.</strong> <code>bom</code>에는 <code>is_default</code>+부분 유일 인덱스가 있는데 <code>routing</code>에는 둘 다 없다(비대칭) → 유효기간이 겹치는 Rev 중 <strong>어느 것을 쓸지 정할 수 없다</strong></td><td><strong>#64</strong></td></tr>
-<tr><th class="nw"><strong>4</strong></th><td>Routing 외주 공정 구분</td><td>Routing 라인 — <strong>요청 형태는 확정</strong>(<code>is_outsourced</code> boolean 1개). 거래처·리드타임·단가는 <code>logistics.subcontract_order</code>가 이미 갖고 있어 마스터에 두지 않는다</td><td><strong>#64</strong></td></tr>
-<tr><th class="nw"><strong>5</strong></th><td>검사정책 3속성 · <strong>샘플 비율의 형태</strong></td><td>검사기준 버전. 확정 문구는 「샘플 비율(%)」인데 컬럼은 <code>sampling_qty</code>(수량)다 → <strong>30%가 30개로 저장될 위험</strong>(A-8)</td><td><strong>#64</strong></td></tr>
-<tr><th class="nw"><strong>6</strong></th><td>불량코드 <strong>공정 N:M 매핑</strong> · 처분구분</td><td><strong>공정 매핑 엔드포인트가 성립하지 않는다.</strong> 결정 12가 N:M 조정을 <strong>승인</strong>했으나(2026-07-06) 물리 모델(2026-07-23)이 <strong>조정 전 형태</strong>(<code>defect_code.process_id</code> N:1)로 굳었다. 결정서가 피해까지 명시했다 — 「<strong>동일 불량이 공정 수만큼 복제 등록</strong>」</td><td><strong>#64</strong></td></tr>
-<tr><th class="nw"><strong>7</strong></th><td><strong>판정유형 통제 속성</strong></td><td><code>W-06-04</code>가 <code>W-06-06</code>의 코드값 편집기 복제가 된다. 결정 10의 6속성(출고차단·출하차단 등)을 담을 컬럼이 없어 <strong>전용 리소스 없이 <code>code_value</code>로만</strong> 선다 — 이 화면의 존재 근거 자체가 걸려 있다</td><td><strong>#64</strong></td></tr>
-<tr><th class="nw"><strong>8</strong></th><td><strong>ERP 수신본 판정 컬럼</strong></td><td>⚠ <strong>가장 위험한 항목이다.</strong> <code>code_group</code>·<code>code_value</code>·<code>department</code>는 ERP 수신본일 가능성이 있어 읽기 전용이어야 하는데(§5-4·B-4-1), <strong>그것을 판정할 컬럼이 물리 모델에 없다.</strong> 그래서 <strong>API가 지금 이 셋의 쓰기를 열어 두고 있다</strong> — 구현팀이 「완전 편집 가능」으로 오인하면 <strong>MES에서 고친 값이 다음 재동기화에 조용히 덮인다.</strong> 각 스키마 <code>description</code>에 이 사실을 적어 뒀으나 <strong>API가 강제하지는 못한다</strong></td><td><strong>#65</strong></td></tr>
-<tr><th class="nw"><strong>9</strong></th><td>I/F 연계정의 · 송신 항목 on/off 테이블</td><td><code>W-06-09</code>·<code>W-06-12</code> <strong>엔드포인트 전무</strong> — §6</td><td><strong>#66</strong></td></tr>
-<tr><th class="nw"><strong>10</strong></th><td><strong><code>audit.audit_event</code> 사용 규약</strong></td><td>변경 이력 응답을 <strong>사람이 읽게 만들 수 없다.</strong> <code>target_id</code>가 <strong>FK가 아니고</strong>(유형별로 다른 테이블) <code>before/after</code> <strong>jsonb 키 규약이 없다.</strong> 그래서 ① 리소스별 <code>/history</code>를 만들지 않고 <strong>횡단 <code>GET /audit/events</code> 하나</strong>로 갔고 ② <code>W-06-11</code>이 「MES 정본 / ERP 정본」을 행마다 가를 수 없다(<code>target_type_code</code> 값 목록 미정)</td><td><strong>#68</strong></td></tr>
-<tr><th class="nw"><strong>11</strong></th><td><strong>자기참조 CHECK의 비대칭</strong></td><td><code>mdm.location</code>·<code>quality.defect_code</code>에 자기참조 CHECK가 <strong>없다</strong> — <code>department</code>·<code>production_line</code> 등 계층 컬럼을 가진 대다수 테이블에는 있다(실측 정정 — 「department에만」은 과잉 정정이었다). <strong>계층 순환을 DB가 막지 않으므로 서버가 막아야 한다</strong>(A-9 ⓐ). 계약에 적었으나 강제는 애플리케이션 책임이다</td><td><strong>#64(추가)</strong></td></tr>
+<tr><th class="nw"><strong>1</strong></th><td>다국어(한/베) 명칭 컬럼</td><td><strong>전 마스터의 명칭 필드.</strong> <code>W-06-06</code>의 존재 근거 절반이 다국어인데 전부 <code>name_t</code> 단일이다 → §6의 「한쪽 언어만 등록」 예외가 <strong>발생할 수 없다</strong></td><td><strong>#64</strong> (closed 2026-08-25)</td></tr>
+<tr><th class="nw"><strong>2</strong></th><td>품목 확장속성 4종</td><td><code>W-06-05</code>의 품목 확장 저장 — 자재LOT 보관단위·생산LOT 기본크기·개발품 플래그·재생재 하위코드</td><td><strong>#64</strong> (closed 2026-08-25)</td></tr>
+<tr><th class="nw"><strong>3</strong></th><td>Routing <strong>기본(default) Rev 플래그</strong></td><td><strong><code>:set-default</code> 오퍼레이션이 Routing에 성립하지 않는다.</strong> <code>bom</code>에는 <code>is_default</code>+부분 유일 인덱스가 있는데 <code>routing</code>에는 둘 다 없다(비대칭) → 유효기간이 겹치는 Rev 중 <strong>어느 것을 쓸지 정할 수 없다</strong></td><td><strong>#64</strong> (closed 2026-08-25)</td></tr>
+<tr><th class="nw"><strong>4</strong></th><td>Routing 외주 공정 구분</td><td>Routing 라인 — <strong>요청 형태는 확정</strong>(<code>is_outsourced</code> boolean 1개). 거래처·리드타임·단가는 <code>logistics.subcontract_order</code>가 이미 갖고 있어 마스터에 두지 않는다</td><td><strong>#64</strong> (closed 2026-08-25)</td></tr>
+<tr><th class="nw"><strong>5</strong></th><td>검사정책 3속성 · <strong>샘플 비율의 형태</strong></td><td>검사기준 버전. 확정 문구는 「샘플 비율(%)」인데 컬럼은 <code>sampling_qty</code>(수량)다 → <strong>30%가 30개로 저장될 위험</strong>(A-8)</td><td><strong>#64</strong> (closed 2026-08-25)</td></tr>
+<tr><th class="nw"><strong>6</strong></th><td>불량코드 <strong>공정 N:M 매핑</strong> · 처분구분</td><td><strong>공정 매핑 엔드포인트가 성립하지 않는다.</strong> 결정 12가 N:M 조정을 <strong>승인</strong>했으나(2026-07-06) 물리 모델(2026-07-23)이 <strong>조정 전 형태</strong>(<code>defect_code.process_id</code> N:1)로 굳었다. 결정서가 피해까지 명시했다 — 「<strong>동일 불량이 공정 수만큼 복제 등록</strong>」</td><td><strong>#64</strong> (closed 2026-08-25)</td></tr>
+<tr><th class="nw"><strong>7</strong></th><td><strong>판정유형 통제 속성</strong></td><td><code>W-06-04</code>가 <code>W-06-06</code>의 코드값 편집기 복제가 된다. 결정 10의 6속성(출고차단·출하차단 등)을 담을 컬럼이 없어 <strong>전용 리소스 없이 <code>code_value</code>로만</strong> 선다 — 이 화면의 존재 근거 자체가 걸려 있다</td><td><strong>#64</strong> (closed 2026-08-25)</td></tr>
+<tr><th class="nw"><strong>8</strong></th><td><strong>ERP 수신본 판정 컬럼</strong></td><td>⚠ <strong>가장 위험한 항목이다.</strong> <code>code_group</code>·<code>code_value</code>·<code>department</code>는 ERP 수신본일 가능성이 있어 읽기 전용이어야 하는데(§5-4·B-4-1), <strong>그것을 판정할 컬럼이 물리 모델에 없다.</strong> 그래서 <strong>API가 지금 이 셋의 쓰기를 열어 두고 있다</strong> — 구현팀이 「완전 편집 가능」으로 오인하면 <strong>MES에서 고친 값이 다음 재동기화에 조용히 덮인다.</strong> 각 스키마 <code>description</code>에 이 사실을 적어 뒀으나 <strong>API가 강제하지는 못한다</strong></td><td><strong>#65</strong> (closed 2026-08-25)</td></tr>
+<tr><th class="nw"><strong>9</strong></th><td>I/F 연계정의 · 송신 항목 on/off 테이블</td><td><code>W-06-09</code>·<code>W-06-12</code> <strong>엔드포인트 전무</strong> — §6</td><td><strong>#66</strong> (closed 2026-08-25)</td></tr>
+<tr><th class="nw"><strong>10</strong></th><td><strong><code>audit.audit_event</code> 사용 규약</strong></td><td>변경 이력 응답을 <strong>사람이 읽게 만들 수 없다.</strong> <code>target_id</code>가 <strong>FK가 아니고</strong>(유형별로 다른 테이블) <code>before/after</code> <strong>jsonb 키 규약이 없다.</strong> 그래서 ① 리소스별 <code>/history</code>를 만들지 않고 <strong>횡단 <code>GET /audit/events</code> 하나</strong>로 갔고 ② <code>W-06-11</code>이 「MES 정본 / ERP 정본」을 행마다 가를 수 없다(<code>target_type_code</code> 값 목록 미정)</td><td><strong>#68</strong> (closed 2026-08-25)</td></tr>
+<tr><th class="nw"><strong>11</strong></th><td><strong>자기참조 CHECK의 비대칭</strong></td><td><code>mdm.location</code>·<code>quality.defect_code</code>에 자기참조 CHECK가 <strong>없다</strong> — <code>department</code>·<code>production_line</code> 등 계층 컬럼을 가진 대다수 테이블에는 있다(실측 정정 — 「department에만」은 과잉 정정이었다). <strong>계층 순환을 DB가 막지 않으므로 서버가 막아야 한다</strong>(A-9 ⓐ). 계약에 적었으나 강제는 애플리케이션 책임이다</td><td><strong>#64(추가)</strong> (closed 2026-08-25)</td></tr>
 <tr><th class="nw"><strong>12</strong></th><td>인증 수단 · 권한의 <strong>법인 축</strong></td><td><code>app_user</code>에 <code>password_hash</code> 류 전무 → <code>loginId</code>는 항상 <code>NOT_COUNTABLE</code>. <code>user_data_scope</code>에 <code>legal_entity_id</code>가 없어 <strong>법인 단위 부여가 사업부 나열로만</strong> 가능하다 → 사업부 추가 시 <strong>격리 구멍</strong>. <code>GET /mdm/legal-entities</code>가 어느 화면에도 안 쓰이는 이유이기도 하다</td><td><strong>#69</strong></td></tr>
-<tr><th class="nw"><strong>13</strong></th><td>판정유형 「<strong>회신 전 임시 등록분</strong>」 표식</td><td><code>W-06-04</code> §6이 「재검토 대상으로 표시」를 요구하는데 그것을 판정할 컬럼이 <code>code_value</code>에 없다 — 회신 도착 전후를 서버도 화면도 모른다</td><td><strong>#64(추가)</strong></td></tr>
+<tr><th class="nw"><strong>13</strong></th><td>판정유형 「<strong>회신 전 임시 등록분</strong>」 표식</td><td><code>W-06-04</code> §6이 「재검토 대상으로 표시」를 요구하는데 그것을 판정할 컬럼이 <code>code_value</code>에 없다 — 회신 도착 전후를 서버도 화면도 모른다</td><td><strong>#64(추가)</strong> (closed 2026-08-25)</td></tr>
 <tr><th class="nw"><strong>14</strong></th><td><strong>공통코드 그룹·값 목록 미정</strong> ⚠ <strong>절반 해소</strong>(2026-08-21 · #179)</td><td>선택 목록이 <code>GET /mdm/code-values?codeGroupId=</code>로 오는데 <strong>어느 그룹인지가 정해져 있지 않다</strong>(창고유형·관리수준·Location유형·품질구역·보관조건·판정유형·상태코드 …). 화면이 그룹 키를 <strong>하드코딩할 수 없다</strong> → 진입 호출 수가 정해지지 않는 근본 원인(4-2 ①)&lt;br&gt;⭐ <strong>이 항목은 두 겹이었고, 아래가 갈린다.</strong>&lt;br&gt;<strong>① 「어떻게 가리키나」 — ✅ 해소.</strong> <code>GET /mdm/code-values</code> 가 <strong><code>codeGroupCode</code>(문자열)</strong> 를 받는다. <code>codeGroupId</code> 는 <strong>필수에서 선택으로</strong> 내렸다(둘 중 정확히 하나 · 어기면 400). ⛔ 채번 식별자는 환경마다 달라 <strong>하드코딩이 애초에 불가능</strong>했다.&lt;br&gt;<strong>② 「어느 그룹인가」 — ⬜ 그룹마다 남는다.</strong> 이번에 <strong>판정유형 하나</strong>를 확정했다(<code>INSPECTION_RESULT_OVERALL_JUDGMENT</code> · 값 <code>ACCEPTED</code>·<code>REJECTED</code>·<code>HELD</code>). 창고유형·관리수준·Location유형·품질구역·보관조건·상태코드는 <strong>아직이다.</strong>&lt;br&gt;⭐ <strong>이름 짓는 규칙을 세웠다</strong> — 컬럼 이름에서 <code>_code</code> 를 뺀 것을 대문자로, 그것만으로 무엇의 값인지 모르면 테이블 이름을 앞에 붙인다(<code>warehouse_type_code</code> → <code>WAREHOUSE_TYPE</code> · <code>inspection_request.status_code</code> → <code>INSPECTION_REQUEST_STATUS</code>). 남은 그룹은 이 규칙으로 뽑는다.</td><td>회신 <strong>E-3</strong> 등 · 각 화면 §8 · <strong>#179</strong></td></tr>
 <tr><th class="nw"><strong>15</strong></th><td>「참조 중 W/O」 산출 방법</td><td><code>W-06-11</code> §4-B의 열 하나가 통째로 비어 있다 — <strong>폐기 가능 여부의 판단 근거</strong>인데 산출 방법이 미결이다</td><td>§8-5</td></tr>
 <tr><th class="nw"><strong>16</strong></th><td><code>bom_component</code> <strong>행 단위 낙관적 잠금의 출처</strong></td><td><code>If-Match</code>는 요구하는데 행 단위 GET이 없어 <code>ETag</code>를 실을 자리가 없었다 → 4-1 ❌-1의 잔여(§8-2 ①)</td><td><strong>✅ 해소</strong>(2026-08-03 사용자 결정 — 행 단위 GET 신설)</td></tr>
 </tbody></table>
-<div class="callout"><p><strong>둘은 「필드가 빈다」가 아니라 「엔드포인트를 쓸 수 없다」</strong>다 — <strong>3</strong>(기본 Rev 플래그 없음 → <code>:set-default</code>)과 <strong>6</strong>(N:M 테이블 없음 → 공정 매핑). 나머지와 성격이 다르므로 따로 표시한다.</p></div>
+<div class="callout"><p><strong>둘은 「필드가 빈다」가 아니라 「엔드포인트를 쓸 수 없다」</strong>다 — <strong>3</strong>(기본 Rev 플래그 없음 → <code>:set-default</code>)과 <strong>6</strong>(N:M 테이블 없음 → 공정 매핑). 나머지와 성격이 다르므로 따로 표시한다.</p>
+<p>⚠ <strong>위 이슈 번호는 전부 2026-08-25 에 닫혔다</strong>(<code>omf-mes#236</code> 이 26건을 정리·재발행). <strong>막힌 사실은 그대로다</strong> — 계약의 <code>/audit/events</code> 는 여전히 <code>x-internal-note</code> 에 「미착지」를 적고 있다. 지금 볼 곳은 아래다.</p>
+<table>
+<thead><tr><th class="nw">옛 번호</th><th>처분(<code>omf-mes#236</code> · 2026-08-25)</th><th>지금 볼 곳</th></tr></thead>
+<tbody>
+<tr><th class="nw"><code>#64</code></th><td>계약 대체 불가 → 재발행</td><td><strong><code>omf-mes-server#42</code></strong>(open)</td></tr>
+<tr><th class="nw"><code>#67</code></th><td>계약 대체 불가 → 재발행</td><td><strong><code>omf-mes-server#44</code></strong>(open)</td></tr>
+<tr><th class="nw"><code>#68</code></th><td>완전 흡수 + 다형 참조는 재발행</td><td>계약 <code>x-internal-note</code> · <strong><code>omf-mes-server#43</code></strong>(open)</td></tr>
+<tr><th class="nw"><code>#65</code>·<code>#66</code></th><td>완전 흡수</td><td>계약이 대장 — 후속 없음</td></tr>
+<tr><th class="nw"><code>#70</code></th><td>✅ 결정 완료(2026-08-24)</td><td>계약 <code>Item.developmentItem</code></td></tr>
+</tbody></table></div>
 <hr>
 <h2>§6. <del>API를 정의할 수 없는 화면 3건</del> → <strong>소멸</strong>(2026-08-18)</h2>
 <p>⛔ <strong>이 절은 비었다. 셋 다 §3-12~3-14 로 옮겨갔다.</strong></p>
@@ -2557,17 +2571,17 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 <p><strong>셋 다 확정이 넷 안팎씩 걸려 근거가 오히려 촘촘했다.</strong> 창작이 되는 것은 <strong>근거 없는 칸</strong>이지 테이블 부재가 아니었다.</p>
 <p>⛔ <strong>근거 없는 칸은 여전히 적지 않았다</strong> — 예비품의 규격·단가·적정재고·교체주기(엑셀 실물 수집 대기) · 연계정의의 변환 규칙 · 송신의 「부속 항목」. <strong>모델 결손과 수집 대기를 가르는 것</strong>이 이 정정의 요점이다. 앞은 통지하고 나아가고, 뒤는 실물을 봐야 안다.</p>
 <p>📨 <strong>모델 결손은 그대로 살아 있다</strong> — <code>#67</code>(설비보전이 물리 모델 선언 범위 밖 · 예비품 표 0건) · <code>#66</code>(연계정의·송신 항목 표 부재 + Legacy 출처 플래그). <strong>작업 통지이고 우리를 막지 않는다.</strong></p>
-<p>⏳ <strong>하나는 계약이 정할 수 없다</strong> — 「개발품 제외」의 판정 축이 품목인지 작업지시 유형인지 <strong>확정 문구가 갈려 있다</strong>(<code>W-06-12</code> §4-B). 모델 문제가 아니라 <strong>두 문서가 다르게 읽히는 문제</strong>라 <code>#70</code> 에서 결정을 기다린다.</p>
+<p>⭐ <strong>「개발품 제외」의 판정 축은 «품목»으로 닫혔다</strong>(사용자 확정 2026-08-24 · <code>omf-mes#70</code> 종료) — 계약이 <code>Item.developmentItem</code> 을 앉혔고 편집은 <code>W-06-05</code> 소관이다. 📨 남은 것은 <code>mdm.item</code> 에 담을 컬럼 하나이고 작업 통지(<code>omf-mes#215</code> — 계약 흡수로 종료 · <code>omf-mes#236</code>)라 우리를 막지 않는다.</p>
 <hr>
 <h2>§7. 범위 밖 — 명시</h2>
 <table>
 <thead><tr><th>항목</th><th>이유</th></tr></thead>
 <tbody>
-<tr><th><strong>인증·인가 엔드포인트</strong></th><td><code>docs/research/2026-07-28-POP-단말인증-설계검토.md</code> 소관이며 §6에 사용자 확정 필요 ②~⑤가 잔존한다. 이 스펙의 403은 <strong>「권한이 없으면 어떤 응답이 오는가」</strong>까지이고 <strong>누가 무슨 권한을 갖는가는 다루지 않는다</strong></td></tr>
+<tr><th><strong>인증·인가 엔드포인트</strong></th><td><code>design/raw/decisions/2026-07-28-POP-단말인증-설계검토.md</code> 소관이며 §6에 사용자 확정 필요 ②~⑤가 잔존한다. 이 스펙의 403은 <strong>「권한이 없으면 어떤 응답이 오는가」</strong>까지이고 <strong>누가 무슨 권한을 갖는가는 다루지 않는다</strong></td></tr>
 <tr><th><strong>POP·모바일 전용 API</strong></th><td>오프라인 선배포·묶음 스냅샷은 성격이 다르다(C-1·C-3). 해당 도메인 확산 시 별도</td></tr>
 <tr><th><strong>다른 도메인이 기준정보를 참조하는 조회</strong></th><td>소비처 화면의 스펙이 아직 없어 추측 설계가 된다</td></tr>
 <tr><th><strong><code>operation_seq</code> 채번 방식</strong>(연번 vs 간격 10·20·30)</th><td><strong>데이터 모델링 재량</strong>이다. 화면이 최종 순서를 통째로 보내고 표시는 <strong>목록 내 위치로 1부터 연속</strong>이라, 백엔드가 채번을 바꿔도 화면이 흔들리지 않는다</td></tr>
-<tr><th><strong>라벨 렌더링·물리 인쇄</strong></th><td><code>W-06-07</code> 「라벨 이미지 생성」의 서버 렌더링 호출은 라벨 도메인 소관(결정 18)</td></tr>
+<tr><th><strong>물리 인쇄</strong></th><td><code>W-06-07</code> 라벨의 프린터 전송·스풀. 서버 렌더링 호출은 §3-10 으로 옮겼다</td></tr>
 <tr><th><strong>서버측 export</strong></th><td><code>W-06-10</code>·<code>W-06-11</code>의 「내보내기」. 이 스펙 전체에 export 엔드포인트를 두지 않았다 — <strong>클라이언트 변환 전제로 확정</strong>(2026-08-03 사용자 확정, §8-2 항목 3). <code>payload</code>는 목록 응답에 없고 상세 GET에서만 제공되며 내려받기 파일에도 포함하지 않으므로 대외비 범위가 자동으로 지켜진다</td></tr>
 <tr><th><strong>이벤트 스키마·목업 서버</strong></th><td>WBS P0.4의 나머지 절반 — 통합 Agent 소유</td></tr>
 <tr><th><strong>일정</strong></th><td>사용자 소관</td></tr>

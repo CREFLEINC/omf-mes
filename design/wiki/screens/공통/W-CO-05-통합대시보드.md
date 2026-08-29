@@ -26,7 +26,7 @@
 | 면 | 근거 | 강도 |
 | --- | --- | :-: |
 | **프로세스** | ⚠ **도식 앵커 밖**이다 — 대시보드는 워크플로우 단계가 아니라 **결과를 모아 보는 자리**다 | 실측 |
-| **화면·IA** | `deliverables/04-통합-IA.md` §3 `W-CO-05` 행 — **유일한 REQ 직접 근거 대시보드**(등급 1) | 실측 |
+| **화면·IA** | `design/wiki/project-spec/04-통합-IA.md` §3 `W-CO-05` 행 — **유일한 REQ 직접 근거 대시보드**(등급 1) | 실측 |
 | **요구** | ✅ **REQ-PR-0036** — **일일 생산실적** · 알람 설비 위치<br>✅ **DR-004 4-A 확정** — 「**알람 위치 표시 = 계층 텍스트.** 평면 배치를 쓰지 않는다」 · 「**웹-통합대시보드는 지금 쓴다.** 알람은 계층 텍스트로 위치를 보인다. **도면 구획 없음**」<br>✅ **DR-003 확정** — 알림센터가 정본 · Zalo 는 부가 전달<br>✓설계확정 **결정 15** L85 | 실측 |
 | **데이터** | ✅ **생산 실적 재료 실재** — `production.production_result` 수량 5종(SQL 1634~1638) · `shift_id`(1647) · `planning.routing_operation.standard_cycle_time_sec`(648)·`standard_yield_rate`(650) · `production.work_session`(847) `started_at` NOT NULL·`ended_at` nullable·`stop_reason_code`(858) · `mdm.shift.start_time`·`end_time`(542·543)·`crosses_midnight`(544)<br>⛔ **없는 것** — `dashboard`·`widget`·`layout`·`oee` 검색 **0건** · **계획 비가동을 담을 곳 0건**(§3-2) | 실측 |
 
@@ -300,4 +300,4 @@ git ls-tree -r a554d11 src/components/Progress/
 | :-: | --- | --- |
 | v0.1 | 2026-08-11 | 초안. ⭐⭐ **14차가 넘긴 OEE 를 받아 실측했고 그리지 않기로 했다** — 14차의 이유(소유가 셋)는 **이 화면에서 해소되나**, **시간가동률의 분모가 성립하지 않는다**(휴일·계획 정지 자리 0건). ⭐⭐ **유일한 `holiday` 한 건이 정책 시드**(`ALLOW_PRODUCTION_ON_HOLIDAYS`, SQL 3359)여서 **판정 근거 없는 게이트**(F-3·F-6)를 드러냈고, **결정 03 과 물리 모델이 어긋난다**. **세 항을 나란히 보이고 시간가동률에 분모를 본문으로 밝힌다**(G-20 · 툴팁 아님). ⭐ **이월 항목 `Chart` 해소** — line/bar/pie · **`ReferenceLine` 목표선 실재** → `a`. ⭐⭐ **`Gauge` 가 `Progress/` 한 층 아래에 있었다** — **DS 판정 절차 ① 보완**(A-13 의 DS 판). ⭐ **`OPERATION_POLICY` 시드 14건 발견** → **B-22 보완**. ⛔ 위젯 편집 안 만든다(G-24). DS 신규 갭 0건. 계약 후보 4건. |
 
-출처: uiux/2026-08-11-화면상세스펙-확대17차/W-CO-05-통합대시보드.md · 최종 대조일: 2026-08-25
+출처: design/wiki/screens/공통/W-CO-05-통합대시보드.md · 최종 대조일: 2026-08-25

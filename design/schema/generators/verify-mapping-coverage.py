@@ -17,6 +17,9 @@
 #   요구서는 액션 여러 개를 한 행에 묶어 적으므로(「스캔(암묵) / 직접 입력」)
 #   슬래시로 나뉜 조각이 하나라도 있으면 다뤄진 것으로 친다.
 #
+# ⚠ 짝인 verify-ui-coverage.py 는 여전히 인자 없으면 mdm 하나만 만든다 — 생성기라
+#   기본을 바꾸지 않았다. 인자 없이 돌린 사람이 생성물 9벌을 한꺼번에 덮어쓰기 때문이다.
+#
 # 표준 라이브러리만 쓴다(저장소 관행).
 import importlib
 import io
@@ -30,7 +33,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 _COV = importlib.import_module("verify-ui-coverage")
 DOMAINS = {name: (files[1], files[2]) for name, files in _COV.DOMAINS.items()}
-DEFAULT_DOMAIN = "mdm"  # 짝인 verify-ui-coverage.py 와 같은 기본값을 쓴다
+DEFAULT_DOMAIN = "mdm"  # 짝인 verify-ui-coverage.py 의 기본값과 같아야 한다. ⛔ 2026-08-29 이후 main() 의 기본은 「전 도메인」이다 — 인자 없이 돌려 한 도메인만 보던 거짓 초록을 없앴다(O-1).
 
 _LIST_SCREEN = re.compile(r"^## ([WMP]-(?:CO|\d{2})-\d{2})\s*$", re.M)
 # ⛔ 번호와 화면 ID 사이에 «꾸밈»이 들어간다 — 실제로 `### 3-8. ⭐ `W-03-10` …` 이
@@ -147,13 +150,30 @@ def check(domain):
 
 
 def main():
-    domain = DEFAULT_DOMAIN
+    # ⛔ 인자 없이 돌리면 «전 도메인»을 본다. 2026-08-29 이전에는 mdm 하나만 보고
+    #    ✅ / EXIT=0 을 내서, 다른 도메인의 결손을 «거짓 초록»으로 덮었다(O-1).
+    #    한 도메인만 보려면 --domain 을 명시한다.
     if "--domain" in sys.argv:
         domain = sys.argv[sys.argv.index("--domain") + 1]
-    if domain not in DOMAINS:
-        print("모르는 도메인: %s (%s 중 하나)" % (domain, " · ".join(DOMAINS)))
+        if domain not in DOMAINS:
+            print("모르는 도메인: %s (%s 중 하나)" % (domain, " · ".join(DOMAINS)))
+            return 1
+        return check(domain)
+
+    results = []
+    for domain in DOMAINS:
+        results.append((domain, check(domain)))
+        print("")
+
+    print("─" * 60)
+    for domain, rc in results:
+        print("  %-6s %s" % (domain, "⛔ 결손" if rc else "✅"))
+    bad = [d for d, rc in results if rc]
+    if bad:
+        print("⛔ 결손이 있는 도메인 %d개 — %s" % (len(bad), " · ".join(bad)))
         return 1
-    return check(domain)
+    print("✅ 등록된 %d개 도메인 전건 다뤘습니다." % len(results))
+    return 0
 
 
 if __name__ == "__main__":
