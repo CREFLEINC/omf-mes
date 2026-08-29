@@ -19,6 +19,14 @@
   ⑦ 선언되지 않은 `tag`
   ⑧ 쓰기 오퍼레이션에 `Idempotency-Key` 없음 — 재전송이 전표를 두 번 만든다
   ⑨ `If-Match` 를 받는데 409 를 선언하지 않음 — 저장 충돌을 400 과 섞게 된다
+  ⑩ **같은 객체에 같은 키가 두 번** — JSON 은 뒤엣것만 남기므로 앞엣것이 «조용히»
+     사라진다. 파일은 그대로 파싱되고 어떤 도구도 울지 않는다
+
+⛔ ⑩ 을 나중에 더한 이유 — `omf-mes#283`
+  한 프로퍼티에 `x-internal-note` 가 두 번 들어가 앞엣것(OCR 결손 표시)이 삼켜졌고,
+  **3일간 어떤 도구에도 보이지 않았다.** 이 검사기가 그때 초록이었다 — `json.load`
+  기본값이 중복 키를 말없이 덮어써, 검사기 자신이 «남은 쪽»만 보고 있었기 때문이다.
+  실물 1건은 손으로 고쳤지만 재발을 막는 장치가 없어 여기에 축을 세운다.
 
 사용법
   python3 check-structure.py [spec.json ...]
@@ -45,6 +53,58 @@ PATH_VAR = re.compile(r'\{(\w+)\}')
 # 다른 스키마에서만 참조되고 경로에서 직접 쓰이지 않아도 되는 것.
 # ErrorItem 은 ErrorResponse 안에서만 쓰인다.
 REFERENCED_INDIRECTLY = {'ErrorItem'}
+
+
+def load_checked(path: str) -> tuple[dict, list]:
+    """JSON 을 읽으면서 «같은 객체 안의 중복 키»를 함께 걷는다.
+
+    ⛔ `json.load` 기본값은 중복 키를 말없이 덮어쓴다 — 뒤엣것만 남고 앞엣것은
+    사라진다. 그래서 「파일이 파싱된다」가 「키가 다 살아 있다」를 뜻하지 않는다.
+    `object_pairs_hook` 은 «덮어쓰기 전»의 쌍 목록을 그대로 받으므로 여기서만
+    보인다(omf-mes#283).
+
+    반환 → (문서, ['$.a.b 에 키가 두 번 — x', …])
+    """
+    marks: list = []          # [(만들어진 객체, [중복 키…])] — 객체를 붙들어 id 를 지킨다
+
+    def hook(pairs: list) -> dict:
+        obj: dict = {}
+        twice: list = []
+        for key, value in pairs:
+            if key in obj and key not in twice:
+                twice.append(key)
+            obj[key] = value
+        if twice:
+            marks.append((obj, twice))
+        return obj
+
+    spec = json.load(io.open(path, encoding='utf-8'), object_pairs_hook=hook)
+    if not marks:
+        return spec, []
+
+    # 어디였는지 되짚는다 — 문서를 훑어 그 «객체 자신»을 찾는다(동일성 비교).
+    where = {id(obj): keys for obj, keys in marks}
+    found: list = []
+
+    def locate(node: object, path_label: str) -> None:
+        if isinstance(node, dict):
+            keys = where.pop(id(node), None)
+            if keys:
+                for key in keys:
+                    found.append('같은 객체에 키가 두 번 — %s.%s (앞엣것이 사라진다)'
+                                 % (path_label, key))
+            for key, value in node.items():
+                locate(value, '%s.%s' % (path_label, key))
+        elif isinstance(node, list):
+            for index, value in enumerate(node):
+                locate(value, '%s[%d]' % (path_label, index))
+
+    locate(spec, '$')
+    # 문서에 안 걸린 것이 남으면 자리를 못 짚은 것이다 — 숨기지 않고 그대로 낸다.
+    for keys in where.values():
+        for key in keys:
+            found.append('같은 객체에 키가 두 번 — (자리 미상) %s' % key)
+    return spec, found
 
 
 def collect_refs(node: object, out: set) -> set:
@@ -183,9 +243,10 @@ def check_annotations(node: object, path: str = '$', in_names: bool = False) -> 
 
 
 def check(path: str) -> int:
-    spec = json.load(io.open(path, encoding='utf-8'))
+    spec, duplicates = load_checked(path)
     used = collect_refs(spec, set())
-    errors = check_schemas(spec, used) + check_paths(spec) + check_annotations(spec)
+    errors = (duplicates + check_schemas(spec, used) + check_paths(spec)
+              + check_annotations(spec))
 
     operations = sum(1 for item in spec['paths'].values() for m in item if m in ALL_METHODS)
     print('%s — 경로 %d · 오퍼레이션 %d · 스키마 %d'

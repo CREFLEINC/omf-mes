@@ -2091,23 +2091,23 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <h2>문서 개요</h2>
 <p>작성일: 2026-07-30 (v1.0 초판) · 최종 갱신: 2026-07-31 (<strong>v1.1</strong> — §2.3 디자인 시스템 실체 등재) · 작성 주체: CREFLE OMF 팀</p>
 <p><strong>성격</strong>: 재편성 산출물 — 원본 무수정·전량 신규 작성. 설계 결정의 정본은 각 원본(확정기록·결정서·WF·도식스펙·개념모델)이며, 본 문서는 개발 착수·열람용 <strong>통합 편람</strong>이다. 본 문서와 원본이 어긋나면 원본이 우선하고, 어긋남 발견 시 본 문서를 갱신한다.</p>
-<p>근거 자료: docs/research/2026-07-09-기술스택-배포모델-결정서.md · 2026-07-28-POP-단말인증-설계검토.md · 2026-07-08-ERP-MES-수신정보-정리.md · 2026-06-26-트랜잭션-발번-2계층설계-및-B섹션재정리.md · 2026-07-03-개념데이터모델-v2-요구사항통합.md · 2026-07-03-워크플로우-요구사항반영-01~06.md · 2026-07-06·07-도식스펙-01~06.md · 2026-07-06-설계결정서-14건.md · 2026-07-04-현장검증-QA-확정기록.md · 날짜별 확정기록 9종(07-13~07-29) · 2026-06-23-용어표준사전.md · docs/planning/2026-07-08-OMF-MES-개발-WBS.md</p>
-<p>⭐ <strong>수치는 이 문서를 믿지 말고 명령을 돌린다</strong> — <code>python3 deliverables/verify-counts.py</code> · 화면 축은 <code>deliverables/화면-진도표.md</code>. <strong>최종 대조 2026-08-19.</strong> 이 문서는 <strong>인수 세트 Ⅱ</strong>이고 세트 표지는 <code>README.md</code> 다.</p>
+<p>근거 자료: design/raw/decisions/2026-07-09-기술스택-배포모델-결정서.md · 2026-07-28-POP-단말인증-설계검토.md · 2026-07-08-ERP-MES-수신정보-정리.md · 2026-06-26-트랜잭션-발번-2계층설계-및-B섹션재정리.md · 2026-07-03-개념데이터모델-v2-요구사항통합.md · 2026-07-03-워크플로우-요구사항반영-01~06.md · 2026-07-06·07-도식스펙-01~06.md · 2026-07-06-설계결정서-14건.md · 2026-07-04-현장검증-QA-확정기록.md · 날짜별 확정기록 9종(07-13~07-29) · 2026-06-23-용어표준사전.md · docs/planning/2026-07-08-OMF-MES-개발-WBS.md</p>
+<p>⭐ <strong>수치는 이 문서를 믿지 말고 명령을 돌린다</strong> — <code>python3 design/schema/generators/verify-counts.py</code> · 화면 축은 <code>design/wiki/handover/화면-진도표.md</code>. <strong>최종 대조 2026-08-19.</strong> 이 문서는 <strong>인수 세트 Ⅱ</strong>이고 세트 표지는 <code>README.md</code> 다.</p>
 <p>표기 원칙: 검증된 사실과 내부 가설 구분(✅REQ / ✓확정 QA #n / ✓설계확정 결정 nn / [가설] / (확인 필요)) · 원본 내부·간 모순은 최신 확정을 채택하고 «(정합주: …)»로 명시 · 예외 E-n(WF 예외 카탈로그)과 회신 E-n(고객 회신 대기)은 구분 표기</p>
 <p>상호 참조: 01-요구사항명세서.md(REQ 원문·추적성) · 03-HW구성안.md(단말·스테이션) · 04-통합-IA.md(화면 인벤토리·정보구조) · 05-사용자-프로세스-태스크플로우.md(단계·태스크 상세)</p>
 <div class="kpi"><div><span class="big">338</span><span class="lbl">도메인 설계 규칙 전건 (§6)</span></div><div><span class="big">142</span><span class="lbl">통합 결정 대장 행 (§7)</span></div><div><span class="big">107</span><span class="lbl">미결 총괄 행 (§8)</span></div></div>
 
 <h2>§1. 문서 개요</h2>
 <h3>§1.1 목적</h3>
-<ul><li>본서는 omf-mes 프로젝트의 <strong>개발 착수용 SW 설계 정본 편람</strong>이다. 산재한 원본 확정 사항(설계결정·QA 확정기록·요구사항·연계 정리)을 개발팀 열람용 단일 문서로 재편성한 것이며, <strong>정본은 각 원본 문서</strong>다. 본서와 원본이 충돌하면 원본·확정기록이 우선한다. 원본 간 스테일(구서술)은 최신 확정을 채택하고 «(정합주: …)» 각주로 표시했다.</li><li>개발 전제: <strong>개발 7주(2026-07-13~08-28) · Agent coding 병렬 · 계약 우선</strong>(제약 C9) 【docs/planning/2026-07-08-OMF-MES-개발-WBS.md §2·§4.1】.</li><li>핵심 설계 원천: 결정 15~19 — 2026-07-10 CTO 전건 확정(ADR 성격), WBS §8 미결 #1 스택·#2 배포·#3 AI를 종결한 결정군 【docs/research/2026-07-09-기술스택-배포모델-결정서.md §0.1】.</li><li>작성일 2026-07-30 · 작성 주체 CREFLE OMF 팀 · v1.0(초판).</li></ul>
+<ul><li>본서는 omf-mes 프로젝트의 <strong>개발 착수용 SW 설계 정본 편람</strong>이다. 산재한 원본 확정 사항(설계결정·QA 확정기록·요구사항·연계 정리)을 개발팀 열람용 단일 문서로 재편성한 것이며, <strong>정본은 각 원본 문서</strong>다. 본서와 원본이 충돌하면 원본·확정기록이 우선한다. 원본 간 스테일(구서술)은 최신 확정을 채택하고 «(정합주: …)» 각주로 표시했다.</li><li>개발 전제: <strong>개발 7주(2026-07-13~08-28) · Agent coding 병렬 · 계약 우선</strong>(제약 C9) 【docs/planning/2026-07-08-OMF-MES-개발-WBS.md §2·§4.1】.</li><li>핵심 설계 원천: 결정 15~19 — 2026-07-10 CTO 전건 확정(ADR 성격), WBS §8 미결 #1 스택·#2 배포·#3 AI를 종결한 결정군 【design/raw/decisions/2026-07-09-기술스택-배포모델-결정서.md §0.1】.</li><li>작성일 2026-07-30 · 작성 주체 CREFLE OMF 팀 · v1.0(초판).</li></ul>
 <h3>§1.2 범위 — 본서 §1~§5 구성</h3>
 <table>
 <thead><tr><th class="nw">절</th><th>내용</th><th>핵심 원본</th></tr></thead>
 <tbody>
-<tr><th class="nw">§2</th><td>시스템 아키텍처 — 지배 제약 C1~C11 · 결정 15(배포·운영) · 결정 16(스택) · CI/CD·현장 적용·관측 · 결정 19(AI 범위)</td><td>docs/research/2026-07-09-기술스택-배포모델-결정서.md</td></tr>
-<tr><th class="nw">§3</th><td>사용자 프로그램·인증 — 폼팩터 3종 · POP 단말인증 3층 설계 · 오프라인 시나리오 2건(결정 17) · 라벨 출력 경로(결정 18)</td><td>위 결정서 + docs/research/2026-07-28-POP-단말인증-설계검토.md</td></tr>
-<tr><th class="nw">§4</th><td>데이터 설계 — 개념모델 v2(클러스터 6·엔티티 64) · Lot Status 체계 · 발번 체계 · 논리·물리 모델 현황(포인터) · 용어사전(포인터)</td><td>docs/research/2026-07-03-개념데이터모델-v2-요구사항통합.md 외</td></tr>
-<tr><th class="nw">§5</th><td>ERP↔MES 연계 — 수신 채널 · 수신 마스터 6종 · 수신 트랜잭션 5계열 · 취급 규칙 · 비연계(오해 방지) · 송신 5전표 · 연계 미결</td><td>docs/research/2026-07-08-ERP-MES-수신정보-정리.md</td></tr>
+<tr><th class="nw">§2</th><td>시스템 아키텍처 — 지배 제약 C1~C11 · 결정 15(배포·운영) · 결정 16(스택) · CI/CD·현장 적용·관측 · 결정 19(AI 범위)</td><td>design/raw/decisions/2026-07-09-기술스택-배포모델-결정서.md</td></tr>
+<tr><th class="nw">§3</th><td>사용자 프로그램·인증 — 폼팩터 3종 · POP 단말인증 3층 설계 · 오프라인 시나리오 2건(결정 17) · 라벨 출력 경로(결정 18)</td><td>위 결정서 + design/raw/decisions/2026-07-28-POP-단말인증-설계검토.md</td></tr>
+<tr><th class="nw">§4</th><td>데이터 설계 — 개념모델 v2(클러스터 6·엔티티 64) · Lot Status 체계 · 발번 체계 · 논리·물리 모델 현황(포인터) · 용어사전(포인터)</td><td>design/wiki/domain-workflow/2026-07-03-개념데이터모델-v2-요구사항통합.md 외</td></tr>
+<tr><th class="nw">§5</th><td>ERP↔MES 연계 — 수신 채널 · 수신 마스터 6종 · 수신 트랜잭션 5계열 · 취급 규칙 · 비연계(오해 방지) · 송신 5전표 · 연계 미결</td><td>design/raw/process/docs/research/2026-07-08-ERP-MES-수신정보-정리.md</td></tr>
 </tbody></table>
 <ul><li>하드웨어 사양·수량·단가·배치 상세는 본서 범위 밖 — <strong>03-HW구성안.md</strong> 참조. 요구사항 원문 전건은 <strong>01-요구사항명세서.md</strong>, 화면·정보구조는 <strong>04-통합-IA.md</strong>, 업무 프로세스·태스크 플로우는 <strong>05-사용자-프로세스-태스크플로우.md</strong> 참조.</li></ul>
 <h3>§1.3 읽는 법</h3>
@@ -2128,23 +2128,23 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th>«(정합주: …)»</th><td>본 편람 편집 각주 — 원본 간 스테일 서술을 최신 확정으로 대체한 지점</td></tr>
 </tbody></table>
 <p><strong>(3) ⚠ E-번호 이중 체계</strong> — 동일 표기 「E-n」이 문서마다 다른 의미로 쓰인다. 본서는 다음과 같이 구분 표기한다:</p>
-<ul><li><strong>예외 E-n</strong> = 워크플로우 예외 카탈로그의 예외 유형 번호(→ 05-사용자-프로세스-태스크플로우.md 소관).</li><li><strong>회신 E-n</strong> = 고객 회신 대기 코드(예: 회신 E-1=알람 이벤트 유형 목록·회신 E-3=판정유형 값 목록·회신 E-4=폐기 계정 항목 — QA #22 기준 고객 액션 회신 E-1~E-10 전부 회수 대기) 【docs/research/2026-07-03-개념데이터모델-v2-요구사항통합.md §8 E18~E20·E28】.</li><li>그 외 국지 번호(개념모델 §8 미결 일련번호 E18~E20, 데이터모델링 CHANGELOG의 ERPNext 벤치마킹 채택 항목 E-1~E-7)는 해당 절(§4.5·§4.6)에서 별도 명시한다 — 회신 E코드와 무관.</li></ul>
+<ul><li><strong>예외 E-n</strong> = 워크플로우 예외 카탈로그의 예외 유형 번호(→ 05-사용자-프로세스-태스크플로우.md 소관).</li><li><strong>회신 E-n</strong> = 고객 회신 대기 코드(예: 회신 E-1=알람 이벤트 유형 목록·회신 E-3=판정유형 값 목록·회신 E-4=폐기 계정 항목 — QA #22 기준 고객 액션 회신 E-1~E-10 전부 회수 대기) 【design/wiki/domain-workflow/2026-07-03-개념데이터모델-v2-요구사항통합.md §8 E18~E20·E28】.</li><li>그 외 국지 번호(개념모델 §8 미결 일련번호 E18~E20, 데이터모델링 CHANGELOG의 ERPNext 벤치마킹 채택 항목 E-1~E-7)는 해당 절(§4.5·§4.6)에서 별도 명시한다 — 회신 E코드와 무관.</li></ul>
 <p><strong>(4) 원본 약칭</strong> — 본서에서 【약칭 §n】으로 인용한다:</p>
 <table>
 <thead><tr><th class="nw">약칭</th><th>경로(저장소 루트 기준)</th></tr></thead>
 <tbody>
-<tr><th class="nw">【결정서】</th><td>docs/research/2026-07-09-기술스택-배포모델-결정서.md (v0.2)</td></tr>
-<tr><th class="nw">【POP인증】</th><td>docs/research/2026-07-28-POP-단말인증-설계검토.md (v0.6)</td></tr>
-<tr><th class="nw">【ERP수신】</th><td>docs/research/2026-07-08-ERP-MES-수신정보-정리.md (v1.2)</td></tr>
-<tr><th class="nw">【발번】</th><td>docs/research/2026-06-26-트랜잭션-발번-2계층설계-및-B섹션재정리.md (v0.2)</td></tr>
-<tr><th class="nw">【개념모델】</th><td>docs/research/2026-07-03-개념데이터모델-v2-요구사항통합.md (v2.10)</td></tr>
-<tr><th class="nw">【용어사전】</th><td>docs/research/2026-06-23-용어표준사전.md (v1.0)</td></tr>
+<tr><th class="nw">【결정서】</th><td>design/raw/decisions/2026-07-09-기술스택-배포모델-결정서.md (v0.2)</td></tr>
+<tr><th class="nw">【POP인증】</th><td>design/raw/decisions/2026-07-28-POP-단말인증-설계검토.md (v0.6)</td></tr>
+<tr><th class="nw">【ERP수신】</th><td>design/raw/process/docs/research/2026-07-08-ERP-MES-수신정보-정리.md (v1.2)</td></tr>
+<tr><th class="nw">【발번】</th><td>design/raw/decisions/2026-06-26-트랜잭션-발번-2계층설계-및-B섹션재정리.md (v0.2)</td></tr>
+<tr><th class="nw">【개념모델】</th><td>design/wiki/domain-workflow/2026-07-03-개념데이터모델-v2-요구사항통합.md (v2.10)</td></tr>
+<tr><th class="nw">【용어사전】</th><td>design/raw/process/docs/research/2026-06-23-용어표준사전.md (v1.0)</td></tr>
 <tr><th class="nw">【WBS】</th><td>docs/planning/2026-07-08-OMF-MES-개발-WBS.md (v0.3)</td></tr>
-<tr><th class="nw">【HW스펙】</th><td>docs/research/2026-07-07-하드웨어-구성-스펙.md (v0.4)</td></tr>
+<tr><th class="nw">【HW스펙】</th><td>design/raw/process/docs/research/2026-07-07-하드웨어-구성-스펙.md (v0.4)</td></tr>
 <tr><th class="nw">【데이터모델링】</th><td>docs/research/2026-07-23-데이터모델링/ (⚠ wooju-shin 담당·읽기 전용 — §4.6)</td></tr>
 </tbody></table>
 <h3>§1.4 산출물 5종 상호 참조</h3>
-<p>같은 deliverables/ 폴더의 5종이 한 세트다.</p>
+<p>같은 design/wiki/project-spec 폴더의 5종이 한 세트다.</p>
 <table>
 <thead><tr><th>산출물</th><th>역할</th><th>본서와의 관계</th></tr></thead>
 <tbody>
@@ -2184,7 +2184,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th>백업 체계(C4 충족)</th><td>일 단위 논리 백업 + WAL 연속 아카이빙(PITR) → <strong>사내망 NAS 연속 복제</strong> → 연 단위 콜드 아카이브(NAS·외장 매체). 장기 보존은 트랜잭션 테이블 파티셔닝+콜드 아카이브 분리로 충족</td><td>확정</td></tr>
 <tr><th>NAS 위치·재해 격리</th><td>4안 중 <strong>고객사 선택 대기</strong> <code>[🔹미정]</code>: ①물리 분리 설치(CREFLE 권장) ②암호화 외장 매체 반출 로테이션 ③유지보수 창구 시점 외부 복제 ④동일 공간 수용. ④ 선택 시 국지 재해에 원본·백업 동시 소실=C4 갭(리스크 8 — 고객 고지 필수)</td><td>고객 선택 대기</td></tr>
 <tr><th>원격 운영</th><td><strong>상시 원격 채널 없음</strong>(C11). 유지보수=방문 기본 + 유지보수 창구(고객 승인 하 일시 인터넷)의 원격 세션 보조. 인바운드 포트 상시 개방 금지</td><td>확정</td></tr>
-<tr><th>알림 채널</th><td>정본=<strong>사내망 채널</strong>(관리 대시보드·알림센터·POP 표시) / 카카오톡·Zalo=<strong>인터넷 가용 시 best-effort 보조로 격하</strong>(QA #24 조정) <code>[확정 2026-07-10 질의]</code> — 격하는 고객 고지 필요 【결정서 §6 #12】 «(정합주: 【개념모델】 6.5 알림의 "채널=대시보드+카카오톡/Zalo 선택 사용 — 채널 어댑터 확정(✓확정 QA #24)" 서술은 후행 결정 15(2026-07-10)의 QA #24 조정으로 대체 — docs/research/2026-07-09-기술스택-배포모델-결정서.md §1)»</td><td>확정(고객 고지 미결)</td></tr>
+<tr><th>알림 채널</th><td>정본=<strong>사내망 채널</strong>(관리 대시보드·알림센터·POP 표시) / 카카오톡·Zalo=<strong>인터넷 가용 시 best-effort 보조로 격하</strong>(QA #24 조정) <code>[확정 2026-07-10 질의]</code> — 격하는 고객 고지 필요 【결정서 §6 #12】 «(정합주: 【개념모델】 6.5 알림의 "채널=대시보드+카카오톡/Zalo 선택 사용 — 채널 어댑터 확정(✓확정 QA #24)" 서술은 후행 결정 15(2026-07-10)의 QA #24 조정으로 대체 — design/raw/decisions/2026-07-09-기술스택-배포모델-결정서.md §1)»</td><td>확정(고객 고지 미결)</td></tr>
 <tr><th>인터넷 의존 기능</th><td><strong>전면 배제</strong> — 외부 AI API 없음·원격 관측 없음·상시 터널 없음. <strong>운영 중 인터넷 0이어도 전 기능 동작</strong></td><td>확정</td></tr>
 <tr><th>이식성</th><td>전 구성요소 컨테이너 패키징 유지(기획서 §11-2 SaaS 티어 옵션 경로 보존)</td><td>확정</td></tr>
 </tbody></table>
@@ -2290,7 +2290,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <hr>
 <h2>§4. 데이터 설계</h2>
 <h3>§4.1 개념 데이터 모델 v2 — 구조 【개념모델 v2.10, 2026-07-29 갱신】</h3>
-<ul><li><strong>위상</strong>: <code>docs/research/2026-06-23-개념데이터모델.md</code>(v1.4)를 대체하는 재정리본. 범위=개념 모델(엔티티·관계·카디널리티), 물리 스키마는 후속(§4.6). 정본=UNIMES(MES).</li><li><strong>총계: 총 64 엔티티</strong> = v1.4의 49 + v2.0 신규 11 + v2.2 신설 5 − 통합·흡수 2(전달사항+공지사항→공지/전달(Notice)·SPC측정값→검사측정치 흡수) + v2.5 신설 1(생산불량LOT, ✓확정 2026-07-15). 보고서 양식=양식 파일 미확보로 비고 수준 예약(✅REQ-PR-0013). «(정합주: 【결정서 §5-4】 "P0.3 물리 스키마 v0(63엔티티 DDL)"·【WBS §2·§3.2】 "63 엔티티"는 2026-07-15 생산불량LOT 신설(v2.5) 이전 수치 — 【개념모델 v2.10】 헤더의 <strong>64</strong>로 대체 채택. 부수: WBS §3.2 클러스터 내역(C1 19/C2 7/C3 6/C4 12/C5 7/C6 13+횡단 2)은 합산 66으로 자체 명기 63과도 불일치·산정 기준 원문 미기재 — 검산 기준으로 쓰지 말 것. docs/research/2026-07-03-개념데이터모델-v2-요구사항통합.md 헤더)»</li><li><strong>구성</strong>: 1 기준정보(C1) · 2 생산실행(C2) · 3 LOT/추적 코어(C3) · 4 품질(C4) · 5 설비/툴(C5) · 6 물류/재고(C6) · 6.5 횡단 · 7 통합 ERD · 8 미결 종합.</li></ul>
+<ul><li><strong>위상</strong>: <code>design/raw/superseded/2026-06-23-개념데이터모델.md</code>(v1.4)를 대체하는 재정리본. 범위=개념 모델(엔티티·관계·카디널리티), 물리 스키마는 후속(§4.6). 정본=UNIMES(MES).</li><li><strong>총계: 총 64 엔티티</strong> = v1.4의 49 + v2.0 신규 11 + v2.2 신설 5 − 통합·흡수 2(전달사항+공지사항→공지/전달(Notice)·SPC측정값→검사측정치 흡수) + v2.5 신설 1(생산불량LOT, ✓확정 2026-07-15). 보고서 양식=양식 파일 미확보로 비고 수준 예약(✅REQ-PR-0013). «(정합주: 【결정서 §5-4】 "P0.3 물리 스키마 v0(63엔티티 DDL)"·【WBS §2·§3.2】 "63 엔티티"는 2026-07-15 생산불량LOT 신설(v2.5) 이전 수치 — 【개념모델 v2.10】 헤더의 <strong>64</strong>로 대체 채택. 부수: WBS §3.2 클러스터 내역(C1 19/C2 7/C3 6/C4 12/C5 7/C6 13+횡단 2)은 합산 66으로 자체 명기 63과도 불일치·산정 기준 원문 미기재 — 검산 기준으로 쓰지 말 것. design/wiki/domain-workflow/2026-07-03-개념데이터모델-v2-요구사항통합.md 헤더)»</li><li><strong>구성</strong>: 1 기준정보(C1) · 2 생산실행(C2) · 3 LOT/추적 코어(C3) · 4 품질(C4) · 5 설비/툴(C5) · 6 물류/재고(C6) · 6.5 횡단 · 7 통합 ERD · 8 미결 종합.</li></ul>
 <p><strong>클러스터별 엔티티 전건</strong> (【개념모델】 각 §엔티티 표 1열):</p>
 <table>
 <thead><tr><th>클러스터</th><th>엔티티</th></tr></thead>
@@ -2325,9 +2325,9 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th class="nw">⑭</th><td>MES↔ERP(UNIERP DB 중계·송신 on/off·검사 결과 비연계)·추적관리시스템 병행 연계 I/F</td></tr>
 </tbody></table>
 <h3>§4.4 발번 체계 — 지시·작업지시·전표 3계층 【발번 §1~§5】</h3>
-<p>«(정합주: 원본 파일명은 "트랜잭션-발번-<strong>2계층</strong>설계"이나 본문 §2가 설계한 것은 지시–작업지시–전표 <strong>3계층</strong> 분리이며, 후속 문서(【ERP수신 §2】·【개념모델 §8.B.9】)가 전부 "3계층 발번"으로 승계 — 본서는 3계층으로 표기. docs/research/2026-06-26-트랜잭션-발번-2계층설계-및-B섹션재정리.md §2)»</p>
+<p>«(정합주: 원본 파일명은 "트랜잭션-발번-<strong>2계층</strong>설계"이나 본문 §2가 설계한 것은 지시–작업지시–전표 <strong>3계층</strong> 분리이며, 후속 문서(【ERP수신 §2】·【개념모델 §8.B.9】)가 전부 "3계층 발번"으로 승계 — 본서는 3계층으로 표기. design/raw/decisions/2026-06-26-트랜잭션-발번-2계층설계-및-B섹션재정리.md §2)»</p>
 <ul><li><strong>배경</strong>(【발번 §1】): B8 미결 — 입하·입고·출고·출하·반품·재고이동·재고실사 <strong>7개 트랜잭션 No의 발번 주체</strong>(MES vs ERP) 미확정이었음. 🔶 "MES가 7개 전부 발번" 가정의 약점: 회계 전표 성격(입고=G/R·출하=PGI·반품=credit memo·실사=조정전표)은 ERP가 법적 장부(SoR) — 단일원장 충돌·순환 의존·채번 유일성·법정연번·수정권한 역전 문제.</li><li><strong>설계 개념</strong>(【발번 §2】): 하나의 물류 사건을 <strong>상위 지시(ERP, nullable) · 작업지시(MES, 항상 생성) · 회계전표(ERP, 회계발생분만)</strong> 3객체로 분리 — 가운데(실행)는 항상 MES 소유.<ul><li>연결 규칙: 작업지시→상위지시=<strong>nullable FK, 0..1:N</strong>(ERP 지시 없으면 standalone 단독 생성, 1 지시→N 작업지시 분할·N 지시→1 작업지시 혼적 표현 가능). 회계전표→작업지시 결과=회계 발생 트랜잭션만, MES 실행 완료 트리거로 ERP 채번.</li><li>위상: ✅ 생산은 이미 이 패턴(P/O─1:N→W/O─→작업실적) — 물류 트랜잭션으로 확장해 시스템 전체 단일 멘탈 모델. 🔶 ISA-95 Level 4↔Level 3 분리와 정합.</li><li>비용(⚠ 원문 명시): 객체·번호 증가(한 흐름 최대 3개 No — I/F 매핑·정합·참조키 규칙 명문화 필요)·<strong>상태 동기화 규칙</strong>(ERP 지시 취소 시 W/O 처리·부분완료 시 지시 상태·분할/통합 수량 정합) 정의 필요 → ERP 지시↔MES 작업지시 상태 동기화 규칙은 【WBS §6.2】 X-ERP 트랙 설계 항목으로 잔존.</ul></li></li><li><strong>트랜잭션별 적용표</strong>(【발번 §3】): 출하(출하지시→출하작업지시 Pick·OQC·Pack→PGI) / 입하·입고(P/O→입고작업지시 검수·적치·자재LOT발행→G/R) / 출고(W/O 상위→불출작업지시→GI, 🔶backflush) / 재고이동(이동작업지시 — 동일 평가영역이면 전표 없음) / 반품(RMA→반품입고작업지시→credit) / 재고실사(실사작업지시=카운팅, <strong>조정전표만 ERP</strong>). ⚠ 순수 회계 사건(차이 조정·credit)엔 작업지시 안 붙음 → "<strong>거의</strong> 모든 트랜잭션 적용"이 정확.</li><li><strong>출하 예시</strong>(【발번 §4】): ERP 출하지시 No→MES 출하작업지시(Picking에서 <strong>실물 제품LOT 확정</strong> — FEFO·위치·가용재고 ★)→OQC→Packing(납품라벨·고객 바코드)→실행 결과 송신→ERP PGI 전표 No. ⚠ 현장 확인: 출하지시에 LOT이 찍혀 오는가. ※출하 상위지시 원천은 이후 고객사 엑셀 지시서로 갱신 승계(【ERP수신 §5】·【개념모델 §8.B.9】 — §5.5 참조).</li></ul>
-<p><strong>생산LOT 발번·폐번 — v2.10 확정</strong> 【개념모델 C3 생산LOT 행 · docs/research/2026-07-29-생산LOT-발번-폐번-확정기록.md】:</p>
+<p><strong>생산LOT 발번·폐번 — v2.10 확정</strong> 【개념모델 C3 생산LOT 행 · design/raw/decisions/2026-07-29-생산LOT-발번-폐번-확정기록.md】:</p>
 <ul><li>키=생산LOT No(<strong>공장 내 유일</strong> — <code>UNIQUE(plant_id, lot_no)</code>·설정형 채번규칙) + <strong>W/O 내 순번</strong>(별도 속성 — 선발행 슬롯 구간 지정용. ⚠ <strong>하류 데이터모델 미보유 — [docs→데이터모델] 이슈 대상</strong>, §4.6).</li><li>상태=<strong>대기/활성/폐번</strong>(패턴 P3): 대기=선발행 슬롯 예약 / 활성=실적 등록 실물 귀속 / 폐번=마감 시 실적 없음·재사용 금지. 전이=대기→활성·대기→폐번뿐(<strong>활성→폐번 없음</strong>).</li><li>발번 수량 규칙(✓확정 2026-07-29): 선발행 N=양품목표÷LOT크기는 계획값이지 상한 아님 — ①추가 발번=초과 생산 시 뒤로 이어 발행(모든 W/O 일반 규칙 — 러닝체인지는 BOM 귀속만 결정·타 구간 선발행분 불변) ②폐번=W/O 마감 시점 전용·시스템 자동. QA #27(초과분 실적 인정/미달 잔량 이월·소멸)과 같은 사건의 두 측면.</li><li>러닝체인지: <strong>W/O 무분할·생산LOT만 BOM 스냅샷별 분할</strong> — 구/신은 각 LOT의 BOM 스냅샷이 정함(<strong>LOT 번호 순서 ≠ 시간 순서</strong>, 「전/후 분할」 표현 폐기 ✓확정 2026-07-29). 생산LOT에는 <strong>양품만 귀속</strong>(불량·의심자재=생산불량LOT 분리, ✓확정 2026-07-15).</li><li>자재LOT 발번=경로 이원화(✓확정 2026-07-20): 사전부착=공급사 번호 수용 / 직접부착=MES 발번(§4.1 C3 행).</li><li>발번 엔진 구현 위치: CORE-1 채번(발번) 엔진 — W/O 발행 시 일괄 발번+선배포 API(§3.3 정합 확인) 【WBS §4.2】.</li></ul>
 <h3>§4.5 개념모델 §8 미결 종합 — 잔존 발췌 【개념모델 §8 (A~E, #1~#29)】</h3>
 <p>※아래 B·D·E+번호는 개념모델 §8의 미결 일련번호이며, 괄호 안 「회신 E-n」이 고객 회신 대기 코드다(§1.3-(3)). 종결분은 원본 참조.</p>
@@ -2349,7 +2349,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <h3>§4.6 논리·물리 모델 현황 — ⚠ 소유 경계·포인터만</h3>
 <ul><li><strong>⚠ 소유 경계(절대)</strong>: <code>docs/research/2026-07-23-데이터모델링/</code>은 <strong>wooju-shin 담당·읽기 전용</strong>. 반영 요청은 <code>[docs→데이터모델]</code> 이슈 + <strong>assignee 필수</strong>. ⚠ 개념모델(상류)만 보고 판단 금지 — <strong>하류가 앞서감</strong>(예: mdm.terminal_process 8플래그·app.operation_policy·mdm.worker_qualification은 하류에만 존재).</li><li>폴더 구성(2026-07-23 기준): 1-1~1-3(도메인 이해·핵심 기능·시나리오) / 2-1~2-7(작업지시·자재투입·생산실적·품질·LOT추적·누락분 보충·물류재고) / 3-1~3-3(개념·논리·물리 모델링) / CHANGELOG.md / mes_erd.md / mes_postgresql_physical_model.sql(173KB) / html/.</li><li><strong>판 이력 — 상태 표기로만 인용(본서가 검산·재서술하지 않음)</strong> 【데이터모델링/CHANGELOG.md】:<ul><li><strong>v2</strong>(DB 설계 검토 반영): 테이블 101→<strong>126</strong>(+25). PostgreSQL 16 전체 DDL 실행 검증(에러 0)·무결성 트리거 7종 스모크 통과. 🔴높음 6건(H-1 사용자·부서·권한 전면 신설 ~ H-6 적치(putaway) 지시)·🟡중간 24건(M-1~M-24 — document_issue_log·operation_policy·numbering_rule·worker_qualification 등)·🟢낮음 다수·⚪과함 정리 2건·명시적 범위 이연 3건.</li><li><strong>v3</strong>(ERPNext 벤치마킹 반영): 테이블 126→<strong>127</strong>(신규 1: <code>putaway_rule</code>). 채택 7건(<strong>벤치마킹 항목 번호 E-1~E-7 — 회신 E코드와 무관</strong>)·검토 후 미채택 8건·구조 유지 결정 다수(불변 원장+역트랜잭션, lot_relation 계보, 다차원 inventory_balance 등 — 원가·평가는 ERP 소관 명시).</li><li><strong>미해결(후속 결정 필요)</strong>: ① LOT 관계유형 코드 시드 — 2-5 FR-LT-053의 12유형 vs 논리 §17.2의 7유형(시드 작성 시 12유형 기준 통일 예정) ② 사이클타임 단위 — 물리=초 고정(<code>standard_cycle_time_sec</code>), 논리 문서 표기를 물리에 맞춰 수정 (+<code>serial_number</code> 계열=요구 근거 미확인·범위 확인 필요로 기록).</ul></li></li><li><strong>상류↔하류 미정합 알려진 건 2건</strong>: 1. 생산LOT 「<strong>W/O 내 순번</strong>」 — 상류(개념모델 C3) ✓확정 2026-07-29·하류 미보유 ⚠ → <code>[docs→데이터모델]</code> 이슈 대상. 2. <code>mdm.terminal.token_version</code> — 구현 마이그레이션(<code>20260728010000_add_terminal_token_version</code>)이 정본 테이블 수정, <strong>모델링 정본 SQL 역반영 필요</strong> ⚠ 【POP인증 §6-②】 — 소유 경계상 <code>[docs→데이터모델]</code> 이슈 경로 필요.</li></ul>
 <h3>§4.7 용어 표준 사전 — 포인터 【용어사전 v1.0(2026-06-23)】</h3>
-<ul><li>목적: 동의어/표기 변이→표준 식별자 통일(엔티티·속성 명명 기준). 정본=UNIMES(MES).</li><li>수록 범위: §1 표준 용어 사전 <strong>49 엔티티</strong>(C1 16/C2 7/C3 5/C4 6/C5 7/C6 8 — 등재는 10, 문서 내 주석으로 카운트 설명) + §1.7 핵심 보강 용어 12건(IQC·PQC·OQC·CoA/CoC·제조이력추적·Cycle Time·OEE·Middleware·기준정보·Web Service·비가동·불량) / §2 용어 변이 해소 <strong>18행</strong> / §3 명명 규칙 <strong>8항</strong>(LOT 계열 단계 명시·인식표=생산LOT No+seq·마스터 <code>(master)</code> 접미·검사 3종 IQC·PQC·OQC 코드 통일·출고(Issue)·재고이동(StockMove)·출하(Shipment) 3분기·W/O=ERP P/O의 MES 전개분·연계분 기준정보 MES 수정·삭제 불가·영문·약어 병기).</li><li>⚠ <strong>시점 고착 주의</strong>: v1.0은 v1.4(49 엔티티) 기준 시점 작성으로 이후 확정이 미반영. «(정합주: 용어사전의 예비품="품목 마스터 보전용 뷰"·Routing 키="품목+공정Ver"·P/O(생산계획) 명칭 등 서술은 후행 확정(✓확정 QA #7 예비품=별도 마스터·✓설계확정 결정 07 Routing=MES 정본(품목코드+Routing Rev)·전달사항+공지사항 통합 등)으로 대체 — 표준 용어 정본 인용 시 【개념모델 v2.10】 우선. docs/research/2026-07-03-개념데이터모델-v2-요구사항통합.md)»</li></ul>
+<ul><li>목적: 동의어/표기 변이→표준 식별자 통일(엔티티·속성 명명 기준). 정본=UNIMES(MES).</li><li>수록 범위: §1 표준 용어 사전 <strong>49 엔티티</strong>(C1 16/C2 7/C3 5/C4 6/C5 7/C6 8 — 등재는 10, 문서 내 주석으로 카운트 설명) + §1.7 핵심 보강 용어 12건(IQC·PQC·OQC·CoA/CoC·제조이력추적·Cycle Time·OEE·Middleware·기준정보·Web Service·비가동·불량) / §2 용어 변이 해소 <strong>18행</strong> / §3 명명 규칙 <strong>8항</strong>(LOT 계열 단계 명시·인식표=생산LOT No+seq·마스터 <code>(master)</code> 접미·검사 3종 IQC·PQC·OQC 코드 통일·출고(Issue)·재고이동(StockMove)·출하(Shipment) 3분기·W/O=ERP P/O의 MES 전개분·연계분 기준정보 MES 수정·삭제 불가·영문·약어 병기).</li><li>⚠ <strong>시점 고착 주의</strong>: v1.0은 v1.4(49 엔티티) 기준 시점 작성으로 이후 확정이 미반영. «(정합주: 용어사전의 예비품="품목 마스터 보전용 뷰"·Routing 키="품목+공정Ver"·P/O(생산계획) 명칭 등 서술은 후행 확정(✓확정 QA #7 예비품=별도 마스터·✓설계확정 결정 07 Routing=MES 정본(품목코드+Routing Rev)·전달사항+공지사항 통합 등)으로 대체 — 표준 용어 정본 인용 시 【개념모델 v2.10】 우선. design/wiki/domain-workflow/2026-07-03-개념데이터모델-v2-요구사항통합.md)»</li></ul>
 <hr>
 <h2>§5. ERP↔MES 연계</h2>
 <h3>§5.1 수신 채널·아키텍처 (✅확정 QA #18) 【ERP수신 §3】</h3>
@@ -2367,7 +2367,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th>거래처(공급사) 🔹</th><td>ERP</td><td>거래처코드</td><td>〃</td><td>원본 읽기 전용</td><td>✅요청 확정(🔹2026-07-08 승격 — 구매발주 공급사 코드 해석용)</td></tr>
 </tbody></table>
 </figure>
-<p>«(정합주: 【개념모델】 C1 「ERP-MES I/F 연계정의」의 수신 목록 "품목·BOM·공통코드·조직·<strong>작업자</strong>·P/O"(거래처 없음)와 【WBS §3.2·§4.2 X-ERP】 "수신 6종(품목·BOM·공통코드·조직·<strong>작업자</strong>·P/O)" 서술은 🔹2026-07-08 확정(사용자로 개명·거래처 승격·수주/초기재고 요청 추가)이 미반영된 구서술 — 본 표(【ERP수신】 v1.1 이후)로 대체 채택. docs/research/2026-07-08-ERP-MES-수신정보-정리.md §1)»</p>
+<p>«(정합주: 【개념모델】 C1 「ERP-MES I/F 연계정의」의 수신 목록 "품목·BOM·공통코드·조직·<strong>작업자</strong>·P/O"(거래처 없음)와 【WBS §3.2·§4.2 X-ERP】 "수신 6종(품목·BOM·공통코드·조직·<strong>작업자</strong>·P/O)" 서술은 🔹2026-07-08 확정(사용자로 개명·거래처 승격·수주/초기재고 요청 추가)이 미반영된 구서술 — 본 표(【ERP수신】 v1.1 이후)로 대체 채택. design/raw/process/docs/research/2026-07-08-ERP-MES-수신정보-정리.md §1)»</p>
 <h3>§5.3 수신 — 지시·트랜잭션 5계열 전건 【ERP수신 §2】</h3>
 <figure class="table-wide">
 <table>
@@ -2434,12 +2434,12 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <table>
 <thead><tr><th class="nw">도메인</th><th>WF 정본</th><th>도식스펙</th><th>노드→화면 매핑</th></tr></thead>
 <tbody>
-<tr><th class="nw">01</th><td>WF01 = docs/research/2026-07-03-워크플로우-요구사항반영-01-자재창고관리.md (v1.6)</td><td>도식01 = docs/research/2026-07-07-도식스펙-01-자재창고관리.md (v2.13)</td><td>매핑01 = uiux/2026-07-25-화면목록-IA/node-screen-mapping/01-자재창고관리.md</td></tr>
-<tr><th class="nw">02</th><td>WF02 = docs/research/2026-07-03-워크플로우-요구사항반영-02-생산실행.md (v1.15)</td><td>도식02 = docs/research/2026-07-06-도식스펙-02-생산실행.md (v2.21)</td><td>매핑02 = uiux/2026-07-25-화면목록-IA/node-screen-mapping/02-생산실행.md</td></tr>
-<tr><th class="nw">03</th><td>WF03 = docs/research/2026-07-03-워크플로우-요구사항반영-03-품질관리.md (v1.5)</td><td>도식03 = docs/research/2026-07-06-도식스펙-03-품질관리.md (v2.2)</td><td>매핑03 = uiux/2026-07-25-화면목록-IA/node-screen-mapping/03-품질관리.md</td></tr>
-<tr><th class="nw">04</th><td>WF04 = docs/research/2026-07-03-워크플로우-요구사항반영-04-제품출하.md (v1.3)</td><td>SPEC04 = docs/research/2026-07-06-도식스펙-04-제품출하.md (v1.7)</td><td>MAP04 = uiux/2026-07-25-화면목록-IA/node-screen-mapping/04-제품출하.md</td></tr>
-<tr><th class="nw">05</th><td>WF05 = docs/research/2026-07-03-워크플로우-요구사항반영-05-설비툴관리.md (v1.3)</td><td>도식05 = docs/research/2026-07-06-도식스펙-05-설비툴관리.md (v1.5)</td><td>매핑05 = uiux/2026-07-25-화면목록-IA/node-screen-mapping/05-설비툴관리.md</td></tr>
-<tr><th class="nw">06</th><td>WF06 = docs/research/2026-07-03-워크플로우-요구사항반영-06-기준정보연계.md (v1.5)</td><td>도식06 = docs/research/2026-07-07-도식스펙-06-기준정보연계.md (v1.6)</td><td>매핑06 = uiux/2026-07-25-화면목록-IA/node-screen-mapping/06-기준정보연계.md</td></tr>
+<tr><th class="nw">01</th><td>WF01 = design/wiki/domain-workflow/2026-07-03-워크플로우-요구사항반영-01-자재창고관리.md (v1.6)</td><td>도식01 = design/wiki/domain-workflow/2026-07-07-도식스펙-01-자재창고관리.md (v2.13)</td><td>매핑01 = design/raw/process/uiux/2026-07-25-화면목록-IA/node-screen-mapping/01-자재창고관리.md</td></tr>
+<tr><th class="nw">02</th><td>WF02 = design/wiki/domain-workflow/2026-07-03-워크플로우-요구사항반영-02-생산실행.md (v1.15)</td><td>도식02 = design/wiki/domain-workflow/2026-07-06-도식스펙-02-생산실행.md (v2.21)</td><td>매핑02 = design/raw/process/uiux/2026-07-25-화면목록-IA/node-screen-mapping/02-생산실행.md</td></tr>
+<tr><th class="nw">03</th><td>WF03 = design/wiki/domain-workflow/2026-07-03-워크플로우-요구사항반영-03-품질관리.md (v1.5)</td><td>도식03 = design/wiki/domain-workflow/2026-07-06-도식스펙-03-품질관리.md (v2.2)</td><td>매핑03 = design/raw/process/uiux/2026-07-25-화면목록-IA/node-screen-mapping/03-품질관리.md</td></tr>
+<tr><th class="nw">04</th><td>WF04 = design/wiki/domain-workflow/2026-07-03-워크플로우-요구사항반영-04-제품출하.md (v1.3)</td><td>SPEC04 = design/wiki/domain-workflow/2026-07-06-도식스펙-04-제품출하.md (v1.7)</td><td>MAP04 = design/raw/process/uiux/2026-07-25-화면목록-IA/node-screen-mapping/04-제품출하.md</td></tr>
+<tr><th class="nw">05</th><td>WF05 = design/wiki/domain-workflow/2026-07-03-워크플로우-요구사항반영-05-설비툴관리.md (v1.3)</td><td>도식05 = design/wiki/domain-workflow/2026-07-06-도식스펙-05-설비툴관리.md (v1.5)</td><td>매핑05 = design/raw/process/uiux/2026-07-25-화면목록-IA/node-screen-mapping/05-설비툴관리.md</td></tr>
+<tr><th class="nw">06</th><td>WF06 = design/wiki/domain-workflow/2026-07-03-워크플로우-요구사항반영-06-기준정보연계.md (v1.5)</td><td>도식06 = design/wiki/domain-workflow/2026-07-07-도식스펙-06-기준정보연계.md (v1.6)</td><td>매핑06 = design/raw/process/uiux/2026-07-25-화면목록-IA/node-screen-mapping/06-기준정보연계.md</td></tr>
 </tbody></table>
 <p><strong>⚠ E-번호 이중 체계 표기 규칙(본 문서 전체 적용)</strong> — 원본군에서 «E+숫자» 표기가 두 체계로 병용된다: ① 각 WF 말미 <strong>예외 흐름 카탈로그</strong> 번호(01=E1~E11 · 02=E1~E14 · 03=E1~E9 · 04=E1~E10 · 05=E1~E9 · 06=E1~E10) ② <strong>고객 회신·액션 대기</strong> 코드(E3=판정유형 값 목록·E4=폐기 계정·E5=출하지시서 샘플·E6=납품라벨 형식·E7=배치도·E9=권한 매트릭스·E10=ERP 연계 방식 등). 예: 「E4」가 WF04 예외 카탈로그에서는 '결품·선입선출 이탈(S4)'이고 회신 코드로는 '폐기 계정 항목'이다. 본 문서는 전자를 <strong>「예외 E-n」</strong>, 후자를 <strong>「회신 E-n」</strong> 으로 구분 표기한다. (근거: WF01 예외 카탈로그 주기 · WF04 예외 카탈로그 vs SPEC04 §4.1 · 도식05 §4.1 vs §4.2 · WF06 예외 카탈로그 주기)</p>
 <p><strong>검사 3종 co-location 원칙(도메인 공통)</strong> — 2026-07-20 「03 품질섹션 구조 재정의」 확정: 03 도식 본체=<strong>Lot Status 상태 전이도</strong>이며, 검사 <em>수행</em> 도식·화면은 각 도메인에 co-locate한다 — <strong>IQC=01(01-S-C·W-01-01) · PQC=02(02-S-E·P-02-13) · OQC=04(S5·W-04-03)</strong>. 03은 판정·Lot Status 전이·검사방식 거버넌스를 소유한다. (근거: WF03 §0 · 도식03 §1.0 · 도식01 v2.8 변경 이력)</p>
@@ -2478,7 +2478,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th class="nw">4</th><td>생산·제품LOT=MES 발번 유지</td><td>✓확정 2026-07-04 QA #1 (WF01 S4 Open-Issue)</td></tr>
 <tr><th class="nw">5</th><td>IQC 불합격=Hold 유지 상태에서 반품</td><td>✓확정 §재정의 #3 (WF01 S3·S10)</td></tr>
 <tr><th class="nw">6</th><td>IQC 대상=등록된 전량(부착 여부 처리 분기 소멸)</td><td>§재정의 (WF01 S3 Rule)</td></tr>
-<tr><th class="nw">7</th><td>긴급 IQC 생략=작업자 요청→권한자 승인→Lot Status=한도승인; 권한자=MES 권한 보유 관리자·승인/기록 매체=관리웹</td><td>✓확정 §재정의 #8 · ✅확정 2026-07-27 (도식01 §1.2-B)</td></tr>
+<tr><th class="nw">7</th><td>긴급 IQC 생략=작업자 요청→권한자 승인→LOT 상태 <code>정상</code> · 한도승인은 조건(<code>app.approval_request</code>) (기존 서술 폐기: 2026-08-07 회신 E-3 종결 — 공유계약 A-14); 권한자=MES 권한 보유 관리자·승인/기록 매체=관리웹</td><td>✓확정 §재정의 #8 · ✅확정 2026-07-27 (도식01 §1.2-B)</td></tr>
 <tr><th class="nw">8</th><td>IQC 생략 2분기 — [생략·샘플링 미대상]→Release(그룹 판정 승계) / [생략·긴급승인→한도승인]; G/R 「합격품 한정」이 한도승인 자동 제외</td><td>✓사용자 확정 2026-07-24 (도식01 §1.2-B·v2.10)</td></tr>
 <tr><th class="nw">9</th><td>판정 유형은 합/불 2값 아님 — 한도승인·특채·폐기 등 실재(목록=회신 E-3 대기)</td><td>✅ REQ-PR-0027 요구 (WF01 S3)</td></tr>
 <tr><th class="nw">10</th><td>LOT 수량 비고정 — 품목별 '자재LOT 보관 단위 기본값'+개별 override, 자재·생산LOT 양쪽</td><td>✅ REQ-PR-0008 요구 · ✓확정 QA #14 (E26 종결) (WF01 S4)</td></tr>
@@ -2939,7 +2939,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <h4>도메인 미결 요약 (핵심 7건 — 전건 고유 68건(회신 5+도식 [확인] 11−중복 1+WF 잔여 47+매핑 6)은 §8)</h4>
 <ol><li><strong>회신 E-5</strong> — 고객사 출하지시서 샘플(import 양식 설계의 전제) — REQ-PR-0035 비고 (SPEC04 EM1·WF04 S3)</li><li><strong>회신 E-6</strong> — 납품라벨 형식 — REQ-PR-0036 비고 (SPEC04 EM3·WF04 S6)</li><li><strong>회신 E-3</strong> — 판정 유형 목록(확정 후 Lot Status 단일 지점에만 통제 규칙 적용 — 결정 10) — REQ-PR-0027 (SPEC04 EM2)</li><li><strong>회신 E-10</strong> — 현행 출하-ERP 기록 항목+반품/실사조정 연계 방식 — REQ-PR-0030 비고 · QA #6 (SPEC04 EM4)</li><li><strong>회신 E-4</strong> — 폐기 계정 항목(QA #21: S10 유일 잔여 미결) — REQ-PR-0028 비고 (WF04 S10)</li><li>ERP 출하지시 계층 병존 여부 재검증(충돌② 전례상) · 지시서 import 방식(파일 업로드/메일 자동 수신 — D18)·D+1 등록 규칙 상세·시간대 슬롯 데이터 구조 (WF04 S3 · SPEC04 §4.2 #9)</li><li>기포장품 스킵 경로의 납품라벨 부착 절차([확인] 7 — 결정 05 보정 미명시·보수적 도식 무표기) — 「부착한다」로 회신되면 H6→G-04-01 흡수 판정 뒤집힘(회신 시 uiux 통보 예약) (SPEC04 §4.2 #7 · MAP04 §3 E)</li></ol>
 <h4>정합주 (04)</h4>
-<ol><li>SPEC04 말미 「제약 준수 체크」 표의 구 집계 「총 <strong>24</strong>(A1~A15+B1~B9)」는 v1.7 §1-② 「메인 15+사이드 <strong>10</strong>=총 <strong>25</strong>」(B10 「판정 의뢰」 1008:9057 신설·변경 이력 명기)로 대체 — 체크 표만 미갱신 슬리피지 (SPEC04 §1-② vs 제약 준수 체크 표).</li><li>MAP04의 SC4(847:8878)/W-04-07 「도식 결함(인접 행위 0개)·존치」 판정은 같은 날 SPEC04 v1.7의 B10 신설로 결함이 해소된 상태와 시차 비동기(MAP04 대장은 v1.4 기준 105행 유지·B10 미등재·「존치 1(1.0%)」 검산 그대로) — W-04-07은 <strong>재판정 대기</strong>로 읽어야 하며 재판정 자체는 미수행(확정 아님) (SPEC04 v1.7 변경 이력·§2 vs MAP04 헤더·§4 검산).</li><li>WF04 S10 내부 서술 긴장 — Exception 절 [확인] 4건(품의 절차·폐기사유 코드 체계·손익 전표 상세·Hold LOT 폐기 종결) 존치 vs Open-Issue·[Check]의 「잔여=회신 E-4(계정)만·사유 코드=내부 설계」(QA #21 인용) — 소멸 범위 서술이 한 문서 안에 병존. 본 문서는 원문 표기대로 §8에 전건 수록·어느 쪽도 소거 확정하지 않음 (WF04 S10 예외 ①~④ vs Open-Issue·[Check]).</li><li>페이지 직속 커넥터 조회 함정 — H7 브래킷(838:8635)·H6 「예」 분기(840:8642+라이저 840:8638)는 부모가 섹션이 아닌 페이지(219:4509) 직속이라 섹션 자식 조회에 미검출 → 「미작화」 오판 2회(#26 H7·#45 H6) 발생·모두 캔버스 실측으로 반증·정정(MAP04 <code>미작화</code> 처분 0건 확정). 04 캔버스 대조 시 섹션 자식만 훑으면 3본 누락 (SPEC04 §1-③·v1.5·v1.6 변경 이력 · MAP04 §0-6·1-3).</li><li>화면 순변동 부기 정정 — 4단계 확정으로 M-04-02 통합(−1)·G-04-12 재고 재등록 신설(+1): 총량 17 유지·구성 변경. MAP04 스스로 「권고안이 B6에 '현행 유지'로 부기한 것은 부정확 — 분리 결정은 실제로 화면을 1건 늘린다」고 정정 기록(W-04-06=반품입고+재고 재등록 분리 대상) (MAP04 §3 C·§4 검산).</li><li>(참고 minor) WF04 근거 자료 목록은 구판 개념모델(docs/research/2026-06-23-개념데이터모델.md)을, SPEC04는 v2(docs/research/2026-07-03-개념데이터모델-v2-요구사항통합.md)를 인용 — 근거 헤더의 세대 미갱신으로 보임(내용 충돌 미발견) (WF04 헤더 vs SPEC04 헤더).</li></ol>
+<ol><li>SPEC04 말미 「제약 준수 체크」 표의 구 집계 「총 <strong>24</strong>(A1~A15+B1~B9)」는 v1.7 §1-② 「메인 15+사이드 <strong>10</strong>=총 <strong>25</strong>」(B10 「판정 의뢰」 1008:9057 신설·변경 이력 명기)로 대체 — 체크 표만 미갱신 슬리피지 (SPEC04 §1-② vs 제약 준수 체크 표).</li><li>MAP04의 SC4(847:8878)/W-04-07 「도식 결함(인접 행위 0개)·존치」 판정은 같은 날 SPEC04 v1.7의 B10 신설로 결함이 해소된 상태와 시차 비동기(MAP04 대장은 v1.4 기준 105행 유지·B10 미등재·「존치 1(1.0%)」 검산 그대로) — W-04-07은 <strong>재판정 대기</strong>로 읽어야 하며 재판정 자체는 미수행(확정 아님) (SPEC04 v1.7 변경 이력·§2 vs MAP04 헤더·§4 검산).</li><li>WF04 S10 내부 서술 긴장 — Exception 절 [확인] 4건(품의 절차·폐기사유 코드 체계·손익 전표 상세·Hold LOT 폐기 종결) 존치 vs Open-Issue·[Check]의 「잔여=회신 E-4(계정)만·사유 코드=내부 설계」(QA #21 인용) — 소멸 범위 서술이 한 문서 안에 병존. 본 문서는 원문 표기대로 §8에 전건 수록·어느 쪽도 소거 확정하지 않음 (WF04 S10 예외 ①~④ vs Open-Issue·[Check]).</li><li>페이지 직속 커넥터 조회 함정 — H7 브래킷(838:8635)·H6 「예」 분기(840:8642+라이저 840:8638)는 부모가 섹션이 아닌 페이지(219:4509) 직속이라 섹션 자식 조회에 미검출 → 「미작화」 오판 2회(#26 H7·#45 H6) 발생·모두 캔버스 실측으로 반증·정정(MAP04 <code>미작화</code> 처분 0건 확정). 04 캔버스 대조 시 섹션 자식만 훑으면 3본 누락 (SPEC04 §1-③·v1.5·v1.6 변경 이력 · MAP04 §0-6·1-3).</li><li>화면 순변동 부기 정정 — 4단계 확정으로 M-04-02 통합(−1)·G-04-12 재고 재등록 신설(+1): 총량 17 유지·구성 변경. MAP04 스스로 「권고안이 B6에 '현행 유지'로 부기한 것은 부정확 — 분리 결정은 실제로 화면을 1건 늘린다」고 정정 기록(W-04-06=반품입고+재고 재등록 분리 대상) (MAP04 §3 C·§4 검산).</li><li>(참고 minor) WF04 근거 자료 목록은 구판 개념모델(design/raw/superseded/2026-06-23-개념데이터모델.md)을, SPEC04는 v2(design/wiki/domain-workflow/2026-07-03-개념데이터모델-v2-요구사항통합.md)를 인용 — 근거 헤더의 세대 미갱신으로 보임(내용 충돌 미발견) (WF04 헤더 vs SPEC04 헤더).</li></ol>
 <hr>
 <h3>§6.5 도메인 05 설비툴관리</h3>
 <h4>범위·경계</h4>
@@ -3136,13 +3136,13 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <h4>정합주 (06)</h4>
 <ol><li>WF06 S2 [Check]에 취소선 없이 남은 「품목 등록을 ERP에서 하나 MES에서 하나 · '생성주체 MES System'의 실제 의미」는 같은 단계 Boundary의 「A1 완전 확정으로 해소 — LOT 3종=MES 발번·품목=ERP 정본 유지(✓확정 QA #1)」로 대체 — 실질은 해소·문서 내 표기만 불일치 (WF06 S2).</li><li>도식06 §0의 구 집계 「미정의 마커 7」은 v1.6(#25) 실측 「<strong>8</strong>」(M8 686:7203 판정유형 독립 Email 노드 확정)로 대체 — 원본 내 자가 정정 완료 사항 (도식06 §4.1 정정 주석).</li><li>이슈 #25의 「06-S-D 체인 서술 오류」 주장은 반증됨 — MES-10은 Server 717:7506+스티키 718:7494의 총칭이므로 「B13·B14 → MES-10 → DB-D」 서술은 옳다. 실제 결함=Server ID 전면 부재(§1.4로 해소)·§3 도형 열 Server 누락(정정) (도식06 §1.4 반증 주석).</li><li>도식06 v1.6 헤더의 WF06 「v1.3」 인용은 표기 stale — WF06 현재 v1.5(v1.4 자재LOT 재정의·v1.5 E4 표현 정정 — 둘 다 「프로세스·엔티티 무파급」 명기라 실질 충돌 없음·버전 표기만 미갱신) (도식06 헤더 vs WF06 변경 이력).</li><li>B12 사번입력의 유형 아이콘 ↔ 단말 정본 어긋남 — 캔버스 아이콘=Mobile, 배지 정본=POP. 정본이 「범례 주석의 대표 사례」로 명기 — 유형 열로 단말 추정 금지의 반례 (매핑06 「규칙 밖·특기 사항」).</li><li>B7 운영마스터 배지 부재=ERP 소관이 아니라 <strong>배지 정본(placement-plan) 누락</strong> 판정(내용상 MES 채번 정본) — docs 이슈 대상 (매핑06 B7 행·보류 확정 결과).</li><li>(참고) 현행에만 있는 화면 4건(W-06-03·04·06·10)=행위 노드 앵커 없이 MES 노트·미정의 마커만 근거 — 매핑 규칙으로 판정·반박 불가(규칙 §2는 노트를 데이터 항목 근거로만 인정). 특히 S1 공통코드는 WF에 등록 단계(Actor·Action)가 실재하나 도식 메인에 등록 행위 노드가 없어(신규 코드 경로=M3 미확정) WF 실체와 도식·매핑 근거 사이 갭 — 화면 정당성 판정은 04-통합-IA.md의 별도 도출 체계 몫 (매핑06 「그룹·현행 대조」 · WF06 S1).</li></ol>
 <h2>§7. 설계 결정 대장 — 통합 결정 인덱스</h2>
-<div class="callout"><p>이 절은 본 저장소 <strong>최초의 단일 결정 원장</strong>이다. 흩어져 있던 결정(QA 확정기록·설계결정서·기술스택 ADR·날짜별 확정기록)을 한 표로 모았다. <strong>읽기 규칙</strong>: ① 본 표의 「결정 요지」는 1~2줄 압축이며 상세 요지·근거 논증·철회 경위는 「원본」 열의 해당 §가 정본이다. ② 「상태」가 <strong>대체/부분 대체/조정</strong>인 행은 원문을 그대로 인용하지 말 것 — §7.3 계보 체인의 말단 확정을 인용한다. ③ 철회·미채택안(EWO §2 철회 3안 · COR §3 미채택 3안)은 제기됐다 버려진 안이므로 설계에 혼입 금지 (docs/research/2026-07-14-긴급WO-운영방식-확정기록.md §2 · docs/research/2026-07-15-마감후정정-운영방식-확정기록.md §3).</p></div>
+<div class="callout"><p>이 절은 본 저장소 <strong>최초의 단일 결정 원장</strong>이다. 흩어져 있던 결정(QA 확정기록·설계결정서·기술스택 ADR·날짜별 확정기록)을 한 표로 모았다. <strong>읽기 규칙</strong>: ① 본 표의 「결정 요지」는 1~2줄 압축이며 상세 요지·근거 논증·철회 경위는 「원본」 열의 해당 §가 정본이다. ② 「상태」가 <strong>대체/부분 대체/조정</strong>인 행은 원문을 그대로 인용하지 말 것 — §7.3 계보 체인의 말단 확정을 인용한다. ③ 철회·미채택안(EWO §2 철회 3안 · COR §3 미채택 3안)은 제기됐다 버려진 안이므로 설계에 혼입 금지 (design/raw/decisions/2026-07-14-긴급WO-운영방식-확정기록.md §2 · design/raw/decisions/2026-07-15-마감후정정-운영방식-확정기록.md §3).</p></div>
 <h3>§7.1 결정 번호 3계열 안내 + 찾는 법</h3>
 <table>
 <thead><tr><th>계열</th><th>ID 형태</th><th>정본 문서</th><th>성격</th></tr></thead>
 <tbody>
-<tr><th>1. 현장검증 QA 확정</th><td>✓확정 QA #1~#37 (+E26 자연 해소)</td><td>docs/research/2026-07-04-현장검증-QA-확정기록.md (v1.4)</td><td>2026-07-03~07 고객 문답 확정 — <strong>정본 계보 최상위</strong> (WBS §3.1)</td></tr>
-<tr><th>2. 설계 결정</th><td>✓설계확정 결정 01~19</td><td>결정 01~14: docs/research/2026-07-06-설계결정서-14건.md (v1.1) / 결정 15~19: docs/research/2026-07-09-기술스택-배포모델-결정서.md (v0.2, ADR)</td><td>CTO 검토 확정 (01~14: 2026-07-06 / 15~19: 2026-07-10)</td></tr>
+<tr><th>1. 현장검증 QA 확정</th><td>✓확정 QA #1~#37 (+E26 자연 해소)</td><td>design/raw/decisions/2026-07-04-현장검증-QA-확정기록.md (v1.4)</td><td>2026-07-03~07 고객 문답 확정 — <strong>정본 계보 최상위</strong> (WBS §3.1)</td></tr>
+<tr><th>2. 설계 결정</th><td>✓설계확정 결정 01~19</td><td>결정 01~14: design/raw/decisions/2026-07-06-설계결정서-14건.md (v1.1) / 결정 15~19: design/raw/decisions/2026-07-09-기술스택-배포모델-결정서.md (v0.2, ADR)</td><td>CTO 검토 확정 (01~14: 2026-07-06 / 15~19: 2026-07-10)</td></tr>
 <tr><th>3. 날짜별 확정기록</th><td>약칭+행번 (예: EWO #1 · MLOT #4 · PLOT 2-1)</td><td>사안 단위 확정기록 문서군 (아래 코드 표)</td><td>2026-06-26~07-29 — 후속 확정이 계열 1·2의 결정을 대체·정교화하는 층 (§7.3)</td></tr>
 </tbody></table>
 <p><strong>찾는 법</strong>: ① ID 형태로 계열 식별 → ② 아래 코드 표에서 원본 경로 확인 → ③ §7.2 해당 행의 「상태」 열에서 유효/대체 여부 확인 → ④ 대체·정교화된 결정은 §7.3 체인을 따라 말단 확정을 인용.</p>
@@ -3150,23 +3150,23 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <table>
 <thead><tr><th class="nw">코드</th><th>파일 (버전)</th></tr></thead>
 <tbody>
-<tr><th class="nw">QA</th><td>docs/research/2026-07-04-현장검증-QA-확정기록.md (v1.4)</td></tr>
-<tr><th class="nw">D14</th><td>docs/research/2026-07-06-설계결정서-14건.md (v1.1)</td></tr>
-<tr><th class="nw">TS</th><td>docs/research/2026-07-09-기술스택-배포모델-결정서.md (v0.2)</td></tr>
-<tr><th class="nw">MAINT</th><td>docs/research/2026-06-26-설비보전-MES-경량보유-결정.md (v0.1)</td></tr>
-<tr><th class="nw">TXN</th><td>docs/research/2026-06-26-트랜잭션-발번-2계층설계-및-B섹션재정리.md (v0.2)</td></tr>
-<tr><th class="nw">SCRAP</th><td>docs/research/2026-06-26-폐기-스크랩-처리-갭.md (v0.1)</td></tr>
-<tr><th class="nw">NOT</th><td>docs/research/2026-07-13-도식-조건라벨-표기체계-v2.md (v1.1)</td></tr>
-<tr><th class="nw">RV</th><td>docs/research/2026-07-14-v2도식-검토의견-확정기록.md (v1.2)</td></tr>
-<tr><th class="nw">EWO</th><td>docs/research/2026-07-14-긴급WO-운영방식-확정기록.md (v1.1)</td></tr>
-<tr><th class="nw">PQCR</th><td>docs/research/2026-07-15-PQC-검사방식-확정기록.md (v1.0)</td></tr>
-<tr><th class="nw">COR</th><td>docs/research/2026-07-15-마감후정정-운영방식-확정기록.md (v1.0)</td></tr>
-<tr><th class="nw">DLOT</th><td>docs/research/2026-07-15-생산불량LOT-정책-확정기록.md (v1.2)</td></tr>
-<tr><th class="nw">QMEMO</th><td>docs/research/2026-07-16-03품질섹션-구조논의-진행메모.md (v0.5)</td></tr>
-<tr><th class="nw">Q3</th><td>docs/research/2026-07-20-03품질섹션-구조재정의-확정기록.md (v1.1)</td></tr>
-<tr><th class="nw">MLOT</th><td>docs/research/2026-07-20-자재LOT관리-재정의-확정기록.md (v1.2)</td></tr>
-<tr><th class="nw">BADGE</th><td>docs/research/2026-07-24-프로그램배지-단말확정-확정기록.md (v1.1)</td></tr>
-<tr><th class="nw">PLOT</th><td>docs/research/2026-07-29-생산LOT-발번-폐번-확정기록.md (v1.0)</td></tr>
+<tr><th class="nw">QA</th><td>design/raw/decisions/2026-07-04-현장검증-QA-확정기록.md (v1.4)</td></tr>
+<tr><th class="nw">D14</th><td>design/raw/decisions/2026-07-06-설계결정서-14건.md (v1.1)</td></tr>
+<tr><th class="nw">TS</th><td>design/raw/decisions/2026-07-09-기술스택-배포모델-결정서.md (v0.2)</td></tr>
+<tr><th class="nw">MAINT</th><td>design/raw/decisions/2026-06-26-설비보전-MES-경량보유-결정.md (v0.1)</td></tr>
+<tr><th class="nw">TXN</th><td>design/raw/decisions/2026-06-26-트랜잭션-발번-2계층설계-및-B섹션재정리.md (v0.2)</td></tr>
+<tr><th class="nw">SCRAP</th><td>design/raw/decisions/2026-06-26-폐기-스크랩-처리-갭.md (v0.1)</td></tr>
+<tr><th class="nw">NOT</th><td>design/raw/decisions/2026-07-13-도식-조건라벨-표기체계-v2.md (v1.1)</td></tr>
+<tr><th class="nw">RV</th><td>design/raw/decisions/2026-07-14-v2도식-검토의견-확정기록.md (v1.2)</td></tr>
+<tr><th class="nw">EWO</th><td>design/raw/decisions/2026-07-14-긴급WO-운영방식-확정기록.md (v1.1)</td></tr>
+<tr><th class="nw">PQCR</th><td>design/raw/decisions/2026-07-15-PQC-검사방식-확정기록.md (v1.0)</td></tr>
+<tr><th class="nw">COR</th><td>design/raw/decisions/2026-07-15-마감후정정-운영방식-확정기록.md (v1.0)</td></tr>
+<tr><th class="nw">DLOT</th><td>design/raw/decisions/2026-07-15-생산불량LOT-정책-확정기록.md (v1.2)</td></tr>
+<tr><th class="nw">QMEMO</th><td>design/raw/process/docs/research/2026-07-16-03품질섹션-구조논의-진행메모.md (v0.5)</td></tr>
+<tr><th class="nw">Q3</th><td>design/raw/decisions/2026-07-20-03품질섹션-구조재정의-확정기록.md (v1.1)</td></tr>
+<tr><th class="nw">MLOT</th><td>design/raw/decisions/2026-07-20-자재LOT관리-재정의-확정기록.md (v1.2)</td></tr>
+<tr><th class="nw">BADGE</th><td>design/raw/decisions/2026-07-24-프로그램배지-단말확정-확정기록.md (v1.1)</td></tr>
+<tr><th class="nw">PLOT</th><td>design/raw/decisions/2026-07-29-생산LOT-발번-폐번-확정기록.md (v1.0)</td></tr>
 <tr><th class="nw">SUM</th><td>docs/planning/2026-06-27-MES-설계결정-요약-소유경계와-검증렌즈.md (v0.1)</td></tr>
 </tbody></table>
 <div class="callout callout-warning"><p>⚠ <strong>마커 세대 차</strong>: 2026-06-26 3문서(MAINT·TXN·SCRAP)는 ✅/🔶/✔/⚠ 표기, 이후 문서는 ✓확정/[가설]/(확인 필요)/<code>[확정 YYYY-MM-DD]</code> 표기 — 동일 의미의 마커가 세대별로 상이하므로 마커 검색 시 둘 다 대상으로 할 것.</p></div>
@@ -3187,7 +3187,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <table>
 <thead><tr><th>ID</th><th>확정일</th><th>결정 요지</th><th>영향</th><th>상태</th><th>원본</th></tr></thead>
 <tbody>
-<tr><th>QA #1 (A1잔)</th><td>2026-07-04</td><td>제품LOT=MES 발번 · ERP G/R=IQC 합격 직후 건별 연계</td><td>제품LOT·자재LOT·ERP I/F</td><td><strong>부분 대체</strong> «(정합주: 「LOT 3종 전부 MES 발번·자재LOT=사전발행+IQC 합격 생성」 구서술은 MLOT #4·#5·#7(2026-07-20) 「등록=입하 Hold·발번 주체 경로 이원화」로 대체 — docs/research/2026-07-20-자재LOT관리-재정의-확정기록.md §2·§4. 제품LOT MES 발번·G/R 시점은 유효)»</td><td>QA §2 #1</td></tr>
+<tr><th>QA #1 (A1잔)</th><td>2026-07-04</td><td>제품LOT=MES 발번 · ERP G/R=IQC 합격 직후 건별 연계</td><td>제품LOT·자재LOT·ERP I/F</td><td><strong>부분 대체</strong> «(정합주: 「LOT 3종 전부 MES 발번·자재LOT=사전발행+IQC 합격 생성」 구서술은 MLOT #4·#5·#7(2026-07-20) 「등록=입하 Hold·발번 주체 경로 이원화」로 대체 — design/raw/decisions/2026-07-20-자재LOT관리-재정의-확정기록.md §2·§4. 제품LOT MES 발번·G/R 시점은 유효)»</td><td>QA §2 #1</td></tr>
 <tr><th>QA #2 (A5)</th><td>2026-07-04</td><td>역추적=납품라벨→제품LOT(포장)→생산LOT 경유 확정(직접 FK 불요) — As-Is는 중간 단절(검증된 DX 갭)</td><td>genealogy·포장구성</td><td>유효</td><td>QA §2 #2</td></tr>
 <tr><th>QA #3 (B1)</th><td>2026-07-04</td><td>BOM=ERP 정본(L1 유지)·Rev 관리 존재 — 유효기간은 확인 필요, 필수 아니면 MES optional 속성</td><td>BOM·ERP I/F</td><td>유효 (잔여: 유효기간 스키마 확인 → §8.1 #12)</td><td>QA §2 #3</td></tr>
 <tr><th>QA #4 (B5)</th><td>2026-07-04</td><td>검사기준=MES 정본(엑셀→DX) · 검사 결과 ERP 비연계 · 생산 실적 MES→ERP 필수(개발품 제외) · PQC=Routing 명시 opt-in</td><td>검사기준·검사실적·ERP I/F·Routing</td><td>유효 — PQCR·Q3로 정교화</td><td>QA §2 #4</td></tr>
@@ -3199,7 +3199,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th>QA #10 (D4잔·E25)</th><td>2026-07-04</td><td>경량 보전 기존 결정 유지·확정 — 점검(Daily/Monthly)+고장 수집+보전 계획·지시·실적</td><td>보전·점검</td><td>유효 — MAINT(06-26) 재확정</td><td>QA §2 #10</td></tr>
 <tr><th>QA #11 (D5잔)</th><td>2026-07-04</td><td>툴 PM 트리거=타발수+날짜 주기 겸용 설정형 · 적정타수 실존(엑셀→DX)</td><td>툴/금형·PM</td><td>유효</td><td>QA §2 #11</td></tr>
 <tr><th>QA #12 (D6)</th><td>2026-07-04</td><td>타발수=작업실적 입력 시 수동 기입(자동 수집·계수기 없음) — 수집원 작업실적 N:1 · 환산 선택형+cavity 배수 속성</td><td>툴 타발수·작업실적</td><td>유효</td><td>QA §2 #12</td></tr>
-<tr><th>QA #13 (D7)</th><td>2026-07-04</td><td>공정-불량코드 1:N · 손실(Loss) 범주 신설 — 작업실적=양품/불량/손실 3원 구조(퍼징·시작불량=손실로 분리)</td><td>불량코드·작업실적</td><td><strong>부분 대체·조정</strong> «(정합주: 3원 집계·손실 분리는 유효. 「1:N ✓확정」 표기는 결정 12에서 N:M 매핑으로 조정 승인 — D14 결정 12. 불량의 생산LOT 멤버십 함의는 DLOT(2026-07-15) 「생산LOT=양품만」으로 대체 — docs/research/2026-07-15-생산불량LOT-정책-확정기록.md §1·§2)»</td><td>QA §2 #13</td></tr>
+<tr><th>QA #13 (D7)</th><td>2026-07-04</td><td>공정-불량코드 1:N · 손실(Loss) 범주 신설 — 작업실적=양품/불량/손실 3원 구조(퍼징·시작불량=손실로 분리)</td><td>불량코드·작업실적</td><td><strong>부분 대체·조정</strong> «(정합주: 3원 집계·손실 분리는 유효. 「1:N ✓확정」 표기는 결정 12에서 N:M 매핑으로 조정 승인 — D14 결정 12. 불량의 생산LOT 멤버십 함의는 DLOT(2026-07-15) 「생산LOT=양품만」으로 대체 — design/raw/decisions/2026-07-15-생산불량LOT-정책-확정기록.md §1·§2)»</td><td>QA §2 #13</td></tr>
 <tr><th>QA #14 (D12잔)</th><td>2026-07-04</td><td>입고—자재LOT 1:N(혼적 실재) · 품목별 기본 보관단위(수량/무게)+override · 출하—제품LOT N:M 유지 · E26 종결</td><td>입고·자재LOT</td><td>유효</td><td>QA §2 #14</td></tr>
 <tr><th>QA #15 (D14잔)</th><td>2026-07-04</td><td>반품 3유형 확정 · 불량창고 입고에 원천 구분(내부 판정 vs 외부 클레임) 속성 신설</td><td>반품·불량창고</td><td>유효 — P4 패턴 선례</td><td>QA §2 #15</td></tr>
 <tr><th>QA #16 (D15잔)</th><td>2026-07-04</td><td>보관 단위(자재LOT 라벨) vs 이동 단위(출고 QR) 분리 — 출고 QR 예외 없이 항상 발행 · 파렛트=이동 그룹핑</td><td>출고 QR·재고이동</td><td>유효 — 결정 17 시나리오 2·BADGE #8의 전제</td><td>QA §2 #16</td></tr>
@@ -3210,13 +3210,13 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th>QA #21 (D20잔)</th><td>2026-07-04</td><td>출하 모니터링=지금 없음·추후 고객 요구 예상 — D20 회신 대기 유지 · D21잔 소멸(수율=#13·전표=#6·계정=회신 E-4 대기)</td><td>대시보드</td><td>유보 (회신 E-24 대시보드 구성에 편입)</td><td>QA §2 #21</td></tr>
 <tr><th>QA #22 (E1~E10)</th><td>2026-07-04</td><td>고객 액션 10건(회신 E-1~E-10) 전부 회수 대기 유지 — E10은 UNIERP·DB 중계 확정분만 반영</td><td>고객 액션</td><td>유보 (상태 확인 — 결정 아님)</td><td>QA §2 #22</td></tr>
 <tr><th>QA #23 (E11)</th><td>2026-07-04</td><td>P/O 변경 강행 옵션 — 관리자 확인 화면에서 '변경 반영 vs 기존 유지(강행)' 선택 · 강행 시 P/O-W/O 불일치 플래그</td><td>P/O·W/O</td><td>유효</td><td>QA §2 #23</td></tr>
-<tr><th>QA #24 (E12)</th><td>2026-07-04</td><td>알림=채널 어댑터(대시보드+카카오톡/Zalo 선택형) · Zalo 기업 API 검토=CREFLE</td><td>알림(Notification)</td><td><strong>조정됨</strong> «(정합주: 결정 15(2026-07-10)에서 사내망 정본+메신저 best-effort 보조로 격하 — docs/research/2026-07-09-기술스택-배포모델-결정서.md §1·§6 #12. 고객 고지 필요·고지 완료 기록 없음)»</td><td>QA §2 #24</td></tr>
+<tr><th>QA #24 (E12)</th><td>2026-07-04</td><td>알림=채널 어댑터(대시보드+카카오톡/Zalo 선택형) · Zalo 기업 API 검토=CREFLE</td><td>알림(Notification)</td><td><strong>조정됨</strong> «(정합주: 결정 15(2026-07-10)에서 사내망 정본+메신저 best-effort 보조로 격하 — design/raw/decisions/2026-07-09-기술스택-배포모델-결정서.md §1·§6 #12. 고객 고지 필요·고지 완료 기록 없음)»</td><td>QA §2 #24</td></tr>
 <tr><th>QA #25 (E13)</th><td>2026-07-04</td><td>중단 사유=관리자 설정형 코드(초안 3종) · 홀드품=라인사이드 경량 Location</td><td>작업홀드·Location</td><td>유효 — P1 선례·결정 14 전제</td><td>QA §2 #25</td></tr>
 <tr><th>QA #26 (E14잔)</th><td>2026-07-04</td><td>긴급 직행=기록상 제품입고+즉시 출하 모두 생성('직행 처리' 원클릭 자동 생성)·실물만 직행</td><td>제품입고·출하</td><td>유효 — 투입 측은 EWO 보완·BADGE #4(관리웹)</td><td>QA §2 #26</td></tr>
 <tr><th>QA #27 (E15)</th><td>2026-07-04</td><td>마감 잔량=관리자가 이월/소멸 선택 · 초과 생산분=해당 계획 실적 그대로 반영</td><td>W/O 마감</td><td>유효 — PLOT §3이 같은 사건의 LOT 슬롯 측면(추가 발번·자동 폐번) 확정</td><td>QA §2 #27</td></tr>
 <tr><th>QA #28 (E16)</th><td>2026-07-04</td><td>선출 기준=품목별 설정 — 유효기한 관리 품목=FEFO·나머지=FIFO</td><td>품목·자재LOT</td><td>유효</td><td>QA §2 #28</td></tr>
 <tr><th>QA #29 (E17)</th><td>2026-07-04</td><td>거래명세서 입고(REQ-PR-0006)=입하 등록의 문서 분석 자동화 — '간이 입고 경로' 해석 전면 정정</td><td>입하·OCR</td><td>유효 — 결정 19에서 온프레 OCR로 구현 방식 확정</td><td>QA §2 #29 · §3.5</td></tr>
-<tr><th>QA #30 (E18)</th><td>2026-07-04</td><td>러닝체인지=동일 품목 구성 부품만 교체 · 계획 분할=생산LOT 분리(genealogy 분리)</td><td>W/O·생산LOT·BOM</td><td>유효 — #37·PLOT로 정교화 «(정합주: 「전/후」 표현은 PLOT 2-7(2026-07-29) 「BOM 스냅샷별 분할」로 정정 — 실질 유지. docs/research/2026-07-29-생산LOT-발번-폐번-확정기록.md §2-7)»</td><td>QA §2 #30</td></tr>
+<tr><th>QA #30 (E18)</th><td>2026-07-04</td><td>러닝체인지=동일 품목 구성 부품만 교체 · 계획 분할=생산LOT 분리(genealogy 분리)</td><td>W/O·생산LOT·BOM</td><td>유효 — #37·PLOT로 정교화 «(정합주: 「전/후」 표현은 PLOT 2-7(2026-07-29) 「BOM 스냅샷별 분할」로 정정 — 실질 유지. design/raw/decisions/2026-07-29-생산LOT-발번-폐번-확정기록.md §2-7)»</td><td>QA §2 #30</td></tr>
 <tr><th>QA #31 (E19)</th><td>2026-07-04</td><td>재생재 코드 2단 구조(ERP 동일 품목코드+하위 코드) — 하위 코드=비노출 축·genealogy 완전 기록</td><td>품목 코드·genealogy</td><td>유효</td><td>QA §2 #31</td></tr>
 <tr><th>QA #32 (E20)</th><td>2026-07-04</td><td>오프라인 내성=POP 로컬 버퍼링+복구 시 자동 동기화 · 책임 경계: 인프라=고객·단절 내성 설계=CREFLE</td><td>POP·오프라인</td><td>유효 — 결정 17이 범위를 '최소 운영 2시나리오'로 재정의</td><td>QA §2 #32</td></tr>
 <tr><th>QA #33 (E23)</th><td>2026-07-04</td><td>다국어 전범위(UI+마스터 한/베+출력물) · 언어=사용자별 설정(역할 고정 아님)</td><td>i18n·라벨</td><td>유효 — 결정 18(서버 폰트)로 라벨 축 종결</td><td>QA §2 #33</td></tr>
@@ -3291,7 +3291,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th>RV §1 N1~N4 표기 규칙</th><td>2026-07-14</td><td>표기 4종 확정: N1 분기 OR 외곽선 #66D575 · N2 분기 조건 라벨 배경(OR-발 한정) · N3 메인 섹션 이동=파란 DOC · N4 타 도메인 사이드 직접 참조=빨간 DOC</td><td>도식 표기</td><td>유효 — NOT v1.1 §2.1 동일 등재</td><td>RV §1·§5.1</td></tr>
 <tr><th>RV §2.1 W/O 전개 마스터 점검 체인</th><td>2026-07-14</td><td>BOM 없으면 W/O 전개 불가 → 02-S-F 사이드 위임 · Routing 없음은 전개 진행 가능</td><td>W/O 전개·02 도식</td><td>유효 (02-S-F 내용 미정 → §8.3 #14)</td><td>RV §2.1·§2.2</td></tr>
 <tr><th>RV §2.3 작업 전 점검 분기</th><td>2026-07-14</td><td>「점검 이력 요구 필수 여부」 분기 신설(필수→이력 없음 시 02-S-G / 선택→직행) · 「긴급 W/O 우회」 노드 삭제(02-S-D 전담)</td><td>02 도식·점검 통제</td><td>유효 (02-S-G 미정·[가설] 맵핑 검증 대기 → §8.3 #15)</td><td>RV §2.3</td></tr>
-<tr><th>RV §2.4 PQC 시점</th><td>2026-07-14</td><td>작업실적 3원 유지("양품만 실적 등록" 철회) · 순서=PQC 선행(실적 입력 전) — WF02 S8 트리거 개정 승인</td><td>작업실적·PQC·WF02 S8</td><td>유효 «(정합주: 「03 품질 검사 경유」 배치는 QMEMO §4(07-16)·Q3 결정 1(07-20) 「수행=02-S-E / 거버넌스=03」으로 최종 대체 — docs/research/2026-07-20-03품질섹션-구조재정의-확정기록.md §2. 산출물은 최종본(Q3)만 따를 것)»</td><td>RV §2.4·§5.2 Q4</td></tr>
+<tr><th>RV §2.4 PQC 시점</th><td>2026-07-14</td><td>작업실적 3원 유지("양품만 실적 등록" 철회) · 순서=PQC 선행(실적 입력 전) — WF02 S8 트리거 개정 승인</td><td>작업실적·PQC·WF02 S8</td><td>유효 «(정합주: 「03 품질 검사 경유」 배치는 QMEMO §4(07-16)·Q3 결정 1(07-20) 「수행=02-S-E / 거버넌스=03」으로 최종 대체 — design/raw/decisions/2026-07-20-03품질섹션-구조재정의-확정기록.md §2. 산출물은 최종본(Q3)만 따를 것)»</td><td>RV §2.4·§5.2 Q4</td></tr>
 <tr><th>RV §2.4 불량 처리</th><td>2026-07-14</td><td>신규 사이드 02-S-E 「PQC 불량 발생 처리」 — 메인 「불량코드 선택」 삭제·사이드 위임(현장 발견 불량 동일 위임)</td><td>02 도식·불량 처리</td><td>유효 — 07-16에 02-S-E가 "PQC"(수행 포함) 사이드로 재정의</td><td>RV §2.4·§5.2 Q1·Q2</td></tr>
 <tr><th>RV §2.4 비가동</th><td>2026-07-14</td><td>비가동=메인에서 삭제 · 사이드 영역 신설하되 행위 비움+「미정」 표기</td><td>02 도식·비가동</td><td>유효 (행위 정의 미정 → §8.3 #16)</td><td>RV §2.4·§5.2 Q3</td></tr>
 <tr><th>RV §2.4 인식표(생산 LOT 라벨)</th><td>2026-07-14</td><td>인식표=제품 개별 부착·<strong>양품만</strong> · 발행=선택적(분기 조건 표기 필수) · 발행·부착=작업자(실적 입력 시) · LOT 완료·인식표=작업자3 이관</td><td>인식표·생산LOT·02 도식</td><td>유효 — COR §2-3이 "발행분에 한해" 연동 자동화 적용</td><td>RV §2.4·§5.2 Q5</td></tr>
@@ -3575,7 +3575,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <thead><tr><th>항목</th><th>요지</th><th>등재처</th></tr></thead>
 <tbody>
 <tr><th>도식 마커 M1(메인 B2 옆)</th><td>설비(기계) 대장의 매체(엑셀?)·Legacy 연계 여부 미검증 — 현장 확인</td><td>WF05 S1 · 도식스펙05 §4.1</td></tr>
-<tr><th>도식 마커 M3(메인 B3 옆)</th><td>점검 입력 매체=POP 여부 ⚠ «(정합주: BADGE #5(2026-07-24)가 점검 입력=<strong>모바일</strong>로 확정 — M3·WF05 S2 가설 표기는 스테일·도식 갱신 대기. docs/research/2026-07-24-프로그램배지-단말확정-확정기록.md §3 #5)» — As-Is 점검 매체·사번 점검자 필드 적용의 현장 확인([Check])만 잔존</td><td>도식스펙05 §4.1 M3 · WF05 S2 26</td></tr>
+<tr><th>도식 마커 M3(메인 B3 옆)</th><td>점검 입력 매체=POP 여부 ⚠ «(정합주: BADGE #5(2026-07-24)가 점검 입력=<strong>모바일</strong>로 확정 — M3·WF05 S2 가설 표기는 스테일·도식 갱신 대기. design/raw/decisions/2026-07-24-프로그램배지-단말확정-확정기록.md §3 #5)» — As-Is 점검 매체·사번 점검자 필드 적용의 현장 확인([Check])만 잔존</td><td>도식스펙05 §4.1 M3 · WF05 S2 26</td></tr>
 <tr><th>도식 마커 M8(사이드 E·797:8193)</th><td>계측기 [확인] 2건 — ①만료 계측기 검사 통제(차단)·고장 시 대체 ②계측기의 '모든 도구(QR 관리)' 포함 여부(REQ-PR-0003) — 현장 확인 대기(WF03 S9와 동일 건)</td><td>도식스펙05 §4.1 M8·§4.2 14·15 · WF03 S9</td></tr>
 <tr><th>도식 마커 M2·M4·M5·M6·M7 배분</th><td>M2→§8.3 #4 · M4→§8.1 #1 · M5→§8.1 #7·#11 · M6→§8.3 #16 · M7→§8.3 #22</td><td>도식스펙05 §4.1</td></tr>
 <tr><th>도식 미표기 잔여(§4.2)</th><td>설비 신규입고·폐기 상태의 채번·연계 주체(툴=MES 확정으로 제외) · 예비품 구조(→§8.3 #23) · 타발수 중복 정합(→§8.3 #24) · QR 라벨 훼손 재발급·수기 폴백(<strong>예외 E-7</strong> — WF05 예외 카탈로그) · DX 원천 확보 3종(엑셀 툴 대장·적정타수 파일·예비품대장 — 현장 수집)</td><td>도식스펙05 §4.2 9~13</td></tr>
@@ -3622,7 +3622,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th class="nw">24</th><td>공통코드 <code>TERMINAL_STATUS</code>에 폐기/분실 상태값 필요 여부 검토</td><td>POP API 착수 전</td><td>POP인증 §5 · 본서 §3.2.4</td></tr>
 <tr><th class="nw">25</th><td>POP 단말 최초 등록(토큰 주입) 화면 필요 여부 — <code>[docs→uiux]</code> 이슈 발행</td><td>POP UI 착수 시</td><td>POP인증 §5 · 본서 §3.2.4</td></tr>
 </tbody></table>
-<div class="callout"><p><strong>종결분 오해 방지</strong>: 연계 통신방식(D18)=확정 · P/O 변경 강행(E11)=종결 · 생산계획 ERP 소유=종결(ERP 대상 아님) · 재고 수신 범위=종결(초기 이관 1회) (docs/research/2026-07-08-ERP-MES-수신정보-정리.md §8) · 이슈 #41(IQC 스테이션 부재)=HW 스펙 v0.4 등재로 종료 — 잔여는 §8.1 #20 고객 회신 3건.</p></div>
+<div class="callout"><p><strong>종결분 오해 방지</strong>: 연계 통신방식(D18)=확정 · P/O 변경 강행(E11)=종결 · 생산계획 ERP 소유=종결(ERP 대상 아님) · 재고 수신 범위=종결(초기 이관 1회) (design/raw/process/docs/research/2026-07-08-ERP-MES-수신정보-정리.md §8) · 이슈 #41(IQC 스테이션 부재)=HW 스펙 v0.4 등재로 종료 — 잔여는 §8.1 #20 고객 회신 3건.</p></div>
 <hr>
 <h2>§9. 원본 자료 지도 — 본서가 딛고 선 정본·참조 문서 전건</h2>
 <div class="callout"><p>경로=저장소 루트(<code>apps/omf/</code>) 기준. <strong>본서는 원본을 대체하지 않는다</strong> — 충돌 시 정본 계보(§1.3: ✓확정 QA &gt; 설계결정서 &gt; 요구사항 명세서 &gt; 도식스펙 &gt; 개발제안서 &gt; 기능분해도)를 따르고, 같은 계열 안에서는 §7.3 체인의 말단(최신 확정)이 우선한다.</p></div>
@@ -3630,35 +3630,35 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <table>
 <thead><tr><th>경로</th><th>역할 (1줄)</th></tr></thead>
 <tbody>
-<tr><th>docs/research/2026-07-04-현장검증-QA-확정기록.md (v1.4)</th><td>고객 문답 확정 #1~#37 — 정본 계보 최상위. ⚠ 회의록 원문 보존 원칙 — QA만 읽으면 MLOT 이전 구모델로 오독 위험(§7.3 체인 1)</td></tr>
-<tr><th>docs/research/2026-07-06-설계결정서-14건.md (v1.1)</th><td>설계 결정 01~14 + 공통 패턴 P1~P4 — 데이터모델 골격 결정</td></tr>
-<tr><th>docs/research/2026-07-09-기술스택-배포모델-결정서.md (v0.2)</th><td>결정 15~19(ADR) + 지배 제약 C1~C11 + §6 미결 — 본서 §2·§3의 원천</td></tr>
-<tr><th>docs/research/2026-06-26-설비보전-MES-경량보유-결정.md (v0.1)</th><td>보전 경량 보유 결정(점검≠보전) — QA #10으로 재확정</td></tr>
-<tr><th>docs/research/2026-06-26-트랜잭션-발번-2계층설계-및-B섹션재정리.md (v0.2)</th><td>지시–작업지시–전표 3계층 발번 + B 섹션 검증 렌즈 L1/L2/L3. ⚠ 파일명 「2계층」·본문은 3계층(후속 문서 전부 '3계층' 인용)</td></tr>
-<tr><th>docs/research/2026-06-26-폐기-스크랩-처리-갭.md (v0.1)</th><td>폐기 트랜잭션 부재 갭 식별 — 부분 해소·회신 E-4 대기(§7.2.4)</td></tr>
-<tr><th>docs/research/2026-07-13-도식-조건라벨-표기체계-v2.md (v1.1)</th><td>도식 문법 정본(인라인 라벨·속성 태그·N1~N4)</td></tr>
-<tr><th>docs/research/2026-07-14-v2도식-검토의견-확정기록.md (v1.2)</th><td>v2 도식 검토 확정 11건(N1~N4·02 사이드 신설·U1·U4·U5·U6)</td></tr>
-<tr><th>docs/research/2026-07-14-긴급WO-운영방식-확정기록.md (v1.1)</th><td>긴급 W/O 운영 #1~#8(U9 종결·교차 투입) + 철회 3안 경위(§2 — 혼입 금지)</td></tr>
-<tr><th>docs/research/2026-07-15-PQC-검사방식-확정기록.md (v1.0)</th><td>PQC 전수/샘플 선택제·합격판정개수·「PQC 검사 필요」 상태 신설</td></tr>
-<tr><th>docs/research/2026-07-15-마감후정정-운영방식-확정기록.md (v1.0)</th><td>마감 재오픈 금지·상쇄식 보정·정정 3종 + 미채택 3안(§3 — 혼입 금지)</td></tr>
-<tr><th>docs/research/2026-07-15-생산불량LOT-정책-확정기록.md (v1.2)</th><td>생산불량LOT 신설·생산LOT=양품만. ⚠ #5는 문서 내 취소선 폐기 — 인용 시 취소선 확인</td></tr>
-<tr><th>docs/research/2026-07-16-03품질섹션-구조논의-진행메모.md (v0.5)</th><td>Q3로 이어진 맥락(옵션 3 합의·02 캔버스 재점검·수행/거버넌스 분업) — 진행메모(결정 정본 아님)</td></tr>
-<tr><th>docs/research/2026-07-20-03품질섹션-구조재정의-확정기록.md (v1.1)</th><td>03=Lot Status 전이도·검사 3종 co-locate·사이드 5종 재배치 — PQC 배치 체인의 최종본</td></tr>
-<tr><th>docs/research/2026-07-20-자재LOT관리-재정의-확정기록.md (v1.2)</th><td>자재LOT 등록=입하 Hold·발번 경로 이원화·34자리 고정폭 — REQ-PR-0001·0007 공식 개정</td></tr>
-<tr><th>docs/research/2026-07-24-프로그램배지-단말확정-확정기록.md (v1.1)</th><td>폼팩터 배정 원칙 + 배지 확정 #1~#10</td></tr>
-<tr><th>docs/research/2026-07-29-생산LOT-발번-폐번-확정기록.md (v1.0)</th><td>생산LOT 추가 발번·자동 폐번·상태 3값·W/O 내 순번 — 러닝체인지 표현 정정</td></tr>
+<tr><th>design/raw/decisions/2026-07-04-현장검증-QA-확정기록.md (v1.4)</th><td>고객 문답 확정 #1~#37 — 정본 계보 최상위. ⚠ 회의록 원문 보존 원칙 — QA만 읽으면 MLOT 이전 구모델로 오독 위험(§7.3 체인 1)</td></tr>
+<tr><th>design/raw/decisions/2026-07-06-설계결정서-14건.md (v1.1)</th><td>설계 결정 01~14 + 공통 패턴 P1~P4 — 데이터모델 골격 결정</td></tr>
+<tr><th>design/raw/decisions/2026-07-09-기술스택-배포모델-결정서.md (v0.2)</th><td>결정 15~19(ADR) + 지배 제약 C1~C11 + §6 미결 — 본서 §2·§3의 원천</td></tr>
+<tr><th>design/raw/decisions/2026-06-26-설비보전-MES-경량보유-결정.md (v0.1)</th><td>보전 경량 보유 결정(점검≠보전) — QA #10으로 재확정</td></tr>
+<tr><th>design/raw/decisions/2026-06-26-트랜잭션-발번-2계층설계-및-B섹션재정리.md (v0.2)</th><td>지시–작업지시–전표 3계층 발번 + B 섹션 검증 렌즈 L1/L2/L3. ⚠ 파일명 「2계층」·본문은 3계층(후속 문서 전부 '3계층' 인용)</td></tr>
+<tr><th>design/raw/decisions/2026-06-26-폐기-스크랩-처리-갭.md (v0.1)</th><td>폐기 트랜잭션 부재 갭 식별 — 부분 해소·회신 E-4 대기(§7.2.4)</td></tr>
+<tr><th>design/raw/decisions/2026-07-13-도식-조건라벨-표기체계-v2.md (v1.1)</th><td>도식 문법 정본(인라인 라벨·속성 태그·N1~N4)</td></tr>
+<tr><th>design/raw/decisions/2026-07-14-v2도식-검토의견-확정기록.md (v1.2)</th><td>v2 도식 검토 확정 11건(N1~N4·02 사이드 신설·U1·U4·U5·U6)</td></tr>
+<tr><th>design/raw/decisions/2026-07-14-긴급WO-운영방식-확정기록.md (v1.1)</th><td>긴급 W/O 운영 #1~#8(U9 종결·교차 투입) + 철회 3안 경위(§2 — 혼입 금지)</td></tr>
+<tr><th>design/raw/decisions/2026-07-15-PQC-검사방식-확정기록.md (v1.0)</th><td>PQC 전수/샘플 선택제·합격판정개수·「PQC 검사 필요」 상태 신설</td></tr>
+<tr><th>design/raw/decisions/2026-07-15-마감후정정-운영방식-확정기록.md (v1.0)</th><td>마감 재오픈 금지·상쇄식 보정·정정 3종 + 미채택 3안(§3 — 혼입 금지)</td></tr>
+<tr><th>design/raw/decisions/2026-07-15-생산불량LOT-정책-확정기록.md (v1.2)</th><td>생산불량LOT 신설·생산LOT=양품만. ⚠ #5는 문서 내 취소선 폐기 — 인용 시 취소선 확인</td></tr>
+<tr><th>design/raw/process/docs/research/2026-07-16-03품질섹션-구조논의-진행메모.md (v0.5)</th><td>Q3로 이어진 맥락(옵션 3 합의·02 캔버스 재점검·수행/거버넌스 분업) — 진행메모(결정 정본 아님)</td></tr>
+<tr><th>design/raw/decisions/2026-07-20-03품질섹션-구조재정의-확정기록.md (v1.1)</th><td>03=Lot Status 전이도·검사 3종 co-locate·사이드 5종 재배치 — PQC 배치 체인의 최종본</td></tr>
+<tr><th>design/raw/decisions/2026-07-20-자재LOT관리-재정의-확정기록.md (v1.2)</th><td>자재LOT 등록=입하 Hold·발번 경로 이원화·34자리 고정폭 — REQ-PR-0001·0007 공식 개정</td></tr>
+<tr><th>design/raw/decisions/2026-07-24-프로그램배지-단말확정-확정기록.md (v1.1)</th><td>폼팩터 배정 원칙 + 배지 확정 #1~#10</td></tr>
+<tr><th>design/raw/decisions/2026-07-29-생산LOT-발번-폐번-확정기록.md (v1.0)</th><td>생산LOT 추가 발번·자동 폐번·상태 3값·W/O 내 순번 — 러닝체인지 표현 정정</td></tr>
 <tr><th>docs/planning/2026-06-27-MES-설계결정-요약-소유경계와-검증렌즈.md (v0.1)</th><td>2026-06-26 결정 3건의 요약 정본(신규 결정 없음) — 소유경계·검증 렌즈 공통 원칙</td></tr>
 </tbody></table>
 <h3>§9.2 아키텍처·연계·데이터 정본 (본서 §2~§5의 원천)</h3>
 <table>
 <thead><tr><th>경로</th><th>역할 (1줄)</th></tr></thead>
 <tbody>
-<tr><th>docs/research/2026-07-28-POP-단말인증-설계검토.md (v0.6)</th><td>POP 단말 토큰 3층 분리 설계 — §6 ①②③ 확정·④⑤ 보류(본서 §3.2)</td></tr>
-<tr><th>docs/research/2026-07-08-ERP-MES-수신정보-정리.md (v1.2)</th><td>ERP 수신 전량 정리(마스터 6종·트랜잭션 5계열·비연계 목록·송신 5전표) — 본서 §5의 원천</td></tr>
-<tr><th>docs/research/2026-07-08-ERP-MES-연계-데이터-제공요청서.xlsx</th><td>고객 회신 요청서(시트2: DB 접근·스키마·전표 I/F·LOT 라벨 규격 등 — §8.1 #13~#15)</td></tr>
-<tr><th>docs/research/2026-07-03-개념데이터모델-v2-요구사항통합.md (v2.10)</th><td>개념 데이터 모델 정본 — 총 64 엔티티·6 클러스터·§8 미결 종합(본서 §4.1)</td></tr>
-<tr><th>docs/research/2026-06-23-개념데이터모델.md (v1.4)</th><td>구판(49 엔티티) — v2로 <strong>대체됨</strong>·인용 금지(계보 확인용)</td></tr>
-<tr><th>docs/research/2026-06-23-용어표준사전.md (v1.0)</th><td>용어·명명 규칙 — ⚠ v1.4 시점 고착(예비품·Routing 키 등 후행 확정과 어긋남) → 최신 정본은 개념모델 v2.10 우선</td></tr>
+<tr><th>design/raw/decisions/2026-07-28-POP-단말인증-설계검토.md (v0.6)</th><td>POP 단말 토큰 3층 분리 설계 — §6 ①②③ 확정·④⑤ 보류(본서 §3.2)</td></tr>
+<tr><th>design/raw/process/docs/research/2026-07-08-ERP-MES-수신정보-정리.md (v1.2)</th><td>ERP 수신 전량 정리(마스터 6종·트랜잭션 5계열·비연계 목록·송신 5전표) — 본서 §5의 원천</td></tr>
+<tr><th>design/raw/process/docs/research/2026-07-08-ERP-MES-연계-데이터-제공요청서.xlsx</th><td>고객 회신 요청서(시트2: DB 접근·스키마·전표 I/F·LOT 라벨 규격 등 — §8.1 #13~#15)</td></tr>
+<tr><th>design/wiki/domain-workflow/2026-07-03-개념데이터모델-v2-요구사항통합.md (v2.10)</th><td>개념 데이터 모델 정본 — 총 64 엔티티·6 클러스터·§8 미결 종합(본서 §4.1)</td></tr>
+<tr><th>design/raw/superseded/2026-06-23-개념데이터모델.md (v1.4)</th><td>구판(49 엔티티) — v2로 <strong>대체됨</strong>·인용 금지(계보 확인용)</td></tr>
+<tr><th>design/raw/process/docs/research/2026-06-23-용어표준사전.md (v1.0)</th><td>용어·명명 규칙 — ⚠ v1.4 시점 고착(예비품·Routing 키 등 후행 확정과 어긋남) → 최신 정본은 개념모델 v2.10 우선</td></tr>
 <tr><th>docs/research/2026-07-23-데이터모델링/ (CHANGELOG.md·mes_postgresql_physical_model.sql 외)</th><td>논리·물리 모델(테이블 127·DDL 검증) — <strong>⚠ wooju-shin 담당·읽기 전용</strong>, 반영 요청=[docs→데이터모델] 이슈+assignee 필수·하류가 상류를 앞서감</td></tr>
 <tr><th>docs/planning/2026-07-08-OMF-MES-개발-WBS.md (v0.3)</th><td>범위 정본 계보·수치 인벤토리·CORE 레인 8종·트랙 구조·화면 규모 가설 [가설]</td></tr>
 </tbody></table>
@@ -3667,34 +3667,34 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <thead><tr><th>경로</th><th>역할 (1줄)</th></tr></thead>
 <tbody>
 <tr><th>docs/research/2026-07-03-MES-요구사항-명세서-v1-정리.md</th><td>요구사항 명세서 — ✅REQ-PR 36건+REQ-OA 11건=47건 정본(우선순위 분류 미완 — 개념모델 §8 E27)</td></tr>
-<tr><th>docs/research/2026-07-03-현장검증-질문지-v2-요구사항통합.md</th><td>현장검증 질문지 v2 — QA 확정기록의 질문 원천·잔여 [확인] 항목의 모체</td></tr>
-<tr><th>docs/research/2026-06-23-기능분해도.md</th><td>기능분해도 baseline — <strong>참조용 최하위</strong>. ⚠ 세대 반전 다수(공정·툴·품질=ERP 송신 나열→MES 정본/비연계 역전)</td></tr>
-<tr><th>docs/research/2026-06-22-UNIMES-제안서-기능워크플로우-추출.md</th><td>참조모델(UNIMES) 추출물 — QA §1 전환 이전의 검증 원천(참고)</td></tr>
+<tr><th>design/raw/decisions/2026-07-03-현장검증-질문지-v2-요구사항통합.md</th><td>현장검증 질문지 v2 — QA 확정기록의 질문 원천·잔여 [확인] 항목의 모체</td></tr>
+<tr><th>design/raw/process/docs/research/2026-06-23-기능분해도.md</th><td>기능분해도 baseline — <strong>참조용 최하위</strong>. ⚠ 세대 반전 다수(공정·툴·품질=ERP 송신 나열→MES 정본/비연계 역전)</td></tr>
+<tr><th>design/raw/process/docs/research/2026-06-22-UNIMES-제안서-기능워크플로우-추출.md</th><td>참조모델(UNIMES) 추출물 — QA §1 전환 이전의 검증 원천(참고)</td></tr>
 </tbody></table>
 <h3>§9.4 도메인 워크플로우·도식스펙 (본서 §6·§8.5의 원천 — 상세=05-사용자-프로세스-태스크플로우.md)</h3>
 <table>
 <thead><tr><th>경로</th><th>역할 (1줄)</th></tr></thead>
 <tbody>
-<tr><th>docs/research/2026-07-03-워크플로우-요구사항반영-01-자재창고관리.md ~ -06-기준정보연계.md (6건)</th><td>도메인별 워크플로우 정본 — 단계(S1~Sn)·예외 카탈로그(<strong>예외 E-n</strong>)·[확인]/[Check]·현장 실행 체크리스트</td></tr>
-<tr><th>docs/research/2026-07-07-도식스펙-01-자재창고관리.md · 2026-07-06-도식스펙-02-생산실행.md · 2026-07-06-도식스펙-03-품질관리.md · 2026-07-06-도식스펙-04-제품출하.md · 2026-07-06-도식스펙-05-설비툴관리.md · 2026-07-07-도식스펙-06-기준정보연계.md (6건)</th><td>FigJam 도식 정본 스펙 — 노드·커넥터·미정의 마커(U·M·E 계열·빨간 Email). ⚠ 03은 Q3 재정의로 v1.0 메인 대체(재작화 미착수 — §8.6 #1)</td></tr>
-<tr><th>docs/research/2026-07-07-도식-정합점검-결과.md</th><td>도식·스펙 간 정합 점검 결과 — 후속 협의 2건 잔존(WBS §6.2)</td></tr>
+<tr><th>design/wiki/domain-workflow/2026-07-03-워크플로우-요구사항반영-01-자재창고관리.md ~ -06-기준정보연계.md (6건)</th><td>도메인별 워크플로우 정본 — 단계(S1~Sn)·예외 카탈로그(<strong>예외 E-n</strong>)·[확인]/[Check]·현장 실행 체크리스트</td></tr>
+<tr><th>design/wiki/domain-workflow/2026-07-07-도식스펙-01-자재창고관리.md · 2026-07-06-도식스펙-02-생산실행.md · 2026-07-06-도식스펙-03-품질관리.md · 2026-07-06-도식스펙-04-제품출하.md · 2026-07-06-도식스펙-05-설비툴관리.md · 2026-07-07-도식스펙-06-기준정보연계.md (6건)</th><td>FigJam 도식 정본 스펙 — 노드·커넥터·미정의 마커(U·M·E 계열·빨간 Email). ⚠ 03은 Q3 재정의로 v1.0 메인 대체(재작화 미착수 — §8.6 #1)</td></tr>
+<tr><th>design/raw/decisions/2026-07-07-도식-정합점검-결과.md</th><td>도식·스펙 간 정합 점검 결과 — 후속 협의 2건 잔존(WBS §6.2)</td></tr>
 <tr><th>docs/research/2026-06-28-현장점검-워크플로우-가설-01~06.md (6건)</th><td>WF 구판(가설 단계) — 2026-07-03 요구사항반영판으로 대체(계보 확인용)</td></tr>
 </tbody></table>
 <h3>§9.5 UI/UX 정본 (04-통합-IA.md의 원천 — 본서 §8.6 uiux 항목의 참조처)</h3>
 <table>
 <thead><tr><th>경로</th><th>역할 (1줄)</th></tr></thead>
 <tbody>
-<tr><th>uiux/2026-07-24-프로그램배지/placement-plan.md</th><td>프로그램 배지 배치 정본 — ⚠ 작성 주체≠소유(docs 작성→uiux 이관 혼종) · §8.6 #9·#10·#11 정정 대상</td></tr>
-<tr><th>uiux/2026-07-25-화면목록-IA/screen-inventory-ia.md</th><td>화면 인벤토리·IA 정본 — 화면 ID(W-·P-·M-·G-) 체계의 원천</td></tr>
-<tr><th>uiux/2026-07-25-화면목록-IA/screen-mapping-rule.md</th><td>도식→화면 매핑 규칙 — 규칙 §5(조회·대시보드는 규칙 밖 — §8.6 #17의 근거)</td></tr>
-<tr><th>uiux/2026-07-25-화면목록-IA/비도식근거-화면도출-규칙.md</th><td>비도식 근거(WF·REQ) 기반 화면 도출 규칙</td></tr>
+<tr><th>design/raw/process/uiux/2026-07-24-프로그램배지/placement-plan.md</th><td>프로그램 배지 배치 정본 — ⚠ 작성 주체≠소유(docs 작성→uiux 이관 혼종) · §8.6 #9·#10·#11 정정 대상</td></tr>
+<tr><th>design/raw/process/uiux/2026-07-25-화면목록-IA/screen-inventory-ia.md</th><td>화면 인벤토리·IA 정본 — 화면 ID(W-·P-·M-·G-) 체계의 원천</td></tr>
+<tr><th>design/raw/process/uiux/2026-07-25-화면목록-IA/screen-mapping-rule.md</th><td>도식→화면 매핑 규칙 — 규칙 §5(조회·대시보드는 규칙 밖 — §8.6 #17의 근거)</td></tr>
+<tr><th>design/raw/process/uiux/2026-07-25-화면목록-IA/비도식근거-화면도출-규칙.md</th><td>비도식 근거(WF·REQ) 기반 화면 도출 규칙</td></tr>
 <tr><th>uiux/2026-07-25-화면목록-IA/node-screen-mapping/00-총괄.md·01~06 (7건)</th><td>도메인별 노드→화면 매핑 대장(본서 인용 표기 「매핑01~06」) — 존치·규칙 밖·docs 이슈 발원지</td></tr>
 </tbody></table>
 <h3>§9.6 하드웨어 (03-HW구성안.md의 원천 — 본서 §2.6 접점)</h3>
 <table>
 <thead><tr><th>경로</th><th>역할 (1줄)</th></tr></thead>
 <tbody>
-<tr><th>docs/research/2026-07-07-하드웨어-구성-스펙.md (v0.4)</th><td>HW 내부 원천 스펙 — 모듈 4종·조합 3종·라벨 8종·배치·§7 미확정 14건</td></tr>
+<tr><th>design/raw/process/docs/research/2026-07-07-하드웨어-구성-스펙.md (v0.4)</th><td>HW 내부 원천 스펙 — 모듈 4종·조합 3종·라벨 8종·배치·§7 미확정 14건</td></tr>
 <tr><th>docs/planning/2026-07-28-HW-단말기-구성-제안서/index.html · 내부용.html (v1.0)</th><td>고객 제안서 — 단말기 유형 4종·122,824,000원·절감안. ⚠ 스펙과 불일치 15건(§8.6 #22)·수정 보류 «리더 결정 2026-07-30»</td></tr>
 <tr><th>docs/research/2026-07-23-고객자료분석/</th><td>고객 제공 자료 실측 대조(설비 마스터·ERP 요약·공정 Routing) — ⚠ 제안서 실측 3수치(창고 25·6라인·사출기 72)의 직접 근거 아님(원자료는 제안서 8장 인용분)</td></tr>
 </tbody></table>
@@ -3703,7 +3703,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <thead><tr><th>경로</th><th>역할 (1줄)</th></tr></thead>
 <tbody>
 <tr><th>docs/planning/2026-06-11-OMF-프로젝트-기획서.md</th><td>상위 기획 — SaaS 티어 옵션 경로(컨테이너 이식성 보존 근거)·「본 프로젝트=제품 1호·AI=후속 OMF-AI 페이즈」 긴장 종결(결정 19)</td></tr>
-<tr><th>deliverables/ 01-요구사항명세서.md · 03-HW구성안.md · 04-통합-IA.md · 05-사용자-프로세스-태스크플로우.md</th><td>본서와 한 세트인 산출물 4종(§1.4 상호 참조) — REQ 전건·HW 상세·화면 IA·프로세스/예외 카탈로그의 편람 측 정본</td></tr>
+<tr><th>design/wiki/project-spec 01-요구사항명세서.md · 03-HW구성안.md · 04-통합-IA.md · 05-사용자-프로세스-태스크플로우.md</th><td>본서와 한 세트인 산출물 4종(§1.4 상호 참조) — REQ 전건·HW 상세·화면 IA·프로세스/예외 카탈로그의 편람 측 정본</td></tr>
 </tbody></table>
 <h2>변경 이력</h2>
 <table>
