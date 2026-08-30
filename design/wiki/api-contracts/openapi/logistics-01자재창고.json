@@ -1421,7 +1421,7 @@
      "inventory"
     ],
     "summary": "취급 단위 구성 치환",
-    "description": "근거: 공유계약 A-5. ⭐ 이 경로의 조회는 ETag 를 내리지 않는다 — If-Match 에 담을 토큰은 부모 자원 GET /inventory/handling-units/{handlingUnitId} 200 의 ETag 다. 잠그는 단위가 부모이기 때문이다. 근거: 공유계약 B-1-1. ⭐ 오프라인 대상 오퍼레이션이다 — 큐에 쌓인 요청은 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 중복은 멱등키가 막고, 이미 처리된 건은 서버가 거부한다.",
+    "description": "근거: 공유계약 A-5. ⭐ 이 경로의 조회는 ETag 를 내리지 않는다 — If-Match 에 담을 토큰은 부모 자원 GET /inventory/handling-units/{handlingUnitId} 200 의 ETag 다. 잠그는 단위가 부모이기 때문이다. 근거: 공유계약 B-1-1. ⭐ 오프라인 대상 오퍼레이션이다 — 큐에 쌓인 요청은 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 중복은 멱등키가 막고, 이미 처리된 건은 서버가 거부한다. ⭐ 결정 13 되살림(2026-08-30) — 이 치환은 서버가 HandlingUnitRepackEvent(헤더) + Line(수량 변경 전/후)을 함께 기록한다. 신규 발번·새 라벨 대상은 이 이벤트가 아니라 POST /inventory/handling-units(P-04-04)가 별도로 만든다. 저장 테이블은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: M-04-03 §5-2",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -1491,6 +1491,49 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/inventory/handling-units/{handlingUnitId}/repack-events": {
+   "parameters": [
+    {
+     "name": "handlingUnitId",
+     "in": "path",
+     "required": true,
+     "schema": {
+      "type": "integer",
+      "format": "int64"
+     }
+    }
+   ],
+   "get": {
+    "tags": [
+     "inventory"
+    ],
+    "summary": "포장 재구성 이력",
+    "description": "결정 13 「이벤트 헤더–라인 계보」를 되살린 자원(2026-08-30) — 누가·언제·왜 재구성했는지와 수량 변경 전/후를 담는다. 저장 테이블은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: M-04-03 §5-2",
+    "responses": {
+     "200": {
+      "description": "재구성 이력",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "required": [
+          "items"
+         ],
+         "properties": {
+          "items": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/HandlingUnitRepackEvent"
+           }
+          }
+         }
         }
        }
       }
@@ -8686,6 +8729,98 @@
       "items": {
        "$ref": "#/components/schemas/HandlingUnitContent"
       }
+     }
+    }
+   },
+   "HandlingUnitRepackEvent": {
+    "type": "object",
+    "description": "포장 재구성 사건 헤더. 결정 13 「이벤트 헤더–라인 계보」를 되살린 자원(2026-08-30) — 신규 생성분(신규 발번)은 이 이벤트가 아니라 POST /inventory/handling-units가 별도로 만든다. 저장 테이블은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: M-04-03 §5-2",
+    "required": [
+     "repackEventId",
+     "repackTypeCode",
+     "performedBy",
+     "occurredAt",
+     "lines"
+    ],
+    "properties": {
+     "repackEventId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "repackTypeCode": {
+      "type": "string",
+      "enum": [
+       "MERGE",
+       "SPLIT",
+       "RECONFIGURE"
+      ],
+      "description": "합병(MERGE)·분할(SPLIT)·재구성(RECONFIGURE) — M-04-03 §3 유형 선택",
+      "example": "SPLIT"
+     },
+     "performedBy": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-06T09:12:00+09:00"
+     },
+     "lines": {
+      "type": "array",
+      "description": "결정 13 규칙 2 — 수량 변경은 이벤트 한정 + 이력",
+      "items": {
+       "$ref": "#/components/schemas/HandlingUnitRepackEventLine"
+      }
+     }
+    }
+   },
+   "HandlingUnitRepackEventLine": {
+    "type": "object",
+    "required": [
+     "handlingUnitId",
+     "roleCode",
+     "itemId",
+     "lotId",
+     "qtyBefore",
+     "qtyAfter"
+    ],
+    "properties": {
+     "handlingUnitId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "roleCode": {
+      "type": "string",
+      "enum": [
+       "SOURCE",
+       "RESULT"
+      ],
+      "description": "이 취급 단위가 이 사건의 원본인지 결과인지",
+      "example": "SOURCE"
+     },
+     "itemId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "lotId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "qtyBefore": {
+      "type": "number",
+      "format": "double",
+      "example": 500.0
+     },
+     "qtyAfter": {
+      "type": "number",
+      "format": "double",
+      "example": 300.0
      }
     }
    },

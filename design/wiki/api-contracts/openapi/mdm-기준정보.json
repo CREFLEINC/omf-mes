@@ -1228,6 +1228,63 @@
         }
       }
     },
+    "/app/users/{appUserId}:reset-password": {
+      "parameters": [
+        {
+          "name": "appUserId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "app"
+        ],
+        "summary": "비밀번호 관리자 초기화",
+        "description": "DR-002 2-B ③ 「관리자 초기화」를 되살린 오퍼레이션(2026-08-30) — 만료·재사용 금지가 없는 것과 짝이라(자가 복구 경로를 안 만든다) 초기화가 유일한 복구 수단이다. 임시 비밀번호를 생성해 이 응답에서 한 번만 보인다 — 저장하지 않는다(단말 토큰 발급과 같은 규약). password_hash·failed_login_count·last_login_at 은 이미 계약에 있다(W-CO-01 §5-B) — 이 오퍼레이션이 새로 필요로 하는 컬럼은 없다. 근거: W-CO-02 §8-2",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "초기화됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppUserPasswordReset"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-CO-02 §6",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "없다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/app/users/{appUserId}/roles": {
       "parameters": [
         {
@@ -13699,6 +13756,32 @@
           }
         }
       },
+      "AppUserPasswordReset": {
+        "type": "object",
+        "description": "비밀번호 관리자 초기화 응답(2026-08-30 되살림 — DR-002 2-B ③). 근거: W-CO-02 §8-2",
+        "required": [
+          "appUserId",
+          "temporaryPassword",
+          "resetAt"
+        ],
+        "properties": {
+          "appUserId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1001
+          },
+          "temporaryPassword": {
+            "type": "string",
+            "x-no-example": "실제 임시 비밀번호 모양을 공개 계약에 남기지 않는다",
+            "description": "이 응답에서 한 번만 보인다 — 서버는 해시만 저장한다(단말 토큰 발급과 같은 규약)"
+          },
+          "resetAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-08-30T09:12:00+09:00"
+          }
+        }
+      },
       "AppUser": {
         "x-source-table": "app.app_user",
         "type": "object",
@@ -13709,7 +13792,7 @@
           "statusCode",
           "isActive"
         ],
-        "description": "사용자. 비밀번호 초기화 액션을 정의할 수 없다. loginId 는 참조를 셀 수 없어(created_by 류가 의도적 비-FK) editability.reason=NOT_COUNTABLE 로 무조건 잠근다 — 공유계약 B-4",
+        "description": "사용자. 비밀번호 관리자 초기화는 POST :reset-password 가 한다(2026-08-30 되살림 — DR-002 2-B ③). loginId 는 참조를 셀 수 없어(created_by 류가 의도적 비-FK) editability.reason=NOT_COUNTABLE 로 무조건 잠근다 — 공유계약 B-4",
         "properties": {
           "appUserId": {
             "x-source-column": "app_user_id",
