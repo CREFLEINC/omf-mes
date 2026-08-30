@@ -2072,7 +2072,7 @@
      "logistics"
     ],
     "summary": "물류 문서 진행현황",
-    "description": "문서 유형마다 테이블이 다른데 화면은 한 목록으로 본다 — 서버가 한 형태로 맞춰 내린다.\n\n⭐ successorCount·cancellable 을 서버가 판정해 내린다. 원천 참조가 다형이라(source_document_type_code + source_document_id) 유형↔테이블 규약이 아직 없는데, 프런트가 「입고 → 출고·이동·투입」 관계표를 하드코딩하면 유형이 늘 때마다 취소 판정이 조용히 틀린다(공유계약 A-10 보강).\n\n⚠ 이 화면이 덮는 것은 6유형이다 — 발주·입하·입고·출고요청·피킹·이동요청. 외주 2문서는 상태 컬럼 자체가 없고 출하·생산품 입고는 다른 도메인이다. 근거: W-01-13 §5-2·§5-3",
+    "description": "문서 유형마다 테이블이 다른데 화면은 한 목록으로 본다 — 서버가 한 형태로 맞춰 내린다.\n\n⭐ successorCount·cancellable 을 서버가 판정해 내린다. 원천 참조가 다형이라(source_document_type_code + source_document_id) 유형↔테이블 규약이 아직 없는데, 프런트가 「입고 → 출고·이동·투입」 관계표를 하드코딩하면 유형이 늘 때마다 취소 판정이 조용히 틀린다(공유계약 A-10 보강).\n\n이 화면이 덮는 것은 8유형이다 — 발주·입하·입고·출고요청·피킹·이동요청·외주출고·외주입고(2026-08-30 되살림 — subcontract_issue/receipt 도 동형으로 status_code 를 둔다). 출하·생산품 입고는 다른 도메인이라 범위 밖이다. 근거: W-01-13 §5-2·§5-3·§5-6",
     "parameters": [
      {
       "name": "documentTypeCode",
@@ -6692,6 +6692,88 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/LotHoldListResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/trace/lot-status-events": {
+   "get": {
+    "tags": [
+     "trace"
+    ],
+    "summary": "LOT 상태 변경이력 조회 — 전이 9종 전건",
+    "description": "결정 10 「현재 1행 + 변경이력 1:N」을 되살린 전용 이력(2026-08-30). 도식스펙03 §1.3 공통 범례가 요구하는 상태 전이 9종(C4·C5·C6·C7·C8·C9·C10·C14·C15) 전건을 사건별 행으로 낸다 — 기존 GET /quality/lot-hold-events(보류 등록·해제 2종만)를 대체하는 상위 자원이다. 저장 테이블은 데이터 모델 담당에게 통지한다 — 기다리지 않는다(data-model-boundary.md). 근거: W-03-01 §5-1·§5-2 · W-01-02 · M-01-08",
+    "parameters": [
+     {
+      "name": "occurredFrom",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "description": "사건 기간 시작 — 감사 조회는 기간을 강제한다(공유계약 L-3)"
+     },
+     {
+      "name": "occurredTo",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "description": "사건 기간 끝"
+     },
+     {
+      "name": "lotId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64"
+      },
+      "description": "「LOT으로 찾기」 모드"
+     },
+     {
+      "name": "transitionCode",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "enum": [
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "C10",
+        "C14",
+        "C15"
+       ]
+      },
+      "description": "「이력으로 찾기」의 판정유형 축"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "LOT 상태 변경이력",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "required": [
+          "items"
+         ],
+         "properties": {
+          "items": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/LotStatusHistoryEvent"
+           }
+          }
+         }
         }
        }
       }
@@ -11614,6 +11696,95 @@
       "items": {
        "$ref": "#/components/schemas/LotHold"
       }
+     }
+    }
+   },
+   "LotStatusHistoryEvent": {
+    "type": "object",
+    "description": "LOT 상태 전이 사건 1건. 결정 10 「현재 1행 + 변경이력 1:N」을 되살린 전용 이력(2026-08-30) — 도식스펙03 §1.3 전이 9종(C4·C5·C6·C7·C8·C9·C10·C14·C15) 전건을 담는다. 저장 테이블(trace.lot_status_history 성격)은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-03-01 §5-1·§5-2",
+    "required": [
+     "lotStatusHistoryId",
+     "lotId",
+     "toStatusCode",
+     "transitionCode",
+     "changedBy",
+     "changedAt"
+    ],
+    "properties": {
+     "lotStatusHistoryId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "lotId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "lotNo": {
+      "type": "string",
+      "example": "값"
+     },
+     "fromStatusCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "x-no-example": true,
+      "description": "전이 전 상태. 최초 등록 전이(C4·C6·C14)는 null"
+     },
+     "toStatusCode": {
+      "type": "string",
+      "x-no-example": true
+     },
+     "transitionCode": {
+      "type": "string",
+      "enum": [
+       "C4",
+       "C5",
+       "C6",
+       "C7",
+       "C8",
+       "C9",
+       "C10",
+       "C14",
+       "C15"
+      ],
+      "description": "전이 9종 — 도식스펙03 §1.3 · W-03-01 §5-1 표",
+      "example": "C7"
+     },
+     "reason": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "example": "값"
+     },
+     "sourceDocumentTypeCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "x-no-example": true,
+      "description": "이 전이를 일으킨 문서 유형 — 다형 참조(공유계약 A-10)"
+     },
+     "sourceDocumentId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "example": 1001
+     },
+     "changedBy": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "changedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-06T09:12:00+09:00"
      }
     }
    },

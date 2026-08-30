@@ -3290,6 +3290,98 @@
         }
       }
     },
+    "/mdm/judgment-type-controls": {
+      "get": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "판정유형별 통제 속성 목록",
+        "description": "결정 10 「출고·출하·Picking 차단 판정은 이 단일 지점을 본다」를 되살린 자원(2026-08-30). 판정유형(code_value, codeGroupCode=JUDGMENT_TYPE)마다 물류 통제 속성 6종을 붙인다. 저장 테이블은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-04 §4-B",
+        "responses": {
+          "200": {
+            "description": "판정유형 통제 속성",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/JudgmentTypeControl"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/judgment-type-controls/{codeValueId}": {
+      "parameters": [
+        {
+          "name": "codeValueId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "put": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "판정유형 통제 속성 편집",
+        "description": "전사 고정 축 — 편집하면 상태 전이도·물류 통제 규칙이 함께 바뀐다(W-06-04 §5-1). 근거: W-06-04 §4-B",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JudgmentTypeControlUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "저장됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JudgmentTypeControl"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "낙관적 잠금 충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/mdm/departments": {
       "get": {
         "tags": [
@@ -8693,7 +8785,7 @@
           "mdm"
         ],
         "summary": "단말 등록 토큰 발급",
-        "description": "⭐ 관리웹이 부르고, 받은 토큰을 화면에 «QR 로» 보인다. 기기는 그것을 스캔해 저장한다 — 기기가 서버를 부르지 않으므로 토큰 없이 열리는 경로가 생기지 않는다. ⚠ 재발급해도 «이전 기기가 끊기지 않는다» — 세대를 올릴 자리가 아직 없다. 화면이 그 사실을 경고한다. 근거: M-CO-01 §5-2 B안(2026-08-13 확정) · W-CO-06 §5-4",
+        "description": "⭐ 관리웹이 부르고, 받은 토큰을 화면에 «QR 로» 보인다. 기기는 그것을 스캔해 저장한다 — 기기가 서버를 부르지 않으므로 토큰 없이 열리는 경로가 생기지 않는다. **재발급하면 이전 기기 전부가 끊긴다** — 세대 번호(tokenVersion)를 올리고 클레임과 대조한다. 화면이 그 사실을 안내한다. 근거: M-CO-01 §5-2 B안(2026-08-13 확정) · W-CO-06 §5-4",
         "parameters": [
           {
             "name": "terminalId",
@@ -14828,6 +14920,108 @@
           }
         }
       },
+      "JudgmentTypeControl": {
+        "type": "object",
+        "description": "판정유형(codeValueId, codeGroupCode=JUDGMENT_TYPE)의 물류 통제 속성. 결정 10을 되살린 자원(2026-08-30). 저장 테이블은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-04 §4-B",
+        "required": [
+          "codeValueId",
+          "blocksIssue",
+          "blocksShipment",
+          "blocksPicking",
+          "requiresApproval",
+          "versionNo"
+        ],
+        "properties": {
+          "codeValueId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1001
+          },
+          "blocksIssue": {
+            "type": "boolean",
+            "description": "출고 차단 — 결정 10",
+            "example": true
+          },
+          "blocksShipment": {
+            "type": "boolean",
+            "description": "출하 차단 — 한도승인·특채는 출하 허용 범위가 판정마다 다르다(결정 10)",
+            "example": true
+          },
+          "blocksPicking": {
+            "type": "boolean",
+            "description": "Picking 차단 — 결정 10",
+            "example": true
+          },
+          "requiresApproval": {
+            "type": "boolean",
+            "description": "승인 필요 — 한도승인·특채는 승인 행위 자체가 감사 대상(결정 10)",
+            "example": false
+          },
+          "approverRoleId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "승인 권한 — 「승인 주체 = MES 권한 보유 관리자」(REQ-PR-0027). requiresApproval 이 참일 때만 의미가 있다",
+            "example": 1001
+          },
+          "lotStatusCode": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "x-no-example": true,
+            "description": "판정유형 → 어떤 Lot Status로 전이하는가(결정 10 「상태 3축」)"
+          },
+          "versionNo": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "JudgmentTypeControlUpdate": {
+        "type": "object",
+        "required": [
+          "blocksIssue",
+          "blocksShipment",
+          "blocksPicking",
+          "requiresApproval"
+        ],
+        "properties": {
+          "blocksIssue": {
+            "type": "boolean",
+            "example": true
+          },
+          "blocksShipment": {
+            "type": "boolean",
+            "example": true
+          },
+          "blocksPicking": {
+            "type": "boolean",
+            "example": true
+          },
+          "requiresApproval": {
+            "type": "boolean",
+            "example": false
+          },
+          "approverRoleId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "example": 1001
+          },
+          "lotStatusCode": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "x-no-example": true
+          }
+        }
+      },
       "CodeValueDetailResponse": {
         "type": "object",
         "required": [
@@ -18293,12 +18487,18 @@
             "example": "2026-08-13T09:12:00+09:00",
             "description": "마지막으로 토큰을 발급한 시각"
           },
+          "tokenVersion": {
+            "x-source-column": "token_version",
+            "type": "integer",
+            "example": 3,
+            "description": "재발급마다 서버가 +1 — 이전 값의 토큰은 클레임 tv 가 이 값과 어긋나 거부된다(공유계약 F-4 · ✓확정 2026-07-28 §6-②)"
+          },
           "versionNo": {
             "type": "integer",
             "example": 1
           }
         },
-        "x-internal-note": "토큰 세대(token_version)와 기기 식별자가 물리 모델에 없다 (W-CO-06 §5-4 · M-CO-01 §5-2). 그래서 잃어버린 기기를 영구히 끊을 수 없다 — 화면도 그 기능을 그리지 않는다(A-11). 공통 트랙 묶음 이슈로 요청. 설비 결속(equipment_id)도 물리 모델 컬럼이 확인되지 않았다 — W-CO-06 §4-A 컬럼표에 설비 행이 없다. design/schema/data-model-boundary.md 「모델이 화면 요구를 못 담을 때 — 계약은 화면대로 쓴다 · 기다리지 않는다」에 따라 계약이 앞서 있다. 확인 요청 = omf-mes#262(닫지 않는다)."
+        "x-internal-note": "토큰 세대(tokenVersion) — 재발급마다 +1, 토큰 클레임 tv 와 매 요청 대조해 이전 토큰 전부를 무효화한다(공유계약 F-4, 2026-08-30 되살림). 저장 컬럼은 데이터 모델 담당에게 통지한다 — 기다리지 않는다(data-model-boundary.md). equipmentId(설비 결속) 관련은 별건 — omf-mes#262(닫지 않는다)."
       },
       "TerminalCreate": {
         "type": "object",
@@ -18414,7 +18614,7 @@
             "description": "만료 1년"
           }
         },
-        "x-internal-note": "⛔ 재발급해도 이전 기기가 끊기지 않는다 — token_version 이 없어 세대를 올릴 수 없다. 화면이 「이전 기기를 끊는다」를 «그리지 않는» 이유다 (A-11 — 할 수 없는 것을 할 수 있는 것처럼 그리지 않는다)."
+        "x-internal-note": "✅ 재발급하면 이전 기기 전부가 끊긴다 — tokenVersion 을 발급마다 올리고 클레임 tv 와 대조한다(공유계약 F-4, 2026-08-30 되살림). 화면은 이 규칙대로 「재발급 시 이전 토큰 전부가 끊깁니다」를 그린다."
       },
       "TerminalProcess": {
         "x-source-table": "mdm.terminal_process",
