@@ -6351,6 +6351,152 @@
         }
       }
     },
+    "/quality/defect-codes/{defectCodeId}/processes": {
+      "parameters": [
+        {
+          "name": "defectCodeId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "불량코드-공정 매핑 목록",
+        "description": "결정 12 「공정—불량코드 연결 = N:M 매핑 테이블」을 되살린 자원(2026-08-30) — 상세 코드만 매핑한다(대분류는 전사 고정 축). POP 불량 입력 화면은 이 매핑으로 자기 공정의 불량코드만 본다. 저장 테이블은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-03 §4-D",
+        "responses": {
+          "200": {
+            "description": "매핑된 공정",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/DefectCodeProcess"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "불량코드-공정 매핑 추가",
+        "description": "부여 형태(created_at·created_by만) — uq(defect_code_id, process_id)로 중복을 막는다. 근거: W-06-03 §4-D·§5-1 「매핑 토글」",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "processId"
+                ],
+                "properties": {
+                  "processId": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1001
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "매핑됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefectCodeProcess"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "이미 매핑돼 있다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quality/defect-codes/{defectCodeId}/processes/{processId}": {
+      "parameters": [
+        {
+          "name": "defectCodeId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "name": "processId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "delete": {
+        "tags": [
+          "quality"
+        ],
+        "summary": "불량코드-공정 매핑 해제",
+        "description": "매핑 토글(셀 클릭)의 해제 쪽 — 즉시 반영. 근거: W-06-03 §5-1",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "해제됨"
+          },
+          "404": {
+            "description": "없다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/quality/cause-codes": {
       "get": {
         "tags": [
@@ -17135,7 +17281,7 @@
           "defectName",
           "isActive"
         ],
-        "description": "2계층(parent_defect_code_id). ck_*_parent 자기참조 CHECK 가 없다 — department 에만 있고 location·defect_code 엔 둘 다 없다(#64). 3계층 이상은 결정 12 위반이라 서버가 차단한다. N:M 테이블이 없어 공정 매핑 엔드포인트가 성립하지 않는다",
+        "description": "2계층(parent_defect_code_id). ck_*_parent 자기참조 CHECK 가 없다 — department 에만 있고 location·defect_code 엔 둘 다 없다(#64). 3계층 이상은 결정 12 위반이라 서버가 차단한다. 공정 매핑은 GET·POST·DELETE /quality/defect-codes/{defectCodeId}/processes(N:M, 2026-08-30 되살림)로 한다",
         "properties": {
           "defectCodeId": {
             "x-source-column": "defect_code_id",
@@ -17173,8 +17319,18 @@
               "null"
             ],
             "format": "int64",
-            "description": "⚠ N:1 — 결정 12 가 N:M 으로 조정 승인했으나 물리 모델 미반영(§8-1). N:M 매핑 테이블이 없어 공정 매핑 엔드포인트를 만들 수 없다",
+            "description": "레거시 N:1 참조 — 결정 12가 N:M 매핑으로 대체를 승인했다. 정식 매핑은 /processes 자원을 쓴다",
             "example": 1001
+          },
+          "dispositionTypeCode": {
+            "x-source-column": "disposition_type_code",
+            "type": "string",
+            "enum": [
+              "REWORKABLE",
+              "SCRAP"
+            ],
+            "description": "처분구분(재작업가능/폐기) — ✅REQ-PR-0025·결정 12 확정. 2026-08-30 되살림. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-03 §4-A",
+            "example": "REWORKABLE"
           },
           "isActive": {
             "x-source-column": "is_active",
@@ -17183,7 +17339,7 @@
             "example": true
           }
         },
-        "x-internal-note": "미착지: 처분구분·다국어(ko/vi)·공정 N:M 매핑 — #64"
+        "x-internal-note": "미착지: 다국어(ko/vi) — #64. 처분구분·공정 N:M 매핑은 2026-08-30 되살렸다."
       },
       "DefectCodeCreate": {
         "x-source-table": "quality.defect_code",
@@ -17225,6 +17381,20 @@
             ],
             "format": "int64",
             "example": 1001
+          },
+          "dispositionTypeCode": {
+            "x-source-column": "disposition_type_code",
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "REWORKABLE",
+              "SCRAP",
+              null
+            ],
+            "description": "처분구분(재작업가능/폐기) — 결정 12. 상세 코드에만 의미가 있다. 2026-08-30 되살림",
+            "example": "REWORKABLE"
           }
         }
       },
@@ -17266,6 +17436,44 @@
             ],
             "format": "int64",
             "example": 1001
+          },
+          "dispositionTypeCode": {
+            "x-source-column": "disposition_type_code",
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "REWORKABLE",
+              "SCRAP",
+              null
+            ],
+            "example": "REWORKABLE"
+          }
+        }
+      },
+      "DefectCodeProcess": {
+        "type": "object",
+        "description": "불량코드-공정 매핑 한 건. 결정 12 N:M을 되살린 자원(2026-08-30). 저장 테이블은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-03 §4-D",
+        "required": [
+         "defectCodeId",
+         "processId"
+        ],
+        "properties": {
+          "defectCodeId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1001
+          },
+          "processId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1001
+          },
+          "processName": {
+            "type": "string",
+            "description": "mdm.process.process_name 조인 — 화면 왕복을 없앤다",
+            "example": "사출"
           }
         }
       },
