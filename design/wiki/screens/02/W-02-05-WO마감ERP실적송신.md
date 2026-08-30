@@ -6,7 +6,7 @@
 - **주요 데이터**: 작업지시(`production.work_order` — `completion_variance_reason_code`·`closed_at`), 생산실적(`production.production_result` — `corrects_production_result_id`), 생산LOT(`trace.lot.status_code`), ERP 연계 메시지(`integration.integration_message`).
 - **핵심 액션**: W/O 선택 → 판정 확인(자동 3분류) → 미달 시 잔량 처분(이월/소멸)·사유 선택 → **마감**(되돌릴 수 없음) 한 번으로 ① 마감 시각 기록 ② 선발행 미등록 슬롯 자동 폐번 ③ ERP 실적 송신 메시지 적재(생산 실적 필수, 기타 항목 on/off, 검사 결과 비연계)가 함께 일어난다.
 
-> 작성일: 2026-08-05 · 서식: `00-서식.md` v1.0 · 작성 주체: CREFLE OMF 팀 (UI/UX)
+> 작성일: 2026-08-05 · 서식: `00-화면스펙서식.md` v1.0 · 작성 주체: CREFLE OMF 팀 (UI/UX)
 > 도메인 02의 출구. **B-8(트랜잭션 경계)·C-4(outbox 동형)가 처음 「송신하는 쪽」에서 검증**된다. `W-06-10`은 받는 쪽이었다.
 
 ## §1. 식별

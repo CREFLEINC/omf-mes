@@ -6,7 +6,7 @@
 - **주요 데이터**: 작업지시(`production.work_order` — `operation_settings_snapshot` jsonb·`released_at`), 생산LOT(`trace.lot` — 선발행 슬롯 N개), 자재출고요청(`logistics.material_issue_request`, 화면 없이 자동 발행).
 - **핵심 액션**: LOT 크기 입력(품목 기본값 없음) → 전달사항 등록 → **확정·배포**(배정 Validation 통과 시 활성) 한 번으로 ① W/O 확정·Rev 스냅샷 고정 ② POP 자동 배포(조회 전환) ③ 생산LOT N슬롯 선발행 ④ 자재 출고요청 자동 발행(긴급 W/O 제외)이 동시에 일어난다.
 
-> 작성일: 2026-08-04 · 서식: `00-서식.md` v1.0 · 작성 주체: CREFLE OMF 팀 (UI/UX)
+> 작성일: 2026-08-04 · 서식: `00-화면스펙서식.md` v1.0 · 작성 주체: CREFLE OMF 팀 (UI/UX)
 > 생산 실행의 **관문**. 관리웹에서 확정하면 POP 11화면이 그 위에서 돈다. 이 장에서 **선발행(번호 슬롯 예약)**과 **Rev 스냅샷 고정**을 다룬다.
 
 ## §1. 식별
