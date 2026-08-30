@@ -18040,6 +18040,16 @@
             "description": "공통코드 — 계열마다 그룹이 다르다. ⭐ 계측기 계열은 GET /mdm/code-values?codeGroupCode=INSTRUMENT_TYPE 로 받는다(CALIPER·MICROMETER·GAUGE). 설비 계열은 codeGroupCode=EQUIPMENT_TYPE 이며 INJECTION_MOLDING(사출기)·PRESS(프레스)·WATER_HEATER(온수기) 세 값이다. ⚠ 한 컬럼에 두 계열이 착지하므로 화면은 «자기 계열의 그룹만» 부른다",
             "example": "CALIPER"
           },
+          "locationId": {
+            "x-source-column": "location_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "이 설비에 매핑된 Location(호퍼 등). 결정 08 「호퍼=Location 모델링(설비—Location 매핑)」을 되살린 축(2026-08-30) — M-01-09가 이 값으로 「1호기 호퍼」처럼 설비 기준으로 호퍼를 지정하고 잔량을 설비 기준으로 집계한다. 비어 있을 수 있다 — 모든 설비가 호퍼를 갖지 않는다. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: M-01-09 §5-3 · P-02-03 §4",
+            "example": 1001
+          },
           "processId": {
             "x-source-column": "process_id",
             "type": [
