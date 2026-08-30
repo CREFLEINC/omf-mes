@@ -3981,7 +3981,7 @@
           "mdm"
         ],
         "summary": "작업자 상세 (읽기 전용)",
-        "description": "쓰기 경로를 제공하지 않는다 — 작업자 기본 정보는 전부 ERP 수신본이다(W-06-06 §5-4). editability.reason 은 항상 RECEIVED_FROM_ERP 로 고정한다 — 이 테이블 전체가 ERP 수신본이라 행 단위 식별 플래그(#65)가 없어도 판정에 모호함이 없다. 자격·인증 편집은 GET/PUT .../qualifications 를 쓴다. 근거: W-06-06 §4-D·§5-4",
+        "description": "기본 정보(코드·이름 원본)는 쓰기 경로가 없다 — 전부 ERP 수신본이다(W-06-06 §5-4). editability.reason 은 항상 RECEIVED_FROM_ERP 로 고정한다. 다국어 명칭(nameKo·nameVi)만 예외로 PUT :update-name-translation 로 편집한다(QA #33·#34 — MES 확장 속성, 2026-08-30 되살림). 자격·인증 편집은 GET/PUT .../qualifications 를 쓴다. 근거: W-06-06 §4-D·§5-4",
         "responses": {
           "200": {
             "description": "상세",
@@ -3989,6 +3989,84 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/WorkerDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mdm/workers/{workerId}:update-name-translation": {
+      "parameters": [
+        {
+          "name": "workerId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "put": {
+        "tags": [
+          "mdm"
+        ],
+        "summary": "작업자 다국어 명칭 편집",
+        "description": "작업자 기본 정보는 전부 ERP 수신본이라 쓰기 경로가 없지만(GET /mdm/workers/{workerId} 참조), 다국어 명칭(nameKo·nameVi)은 QA #33·#34가 「MES 확장 속성」으로 확정해 예외로 둔다 — 2026-08-30 되살림. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-06 §8-1",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchVersion"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nameKo": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 200,
+                    "example": "표시명"
+                  },
+                  "nameVi": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 200,
+                    "example": "Ten hien thi"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "저장됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Worker"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "낙관적 잠금 충돌",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
                 }
               }
             }
@@ -14650,6 +14728,26 @@
             "maxLength": 200,
             "example": "표시명"
           },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "공정 한국어 명칭 — QA #33 「다국어(한/베) 전범위(UI·마스터 명칭·출력물)」·QA #34 「다국어 명칭 = MES 확장 속성」을 되살렸다(2026-08-30). ERP 원본 필드의 편집 가능 여부와 무관하게 항상 편집 가능하다. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "공정 베트남어 명칭 — QA #33·#34. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
+          },
           "mesManaged": {
             "x-source-column": "mes_managed",
             "type": "boolean",
@@ -14773,6 +14871,26 @@
             "type": "string",
             "maxLength": 200,
             "example": "표시명"
+          },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "공정 한국어 명칭 — QA #33 「다국어(한/베) 전범위(UI·마스터 명칭·출력물)」·QA #34 「다국어 명칭 = MES 확장 속성」을 되살렸다(2026-08-30). ERP 원본 필드의 편집 가능 여부와 무관하게 항상 편집 가능하다. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "공정 베트남어 명칭 — QA #33·#34. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
           },
           "mesManaged": {
             "x-source-column": "mes_managed",
@@ -15078,6 +15196,26 @@
             "maxLength": 200,
             "example": "표시명"
           },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "코드값 한국어 명칭 — QA #33 「다국어(한/베) 전범위(UI·마스터 명칭·출력물)」·QA #34 「다국어 명칭 = MES 확장 속성」을 되살렸다(2026-08-30). ERP 원본 필드의 편집 가능 여부와 무관하게 항상 편집 가능하다. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "코드값 베트남어 명칭 — QA #33·#34. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
+          },
           "displayOrder": {
             "x-source-column": "display_order",
             "type": "integer",
@@ -15142,6 +15280,26 @@
             "maxLength": 200,
             "example": "표시명"
           },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "코드값 한국어 명칭 — QA #33 「다국어(한/베) 전범위(UI·마스터 명칭·출력물)」·QA #34 「다국어 명칭 = MES 확장 속성」을 되살렸다(2026-08-30). ERP 원본 필드의 편집 가능 여부와 무관하게 항상 편집 가능하다. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "코드값 베트남어 명칭 — QA #33·#34. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
+          },
           "displayOrder": {
             "x-source-column": "display_order",
             "type": "integer",
@@ -15190,6 +15348,26 @@
             "type": "string",
             "maxLength": 200,
             "example": "표시명"
+          },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "코드값 한국어 명칭 — QA #33 「다국어(한/베) 전범위(UI·마스터 명칭·출력물)」·QA #34 「다국어 명칭 = MES 확장 속성」을 되살렸다(2026-08-30). ERP 원본 필드의 편집 가능 여부와 무관하게 항상 편집 가능하다. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "코드값 베트남어 명칭 — QA #33·#34. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
           },
           "displayOrder": {
             "x-source-column": "display_order",
@@ -15363,6 +15541,26 @@
             "maxLength": 200,
             "example": "생산1팀"
           },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "부서 한국어 명칭 — QA #33 「다국어(한/베) 전범위(UI·마스터 명칭·출력물)」·QA #34 「다국어 명칭 = MES 확장 속성」을 되살렸다(2026-08-30). ERP 원본 필드의 편집 가능 여부와 무관하게 항상 편집 가능하다. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "부서 베트남어 명칭 — QA #33·#34. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
+          },
           "parentDepartmentId": {
             "x-source-column": "parent_department_id",
             "type": [
@@ -15423,6 +15621,26 @@
             "maxLength": 200,
             "example": "생산1팀"
           },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "부서 한국어 명칭 — QA #33 「다국어(한/베) 전범위(UI·마스터 명칭·출력물)」·QA #34 「다국어 명칭 = MES 확장 속성」을 되살렸다(2026-08-30). ERP 원본 필드의 편집 가능 여부와 무관하게 항상 편집 가능하다. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "부서 베트남어 명칭 — QA #33·#34. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
+          },
           "parentDepartmentId": {
             "x-source-column": "parent_department_id",
             "type": [
@@ -15463,6 +15681,26 @@
             "type": "string",
             "maxLength": 200,
             "example": "생산1팀"
+          },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "부서 한국어 명칭 — QA #33 「다국어(한/베) 전범위(UI·마스터 명칭·출력물)」·QA #34 「다국어 명칭 = MES 확장 속성」을 되살렸다(2026-08-30). ERP 원본 필드의 편집 가능 여부와 무관하게 항상 편집 가능하다. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "부서 베트남어 명칭 — QA #33·#34. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
           },
           "parentDepartmentId": {
             "x-source-column": "parent_department_id",
@@ -15531,6 +15769,26 @@
             "type": "string",
             "maxLength": 200,
             "example": "홍길동"
+          },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "작업자 한국어 명칭 — QA #33 「다국어(한/베) 전범위(UI·마스터 명칭·출력물)」·QA #34 「다국어 명칭 = MES 확장 속성」을 되살렸다(2026-08-30). ERP 원본 필드의 편집 가능 여부와 무관하게 항상 편집 가능하다. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "작업자 베트남어 명칭 — QA #33·#34. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
           },
           "businessUnitId": {
             "x-source-column": "business_unit_id",
@@ -15722,6 +15980,26 @@
             "maxLength": 200,
             "description": "⚠ 한/베 두 언어를 담을 컬럼이 없다 — W-06-06 §8-1 과 같은 결함",
             "example": "하우징 커버 A"
+          },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "품목 한국어 명칭 — QA #33 「다국어(한/베) 전범위(UI·마스터 명칭·출력물)」·QA #34 「다국어 명칭 = MES 확장 속성」을 되살렸다(2026-08-30). ERP 원본 필드의 편집 가능 여부와 무관하게 항상 편집 가능하다. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "품목 베트남어 명칭 — QA #33·#34. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
           },
           "itemTypeCode": {
             "x-source-column": "item_type_code",
@@ -15948,6 +16226,26 @@
             "exclusiveMinimum": 0,
             "description": "MES 확장 — 생산LOT 기본크기. 확정 REQ-PR-0008·E26. 2026-08-30 되살림",
             "example": 500.0
+          },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "품목 한국어 명칭 — QA #33 「다국어(한/베) 전범위(UI·마스터 명칭·출력물)」·QA #34 「다국어 명칭 = MES 확장 속성」을 되살렸다(2026-08-30). ERP 원본 필드의 편집 가능 여부와 무관하게 항상 편집 가능하다. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "품목 베트남어 명칭 — QA #33·#34. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
           }
         }
       },
@@ -16510,6 +16808,26 @@
             "description": "⚠ 한/베 컬럼 없음",
             "example": "하우징 IQC 기준"
           },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "검사기준 한국어 명칭 — QA #33 「다국어(한/베) 전범위(UI·마스터 명칭·출력물)」·QA #34 「다국어 명칭 = MES 확장 속성」을 되살렸다(2026-08-30). ERP 원본 필드의 편집 가능 여부와 무관하게 항상 편집 가능하다. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "검사기준 베트남어 명칭 — QA #33·#34. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
+          },
           "itemId": {
             "x-source-column": "item_id",
             "type": [
@@ -16606,6 +16924,26 @@
             "maxLength": 200,
             "example": "하우징 IQC 기준"
           },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "검사기준 한국어 명칭 — QA #33 「다국어(한/베) 전범위(UI·마스터 명칭·출력물)」·QA #34 「다국어 명칭 = MES 확장 속성」을 되살렸다(2026-08-30). ERP 원본 필드의 편집 가능 여부와 무관하게 항상 편집 가능하다. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "검사기준 베트남어 명칭 — QA #33·#34. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
+          },
           "itemId": {
             "x-source-column": "item_id",
             "type": [
@@ -16669,6 +17007,26 @@
             "type": "string",
             "maxLength": 200,
             "example": "하우징 IQC 기준"
+          },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "검사기준 한국어 명칭 — QA #33 「다국어(한/베) 전범위(UI·마스터 명칭·출력물)」·QA #34 「다국어 명칭 = MES 확장 속성」을 되살렸다(2026-08-30). ERP 원본 필드의 편집 가능 여부와 무관하게 항상 편집 가능하다. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "검사기준 베트남어 명칭 — QA #33·#34. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
           },
           "itemId": {
             "x-source-column": "item_id",
@@ -17135,6 +17493,26 @@
             "description": "⚠ 한/베 컬럼 없음",
             "example": "표시명"
           },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "검사항목 한국어 명칭 — QA #33 「다국어(한/베) 전범위(UI·마스터 명칭·출력물)」·QA #34 「다국어 명칭 = MES 확장 속성」을 되살렸다(2026-08-30). ERP 원본 필드의 편집 가능 여부와 무관하게 항상 편집 가능하다. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "검사항목 베트남어 명칭 — QA #33·#34. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
+          },
           "dataTypeCode": {
             "x-source-column": "data_type_code",
             "type": "string",
@@ -17269,6 +17647,26 @@
             "description": "⚠ 한/베 컬럼 없음",
             "example": "표시명"
           },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "검사항목 한국어 명칭 — QA #33 「다국어(한/베) 전범위(UI·마스터 명칭·출력물)」·QA #34 「다국어 명칭 = MES 확장 속성」을 되살렸다(2026-08-30). ERP 원본 필드의 편집 가능 여부와 무관하게 항상 편집 가능하다. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "검사항목 베트남어 명칭 — QA #33·#34. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
+          },
           "dataTypeCode": {
             "x-source-column": "data_type_code",
             "type": "string",
@@ -17399,6 +17797,26 @@
             "description": "⚠ 결정 12 가 「다국어 명칭(ko/vi)」으로 컬럼 형태까지 지정했는데 단일 컬럼이다 §8-2",
             "example": "표시명"
           },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "불량코드 한국어 명칭 — 결정 12 「다국어 명칭(ko/vi)」을 되살렸다(2026-08-30). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "불량코드 베트남어 명칭 — 결정 12. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
+          },
           "parentDefectCodeId": {
             "x-source-column": "parent_defect_code_id",
             "type": [
@@ -17436,7 +17854,7 @@
             "example": true
           }
         },
-        "x-internal-note": "미착지: 다국어(ko/vi) — #64. 처분구분·공정 N:M 매핑은 2026-08-30 되살렸다."
+        "x-internal-note": "미착지 없음(2026-08-30 전부 되살림) — 다국어(nameKo/nameVi)·처분구분·공정 N:M 매핑."
       },
       "DefectCodeCreate": {
         "x-source-table": "quality.defect_code",
@@ -17459,6 +17877,26 @@
             "type": "string",
             "maxLength": 200,
             "example": "표시명"
+          },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "불량코드 한국어 명칭 — 결정 12 「다국어 명칭(ko/vi)」을 되살렸다(2026-08-30). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "불량코드 베트남어 명칭 — 결정 12. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
           },
           "parentDefectCodeId": {
             "x-source-column": "parent_defect_code_id",
@@ -17515,6 +17953,26 @@
             "type": "string",
             "maxLength": 200,
             "example": "표시명"
+          },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "불량코드 한국어 명칭 — 결정 12 「다국어 명칭(ko/vi)」을 되살렸다(2026-08-30). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "불량코드 베트남어 명칭 — 결정 12. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
           },
           "parentDefectCodeId": {
             "x-source-column": "parent_defect_code_id",
@@ -17619,6 +18077,26 @@
             "description": "다국어 결함 동일 — W-06-06 §8-1",
             "example": "표시명"
           },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "원인코드 한국어 명칭 — 결정 12 「다국어 명칭(ko/vi)」을 되살렸다(2026-08-30). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "원인코드 베트남어 명칭 — 결정 12. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
+          },
           "parentCauseCodeId": {
             "x-source-column": "parent_cause_code_id",
             "type": [
@@ -17669,6 +18147,26 @@
             "maxLength": 200,
             "example": "표시명"
           },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "원인코드 한국어 명칭 — 결정 12 「다국어 명칭(ko/vi)」을 되살렸다(2026-08-30). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "원인코드 베트남어 명칭 — 결정 12. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
+          },
           "parentCauseCodeId": {
             "x-source-column": "parent_cause_code_id",
             "type": [
@@ -17709,6 +18207,26 @@
             "type": "string",
             "maxLength": 200,
             "example": "표시명"
+          },
+          "nameKo": {
+            "x-source-column": "name_ko",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "원인코드 한국어 명칭 — 결정 12 「다국어 명칭(ko/vi)」을 되살렸다(2026-08-30). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다.",
+            "example": "표시명"
+          },
+          "nameVi": {
+            "x-source-column": "name_vi",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200,
+            "description": "원인코드 베트남어 명칭 — 결정 12. 2026-08-30 되살림.",
+            "example": "Ten hien thi"
           },
           "parentCauseCodeId": {
             "x-source-column": "parent_cause_code_id",
