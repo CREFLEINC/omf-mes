@@ -2596,6 +2596,142 @@
     }
    }
   },
+  "/production/work-orders/{workOrderId}/resource-plans": {
+   "parameters": [
+    {
+     "name": "workOrderId",
+     "in": "path",
+     "required": true,
+     "schema": {
+      "type": "integer",
+      "format": "int64"
+     }
+    }
+   ],
+   "get": {
+    "tags": [
+     "production"
+    ],
+    "summary": "4M 계획 배정 목록",
+    "description": "결정 04 「배정 No(surrogate) + 논리 유니크(W/O·자원유형·자원ID)」를 되살린 자원(2026-08-30) — 자원 유형당 N개 배정을 받는다(work_order 계획 컬럼 5개의 「자원 유형당 1개」 제약을 벗는다). 저장 테이블은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-02-03 §5-1",
+    "responses": {
+     "200": {
+      "description": "계획 배정",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "required": [
+          "items"
+         ],
+         "properties": {
+          "items": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/WorkOrderResourcePlan"
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "4M 계획 배정 추가",
+    "description": "자원 유형(EQUIPMENT·WORKER·MOLD)마다 여러 행을 만들 수 있다 — R23. uq_work_order_resource_plan(work_order_id, resource_type_code, resource_id)로 같은 자원 중복 배정을 막는다. 근거: W-02-03 §5-1",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/WorkOrderResourcePlanCreate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "배정됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/WorkOrderResourcePlan"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "이미 같은 자원이 배정돼 있다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/production/work-orders/{workOrderId}/resource-plans/{workOrderResourcePlanId}": {
+   "parameters": [
+    {
+     "name": "workOrderId",
+     "in": "path",
+     "required": true,
+     "schema": {
+      "type": "integer",
+      "format": "int64"
+     }
+    },
+    {
+     "name": "workOrderResourcePlanId",
+     "in": "path",
+     "required": true,
+     "schema": {
+      "type": "integer",
+      "format": "int64"
+     }
+    }
+   ],
+   "delete": {
+    "tags": [
+     "production"
+    ],
+    "summary": "4M 계획 배정 해제",
+    "description": "배정 한 건을 뺀다 — 우선순위 조정 화면(W-02-03)이 부른다. 근거: W-02-03 §5-1",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "해제됨"
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
   "/production/work-orders/{workOrderId}/validation": {
    "get": {
     "tags": [
@@ -5698,6 +5834,68 @@
      "message"
     ],
     "description": "오류가 아니라 점검 결과다 — ErrorItem 을 재사용하지 않는다. 등급 축(BLOCK/WARN)이 필요하기 때문이다."
+   },
+   "WorkOrderResourcePlan": {
+    "type": "object",
+    "description": "W/O 4M 계획 배정 한 건. 결정 04 R23·R24를 되살린 자원(2026-08-30) — 자원 유형당 N개 배정을 받아 work_order 계획 컬럼 5개의 「자원 유형당 1개」 표현력 제약을 벗는다. 저장 테이블은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-02-03 §5-1",
+    "required": [
+     "workOrderResourcePlanId",
+     "workOrderId",
+     "resourceTypeCode",
+     "resourceId"
+    ],
+    "properties": {
+     "workOrderResourcePlanId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "배정 No — surrogate(R23)",
+      "example": 1001
+     },
+     "workOrderId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "resourceTypeCode": {
+      "type": "string",
+      "enum": [
+       "EQUIPMENT",
+       "WORKER",
+       "MOLD"
+      ],
+      "description": "자원 유형 — R23",
+      "example": "EQUIPMENT"
+     },
+     "resourceId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "resourceTypeCode 에 따라 equipment_id·worker_id·mold_id 중 하나를 가리킨다",
+      "example": 1001
+     }
+    }
+   },
+   "WorkOrderResourcePlanCreate": {
+    "type": "object",
+    "required": [
+     "resourceTypeCode",
+     "resourceId"
+    ],
+    "properties": {
+     "resourceTypeCode": {
+      "type": "string",
+      "enum": [
+       "EQUIPMENT",
+       "WORKER",
+       "MOLD"
+      ],
+      "example": "EQUIPMENT"
+     },
+     "resourceId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     }
+    }
    },
    "ValidationReport": {
     "type": "object",
