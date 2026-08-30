@@ -2368,6 +2368,53 @@
         }
       }
     },
+    "/planning/routings/{routingId}:set-default": {
+      "parameters": [
+        {
+          "name": "routingId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "planning"
+        ],
+        "summary": "기본 Rev 지정",
+        "description": "결정 07 헤더 속성 「기본(default) Rev 플래그」를 되살린 오퍼레이션(2026-08-30) — Bom.isDefault·:set-default와 같은 형태(공유계약 A-6). uq_routing_default ON (item_id) WHERE is_default — 서버가 한 트랜잭션으로 지정한 Routing을 isDefault=true로 세우고 같은 품목의 기존 기본 Rev를 isDefault=false로 내린다. 유효 기간이 겹치는 Rev가 둘일 때 이 값으로 어느 것을 쓸지 정한다. 근거: W-06-01 §8-1",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "지정됨 — 응답은 지정한 Routing만 반환한다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Routing"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음. 근거: W-06-01 §6",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/planning/routings/{routingId}/operations": {
       "parameters": [
         {
@@ -5638,7 +5685,7 @@
           "quality"
         ],
         "summary": "검사기준 버전 수정",
-        "description": "상태=작성중일 때만 허용한다 — W-06-01 §5-4 와 같은 규칙을 적용한다(다만 근거는 status_code 의 존재와 inspection_item_spec 에 version_no 가 없다는 구조에서 읽은 것이다 [추정] — W-06-02 §5-4). 상태≠작성중이면 400(ErrorResponse, code=STATE_LOCKED). planVersion·statusCode 는 이 API 로 바꾸지 않고 :new-revision·:confirm·:obsolete 로만 전이한다. ck_inspection_plan_version_dates — effectiveTo 는 있으면 effectiveFrom 이상. ⚠ sampling_qty 의 단위 해석(비율/수량)이 확정되지 않았다 — 규약 없이 개발하면 30%가 30개로 저장된다. 낙관적 잠금은 공유계약 B-1. 근거: W-06-02 §4-B·§5-4",
+        "description": "상태=작성중일 때만 허용한다 — W-06-01 §5-4 와 같은 규칙을 적용한다(다만 근거는 status_code 의 존재와 inspection_item_spec 에 version_no 가 없다는 구조에서 읽은 것이다 [추정] — W-06-02 §5-4). 상태≠작성중이면 400(ErrorResponse, code=STATE_LOCKED). planVersion·statusCode 는 이 API 로 바꾸지 않고 :new-revision·:confirm·:obsolete 로만 전이한다. ck_inspection_plan_version_dates — effectiveTo 는 있으면 effectiveFrom 이상. 샘플 비율(%)이 정본이다(samplingRatio) — 확정 2026-07-15·재확인 2026-08-18. 낙관적 잠금은 공유계약 B-1. 근거: W-06-02 §4-B·§5-4",
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
@@ -14438,9 +14485,16 @@
             "format": "date",
             "description": "ck_routing_dates — 있으면 effectiveFrom 이상",
             "example": "2026-08-04"
+          },
+          "isDefault": {
+            "x-source-column": "is_default",
+            "type": "boolean",
+            "default": false,
+            "description": "uq_routing_default ON (item_id) WHERE is_default — 부분 유일 인덱스, Bom.isDefault와 같은 형태(2026-08-30 되살림). :set-default 로만 바꾼다",
+            "example": true
           }
         },
-        "x-internal-note": "① 기본 개정(default Rev) 플래그가 모델에 없어 :set-default 오퍼레이션이 성립하지 않는다. 유효 기간이 겹치는 개정이 둘일 때 어느 것을 쓸지 정할 수 없다 — 📨 작업 통지 대상(#64). ② effectiveFrom 은 ✓설계확정 결정 07 이 「선택」이라 했고 «그것이 정본이다». 앞서 「모델이 NOT NULL 이니 하류를 따른다」로 필수로 두었던 것을 2026-08-18 되돌렸다 — 물리 모델은 설계 결정을 앞설 수 없다(사용자 확정). 모델의 NOT NULL 은 우리를 막지 않으며 작업 통지로 넘긴다."
+        "x-internal-note": "② effectiveFrom 은 ✓설계확정 결정 07 이 「선택」이라 했고 «그것이 정본이다». 앞서 「모델이 NOT NULL 이니 하류를 따른다」로 필수로 두었던 것을 2026-08-18 되돌렸다 — 물리 모델은 설계 결정을 앞설 수 없다(사용자 확정). 모델의 NOT NULL 은 우리를 막지 않으며 작업 통지로 넘긴다. ① 기본 개정(isDefault) 플래그는 2026-08-30 되살렸다 — 저장 컬럼은 데이터 모델 담당에게 통지, 기다리지 않는다."
       },
       "RoutingCreate": {
         "x-source-table": "planning.routing",
@@ -14621,6 +14675,13 @@
             "description": "PQC opt-in 의 근거 필드(결정 07) — 끄면 PQC 생략",
             "example": false
           },
+          "isOutsourced": {
+            "x-source-column": "is_outsourced",
+            "type": "boolean",
+            "default": false,
+            "description": "이 공정은 외주로 나간다 — 결정 07 라인 속성(2026-08-03 사용자 확정 · 2026-08-30 되살림). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-01 §4-B-1",
+            "example": false
+          },
           "outputLotRequired": {
             "x-source-column": "output_lot_required",
             "type": "boolean",
@@ -14736,6 +14797,13 @@
             "type": "boolean",
             "default": false,
             "description": "PQC opt-in 의 근거 필드(결정 07) — 끄면 PQC 생략",
+            "example": false
+          },
+          "isOutsourced": {
+            "x-source-column": "is_outsourced",
+            "type": "boolean",
+            "default": false,
+            "description": "이 공정은 외주로 나간다 — 결정 07 라인 속성(2026-08-03 사용자 확정 · 2026-08-30 되살림). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-01 §4-B-1",
             "example": false
           },
           "outputLotRequired": {
@@ -16490,6 +16558,13 @@
             "description": "approvedBy 와 짝(CHECK 없음 — 서버가 항상 함께 기록해 보장)",
             "example": "2026-08-04T09:12:00+09:00"
           },
+          "pqcSkipAllowed": {
+            "x-source-column": "pqc_skip_allowed",
+            "type": "boolean",
+            "default": false,
+            "description": "PQC 생략 허용 — QA #4 「품목·공정 단위 생략 설정」(itemId·processId와 함께 축을 이룬다). Routing에 PQC 공정 미명시 시 생략(RoutingOperation.inspectionManaged)과는 다른 축이다. 2026-08-30 되살림. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-02 §4-A",
+            "example": false
+          },
           "isActive": {
             "x-source-column": "is_active",
             "type": "boolean",
@@ -16554,6 +16629,12 @@
             "maxLength": 50,
             "example": "IQC",
             "description": "공통코드 — IQC/PQC(공정·초중종·자주)/OQC ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=QUALITY_INSPECTION_TYPE 로 받는다(IQC·PQC·OQC). ⚠ 설비 점검의 inspectionTypeCode(DAILY·MONTHLY·MAINTENANCE)와 «같은 이름 다른 값» 이라 그룹을 가른다. 근거: omf-mes#186"
+          },
+          "pqcSkipAllowed": {
+            "x-source-column": "pqc_skip_allowed",
+            "type": "boolean",
+            "example": false,
+            "description": "PQC 생략 허용 — QA #4. 2026-08-30 되살림"
           }
         }
       },
@@ -16612,6 +16693,12 @@
             "maxLength": 50,
             "example": "IQC",
             "description": "공통코드 — IQC/PQC(공정·초중종·자주)/OQC ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=QUALITY_INSPECTION_TYPE 로 받는다(IQC·PQC·OQC). ⚠ 설비 점검의 inspectionTypeCode(DAILY·MONTHLY·MAINTENANCE)와 «같은 이름 다른 값» 이라 그룹을 가른다. 근거: omf-mes#186"
+          },
+          "pqcSkipAllowed": {
+            "x-source-column": "pqc_skip_allowed",
+            "type": "boolean",
+            "example": false,
+            "description": "PQC 생략 허용 — QA #4. 2026-08-30 되살림"
           }
         }
       },
@@ -16642,7 +16729,7 @@
           "inspectionFrequencyCode",
           "statusCode"
         ],
-        "description": "samplingQty 는 확정 문구가 「샘플 비율(%)」인데 컬럼은 수량(app.qty_t)이다 — 규약 없이 개발하면 30%가 30개로 저장된다(A-8·#64)",
+        "description": "샘플 비율(%)이 정본이다(samplingRatio) — 확정 문구가 「샘플 비율(%)」이고 수량은 로트 크기를 알아야 나오는 파생값이라 두지 않는다(A-8). 2026-08-30 되살림.",
         "properties": {
           "inspectionPlanVersionId": {
             "x-source-column": "inspection_plan_version_id",
