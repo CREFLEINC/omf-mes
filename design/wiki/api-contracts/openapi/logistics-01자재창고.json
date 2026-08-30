@@ -11669,6 +11669,16 @@
       "description": "보류 시각보다 앞설 수 없다",
       "example": "2026-08-06T09:12:00+09:00"
      },
+     "releaseReasonCode": {
+      "x-source-column": "release_reason_code",
+      "type": [
+       "string",
+       "null"
+      ],
+      "maxLength": 50,
+      "description": "해제 사유(코드형) — 2026-08-30 되살림. 등록 사유(reasonCode)와 대칭 축이다 — C7(재판정 합격)·C8(재판정 불합격)이 왜 갈렸는지를 이 값으로 가른다. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_RELEASE_REASON 로 받는다(공유계약 G-32). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-03-02 §5-4 · omf-mes#87",
+      "example": "RETEST_PASS"
+     },
      "remarks": {
       "x-source-column": "remarks",
       "type": [
@@ -11683,7 +11693,7 @@
       "example": "NORMAL"
      }
     },
-    "x-internal-note": "해제 사유를 담을 자리가 없다 — 같은 테이블 안에서 등록 사유는 있고 해제 사유는 없다(#87 요청분). / ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 01 요구서 §7 · 03 계약 2단계 §4"
+    "x-internal-note": "해제 사유(releaseReasonCode)를 등록 사유와 대칭으로 되살렸다(2026-08-30) — 등록·해제 비대칭이 해소됐다(#87 요청분). / ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 01 요구서 §7 · 03 계약 2단계 §4"
    },
    "LotHoldListResponse": {
     "type": "object",
@@ -11929,6 +11939,15 @@
       "format": "int64",
       "example": 1001
      },
+     "reasonCode": {
+      "x-source-column": "reason_code",
+      "type": [
+       "string",
+       "null"
+      ],
+      "x-no-example": true,
+      "description": "요청 사유(코드형) — 2026-08-30 되살림. GET /mdm/code-values?codeGroupCode=MATERIAL_ISSUE_REQUEST_REASON. 사유별 집계는 이 값으로 한다(§9-2 목록 요약). 근거: W-02-10 §5-1"
+     },
      "remarks": {
       "x-source-column": "remarks",
       "type": [
@@ -11975,12 +11994,13 @@
       "example": "2026-08-12T14:00:00+09:00"
      },
      "reasonCode": {
+      "x-source-column": "reason_code",
       "type": [
        "string",
        "null"
       ],
-      "description": "요청 사유. ⛔ 담을 코드 컬럼이 아직 없어 remarks 로 저장된다 — 「무절차 반출 금지」를 화면이 말하지만 집계는 안 된다. 근거: omf-mes#87",
-      "example": "부족분 보충"
+      "description": "요청 사유(코드형) — 확정이 형태까지 지정했다(✓확정 2026-07-14 #4·#5·#7·#8 「사유 필드(코드형 — '긴급 W/O 대응' 포함) 신설」). 2026-08-30 되살림. 값 목록은 GET /mdm/code-values?codeGroupCode=MATERIAL_ISSUE_REQUEST_REASON 로 받는다 — 「긴급 W/O 대응」 포함(공유계약 G-32). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-02-10 §5-1 · omf-mes#87",
+      "example": "URGENT_WO_RESPONSE"
      },
      "remarks": {
       "x-source-column": "remarks",
