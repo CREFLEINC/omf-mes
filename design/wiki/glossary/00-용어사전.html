@@ -2105,7 +2105,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th><strong>결정이 안 내려앉음</strong></th><td>회의에서 확정했는데 물리 모델에 반영되지 않았다</td></tr>
 <tr><th><strong>화면이 요구하는데 없음</strong></th><td>화면이 필요로 하는 컬럼·테이블이 애초에 없다</td></tr>
 </tbody></table>
-<p><strong>예</strong> — 2026-07-06 결정 12가 「불량코드와 공정은 N:M으로 조정한다」를 승인했으나, 완성된 물리 모델은 조정 전 형태(<code>defect_code.process_id</code>, N:1)로 굳었다. 결정이 <strong>착지하지 못했다.</strong> 그래서 「공정 매핑」 API 엔드포인트를 만들 수 없다 — 없는 테이블을 스펙에 넣으면 개발자가 「만들어야 할 것」으로 읽기 때문이다.</p>
+<p><strong>예</strong> — 2026-07-06 결정 12가 「불량코드와 공정은 N:M으로 조정한다」를 승인했으나, 완성된 물리 모델은 조정 전 형태(<code>defect_code.process_id</code>, N:1)로 굳었다. 결정이 <strong>착지하지 못했다.</strong> ⚠ 그렇다고 「공정 매핑」 API를 안 만드는 것은 원칙 위반이다(<code>data-model-boundary.md</code>) — 계약은 확정(N:M)대로 쓰고, 내부 주석에 결손과 요청 이슈 번호를 적어 데이터 모델 담당에게 통지한다. 기다리지 않는다.</p>
 <p><strong>비슷하지만 다른 말</strong> — [미결](#미결) · [범위 밖](#범위-밖)</p>
 <h2>L2 — 화면 설계</h2>
 <h3>도식 근거 / 비도식 근거</h3>
@@ -2228,6 +2228,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <table>
 <thead><tr><th class="nw">버전</th><th>날짜</th><th>변경 요지</th></tr></thead>
 <tbody>
+<tr><th class="nw"><strong>v1.2</strong></th><td>2026-08-30</td><td>⭐ 2026-08-30 사용자 원칙 확정 반영 — 「미착지」 예시(L2 §가장 자주 막히는 말)의 결론 문구 정정. 「그래서 「공정 매핑」 API 엔드포인트를 만들 수 없다」는 「데이터 모델은 설계 결정을 앞설 수 없다」 원칙 위반이었다 — 「계약은 확정대로 쓰고 통지한다, 기다리지 않는다」로 교체. 「미착지」 정의(표 2행) 자체는 불변.</td></tr>
 <tr><th class="nw"><strong>v1.1</strong></th><td>2026-08-06</td><td>「계약 정본」 신설 — 공유계약과 OpenAPI 계약 정본을 구분</td></tr>
 <tr><th class="nw">v1.0</th><td>2026-08-03</td><td>초안 — 5군 27항목</td></tr>
 <tr><th class="nw"><strong>design</strong></th><td>2026-08-25</td><td><code>design/wiki/glossary/</code>로 이관, Tier 2 재구성</td></tr>

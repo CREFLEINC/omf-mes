@@ -3,7 +3,7 @@
   "info": {
     "title": "omf-mes 기준정보 도메인 API (초안)",
     "version": "0.1.0",
-    "description": "기준정보 도메인 API 계약. 필드 정의의 정본은 데이터베이스 물리 모델이며 이 문서는 그것을 옮긴 것이다. 마스터 형 패턴에 개별 「변경 이력」(/history) 엔드포인트는 두지 않는다 — 전 마스터의 변경 이력은 횡단 조회 GET /audit/events 하나로 받으며, 원본 컬럼(beforeValue·afterValue 포함)을 해석하지 않고 그대로 노출한다.",
+    "description": "기준정보 도메인 API 계약. 필드가 무엇을 받는지·필수 여부·값 목록은 이 계약이 정한다 — 물리 모델은 타입·길이만 따른다. 마스터 형 패턴에 개별 「변경 이력」(/history) 엔드포인트는 두지 않는다 — 전 마스터의 변경 이력은 횡단 조회 GET /audit/events 하나로 받으며, 원본 컬럼(beforeValue·afterValue 포함)을 해석하지 않고 그대로 노출한다.",
     "x-internal-note": "근거·맥락은 deliverables/06-API-요구서.md 를 본다. WBS P0.4 API 계약 v0 의 초안 입력이며 계약 확정·소유는 통합 Agent 소관이다. /history 를 두지 않는 이유는 이슈 #68 해소 전이기 때문이다 — target_id 가 FK 가 아니고 before_value/after_value jsonb 의 키 규약이 없어 지금 만들면 필드를 지어내게 된다. 횡단 조회 근거 = W-06-11 §4-A·§5-1."
   },
   "servers": [
