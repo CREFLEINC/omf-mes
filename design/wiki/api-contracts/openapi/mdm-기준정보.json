@@ -14774,11 +14774,11 @@
             "example": false
           },
           "isOutsourced": {
-            "x-source-column": "is_outsourced",
             "type": "boolean",
             "default": false,
-            "description": "이 공정은 외주로 나간다 — 결정 07 라인 속성(2026-08-03 사용자 확정 · 2026-08-30 되살림). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-01 §4-B-1",
-            "example": false
+            "description": "이 공정은 외주로 나간다 — 결정 07 라인 속성(2026-08-03 사용자 확정 · 2026-08-30 되살림). 물리 컬럼은 이미 있다(omf-mes-server#42 2026-08-28 확인 — planning.routing_operation.is_subcontract) — 이름만 확정 이름(isOutsourced)과 다르다. 데이터 모델 담당에게 이름 정합화를 통지 — 기다리지 않는다. 근거: W-06-01 §4-B-1",
+            "example": false,
+            "x-internal-note": "⚠ x-source-column 을 달지 않았다 — 물리 이름(is_subcontract)과 확정 이름(isOutsourced)이 달라 어느 쪽으로 정할지 미정이다. 이름이 정해지면 채운다."
           },
           "outputLotRequired": {
             "x-source-column": "output_lot_required",
@@ -14918,11 +14918,11 @@
             "example": false
           },
           "isOutsourced": {
-            "x-source-column": "is_outsourced",
             "type": "boolean",
             "default": false,
-            "description": "이 공정은 외주로 나간다 — 결정 07 라인 속성(2026-08-03 사용자 확정 · 2026-08-30 되살림). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-01 §4-B-1",
-            "example": false
+            "description": "이 공정은 외주로 나간다 — 결정 07 라인 속성(2026-08-03 사용자 확정 · 2026-08-30 되살림). 물리 컬럼은 이미 있다(omf-mes-server#42 2026-08-28 확인 — planning.routing_operation.is_subcontract) — 이름만 확정 이름(isOutsourced)과 다르다. 데이터 모델 담당에게 이름 정합화를 통지 — 기다리지 않는다. 근거: W-06-01 §4-B-1",
+            "example": false,
+            "x-internal-note": "⚠ x-source-column 을 달지 않았다 — 물리 이름(is_subcontract)과 확정 이름(isOutsourced)이 달라 어느 쪽으로 정할지 미정이다. 이름이 정해지면 채운다."
           },
           "outputLotRequired": {
             "x-source-column": "output_lot_required",
@@ -16890,7 +16890,7 @@
             "x-source-column": "pqc_skip_allowed",
             "type": "boolean",
             "default": false,
-            "description": "PQC 생략 허용 — QA #4 「품목·공정 단위 생략 설정」(itemId·processId와 함께 축을 이룬다). Routing에 PQC 공정 미명시 시 생략(RoutingOperation.inspectionManaged)과는 다른 축이다. 2026-08-30 되살림. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-02 §4-A",
+            "description": "PQC 생략 허용 — QA #4 「품목·공정 단위 생략 설정」(itemId·processId와 함께 축을 이룬다). Routing에 PQC 공정 미명시 시 생략(RoutingOperation.inspectionManaged)과는 다른 축이다. 2026-08-30 되살림. 물리 컬럼은 quality.inspection_plan 헤더에 이미 있다(omf-mes-server#42 2026-08-28 확인). 근거: W-06-02 §4-A",
             "example": false
           },
           "isActive": {
@@ -18008,8 +18008,9 @@
         }
       },
       "DefectCodeProcess": {
+        "x-source-table": "quality.defect_code_process",
         "type": "object",
-        "description": "불량코드-공정 매핑 한 건. 결정 12 N:M을 되살린 자원(2026-08-30). 저장 테이블은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-03 §4-D",
+        "description": "불량코드-공정 매핑 한 건. 결정 12 N:M을 되살린 자원(2026-08-30). 테이블은 이미 있다(omf-mes-server#42 2026-08-28 확인 — quality.defect_code_process, 5979행) — 없던 것은 API 쓰기 경로뿐이라 이번에 그것만 신설했다. 근거: W-06-03 §4-D",
         "required": [
           "defectCodeId",
           "processId"
