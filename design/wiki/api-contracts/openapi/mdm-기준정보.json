@@ -4261,7 +4261,7 @@
             }
           }
         },
-        "x-internal-note": "미착지 넷: 자재LOT 보관단위·생산LOT 기본크기·개발품 플래그·재생재 하위코드 — #64"
+        "x-internal-note": "미착지 둘 — 자재LOT 보관단위·생산LOT 기본크기(#64). 개발품 플래그(developmentItem)·재생재 하위코드(mesCategoryCode)는 이미 계약에 있다(2026-08-30 재확인)."
       }
     },
     "/mdm/items/{itemId}/uom-conversions": {
@@ -15515,9 +15515,30 @@
             "type": "boolean",
             "description": "개발품인가 — 참이면 생산 실적을 ERP 로 송신하지 않는다. ⭐ 「개발품 제외」의 판정 축은 «품목»이다(사용자 확정 2026-08-24 · omf-mes#70). 확정 문구(✓확정 QA #35 · WF06 S7)가 「생산 실적 송신 = 필수(개발품 제외)」라고만 적고 무엇이 개발품인지를 안 적어 품목 속성(화면 인벤토리)과 작업지시 유형(설계 결정 14)으로 갈려 읽히던 것을 품목으로 닫았다. ⛔ mdm.item 에 담을 컬럼이 아직 없다 — 데이터 모델 담당에게 통지했다(W-06-05 §8-1). 컬럼이 서기 전까지 서버는 이 값을 늘 거짓으로 내리고, W-06-12 는 그동안 전건 송신으로 물러나 있다(A-11). 근거: W-06-12 §4-B · W-06-05 §4-B",
             "example": false
+          },
+          "defaultLotStorageUomId": {
+            "x-source-column": "default_lot_storage_uom_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "MES 확장 — 자재LOT 보관 단위 기본값(수량·무게 등). 확정 QA #14 「자재별 LOT 보관 단위 기본값 사용 + 특이 시 개별 설정」 — 이 값은 기본값이고 LOT마다 개별 재정의를 막지 않는다. 2026-08-30 되살림. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-05 §4-B",
+            "example": 1001
+          },
+          "defaultProductionLotSize": {
+            "x-source-column": "default_production_lot_size",
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "exclusiveMinimum": 0,
+            "description": "MES 확장 — 생산LOT 기본크기. 확정 REQ-PR-0008 · E26 「기본값 + 수정 가능」. 2026-08-30 되살림. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-05 §4-B",
+            "example": 500.0
           }
         },
-        "x-internal-note": "미착지 넷: 자재LOT 보관단위·생산LOT 기본크기·개발품 플래그·재생재 하위코드 — #64"
+        "x-internal-note": "미착지 둘 — 자재LOT 보관단위·생산LOT 기본크기 되살림(2026-08-30, defaultLotStorageUomId·defaultProductionLotSize 신설 · #64). 개발품 플래그(developmentItem)·재생재 하위코드(mesCategoryCode)는 이미 계약에 있었다(재확인)."
       },
       "ItemUpdate": {
         "x-source-table": "mdm.item",
@@ -15599,6 +15620,27 @@
             "type": "boolean",
             "description": "개발품인가 — 참이면 생산 실적을 ERP 로 송신하지 않는다. ⭐ 「개발품 제외」의 판정 축은 «품목»이다(사용자 확정 2026-08-24 · omf-mes#70). 확정 문구(✓확정 QA #35 · WF06 S7)가 「생산 실적 송신 = 필수(개발품 제외)」라고만 적고 무엇이 개발품인지를 안 적어 품목 속성(화면 인벤토리)과 작업지시 유형(설계 결정 14)으로 갈려 읽히던 것을 품목으로 닫았다. ⛔ mdm.item 에 담을 컬럼이 아직 없다 — 데이터 모델 담당에게 통지했다(W-06-05 §8-1). 컬럼이 서기 전까지 서버는 이 값을 늘 거짓으로 내리고, W-06-12 는 그동안 전건 송신으로 물러나 있다(A-11). 근거: W-06-12 §4-B · W-06-05 §4-B",
             "example": false
+          },
+          "defaultLotStorageUomId": {
+            "x-source-column": "default_lot_storage_uom_id",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "MES 확장 — 자재LOT 보관 단위 기본값. 확정 QA #14. 2026-08-30 되살림",
+            "example": 1001
+          },
+          "defaultProductionLotSize": {
+            "x-source-column": "default_production_lot_size",
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "exclusiveMinimum": 0,
+            "description": "MES 확장 — 생산LOT 기본크기. 확정 REQ-PR-0008·E26. 2026-08-30 되살림",
+            "example": 500.0
           }
         }
       },
