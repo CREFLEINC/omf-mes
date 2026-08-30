@@ -15343,7 +15343,7 @@
           "departmentName",
           "isActive"
         ],
-        "description": "계층(parent_department_id). ck_department_parent 는 자기 자신만 막고 순환(A→B→A)은 막지 않으므로 서버가 검사한다. ERP 수신본이라 읽기 전용이어야 하는데 판정할 컬럼이 없다",
+        "description": "계층(parent_department_id). ck_department_parent 는 자기 자신만 막고 순환(A→B→A)은 막지 않으므로 서버가 검사한다. ERP 수신본이면 읽기 전용이다 — sourceSystemCode로 판정한다(2026-08-30 되살림).",
         "properties": {
           "departmentId": {
             "x-source-column": "department_id",
@@ -15387,9 +15387,19 @@
             "type": "boolean",
             "default": true,
             "example": true
+          },
+          "sourceSystemCode": {
+            "x-source-column": "source_system_code",
+            "type": "string",
+            "enum": [
+              "ERP",
+              "MES"
+            ],
+            "description": "이 행의 출처 — ERP(Legacy 수신본, 수정/삭제 불가) · MES(자체 등록). WF06 S7 Result 「'Legacy 출처' 플래그 + MES 원천 등록분과 연계분의 구분 플래그」를 되살린 하나의 축이다(2026-08-30). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-09 §4-D · W-06-05 §9-1 · W-06-06 §5-4",
+            "example": "MES"
           }
         },
-        "x-internal-note": "미착지: 수신본 식별 플래그 — #65"
+        "x-internal-note": "미착지: 수신본 식별 플래그 — 되살렸다(sourceSystemCode, 2026-08-30). DepartmentUpdate가 노출하는 필드는 이 값으로 편집 잠금을 판정한다(editability). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다."
       },
       "DepartmentCreate": {
         "x-source-table": "mdm.department",
@@ -15568,7 +15578,7 @@
             "example": true
           }
         },
-        "x-internal-note": "미착지: 수신본 식별 플래그 — #65"
+        "x-internal-note": "정정(2026-08-30) — WorkerUpdate가 편집 가능한 필드를 하나도 노출하지 않아(전 필드 ERP 원본) 이미 구조적으로 잠겨 있다. 수신본 식별 플래그는 불필요하다 — Item과 같은 해법."
       },
       "WorkerDetailResponse": {
         "type": "object",
@@ -17543,8 +17553,8 @@
         "type": "object",
         "description": "불량코드-공정 매핑 한 건. 결정 12 N:M을 되살린 자원(2026-08-30). 저장 테이블은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-03 §4-D",
         "required": [
-         "defectCodeId",
-         "processId"
+          "defectCodeId",
+          "processId"
         ],
         "properties": {
           "defectCodeId": {
