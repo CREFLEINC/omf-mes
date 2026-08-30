@@ -134,6 +134,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 접근범위 추가 / ⊖ | `PUT /app/users/{id}/data-scopes` — 전체 치환 | §4-D · B-6 · A-7 |
 | 기능 권한 체크·해제 | `PUT /app/roles/{id}/permissions` — **엔드포인트는 있으나 화면이 비활성**(`permission_code` 값 목록이 회신 **E-9** 대기) | §4-E · G-2·G-6 |
 | 변경 이력 | `GET /audit/events?targetTypeCode=…&targetId=…` — 리소스별 `/history`는 **없다**(#68) | §5-1 · B-5 |
+| 비밀번호 초기화 | `POST /app/users/{appUserId}:reset-password` — 임시 비밀번호를 생성해 **한 번만** 응답에 싣는다 | §5-1·§8-2 · DR-002 2-B ③ — 2026-08-30 되살림 |
 
 - **역할 중복 부여 경합**(§6)은 유일 위반으로 거부하지 않고 **이미 반영된 상태로 조용히 갱신**한다 — `PUT …/roles`의 계약에 명시.
 - 접근범위의 유일 인덱스가 `COALESCE(…,0)`로 빈 축을 접으므로 화면은 빈 축을 **`(전체)`**로 표기한다(A-7).

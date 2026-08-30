@@ -6063,7 +6063,7 @@
      "operationSettingsSnapshot": {
       "type": "object",
       "description": "확정 시점의 공정 설정을 굳혀 둔 것. 근거: 공유계약 A-18",
-      "x-internal-note": "⚠ 이 스냅샷은 work_order 단위다 — R42·R43(W/O 무분할·생산LOT만 BOM 스냅샷별 분할)이 요구하는 「생산LOT 별 BOM 스냅샷」에 대응하는 trace.lot 쪽 컬럼이 없다(실측). 러닝체인지(P-02-11)에서 신·구 BOM이 갈릴 때 이 W/O 스냅샷 하나로는 LOT마다 다른 BOM을 표현할 수 없다 — R43 투입 Validation 은 W/O BOM 기준으로 물러난 상태(A-11). 근거: 공유계약 §I-16 · P-02-11 §5-3 · omf-mes#76",
+      "x-internal-note": "⚠ 이 스냅샷은 work_order 단위다 — R42(W/O 무분할·생산LOT만 BOM 스냅샷별 분할)의 W/O 쪽 반쪽만 여기서 담는다. LOT 단위 반쪽은 2026-08-30 `Lot.bomSnapshot`(01 계약)으로 되살렸다 — 러닝체인지(P-02-11)에서 신·구 BOM이 갈려도 LOT마다 자기 스냅샷을 갖고, R43 투입 Validation이 해당 LOT BOM 기준으로 선다. 저장 컬럼은 둘 다 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: 공유계약 §I-16 · P-02-11 §5-3 · Lot.bomSnapshot(01 계약)",
       "example": {
        "standardCycleTimeSec": 42,
        "standardYieldRate": 0.98

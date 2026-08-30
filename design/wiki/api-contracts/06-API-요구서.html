@@ -2191,6 +2191,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 <tr><th>접근범위 추가 / ⊖</th><td><code>PUT /app/users/{id}/data-scopes</code> — 전체 치환</td><td>§4-D · B-6 · A-7</td></tr>
 <tr><th>기능 권한 체크·해제</th><td><code>PUT /app/roles/{id}/permissions</code> — <strong>엔드포인트는 있으나 화면이 비활성</strong>(<code>permission_code</code> 값 목록이 회신 <strong>E-9</strong> 대기)</td><td>§4-E · G-2·G-6</td></tr>
 <tr><th>변경 이력</th><td><code>GET /audit/events?targetTypeCode=…&amp;targetId=…</code> — 리소스별 <code>/history</code>는 <strong>없다</strong>(#68)</td><td>§5-1 · B-5</td></tr>
+<tr><th>비밀번호 초기화</th><td><code>POST /app/users/{appUserId}:reset-password</code> — 임시 비밀번호를 생성해 <strong>한 번만</strong> 응답에 싣는다</td><td>§5-1·§8-2 · DR-002 2-B ③ — 2026-08-30 되살림</td></tr>
 </tbody></table>
 <ul><li><strong>역할 중복 부여 경합</strong>(§6)은 유일 위반으로 거부하지 않고 <strong>이미 반영된 상태로 조용히 갱신</strong>한다 — <code>PUT …/roles</code>의 계약에 명시.</li><li>접근범위의 유일 인덱스가 <code>COALESCE(…,0)</code>로 빈 축을 접으므로 화면은 빈 축을 <strong><code>(전체)</code></strong>로 표기한다(A-7).</li></ul>
 <h3>3-2. <code>W-06-01</code> Routing(공정) 등록·관리</h3>
