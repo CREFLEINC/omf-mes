@@ -1410,6 +1410,15 @@
       "description": "의뢰 전 · 판정 대기 · 판정 완료"
      },
      {
+      "name": "sourceCode",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "example": "PRODUCT"
+      },
+      "description": "PRODUCT(제품)·RETURN(반품). 2026-08-30 되살림 — W-03-10 §5-4"
+     },
+     {
       "name": "warehouseId",
       "in": "query",
       "schema": {
@@ -1879,6 +1888,12 @@
       "format": "int64",
       "description": "검사에서 나온 부적합이면 가리킨다. 검사 결과는 03 품질 계약이 소유한다",
       "example": 1001
+     },
+     "sourceCode": {
+      "x-source-column": "source_code",
+      "type": "string",
+      "x-no-example": true,
+      "description": "원천 축 — PRODUCT(04 제품 부적합 등록)·RETURN(04 반품 입고) 2종. 02 수리·01 자재는 이 경로로 들어오지 않아 대상이 아니다(W-03-10 §5-4). 2026-08-30 되살림 — W-04-07·W-04-06 이 같은 경로·스키마를 쓰던 것을 이 축으로 가른다"
      },
      "severityCode": {
       "type": "string",

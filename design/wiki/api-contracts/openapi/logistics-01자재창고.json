@@ -1421,7 +1421,7 @@
      "inventory"
     ],
     "summary": "취급 단위 구성 치환",
-    "description": "근거: 공유계약 A-5. ⭐ 이 경로의 조회는 ETag 를 내리지 않는다 — If-Match 에 담을 토큰은 부모 자원 GET /inventory/handling-units/{handlingUnitId} 200 의 ETag 다. 잠그는 단위가 부모이기 때문이다. 근거: 공유계약 B-1-1. ⭐ 오프라인 대상 오퍼레이션이다 — 큐에 쌓인 요청은 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 중복은 멱등키가 막고, 이미 처리된 건은 서버가 거부한다.",
+    "description": "근거: 공유계약 A-5. ⭐ 이 경로의 조회는 ETag 를 내리지 않는다 — If-Match 에 담을 토큰은 부모 자원 GET /inventory/handling-units/{handlingUnitId} 200 의 ETag 다. 잠그는 단위가 부모이기 때문이다. 근거: 공유계약 B-1-1. ⭐ 오프라인 대상 오퍼레이션이다 — 큐에 쌓인 요청은 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 중복은 멱등키가 막고, 이미 처리된 건은 서버가 거부한다. ⭐ 결정 13 되살림(2026-08-30) — 이 치환은 서버가 HandlingUnitRepackEvent(헤더) + Line(수량 변경 전/후)을 함께 기록한다. 신규 발번·새 라벨 대상은 이 이벤트가 아니라 POST /inventory/handling-units(P-04-04)가 별도로 만든다. 저장 테이블은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: M-04-03 §5-2",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -1491,6 +1491,49 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/inventory/handling-units/{handlingUnitId}/repack-events": {
+   "parameters": [
+    {
+     "name": "handlingUnitId",
+     "in": "path",
+     "required": true,
+     "schema": {
+      "type": "integer",
+      "format": "int64"
+     }
+    }
+   ],
+   "get": {
+    "tags": [
+     "inventory"
+    ],
+    "summary": "포장 재구성 이력",
+    "description": "결정 13 「이벤트 헤더–라인 계보」를 되살린 자원(2026-08-30) — 누가·언제·왜 재구성했는지와 수량 변경 전/후를 담는다. 저장 테이블은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: M-04-03 §5-2",
+    "responses": {
+     "200": {
+      "description": "재구성 이력",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "required": [
+          "items"
+         ],
+         "properties": {
+          "items": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/HandlingUnitRepackEvent"
+           }
+          }
+         }
         }
        }
       }
@@ -2072,7 +2115,7 @@
      "logistics"
     ],
     "summary": "물류 문서 진행현황",
-    "description": "문서 유형마다 테이블이 다른데 화면은 한 목록으로 본다 — 서버가 한 형태로 맞춰 내린다.\n\n⭐ successorCount·cancellable 을 서버가 판정해 내린다. 원천 참조가 다형이라(source_document_type_code + source_document_id) 유형↔테이블 규약이 아직 없는데, 프런트가 「입고 → 출고·이동·투입」 관계표를 하드코딩하면 유형이 늘 때마다 취소 판정이 조용히 틀린다(공유계약 A-10 보강).\n\n⚠ 이 화면이 덮는 것은 6유형이다 — 발주·입하·입고·출고요청·피킹·이동요청. 외주 2문서는 상태 컬럼 자체가 없고 출하·생산품 입고는 다른 도메인이다. 근거: W-01-13 §5-2·§5-3",
+    "description": "문서 유형마다 테이블이 다른데 화면은 한 목록으로 본다 — 서버가 한 형태로 맞춰 내린다.\n\n⭐ successorCount·cancellable 을 서버가 판정해 내린다. 원천 참조가 다형이라(source_document_type_code + source_document_id) 유형↔테이블 규약이 아직 없는데, 프런트가 「입고 → 출고·이동·투입」 관계표를 하드코딩하면 유형이 늘 때마다 취소 판정이 조용히 틀린다(공유계약 A-10 보강).\n\n이 화면이 덮는 것은 8유형이다 — 발주·입하·입고·출고요청·피킹·이동요청·외주출고·외주입고(2026-08-30 되살림 — subcontract_issue/receipt 도 동형으로 status_code 를 둔다). 출하·생산품 입고는 다른 도메인이라 범위 밖이다. 근거: W-01-13 §5-2·§5-3·§5-6",
     "parameters": [
      {
       "name": "documentTypeCode",
@@ -6699,6 +6742,88 @@
     }
    }
   },
+  "/trace/lot-status-events": {
+   "get": {
+    "tags": [
+     "trace"
+    ],
+    "summary": "LOT 상태 변경이력 조회 — 전이 9종 전건",
+    "description": "결정 10 「현재 1행 + 변경이력 1:N」을 되살린 전용 이력(2026-08-30). 도식스펙03 §1.3 공통 범례가 요구하는 상태 전이 9종(C4·C5·C6·C7·C8·C9·C10·C14·C15) 전건을 사건별 행으로 낸다 — 기존 GET /quality/lot-hold-events(보류 등록·해제 2종만)를 대체하는 상위 자원이다. 저장 테이블은 데이터 모델 담당에게 통지한다 — 기다리지 않는다(data-model-boundary.md). 근거: W-03-01 §5-1·§5-2 · W-01-02 · M-01-08",
+    "parameters": [
+     {
+      "name": "occurredFrom",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "description": "사건 기간 시작 — 감사 조회는 기간을 강제한다(공유계약 L-3)"
+     },
+     {
+      "name": "occurredTo",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "description": "사건 기간 끝"
+     },
+     {
+      "name": "lotId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64"
+      },
+      "description": "「LOT으로 찾기」 모드"
+     },
+     {
+      "name": "transitionCode",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "enum": [
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "C10",
+        "C14",
+        "C15"
+       ]
+      },
+      "description": "「이력으로 찾기」의 판정유형 축"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "LOT 상태 변경이력",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "required": [
+          "items"
+         ],
+         "properties": {
+          "items": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/LotStatusHistoryEvent"
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  },
   "/trace/lots/{lotId}:request-iqc-skip": {
    "parameters": [
     {
@@ -8604,6 +8729,98 @@
       "items": {
        "$ref": "#/components/schemas/HandlingUnitContent"
       }
+     }
+    }
+   },
+   "HandlingUnitRepackEvent": {
+    "type": "object",
+    "description": "포장 재구성 사건 헤더. 결정 13 「이벤트 헤더–라인 계보」를 되살린 자원(2026-08-30) — 신규 생성분(신규 발번)은 이 이벤트가 아니라 POST /inventory/handling-units가 별도로 만든다. 저장 테이블은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: M-04-03 §5-2",
+    "required": [
+     "repackEventId",
+     "repackTypeCode",
+     "performedBy",
+     "occurredAt",
+     "lines"
+    ],
+    "properties": {
+     "repackEventId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "repackTypeCode": {
+      "type": "string",
+      "enum": [
+       "MERGE",
+       "SPLIT",
+       "RECONFIGURE"
+      ],
+      "description": "합병(MERGE)·분할(SPLIT)·재구성(RECONFIGURE) — M-04-03 §3 유형 선택",
+      "example": "SPLIT"
+     },
+     "performedBy": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-06T09:12:00+09:00"
+     },
+     "lines": {
+      "type": "array",
+      "description": "결정 13 규칙 2 — 수량 변경은 이벤트 한정 + 이력",
+      "items": {
+       "$ref": "#/components/schemas/HandlingUnitRepackEventLine"
+      }
+     }
+    }
+   },
+   "HandlingUnitRepackEventLine": {
+    "type": "object",
+    "required": [
+     "handlingUnitId",
+     "roleCode",
+     "itemId",
+     "lotId",
+     "qtyBefore",
+     "qtyAfter"
+    ],
+    "properties": {
+     "handlingUnitId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "roleCode": {
+      "type": "string",
+      "enum": [
+       "SOURCE",
+       "RESULT"
+      ],
+      "description": "이 취급 단위가 이 사건의 원본인지 결과인지",
+      "example": "SOURCE"
+     },
+     "itemId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "lotId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "qtyBefore": {
+      "type": "number",
+      "format": "double",
+      "example": 500.0
+     },
+     "qtyAfter": {
+      "type": "number",
+      "format": "double",
+      "example": 300.0
      }
     }
    },
@@ -11124,7 +11341,7 @@
       "format": "int64",
       "description": "분할 조회 편의용 표시 값. 계보의 원천은 아니다",
       "example": 1001,
-      "x-internal-note": "계보(trace.lot_relation)의 전체 지도. ⭐ 시작 = 자재LOT → 생산LOT(투입 확정). ⭐ 종결 = 출하 LOT 배분. ⭐ 회귀 = 반품 입고 — 원 LOT 을 그대로 쓰므로 관계가 생기지 않는다(W-04-06 §5-3). ⛔ 계보가 생기지 않는 자리 넷 — ①포장 재구성(M-04-03 §5-3) ②재생재 등록(M-01-12 · DR-006) ③재고 재등록(W-04-11 §5-1) ④예비품 출고(W-05-06 §8-5). ⚠ LOT 이 갈리는데 담을 자리가 없는 자리 셋 — ①선별(W-04-07 §5-4) ②러닝체인지의 생산LOT별 BOM 스냅샷(R42·R43) ③수리 왕복 재투입 참조(M-02-02 §4 · R75). ⚠ 일부만 채워진 계보가 빈 계보보다 위험하다 — 한 경로에만 부모가 있으면 계보 조회 화면이 「추적 가능」으로 오해한다(공유계약 G-24 의 데이터 판)."
+      "x-internal-note": "계보(trace.lot_relation)의 전체 지도. ⭐ 시작 = 자재LOT → 생산LOT(투입 확정). ⭐ 종결 = 출하 LOT 배분. ⭐ 회귀 = 반품 입고 — 원 LOT 을 그대로 쓰므로 관계가 생기지 않는다(W-04-06 §5-3). ⛔ 계보가 생기지 않는 자리 넷 — ①포장 재구성(M-04-03 §5-3) ②재생재 등록(M-01-12 · DR-006) ③재고 재등록(W-04-11 §5-1) ④예비품 출고(W-05-06 §8-5). ⚠ LOT 이 갈리는데 담을 자리가 없는 자리 둘 — ①선별(W-04-07 §5-4) ②수리 왕복 재투입 참조(M-02-02 §4 · R75). ⚠ 러닝체인지의 생산LOT별 BOM 스냅샷(R42·R43)은 2026-08-30 `bomSnapshot`(위)으로 되살렸다 — 더 이상 이 목록에 없다. ⚠ 일부만 채워진 계보가 빈 계보보다 위험하다 — 한 경로에만 부모가 있으면 계보 조회 화면이 「추적 가능」으로 오해한다(공유계약 G-24 의 데이터 판)."
      },
      "completedAt": {
       "type": [
@@ -11135,6 +11352,25 @@
       "description": "생산 LOT 완료 처리(P-02-06)가 찍는 시각. 비어 있으면 아직 완료되지 않았다. ⭐ 상태 코드 문자열을 몰라도 완료 여부가 판정된다 — 완료 시각이 있고 없고로 갈리기 때문이다. ⛔ 「완료」·「미달 마감」은 statusCode(품질 판정)에도 lifecycleStatusCode(생명주기)에도 값으로 넣지 않는다. 자재·제품 LOT 은 null. 근거: P-02-06 §5-5 · 공유계약 §I-32·§I-49",
       "example": "2026-08-11T17:40:00+09:00",
       "x-internal-note": "⛔ 물리 컬럼 신설 대상 — trace.lot 에 대응 컬럼이 없어 x-source-column 을 달 수 없다. lifecycleStatusCode 와 한 묶음으로 데이터모델 담당에 통지한다. ⛔ Lot 에 두 번째 판정값을 두지 않는다 — 완료/미달 배지의 판정값은 W/O 진행 스키마의 completionJudgmentCode 와 같은 어휘로 서버가 한 곳에서만 낸다(W-02-08 §5-2). 근거: omf-mes#269"
+     },
+     "bomSnapshot": {
+      "type": [
+       "object",
+       "null"
+      ],
+      "description": "생산LOT 선발행(W-02-04) 확정 시점의 BOM을 굳혀 둔 것 — 러닝체인지로 LOT마다 다른 BOM 버전을 쓸 수 있다(R42 「W/O 무분할 · 생산LOT만 BOM 스냅샷별 분할」). 서버가 선발행 시점에 자동으로 채운다 — 화면·클라이언트가 값을 만들어 보내지 않는다(LotCreate 에 없다). 자재·제품 LOT 은 null. 이 값이 있으면 투입 오투입 판정(P-02-03)이 해당 LOT의 BOM 기준으로 선다(R43) — 없으면 W/O BOM 기준으로 물러난다(공유계약 A-11). 2026-08-30 되살림. 근거: 공유계약 A-11 · §I-16 · P-02-11 §5-3 · W-02-04 §5-2",
+      "example": {
+       "bomId": 1001,
+       "bomVersion": 2,
+       "components": [
+        {
+         "componentItemId": 2001,
+         "requiredQty": 4,
+         "uomId": 1001
+        }
+       ]
+      },
+      "x-internal-note": "⚠ 물리 컬럼 신설 또는 확인 대상 — x-source-column 을 달지 않았다. omf-mes#76(2026-08-04 실측) 당시엔 trace.lot 에 대응 컬럼이 없었으나, omf-mes-server#50 코멘트가 trace.lot 의 CHECK 제약 중 ck_lot_bom_snapshot 이라는 이름을 인용한다 — 물리 모델이 그 사이 바뀌어 이미 있을 가능성이 있다(token_version 이 omf-mes-server#48 에서 같은 패턴으로 「이미 있음」 판정을 받은 전례). 신설이든 확인이든 데이터 모델 담당에 통지한다, 기다리지 않는다(A-11 규칙 3). 근거: 공유계약 §I-16 · omf-mes-server#50"
      },
      "progress": {
       "$ref": "#/components/schemas/LotProgress",
@@ -11587,6 +11823,16 @@
       "description": "보류 시각보다 앞설 수 없다",
       "example": "2026-08-06T09:12:00+09:00"
      },
+     "releaseReasonCode": {
+      "x-source-column": "release_reason_code",
+      "type": [
+       "string",
+       "null"
+      ],
+      "maxLength": 50,
+      "description": "해제 사유(코드형) — 2026-08-30 되살림. 등록 사유(reasonCode)와 대칭 축이다 — C7(재판정 합격)·C8(재판정 불합격)이 왜 갈렸는지를 이 값으로 가른다. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_RELEASE_REASON 로 받는다(공유계약 G-32). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-03-02 §5-4 · omf-mes#87",
+      "example": "RETEST_PASS"
+     },
      "remarks": {
       "x-source-column": "remarks",
       "type": [
@@ -11601,7 +11847,7 @@
       "example": "NORMAL"
      }
     },
-    "x-internal-note": "해제 사유를 담을 자리가 없다 — 같은 테이블 안에서 등록 사유는 있고 해제 사유는 없다(#87 요청분). / ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 01 요구서 §7 · 03 계약 2단계 §4"
+    "x-internal-note": "해제 사유(releaseReasonCode)를 등록 사유와 대칭으로 되살렸다(2026-08-30) — 등록·해제 비대칭이 해소됐다(#87 요청분). / ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 01 요구서 §7 · 03 계약 2단계 §4"
    },
    "LotHoldListResponse": {
     "type": "object",
@@ -11614,6 +11860,95 @@
       "items": {
        "$ref": "#/components/schemas/LotHold"
       }
+     }
+    }
+   },
+   "LotStatusHistoryEvent": {
+    "type": "object",
+    "description": "LOT 상태 전이 사건 1건. 결정 10 「현재 1행 + 변경이력 1:N」을 되살린 전용 이력(2026-08-30) — 도식스펙03 §1.3 전이 9종(C4·C5·C6·C7·C8·C9·C10·C14·C15) 전건을 담는다. 저장 테이블(trace.lot_status_history 성격)은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-03-01 §5-1·§5-2",
+    "required": [
+     "lotStatusHistoryId",
+     "lotId",
+     "toStatusCode",
+     "transitionCode",
+     "changedBy",
+     "changedAt"
+    ],
+    "properties": {
+     "lotStatusHistoryId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "lotId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "lotNo": {
+      "type": "string",
+      "example": "값"
+     },
+     "fromStatusCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "x-no-example": true,
+      "description": "전이 전 상태. 최초 등록 전이(C4·C6·C14)는 null"
+     },
+     "toStatusCode": {
+      "type": "string",
+      "x-no-example": true
+     },
+     "transitionCode": {
+      "type": "string",
+      "enum": [
+       "C4",
+       "C5",
+       "C6",
+       "C7",
+       "C8",
+       "C9",
+       "C10",
+       "C14",
+       "C15"
+      ],
+      "description": "전이 9종 — 도식스펙03 §1.3 · W-03-01 §5-1 표",
+      "example": "C7"
+     },
+     "reason": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "example": "값"
+     },
+     "sourceDocumentTypeCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "x-no-example": true,
+      "description": "이 전이를 일으킨 문서 유형 — 다형 참조(공유계약 A-10)"
+     },
+     "sourceDocumentId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "example": 1001
+     },
+     "changedBy": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "changedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-06T09:12:00+09:00"
      }
     }
    },
@@ -11758,6 +12093,15 @@
       "format": "int64",
       "example": 1001
      },
+     "reasonCode": {
+      "x-source-column": "reason_code",
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "요청 사유(코드형) — 2026-08-30 되살림. GET /mdm/code-values?codeGroupCode=MATERIAL_ISSUE_REQUEST_REASON. 사유별 집계는 이 값으로 한다(§9-2 목록 요약). 근거: W-02-10 §5-1",
+      "example": "URGENT_WO_RESPONSE"
+     },
      "remarks": {
       "x-source-column": "remarks",
       "type": [
@@ -11804,12 +12148,13 @@
       "example": "2026-08-12T14:00:00+09:00"
      },
      "reasonCode": {
+      "x-source-column": "reason_code",
       "type": [
        "string",
        "null"
       ],
-      "description": "요청 사유. ⛔ 담을 코드 컬럼이 아직 없어 remarks 로 저장된다 — 「무절차 반출 금지」를 화면이 말하지만 집계는 안 된다. 근거: omf-mes#87",
-      "example": "부족분 보충"
+      "description": "요청 사유(코드형) — 확정이 형태까지 지정했다(✓확정 2026-07-14 #4·#5·#7·#8 「사유 필드(코드형 — '긴급 W/O 대응' 포함) 신설」). 2026-08-30 되살림. 값 목록은 GET /mdm/code-values?codeGroupCode=MATERIAL_ISSUE_REQUEST_REASON 로 받는다 — 「긴급 W/O 대응」 포함(공유계약 G-32). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-02-10 §5-1 · omf-mes#87",
+      "example": "URGENT_WO_RESPONSE"
      },
      "remarks": {
       "x-source-column": "remarks",

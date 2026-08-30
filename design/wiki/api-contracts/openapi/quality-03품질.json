@@ -2790,7 +2790,7 @@
      },
      "duplicateRisk": {
       "type": "boolean",
-      "description": "⚠ 공정별로 나눌 때 같은 현상이 공정 수만큼 복제 등록됐을 수 있다는 표식이다. 결정 12 의 공정—불량코드 N:M 이 물리 모델에 착지하지 않아 defect_code.process_id 가 아직 N:1 이다. 화면이 경고를 상시 보인다. 근거: W-03-05 §5-5",
+      "description": "⚠ 공정별로 나눌 때 같은 현상이 공정 수만큼 복제 등록됐을 수 있다는 표식이다. 결정 12의 공정—불량코드 N:M을 되살렸다(DefectCodeProcess, 2026-08-30) — 신규 등록은 더 이상 공정마다 복제할 필요가 없다. 과거 데이터의 복제 흔적은 남을 수 있어 화면은 경고를 상시 보인다. 근거: W-03-05 §5-5",
       "example": true
      }
     },
@@ -2872,10 +2872,19 @@
       "format": "int64",
       "example": 1001
      },
+     "sourceCode": {
+      "x-source-column": "source_code",
+      "type": "string",
+      "x-no-example": true,
+      "description": "원천 축 — FIELD(현장)·PQC·OQC·REPAIR(수리)·CLAIM(클레임) 5종(공유계약 결정 09). REPAIR 는 M-02-02 착수 전까지 실적 0건. 2026-08-30 되살림 — productionResultId/inspectionResultId 2단 조인 대신 이 축으로 직접 필터한다"
+     },
      "workOrderId": {
-      "type": "integer",
+      "type": [
+       "integer",
+       "null"
+      ],
       "format": "int64",
-      "description": "⛔ NOT NULL 이다. 그래서 W/O 없는 클레임 불량(고객 지급품·외주 가공품)이 들어오지 못한다 — 계약이 우회하지 않는다. 근거: W-03-05 §5-2 · 확정 QA #15",
+      "description": "NULL 허용 — 클레임 원천(sourceCode=CLAIM)은 W/O가 없다. 2026-08-30 되살림: NOT NULL 로 클레임을 막던 것이 원칙 위반이었다(data-model-boundary.md). 저장 제약 완화는 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-03-05 §5-2 · 확정 QA #15",
       "example": 1001
      },
      "lotId": {
@@ -4111,15 +4120,23 @@
       "description": "부분 해제. 원 행을 해제하고 남은 수량으로 새 보류 행을 만든다 — hold_qty 를 줄이지 않는다(공유계약 B-3). 근거: W-03-02 §5-7",
       "example": 30.0
      },
-     "remarks": {
+     "releaseReasonCode": {
       "type": "string",
-      "description": "⛔ 해제 사유를 담을 코드 컬럼이 lot_hold 에 없다 — 등록에는 reason_code 가 있는데 해제에는 없다. 자유 텍스트로 물러나므로 「재판정으로 풀린 건」을 셀 수 없다. 「기록하라는데 자리가 없다」 7번째(omf-mes#87). 근거: W-03-02 §5-4",
+      "description": "해제 사유(코드형) — 2026-08-30 되살림. 등록 사유(reasonCode)와 대칭 축이다 — C7(재판정 합격)·C8(재판정 불합격)이 왜 갈렸는지 이 값으로 센다(「기록하라는데 자리가 없다」 7번째, omf-mes#87 해소). 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_RELEASE_REASON. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-03-02 §5-4",
+      "example": "RETEST_PASS"
+     },
+     "remarks": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "부가 비고 — 사유는 releaseReasonCode 가 정본이다",
       "example": "값"
      }
     },
     "required": [
      "targetLotStatusCode",
-     "remarks"
+     "releaseReasonCode"
     ]
    },
    "LotQualityStatus": {
