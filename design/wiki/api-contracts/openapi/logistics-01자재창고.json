@@ -11370,7 +11370,7 @@
         }
        ]
       },
-      "x-internal-note": "⛔ 물리 컬럼 신설 대상 — trace.lot 에 대응 컬럼이 없어 x-source-column 을 달 수 없다. work_order.operation_settings_snapshot(jsonb)과 같은 패턴 — 데이터 모델 담당에 통지한다, 기다리지 않는다(A-11 규칙 3). 근거: omf-mes#76(2026-08-25 종결 — 본문 3건 중 「긴급 W/O」만 해법이 나왔고 이 건은 실제로는 미해결로 남아 있었다. 「종결」이 「해결」을 뜻하지 않는다 — 2026-08-30 재확인) · 공유계약 §I-16"
+      "x-internal-note": "⚠ 물리 컬럼 신설 또는 확인 대상 — x-source-column 을 달지 않았다. omf-mes#76(2026-08-04 실측) 당시엔 trace.lot 에 대응 컬럼이 없었으나, omf-mes-server#50 코멘트가 trace.lot 의 CHECK 제약 중 ck_lot_bom_snapshot 이라는 이름을 인용한다 — 물리 모델이 그 사이 바뀌어 이미 있을 가능성이 있다(token_version 이 omf-mes-server#48 에서 같은 패턴으로 「이미 있음」 판정을 받은 전례). 신설이든 확인이든 데이터 모델 담당에 통지한다, 기다리지 않는다(A-11 규칙 3). 근거: 공유계약 §I-16 · omf-mes-server#50"
      },
      "progress": {
       "$ref": "#/components/schemas/LotProgress",
