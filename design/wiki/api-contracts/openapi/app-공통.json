@@ -2663,7 +2663,7 @@
           "app"
         ],
         "summary": "통합 대시보드 집계",
-        "description": "카드마다 소유 화면이 따로 있고 이 경로는 «숫자만» 모은다. ⛔ 자동 갱신을 두지 않는다 — 사람이 「갱신」을 누른다. ⛔ 설비종합효율(OEE)은 내지 않는다: 계획 조업 시간의 분모가 되는 휴일·계획 정지를 담을 자리가 아직 없다. 근거: W-CO-05 §5·§8-1",
+        "description": "카드마다 소유 화면이 따로 있고 이 경로는 «숫자만» 모은다. ⛔ 자동 갱신을 두지 않는다 — 사람이 「갱신」을 누른다. ✅ 설비종합효율(OEE)을 낸다(2026-08-30 되살림) — 계획 조업 시간의 분모는 mdm.WorkCalendar/WorkCalendarDay/WorkCalendarApplication(결정 03)에서 구한다. 근거: W-CO-05 §5·§8-1",
         "parameters": [
           {
             "name": "baseDate",
@@ -5181,7 +5181,7 @@
             "x-no-example": "하위 프로퍼티(seriesName·unit·targetValue·points·asOf)가 각각 example 을 갖는다 — 객체 통째 예시는 중복이다"
           }
         },
-        "x-internal-note": "⛔ 설비종합효율(OEE)을 내지 않는다. 계획 조업 시간의 분모가 되는 휴일·계획 정지를 담을 자리가 물리 모델에 없다(W-CO-05 §8-1). 정책 코드 ALLOW_PRODUCTION_ON_HOLIDAYS 는 시드에 있는데 어느 날이 휴일인지가 없다 — omf-mes#67 코멘트에 올라가 있다. 화면은 교대 기준으로 그리고 주석을 단다 — 자리가 생기면 주석만 뗀다."
+        "x-internal-note": "✅ 설비종합효율(OEE)을 되살렸다(2026-08-30) — 계획 조업 시간의 분모는 WorkCalendarDay.dayTypeCode(WORKING·HOLIDAY·PARTIAL) + startTime/endTime으로 구한다(공정 대상은 WorkCalendarApplication이 정한다 — 결정 03). 정책 코드 ALLOW_PRODUCTION_ON_HOLIDAYS(시드)와 함께 쓴다. 시간가동률 카드의 note는 이제 「교대 시간 기준」 캐비어트가 필요 없다 — 캘린더 기준으로 계산한다. OEE 카드(cardCode=OEE)를 cards 배열에 추가한다."
       },
       "DashboardCard": {
         "type": "object",
