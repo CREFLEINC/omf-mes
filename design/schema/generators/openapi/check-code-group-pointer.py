@@ -52,7 +52,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 # Tier 0 — OpenAPI JSON 정본. Phase 5 컷오버(2026-08-25)로 design/wiki/api-contracts/openapi/가 정본 위치다.
 CONTRACTS_DIR = os.path.join(HERE, "..", "..", "..", "wiki", "api-contracts", "openapi")
 
-# 등록부 — 공유계약 G-32 확정 11 · omf-mes#198 확정 29 · 2026-08-29 등재 2 · 2026-08-31 등재 1 = 43 (겹치는 이름 0).
+# 등록부 — 공유계약 G-32 확정 11 · omf-mes#198 확정 29 · 2026-08-29 등재 2 · 2026-08-31 등재 4 = 46 (겹치는 이름 0).
 # ⛔ 여기에 없는 이름을 계약에 적지 않는다. 늘리려면 «먼저» G-32 를 고친다 —
 #    조항이 정본이고 이 집합은 그 사본이다.
 REGISTRY = set("""
@@ -68,6 +68,7 @@ WORK_ORDER_COMPLETION_VARIANCE_REASON WORK_SESSION_EVENT_REASON WORK_CALENDAR_DA
 LOT_HOLD_REASON DOWNTIME_REASON INSPECTION_FREQUENCY INSPECTION_ITEM_SPEC_METHOD
 INSPECTION_SAMPLING_METHOD PROCESS_TYPE QUALIFICATION_TYPE STORAGE_CONDITION REISSUE_REASON
 WORK_SESSION_EVENT_TYPE INBOUND_VARIANCE_TYPE
+LOT_HOLD_RELEASE_REASON MATERIAL_ISSUE_REQUEST_REASON WAREHOUSE_TYPE
 """.split())
 
 POINTER = re.compile(r"codeGroupCode=([A-Z][A-Z0-9_]*)")
