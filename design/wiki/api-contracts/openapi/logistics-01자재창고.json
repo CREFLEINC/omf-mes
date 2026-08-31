@@ -11768,9 +11768,9 @@
       "x-source-column": "reason_code",
       "type": "string",
       "maxLength": 50,
-      "description": "보류 사유. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "QUALITY_HOLD",
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "description": "보류 사유. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_REASON 로 받는다. 고객이 운영 중 W-06-06 공통코드 마스터에서 정하는 실행 시점 자료라 계약에 enum 을 두지 않는다. 근거: 공유계약 G-31·G-32 · 시드 omf-mes#198",
+      "example": "INCOMING_INSPECTION_WAIT",
+      "x-internal-note": "omf-mes#198 로 초기 시드가 나간 마스터안전형 그룹(공유계약 G-31). enum 을 두지 않는 것이 정상이다 — 「미확정」이 아니다."
      },
      "releaseCondition": {
       "x-source-column": "release_condition",
@@ -11843,7 +11843,7 @@
      },
      "lotStatusCode": {
       "type": "string",
-      "description": "이 보류가 걸었을 때 LOT 이 간 상태. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). 근거: 공유계약 G-32",
+      "description": "이 보류가 걸었을 때 LOT 이 간 상태 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). 근거: 공유계약 G-32 · omf-mes#176",
       "example": "NORMAL"
      }
     },
