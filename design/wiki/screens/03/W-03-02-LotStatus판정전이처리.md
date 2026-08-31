@@ -269,7 +269,7 @@ trace.lot_hold  「LOT 보류: 특정 LOT(전량 또는 일부 수량) 사용 �
 | 현재 상태 카드 | `Card` + `Chip` | a |
 | 전이 대상 선택 | `RadioGroup` | a — **서버가 선택지를 준다**(§5-5) |
 | 수량 입력 | `TextField`(숫자) | a |
-| 사유 입력 | `TextArea` | a |
+| 사유 입력 | `Select` | a — G-31 마스터, `LOT_HOLD_RELEASE_REASON`(§5-4) |
 | **「이 전이가 하는 일」 블록** | `AlertBanner`(info/warning) | a — G-1 |
 | 확인 | `Dialog` | a |
 
