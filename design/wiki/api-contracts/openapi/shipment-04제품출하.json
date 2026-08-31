@@ -451,6 +451,15 @@
       }
      },
      {
+      "name": "timeSlotCode",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "example": "MORNING"
+      },
+      "description": "출하 희망 시간대 필터 — 공통코드 그룹 `SHIPMENT_TIME_SLOT`(`MORNING`·`AFTERNOON`·`NIGHT`). W-04-02 시간대 필터 축. 근거: W-04-02 §5-2, 2026-08-31 결정(omf-mes-server#41)"
+     },
+     {
       "name": "shippingInspectionRequired",
       "in": "query",
       "schema": {
@@ -2706,6 +2715,14 @@
       "format": "date",
       "example": "2026-08-13"
      },
+     "timeSlotCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "출하 희망 시간대(코드형). nullable — 지시서가 시간대를 지정한 라인이 있는 건만 채운다(「일부 항목」, W-04-01 §5-3). 값 목록은 GET /mdm/code-values?codeGroupCode=SHIPMENT_TIME_SLOT 로 받는다(공유계약 G-31·G-32 — 동작이 값에 걸리지 않는 필터·표시용이라 고객 마스터). 고객 확정 3값: `MORNING`·`AFTERNOON`·`NIGHT`(2026-08-31, omf-mes-server#41 회신).",
+      "example": "MORNING"
+     },
      "statusCode": {
       "type": "string",
       "example": "값"
@@ -2828,6 +2845,14 @@
       "type": "string",
       "format": "date",
       "example": "2026-08-13"
+     },
+     "timeSlotCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "출하 희망 시간대(코드형). nullable — 지시서가 시간대를 지정하지 않은 건은 비운다. 값 목록은 GET /mdm/code-values?codeGroupCode=SHIPMENT_TIME_SLOT 로 받는다(공유계약 G-31·G-32).",
+      "example": "MORNING"
      },
      "lines": {
       "type": "array",
