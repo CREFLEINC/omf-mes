@@ -26,9 +26,12 @@
 ⚠ 이 검사기가 «안 보는 것»
 --------------------------
 - **통지를 실제로 냈는지는 안 본다.** 「필수가 바뀐 자리가 있다」까지만 말한다.
-- **요청·응답 판정은 `$ref` 를 한 겹만 따라간다.** 스키마 안에서 다른 스키마를
-  품는 중첩(`allOf`·배열 원소)은 그 부모의 방향을 물려받지 못한다 — 그런 자리는
-  「방향 미상」으로 내고 사람이 읽는다.
+- **요청·응답 판정은 «전이 폐쇄»로 한다.** 직접 참조에서 시작해 스키마 안의 `$ref`
+  를 따라 부모의 방향을 물려준다(고정점 반복이라 순환 참조에도 멈춘다). 실측상 계약
+  7벌 495스키마가 «전건» 판정된다 — 미상 0.
+  ⚠ 한 스키마가 **요청·응답 양쪽**에 걸리면 `요청·응답` 으로 내고 어느 방향이든 ⛔ 로
+  둔다 — 양쪽으로 깨질 수 있기 때문이다.
+- **그래도 미상이 남으면 ⛔ 로 낸다** — 판정하지 못한 것을 통과시키지 않는다.
 - **새로 생긴 스키마·필드는 세지 않는다.** 없던 것으로는 아무도 코드를 만들지
   않았으므로 깨질 것이 없다(`check-enum-narrowing` 과 같은 기준).
 - **서버가 실제로 무엇을 내리는지는 모른다.** 계약이 「비어도 된다」로 바뀐 것과
@@ -57,10 +60,15 @@ REF = re.compile(r'"#/components/schemas/([^"]+)"')
 
 
 def roles(doc: dict) -> dict[str, set[str]]:
-    """스키마 이름 → {"요청","응답"} — requestBody / responses 에서 한 겹 따라간다."""
+    """스키마 이름 → {"요청","응답"}.
+
+    ⛔ 직접 참조만 보면 «중첩 스키마»가 통째로 빠진다 — 2026-08-31 실측에서 495 중
+    99(20%)가 「미상」이었고, 미상은 ⛔ 로 울므로 요청 계열 완화까지 거짓 ⛔ 가 됐다.
+    그래서 부모의 방향을 자식에게 «전이»시킨다. 고정점 반복이라 순환 참조에도 멈춘다.
+    """
     out: dict[str, set[str]] = {}
 
-    def mark(node, role):
+    def mark(node, role: str) -> None:
         for name in REF.findall(json.dumps(node, ensure_ascii=False)):
             out.setdefault(name, set()).add(role)
 
@@ -74,6 +82,22 @@ def roles(doc: dict) -> dict[str, set[str]]:
                 mark(op["requestBody"], "요청")
             if "responses" in op:
                 mark(op["responses"], "응답")
+
+    schemas = doc.get("components", {}).get("schemas") or {}
+    changed = True
+    while changed:                       # 고정점까지 — 순환 참조에서도 끝난다
+        changed = False
+        for name, role in list(out.items()):
+            body = schemas.get(name)
+            if body is None:
+                continue
+            for child in REF.findall(json.dumps(body, ensure_ascii=False)):
+                if child == name:
+                    continue
+                before = set(out.get(child, ()))
+                out.setdefault(child, set()).update(role)
+                if out[child] != before:
+                    changed = True
     return out
 
 
@@ -91,7 +115,7 @@ def shape(doc: dict) -> dict[str, dict]:
     return out
 
 
-def load(ref: str, path: str):
+def load(ref: str, path: str) -> dict | None:
     rel = os.path.relpath(path, ROOT)
     r = subprocess.run(["git", "show", f"{ref}:{rel}"],
                        capture_output=True, text=True, cwd=ROOT)

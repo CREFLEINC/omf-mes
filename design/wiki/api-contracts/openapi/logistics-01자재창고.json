@@ -8213,7 +8213,8 @@
       ],
       "maxLength": 50,
       "description": "원천 문서 유형. ⭐ **비울 수 있다**(2026-08-31 사용자 확정) — 출하가 완료된 뒤 되돌아오는 반품 입고처럼 가리킬 원천 문서가 없는 갈래가 성립한다. ⛔ 「없음(NONE)」을 값으로 두지 않는다 — 가리킬 대상이 없는 값을 다형 참조 판별자에 섞지 않는다(공유계약 A-10). 값 목록은 아직 확정 전이다(omf-mes#145).",
-      "x-internal-note": "2026-08-31 사용자 확정 — 「없음(NONE)」을 값으로 두지 않고 칸을 비울 수 있게 한다. 저장 컬럼의 NOT NULL 해제는 데이터 모델 담당에게 통지한다 — 기다리지 않는다(schema/data-model-boundary.md). 근거: W-04-06 §5-3 · omf-mes#302."
+      "x-internal-note": "2026-08-31 사용자 확정 — 「없음(NONE)」을 값으로 두지 않고 칸을 비울 수 있게 한다. 저장 컬럼의 NOT NULL 해제는 데이터 모델 담당에게 통지한다 — 기다리지 않는다(schema/data-model-boundary.md). 근거: W-04-06 §5-3 · omf-mes#302.",
+      "x-no-example": "값 목록이 아직 확정 전이다(omf-mes#145) — 확정 전에는 예시를 지어내지 않는다."
      },
      "sourceDocumentId": {
       "x-source-column": "source_document_id",
@@ -8233,7 +8234,8 @@
       ],
       "maxLength": 50,
       "description": "입고 사유. ⭐ **고객이 운영 중에 설정하는 마스터다**(공유계약 G-31 · 2026-08-31 사용자 확정) — 확정을 기다리지 않는다. 목록은 실행 시점에 마스터에서 오므로 **화면은 정상 동작한다**(비활성으로 두지 않는다). 값 목록은 GET /mdm/code-values?codeGroupCode=GOODS_RECEIPT_REASON 로 받는다. ⛔ enum 을 못박지 않는다 — 「아직 미확정이라서」가 아니라 **실행 시점 자료라서**다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-no-example": "고객 설정 마스터(공유계약 G-31) — 값을 지어내지 않는다. 목록은 실행 시점에 마스터에서 온다."
      },
      "remarks": {
       "x-source-column": "remarks",
@@ -8319,7 +8321,8 @@
       ],
       "maxLength": 50,
       "description": "입고 사유. ⭐ **고객이 운영 중에 설정하는 마스터다**(공유계약 G-31 · 2026-08-31 사용자 확정) — 확정을 기다리지 않는다. 목록은 실행 시점에 마스터에서 오므로 **화면은 정상 동작한다**(비활성으로 두지 않는다). 값 목록은 GET /mdm/code-values?codeGroupCode=GOODS_RECEIPT_REASON 로 받는다. ⛔ enum 을 못박지 않는다 — 「아직 미확정이라서」가 아니라 **실행 시점 자료라서**다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-no-example": "고객 설정 마스터(공유계약 G-31) — 값을 지어내지 않는다. 목록은 실행 시점에 마스터에서 온다."
      },
      "remarks": {
       "x-source-column": "remarks",
