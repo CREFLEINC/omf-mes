@@ -148,6 +148,28 @@ PLACEHOLDER = re.compile(r'<[가-힣][^>]*>|W-00-00|omf-mes#00|YYYY-MM-DD|v0\.0|
 
 SCREEN_ID = re.compile(r'\b([WPM]-(?:CO|\d{2})-\d{2})\b')
 
+# 착수 가능 통지의 제목 접두 — 이것이 정본이다(SKILL.md 「절차 ③」).
+KICKOFF_TITLE = re.compile(r'^\[uiux→client\]\s*착수\s*가능\s*—')
+
+
+def is_kickoff(issue):
+    """이 이슈가 «착수 가능 통지» 인가 — 제목 접두가 정본, ready 라벨은 보조.
+
+    ⛔ 라벨만으로 판정하지 않는다 — ready 가 빠진 채 발행된 착수 이슈가 5건 있다
+       (#67 W-02-02 · #68 W-02-03 · #80 W-02-04 · #89 W-03-03 · #90 W-03-05).
+       그 5건이 --status 현황표에서 통째로 사라져 있었다(발행 106 으로 나오나 실측 111).
+    ⛔ 제목에 「착수 가능」이 «들어가는지» 로도 판정하지 않는다 — 변경 통지 #95 가
+       제목 «말미» 에 그 말을 쓴다("… W-02-10 · P-02-06 · P-02-08 착수 가능").
+       접두로 걸러야 그 한 건만 정확히 빠진다(실측 2026-08-31: 후보 112 → 접두 일치 111).
+
+    ⭐ 두 판정 자리가 서로 다른 식을 쓰던 것을 이 함수로 합쳤다 — 중복 검사(발행 전)와
+       현황 출력(--status)이 같은 답을 내야 한다.
+    """
+    if KICKOFF_TITLE.match(issue.get('title', '')):
+        return True
+    labels = [l['name'] for l in issue.get('labels', [])]
+    return 'ready' in labels
+
 # 회신 코멘트 첫 줄 — team-issue-protocol §7.
 # 2026-08-27 재확정 — v2 문서 line 62 원문("개발팀에 전달사항", 조사 있음)을 그대로 쓴다.
 # ⭐ 「##」는 강제하지 않는다 — 있어도 없어도 통과한다(작성자 재량, 사용자 결정).
@@ -235,8 +257,7 @@ def check_duplicate(screen_id, change_notice, issues=None):
 
     same = [i for i in issues if screen_id and screen_id in i['title']]
     for i in same:
-        labels = [l['name'] for l in i.get('labels', [])]
-        is_ready = 'ready' in labels or '착수 가능' in i['title']
+        is_ready = is_kickoff(i)
         num = '#%d' % i['number']
 
         if change_notice:
@@ -262,8 +283,7 @@ def print_status():
     if issues is None:
         print('⛔ 조회 실패 — gh auth status 를 확인하세요.')
         return 1
-    ready = [i for i in issues
-             if 'ready' in [l['name'] for l in i.get('labels', [])]]
+    ready = [i for i in issues if is_kickoff(i)]
     print('착수 가능 통지 현황 — %s' % REPO)
     print('─' * 66)
     if not ready:

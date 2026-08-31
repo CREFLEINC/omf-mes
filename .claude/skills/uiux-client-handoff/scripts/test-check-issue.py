@@ -166,5 +166,52 @@ class NoRegression(unittest.TestCase):
         self.assertEqual(rc, 0)
 
 
+class IsKickoff(unittest.TestCase):
+    """착수 이슈 판별 — 중복 검사와 --status 가 «같은 답»을 내야 한다.
+
+    이 판별식은 원래 두 자리에 서로 다르게 적혀 있었다. 중복 검사는
+    `ready 라벨 or 제목에 '착수 가능' 포함`, 현황 출력은 `ready 라벨`만.
+    그래서 ready 가 빠진 착수 이슈 5건이 현황표에서 사라졌다(발행 106 vs 실측 111).
+    """
+
+    @staticmethod
+    def issue(number, title, labels=(), state="OPEN"):
+        return {"number": number, "title": title, "state": state,
+                "labels": [{"name": n} for n in labels]}
+
+    def test_접두와_라벨이_다_있으면_착수다(self):
+        self.assertTrue(chk.is_kickoff(self.issue(
+            21, "[uiux→client] 착수 가능 — W-01-07 · 재고 현황·상태 조회",
+            ["uiux→client", "ready"])))
+
+    def test_ready_라벨이_없어도_접두가_맞으면_착수다(self):
+        """실측 5건 — #67·#68·#80·#89·#90 이 이 형태로 현황표에서 빠져 있었다."""
+        self.assertTrue(chk.is_kickoff(self.issue(
+            90, "[uiux→client] 착수 가능 — W-03-05 · 검사실적·검사결과 조회",
+            ["uiux→client", "Agent : T3"], state="CLOSED")))
+
+    def test_제목_말미의_착수_가능은_착수가_아니다(self):
+        """⛔ 실측 #95 — 변경 통지인데 제목 끝에 「착수 가능」을 쓴다.
+        「포함」으로 판정하면 이 한 건이 착수로 잘못 잡힌다."""
+        self.assertFalse(chk.is_kickoff(self.issue(
+            95, "[uiux→client] ⚠ 자재창고 계약에 오퍼레이션 3건 추가 "
+                "— W-02-10 · P-02-06 · P-02-08 착수 가능",
+            ["uiux→client"], state="CLOSED")))
+
+    def test_변경_통지는_착수가_아니다(self):
+        self.assertFalse(chk.is_kickoff(self.issue(
+            634, "[uiux→client] ⛔ 변경 — 입고 전표 응답의 원천 문서 두 값이 null 로 올 수 있다",
+            ["uiux→client"])))
+
+    def test_라벨만_있고_접두가_달라도_착수로_본다(self):
+        """접두 규약이 바뀌어도 라벨이 붙어 있으면 놓치지 않는다 — 보조 경로."""
+        self.assertTrue(chk.is_kickoff(self.issue(
+            999, "[uiux→client] 착수해도 됩니다 — W-99-99", ["uiux→client", "ready"])))
+
+    def test_라벨이_리스트에_없어도_터지지_않는다(self):
+        self.assertFalse(chk.is_kickoff({"number": 1, "title": "무관한 제목",
+                                         "state": "OPEN"}))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
