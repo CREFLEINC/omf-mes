@@ -162,7 +162,7 @@ Phase 6b(닫기)까지 커버한다** — Phase 5 이후 새 사실이 드러나
 | 계약 구조 | `openapi/check-structure.py` |
 | 공개 안전 | `openapi/check-public-safe.py` |
 | enum 협착(★기준 명시 필수) | `openapi/check-enum-narrowing.py $(git merge-base origin/main HEAD)` — 인자 없이 돌리면 기본 `HEAD` 비교라 커밋 후 항상 초록 |
-| 생성 스냅숏 | `verify-generated-fresh.py [--domain NN]` |
+| 생성 스냅숏 | `verify-generated-fresh.py [--kind md\|html] [--domain NN]` — 인자 없이 돌리면 두 축(요구목록 마크다운 9건 + HTML 배포본 9건)을 다 본다. ⛔ `--domain` 은 마크다운 축 개념이라 `--kind html` 과 함께 주지 않는다 |
 
 각 검사기가 "안 보는 것"은 `03_brief.md`에 명시한다(예: `check-enum-narrowing`은 필드 삭제·
 required 승격·경로 삭제·필수 헤더 신설·의미 변경을 못 잡는다 — 아래 등급표로 수동 보강).
