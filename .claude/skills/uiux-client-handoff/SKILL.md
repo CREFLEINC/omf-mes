@@ -144,8 +144,9 @@ gh issue create --repo CREFLEINC/omf-mes-client \
 ```
 
 ⛔ **1 을 건너뛰지 않는다.** GitHub 은 본문 편집 이력을 **UI 드롭다운에만** 남기고
-**REST API 로는 주지 않는다**(실측 2026-09-01 — `/issues/{n}/timeline` 이 `commented`·`labeled`
-만 낸다). 감사는 API 로 돌기 때문에, 원문을 코멘트로 박제하지 않으면 **「그때 무엇을 보냈나」가
+**REST API 로는 주지 않는다**(실측 2026-09-01 — `/issues/{n}/timeline` 을 네 이슈에서 받아
+보니 `commented`·`labeled`·`cross-referenced`·`referenced` 뿐이고 **본문 편집 이벤트가 없다**.
+편집 이력은 GraphQL `userContentEdits` 에만 있다). 감사는 REST 로 돌기 때문에, 원문을 코멘트로 박제하지 않으면 **「그때 무엇을 보냈나」가
 기계에게서 사라진다.** 이번 회차만 해도 그 질문이 판단 근거가 된 자리가 넷이었다
 (`#602` 유출 문구 · `#626` 화면 2장 기재 · `#601` §4-3 오분류 · `#589` 3화면).
 
