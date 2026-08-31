@@ -13424,10 +13424,11 @@
               "REFERENCED",
               "NOT_COUNTABLE",
               "RECEIVED_FROM_ERP",
-              "LABEL_ISSUED"
+              "LABEL_ISSUED",
+              "SYSTEM_OWNED"
             ],
-            "description": "NOT_COUNTABLE = 참조가 FK 가 아니라 세지 못함(의도적 비-FK 또는 코드 문자열 참조) → 화면은 무조건 잠근다. RECEIVED_FROM_ERP = 수신본이라 항상 읽기 전용. LABEL_ISSUED = 코드가 라벨로 발행돼 현장에 물리적으로 나가 있다 → 참조 건수가 0이어도 잠근다",
-            "example": "라인 정지 임박. 검사 대기 불가."
+            "description": "NOT_COUNTABLE = 참조가 FK 가 아니라 세지 못함(의도적 비-FK 또는 코드 문자열 참조) → 화면은 무조건 잠근다. RECEIVED_FROM_ERP = 수신본이라 항상 읽기 전용. LABEL_ISSUED = 코드가 라벨로 발행돼 현장에 물리적으로 나가 있다 → 참조 건수가 0이어도 잠근다. SYSTEM_OWNED = 그룹 자체가 시스템 소유라 고객이 값을 편집할 수 없다(mdm.code_group 의 그룹 단위 플래그, 근거: omf-mes-server#45 정정 회신) → 화면은 그룹 단위로 잠근다(개별 값이 아니라 그룹 전체)",
+            "example": "REFERENCED"
           },
           "referenceCount": {
             "type": [
