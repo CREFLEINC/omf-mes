@@ -271,7 +271,7 @@ J-5는 「승인 화면은 **승인하면 무엇이 일어나는가**를 명시�
 | **페이지 이동** | `Button` + `Select` + 상태 | **c** — **G-12** |
 | 상태 표시 | `Chip` | a |
 | **결재 진행 단계** | **`Stepper`** — `orientation="vertical"` · `steps[].description` · `status="rejected"` | **a** §7-1 |
-| 사유·의견 | `TextField`(multiline) | a |
+| 사유·의견 | `TextArea` | a |
 | 상시 안내·경고 | `AlertBanner` | a — G-1 |
 | 승인·반려 확인 | `Dialog` | a |
 | 상단 대기 건수 배지 | **`Chip`** — ⛔ `Badge` 는 없다(§7-1) | a |
