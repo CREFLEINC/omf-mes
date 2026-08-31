@@ -123,6 +123,19 @@ BLOCKING = [
     ('스펙 본문 인용 의심',
      re.compile(r'^>\s*\S.{40,}', re.MULTILINE),
      '블록 인용으로 긴 문장이 들어왔다. 스펙 본문 복사인지 확인하고 요약이 아니라 포인터로 바꾼다'),
+
+    # ⭐ 2026-08-31 신설 — 「초안 잔재」. 위 항목들이 «내용 유출»을 보는 것과 달리
+    #    이것은 «초안이 안 끝났다»를 본다. 실측 사고: omf-mes-client#602·#603 이
+    #    발행 전 자기검토 문구를 단 채 공개 저장소로 나갔다(둘 다 지금도 OPEN).
+    ('내부 에이전트·스킬 이름',
+     re.compile(r'design-review-analyst|design-doc-writer|design-review-intake'
+                r'|uiux-client-handoff|team-issue-protocol'),
+     '우리 하네스의 내부 이름이다. 받는 쪽에게 뜻이 없고 내부 절차를 드러낸다 — 지운다'),
+
+    ('발행 전 지시 잔재',
+     re.compile(r'발행\s*(?:전|하기\s*전)[^\n]{0,30}?(?:확인|검토|권장)'),
+     '이미 발행된 글에 「발행 전에 …하라」가 남아 있다. 초안 메모다 — 지우고, '
+     '정말 확인이 안 끝났으면 발행을 미룬다'),
 ]
 
 # ⚠ 확인 — 자동으로 막지 않는다. 사람이 판단한다.
@@ -142,11 +155,43 @@ ADVISORY = [
     ('원본 자료 경로',
      re.compile(r'docs/research/|design/raw/(?:customer|decisions|process)/'),
      '경로는 포인터라 허용이나, 원본 자료는 파일명 자체가 내용을 드러낼 수 있다'),
+
+    # ⚠ 막지 않는다 — 받는 쪽에게 「여기까지만 확인했다」를 정직하게 알리는 것은 정당하다.
+    #    다만 omf-mes-client#602·#603 에서는 그것이 «발행 전 자기검토» 잔재였다.
+    ('자기 미확인 자인',
+     re.compile(r'확인하지\s*못했|확인\s*못\s*했|일부만\s*확인'),
+     '받는 쪽에게 한계를 알리는 문장이면 허용. 발행 전 자기검토 메모가 남은 것이면 지운다 '
+     '— 「확인이 안 끝났다」가 사실이면 발행을 미루는 쪽이 맞다'),
 ]
 
-PLACEHOLDER = re.compile(r'<[가-힣][^>]*>|W-00-00|omf-mes#00|YYYY-MM-DD|v0\.0|<해시>')
+# 미기입 자리표시 — 모드와 무관하게 «언제나» 본다(회신·변경 통지 포함).
+# `(?, #14)` 형태는 omf-mes-client#602 가 표 칸을 못 채운 채 발행된 실측 사례다.
+PLACEHOLDER = re.compile(r'<[가-힣][^>]*>|W-00-00|omf-mes#00|YYYY-MM-DD|v0\.0|<해시>'
+                         r'|\(\s*\?\s*[,)]')
 
 SCREEN_ID = re.compile(r'\b([WPM]-(?:CO|\d{2})-\d{2})\b')
+
+# 착수 가능 통지의 제목 접두 — 이것이 정본이다(SKILL.md 「절차 ③」).
+KICKOFF_TITLE = re.compile(r'^\[uiux→client\]\s*착수\s*가능\s*—')
+
+
+def is_kickoff(issue):
+    """이 이슈가 «착수 가능 통지» 인가 — 제목 접두가 정본, ready 라벨은 보조.
+
+    ⛔ 라벨만으로 판정하지 않는다 — ready 가 빠진 채 발행된 착수 이슈가 5건 있다
+       (#67 W-02-02 · #68 W-02-03 · #80 W-02-04 · #89 W-03-03 · #90 W-03-05).
+       그 5건이 --status 현황표에서 통째로 사라져 있었다(발행 106 으로 나오나 실측 111).
+    ⛔ 제목에 「착수 가능」이 «들어가는지» 로도 판정하지 않는다 — 변경 통지 #95 가
+       제목 «말미» 에 그 말을 쓴다("… W-02-10 · P-02-06 · P-02-08 착수 가능").
+       접두로 걸러야 그 한 건만 정확히 빠진다(실측 2026-08-31: 후보 112 → 접두 일치 111).
+
+    ⭐ 두 판정 자리가 서로 다른 식을 쓰던 것을 이 함수로 합쳤다 — 중복 검사(발행 전)와
+       현황 출력(--status)이 같은 답을 내야 한다.
+    """
+    if KICKOFF_TITLE.match(issue.get('title', '')):
+        return True
+    labels = [l['name'] for l in issue.get('labels', [])]
+    return 'ready' in labels
 
 # 회신 코멘트 첫 줄 — team-issue-protocol §7.
 # 2026-08-27 재확정 — v2 문서 line 62 원문("개발팀에 전달사항", 조사 있음)을 그대로 쓴다.
@@ -235,8 +280,7 @@ def check_duplicate(screen_id, change_notice, issues=None):
 
     same = [i for i in issues if screen_id and screen_id in i['title']]
     for i in same:
-        labels = [l['name'] for l in i.get('labels', [])]
-        is_ready = 'ready' in labels or '착수 가능' in i['title']
+        is_ready = is_kickoff(i)
         num = '#%d' % i['number']
 
         if change_notice:
@@ -262,8 +306,7 @@ def print_status():
     if issues is None:
         print('⛔ 조회 실패 — gh auth status 를 확인하세요.')
         return 1
-    ready = [i for i in issues
-             if 'ready' in [l['name'] for l in i.get('labels', [])]]
+    ready = [i for i in issues if is_kickoff(i)]
     print('착수 가능 통지 현황 — %s' % REPO)
     print('─' * 66)
     if not ready:
