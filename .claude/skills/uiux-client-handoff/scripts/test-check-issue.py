@@ -247,5 +247,69 @@ class IsKickoff(unittest.TestCase):
                                          "state": "OPEN"}))
 
 
+def kickoff(settled_block: str) -> str:
+    """착수 통지 최소 본문 — §3 만 바꿔 가며 쓴다."""
+    return (
+        "### 1. 화면 ID · 이름\n\nP-02-04 · 작업실적 등록\n\n"
+        "### 1-2. 리소스 패턴\n\n입력 형 — 실적 등록\n\n"
+        "### 2. 근거 — 무엇을 보고 판단했는가\n\n- 화면 스펙: 있음\n\n"
+        "### 2-2. 확인 시점\n\n2026-09-01\n\n"
+        "### 3. 확정된 것 — 이 화면에서 더 바뀌지 않는 것\n\n" + settled_block + "\n"
+        "### 4. 미결 항목 — 확정되지 않은 것과 그 처리 방법\n\n없음\n\n"
+        "### 5. 선행·순서 — 먼저 끝나야 하는 것과 재작업 위험\n\n- 선행: 없음\n\n"
+        "### 6. 특별히 조심할 것\n\n- 없음\n"
+    )
+
+
+def endpoint_errs(settled_block: str):
+    text = kickoff(settled_block)
+    errs, _ = chk.check_structure(text, chk.sections(text))
+    return [e for e in errs if "엔드포인트" in e[0]]
+
+
+CHECKED = "- [x] **엔드포인트 존재** — 계약 정본에 필요한 오퍼레이션이 모두 있다\n"
+UNCHECKED = "- [ ] **엔드포인트 존재** — 계약 정본에 필요한 오퍼레이션이 모두 있다\n"
+
+
+class EndpointList(unittest.TestCase):
+    """「엔드포인트 존재」 체크는 목록이 없으면 «검증할 수 없는 주장»이다.
+
+    실측(2026-09-01) — 열린 착수 통지 50건 중 경로를 적은 것 10건뿐이고, 요구서가
+    지정한 호출 229개 중 208개가 본문에 흔적조차 없었다. 그 결손이 다섯 화면에서
+    단말 게이팅 호출 누락으로 드러났다(`#69`·`#73`·`#74`·`#75`·`#78`).
+    """
+
+    def test_체크만_하고_목록이_없으면_막는다(self):
+        self.assertEqual(len(endpoint_errs(CHECKED)), 1)
+
+    def test_경로를_적으면_통과한다(self):
+        self.assertEqual(endpoint_errs(
+            CHECKED + "\n```\nPOST /production/production-results   실적 저장\n```\n"), [])
+
+    def test_모든_메서드를_인정한다(self):
+        for m in ("GET", "POST", "PUT", "PATCH", "DELETE"):
+            with self.subTest(method=m):
+                self.assertEqual(
+                    endpoint_errs(CHECKED + "\n`%s /x/y` 무엇\n" % m), [],
+                    "%s 를 경로로 못 알아본다" % m)
+
+    def test_체크하지_않았으면_이_규칙은_걸리지_않는다(self):
+        """체크 안 한 항목은 4번 미결이 받는다 — 여기서 두 번 막지 않는다."""
+        self.assertEqual(endpoint_errs(UNCHECKED), [])
+
+    def test_메서드만_있고_경로가_없으면_목록으로_치지_않는다(self):
+        """「POST 로 보냅니다」 같은 산문을 목록으로 오인하지 않는다."""
+        self.assertEqual(len(endpoint_errs(
+            CHECKED + "\n실적은 POST 로 보냅니다. GET 은 쓰지 않습니다.\n")), 1)
+
+    def test_다른_절의_경로는_목록으로_치지_않는다(self):
+        """§6 주의사항에 딸려 들어간 경로는 «목록»이 아니다 — 실측 9건이 그 모양이었다."""
+        text = kickoff(CHECKED).replace(
+            "### 6. 특별히 조심할 것\n\n- 없음\n",
+            "### 6. 특별히 조심할 것\n\n- 인쇄는 `POST /app/document-issues` 로 시작합니다\n")
+        errs, _ = chk.check_structure(text, chk.sections(text))
+        self.assertEqual(len([e for e in errs if "엔드포인트" in e[0]]), 1)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
