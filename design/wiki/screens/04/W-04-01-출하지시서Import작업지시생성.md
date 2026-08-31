@@ -143,8 +143,10 @@ WF04 S3 M2와 인벤토리 근거가 「**시간대 슬롯**」을 요구했고,
 **팀 리더 확정**: 고객 운영이 **고정 슬롯**을 쓴다 — 오전·오후·야간 3구간. 자유 시간 구간이 아니다.
 
 ```
-shipment_request.time_slot_code   varchar   nullable   ← 신설. codeGroupCode=SHIPMENT_TIME_SLOT
+shipment_request.time_slot_code   nullable   ← 신설. codeGroupCode=SHIPMENT_TIME_SLOT
 ```
+
+타입·길이는 데이터 모델 담당 소관이다(`data-model-boundary.md`) — 설계는 필드 존재·nullable·값 목록까지만 정한다.
 
 값 목록(공유계약 G-31·G-32 — 동작이 안 걸리는 필터·표시용이라 고객 마스터안전형): `MORNING`·`AFTERNOON`·`NIGHT`.
 `sales_order_line.requested_delivery_date`·`shipment_request.requested_ship_date`는 그대로 날짜만 갖고, 시간대는 **별도 컬럼**으로 신설한다 — 날짜 필드를 시각으로 바꾸지 않는다.
