@@ -166,6 +166,40 @@ class NoRegression(unittest.TestCase):
         self.assertEqual(rc, 0)
 
 
+class DraftResidue(unittest.TestCase):
+    """초안 잔재 — 「내용 유출」이 아니라 「초안이 안 끝났다」를 본다.
+
+    실측 사고: omf-mes-client#602·#603 이 발행 전 자기검토 문구를 단 채
+    «공개» 저장소로 나갔다. 검사기는 그때 「✅ 발행해도 되는 상태」를 냈다 —
+    기존 금지어가 전부 내용 유출(이미지·조항·실데이터·인프라)만 보고 있었다.
+    """
+
+    def test_내부_에이전트_이름은_막는다(self):
+        body = "개발팀에 전달사항\n\n발행 전 design-review-analyst 재확인을 권장한다.\n"
+        self.assertEqual(run(body, "--change-notice", "--no-remote"), 1)
+
+    def test_발행_전_지시_잔재는_막는다(self):
+        body = "개발팀에 전달사항\n\n확정 범위만 먼저 내고, 발행 전에 다시 검토합니다.\n"
+        self.assertEqual(run(body, "--change-notice", "--no-remote"), 1)
+
+    def test_미기입_물음표_칸은_막는다(self):
+        """#602 가 표 칸을 「W-06-05(?, #14)」로 둔 채 발행됐다."""
+        body = "개발팀에 전달사항\n\n| 화면 |\n| --- |\n| W-06-05(?, #14) |\n"
+        self.assertEqual(run(body, "--change-notice", "--no-remote"), 1)
+
+    def test_한계를_알리는_문장은_막지_않는다(self):
+        """⚠ 오탐 잠금 — 「여기까지만 확인했다」를 정직하게 알리는 것은 정당하다.
+        경고로만 뜨고 발행을 막지 않는다."""
+        body = ("개발팀에 전달사항\n\n필드 단위 실사용까지는 확인하지 못했습니다 — "
+                "어긋나면 알려 주십시오.\n")
+        self.assertEqual(run(body, "--change-notice", "--no-remote"), 0)
+
+    def test_평범한_변경_통지는_그대로_통과한다(self):
+        body = ("개발팀에 전달사항\n\n## 무엇이 바뀌었나\n\n응답에 필드 둘이 늘었습니다.\n\n"
+                "## 코드에 무엇을 해야 하나\n\n널 가드를 넣어 주십시오.\n")
+        self.assertEqual(run(body, "--change-notice", "--no-remote"), 0)
+
+
 class IsKickoff(unittest.TestCase):
     """착수 이슈 판별 — 중복 검사와 --status 가 «같은 답»을 내야 한다.
 
