@@ -21,7 +21,7 @@
 
 | 무엇 | 정본 | 규모 | 세는 명령 |
 | --- | --- | :-: | --- |
-| **계약** | `wiki/api-contracts/openapi/*.json` **7파일** | **경로 346 · 오퍼레이션 479 · 스키마 494** | `python3 design/schema/generators/openapi/check-structure.py` |
+| **계약** | `wiki/api-contracts/openapi/*.json` **7파일** | **경로 347 · 오퍼레이션 480 · 스키마 495** | `python3 design/schema/generators/openapi/check-structure.py` |
 | **근거** — 화면 액션이 어느 경로에 대응하나 | `design/wiki/api-contracts/06-API-요구서*.md` **9장** | 인용 **674** 전건 계약에 실재 | `python3 design/schema/generators/verify-doc-citations.py` |
 | **덮은 화면** | 요구서 §3 소절 | **117 / 117** | `python3 design/schema/generators/build-screen-progress.py` |
 

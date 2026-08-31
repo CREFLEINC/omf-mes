@@ -5590,7 +5590,7 @@
           "quality"
         ],
         "summary": "검사기준 승인",
-        "description": "approvedBy·approvedAt 을 서버가 동시에 기록한다(현재 사용자·현재 시각) — 둘은 짝이어야 하나 물리 모델에 CHECK 제약이 없어(§8-3) 서버가 항상 함께 채우는 방식으로 짝을 보장한다(A-9 취지). 전제: 이 기준에 확정(status_code=확정) 버전이 1건 이상 있어야 한다 — 없으면 400(code=CONFIRMED_VERSION_REQUIRED). 승인 해제(취소)는 제공하지 않는다. 근거: W-06-02 §5-1 「승인」",
+        "description": "approvedBy·approvedAt 을 서버가 동시에 기록한다(현재 사용자·현재 시각) — 둘은 짝이어야 하며 서버가 항상 함께 채우는 방식으로 그 짝을 보장한다(A-9 취지 · §8-3). 전제: 이 기준에 확정(status_code=확정) 버전이 1건 이상 있어야 한다 — 없으면 400(code=CONFIRMED_VERSION_REQUIRED). 승인 해제(취소)는 제공하지 않는다. 근거: W-06-02 §5-1 「승인」",
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
@@ -8516,7 +8516,7 @@
           "logistics"
         ],
         "summary": "적치 규칙 다시 사용",
-        "description": "중지한 규칙을 되살린다. 같은 (품목, 창고, 위치, 우선순위)로 이미 활성인 규칙이 있으면 400 이다 — 물리 모델에 유일 제약이 없어 계약이 막는다. 근거: W-06-14 §5-2·§5-7 · 공유계약 B-12",
+        "description": "중지한 규칙을 되살린다. 같은 (품목, 창고, 위치, 우선순위)로 이미 활성인 규칙이 있으면 400 이다 — 같은 조합에 활성 규칙이 둘이면 어느 것을 적용할지 정해지지 않으므로 계약이 막는다. 근거: W-06-14 §5-2·§5-7 · 공유계약 B-12",
         "parameters": [
           {
             "$ref": "#/components/parameters/IdempotencyKey"
@@ -15982,7 +15982,7 @@
             "x-source-column": "item_name",
             "type": "string",
             "maxLength": 200,
-            "description": "⚠ 한/베 두 언어를 담을 컬럼이 없다 — W-06-06 §8-1 과 같은 결함",
+            "description": "⚠ 한/베 두 언어를 나눠 담는 축이 아직 없다 — W-06-06 §8-1 과 같은 결손이며 되살리기 잔여다",
             "example": "하우징 커버 A"
           },
           "nameKo": {
