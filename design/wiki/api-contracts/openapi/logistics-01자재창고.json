@@ -6824,6 +6824,82 @@
     }
    }
   },
+  "/trace/lot-lifecycle-events": {
+   "get": {
+    "tags": [
+     "trace"
+    ],
+    "summary": "LOT 생명주기 변경이력 조회 — 전이 3종 전건",
+    "description": "선발행 LOT 번호 슬롯(trace.lot.lifecycleStatusCode — 대기/활성/폐번)의 전이 3종(L1·L2·L3)을 사건별 행으로 낸다. LotStatusHistoryEvent(품질 판정 축 — 정상/불량/검사대기/폐기)와는 다른 축이다 — 섞지 않는다. 저장 테이블은 데이터 모델 담당에게 통지한다 — 기다리지 않는다(data-model-boundary.md). 근거: omf-mes-server#50 정정 회신(2026-08-31) · W-02-05 §5-3 · W-02-06 §5-5 · DR-007",
+    "parameters": [
+     {
+      "name": "occurredFrom",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "description": "사건 기간 시작 — 감사 조회는 기간을 강제한다(공유계약 L-3)"
+     },
+     {
+      "name": "occurredTo",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "description": "사건 기간 끝"
+     },
+     {
+      "name": "lotId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64"
+      },
+      "description": "「LOT으로 찾기」 모드"
+     },
+     {
+      "name": "transitionCode",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "enum": [
+        "L1",
+        "L2",
+        "L3"
+       ]
+      },
+      "description": "「이력으로 찾기」의 전이유형 축"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "LOT 생명주기 변경이력",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "required": [
+          "items"
+         ],
+         "properties": {
+          "items": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/LotLifecycleHistoryEvent"
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  },
   "/trace/lots/{lotId}:request-iqc-skip": {
    "parameters": [
     {
@@ -11940,6 +12016,76 @@
      },
      "changedBy": {
       "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "changedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-06T09:12:00+09:00"
+     }
+    }
+   },
+   "LotLifecycleHistoryEvent": {
+    "type": "object",
+    "description": "LOT 생명주기 전이 사건 1건(대기/활성/폐번). LotStatusHistoryEvent(품질 판정 축)와 형태를 맞춘 별도 이력 — 두 축을 한 이력에 섞지 않는다(과거 W-03-01 §8이 두 축을 헷갈려 적었던 사고 재발 방지). 저장 테이블(trace.lot_lifecycle_history 성격)은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: omf-mes-server#50 정정 회신(2026-08-31)",
+    "required": [
+     "lotLifecycleHistoryId",
+     "lotId",
+     "toLifecycleStatusCode",
+     "transitionCode",
+     "changedAt"
+    ],
+    "properties": {
+     "lotLifecycleHistoryId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "lotId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "lotNo": {
+      "type": "string",
+      "example": "값"
+     },
+     "fromLifecycleStatusCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "x-no-example": true,
+      "description": "전이 전 생명주기 상태. 최초 전이(L1)는 null"
+     },
+     "toLifecycleStatusCode": {
+      "type": "string",
+      "x-no-example": true
+     },
+     "transitionCode": {
+      "type": "string",
+      "enum": [
+       "L1",
+       "L2",
+       "L3"
+      ],
+      "description": "L1=대기→활성(첫 실적이 붙을 때, 해당 슬롯) · L2=대기→폐번(마감, 실적 없는 슬롯만) · L3=활성→폐번(작업지시 취소, 그 작업지시의 선발행 슬롯 전건 — DR-007). ⚠ L3를 여는 것은 취소 오퍼레이션 한 곳뿐이다 — 사람이 화면에서 직접 폐번하는 액션은 없다",
+      "example": "L1"
+     },
+     "sourceDocumentTypeCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "x-no-example": true,
+      "description": "이 전이를 일으킨 문서 유형 — 다형 참조(공유계약 A-10). L2=work_order_closing, L3=work_order"
+     },
+     "sourceDocumentId": {
+      "type": [
+       "integer",
+       "null"
+      ],
       "format": "int64",
       "example": 1001
      },
