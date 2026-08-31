@@ -182,7 +182,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 저장 / 취소 | `PUT /quality/defect-codes/{id}` · `PUT /quality/cause-codes/{id}` | §4-A·§4-C · B-1 |
 | 사용 중지 | `POST …/defect-codes/{id}:deactivate` · `POST …/cause-codes/{id}:deactivate` | §5-1 · B-4 |
 | 원인코드 추가·편집 | `POST /quality/cause-codes` · `PUT /quality/cause-codes/{id}` | §4-C · §5-1 |
-| 매핑 토글 | **없음 — 미착지 #64.** 공정–불량코드 **N:M 매핑 테이블이 물리 모델에 없다**(결정 12가 N:M 조정을 승인했으나 17일 뒤 물리 모델이 조정 전 형태로 굳었다) | §4-D·§8-1 |
+| 매핑 토글 | ✅ **되살렸다(2026-08-30 · PR #290)** — 결정 12의 N:M 조정대로 계약이 공정–불량코드 매핑 자원을 갖는다. 📨 물리 표는 통지 대상이며 우리를 막지 않는다 | §4-D·§8-1 |
 | 변경 이력 | `GET /audit/events` | §5-1 · B-5 |
 
 - **자기참조·3계층을 DB가 막지 않는다.** `department`·`production_line` 등 계층 컬럼을 가진 대다수 테이블에는 `ck_*_parent`가 있는데 `defect_code`·`location`에는 **둘 다 없다**(실측). 서버가 차단한다 — A-9 ⓐ. 이 비대칭 자체가 §5 미착지 11이다.
@@ -196,7 +196,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 저장 / 취소 | `PUT /mdm/code-values/{id}` | §4-A · B-1 |
 | 정렬 재배치 | `PUT /mdm/code-values/{id}` — **행마다 개별 호출.** `display_order`에는 유일 제약이 없어 **A-5 대상이 아니다** | §5-1 |
 | 사용 중지 | `POST /mdm/code-values/{id}:deactivate` | §5-1 · B-4 |
-| 통제 속성 편집 | **없음 — 미착지 #64.** 결정 10이 요구한 6속성(출고차단·출하차단 등)을 담을 컬럼이 없다. 판정유형은 `code_t` 맨몸이다 | §8-1 |
+| 통제 속성 편집 | ✅ **되살렸다(2026-08-30 · PR #290)** — 결정 10이 요구한 6속성(출고차단·출하차단 등)을 계약이 갖는다. 📨 담을 컬럼은 통지 대상이다 | §8-1 |
 | 변경 이력 | `GET /audit/events` | §5-1 · B-5 |
 
 > ⚠ **이 화면은 현재 `W-06-06`의 코드값 편집기와 같은 경로를 공유한다.** 통제 속성 컬럼이 생기기 전까지 전용 리소스가 성립하지 않으며, **그 컬럼이 이 화면의 존재 근거**다. `[docs→데이터모델]` #64가 이 화면의 운명을 좌우한다.
@@ -539,7 +539,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | **5** | ✅ **부분 되살렸다**(2026-08-30) — 검사정책 3속성 · **샘플 비율의 형태** | PQC 생략 허용(`pqcSkipAllowed`) 신설 — 물리는 `quality.inspection_plan` 헤더에 이미 있음(`omf-mes-server#42` 확인). 샘플 비율(`samplingRatio`, 0~1) 신설 — 저장 컬럼 데이터 모델 통지. 단순 선택 허용은 별건(미확인 유지) | 공유계약 §I-9 |
 | **6** | ✅ **되살렸다**(2026-08-30) — 불량코드 **공정 N:M 매핑** · 처분구분 | `DefectCodeProcess` API 신설로 결정 12를 되살렸다 — 매핑 테이블(`quality.defect_code_process`) 자체는 이미 있었음(`omf-mes-server#42` 확인), 없던 건 API 쓰기 경로뿐. `DefectCode.dispositionTypeCode` 신설(저장 컬럼 데이터 모델 통지) | 공유계약 §I-10 |
 | **7** | ✅ **되살렸다**(2026-08-30) — **판정유형 통제 속성** | `JudgmentTypeControl`(+`Update`) 신설로 결정 10의 「이 단일 지점」 축을 되살렸다 — `W-06-04`가 `W-06-06`의 코드값 편집기 복제가 아니게 됐다. 신규 테이블은 데이터 모델 통지 | 공유계약 §I-11 |
-| **8** | **ERP 수신본 판정 컬럼** | ⚠ **가장 위험한 항목이다.** `code_group`·`code_value`·`department`는 ERP 수신본일 가능성이 있어 읽기 전용이어야 하는데(§5-4·B-4-1), **그것을 판정할 컬럼이 물리 모델에 없다.** 그래서 **API가 지금 이 셋의 쓰기를 열어 두고 있다** — 구현팀이 「완전 편집 가능」으로 오인하면 **MES에서 고친 값이 다음 재동기화에 조용히 덮인다.** 각 스키마 `description`에 이 사실을 적어 뒀으나 **API가 강제하지는 못한다** | **#65** (closed 2026-08-25) |
+| **8** | **ERP 수신본 판정 축** | ✅ **되살렸다(2026-08-30 · PR #290 — `Department.sourceSystemCode` 신설 · 공유계약 F-3).** `code_group`·`code_value`·`department`가 ERP 수신본이면 읽기 전용이어야 한다는 판정을(§5-4·B-4-1) **계약이 자기 축으로 갖는다.** ⛔ 「판정할 컬럼이 물리 모델에 없어서 쓰기를 열어 둔다」는 **철회된 근거다**(A-11 v4.6) — 구현팀이 「완전 편집 가능」으로 오인하면 **MES에서 고친 값이 다음 재동기화에 조용히 덮인다.** 각 스키마 `description`에 이 사실을 적어 뒀으나 **API가 강제하지는 못한다** | **#65** (closed 2026-08-25) |
 | **9** | I/F 연계정의 · 송신 항목 on/off 테이블 | `W-06-09`·`W-06-12` **엔드포인트 전무** — §6 | **#66** (closed 2026-08-25) |
 | **10** | **`audit.audit_event` 사용 규약** | 변경 이력 응답을 **사람이 읽게 만들 수 없다.** `target_id`가 **FK가 아니고**(유형별로 다른 테이블) `before/after` **jsonb 키 규약이 없다.** 그래서 ① 리소스별 `/history`를 만들지 않고 **횡단 `GET /audit/events` 하나**로 갔고 ② `W-06-11`이 「MES 정본 / ERP 정본」을 행마다 가를 수 없다(`target_type_code` 값 목록 미정) | **#68** (closed 2026-08-25) |
 | **11** | **자기참조 CHECK의 비대칭** | `mdm.location`·`quality.defect_code`에 자기참조 CHECK가 **없다** — `department`·`production_line` 등 계층 컬럼을 가진 대다수 테이블에는 있다(실측 정정 — 「department에만」은 과잉 정정이었다). **계층 순환을 DB가 막지 않으므로 서버가 막아야 한다**(A-9 ⓐ). 계약에 적었으나 강제는 애플리케이션 책임이다 | **#64(추가)** (closed 2026-08-25) |

@@ -73,7 +73,7 @@
 | 창고코드 / *(미정)* | `warehouse_code` | `code_t` varchar(50) | ✅ | ✅ **(공장 내)** | 공백만 불가 · 중복 시 「같은 공장에 이미 있는 창고코드입니다」 | ⚠ §8-7 |
 | 창고명 / *(미정)* | `warehouse_name` | `name_t` varchar(200) | ✅ | | 공백만 불가 | ✅ |
 | 창고유형 / *(미정)* | `warehouse_type_code` | `code_t` | ✅ | | 공통코드 — 자재·제품·반제품·상품·생산 5종 «§8-3» | ✅ |
-| 관리수준 / *(미정)* | `management_level_code` | `code_t` | ✅ | | 공통코드 — **값 목록 미정 §8-2** | ✅ |
+| 관리수준 | `management_level_code` | `code_t` | ✅ | | ✅ **확정 2026-08-31(사용자)** — 창고(WAREHOUSE) · 구역(ZONE) · 랙(RACK) · 셀(CELL). **순서가 계층 깊이를 뜻한다.** 그룹 이름 `MANAGEMENT_LEVEL`(G-32) | ✅ |
 | 외부창고 / *(미정)* | `is_external` | boolean | ✅ 기본 `false` | | 켜면 거래처 필수(아래) | ✅ |
 | 거래처 / *(미정)* | `partner_id` | FK → `mdm.partner` | **조건부** | | `ck_external_warehouse_partner` — **외부창고면 필수** · 「외부 창고는 거래처를 반드시 선택해야 합니다」 | ✅ |
 | 불량창고 / *(미정)* | `is_defect` | boolean | ✅ 기본 `false` | | 창고유형·외부창고와 **별개 축**(품질 축) — 자재 불량창고도 제품 불량창고도 성립한다. 켜면 `W-01-06` 폐기 품의·기타출고의 창고 선택에 뜬다 | ✅ |
@@ -170,7 +170,7 @@
 
 | # | 항목 | 성격 | 처리 |
 | --- | --- | --- | --- |
-| 2 | `management_level_code` · `location_type_code` · `quality_zone_code` 값 목록 미정 | 공통코드 | `W-06-06` 공통코드 마스터 소관 · 확정 전까지 선택 목록 비움. 특히 `quality_zone_code`와 **Lot Status Hold/Release 물류 통제의 관계**가 정의되지 않음 |
+| 2 | ~~`management_level_code`~~ ✅ **확정 2026-08-31** · `location_type_code` · `quality_zone_code` 값 목록 미정 | 공통코드 | `W-06-06` 공통코드 마스터 소관 · 확정 전까지 선택 목록 비움. 특히 `quality_zone_code`와 **Lot Status Hold/Release 물류 통제의 관계**가 정의되지 않음 |
 | 3 | 창고유형 5종(자재·제품·반제품·상품·생산)이 `warehouse_type_code` 공통코드 값과 1:1인지 미확인 | 정합 | 확인 필요 |
 | 4 | **마스터 변경 이력 저장 방식** — REQ-PR-0021이 「변경 이력 필수」인데 **확인 범위의 물리 모델에서 범용 이력 테이블이 발견되지 않음**(감사 컬럼 4개는 최신 상태만 보존하므로 이력이 아님) | 데이터 | 하류 확인 후 부재 시 **`[docs→데이터모델]` 이슈**(assignee 필수) |
 | 5 | **Location 계층 최대 깊이** — 2단 이내면 `Table`+`groupBy`로 충분해 §7-2 갭이 성립하지 않음 | 설계 | 운영 실태 확인 필요. **DS 갭 판정의 선행 조건** |
