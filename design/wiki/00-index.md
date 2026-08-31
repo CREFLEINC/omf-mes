@@ -87,6 +87,10 @@ python3 design/schema/generators/verify-counts.py     ← 이 문서의 숫자�
 
 ⚠ **HTML 판은 옛 수치를 담고 있을 수 있다** — 생성기 상단의 표지 문구·요약 수치가 **자동 파싱이 아니라 손으로 관리**되는 자리다. 마크다운이 정본이다.
 
+⛔ **그래서 `verify-generated-fresh.py` 도 이 자리는 못 잡는다** — 표지 수치가 손으로 적은 값이라
+원본 마크다운의 숫자가 바뀌어도 재생성 바이트는 그대로고, 검사는 초록을 낸다. 표지 수치는 사람이
+본다. `build-04-ia-html.py` · `build-04-ia-도식본.py` 는 마크다운에서 직접 세므로 예외다.
+
 ## 검사기 — **돌려서 확인한다**
 
 | 무엇을 보나 | 명령 |
@@ -94,7 +98,7 @@ python3 design/schema/generators/verify-counts.py     ← 이 문서의 숫자�
 | **이 문서의 숫자가 아직 맞나** | `verify-counts.py` |
 | 화면 수가 두 곳에서 같나 | `verify-screen-inventory.py` |
 | 화면 액션을 요구서가 다 다뤘나 | `verify-ui-coverage.py` → `verify-mapping-coverage.py --domain <도메인>` |
-| 생성물이 정본과 갈렸나 | `verify-generated-fresh.py` |
+| 생성물이 정본과 갈렸나 *(두 축 — 요구목록 마크다운 9건 + HTML 배포본 9건. `--kind md\|html` 로 한 축만 돌린다)* | `verify-generated-fresh.py` |
 | 폐기한 옛 표기가 아직 남아 있나 *(막지 않는다 — 회차 단위 ref 로 돌린다)* | `verify-stale-terms.py <기준 ref>` |
 | 요구서가 인용한 경로가 계약에 있나 | `verify-doc-citations.py` |
 | 계약이 가리킨 코드그룹 이름이 등록부에 있나 | `openapi/check-code-group-pointer.py` |
