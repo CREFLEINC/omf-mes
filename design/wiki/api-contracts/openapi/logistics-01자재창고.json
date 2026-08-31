@@ -10338,6 +10338,26 @@
       "readOnly": true,
       "example": "A-01-03",
       "description": "화면이 보이는 값. 축이 접힌 줄에서는 비어 온다. 근거: W-01-07 §3"
+     },
+     "warehouseName": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "maxLength": 200,
+      "readOnly": true,
+      "example": "1공장 자재창고",
+      "description": "화면이 보이는 값. 식별자를 사람이 읽는 값으로 바꾸려 마스터를 다시 부르지 않게 한다 — ⛔ 이 값이 있으므로 GET /mdm/warehouses/{warehouseId} 를 부르지 않는다. 축이 접힌 줄에서는 비어 온다. 근거: M-01-04 §3 · W-01-07 §3"
+     },
+     "locationName": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "maxLength": 200,
+      "readOnly": true,
+      "example": "A구역 01열 03단",
+      "description": "화면이 보이는 값. ⛔ 이 값이 있으므로 GET /mdm/locations/{locationId} 를 부르지 않는다. groupBy 가 LOCATION 이 아니거나 축이 접힌 줄에서는 비어 온다 — locationId·locationCode 와 같은 조건이다. 근거: M-01-04 §3 · W-01-07 §3"
      }
     },
     "x-internal-note": "available_qty 는 GENERATED STORED 다 — 공유계약 L-2. 소유 축을 합치지 않는 규칙은 L-7. heldLotCount 는 B-4 와 같은 원리로 서버가 센다."
