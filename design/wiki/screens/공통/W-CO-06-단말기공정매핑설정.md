@@ -28,7 +28,7 @@
 | **프로세스** | `05` — **03·05 도식 어디에도 앵커가 없다.** 시나리오 L134 「지시 → 해당 공정 현장 단말 표시」 · 데이터모델링 **EX-10 「단말기 허용 공정 불일치」** · **FR-PR-003 「공용 단말기 실적등록」** — 둘 다 단말×공정 데이터를 전제한다 |
 | **화면·IA** | 인벤토리 v1.5 `W-CO-06` — 유형 설정·마스터 · 데이터=단말기·공정·설비 · 신뢰도 **추정** · **등급 4(엔티티 실재)로 도출** — v1.5가 「물리 모델 대조를 통과해야 확정」이라 명시한 3화면 중 하나 |
 | **요구** | ✅**REQ-PR-0017** 현장 단말기·스캐너·프린터 설치 — **비기능** · 잔여 = **회신 E-2 설치 공정·위치** · ✓**확정 2026-07-28 「POP 단말인증 설계검토」 §6-②** — **폐기 = `mdm.terminal.token_version` 세대 번호**(토큰 해시 저장·발급 이력은 두지 않음) · ✓**확정 §6-③** 모바일도 동일(만료 1년) · 공유계약 **F-1**·**F-2** |
-| **데이터** | `mdm.terminal`(8열 + 감사 · ✅ **`token_version` 실재** — `omf-mes-server#48` 회신 2026-08-28 §5-4 · ⛔ **`equipment_id` 는 계약이 앞서 있다** `omf-mes#262`) · `mdm.terminal_process`(**8 boolean · 전부 `DEFAULT false`** · `uq_terminal_process UNIQUE(terminal_id, process_id)` · **`version_no` 없음**) · `mdm.process`(`process_type_code`는 맨 `code_t`) · `mdm.location` — 실측 |
+| **데이터** | `mdm.terminal`(8열 + 감사 · ✅ **`token_version` 실재** — `omf-mes-server#48` 회신 2026-08-28 §5-4 · 📨 **`equipment_id` 는 계약이 앞서 있다** — 통지 완료 `omf-mes#262`) · `mdm.terminal_process`(**8 boolean · 전부 `DEFAULT false`** · `uq_terminal_process UNIQUE(terminal_id, process_id)` · **`version_no` 없음**) · `mdm.process`(`process_type_code`는 맨 `code_t`) · `mdm.location` — 실측 |
 
 > ⚠ **이슈 #28 → #33의 잔재** — 인벤토리가 인용한 「개념모델 §3 단말기 기준정보」는 존재하지 않았고(§3은 LOT/추적), 개념모델 L371은 「POP 단말·스캐너·프린터 설치는 **인프라 비기능으로 엔티티가 아니다**」라고 **명시 배제**했다. 그런데 물리 모델에는 `mdm.terminal`·`terminal_process`가 실재한다. 「**설치=인프라 / 기능 구성=운영 데이터**」로 갈린 것이고 이 화면은 후자만 맡는다. **상류(개념모델)만 「엔티티 아님」으로 남은 상태가 이슈 #33으로 열려 있다.**
 
@@ -80,7 +80,7 @@
 | 단말 코드 | `terminal_code` | `code_t` | ✅ | ✅ **전역** | 신규만 | ⚠ **공장 무관 전역 유일** — 오류 문구에 범위를 담는다(A-1) §5-5 |
 | 공장 | `plant_id` | bigint FK | ✅ | — | ✅ | 토큰 클레임 `plantId`의 원천 |
 | 설치 위치 | `location_id` | bigint FK | — | — | ✅ | **nullable** — 미지정 허용. 회신 E-2 §5-6 |
-| 설비 | `equipment_id` | bigint FK | — | — | ✅ | **nullable** — 미결속 허용. 현장 단말이 「이 설비」를 얻는 원천이다(`P-02-01` §4 · `P-05-02` §4-A). ⛔ 물리 컬럼 확인 전이라 계약이 앞서 있다 — `omf-mes#262` |
+| 설비 | `equipment_id` | bigint FK | — | — | ✅ | **nullable** — 미결속 허용. 현장 단말이 「이 설비」를 얻는 원천이다(`P-02-01` §4 · `P-05-02` §4-A). 📨 계약이 앞서 있고 저장 컬럼은 통지 대상이다(기다리지 않는다) — `omf-mes#262` |
 | 단말 유형 | `terminal_type_code` | `code_t` | ✅ | — | ✅ | ⚠ 값 목록 미정 — **`MOBILE`이 있어야 한다** §8-2 |
 | 상태 | `status_code` | `code_t` | ✅ | — | ✅ | ⚠ **폐기·분실 값이 필요한지 미확인**(설계검토 §5) §8-2 |
 | 사용 | `is_active` | boolean | ✅ | — | ✅ | ⚠ **이것은 폐기 수단이 아니다** §5-4 |

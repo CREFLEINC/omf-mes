@@ -19461,7 +19461,7 @@
             "example": 1
           }
         },
-        "x-internal-note": "토큰 세대(tokenVersion) — 재발급마다 +1, 토큰 클레임 tv 와 매 요청 대조해 이전 토큰 전부를 무효화한다(공유계약 F-4, 2026-08-30 되살림). 저장 컬럼은 데이터 모델 담당에게 통지한다 — 기다리지 않는다(data-model-boundary.md). equipmentId(설비 결속) 관련은 별건 — omf-mes#262(닫지 않는다)."
+        "x-internal-note": "토큰 세대(tokenVersion) — 재발급마다 +1, 토큰 클레임 tv 와 매 요청 대조해 이전 토큰 전부를 무효화한다(공유계약 F-4, 2026-08-30 되살림). 저장 컬럼은 데이터 모델 담당에게 통지한다 — 기다리지 않는다(data-model-boundary.md). equipmentId(설비 결속)의 저장 컬럼도 같다 — 계약이 앞서 있고 통지했다(omf-mes#262 · 2026-08-31 종결). 기다리지 않는다."
       },
       "TerminalCreate": {
         "type": "object",
