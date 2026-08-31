@@ -7718,9 +7718,9 @@
       "x-source-column": "issue_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "출고 유형. 일반 출고·반품·기타 출고를 가른다. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
-      "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "description": "출고 유형. ✅ **값 목록 확정 2026-08-31(사용자)** — 생산투입(PRODUCTION) · 공급사반품(SUPPLIER_RETURN) · 기타출고(OTHER) · 출하(SHIPMENT) 넷이다. 값 목록은 GET /mdm/code-values?codeGroupCode=ISSUE_TYPE 로 받는다(공유계약 G-32). ⛔ **폐기는 출고 «유형»이 아니라 기타출고의 «사유»다**(2026-08-31 확정) — issueTypeCode=OTHER 로 두고 reasonCode 로 가른다. 승인 게이트도 사유를 보고 건다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "example": "PRODUCTION"
      },
      "sourceDocumentTypeCode": {
       "x-source-column": "source_document_type_code",
@@ -7848,9 +7848,9 @@
       "x-source-column": "issue_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "출고 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
-      "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "description": "출고 유형. ✅ **값 목록 확정 2026-08-31(사용자)** — 생산투입(PRODUCTION) · 공급사반품(SUPPLIER_RETURN) · 기타출고(OTHER) · 출하(SHIPMENT) 넷이다. 값 목록은 GET /mdm/code-values?codeGroupCode=ISSUE_TYPE 로 받는다(공유계약 G-32). ⛔ **폐기는 출고 «유형»이 아니라 기타출고의 «사유»다**(2026-08-31 확정) — issueTypeCode=OTHER 로 두고 reasonCode 로 가른다. 승인 게이트도 사유를 보고 건다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "example": "PRODUCTION"
      },
      "sourceDocumentTypeCode": {
       "x-source-column": "source_document_type_code",
@@ -8154,9 +8154,7 @@
      "plantId",
      "warehouseId",
      "receiptDatetime",
-     "statusCode",
-     "sourceDocumentTypeCode",
-     "sourceDocumentId"
+     "statusCode"
     ],
     "description": "입고 전표. 근거: W-01-10",
     "properties": {
@@ -8176,9 +8174,9 @@
       "x-source-column": "receipt_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "입고 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
-      "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "description": "입고 유형. ✅ **값 목록 확정 2026-08-31(사용자)** — 자재입고(MATERIAL) · 제품입고(PRODUCT) · 반품입고(RETURN) · 창고간이동입고(TRANSFER) 넷이다. 값 목록은 GET /mdm/code-values?codeGroupCode=RECEIPT_TYPE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "example": "MATERIAL"
      },
      "plantId": {
       "x-source-column": "plant_id",
@@ -8209,17 +8207,22 @@
      },
      "sourceDocumentTypeCode": {
       "x-source-column": "source_document_type_code",
-      "type": "string",
+      "type": [
+       "string",
+       "null"
+      ],
       "maxLength": 50,
-      "description": "원천 문서의 유형. 유형 코드와 대응 테이블의 규약이 함께 와야 화면이 원천을 표시할 수 있다. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
-      "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "description": "원천 문서 유형. ⭐ **비울 수 있다**(2026-08-31 사용자 확정) — 출하가 완료된 뒤 되돌아오는 반품 입고처럼 가리킬 원천 문서가 없는 갈래가 성립한다. ⛔ 「없음(NONE)」을 값으로 두지 않는다 — 가리킬 대상이 없는 값을 다형 참조 판별자에 섞지 않는다(공유계약 A-10). 값 목록은 아직 확정 전이다(omf-mes#145).",
+      "x-internal-note": "2026-08-31 사용자 확정 — 「없음(NONE)」을 값으로 두지 않고 칸을 비울 수 있게 한다. 저장 컬럼의 NOT NULL 해제는 데이터 모델 담당에게 통지한다 — 기다리지 않는다(schema/data-model-boundary.md). 근거: W-04-06 §5-3 · omf-mes#302."
      },
      "sourceDocumentId": {
       "x-source-column": "source_document_id",
-      "type": "integer",
+      "type": [
+       "integer",
+       "null"
+      ],
       "format": "int64",
-      "description": "원천 문서 식별자. 유형에 따라 가리키는 테이블이 다르다",
+      "description": "원천 문서 식별자. ⭐ sourceDocumentTypeCode 와 «짝»이다 — 가리킬 문서가 없으면 둘을 함께 비운다(✓확정 2026-08-31 사용자 · 공유계약 A-10). 한쪽만 채우지 않는다.",
       "example": 1001
      },
      "reasonCode": {
@@ -8229,8 +8232,7 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "반품 입고 등의 사유. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
-      "x-no-example": true,
+      "description": "입고 사유. ⭐ **고객이 운영 중에 설정하는 마스터다**(공유계약 G-31 · 2026-08-31 사용자 확정) — 확정을 기다리지 않는다. 목록은 실행 시점에 마스터에서 오므로 **화면은 정상 동작한다**(비활성으로 두지 않는다). 값 목록은 GET /mdm/code-values?codeGroupCode=GOODS_RECEIPT_REASON 로 받는다. ⛔ enum 을 못박지 않는다 — 「아직 미확정이라서」가 아니라 **실행 시점 자료라서**다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
      },
      "remarks": {
@@ -8257,8 +8259,6 @@
      "plantId",
      "warehouseId",
      "receiptDatetime",
-     "sourceDocumentTypeCode",
-     "sourceDocumentId",
      "businessDate",
      "lines"
     ],
@@ -8268,9 +8268,9 @@
       "x-source-column": "receipt_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "입고 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
-      "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "description": "입고 유형. ✅ **값 목록 확정 2026-08-31(사용자)** — 자재입고(MATERIAL) · 제품입고(PRODUCT) · 반품입고(RETURN) · 창고간이동입고(TRANSFER) 넷이다. 값 목록은 GET /mdm/code-values?codeGroupCode=RECEIPT_TYPE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "example": "MATERIAL"
      },
      "plantId": {
       "x-source-column": "plant_id",
@@ -8292,17 +8292,24 @@
      },
      "sourceDocumentTypeCode": {
       "x-source-column": "source_document_type_code",
-      "type": "string",
+      "type": [
+       "string",
+       "null"
+      ],
       "maxLength": 50,
-      "description": "원천 문서 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⚠ 반품·클레임 입고(W-04-06)에서는 부적합/클레임 접수 문서를 가리킨다.",
+      "description": "원천 문서 유형. ⭐ **비울 수 있다**(2026-08-31 사용자 확정) — 출하가 완료된 뒤 되돌아오는 반품 입고처럼 가리킬 원천 문서가 없는 갈래가 성립한다. ⛔ 「없음(NONE)」을 값으로 두지 않는다 — 가리킬 대상이 없는 값을 다형 참조 판별자에 섞지 않는다(공유계약 A-10). 값 목록은 아직 확정 전이다(omf-mes#145).",
       "example": "INBOUND_RECEIPT",
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다. A-10 규칙1(유형 코드 ↔ 대상 테이블 대응표)이 goods_receipt 원천에 대해 미이행 — 유형 코드가 확정될 때까지 G-2 유예. 근거: W-04-06 §5-3"
+      "x-internal-note": "2026-08-31 사용자 확정 — 「없음(NONE)」을 값으로 두지 않고 칸을 비울 수 있게 한다. 저장 컬럼의 NOT NULL 해제는 데이터 모델 담당에게 통지한다 — 기다리지 않는다(schema/data-model-boundary.md). 근거: W-04-06 §5-3 · omf-mes#302."
      },
      "sourceDocumentId": {
       "x-source-column": "source_document_id",
-      "type": "integer",
+      "type": [
+       "integer",
+       "null"
+      ],
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "원천 문서 식별자. ⭐ sourceDocumentTypeCode 와 «짝»이다 — 가리킬 문서가 없으면 둘을 함께 비운다(✓확정 2026-08-31 사용자 · 공유계약 A-10). 한쪽만 채우지 않는다."
      },
      "reasonCode": {
       "x-source-column": "reason_code",
@@ -8311,8 +8318,7 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "사유. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
-      "x-no-example": true,
+      "description": "입고 사유. ⭐ **고객이 운영 중에 설정하는 마스터다**(공유계약 G-31 · 2026-08-31 사용자 확정) — 확정을 기다리지 않는다. 목록은 실행 시점에 마스터에서 오므로 **화면은 정상 동작한다**(비활성으로 두지 않는다). 값 목록은 GET /mdm/code-values?codeGroupCode=GOODS_RECEIPT_REASON 로 받는다. ⛔ enum 을 못박지 않는다 — 「아직 미확정이라서」가 아니라 **실행 시점 자료라서**다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
      },
      "remarks": {
