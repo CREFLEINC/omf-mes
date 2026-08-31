@@ -202,7 +202,7 @@ default_scrap_location_id    불량 위치
 | W/O 정보 | `Card` + 읽기 전용 구획 | **c** — G-10 |
 | LOT 크기·수량 입력 | `TextField`(숫자) | a |
 | 위치 선택 ×3 | `Select` (계층) | a · ⚠ G-1 |
-| 전달사항 | `TextField multiline` + `Checkbox` | a |
+| 전달사항 | `TextArea` + `Checkbox` | a |
 | 결과 안내 | `AlertBanner`(info) | a |
 | 확정·취소 | `Button` | a |
 
