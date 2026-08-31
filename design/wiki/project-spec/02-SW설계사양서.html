@@ -3240,7 +3240,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th>결정 05-보정</th><td>2026-07-06 (승인)</td><td>포장 실적 원천 2원화 — ①생산 포장(Routing 명시) ②출하 포장(P&amp;P Packing) · 포장단위에 원천 축(P4) 추가</td><td>포장단위·제품입고</td><td>유효 (잔여: 부품사업부 실재 범위 확인 → §8.3 #6)</td><td>D14 결정 05 보정·변경이력 v1.1</td></tr>
 <tr><th>결정 06 (D17)</th><td>2026-07-06</td><td>계측기이력 엔티티 신설 + 이력유형=관리자 설정형 코드(초안 4종: 검교정/점검/수리/폐기)</td><td>계측기·계측기이력</td><td>유효 — Q3 결정 4에서 도식은 05로 이관(엔티티 정본 불변)</td><td>D14 결정 06</td></tr>
 <tr><th>결정 07 (B2잔)</th><td>2026-07-06</td><td>Routing=헤더(품목코드+Rev)–라인(Sequence) 2계층 + W/O 전개 시 Rev 스냅샷 고정 · 라인에 PQC 명시 플래그·외주 구분</td><td>Routing·W/O</td><td>유효</td><td>D14 결정 07</td></tr>
-<tr><th>결정 08 (B7잔)</th><td>2026-07-06</td><td>수불 원장=정본·잔량=파생 스냅샷 · 재고 행에 상태 축 비보유(캐시 없음) · 호퍼 실측=조정 트랜잭션</td><td>재고·수불 원장</td><td>유효 — TS C10·결정 17 충돌 병합의 전제</td><td>D14 결정 08</td></tr>
+<tr><th>결정 08 (B7잔)</th><td>2026-07-06</td><td>수불 원장=정본·잔량=파생 스냅샷 · <del>재고 행에 상태 축 비보유(캐시 없음)</del> · 호퍼 실측=조정 트랜잭션</td><td>재고·수불 원장</td><td>⚠ <strong>부분 철회(2026-08-31 사용자 결정)</strong> — 「재고 행에 상태 축을 두지 않는다」를 <strong>철회한다. 재고 행이 품질 상태를 보유한다.</strong> 근거는 <strong>업무</strong>다 — 같은 LOT 의 일부만 보류·특채되고 창고별로 나뉘어 서므로 <strong>LOT 단위 한 값으로는 표현할 수 없다</strong>(§I-45·46). ⛔ 「물리 모델이 이미 그렇다」는 근거가 아니다(<code>schema/data-model-boundary.md</code>). 나머지(수불 원장=정본 · 잔량=파생 · 호퍼 실측)는 <strong>유효</strong></td><td>D14 결정 08 · <code>omf-mes#115</code></td></tr>
 <tr><th>결정 09 (C2잔)</th><td>2026-07-06</td><td>불량 중복 집계 방지=판정 이벤트 1회 기록+원천 축(현장/PQC/OQC/수리/클레임)+산식별 원천 필터(뷰) · 재판정=원 레코드 갱신</td><td>작업실적·검사실적·수리이력</td><td>유효 — DLOT §4 판정: 원천 축·입력 경계는 생산불량LOT에 그대로 흡수</td><td>D14 결정 09</td></tr>
 <tr><th>결정 10 (D2잔)</th><td>2026-07-06</td><td>품질 판정 정본=Lot Status 단일 지점 + LotStatus변경이력 신설(1:N) + 상태 3축 분리(수명주기/품질 판정/작업 홀드)</td><td>Lot Status·변경이력</td><td>유효 — PQCR·MLOT·Q3·BADGE #9로 확장 (값 목록=회신 E-3 대기)</td><td>D14 결정 10</td></tr>
 <tr><th>결정 11 (D9잔)</th><td>2026-07-06</td><td>측정치 저장소 단일화(SPC측정값→검사측정치 흡수) + 수집채널매핑 마스터 신설 · SPC 관리도 통계=Analytics 이연</td><td>검사측정치·수집채널매핑</td><td>유효</td><td>D14 결정 11</td></tr>
@@ -3249,7 +3249,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th>결정 14 (E13)</th><td>2026-07-06</td><td>W/O 상태 전이 그래프 확정(8종 — '재시작' 상태 제거·전이 이벤트화) + 중단=구간 이력(P2) · 마감 시 미종료 홀드 강제 종료</td><td>W/O·작업홀드이력</td><td>유효</td><td>D14 결정 14</td></tr>
 </tbody></table>
 </figure>
-<h4>§7.2.3 기술 스택·배포 모델 ADR — 결정 15~19, 확정 2026-07-10 (5행 · 상세=본서 §2·§3)</h4>
+<h4>§7.2.3 기술 스택·배포 모델 ADR — 결정 15~20 (6행 · 확정 2026-07-10 + 2026-08-31 · 상세=본서 §2·§3)</h4>
 <figure class="table-wide">
 <table>
 <thead><tr><th class="nw">ID</th><th>확정일</th><th>결정 요지</th><th>영향</th><th>상태</th><th>원본</th></tr></thead>
@@ -3259,6 +3259,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th class="nw">결정 17</th><td>2026-07-10</td><td>오프라인 내성=광범위 적용 아님 — 최소 운영 한정 확정 시나리오 2건(생산 실행 선배포 / 자재 입·출고 단일 단말)</td><td>POP·모바일·API 계약</td><td><strong>확정</strong> — QA #32의 축소 구체화</td><td>TS §3 결정 17</td></tr>
 <tr><th class="nw">결정 18</th><td>2026-07-10</td><td>라벨 출력=서버 측 이미지 렌더링 인쇄 + 인쇄 기능 POP 앱 내장(별도 에이전트 불요) · 서버 폰트로 한/베 종결</td><td>라벨·POP</td><td><strong>확정</strong></td><td>TS §3 결정 18</td></tr>
 <tr><th class="nw">결정 19</th><td>2026-07-10</td><td>AI 1차 범위: AI Agent 전면 제외 — 거래명세서=온프레 OCR·출하지시=결정론적 엑셀 파서·RAG=포함 여지(미정) · WBS 트랙 AI 삭제</td><td>OCR·출하지시 import</td><td><strong>확정</strong> (잔여: OCR 엔진 선정·RAG 여부 → §8.4 #2·#3)</td><td>TS §3 결정 19</td></tr>
+<tr><th class="nw"><strong>결정 20</strong></th><td><strong>2026-08-31</strong></td><td>⭐ <strong>운영 통신·앱 배포 4건 확정</strong> — ① <strong>운영 서버 통신 = 평문(HTTP)</strong>, 사내망 전용 ② <strong>앱 배포 경로 = 사내 반입 설치</strong>(USB 반입 · 수동 적용 · 단말에 「알 수 없는 출처 설치」 허용 필요) ③ <strong>APK 서명 키 = 담당자 로컬 보관</strong> — 단 <strong>키스토어 사본·비밀번호를 조직이 접근 가능한 곳에 이중 보관</strong>한다(키가 끊기면 ④가 무너진다) ④ <strong>앱 갱신 = 덮어쓰기 보존형</strong> + <strong>「갱신 전 미전송 0건 확인」을 갱신 절차의 규칙으로 둔다</strong>(앱 제거·저장소 초기화는 운영체제 소관이라 화면이 막을 수 없다)</td><td>인프라 · 모바일 배포 · 단말 인증</td><td><strong>확정</strong> — 사용자 결정. ⚠ ①의 대가는 <strong>단말 토큰이 평문으로 흐른다</strong>는 것이고, 그 유일한 대응이 <strong>재발급 폐기(공유계약 F-4)</strong> 다. F-4 는 2026-08-30 되살렸고 저장 컬럼 실재도 확인됐다(<code>omf-mes-server#48</code>) — <strong>평문 결정은 F-4 가 살아 있는 것에 의존한다</strong></td><td><code>omf-mes#275</code> ④ · <code>omf-mes#279</code> ⓐⓑⓒ</td></tr>
 </tbody></table>
 </figure>
 <h4>§7.2.4 2026-06-26 결정 3건+파생 (5행)</h4>
