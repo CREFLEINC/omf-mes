@@ -512,7 +512,11 @@
      {
       "name": "itemId",
       "in": "query",
-      "schema": {"type": "integer", "format": "int64", "example": 1001},
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      },
       "description": "이 품목이 담긴 라인이 있는 작업지시만. ⭐ 긴급 직행 출하(W-04-05)가 고른 제품 LOT 의 품목으로 지시를 좁히는 축이다 — 이 축이 없으면 화면이 이번 쪽 안에서만 거를 수 있어 맞는 지시가 있는데도 안 보인다(공유계약 L-11). 근거: W-04-05 §5-7"
      },
      {
@@ -787,6 +791,16 @@
        "example": true
       },
       "description": "출하 잔여가 남은 작업지시만 — 라인 중 shippedQty < allocatedQty 인 것이 하나라도 있는 건. ⭐ 부분 출하 후 잔여도 다시 잡힌다(W-04-04 §5-7·§8-6)"
+     },
+     {
+      "name": "itemId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      },
+      "description": "이 품목이 담긴 라인이 있는 작업지시만. ⭐ 긴급 직행 출하(W-04-05)가 고른 제품 LOT 의 품목으로 지시를 좁히는 축이다 — 이 축이 없으면 화면이 이번 쪽 안에서만 거를 수 있어 맞는 지시가 있는데도 안 보인다(공유계약 L-11). 근거: W-04-05 §5-7"
      }
     ],
     "responses": {
@@ -2471,12 +2485,14 @@
       "example": "값"
      },
      "businessDate": {
-      "type": "string", "format": "date",
+      "type": "string",
+      "format": "date",
       "description": "영업일(발생일). 취소는 재고를 되돌리므로 원장을 지난다 — 유일 제약에 영업일이 들어 있다(공유계약 C-8 · W-04-12 §5-8).",
       "example": "2026-08-06"
      },
      "occurredAt": {
-      "type": "string", "format": "date-time",
+      "type": "string",
+      "format": "date-time",
       "description": "취소를 실행한 시각. 근거: 공유계약 C-1",
       "example": "2026-08-06T09:12:00+09:00"
      }
