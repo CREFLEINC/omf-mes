@@ -578,7 +578,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "description": "품질 상태로 거른다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED · 공유계약 G-32). ⛔ 목록은 서버가 갖는다 — 값을 화면에 박지 않는다(고객이 W-06-06 에서 바꾼다 · 공유계약 G-31 마스터안전형). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "inventoryStatusCode",
@@ -592,7 +593,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "description": "소유 구분으로 거른다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=OWNERSHIP_TYPE 로 받는다(공유계약 G-32 · omf-mes#198). ⛔ 목록은 서버가 갖는다 — 값을 화면에 박지 않는다(고객이 W-06-06 에서 바꾼다 · 공유계약 G-31 마스터안전형). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "includeZero",
@@ -10282,7 +10284,7 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "품질 상태. 정상 · 불량 · 검사 대기 · 폐기 네 가지다. ⚠ 값 집합은 확정이나 코드 문자열이 아직 정해지지 않아 enum 을 못 박지 않는다 — 서버가 내려주는 선택지를 그대로 쓴다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). 근거: 공유계약 G-32",
+      "description": "품질 상태. 정상 · 불량 · 검사 대기 · 폐기 네 가지다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). 근거: 공유계약 G-32",
       "example": "NORMAL",
       "x-internal-note": "값 집합 출처 = 회신 E-3 확정(정상·불량·검사 대기·폐기). E-3 는 이 축이 재고의 차원임을 확인했다 — uq_inventory_balance_dim 에 quality_status_code 가 들어 있어 같은 LOT 이 같은 위치에 있어도 품질 상태가 다르면 재고 행이 갈린다. ⚠ example 'RELEASED' 는 확정 4값 어디에도 없는 잠정값이었다 — 2026-08-29 교체 완료. 구 서술 「확정된 값 목록이 아직 없다(G-2)」는 오기였다."
      },
@@ -10308,9 +10310,9 @@
       "x-source-column": "ownership_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "소유 구분. 묶는 축과 무관하게 항상 채워진다. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=OWNERSHIP_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "소유 구분. 묶는 축과 무관하게 항상 채워진다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=OWNERSHIP_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⛔ 목록은 서버가 갖는다 — 값을 화면에 박지 않는다(고객이 W-06-06 에서 바꾼다 · 공유계약 G-31 마스터안전형). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "OWNED",
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "값 출처 = 공통코드 그룹 OWNERSHIP_TYPE(omf-mes#198 · G-31 마스터안전형). 구 서술 「값 집합이 데이터에 없다(#64 계열) · 공유계약 G-2 를 계약에도 적용한다」는 오기였다 — #198 이 그룹을 확정했다. ⚠ 시드 삽입은 omf-mes-server#45 에서 아직 확인되지 않았다."
      },
      "ownerPartnerId": {
       "x-source-column": "owner_partner_id",
@@ -11282,7 +11284,7 @@
       ],
       "maxLength": 50,
       "example": "NORMAL",
-      "description": "전이 전 품질 상태. 정상 · 불량 · 검사 대기 · 폐기 네 가지다. ⚠ 값 집합은 확정이나 코드 문자열이 아직 정해지지 않아 enum 을 못 박지 않는다 — 서버가 내려주는 선택지를 그대로 쓴다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). 근거: 공유계약 G-32",
+      "description": "전이 전 품질 상태. 정상 · 불량 · 검사 대기 · 폐기 네 가지다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). 근거: 공유계약 G-32",
       "x-internal-note": "값 집합 출처 = 회신 E-3 확정(정상·불량·검사 대기·폐기). E-3 는 이 축이 재고의 차원임을 확인했다 — uq_inventory_balance_dim 에 quality_status_code 가 들어 있어 같은 LOT 이 같은 위치에 있어도 품질 상태가 다르면 재고 행이 갈린다. ⚠ example 'RELEASED' 는 확정 4값 어디에도 없는 잠정값이었다 — 2026-08-29 교체 완료. 구 서술 「확정된 값 목록이 아직 없다(G-2)」는 오기였다."
      },
      "fromInventoryStatusCode": {
@@ -11329,7 +11331,7 @@
       ],
       "maxLength": 50,
       "example": "NORMAL",
-      "description": "전이 후 품질 상태. 정상 · 불량 · 검사 대기 · 폐기 네 가지다. ⚠ 값 집합은 확정이나 코드 문자열이 아직 정해지지 않아 enum 을 못 박지 않는다 — 서버가 내려주는 선택지를 그대로 쓴다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). 근거: 공유계약 G-32",
+      "description": "전이 후 품질 상태. 정상 · 불량 · 검사 대기 · 폐기 네 가지다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). 근거: 공유계약 G-32",
       "x-internal-note": "값 집합 출처 = 회신 E-3 확정(정상·불량·검사 대기·폐기). E-3 는 이 축이 재고의 차원임을 확인했다 — uq_inventory_balance_dim 에 quality_status_code 가 들어 있어 같은 LOT 이 같은 위치에 있어도 품질 상태가 다르면 재고 행이 갈린다. ⚠ example 'RELEASED' 는 확정 4값 어디에도 없는 잠정값이었다 — 2026-08-29 교체 완료. 구 서술 「확정된 값 목록이 아직 없다(G-2)」는 오기였다."
      },
      "toInventoryStatusCode": {

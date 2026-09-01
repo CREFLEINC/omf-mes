@@ -117,7 +117,7 @@ class Domain01Test(unittest.TestCase):
         # 119 — W-01-06 에 「자체 폐기 체크」·「폐기 거래처 선택」 2건 추가(DR-013) +
         #       P-01-01 「인쇄(등록 완료분)」 1건. ⚠ 118 은 2026-08-29 실측에서 이미 낡아
         #       있었다 — 이 수치는 verify-counts 등록부와 달리 아무도 감시하지 않는다.
-        self.assertEqual(len(rows), 119)
+        self.assertEqual(len(rows), 120)
 
     def test_모바일_POP_화면ID도_읽는다(self):
         rows = cov.extract_actions(self.M0104)

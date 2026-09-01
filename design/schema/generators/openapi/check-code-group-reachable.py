@@ -86,8 +86,8 @@ POINTER = re.compile(r"codeGroupCode=([A-Z][A-Z0-9_]*)")
 DOC_SCREEN = re.compile(r"^### 3-\d+\.[^\n`]*`([WMP]-(?:CO|\d{2})-\d{2})`", re.M)
 
 # 기준선 — 2026-09-01 실측. ⛔ 늘리지 않는다. 줄었으면 이 수를 낮춘다.
-BASELINE = 33
-BASELINE_SCREEN = 67
+BASELINE = 31
+BASELINE_SCREEN = 63
 
 
 def table_groups_from_doc(doc: dict) -> dict[str, set[str]]:
