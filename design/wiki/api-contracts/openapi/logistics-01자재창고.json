@@ -2115,16 +2115,27 @@
      "logistics"
     ],
     "summary": "물류 문서 진행현황",
-    "description": "문서 유형마다 테이블이 다른데 화면은 한 목록으로 본다 — 서버가 한 형태로 맞춰 내린다.\n\n⭐ successorCount·cancellable 을 서버가 판정해 내린다. 원천 참조가 다형이라(source_document_type_code + source_document_id) 유형↔테이블 규약이 아직 없는데, 프런트가 「입고 → 출고·이동·투입」 관계표를 하드코딩하면 유형이 늘 때마다 취소 판정이 조용히 틀린다(공유계약 A-10 보강).\n\n이 화면이 덮는 것은 8유형이다 — 발주·입하·입고·출고요청·피킹·이동요청·외주출고·외주입고(2026-08-30 되살림 — subcontract_issue/receipt 도 동형으로 status_code 를 둔다). 출하·생산품 입고는 다른 도메인이라 범위 밖이다. 근거: W-01-13 §5-2·§5-3·§5-6",
+    "description": "문서 유형마다 테이블이 다른데 화면은 한 목록으로 본다 — 서버가 한 형태로 맞춰 내린다.\n\n⭐ successorCount·cancellable 을 서버가 판정해 내린다. 원천 참조가 다형이라(source_document_type_code + source_document_id) 유형↔테이블 규약이 아직 없는데, 프런트가 「입고 → 출고·이동·투입」 관계표를 하드코딩하면 유형이 늘 때마다 취소 판정이 조용히 틀린다(공유계약 A-10 보강).\n\n이 화면이 덮는 것은 9종이다 — 발주·입하·입고·출고요청·피킹·이동요청·외주출고·외주입고(2026-08-30 되살림 — subcontract_issue/receipt 도 동형으로 status_code 를 둔다) + 출고(2026-09-02 — FR-IM-078 출고취소가 이 화면 소관이고, POST /logistics/goods-issues/{goodsIssueId}:request-cancel 이 후속 목록의 원천으로 이 경로를 지목한다). 셈 — 물류 12테이블 − 출하 2 = 10, 10 − 생산품 입고 1 = 9. 출하·생산품 입고는 다른 도메인이라 범위 밖이다. 근거: W-01-13 §5-2·§5-3·§5-6\n\n취소 실행 경로는 3종에만 있다 — INBOUND_RECEIPT 는 /logistics/inbound-receipts/{id}, GOODS_RECEIPT 는 /logistics/goods-receipts/{id}, GOODS_ISSUE 는 /logistics/goods-issues/{id} 의 :request-cancel · :cancel 을 쓴다. 그 밖 6종은 취소 경로가 없다. ⚠ 이 대응은 설명이라 생성 타입에 실리지 않는다 — 화면이 옮겨 적는 것은 한시적이고, 계약 필드로 내리는 안을 따로 세운다.",
     "parameters": [
      {
       "name": "documentTypeCode",
       "in": "query",
       "required": true,
       "schema": {
-       "type": "string"
+       "type": "string",
+       "enum": [
+        "PURCHASE_ORDER",
+        "INBOUND_RECEIPT",
+        "GOODS_RECEIPT",
+        "MATERIAL_ISSUE_REQUEST",
+        "PICKING_ORDER",
+        "STOCK_TRANSFER",
+        "SUBCONTRACT_ISSUE",
+        "SUBCONTRACT_RECEIPT",
+        "GOODS_ISSUE"
+       ]
       },
-      "description": "유형을 고르지 않으면 한 형태로 맞출 대상이 정해지지 않는다"
+      "description": "유형을 고르지 않으면 한 형태로 맞출 대상이 정해지지 않는다. ⛔ 공통코드 그룹으로 받지 않는다 — 값이 우리 계약의 리소스 이름이라 고객이 늘릴 수 있는 값이 아니다(공유계약 A-16 「가르는 물음 넷」 — 「가」 거짓 · 「라」 거짓 · 2026-09-02 판정). 선례는 같은 갈래에서 approval_type_code 8값을 enum 으로 닫은 omf-mes#336 이다. 새 대상이 생기면 화면이 문자열을 정하기 전에 이 목록에 등재한다. ⚠ 같은 이름의 다른 자리는 값 집합이 다르다 — 자리마다 닫는다."
      },
      {
       "name": "statusCode",
@@ -2254,8 +2265,20 @@
      "in": "path",
      "required": true,
      "schema": {
-      "type": "string"
-     }
+      "type": "string",
+      "enum": [
+       "PURCHASE_ORDER",
+       "INBOUND_RECEIPT",
+       "GOODS_RECEIPT",
+       "MATERIAL_ISSUE_REQUEST",
+       "PICKING_ORDER",
+       "STOCK_TRANSFER",
+       "SUBCONTRACT_ISSUE",
+       "SUBCONTRACT_RECEIPT",
+       "GOODS_ISSUE"
+      ]
+     },
+     "description": "이 화면이 다루는 물류 문서의 종류. ⛔ 공통코드 그룹으로 받지 않는다 — 값이 우리 계약의 리소스 이름이라 고객이 늘릴 수 있는 값이 아니다(공유계약 A-16 「가르는 물음 넷」 — 「가」 거짓 · 「라」 거짓 · 2026-09-02 판정). 선례는 같은 갈래에서 approval_type_code 8값을 enum 으로 닫은 omf-mes#336 이다. 새 대상이 생기면 화면이 문자열을 정하기 전에 이 목록에 등재한다. ⚠ 같은 이름의 다른 자리는 값 집합이 다르다 — 자리마다 닫는다."
     },
     {
      "name": "documentId",
@@ -7368,7 +7391,13 @@
     "properties": {
      "documentTypeCode": {
       "type": "string",
-      "example": "GOODS_RECEIPT"
+      "example": "GOODS_RECEIPT",
+      "enum": [
+       "INBOUND_RECEIPT",
+       "GOODS_RECEIPT",
+       "GOODS_ISSUE"
+      ],
+      "description": "취소를 실행한 문서의 종류. ⛔ 취소 실행 경로가 있는 3종뿐이다 — 입하·입고·출고. 조회 축(DocumentProgress)은 9종이라 값 집합이 다르다 — 자리마다 닫는다(공유계약 A-16 · omf-mes#336 선례)."
      },
      "documentId": {
       "type": "integer",
@@ -7444,8 +7473,19 @@
     "properties": {
      "documentTypeCode": {
       "type": "string",
-      "description": "입하·입고·출고·발주·피킹·이동요청. 값 목록은 공통코드 소관이다",
-      "example": "GOODS_RECEIPT"
+      "description": "이 화면이 다루는 물류 문서의 종류 — 발주·입하·입고·출고요청·피킹·이동요청·외주출고·외주입고·출고 9종. ⛔ 공통코드 그룹으로 받지 않는다 — 값이 우리 계약의 리소스 이름이라 고객이 늘릴 수 있는 값이 아니다(공유계약 A-16 「가르는 물음 넷」 — 「가」 거짓 · 「라」 거짓 · 2026-09-02 판정). 선례는 같은 갈래에서 approval_type_code 8값을 enum 으로 닫은 omf-mes#336 이다. 새 대상이 생기면 화면이 문자열을 정하기 전에 이 목록에 등재한다. ⚠ 같은 이름의 다른 자리는 값 집합이 다르다 — 자리마다 닫는다.",
+      "example": "GOODS_RECEIPT",
+      "enum": [
+       "PURCHASE_ORDER",
+       "INBOUND_RECEIPT",
+       "GOODS_RECEIPT",
+       "MATERIAL_ISSUE_REQUEST",
+       "PICKING_ORDER",
+       "STOCK_TRANSFER",
+       "SUBCONTRACT_ISSUE",
+       "SUBCONTRACT_RECEIPT",
+       "GOODS_ISSUE"
+      ]
      },
      "documentId": {
       "type": "integer",
