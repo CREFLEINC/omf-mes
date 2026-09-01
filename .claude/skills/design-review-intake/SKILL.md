@@ -151,27 +151,62 @@ Phase 6b(닫기)까지 커버한다** — Phase 5 이후 새 사실이 드러나
 `design-doc-writer`(sonnet)를 스폰해 승인된 `03_brief.md`를 실행시킨다. writer가 검사기
 빨간불로 되돌리면 Phase 3(analyst)으로 되돌아가 재판정한다 — writer가 스스로 고치지 않는다.
 
-검사기 호출(빠짐없이, 지시서가 건드린 파일 종류에 따라 해당분만):
+검사기 호출 — **표 전건이 정본이다.** 「지시서가 건드린 파일 종류」로 고르되, ⭐ 표가 실물보다
+적으면 안 돌린 것이 사고가 된다(2026-09-01 실측 — 표에 8건뿐이라 `verify-mapping-coverage` 를
+**6개 PR 에서 0회** 돌렸고 `#334` 가 초록으로 병합된 뒤 빨강이 됐다).
+
+**① 언제나 돌린다 — 무엇을 고쳤든**
+
 | 대상 | 명령 |
 |---|---|
 | 인용 경로 | `verify-doc-citations.py` |
 | 조항 인용 | `verify-contract-citation.py` |
-| 화면 액션 커버리지 | `verify-ui-coverage.py --domain <NN>` |
+| 박힌 수치 | `verify-counts.py` — 문서에 적은 「N건」이 실물과 같은가 |
 | 미결 정합 | `collect-open-items.py --check` |
-| 계약 구조 | `openapi/check-structure.py` |
-| 공개 안전 | `openapi/check-public-safe.py` |
-| enum 협착(★기준 명시 필수) | `openapi/check-enum-narrowing.py $(git merge-base origin/main HEAD)` — 인자 없이 돌리면 기본 `HEAD` 비교라 커밋 후 항상 초록 |
+| 죽은 경로 | `check-dead-path-citations.py` — 2026-08-25 구조 삭제 전 경로 인용 |
 | 생성 스냅숏 | `verify-generated-fresh.py [--kind md\|html] [--domain NN]` — 인자 없이 돌리면 두 축(요구목록 마크다운 9건 + HTML 배포본 9건)을 다 본다. ⛔ `--domain` 은 마크다운 축 개념이라 `--kind html` 과 함께 주지 않는다 |
 
-각 검사기가 "안 보는 것"은 `03_brief.md`에 명시한다(예: `check-enum-narrowing`은 필드 삭제·
-required 승격·경로 삭제·필수 헤더 신설·의미 변경을 못 잡는다 — 아래 등급표로 수동 보강).
+**② 화면 스펙·요구서를 고쳤으면**
+
+| 대상 | 명령 |
+|---|---|
+| 화면 액션 커버리지 | `verify-ui-coverage.py --domain <NN>` |
+| ⭐ 매핑 커버리지 | `verify-mapping-coverage.py` — 요구목록의 액션이 요구서 §3 에 다 있는가. **스펙과 요구서 중 한쪽만 고치면 여기서 터진다** |
+| 화면 정본 | `verify-screen-inventory.py` — 인벤토리와 통합 IA 가 같은 화면을 말하는가 |
+| 옛 표기 | `verify-stale-terms.py <기준ref>` — 표기를 바꿨을 때만. ⛔ 막지 않는다(항상 종료 0) |
+
+**③ 계약 JSON 을 고쳤으면** — `git diff --name-only -- design/wiki/api-contracts/openapi/` 가 비지 않으면 전건
+
+| 대상 | 명령 | 무엇을 막나 |
+|---|---|---|
+| 계약 구조 | `openapi/check-structure.py` | 계약으로 성립하는가 |
+| 공개 안전 | `openapi/check-public-safe.py` | 단가·내부 주소 유출 |
+| enum 협착 | `openapi/check-enum-narrowing.py $(git merge-base origin/main HEAD)` | 자유문자열→enum · 값 삭제. ⛔ 인자 없이 돌리면 기본 `HEAD` 비교라 커밋 후 항상 초록 |
+| ⭐ 필수 변경 | `openapi/check-required-change.py $(git merge-base origin/main HEAD)` | optional→required. **`check-enum-narrowing` 이 못 보는 파괴 변경** |
+| ⭐ 조회 표준형 | `openapi/check-query-envelope.py` | 목록·요약 응답이 §L 게이트를 지키는가. **목록에 질의를 더하고 `/summary` 짝을 안 고치면 여기서 터진다**(`L-1-1 ⑶`) |
+| ⭐ 코드그룹 이름 | `openapi/check-code-group-pointer.py` | 등록부에 없는 그룹 이름을 계약이 가리키면 화면이 **빈 목록**을 받는다 |
+| ⭐ 코드그룹 도달 | `openapi/check-code-group-reachable.py` | 계약엔 있는데 요구서 §3 에 없어 **화면이 부를 줄 모르는** 그룹(래칫 — 늘면 ⛔) |
+| 예시값 | `openapi/check-example-placeholder.py` | `example` 이 확정값 밖 — 구현팀이 그 값으로 만든다(`#191`) |
+| 저장 충돌 토큰 | `openapi/check-lock-token-source.py` | `If-Match` 를 쓰라면서 `ETag` 받을 곳이 없는 자리 |
+| 귀속 사번 | `openapi/check-worker-no.py` | 사번을 받을 곳이 계약에 있는가 |
+| 오프라인 표기 | `openapi/check-offline-consistency.py` | 계약의 오프라인 표기 ↔ 그 오퍼레이션을 부르는 화면의 판정 |
+
+⛔ **초록을 「내가 안 깼다」로 읽지 마라.** ①③ 중 몇은 **main 에서 이미 빨강·⚠**이다(예:
+`check-lock-token-source` ⚠ 2건 — 「자동으로 붙이지 마세요」가 붙은 의도된 보류). **고치기 전에
+먼저 돌려 기준선을 잡고**, 반영 뒤 값과 대조해 «내가 낸 것»만 가른다.
+
+각 검사기가 "안 보는 것"은 `03_brief.md`에 명시한다 — `check-enum-narrowing` 은 필드 삭제·
+경로 삭제·필수 헤더 신설·**의미 변경**을 못 잡는다(required 승격은 `check-required-change` 가
+따로 본다). ⭐ **의미 변경은 어느 검사기도 못 잡는다** — 자리 수도 글자 수도 그대로인 채 뜻만
+바뀌므로 등급표로 수동 보강한다.
 
 계약 JSON을 고쳤으면(`git diff --name-only -- design/wiki/api-contracts/openapi/`) 아래
 등급표 **전 행을 채운다**(빈칸 금지):
 
 | 계약 변경 | 등급 | 자동 검출 |
 |---|:-:|:-:|
-| 경로/오퍼레이션 삭제, 필드 삭제, optional→required, 필수 헤더 신설, 의미 변경 | ⛔ | 없음 — 수동 |
+| optional→required | ⛔ | `check-required-change.py` |
+| 경로/오퍼레이션 삭제, 필드 삭제, 필수 헤더 신설, **의미 변경** | ⛔ | 없음 — 수동 |
 | 자유문자열→enum, enum 값 삭제 | ⛔ | `check-enum-narrowing.py` |
 | 필드·경로 신설, enum 값 추가 | ⚠ | 없음 — 수동 |
 | description만 | ℹ | — |
