@@ -252,7 +252,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "스캔한 생산 LOT 값. shipmentId(납품라벨 스캔으로 정해진 출하)와 함께 주면 서버가 「이 출하의 배분에 이 LOT 이 있는가」를 판정한다 — 화면이 목록을 받아 비교하지 않는다(P-04-01 §5-1 · 공유계약 C-6)"
+      "description": "스캔한 생산 LOT 값. shipmentId(납품라벨 스캔으로 정해진 출하)와 함께 주면 서버가 「이 출하의 배분에 이 LOT 이 있는가」를 판정한다 — 화면이 목록을 받아 비교하지 않는다(P-04-01 §5-1 · 공유계약 C-6) ⭐ 이 shipmentId 는 첫 스캔(q) 응답의 ShipmentLotAllocation.shipmentId 에서 그대로 얻는다 — 화면이 출하를 다시 조회하지 않는다(omf-mes#330 A)."
      },
      {
       "name": "page",
@@ -2701,10 +2701,28 @@
       "format": "int64",
       "example": 1001
      },
+     "shipmentId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001,
+      "description": "이 배분이 속한 출하. ⛔ 없으면 P-04-01 의 둘째 스캔을 부를 수 없다 — 첫 스캔(q)이 주는 것은 shipmentLineId 까지인데 lotQ 판정은 «출하» 범위를 요구한다(같은 오퍼레이션의 lotQ 설명). 질의 축에는 있는데 응답에 없어 «거를 수는 있고 받을 수는 없던» 자리다 — 항상 내린다. 근거: P-04-01 §5-1 · omf-mes#330 A"
+     },
      "shipmentLineId": {
       "type": "integer",
       "format": "int64",
       "example": 1001
+     },
+     "itemId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001,
+      "description": "이 배분의 품목. shipment_line.item_id 를 그대로 내린다. ⛔ 없으면 포장 확정 본문(01 계약 HandlingUnitContentUpsert.itemId 필수)을 채울 수 없다 — 표시가 아니라 «쓰기»가 막힌다. 항상 내린다. 근거: P-04-01 §4-B·§5-6 · omf-mes#330 A"
+     },
+     "itemCode": {
+      "type": "string",
+      "maxLength": 50,
+      "example": "ABC-123",
+      "description": "화면에 그대로 그리는 품목 코드. ⛔ 화면이 itemId→코드 대응을 따로 조회하지 않는다 — 계약이 표시 문자열까지 내려 준다(공유계약 A-10 보강 · W-02-06 ProductionOrderChangedField.label 과 같은 형태). P-04-01 §3 포장 구성 표의 「품목」 열과 불일치 문구(「이 납품라벨은 FG-1002 용입니다」)가 이 값이다. ⚠ itemName 은 두지 않는다 — POP 1024×768 의 세로·가로 예산(E-1·E-2)에 이름 열이 들어갈 자리가 없다"
      },
      "lotId": {
       "type": "integer",
@@ -2723,6 +2741,12 @@
       "format": "int64",
       "description": "⚠ 비어도 된다 — 포장하지 않는 출하도 있다(P-04-01 §4-C)",
       "example": 1001
+     },
+     "warehouseId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001,
+      "description": "이 배분이 나가는 창고(shipment.warehouse_id). ⛔ 없으면 P-04-01 이 상위 포장 후보를 좁힐 수 없어 창고 전체가 후보가 된다 — 01 계약 GET /inventory/handling-units 의 warehouseId 질의에 넣는 값이다(새 질의 축을 만들지 않는다). 새로 만드는 취급 단위의 warehouseId 도 이 값이다. 근거: P-04-01 §5-2 · omf-mes#330 D"
      },
      "allocatedQty": {
       "type": "number",
@@ -2748,8 +2772,12 @@
     },
     "required": [
      "shipmentLotAllocationId",
+     "shipmentId",
      "shipmentLineId",
+     "itemId",
+     "itemCode",
      "lotId",
+     "warehouseId",
      "allocatedQty",
      "uomId",
      "packedQty",
