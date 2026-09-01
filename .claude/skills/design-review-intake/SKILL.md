@@ -173,7 +173,7 @@ Phase 6b(닫기)까지 커버한다** — Phase 5 이후 새 사실이 드러나
 | 화면 액션 커버리지 | `verify-ui-coverage.py --domain <NN>` |
 | ⭐ 매핑 커버리지 | `verify-mapping-coverage.py` — 요구목록의 액션이 요구서 §3 에 다 있는가. **스펙과 요구서 중 한쪽만 고치면 여기서 터진다** |
 | 화면 정본 | `verify-screen-inventory.py` — 인벤토리와 통합 IA 가 같은 화면을 말하는가 |
-| 옛 표기 | `verify-stale-terms.py <기준ref>` — 표기를 바꿨을 때만. ⛔ 막지 않는다(항상 종료 0) |
+| 옛 표기 | `verify-stale-terms.py <기준ref>` — 표기를 바꿨을 때만. ⛔ 막지 않는다(항상 종료 0). ⛔ 인자 없이 돌리면 기본 `HEAD` 비교라 「대조한 파일 0」로 공허하게 초록이다 |
 
 **③ 계약 JSON 을 고쳤으면** — `git diff --name-only -- design/wiki/api-contracts/openapi/` 가 비지 않으면 전건
 
@@ -182,18 +182,25 @@ Phase 6b(닫기)까지 커버한다** — Phase 5 이후 새 사실이 드러나
 | 계약 구조 | `openapi/check-structure.py` | 계약으로 성립하는가 |
 | 공개 안전 | `openapi/check-public-safe.py` | 단가·내부 주소 유출 |
 | enum 협착 | `openapi/check-enum-narrowing.py $(git merge-base origin/main HEAD)` | 자유문자열→enum · 값 삭제. ⛔ 인자 없이 돌리면 기본 `HEAD` 비교라 커밋 후 항상 초록 |
-| ⭐ 필수 변경 | `openapi/check-required-change.py $(git merge-base origin/main HEAD)` | optional→required. **`check-enum-narrowing` 이 못 보는 파괴 변경** |
+| ⭐ 필수 변경 | `openapi/check-required-change.py $(git merge-base origin/main HEAD)` | optional→required. **`check-enum-narrowing` 이 못 보는 파괴 변경**. ⛔ 인자 없이 돌리면 기본 `HEAD` 비교라 커밋 후 항상 초록 |
 | ⭐ 조회 표준형 | `openapi/check-query-envelope.py` | 목록·요약 응답이 §L 게이트를 지키는가. **목록에 질의를 더하고 `/summary` 짝을 안 고치면 여기서 터진다**(`L-1-1 ⑶`) |
 | ⭐ 코드그룹 이름 | `openapi/check-code-group-pointer.py` | 등록부에 없는 그룹 이름을 계약이 가리키면 화면이 **빈 목록**을 받는다 |
 | ⭐ 코드그룹 도달 | `openapi/check-code-group-reachable.py` | 계약엔 있는데 요구서 §3 에 없어 **화면이 부를 줄 모르는** 그룹(래칫 — 늘면 ⛔) |
-| 예시값 | `openapi/check-example-placeholder.py` | `example` 이 확정값 밖 — 구현팀이 그 값으로 만든다(`#191`) |
+| 예시값 | `openapi/check-example-placeholder.py` | `example` 이 확정값 밖 — 구현팀이 그 값으로 만든다(`#191`). ⛔ 아직 **막지 않는다**(종료 0) — `#191` 반영이 끝나 0건이 되면 게이트로 올린다 |
 | 저장 충돌 토큰 | `openapi/check-lock-token-source.py` | `If-Match` 를 쓰라면서 `ETag` 받을 곳이 없는 자리 |
 | 귀속 사번 | `openapi/check-worker-no.py` | 사번을 받을 곳이 계약에 있는가 |
 | 오프라인 표기 | `openapi/check-offline-consistency.py` | 계약의 오프라인 표기 ↔ 그 오퍼레이션을 부르는 화면의 판정 |
 
-⛔ **초록을 「내가 안 깼다」로 읽지 마라.** ①③ 중 몇은 **main 에서 이미 빨강·⚠**이다(예:
-`check-lock-token-source` ⚠ 2건 — 「자동으로 붙이지 마세요」가 붙은 의도된 보류). **고치기 전에
-먼저 돌려 기준선을 잡고**, 반영 뒤 값과 대조해 «내가 낸 것»만 가른다.
+⛔ **초록을 「내가 안 깼다」로, 빨강을 「내가 깼다」로 읽지 마라.** ③ 중 둘은 **손대기 전부터
+비초록**이다. ⭐ **고치기 전에 먼저 돌려 기준선을 잡고**, 반영 뒤 값과 대조해 «내가 낸 것»만 가른다.
+
+| 검사기 | 2026-09-01 `4c4b67e` 기준선 | 성격 |
+| --- | --- | --- |
+| `check-lock-token-source` | ⚠ 2건 · 종료 1 | 의도된 보류 — 「⛔ 자동으로 붙이지 마세요, 원천이 부모 자원인가 자식 집합인가는 판단이다」 |
+| `check-worker-no` | ⛔ 1건 ＋ ⚠ 3건 · 종료 1 | 미해소 부채 — `POST /logistics/stock-transfers` 선언=`WorkerNoOptional`→`WorkerNo` |
+
+⚠ 이 표는 **떠 있는 값이다.** 기준선이 바뀌면 여기 날짜와 커밋을 함께 갱신한다 — 갱신을 잊은
+표는 「내가 깼나」를 다시 못 가리게 만든다.
 
 각 검사기가 "안 보는 것"은 `03_brief.md`에 명시한다 — `check-enum-narrowing` 은 필드 삭제·
 경로 삭제·필수 헤더 신설·**의미 변경**을 못 잡는다(required 승격은 `check-required-change` 가
