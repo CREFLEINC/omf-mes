@@ -5910,7 +5910,7 @@
       "$ref": "#/components/parameters/IfMatchVersionOptional"
      },
      {
-      "$ref": "#/components/parameters/WorkerNoOptional"
+      "$ref": "#/components/parameters/WorkerNo"
      }
     ],
     "requestBody": {
@@ -5974,7 +5974,7 @@
       }
      }
     },
-    "x-internal-note": "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 도출 단계의 :depart 를 두지 않는다 — 화면에 「반출 스캔」 버튼 하나뿐이고, 생성과 반출을 나누면 오프라인 큐에 반출 전 상태가 남는다. ⚠ 이 오퍼레이션은 M-01-10(모바일)과 W-04-11(관리웹) 두 셸이 부른다 — 그래서 WorkerNoOptional 이다(#178)."
+    "x-internal-note": "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 도출 단계의 :depart 를 두지 않는다 — 화면에 「반출 스캔」 버튼 하나뿐이고, 생성과 반출을 나누면 오프라인 큐에 반출 전 상태가 남는다. ⛔ 귀속 사번은 «필수»다 — 부르는 셸이 모바일 하나뿐이다(M-01-10 §5-6). «(정합주: 2026-09-01 이전에는 W-04-11 재고 재등록(관리웹)도 이 경로를 불렀고, 그래서 WorkerNoOptional 이었다(#178). omf-mes#304 가 재등록 확정을 POST /logistics/stock-reinstatements 한 호출로 옮기면서 관리웹 호출자가 사라졌다 — 완화의 근거가 그때 소멸했는데 선언이 안 따라왔다. omf-mes#350)» ⚠ 런타임 동작은 안 바뀐다 — WorkerNoOptional 도 「단말 토큰으로 온 요청에 이 헤더가 없으면 서버가 거부한다」였다. 계약이 서버가 하는 일을 그대로 말하게 된 것이다."
    }
   },
   "/logistics/stock-transfers/{stockTransferId}": {
