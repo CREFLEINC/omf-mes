@@ -93,7 +93,7 @@ WBS §4.2 **P0.4**가 「API 계약 v0 + 목업 서버」로 이미 계획돼 �
 cd deliverables
 
 # ① UI 요구 목록 재생성 — 화면 스펙 §5-1에서 액션을 전건 추출한다
-python3 verify-ui-coverage.py          # → 화면 11 · 액션 80
+python3 verify-ui-coverage.py          # → 화면 14 · 액션 100
 python3 test-verify-ui-coverage.py     # 회귀 테스트 8건
 
 # ② OpenAPI 문법·규모
@@ -101,13 +101,13 @@ python3 -c "import json,io; d=json.load(io.open('openapi/mdm-기준정보.json',
 print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['paths'])))"
 ```
 
-**대조 규칙**: `openapi/ui-요구목록.md`의 액션 **71건**이 §3 매핑표에 하나도 빠짐없이 있어야 한다. 엔드포인트가 없는 액션도 **「없음 + 이유」로 한 행을 차지**하며, 그것을 다룬 것으로 친다. **빈칸은 누락이다.**
+**대조 규칙**: `openapi/ui-요구목록.md`의 액션 **100건**이 §3 매핑표에 하나도 빠짐없이 있어야 한다. 엔드포인트가 없는 액션도 **「없음 + 이유」로 한 행을 차지**하며, 그것을 다룬 것으로 친다. **빈칸은 누락이다.**
 
 ---
 
 ## §3. 화면 → API 매핑
 
-`openapi/ui-요구목록.md`의 **화면 11 · 액션 80**을 전건 소화한다. 액션 이름과 활성 조건은 화면 스펙 §5-1 원문 그대로다.
+`openapi/ui-요구목록.md`의 **화면 14 · 액션 100**을 전건 소화한다. 액션 이름과 활성 조건은 화면 스펙 §5-1 원문 그대로다.
 
 ### 3-0. 「없음」의 다섯 가지 — 이유가 다르면 대응이 다르다
 
@@ -251,6 +251,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 화면 액션(§5-1) | 엔드포인트 | 근거 |
 | --- | --- | --- |
 | 조회 | `GET /integration/messages` — `createdFrom`·`createdTo` **필수**(로그성 조회 공통 규약) | §4-A·§5-1 |
+| **선택지(인터페이스)** | `GET /integration/interface-definitions` — 인터페이스 코드 필터를 채운다. ⭐ **공통코드가 아니라 자원 목록이다** — 값이 고객이 만드는 연계 정의라 열거할 수 없다. ⚠ 방향(`directionCode`)은 계약이 `enum` 두 값(`INBOUND`·`OUTBOUND`)으로 닫았으니 이 조회가 필요 없다 | §5-1 · §8-1 해소 |
 | 상세 보기 | `GET /integration/messages/{id}` → `IntegrationMessageDetail`(payload 전문) | §4-C |
 | 재처리(단건) | `POST /integration/messages/{id}:retry` — 리스 충돌은 409 `conflictCause=workerLease` | §5-1·§5-4 · B-1·C-4 |
 | 재처리(선택 일괄) | `POST /integration/messages:retry-batch` → `BatchResult` — **부분 실패 허용, 전체 롤백 없음** | §5-1 · C-2 |
@@ -370,8 +371,8 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 무엇 | 값 | 명령 |
 | --- | :-: | --- |
 | **화면** | **14** | `python3 design/schema/generators/verify-ui-coverage.py` |
-| **액션**(화면 스펙에서 실측) | **99** | 동상 |
-| **§3 매핑 행** | **108** | 아래 주 |
+| **액션**(화면 스펙에서 실측) | **100** | 동상 |
+| **§3 매핑 행** | **109** | 아래 주 (2026-09-02 `W-06-10` 선택지 행 +1) |
 | **「없음 + 이유」로 명시한 행** | **22** | 동상 |
 | **전건 대조** | ✅ 통과 | `python3 design/schema/generators/verify-mapping-coverage.py` |
 
