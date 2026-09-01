@@ -76,6 +76,12 @@ REQUIRED_SECTIONS = [
     '6. 특별히 조심할 것',
 ]
 
+# 「엔드포인트 존재」 체크는 목록이 없으면 검증할 수 없는 주장이다.
+# 실측(2026-09-01) — 열린 착수 통지 50건 중 경로를 적은 것 10건, 요구서가 지정한 호출
+# 229개 중 208개(90%)가 본문에 흔적 없음. 그 결손이 `P-02-01`·`P-02-03`·`P-02-04`·
+# `P-02-06`·`P-02-11` 다섯 화면에서 단말 게이팅 호출 누락으로 드러났다.
+ENDPOINT = re.compile(r'\b(?:GET|POST|PUT|PATCH|DELETE)\s+/\S')
+
 PATTERNS = [
     '마스터 형',
     '버전 마스터 형',
@@ -383,6 +389,17 @@ def check_structure(text, secs):
                               'omf-mes#번호를 적으면 나중에 무엇이 풀렸는지 따라갈 수 있다'))
 
     settled = body('3.')
+
+    # 「엔드포인트 존재 — 모두 있다」에 체크했으면 그 「모두」가 무엇인지 적는다.
+    # 프론트는 계약 정본(비공개 저장소)을 볼 수 없고 생성 타입에는 전 경로가 들어 있어,
+    # 「이 화면 몫이 어느 것인가」는 이 통지 말고 알 길이 없다.
+    # ⚠ `- [X]` 도 GitHub 은 체크로 렌더한다. 대소문자를 가리면 게이트가 «조용히» 열린다.
+    if any(l.strip().lower().startswith('- [x]') and '엔드포인트' in l
+           for l in settled.splitlines()) and not ENDPOINT.search(settled):
+        errs.append(('엔드포인트 목록 없음', '「모두 있다」만 있고 무엇인지 없다',
+                     '체크 밑에 이 화면이 부르는 경로를 적는다 '
+                     '(예: `POST /production/work-sessions   작업 시작`)'))
+
     unchecked = [l for l in settled.splitlines() if l.strip().startswith('- [ ]')]
     if unchecked and open_items.strip() == '없음':
         errs.append(('3번 ↔ 4번 모순', '체크 안 한 항목 %d 개' % len(unchecked),
