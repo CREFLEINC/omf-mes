@@ -18,9 +18,9 @@ G-32 의 「그룹 이름 짓는 규칙」은 이름을 *짓는* 법이고, 이 
 
 무엇을 보나
 -----------
-① ⛔ **`codeGroupCode=<이름>` 포인터가 등록부 밖**인 자리 — 스키마 설명 · 프로퍼티
-   설명 · 오퍼레이션 설명 · 파라미터 설명 · 응답 설명 **전부**를 본다
-   (2026-09-01 확장 — 프로퍼티만 보다가 `JUDGMENT_TYPE` 을 놓쳤다).
+① ⛔ **`codeGroupCode=<이름>` 포인터가 등록부 밖**인 자리 — 문서 안의 모든
+   `description` 을 본다(자리를 열거하지 않고 훑는다).
+   2026-09-01 확장 — 프로퍼티만 보다가 `JUDGMENT_TYPE` 을 놓쳤다.
    전건 출력하고 종료 코드 1 을 낸다.
 ② ⚠ `enum` 도 `codeGroupCode=` 포인터도 `x-no-example` 도 없는 `*Code` 자리.
    **개수와 상위 파일만** 찍고 종료 코드를 바꾸지 않는다.
@@ -35,7 +35,8 @@ G-32 의 「그룹 이름 짓는 규칙」은 이름을 *짓는* 법이고, 이 
 ⚠ 이 검사기가 못 보는 것
 ------------------------
   - 등록부에 «있는» 이름을 «틀린 자리»에 쓴 것 — 이름이 맞으면 통과한다
-  - `description` 밖(예시·`x-` 확장·본문 산문)에 적힌 그룹 이름 — 포인터 형태만 본다
+  - `description` **밖**(예시·`x-` 확장·본문 산문)에 적힌 그룹 이름 — `description`
+    키만 보고, 그 안에서도 포인터 형태만 본다
   - 그룹에 실제로 «값이 들어 있는가» — 계약이 답할 수 있는 물음이 아니다
 
 쓰기
@@ -88,40 +89,34 @@ def schemas(doc: dict):
                 yield name, field, prop
 
 
-def descriptions(doc):
-    """`codeGroupCode=` 포인터가 적힐 수 «있는» 자리를 전건 낸다 — (자리 이름, 설명).
+def descriptions(doc: dict) -> "Iterator[tuple[str, str]]":
+    """`description` 이 적힌 자리를 **전건** 낸다 — (자리 이름, 설명).
 
-    ⛔ **프로퍼티 설명만 보면 놓친다.** 2026-09-01 실측에서 `JUDGMENT_TYPE` 이
-    «스키마» 설명과 «오퍼레이션» 설명에만 적혀 있어 이 검사기를 그대로 통과했다.
-    등록부 밖 이름이었는데도 초록이었다 — 검사기가 초록이라는 사실이 근거로
-    쓰이던 자리라 그 구멍이 그대로 신뢰가 됐다.
+    ⛔ **자리를 «열거»하지 않는다 — 문서를 훑는다.**
+    처음에는 스키마·프로퍼티·오퍼레이션·파라미터·응답 다섯을 손으로 적었는데,
+    그러면 적지 않은 자리가 그대로 구멍이 된다. 실측(2026-09-01)으로
+    `components/parameters` **27자리** · `requestBody` 인라인 스키마 **24자리** 가
+    그 밖에 있었다. 지금은 그 자리에 포인터가 없지만, 「지금 없다」와
+    「앞으로도 안 생긴다」는 다르다.
+
+    ⛔ 이 검사기가 놓쳤던 사고가 정확히 그 형태다 — `JUDGMENT_TYPE` 이 «스키마»
+    설명과 «오퍼레이션» 설명에만 있어 프로퍼티만 보던 검사기를 그대로 통과했다.
+    등록부 밖 이름이었는데도 초록이었고, 그 초록이 근거로 쓰이고 있었다.
+
+    ⚠ 그래서 `x-` 확장·예시·산문은 여전히 못 본다 — `description` 키만 본다.
     """
-    for name, schema in (doc.get("components", {}).get("schemas") or {}).items():
-        if not isinstance(schema, dict):
-            continue
-        yield "스키마 %s" % name, schema.get("description") or ""
-        for field, prop in (schema.get("properties") or {}).items():
-            if isinstance(prop, dict):
-                yield "%s.%s" % (name, field), prop.get("description") or ""
-    for path, ops in (doc.get("paths") or {}).items():
-        if not isinstance(ops, dict):
-            continue
-        for method, op in ops.items():
-            if method == "parameters":
-                for pr in op or []:
-                    if isinstance(pr, dict):
-                        yield "%s?%s" % (path, pr.get("name")), pr.get("description") or ""
-                continue
-            if not isinstance(op, dict):
-                continue
-            head = "%s %s" % (method.upper(), path)
-            yield head, op.get("description") or ""
-            for pr in op.get("parameters") or []:
-                if isinstance(pr, dict):
-                    yield "%s?%s" % (head, pr.get("name")), pr.get("description") or ""
-            for code, resp in (op.get("responses") or {}).items():
-                if isinstance(resp, dict):
-                    yield "%s → %s" % (head, code), resp.get("description") or ""
+    def walk(node, path: str):
+        if isinstance(node, dict):
+            for key, value in node.items():
+                if key == "description" and isinstance(value, str):
+                    yield path or "(문서)", value
+                else:
+                    yield from walk(value, "%s/%s" % (path, key))
+        elif isinstance(node, list):
+            for idx, value in enumerate(node):
+                yield from walk(value, "%s[%d]" % (path, idx))
+
+    yield from walk(doc, "")
 
 
 def main() -> int:

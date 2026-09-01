@@ -3,6 +3,9 @@
 # check-code-group-pointer.py 의 단위 테스트. 표준 라이브러리만 쓴다(저장소 관행).
 #
 # ⛔ 이 파일이 잠그는 사고는 하나다 — **검사기가 초록인데 구멍이 있었다.**
+# 두 번 났다: ① 프로퍼티 설명만 보다가 JUDGMENT_TYPE 을 놓쳤고, ② 그 고침이
+# 「자리 다섯」을 손으로 열거해 components/parameters·requestBody 를 또 빠뜨렸다.
+# 지금은 자리를 «열거하지 않고» 문서를 훑는다 — 그래서 깊이·구조에 상한이 없다.
 # 2026-09-01 실측에서 `JUDGMENT_TYPE`(등록부 밖 이름)이 «스키마» 설명과
 # «오퍼레이션» 설명에만 적혀 있어 그대로 통과했다. 그때 이 검사기의 초록이
 # 「계약이 가리킨 이름은 전부 등록부 안」의 근거로 쓰이고 있었으므로,
@@ -55,6 +58,29 @@ class 자리마다_찾는다(unittest.TestCase):
         d = {"paths": {"/x": {"post": {"responses": {
             "400": {"description": P % "VARIANCE_REASON"}}}}}}
         self.assertEqual(found(d), {"VARIANCE_REASON"})
+
+    # ⛔ 아래 셋은 «자리를 열거하던» 판이 못 보던 자리다(2026-09-01 리뷰).
+    #    실측으로 components/parameters 27자리 · requestBody 인라인 스키마 24자리가 있었다.
+    def test_components_parameters(self):
+        d = {"components": {"parameters": {"ReasonCode": {
+            "name": "reasonCode", "in": "query", "description": P % "DOWNTIME_REASON"}}}}
+        self.assertEqual(found(d), {"DOWNTIME_REASON"})
+
+    def test_requestBody_인라인_스키마_프로퍼티(self):
+        d = {"paths": {"/x": {"put": {"requestBody": {"content": {"application/json": {
+            "schema": {"type": "object", "properties": {
+                "reasonCode": {"description": P % "GOODS_ISSUE_REASON"}}}}}}}}}}
+        self.assertEqual(found(d), {"GOODS_ISSUE_REASON"})
+
+    def test_components_responses(self):
+        d = {"components": {"responses": {
+            "Conflict": {"description": P % "LOT_HOLD_RELEASE_REASON"}}}}
+        self.assertEqual(found(d), {"LOT_HOLD_RELEASE_REASON"})
+
+    def test_아무리_깊어도_찾는다(self):
+        # 자리를 열거하지 않고 훑으므로 깊이에 상한이 없다.
+        d = {"a": {"b": {"c": [{"d": {"description": P % "PICKING_TYPE"}}]}}}
+        self.assertEqual(found(d), {"PICKING_TYPE"})
 
 
 class 등록부_대조(unittest.TestCase):
