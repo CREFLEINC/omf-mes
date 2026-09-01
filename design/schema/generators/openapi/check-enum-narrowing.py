@@ -44,8 +44,8 @@
 
 쓰기
 ----
-    python3 deliverables/openapi/check-enum-narrowing.py            # HEAD 대비
-    python3 deliverables/openapi/check-enum-narrowing.py <기준 커밋>
+    python3 design/schema/generators/openapi/check-enum-narrowing.py            # HEAD 대비
+    python3 design/schema/generators/openapi/check-enum-narrowing.py <기준 커밋>
 """
 from __future__ import annotations
 
