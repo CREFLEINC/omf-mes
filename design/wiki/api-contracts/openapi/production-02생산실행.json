@@ -5282,7 +5282,7 @@
       "description": "무엇이 몇에서 몇으로 바뀌었나. 서버가 «수량 → 납기 → 상태» 고정 순으로 낸다 — 화면이 정렬하지 않는다. ⛔ 빈 배열일 수 있다 — 열거한 세 항목 «밖»이 바뀐 경우다. 그때 화면은 그 사실을 그대로 말하고 항목을 지어내지 않는다(공유계약 G-9)"
      }
     },
-    "x-internal-note": "저장 자리가 물리 모델에 없다 — P/O 행을 덮어쓰므로 이전 값이 남지 않는다. 데이터 모델 담당에게 통지했다(omf-mes-server#<이슈①> · 기다리지 않는다 · data-model-boundary.md). 근거: omf-mes#305"
+    "x-internal-note": "저장 자리가 물리 모델에 없다 — P/O 행을 덮어쓰므로 이전 값이 남지 않는다. 데이터 모델 담당에게 통지했다(omf-mes-server#73 · 기다리지 않는다 · data-model-boundary.md). 근거: omf-mes#305"
    },
    "ProductionOrderChangedField": {
     "type": "object",
