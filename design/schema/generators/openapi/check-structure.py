@@ -147,6 +147,13 @@ def check_schemas(spec: dict, used: set) -> list:
             if '$ref' in definition or definition.get('type') == 'array':
                 continue
             if 'example' in definition or 'x-no-example' in definition:
+                # ⭐ example 이 «자기 enum» 밖이면 모순이다 — 구현팀이 그 값으로 만든다(omf-mes#191).
+                #    값 목록을 «좁힐» 때 example 을 같이 안 고치면 여기서 걸린다.
+                enum = definition.get('enum')
+                example = definition.get('example')
+                if enum and example is not None and example not in enum:
+                    errors.append('example 이 enum 밖 — %s.%s = %r (허용 %s)'
+                                  % (name, field, example, enum))
                 continue
             errors.append('example 없음 — %s.%s' % (name, field))
 
