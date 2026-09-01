@@ -2177,9 +2177,17 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 <tr><th class="nw"><strong>미착지</strong></th><td>물리 모델에 근거가 없어 지금 만들면 <strong>지어내는 것</strong>이 된다</td><td><strong>이슈 해소</strong>(번호 필수)</td></tr>
 <tr><th class="nw"><strong>선행 미결</strong></th><td>화면 스펙 자신이 정책·자료를 미결로 남겼다</td><td>해당 화면 §8 미결 결정</td></tr>
 <tr><th class="nw"><strong>소관 이동</strong></th><td>엔드포인트는 이 스펙 안에 있고 <strong>다른 화면이 실행을 소유</strong>한다(중복 구현 금지)</td><td>— 정상</td></tr>
-<tr><th class="nw"><strong>API 불필요</strong></th><td>화면 안에서 끝난다(로컬 취소·이미 받은 데이터 펼침 등)</td><td>— 정상</td></tr>
+<tr><th class="nw"><strong>API 불필요</strong></th><td>화면 안에서 끝난다 — 로컬 취소 · 이미 받은 자료 펼침 · <strong>사용자가 손으로 치는</strong> 입력. ⛔ <strong>선택칸의 «값 목록»은 여기 들지 않는다</strong>(2026-09-01 정정)</td><td>— 정상</td></tr>
 </tbody></table>
 <p>집계는 §3-11에 둔다.</p>
+<p>⛔ <strong>선택칸의 «값 목록»은 API 호출이다 — 2026-09-01 정정.</strong> 공통코드에서 오는 선택지는 <code>GET /mdm/code-values?codeGroupCode=…</code> 로 받는다. 그것을 「API 불필요」로 적거나 아예 적지 않으면 프론트는 그 호출을 만들지 않고, 화면은 오류 없이 <strong>빈 선택칸</strong>으로 선다 — 실측으로 <strong>8화면</strong>이 그 상태였다(2026-09-01). §1-3 이 이미 「그 화면들이 <strong>선택 목록으로 필요로 하는 조회 전용</strong>」을 범위에 넣어 두었는데 §3 표가 그것을 어긴 자리다.</p>
+<p><strong>판별은 하나다 — 그 칸의 값이 «어디서 오는가».</strong></p>
+<table>
+<thead><tr><th>값의 출처</th><th>§3 표기</th></tr></thead>
+<tbody>
+<tr><th>사용자가 손으로 친다 · 앞 화면이 넘겨준다 · 스캔이 채운다</th><td><strong>API 불필요</strong></td></tr>
+<tr><th><strong>공통코드 마스터</strong> · 다른 자원의 목록</th><td>⭐ <strong>그 조회 경로를 «행으로» 적는다</strong></td></tr>
+</tbody></table>
 <h3>3-1. <code>W-CO-02</code> 사용자·역할·권한 관리</h3>
 <table>
 <thead><tr><th>화면 액션(§5-1)</th><th>엔드포인트</th><th>근거</th></tr></thead>
@@ -2189,7 +2197,8 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 <tr><th>사용 중지 / 다시 사용</th><td><code>POST /app/users/{id}:deactivate</code> · <code>:activate</code> · <code>POST /app/roles/{id}:deactivate</code> · <code>:activate</code> — ⚠ 역할 쪽은 상세 응답의 <code>assignedUserCount</code> 로 확인 다이얼로그를 만든다(§6)</td><td>§5-1 · B-4</td></tr>
 <tr><th>역할 체크·해제</th><td><code>PUT /app/users/{id}/roles</code> — 전체 치환</td><td>§4-C · B-6</td></tr>
 <tr><th>접근범위 추가 / ⊖</th><td><code>PUT /app/users/{id}/data-scopes</code> — 전체 치환</td><td>§4-D · B-6 · A-7</td></tr>
-<tr><th>기능 권한 체크·해제</th><td><code>PUT /app/roles/{id}/permissions</code> — <strong>엔드포인트는 있으나 화면이 비활성</strong>(<code>permission_code</code> 값 목록이 회신 <strong>E-9</strong> 대기)</td><td>§4-E · G-2·G-6</td></tr>
+<tr><th>⭐ <strong>기능 권한 «후보 목록»</strong></th><td><strong><code>GET /app/permissions</code></strong> — 격자의 «열»이다(<strong>2026-09-01 신설</strong>). ⛔ 이것이 없어 화면은 「이미 부여된 것」만 알아 <strong>권한을 새로 줄 수 없었다</strong> — 프론트가 격자를 보기 전용으로 닫은 이유다(<code>client#17</code>)</td><td>§4-E · <code>W-CO-02</code> §8-7</td></tr>
+<tr><th>기능 권한 체크·해제</th><td><code>PUT /app/roles/{id}/permissions</code> — 전체 치환. ✅ <strong>화면을 연다</strong>(2026-09-01) — 회신 <strong>E-9 를 기다리지 않는다</strong>: 권한은 앱 기능 목록이라 고객이 정할 성질이 아니다(<code>G-31</code>). ⛔ 400 <code>LAST_ADMIN</code> — 관리 권한 보유자가 0이 되는 치환은 막힌다</td><td>§4-E · B-6</td></tr>
 <tr><th>변경 이력</th><td><code>GET /audit/events?targetTypeCode=…&amp;targetId=…</code> — 리소스별 <code>/history</code>는 <strong>없다</strong>(#68)</td><td>§5-1 · B-5</td></tr>
 <tr><th>비밀번호 초기화</th><td><code>POST /app/users/{appUserId}:reset-password</code> — 임시 비밀번호를 생성해 <strong>한 번만</strong> 응답에 싣는다</td><td>§5-1·§8-2 · DR-002 2-B ③ — 2026-08-30 되살림</td></tr>
 </tbody></table>
@@ -2217,6 +2226,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 <tr><th>신규 버전</th><td><code>POST /quality/inspection-plan-versions</code>(버전 0건) <strong>또는</strong> <code>POST …/{id}:new-revision</code>(최신=확정)</td><td>§5-1 · B-7</td></tr>
 <tr><th>저장 / 취소</th><td><code>PUT /quality/inspection-plans/{id}</code>(헤더) · <code>PUT /quality/inspection-plan-versions/{id}</code>(버전) — 바뀐 쪽만</td><td>§4-A·§4-B · B-1</td></tr>
 <tr><th>항목 추가·삭제·순서 이동</th><td><code>PUT /quality/inspection-plan-versions/{id}/items</code> — 전체 치환</td><td>§4-C · A-5</td></tr>
+<tr><th>⭐ <strong>항목 자료형·검사 방법·샘플링 방법·검사 주기 선택지</strong></th><td><strong><code>GET /mdm/code-values?codeGroupCode=INSPECTION_ITEM_SPEC_DATA_TYPE</code></strong> · <strong><code>GET /mdm/code-values?codeGroupCode=INSPECTION_ITEM_SPEC_METHOD</code></strong> · <strong><code>GET /mdm/code-values?codeGroupCode=INSPECTION_SAMPLING_METHOD</code></strong> · <strong><code>GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY</code></strong> — 공통코드에서 온다(<strong>2026-09-01 신설</strong>). ⚠ 자료형은 <strong>2026-08-21 에 이미 확정</strong>됐는데 이 표에 없어 화면이 아직 자리표시로 두고 있다</td><td>§4-B·§4-C · G-32</td></tr>
 <tr><th>확정</th><td><code>POST /quality/inspection-plan-versions/{id}:confirm</code></td><td>§5-1 · B-2</td></tr>
 <tr><th>승인</th><td><code>POST /quality/inspection-plans/{id}:approve</code> — <code>approved_by</code>·<code>approved_at</code>을 <strong>서버가 동시에</strong> 채운다</td><td>§5-1·§8-3</td></tr>
 <tr><th>폐기</th><td><code>POST /quality/inspection-plan-versions/{id}:obsolete</code></td><td>§5-1</td></tr>
@@ -2306,6 +2316,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 <tbody>
 <tr><th>창고 추가</th><td><code>POST /mdm/warehouses</code></td><td>§5-1 · A-1</td></tr>
 <tr><th>저장</th><td><code>PUT /mdm/warehouses/{id}</code> · <code>PUT /mdm/locations/{id}</code></td><td>§5-3 · B-1</td></tr>
+<tr><th>⭐ <strong>창고 유형·관리수준·보관조건 선택지</strong></th><td><strong><code>GET /mdm/code-values?codeGroupCode=WAREHOUSE_TYPE</code></strong> · <strong><code>GET /mdm/code-values?codeGroupCode=MANAGEMENT_LEVEL</code></strong> · <strong><code>GET /mdm/code-values?codeGroupCode=STORAGE_CONDITION</code></strong> — 공통코드에서 온다(<strong>2026-09-01 신설</strong>). ⛔ 화면이 창고 유형 5값을 <strong>하드코딩</strong>하고 있다(2026-09-01 실측 · 변경 통지 대상). ⚠ 위치 유형·품질 구역은 아직 그룹 이름이 없다(<code>#145</code>)</td><td>§5-1·§5-3 · G-32</td></tr>
 <tr><th>취소</th><td><strong>없음 — API 불필요.</strong> 변경 파기 확인 후 로컬 폐기</td><td>§5-1</td></tr>
 <tr><th>사용 중지</th><td><code>POST /mdm/warehouses/{id}:deactivate</code> · <code>POST /mdm/locations/{id}:deactivate</code></td><td>§5-1·§8-6 · B-4</td></tr>
 <tr><th>Location 추가 / 하위 추가</th><td><code>POST /mdm/locations</code> — 하위는 <code>parentLocationId</code> 지정</td><td>§5-1</td></tr>
