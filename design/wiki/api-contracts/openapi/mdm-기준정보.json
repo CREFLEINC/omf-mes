@@ -7066,7 +7066,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "공통코드 — 값 목록 미정 §8-3. 최소 구분: 대기/처리중/완료/실패"
+      "description": "공통코드 — 값 목록이 아직 서지 않았다. 최소 구분: 대기/처리중/완료/실패. 추적처는 omf-mes#213(리소스별 상태값 코드 문자열)이다."
      },
      {
       "name": "interfaceCode",
@@ -18435,7 +18435,7 @@
       "x-source-column": "status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "공통코드 — 값 목록 미정. 최소 구분: 대기/처리중/완료/실패",
+      "description": "공통코드 — 값 목록이 아직 서지 않았다. 최소 구분: 대기/처리중/완료/실패. 추적처는 omf-mes#213(리소스별 상태값 코드 문자열)이다.",
       "example": "FAILED"
      },
      "retryCount": {
