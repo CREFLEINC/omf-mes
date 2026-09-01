@@ -119,9 +119,20 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | **미착지** | 물리 모델에 근거가 없어 지금 만들면 **지어내는 것**이 된다 | **이슈 해소**(번호 필수) |
 | **선행 미결** | 화면 스펙 자신이 정책·자료를 미결로 남겼다 | 해당 화면 §8 미결 결정 |
 | **소관 이동** | 엔드포인트는 이 스펙 안에 있고 **다른 화면이 실행을 소유**한다(중복 구현 금지) | — 정상 |
-| **API 불필요** | 화면 안에서 끝난다(로컬 취소·이미 받은 데이터 펼침 등) | — 정상 |
+| **API 불필요** | 화면 안에서 끝난다 — 로컬 취소 · 이미 받은 자료 펼침 · **사용자가 손으로 치는** 입력. ⛔ **선택칸의 «값 목록»은 여기 들지 않는다**(2026-09-01 정정) | — 정상 |
 
 집계는 §3-11에 둔다.
+
+⛔ **선택칸의 «값 목록»은 API 호출이다 — 2026-09-01 정정.**
+공통코드에서 오는 선택지는 `GET /mdm/code-values?codeGroupCode=…` 로 받는다. 그것을 「API 불필요」로 적거나 아예 적지 않으면 프론트는 그 호출을 만들지 않고, 화면은 오류 없이 **빈 선택칸**으로 선다 — 실측으로 **8화면**이 그 상태였다(2026-09-01). §1-3 이 이미 「그 화면들이 **선택 목록으로 필요로 하는 조회 전용**」을 범위에 넣어 두었는데 §3 표가 그것을 어긴 자리다.
+
+**판별은 하나다 — 그 칸의 값이 «어디서 오는가».**
+
+| 값의 출처 | §3 표기 |
+| --- | --- |
+| 사용자가 손으로 친다 · 앞 화면이 넘겨준다 · 스캔이 채운다 | **API 불필요** |
+| **공통코드 마스터** · 다른 자원의 목록 | ⭐ **그 조회 경로를 «행으로» 적는다** |
+
 
 ### 3-1. `W-CO-02` 사용자·역할·권한 관리
 
@@ -132,7 +143,8 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 사용 중지 / 다시 사용 | `POST /app/users/{id}:deactivate` · `:activate` · `POST /app/roles/{id}:deactivate` · `:activate` — ⚠ 역할 쪽은 상세 응답의 `assignedUserCount` 로 확인 다이얼로그를 만든다(§6) | §5-1 · B-4 |
 | 역할 체크·해제 | `PUT /app/users/{id}/roles` — 전체 치환 | §4-C · B-6 |
 | 접근범위 추가 / ⊖ | `PUT /app/users/{id}/data-scopes` — 전체 치환 | §4-D · B-6 · A-7 |
-| 기능 권한 체크·해제 | `PUT /app/roles/{id}/permissions` — **엔드포인트는 있으나 화면이 비활성**(`permission_code` 값 목록이 회신 **E-9** 대기) | §4-E · G-2·G-6 |
+| ⭐ **기능 권한 «후보 목록»** | **`GET /app/permissions`** — 격자의 «열»이다(**2026-09-01 신설**). ⛔ 이것이 없어 화면은 「이미 부여된 것」만 알아 **권한을 새로 줄 수 없었다** — 프론트가 격자를 보기 전용으로 닫은 이유다(`client#17`) | §4-E · `W-CO-02` §8-7 |
+| 기능 권한 체크·해제 | `PUT /app/roles/{id}/permissions` — 전체 치환. ✅ **화면을 연다**(2026-09-01) — 회신 **E-9 를 기다리지 않는다**: 권한은 앱 기능 목록이라 고객이 정할 성질이 아니다(`G-31`). ⛔ 400 `LAST_ADMIN` — 관리 권한 보유자가 0이 되는 치환은 막힌다 | §4-E · B-6 |
 | 변경 이력 | `GET /audit/events?targetTypeCode=…&targetId=…` — 리소스별 `/history`는 **없다**(#68) | §5-1 · B-5 |
 | 비밀번호 초기화 | `POST /app/users/{appUserId}:reset-password` — 임시 비밀번호를 생성해 **한 번만** 응답에 싣는다 | §5-1·§8-2 · DR-002 2-B ③ — 2026-08-30 되살림 |
 
@@ -164,6 +176,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 신규 버전 | `POST /quality/inspection-plan-versions`(버전 0건) **또는** `POST …/{id}:new-revision`(최신=확정) | §5-1 · B-7 |
 | 저장 / 취소 | `PUT /quality/inspection-plans/{id}`(헤더) · `PUT /quality/inspection-plan-versions/{id}`(버전) — 바뀐 쪽만 | §4-A·§4-B · B-1 |
 | 항목 추가·삭제·순서 이동 | `PUT /quality/inspection-plan-versions/{id}/items` — 전체 치환 | §4-C · A-5 |
+| ⭐ **항목 자료형·검사 방법·샘플링 방법·검사 주기 선택지** | **`GET /mdm/code-values?codeGroupCode=INSPECTION_ITEM_SPEC_DATA_TYPE`** · **`GET /mdm/code-values?codeGroupCode=INSPECTION_ITEM_SPEC_METHOD`** · **`GET /mdm/code-values?codeGroupCode=INSPECTION_SAMPLING_METHOD`** · **`GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY`** — 공통코드에서 온다(**2026-09-01 신설**). ⚠ 자료형은 **2026-08-21 에 이미 확정**됐는데 이 표에 없어 화면이 아직 자리표시로 두고 있다 | §4-B·§4-C · G-32 |
 | 확정 | `POST /quality/inspection-plan-versions/{id}:confirm` | §5-1 · B-2 |
 | 승인 | `POST /quality/inspection-plans/{id}:approve` — `approved_by`·`approved_at`을 **서버가 동시에** 채운다 | §5-1·§8-3 |
 | 폐기 | `POST /quality/inspection-plan-versions/{id}:obsolete` | §5-1 |
@@ -268,6 +281,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | --- | --- | --- |
 | 창고 추가 | `POST /mdm/warehouses` | §5-1 · A-1 |
 | 저장 | `PUT /mdm/warehouses/{id}` · `PUT /mdm/locations/{id}` | §5-3 · B-1 |
+| ⭐ **창고 유형·관리수준·보관조건 선택지** | **`GET /mdm/code-values?codeGroupCode=WAREHOUSE_TYPE`** · **`GET /mdm/code-values?codeGroupCode=MANAGEMENT_LEVEL`** · **`GET /mdm/code-values?codeGroupCode=STORAGE_CONDITION`** — 공통코드에서 온다(**2026-09-01 신설**). ⛔ 화면이 창고 유형 5값을 **하드코딩**하고 있다(2026-09-01 실측 · 변경 통지 대상). ⚠ 위치 유형·품질 구역은 아직 그룹 이름이 없다(`#145`) | §5-1·§5-3 · G-32 |
 | 취소 | **없음 — API 불필요.** 변경 파기 확인 후 로컬 폐기 | §5-1 |
 | 사용 중지 | `POST /mdm/warehouses/{id}:deactivate` · `POST /mdm/locations/{id}:deactivate` | §5-1·§8-6 · B-4 |
 | Location 추가 / 하위 추가 | `POST /mdm/locations` — 하위는 `parentLocationId` 지정 | §5-1 |

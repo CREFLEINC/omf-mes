@@ -18,7 +18,9 @@ G-32 의 「그룹 이름 짓는 규칙」은 이름을 *짓는* 법이고, 이 
 
 무엇을 보나
 -----------
-① ⛔ **`description` 의 `codeGroupCode=<이름>` 포인터가 등록부 40 밖**인 자리.
+① ⛔ **`codeGroupCode=<이름>` 포인터가 등록부 밖**인 자리 — 문서 안의 모든
+   `description` 을 본다(자리를 열거하지 않고 훑는다).
+   2026-09-01 확장 — 프로퍼티만 보다가 `JUDGMENT_TYPE` 을 놓쳤다.
    전건 출력하고 종료 코드 1 을 낸다.
 ② ⚠ `enum` 도 `codeGroupCode=` 포인터도 `x-no-example` 도 없는 `*Code` 자리.
    **개수와 상위 파일만** 찍고 종료 코드를 바꾸지 않는다.
@@ -33,7 +35,8 @@ G-32 의 「그룹 이름 짓는 규칙」은 이름을 *짓는* 법이고, 이 
 ⚠ 이 검사기가 못 보는 것
 ------------------------
   - 등록부에 «있는» 이름을 «틀린 자리»에 쓴 것 — 이름이 맞으면 통과한다
-  - `description` 밖(예시·본문 산문)에 적힌 그룹 이름 — 포인터 형태만 본다
+  - `description` **밖**(예시·`x-` 확장·본문 산문)에 적힌 그룹 이름 — `description`
+    키만 보고, 그 안에서도 포인터 형태만 본다
   - 그룹에 실제로 «값이 들어 있는가» — 계약이 답할 수 있는 물음이 아니다
 
 쓰기
@@ -52,7 +55,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 # Tier 0 — OpenAPI JSON 정본. Phase 5 컷오버(2026-08-25)로 design/wiki/api-contracts/openapi/가 정본 위치다.
 CONTRACTS_DIR = os.path.join(HERE, "..", "..", "..", "wiki", "api-contracts", "openapi")
 
-# 등록부 — 공유계약 G-32 확정 11 · omf-mes#198 확정 29 · 2026-08-29 등재 2 · 2026-08-31 등재 5 = 47 (겹치는 이름 0).
+# 등록부 — 공유계약 G-32 확정 11 · omf-mes#198 확정 29 · 2026-08-29 등재 2 · 2026-08-31 등재 5＋4 · 2026-09-01 등재 2 = 53 (겹치는 이름 0).
 # ⛔ 여기에 없는 이름을 계약에 적지 않는다. 늘리려면 «먼저» G-32 를 고친다 —
 #    조항이 정본이고 이 집합은 그 사본이다.
 REGISTRY = set("""
@@ -70,13 +73,14 @@ INSPECTION_SAMPLING_METHOD PROCESS_TYPE QUALIFICATION_TYPE STORAGE_CONDITION REI
 WORK_SESSION_EVENT_TYPE INBOUND_VARIANCE_TYPE
 LOT_HOLD_RELEASE_REASON MATERIAL_ISSUE_REQUEST_REASON WAREHOUSE_TYPE SHIPMENT_TIME_SLOT
 RECEIPT_TYPE ISSUE_TYPE MANAGEMENT_LEVEL GOODS_RECEIPT_REASON
+APP_USER_STATUS JUDGMENT_TYPE
 """.split())
 
 POINTER = re.compile(r"codeGroupCode=([A-Z][A-Z0-9_]*)")
 
 
 def schemas(doc: dict):
-    """(스키마 이름, 필드 이름, 프로퍼티) 를 전건 낸다."""
+    """(스키마 이름, 필드 이름, 프로퍼티) 를 전건 낸다 — `*Code` 계수용."""
     for name, schema in (doc.get("components", {}).get("schemas") or {}).items():
         if not isinstance(schema, dict):
             continue
@@ -85,8 +89,38 @@ def schemas(doc: dict):
                 yield name, field, prop
 
 
+def descriptions(doc: dict) -> "Iterator[tuple[str, str]]":
+    """`description` 이 적힌 자리를 **전건** 낸다 — (자리 이름, 설명).
+
+    ⛔ **자리를 «열거»하지 않는다 — 문서를 훑는다.**
+    처음에는 스키마·프로퍼티·오퍼레이션·파라미터·응답 다섯을 손으로 적었는데,
+    그러면 적지 않은 자리가 그대로 구멍이 된다. 실측(2026-09-01)으로
+    `components/parameters` **27자리** · `requestBody` 인라인 스키마 **24자리** 가
+    그 밖에 있었다. 지금은 그 자리에 포인터가 없지만, 「지금 없다」와
+    「앞으로도 안 생긴다」는 다르다.
+
+    ⛔ 이 검사기가 놓쳤던 사고가 정확히 그 형태다 — `JUDGMENT_TYPE` 이 «스키마»
+    설명과 «오퍼레이션» 설명에만 있어 프로퍼티만 보던 검사기를 그대로 통과했다.
+    등록부 밖 이름이었는데도 초록이었고, 그 초록이 근거로 쓰이고 있었다.
+
+    ⚠ 그래서 `x-` 확장·예시·산문은 여전히 못 본다 — `description` 키만 본다.
+    """
+    def walk(node, path: str):
+        if isinstance(node, dict):
+            for key, value in node.items():
+                if key == "description" and isinstance(value, str):
+                    yield path or "(문서)", value
+                else:
+                    yield from walk(value, "%s/%s" % (path, key))
+        elif isinstance(node, list):
+            for idx, value in enumerate(node):
+                yield from walk(value, "%s[%d]" % (path, idx))
+
+    yield from walk(doc, "")
+
+
 def main() -> int:
-    stray: list[tuple[str, str, str, str]] = []
+    stray: list[tuple[str, str, str]] = []
     bare = collections.Counter()
     total_code = 0
     pointers = 0
@@ -95,17 +129,20 @@ def main() -> int:
         fname = os.path.basename(f)
         with open(f, encoding="utf-8") as fh:
             doc = json.load(fh)
-        for sname, field, prop in schemas(doc):
-            desc = prop.get("description") or ""
+        # ① 포인터는 «적힐 수 있는 자리 전부»에서 본다 — 프로퍼티만 보면 놓친다.
+        for where, desc in descriptions(doc):
             names = POINTER.findall(desc)
             pointers += len(names)
             for n in names:
                 if n not in REGISTRY:
-                    stray.append((fname, sname, field, n))
+                    stray.append((fname, where, n))
+        # ② 「포인터도 enum 도 없는 `*Code`」 계수는 프로퍼티 축이다.
+        for sname, field, prop in schemas(doc):
             if not field.endswith("Code"):
                 continue
             total_code += 1
-            if "enum" in prop or names or "x-no-example" in prop:
+            desc = prop.get("description") or ""
+            if "enum" in prop or POINTER.search(desc) or "x-no-example" in prop:
                 continue
             bare[fname] += 1
 
@@ -124,8 +161,8 @@ def main() -> int:
 
     print("⛔ 등록부 밖 그룹 이름을 가리키는 자리 %d건 (포인터 %d자리 검사 · 등록부 %d개)\n"
           % (len(stray), pointers, len(REGISTRY)))
-    for fname, sname, field, name in stray:
-        print("   %-26s %-24s %-24s → %s" % (fname, sname, field, name))
+    for fname, where, name in stray:
+        print("   %-26s %-46s → %s" % (fname, where, name))
     print("\n   ⭐ 둘 중 하나를 «정해서» 닫는다 —\n"
           "      ① 그 이름을 공유계약 G-32 등록부에 올린다(마스터에 행이 실재해야 한다)\n"
           "      ② 등록부에 있는 이름으로 포인터를 고친다\n"
