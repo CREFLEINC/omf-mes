@@ -293,6 +293,10 @@ class EndpointList(unittest.TestCase):
                     endpoint_errs(CHECKED + "\n`%s /x/y` 무엇\n" % m), [],
                     "%s 를 경로로 못 알아본다" % m)
 
+    def test_대문자_체크박스도_같이_막는다(self):
+        """`- [X]` 도 GitHub 은 체크로 렌더한다 — 가리면 게이트가 조용히 열린다."""
+        self.assertEqual(len(endpoint_errs(CHECKED.replace("[x]", "[X]"))), 1)
+
     def test_체크하지_않았으면_이_규칙은_걸리지_않는다(self):
         """체크 안 한 항목은 4번 미결이 받는다 — 여기서 두 번 막지 않는다."""
         self.assertEqual(endpoint_errs(UNCHECKED), [])

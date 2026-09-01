@@ -393,7 +393,8 @@ def check_structure(text, secs):
     # 「엔드포인트 존재 — 모두 있다」에 체크했으면 그 「모두」가 무엇인지 적는다.
     # 프론트는 계약 정본(비공개 저장소)을 볼 수 없고 생성 타입에는 전 경로가 들어 있어,
     # 「이 화면 몫이 어느 것인가」는 이 통지 말고 알 길이 없다.
-    if any(l.strip().startswith('- [x]') and '엔드포인트' in l
+    # ⚠ `- [X]` 도 GitHub 은 체크로 렌더한다. 대소문자를 가리면 게이트가 «조용히» 열린다.
+    if any(l.strip().lower().startswith('- [x]') and '엔드포인트' in l
            for l in settled.splitlines()) and not ENDPOINT.search(settled):
         errs.append(('엔드포인트 목록 없음', '「모두 있다」만 있고 무엇인지 없다',
                      '체크 밑에 이 화면이 부르는 경로를 적는다 '
