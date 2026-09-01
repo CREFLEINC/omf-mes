@@ -655,7 +655,16 @@
       "name": "targetTypeCode",
       "in": "query",
       "schema": {
-       "type": "string"
+       "type": "string",
+       "enum": [
+        "GOODS_ISSUE",
+        "GOODS_RECEIPT",
+        "INBOUND_RECEIPT",
+        "INVENTORY_ADJUSTMENT",
+        "PURCHASE_ORDER",
+        "SHIPMENT",
+        "INBOUND_LOT"
+       ]
       },
       "description": "업무 화면이 자기 문서의 승인 상태를 찾을 때 targetId 와 함께 쓴다"
      },
@@ -3901,7 +3910,17 @@
      "targetTypeCode": {
       "x-source-column": "target_type_code",
       "type": "string",
-      "example": "GOODS_ISSUE"
+      "example": "GOODS_ISSUE",
+      "description": "승인 대상 유형. **A-10 다형 참조 판별자**이고 값은 **상신 오퍼레이션이 정한다** — 화면이 고르는 값이 아니라 서버가 채운다(예: `POST /trace/lots/{lotId}:request-iqc-skip` 이 `INBOUND_LOT` 을 채운다). 업무 화면이 「이 문서의 승인 상태」를 찾을 때 `GET /app/approval-requests?targetTypeCode=&targetId=` 에 싣는다. ⚠ **`INBOUND_LOT` 이 어느 표를 가리키는지는 아직 정하지 않았다**(`omf-mes-server#74`) — 값은 확정이고 대응 표만 남았다. ⛔ 같은 이름의 다른 자리(`DocumentTarget`·`Attachment`·`AuditEvent`·`MaintenanceOrder`·`InspectionRequest`·`Notification`·`IntegrationMessage`)는 **값 집합이 다르다** — 이 목록을 그쪽에 쓰지 않는다(공유계약 G-32).",
+      "enum": [
+       "GOODS_ISSUE",
+       "GOODS_RECEIPT",
+       "INBOUND_RECEIPT",
+       "INVENTORY_ADJUSTMENT",
+       "PURCHASE_ORDER",
+       "SHIPMENT",
+       "INBOUND_LOT"
+      ]
      },
      "targetId": {
       "x-source-column": "target_id",
