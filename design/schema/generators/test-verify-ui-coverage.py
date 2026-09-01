@@ -127,7 +127,7 @@ class Domain01Test(unittest.TestCase):
         # 공용 코드를 고쳤으므로 기존 도메인이 안 흔들리는지 함께 잠근다.
         rows = cov.extract_all(SCREENS_ROOT)
         # 99 — 81(DR-013 거래처 역할 탭까지)에 2026-08-18 복귀 세 화면의 18건이 붙었다.
-        self.assertEqual(len(rows), 99)
+        self.assertEqual(len(rows), 100)
         self.assertEqual(len({r["screen"] for r in rows}), 14)
 
 
