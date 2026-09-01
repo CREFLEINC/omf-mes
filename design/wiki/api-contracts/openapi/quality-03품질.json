@@ -390,7 +390,12 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "example": "값",
+       "enum": [
+        "REWORK",
+        "SCRAP",
+        "NORMAL"
+       ]
       },
       "description": "재작업 · 폐기 · 정상"
      },
@@ -3003,8 +3008,13 @@
      },
      "dispositionTypeCode": {
       "type": "string",
-      "description": "재작업 · 폐기 · 정상. ⛔ 선별은 1차 범위 밖이라 값이 와도 실행 화면이 없다(omf-mes#118)",
-      "x-no-example": "값 목록이 미확정이라 코드 문자열을 못 박지 않는다(2차 값 목록 제안안 대상). 임의 코드를 example 로 넣으면 목이 확정값처럼 보인다"
+      "description": "처분 유형. ✅ **값 목록 확정 2026-09-01(사용자 · omf-mes#336)** — REWORK 재작업 · SCRAP 폐기 · NORMAL 정상 셋이다. ⛔ 선별은 1차 범위 밖이라 값이 와도 실행 화면이 없다(omf-mes#118 종결). ⚠ mdm 계약의 DefectCode.dispositionTypeCode(['REWORKABLE','SCRAP'])와 «같은 그룹이 아니다» — 그쪽은 불량코드가 가진 처분 «성향»이고 이 칸은 실제 처분 «결정»이다. 한 그룹으로 묶지 않는다(공유계약 G-32). ⚠ SCRAP 은 LOT_STATUS 의 SCRAPPED 와 낱말이 닮았으나 축이 다르다 — LOT 의 «상태» ↔ 처분의 «결정». 스키마가 갈려 있어 값 수준에서 섞이지 않는다(✓확정 2026-09-01 사용자). ⛔ 공통코드 그룹으로 받지 않는다 — 진입 목록이 이 값으로 갈리고(W-04-10·W-04-11) 후속 화면이 값마다 붙는다. 고객이 늘리면 후속 없는 처분이 생긴다(공유계약 G-31)",
+      "x-no-example": "값 목록이 미확정이라 코드 문자열을 못 박지 않는다(2차 값 목록 제안안 대상). 임의 코드를 example 로 넣으면 목이 확정값처럼 보인다",
+      "enum": [
+       "REWORK",
+       "SCRAP",
+       "NORMAL"
+      ]
      },
      "decisionQty": {
       "type": "number",
@@ -3149,8 +3159,13 @@
     "properties": {
      "dispositionTypeCode": {
       "type": "string",
-      "description": "재작업 · 폐기 · 정상. ⛔ 선별은 받지 않는다(omf-mes#118)",
-      "x-no-example": "값 목록 미확정 — 2차 값 목록 제안안 대상"
+      "description": "처분 유형. ✅ **값 목록 확정 2026-09-01(사용자 · omf-mes#336)** — REWORK 재작업 · SCRAP 폐기 · NORMAL 정상 셋이다. ⛔ 선별은 1차 범위 밖이라 값이 와도 실행 화면이 없다(omf-mes#118 종결). ⚠ mdm 계약의 DefectCode.dispositionTypeCode(['REWORKABLE','SCRAP'])와 «같은 그룹이 아니다» — 그쪽은 불량코드가 가진 처분 «성향»이고 이 칸은 실제 처분 «결정»이다. 한 그룹으로 묶지 않는다(공유계약 G-32). ⚠ SCRAP 은 LOT_STATUS 의 SCRAPPED 와 낱말이 닮았으나 축이 다르다 — LOT 의 «상태» ↔ 처분의 «결정». 스키마가 갈려 있어 값 수준에서 섞이지 않는다(✓확정 2026-09-01 사용자). ⛔ 공통코드 그룹으로 받지 않는다 — 진입 목록이 이 값으로 갈리고(W-04-10·W-04-11) 후속 화면이 값마다 붙는다. 고객이 늘리면 후속 없는 처분이 생긴다(공유계약 G-31)",
+      "x-no-example": "값 목록 미확정 — 2차 값 목록 제안안 대상",
+      "enum": [
+       "REWORK",
+       "SCRAP",
+       "NORMAL"
+      ]
      },
      "decisionQty": {
       "type": "number",
