@@ -19,6 +19,7 @@
 # 테스트가 잠그는 것은 «규칙»이므로 그대로 둔다.
 import importlib
 import os
+import shutil
 import sys
 import tempfile
 import unittest
@@ -109,9 +110,14 @@ class 표를_읽어서도_같은가(unittest.TestCase):
 | **3** | **셋째** | 회신/설계 | WF06 S8 「Routing 축은 스냅샷으로 종결」. BOM 축은 정의되지 않았다 |
 """
 
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
     def test_열림_둘_해소_하나(self):
-        tmp = tempfile.mkdtemp()
-        경로 = os.path.join(tmp, "W-99-01-시험용화면.md")
+        경로 = os.path.join(self.tmp, "W-99-01-시험용화면.md")
         with open(경로, "w", encoding="utf-8") as f:
             f.write(self.스펙)
         결과 = coi.parse(경로)
