@@ -123,5 +123,46 @@ class 형제_갈림을_찾는다(unittest.TestCase):
         self.assertEqual(cd.split_siblings(found), [])
 
 
+
+class 등록부와_사전이_1대1인가(unittest.TestCase):
+    """⛔ 2026-09-02 2단계 — 이 셋만 «막는다».
+
+    걸어 두지 않으면 새 그룹이 사전을 건너뛰고, 값은 다시 계약 산문으로 흩어진다 —
+    1단계에서 꺼낸 45그룹이 정확히 그렇게 흩어져 있던 것들이다.
+    """
+
+    def test_실물이_1대1이다(self):
+        # 62그룹 전부가 사전에 있어야 한다. 하나라도 빠지면 게이트가 울린다.
+        import importlib
+        ptr = importlib.import_module("check-code-group-pointer")
+        registry = ptr.load_registry()
+        covered = set()
+        for e in cd.read_dictionary(cd.DICT):
+            covered |= set(e["group"])
+        self.assertEqual(sorted(registry - covered), [])
+
+    def test_소유가_등록부와_같다(self):
+        import importlib
+        ptr = importlib.import_module("check-code-group-pointer")
+        owners = ptr.load_registry_owners()
+        for e in cd.read_dictionary(cd.DICT):
+            for g in e["group"]:
+                if owners.get(g, "미판정") != "미판정":
+                    self.assertEqual(e["owner"], owners[g],
+                                     "%s 의 소유가 등록부와 다르다" % e["key"])
+
+    def test_사전의_그룹은_전부_등록부_안이다(self):
+        import importlib
+        ptr = importlib.import_module("check-code-group-pointer")
+        registry = ptr.load_registry()
+        for e in cd.read_dictionary(cd.DICT):
+            for g in e["group"]:
+                self.assertIn(g, registry, "%s 의 그룹이 등록부 밖이다" % e["key"])
+
+    def test_키는_중복하지_않는다(self):
+        keys = [e["key"] for e in cd.read_dictionary(cd.DICT)]
+        self.assertEqual(len(keys), len(set(keys)))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
