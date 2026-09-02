@@ -771,7 +771,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "description": "재고 실사 상태로 거른다 — 계획(PLANNED) · 진행중(IN_PROGRESS) · 완료(COMPLETED). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INVENTORY_COUNT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "inProgressOnly",
@@ -2144,7 +2145,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "description": "물류 전표의 진행 상태로 거른다 — 등록(REGISTERED) · 전기완료(POSTED) · 취소요청(CANCEL_REQUESTED) · 취소완료(CANCELLED). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOGISTICS_DOCUMENT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "documentDateFrom",
@@ -2369,7 +2371,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "description": "물류 전표의 진행 상태로 거른다 — 등록(REGISTERED) · 전기완료(POSTED) · 취소요청(CANCEL_REQUESTED) · 취소완료(CANCELLED). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOGISTICS_DOCUMENT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "reasonCode",
@@ -3076,7 +3079,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "description": "물류 전표의 진행 상태로 거른다 — 등록(REGISTERED) · 전기완료(POSTED) · 취소요청(CANCEL_REQUESTED) · 취소완료(CANCELLED). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOGISTICS_DOCUMENT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "q",
@@ -3579,7 +3583,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "description": "물류 전표의 진행 상태로 거른다 — 등록(REGISTERED) · 전기완료(POSTED) · 취소요청(CANCEL_REQUESTED) · 취소완료(CANCELLED). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOGISTICS_DOCUMENT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "labelIssued",
@@ -4235,7 +4240,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "description": "물류 전표의 진행 상태로 거른다 — 등록(REGISTERED) · 전기완료(POSTED) · 취소요청(CANCEL_REQUESTED) · 취소완료(CANCELLED). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOGISTICS_DOCUMENT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "requiredAtFrom",
@@ -4492,7 +4498,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "description": "물류 전표의 진행 상태로 거른다 — 등록(REGISTERED) · 전기완료(POSTED) · 취소요청(CANCEL_REQUESTED) · 취소완료(CANCELLED). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOGISTICS_DOCUMENT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "sourceDocumentId",
@@ -4715,7 +4722,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "상태"
+      "description": "물류 전표의 진행 상태로 거른다 — 등록(REGISTERED) · 전기완료(POSTED) · 취소요청(CANCEL_REQUESTED) · 취소완료(CANCELLED). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOGISTICS_DOCUMENT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "itemId",
@@ -5831,7 +5838,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "description": "물류 전표의 진행 상태로 거른다 — 등록(REGISTERED) · 전기완료(POSTED) · 취소요청(CANCEL_REQUESTED) · 취소완료(CANCELLED). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOGISTICS_DOCUMENT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "requestedAtFrom",

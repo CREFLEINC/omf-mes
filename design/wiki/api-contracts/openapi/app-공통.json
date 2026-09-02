@@ -669,7 +669,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "description": "결재 요청 상태로 거른다 — 대기(PENDING) · 승인(APPROVED) · 반려(REJECTED). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=APPROVAL_REQUEST_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "targetTypeCode",

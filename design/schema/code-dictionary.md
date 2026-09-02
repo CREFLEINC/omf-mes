@@ -133,15 +133,15 @@ CD-<계열>-<축>
 | `CD-EQUIPMENT-BREAKDOWN-STATUS` | `RECEIVED` `HANDLING` `DONE` | `EQUIPMENT_BREAKDOWN_STATUS` | `statusCode` | `registry-system` | 2 | 고장 접수. **값이 계약 산문에 이미 있었다**(2026-09-02 꺼냄) · `W-05-04` |
 | `CD-MAINTENANCE-ORDER-STATUS` | `ISSUED` `DONE` `CANCELLED` | `MAINTENANCE_ORDER_STATUS` | `statusCode` | `registry-system` | 2 | 보전 지시. 같음 · `W-05-05` |
 | `CD-MAINTENANCE-ORDER-ITEM-STATUS` | `PLANNED` `DONE` `NA` | `MAINTENANCE_ORDER_ITEM_STATUS` | `statusCode` | `registry-system` | 1 | 보전 지시 **항목**. ⚠ 지시 전체와 **다른 축**이다 |
-| `CD-LOGISTICS-DOCUMENT-STATUS` | `REGISTERED` `POSTED` `CANCEL_REQUESTED` `CANCELLED` | `LOGISTICS_DOCUMENT_STATUS` | `statusCode` | `registry-system` | 7 | 물류 전표 9종 공용. ⭐ `W-01-13` §3 목업이 네 값을 이미 그렸다 — 꺼낸 것이지 정한 것이 아니다. 9종은 `CD-LOGISTICS-DOCUMENT-TYPE` 과 같은 집합이다 · 사용자 결정 2026-09-02 |
-| `CD-INVENTORY-COUNT-STATUS` | `PLANNED` `IN_PROGRESS` `COMPLETED` | `INVENTORY_COUNT_STATUS` | `statusCode` | `registry-system` | 1 | 재고 실사. ⚠ **전표 상태와 다른 축** — 전기·취소가 없다. `W-01-04` §3 목업 · 사용자 결정 2026-09-02 |
+| `CD-LOGISTICS-DOCUMENT-STATUS` | `REGISTERED` `POSTED` `CANCEL_REQUESTED` `CANCELLED` | `LOGISTICS_DOCUMENT_STATUS` | `statusCode` | `registry-system` | 15 | 물류 전표 9종 공용. ⭐ `W-01-13` §3 목업이 네 값을 이미 그렸다 — 꺼낸 것이지 정한 것이 아니다. 9종은 `CD-LOGISTICS-DOCUMENT-TYPE` 과 같은 집합이다 · 사용자 결정 2026-09-02 |
+| `CD-INVENTORY-COUNT-STATUS` | `PLANNED` `IN_PROGRESS` `COMPLETED` | `INVENTORY_COUNT_STATUS` | `statusCode` | `registry-system` | 2 | 재고 실사. ⚠ **전표 상태와 다른 축** — 전기·취소가 없다. `W-01-04` §3 목업 · 사용자 결정 2026-09-02 |
 | `CD-MASTER-VERSION-STATUS` | `DRAFT` `CONFIRMED` `OBSOLETE` | `MASTER_VERSION_STATUS` | `statusCode` | `registry-system` | 3 | 마스터 버전 편집 잠금 — `Routing`·`Bom`·`InspectionPlanVersion` 공용. ⭐ 결정 07 이 Routing 에서 확정한 값을 둘이 준용한다 · 사용자 결정 2026-09-02 |
-| `CD-APPROVAL-REQUEST-STATUS` | `PENDING` `APPROVED` `REJECTED` | `APPROVAL_REQUEST_STATUS` | `statusCode` | `registry-system` | 1 | 결재 요청. `W-CO-09` §3 목업 · 사용자 결정 2026-09-02 |
-| `CD-INTEGRATION-MESSAGE-STATUS` | `PENDING` `PROCESSING` `DONE` `FAILED` | `INTEGRATION_MESSAGE_STATUS` | `statusCode` | `registry-system` | 1 | ERP 연계 메시지. ⭐ 계약이 적어 둔 「최소 구분」 넷을 그대로 확정 · 사용자 결정 2026-09-02 |
+| `CD-APPROVAL-REQUEST-STATUS` | `PENDING` `APPROVED` `REJECTED` | `APPROVAL_REQUEST_STATUS` | `statusCode` | `registry-system` | 2 | 결재 요청. `W-CO-09` §3 목업 · 사용자 결정 2026-09-02 |
+| `CD-INTEGRATION-MESSAGE-STATUS` | `PENDING` `PROCESSING` `DONE` `FAILED` | `INTEGRATION_MESSAGE_STATUS` | `statusCode` | `registry-system` | 2 | ERP 연계 메시지. ⭐ 계약이 적어 둔 「최소 구분」 넷을 그대로 확정 · 사용자 결정 2026-09-02 |
 | `CD-TERMINAL-STATUS` | `RUNNING` `STOPPED` | `TERMINAL_STATUS` | `statusCode` | `registry-system` | 1 | 단말 가동 상태. ⛔ `isActive`(켬/끔 스위치)와 **다른 축** — 폐기는 재발급이 담당한다(`W-CO-06` §5-4) · 사용자 결정 2026-09-02 |
-| `CD-APP-USER-STATUS` | ⬜ **미상** | `APP_USER_STATUS` | `statusCode` | `registry` | 3 | ⬜ **뜻은 확정, 코드 문자열이 없다** — 계약이 「재직·휴직·퇴사 등」으로 «한국어 뜻»만 적었다. `§G` 규약대로 「확정된 뜻을 영문 SNAKE 로 옮긴다」를 적용할 자리이나 그 도출은 아직 안 했다. ⛔ 계정 사용 가부는 이 값이 아니라 `isActive` 가 정한다 |
+| `CD-APP-USER-STATUS` | ⬜ **미상** | `APP_USER_STATUS` | `statusCode` | `registry` | 4 | ⬜ **뜻은 확정, 코드 문자열이 없다** — 계약이 「재직·휴직·퇴사 등」으로 «한국어 뜻»만 적었다. `§G` 규약대로 「확정된 뜻을 영문 SNAKE 로 옮긴다」를 적용할 자리이나 그 도출은 아직 안 했다. ⛔ 계정 사용 가부는 이 값이 아니라 `isActive` 가 정한다 |
 | `CD-CONTROL-OVERRIDE-REASON` | `EMERGENCY_WORK_ORDER` `OTHER` | `CONTROL_OVERRIDE_REASON` | `reasonCode` | `registry` | 1 | 통제 우회 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
-| `CD-DOWNTIME-REASON` | `EQUIPMENT_FAILURE` `MOLD_CHANGE` `MATERIAL_WAIT` `LABOR_WAIT` `PREVENTIVE_MAINTENANCE` `OTHER` | `DOWNTIME_REASON` | ⬜ **자리 없음** | `registry` | 1 | 설비 비가동 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
+| `CD-DOWNTIME-REASON` | `EQUIPMENT_FAILURE` `MOLD_CHANGE` `MATERIAL_WAIT` `LABOR_WAIT` `PREVENTIVE_MAINTENANCE` `OTHER` | `DOWNTIME_REASON` | `reasonCode`(쿼리) | `registry` | 1 | 설비 비가동 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-EQUIPMENT-INSPECTION-JUDGMENT-METHOD` | `VISUAL` `MEASUREMENT` | `EQUIPMENT_INSPECTION_JUDGMENT_METHOD` | `judgmentMethodCode` | `registry-system` | 4 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
 | `CD-EQUIPMENT-INSPECTION-TYPE` | `DAILY` `MONTHLY` `MAINTENANCE` | `EQUIPMENT_INSPECTION_TYPE` | `inspectionTypeCode` | `registry` | 6 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
 | `CD-EQUIPMENT-STATUS` | `IN_SERVICE` `DISPOSED` | `EQUIPMENT_STATUS` | `statusCode` | `registry-system` | 4 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
@@ -154,12 +154,12 @@ CD-<계열>-<축>
 | `CD-INSPECTION-FREQUENCY` | `WORK_ORDER` `PRODUCTION_LOT` `MATERIAL_LOT` `SHIFT` `TIME_INTERVAL` `QUANTITY_INTERVAL` `EQUIPMENT_MOLD_CHANGE` `USER_REQUEST` | `INSPECTION_FREQUENCY` | `inspectionFrequencyCode` | `registry` | 3 | 검사 주기. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-INSPECTION-ITEM-SPEC-DATA-TYPE` | `NUMERIC` `TEXT` `BOOLEAN` | `INSPECTION_ITEM_SPEC_DATA_TYPE` | `dataTypeCode` | `registry-system` | 2 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
 | `CD-INSPECTION-ITEM-SPEC-METHOD` | `MEASUREMENT` `VISUAL` `FUNCTIONAL` | `INSPECTION_ITEM_SPEC_METHOD` | `inspectionMethodCode` | `registry` | 2 | 검사 항목 판정 방법. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
-| `CD-INSPECTION-REQUEST-STATUS` | `REQUESTED` `IN_PROGRESS` `COMPLETED` `SKIPPED` `CANCELLED` | `INSPECTION_REQUEST_STATUS` | `statusCode` | `registry-system` | 1 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
+| `CD-INSPECTION-REQUEST-STATUS` | `REQUESTED` `IN_PROGRESS` `COMPLETED` `SKIPPED` `CANCELLED` | `INSPECTION_REQUEST_STATUS` | `statusCode` | `registry-system` | 2 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
 | `CD-INSPECTION-SAMPLING-METHOD` | `FULL_INSPECTION` `SAMPLE_BY_UNIT` `SAMPLE_BY_LOT` | `INSPECTION_SAMPLING_METHOD` | `samplingMethodCode` | `registry` | 3 | 검사 샘플링 방식. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-INVENTORY-ADJUSTMENT-REASON` | `COUNT_VARIANCE` `TRANSPORT_DAMAGE` `HOPPER_MEASUREMENT` `SYSTEM_ERROR_CORRECTION` `OTHER` | `INVENTORY_ADJUSTMENT_REASON` | `reasonCode` | `registry` | 2 | 재고조정 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-INVENTORY-COUNT-TYPE` | `PERIODIC` `ADHOC` `CYCLE` | `INVENTORY_COUNT_TYPE` | `countTypeCode` | `registry` | 2 | 재고실사 유형. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-ISSUE-TYPE` | `PRODUCTION` `SUPPLIER_RETURN` `OTHER` `SHIPMENT` | `ISSUE_TYPE` | `issueTypeCode` | `registry` | 2 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
-| `CD-JUDGMENT-TYPE` | ⬜ **미상** | `JUDGMENT_TYPE` | ⬜ **자리 없음** | `registry` | 2 | ⭐ **값이 없는 것이 정상이다** — `W-06-04` 판정유형 코드 마스터가 «고객 운영»으로 관리한다. 판정유형마다 물류 통제 속성 6종을 붙이는 구조라 값은 고객이 늘린다 |
+| `CD-JUDGMENT-TYPE` | ⬜ **미상** | `JUDGMENT_TYPE` | ⬜ **프로퍼티가 아니다** — 스키마·경로 설명 | `registry` | 2 | ⭐ **값이 없는 것이 정상이다** — `W-06-04` 판정유형 코드 마스터가 «고객 운영»으로 관리한다. 판정유형마다 물류 통제 속성 6종을 붙이는 구조라 값은 고객이 늘린다. ⚠ **① 계수에 남는 2는 결손이 아니다** — 이 그룹의 포인터는 «프로퍼티»가 아니라 스키마·경로 설명에 있어 검사기가 프로퍼티 축에서 못 센다 |
 | `CD-LOT-EXTERNAL-IDENTIFIER-TYPE` | `SUPPLIER_LOT` `ERP_LOT` `CUSTOMER_LOT` `SUBCONTRACTOR_LOT` | `LOT_EXTERNAL_IDENTIFIER_TYPE` | `identifierTypeCode` | `registry` | 2 | LOT 외부식별자 유형. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-LOT-HOLD-REASON` | `INCOMING_INSPECTION_WAIT` `FOREIGN_MATTER_SUSPECTED` `DIMENSION_ABNORMAL` `APPEARANCE_ABNORMAL` `CLAIM_RECALL` `OTHER` | `LOT_HOLD_REASON` | `holdReasonCode` `reasonCode` | `registry` | 3 | LOT 보류 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-LOT-HOLD-RELEASE-REASON` | `RETEST_PASS` `RETEST_FAIL` `INVESTIGATION_CLEARED` `MANAGER_OVERRIDE` | `LOT_HOLD_RELEASE_REASON` | `releaseReasonCode` | `registry` | 4 | 공유계약 `G-32` 등록부 표의 근거 칸에서 옮겼다 |
@@ -193,21 +193,21 @@ CD-<계열>-<축>
 | `CD-COMPLETION-JUDGMENT` | `NORMAL` `OVER` `UNDER` | — | `completionJudgmentCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `LotProgress` · `WorkOrderProgress`(`logistics-01자재창고`) |
 | `CD-CONTROL-LEVEL` | `BLOCK` `OFF` `WARN` | — | `controlLevelCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `PrecheckDecision` · `PrecheckDecisionCreate`(`production-02생산실행`) |
 | `CD-DAY-TYPE` | `HOLIDAY` `PARTIAL` `WORKING` | — | `dayTypeCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `WorkCalendarDay`(`mdm-기준정보`) |
-| `CD-DECISION` | `BLOCKED` `OVERRIDDEN` `PASSED` `WARNED` | — | `decisionCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `PrecheckDecision` · `PrecheckDecisionCreate`(`production-02생산실행`) |
+| `CD-DECISION` | `BLOCKED` `OVERRIDDEN` `PASSED` `WARNED` | — | `decisionCode` | `enum` | 3 | 계약이 `enum` 으로 닫은 값 — `PrecheckDecision` · `PrecheckDecisionCreate`(`production-02생산실행`) |
 | `CD-DEFECT-CODE-DISPOSITION-TYPE` | `REWORKABLE` `SCRAP` | — | `dispositionTypeCode` | `enum` | 3 | 계약이 `enum` 으로 닫은 값 — `DefectCode` · `DefectCodeCreate`(`mdm-기준정보`) |
 | `CD-DELAY-STATUS` | `DELAYED` `ON_TIME` `UNDETERMINABLE` | — | `delayStatusCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `WorkOrderProgress`(`production-02생산실행`) |
-| `CD-DIRECTION` | `INBOUND` `OUTBOUND` | — | `directionCode` | `enum` | 4 | 계약이 `enum` 으로 닫은 값 — `IntegrationMessage` · `InterfaceDefinition`(`mdm-기준정보`) |
-| `CD-DISPOSITION-DECISION-DISPOSITION-TYPE` | `NORMAL` `REWORK` `SCRAP` | — | `dispositionTypeCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `DispositionDecision` · `DispositionDecisionCreate`(`quality-03품질`) |
+| `CD-DIRECTION` | `INBOUND` `OUTBOUND` | — | `directionCode` | `enum` | 6 | 계약이 `enum` 으로 닫은 값 — `IntegrationMessage` · `InterfaceDefinition`(`mdm-기준정보`) |
+| `CD-DISPOSITION-DECISION-DISPOSITION-TYPE` | `NORMAL` `REWORK` `SCRAP` | — | `dispositionTypeCode` | `enum` | 3 | 계약이 `enum` 으로 닫은 값 — `DispositionDecision` · `DispositionDecisionCreate`(`quality-03품질`) |
 | `CD-DISPOSITION-PROGRESS` | `COMPLETED` `NOT_STARTED` `PARTIAL` | — | `dispositionProgressCode` `followUpStatusCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `DispositionDecision` · `Nonconformance`(`quality-03품질`) |
-| `CD-EVENT-TYPE` | `HELD` `RELEASED` | — | `eventTypeCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `LotHoldEvent`(`quality-03품질`) |
-| `CD-EXTERNAL-SYSTEM` | `EQUIPMENT_STANDARD_IF` `TRACKING_SYSTEM` `UNIERP` | — | `externalSystemCode` | `enum` | 3 | 계약이 `enum` 으로 닫은 값 — `InterfaceDefinition` · `InterfaceDefinitionCreate`(`mdm-기준정보`) |
+| `CD-EVENT-TYPE` | `HELD` `RELEASED` | — | `eventTypeCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `LotHoldEvent`(`quality-03품질`) |
+| `CD-EXTERNAL-SYSTEM` | `EQUIPMENT_STANDARD_IF` `TRACKING_SYSTEM` `UNIERP` | — | `externalSystemCode` | `enum` | 4 | 계약이 `enum` 으로 닫은 값 — `InterfaceDefinition` · `InterfaceDefinitionCreate`(`mdm-기준정보`) |
 | `CD-FROM-INVENTORY-STATUS` | `AVAILABLE` `BLOCKED` `IN_TRANSIT` `ON_HOLD` | — | `fromInventoryStatusCode` `inventoryStatusCode` `toInventoryStatusCode` | `enum` | 5 | 계약이 `enum` 으로 닫은 값 — `GoodsReceiptLine` · `GoodsReceiptLineCreate`(`logistics-01자재창고`) |
-| `CD-LEVEL` | `EQUIPMENT_GROUP` `PLANT` | — | `levelCode` `targetTypeCode` | `enum` | 3 | 계약이 `enum` 으로 닫은 값 — `WorkCalendarApplication` · `WorkCalendarApplicationUpdate`(`mdm-기준정보`) |
-| `CD-LOT-LIFECYCLE-HISTORY-EVENT-TRANSITION` | `L1` `L2` `L3` | — | `transitionCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `LotLifecycleHistoryEvent`(`logistics-01자재창고`) |
-| `CD-LOT-STATUS-HISTORY-EVENT-TRANSITION` | `C10` `C14` `C15` `C4` `C5` `C6` `C7` `C8` `C9` | — | `transitionCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `LotStatusHistoryEvent`(`logistics-01자재창고`) |
+| `CD-LEVEL` | `EQUIPMENT_GROUP` `PLANT` | — | `levelCode` `targetTypeCode` | `enum` | 4 | 계약이 `enum` 으로 닫은 값 — `WorkCalendarApplication` · `WorkCalendarApplicationUpdate`(`mdm-기준정보`) |
+| `CD-LOT-LIFECYCLE-HISTORY-EVENT-TRANSITION` | `L1` `L2` `L3` | — | `transitionCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `LotLifecycleHistoryEvent`(`logistics-01자재창고`) |
+| `CD-LOT-STATUS-HISTORY-EVENT-TRANSITION` | `C10` `C14` `C15` `C4` `C5` `C6` `C7` `C8` `C9` | — | `transitionCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `LotStatusHistoryEvent`(`logistics-01자재창고`) |
 | `CD-NUMBER-SOURCE` | `MES` `SUPPLIER` | — | `numberSourceCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `LotCreate`(`logistics-01자재창고`) |
 | `CD-OUTBOUND-ITEM` | `GOODS_RECEIPT` `PRODUCTION_RESULT` `RETURN` `SHIPMENT_PGI` `STOCK_ADJUSTMENT` | — | `outboundItemCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `OutboundItemSetting` · `OutboundItemSettingInput`(`mdm-기준정보`) |
-| `CD-POLICY` | `FIFO_ENFORCEMENT_LEVEL` `MINOR_STOP_THRESHOLD_MINUTES` `PRECHECK_CONTROL_LEVEL` `SHOT_CONVERSION_ENABLED` `SHOT_CONVERSION_RATIO` | — | `policyCode` | `enum` | 3 | 계약이 `enum` 으로 닫은 값 — `OperationPolicy` · `OperationPolicyCreate`(`app-공통`) |
+| `CD-POLICY` | `FIFO_ENFORCEMENT_LEVEL` `MINOR_STOP_THRESHOLD_MINUTES` `PRECHECK_CONTROL_LEVEL` `SHOT_CONVERSION_ENABLED` `SHOT_CONVERSION_RATIO` | — | `policyCode` | `enum` | 5 | 계약이 `enum` 으로 닫은 값 — `OperationPolicy` · `OperationPolicyCreate`(`app-공통`) |
 | `CD-REMAINDER-DISPOSITION` | `CARRY_OVER` `WRITE_OFF` | — | `remainderDispositionCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `WorkOrderClose`(`production-02생산실행`) |
 | `CD-REPACK-TYPE` | `MERGE` `RECONFIGURE` `SPLIT` | — | `repackTypeCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `HandlingUnitRepackEvent`(`logistics-01자재창고`) |
 | `CD-REPAIR-RESULT` | `FAILED` `SUCCEEDED` | — | `repairResultCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `RepairExecution` · `RepairExecutionReturn`(`production-02생산실행`) |
@@ -215,12 +215,12 @@ CD-<계열>-<축>
 | `CD-RESOURCE-TYPE` | `EQUIPMENT` `MOLD` `WORKER` | — | `resourceTypeCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `WorkOrderResourcePlan` · `WorkOrderResourcePlanCreate`(`production-02생산실행`) |
 | `CD-ROLE` | `RESULT` `SOURCE` | — | `roleCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `HandlingUnitRepackEventLine`(`logistics-01자재창고`) |
 | `CD-ROLE-TYPE` | `CUSTOMER` `DISPOSAL` `OTHER` `SUBCONTRACTOR` `SUPPLIER` | — | `roleTypeCode` `roleTypeCodes` | `enum` | 3 | 계약이 `enum` 으로 닫은 값 — `PartnerRole` · `PartnerRolesReplace`(`mdm-기준정보`) |
-| `CD-SCOPE` | `BUSINESS_UNIT` `COMPANY` `EQUIPMENT_GROUP` `WORK_ORDER` `WORK_SHIFT` | — | `scopeCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `Notice` · `NoticeCreate`(`app-공통`) |
+| `CD-SCOPE` | `BUSINESS_UNIT` `COMPANY` `EQUIPMENT_GROUP` `WORK_ORDER` `WORK_SHIFT` | — | `scopeCode` | `enum` | 3 | 계약이 `enum` 으로 닫은 값 — `Notice` · `NoticeCreate`(`app-공통`) |
 | `CD-SHIPPING-INSPECTION-STATUS` | `HELD` `NOT_REQUIRED` `PASSED` `PENDING` `REJECTED` | — | `shippingInspectionStatusCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `ShipmentRequest`(`shipment-04제품출하`) |
 | `CD-SOURCE-DOCUMENT-TYPE` | `DISPOSITION_DECISION` `GOODS_RECEIPT` `PICKING_ORDER` | — | `sourceDocumentTypeCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `GoodsIssue` · `GoodsIssueCreate`(`logistics-01자재창고`) |
 | `CD-SOURCE-SYSTEM` | `ERP` `MES` | — | `sourceSystemCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `Department`(`mdm-기준정보`) |
-| `CD-STATUS` | `CLOSED` `DRAFT` `PUBLISHED` `SCHEDULED` | — | `statusCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `Notice`(`app-공통`) |
-| `CD-TARGET-TYPE` | `GOODS_ISSUE` `GOODS_RECEIPT` `INBOUND_LOT` `INBOUND_RECEIPT` `INVENTORY_ADJUSTMENT` `PURCHASE_ORDER` `SHIPMENT` | — | `targetTypeCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `ApprovalTarget`(`app-공통`) |
+| `CD-STATUS` | `CLOSED` `DRAFT` `PUBLISHED` `SCHEDULED` | — | `statusCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `Notice`(`app-공통`) |
+| `CD-TARGET-TYPE` | `GOODS_ISSUE` `GOODS_RECEIPT` `INBOUND_LOT` `INBOUND_RECEIPT` `INVENTORY_ADJUSTMENT` `PURCHASE_ORDER` `SHIPMENT` | — | `targetTypeCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `ApprovalTarget`(`app-공통`) |
 | `CD-TRIGGER-TYPE` | `EVENT` `TIME_SCHEDULE` | — | `triggerTypeCode` | `enum` | 3 | 계약이 `enum` 으로 닫은 값 — `InterfaceDefinition` · `InterfaceDefinitionCreate`(`mdm-기준정보`) |
 | `CD-VALUE-STATUS` | `AVAILABLE` `NOT_YET` `PARTIAL` | — | `valueStatusCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `DashboardCard`(`app-공통`) |
 

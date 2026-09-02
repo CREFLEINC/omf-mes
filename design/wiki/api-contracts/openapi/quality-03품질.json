@@ -588,7 +588,7 @@
        "type": "string",
        "example": "REQUESTED"
       },
-      "description": "검사 의뢰 상태로 좁힌다 — 확정 5값: REQUESTED(대기) · IN_PROGRESS(진행) · COMPLETED(완료) · SKIPPED(생략) · CANCELLED(취소). ⛔ 값 목록을 화면에 고정하지 않는다 — 표시명은 06 계약 GET /mdm/code-values 로 채운다(공유계약 G-6). ⚠ 「아직 안 끝난 것」을 보려면 이것이 아니라 pendingOnly 를 쓴다 — 큐는 상태 하나가 아니다. 근거: W-01-01 §3 · 확정 2026-08-21"
+      "description": "검사 의뢰 상태로 좁힌다 — 확정 5값: REQUESTED(대기) · IN_PROGRESS(진행) · COMPLETED(완료) · SKIPPED(생략) · CANCELLED(취소). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_REQUEST_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "pendingOnly",
@@ -769,7 +769,8 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "description": "검사 종합 판정으로 거른다 — 합격(ACCEPTED) · 불합격(REJECTED) · 보류(HELD). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_OVERALL_JUDGMENT 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "statusCode",
@@ -1009,7 +1010,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "판정 필터 — 목록·요약과 같은 축. 근거: omf-mes#192 문1"
+      "description": "판정 필터 — 목록·요약과 같은 축. 합격(ACCEPTED) · 불합격(REJECTED) · 보류(HELD). 근거: omf-mes#192 문1. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_OVERALL_JUDGMENT 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "processId",
@@ -1126,7 +1127,8 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "description": "검사 종합 판정으로 거른다 — 목록과 같은 축. 합격(ACCEPTED) · 불합격(REJECTED) · 보류(HELD). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_OVERALL_JUDGMENT 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "inspectedFrom",

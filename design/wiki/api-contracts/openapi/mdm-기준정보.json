@@ -861,7 +861,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "상태 필터"
+      "description": "사용자의 «인사» 상태로 거른다. ⛔ 계정 사용 가부는 이 값이 아니라 isActive 가 정한다 — 로그인 차단 여부로 거르려면 isActive 를 쓴다(W-CO-02 §8-4). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=APP_USER_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "includeInactive",
@@ -7066,7 +7066,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "공통코드 — 값 목록이 아직 서지 않았다. 최소 구분: 대기/처리중/완료/실패. 추적처는 omf-mes#213(리소스별 상태값 코드 문자열)이다."
+      "description": "ERP 연계 메시지의 처리 상태로 거른다 — 대기(PENDING) · 처리중(PROCESSING) · 완료(DONE) · 실패(FAILED). 재처리 대상은 FAILED 로 거른다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INTEGRATION_MESSAGE_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "interfaceCode",
@@ -8081,7 +8081,7 @@
        "MICROMETER",
        "GAUGE"
       ],
-      "description": "설비 유형으로 거른다 — 값 여럿을 쉼표로 이어 보낸다. 한 화면이 «계열 전체»를 한 번에 걸러야 해서 여럿을 받는다. 계측기 마스터 관리(W-05-11)는 계측기 계열 그룹(INSTRUMENT_TYPE)의 값 전체를, 설비·설비그룹 마스터(W-05-12)는 설비 계열 그룹(EQUIPMENT_TYPE)의 값 전체를 싣는다. 두 그룹 다 값이 확정됐다 — 계측기 3값 · 설비 3값(INJECTION_MOLDING·PRESS·WATER_HEATER). 걸지 않으면 두 계열이 함께 나온다."
+      "description": "설비 유형으로 거른다 — 값 여럿을 쉼표로 이어 보낸다. 한 화면이 «계열 전체»를 한 번에 걸러야 해서 여럿을 받는다. 계측기 마스터 관리(W-05-11)는 계측기 계열 그룹(INSTRUMENT_TYPE)의 값 전체를, 설비·설비그룹 마스터(W-05-12)는 설비 계열 그룹(EQUIPMENT_TYPE)의 값 전체를 싣는다. 두 그룹 다 값이 확정됐다 — 계측기 3값 · 설비 3값(INJECTION_MOLDING·PRESS·WATER_HEATER). 걸지 않으면 두 계열이 함께 나온다. ⭐ 값 목록은 화면이 쓰는 «계열»의 그룹에서 받는다 — GET /mdm/code-values?codeGroupCode=INSTRUMENT_TYPE(W-05-11) 또는 GET /mdm/code-values?codeGroupCode=EQUIPMENT_TYPE(W-05-12). ⛔ 한 그룹만 불러 다른 계열을 거르면 목록이 조용히 빈다 — 계열마다 그룹이 갈려 있다(공유계약 G-32 · omf-mes#219). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "calibrationRequired",
