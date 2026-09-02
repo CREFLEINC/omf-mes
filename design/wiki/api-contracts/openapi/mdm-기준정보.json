@@ -14242,8 +14242,8 @@
       "type": "string",
       "maxLength": 50,
       "default": "ACTIVE",
-      "description": "사용자의 «인사» 상태 — 재직·휴직·퇴사 등. ⛔ **계정을 쓸 수 있는가는 이 값이 아니라 isActive 가 정한다**(사용자 결정 2026-09-01 · W-CO-02 §8-4 해소). 둘이 겹쳐 읽히던 자리라 축을 갈랐다 — 휴직인데 계정은 살려 두는 경우가 실재하므로 하나로 합칠 수 없다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=APP_USER_STATUS 로 받는다(공유계약 G-31 마스터안전형 · G-32 · 2026-09-01 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "ACTIVE",
+      "description": "사용자의 «인사» 상태 — EMPLOYED(재직) · ON_LEAVE(휴직) · RESIGNED(퇴사) 3값(2026-09-01 뜻 확정 · 2026-09-03 문자열 도출 · 공유계약 §G). ⭐ 고객이 늘린다 — 위 셋은 초기 시드다(G-31). 값 목록은 GET /mdm/code-values?codeGroupCode=APP_USER_STATUS 로 받는다(G-32). ⛔ **계정 사용 가부는 이 값이 아니라 isActive 가 정한다** — 로그인 차단의 정본은 isActive 다(W-CO-02 §8-4 · 사용자 결정 2026-09-01). ⛔ ACTIVE 를 쓰지 않는다 — 「사용 여부」와 「수명주기」에 같은 낱말을 쓰면 두 축이 다시 섞인다(G-32 v3.5). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "EMPLOYED",
       "x-code-key": "CD-APP-USER-STATUS"
      },
      "isActive": {
@@ -14302,8 +14302,8 @@
       "x-source-column": "status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "사용자의 «인사» 상태. 미지정 시 서버가 물리 모델 DEFAULT('ACTIVE')로 채운다. ⛔ 계정을 쓸 수 있는가는 이 값이 아니라 isActive 가 정한다(사용자 결정 2026-09-01 · W-CO-02 §8-4 해소). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=APP_USER_STATUS 로 받는다(공유계약 G-31 마스터안전형 · G-32 · 2026-09-01 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "ACTIVE",
+      "description": "사용자의 «인사» 상태 — EMPLOYED(재직) · ON_LEAVE(휴직) · RESIGNED(퇴사) 3값(2026-09-01 뜻 확정 · 2026-09-03 문자열 도출 · 공유계약 §G). ⭐ 고객이 늘린다 — 위 셋은 초기 시드다(G-31). 값 목록은 GET /mdm/code-values?codeGroupCode=APP_USER_STATUS 로 받는다(G-32). ⛔ **계정 사용 가부는 이 값이 아니라 isActive 가 정한다** — 로그인 차단의 정본은 isActive 다(W-CO-02 §8-4 · 사용자 결정 2026-09-01). ⛔ ACTIVE 를 쓰지 않는다 — 「사용 여부」와 「수명주기」에 같은 낱말을 쓰면 두 축이 다시 섞인다(G-32 v3.5). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "EMPLOYED",
       "x-code-key": "CD-APP-USER-STATUS"
      }
     }
@@ -14345,8 +14345,8 @@
       "x-source-column": "status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "사용자의 «인사» 상태. ⛔ 계정을 쓸 수 있는가는 이 값이 아니라 isActive 가 정한다 — isActive 는 이 본문으로 못 바꾼다(:deactivate / :activate 액션 전용). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=APP_USER_STATUS 로 받는다(공유계약 G-31 마스터안전형 · G-32 · 2026-09-01 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "ACTIVE",
+      "description": "사용자의 «인사» 상태 — EMPLOYED(재직) · ON_LEAVE(휴직) · RESIGNED(퇴사) 3값(2026-09-01 뜻 확정 · 2026-09-03 문자열 도출 · 공유계약 §G). ⭐ 고객이 늘린다 — 위 셋은 초기 시드다(G-31). 값 목록은 GET /mdm/code-values?codeGroupCode=APP_USER_STATUS 로 받는다(G-32). ⛔ **계정 사용 가부는 이 값이 아니라 isActive 가 정한다** — 로그인 차단의 정본은 isActive 다(W-CO-02 §8-4 · 사용자 결정 2026-09-01). ⛔ ACTIVE 를 쓰지 않는다 — 「사용 여부」와 「수명주기」에 같은 낱말을 쓰면 두 축이 다시 섞인다(G-32 v3.5). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "EMPLOYED",
       "x-code-key": "CD-APP-USER-STATUS"
      }
     }

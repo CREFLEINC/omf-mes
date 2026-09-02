@@ -181,6 +181,23 @@ class OffValueTest(unittest.TestCase):
         _, off = scd.judge_row(line, {"CD-A"}, {"CD-A": entry([])}, REGISTRY)
         self.assertEqual(off, [])
 
+    def test_폐기한_이름을_인용한_부정문은_잡지_않는다(self):
+        # ⛔ 2026-09-03 실측 — `W-CO-02` 가 「⛔ `ACTIVE` 를 «쓰지 않는다»」로 적은
+        #    부정문의 토큰을 ㉯ 가 값으로 셌다. 폐기한 이름을 «왜 안 쓰는지» 적는 것은
+        #    이 저장소가 권장하는 일이다(`G-32` v3.5). 표식이 붙으면 보지 않는다.
+        line = ("| 상태 | `status_code` | `EMPLOYED`·`ON_LEAVE`·`RESIGNED` — "
+                "⛔ **`ACTIVE` 를 쓰지 않는다** «(구표기 보존)» |")
+        dic = {"CD-A": entry(["EMPLOYED", "ON_LEAVE", "RESIGNED"])}
+        _, off = scd.judge_row(line, {"CD-A"}, dic, REGISTRY)
+        self.assertEqual(off, [])
+
+    def test_표식이_없으면_같은_줄을_잡는다(self):
+        line = ("| 상태 | `status_code` | `EMPLOYED`·`ON_LEAVE`·`RESIGNED` — "
+                "⛔ **`ACTIVE` 를 쓰지 않는다** |")
+        dic = {"CD-A": entry(["EMPLOYED", "ON_LEAVE", "RESIGNED"])}
+        _, off = scd.judge_row(line, {"CD-A"}, dic, REGISTRY)
+        self.assertEqual(off, ["ACTIVE"])
+
 
 # ── §4 필드표 행 읽기 ───────────────────────────────────────────────────
 
