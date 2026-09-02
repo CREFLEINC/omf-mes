@@ -287,8 +287,7 @@
       "schema": {
        "type": "string",
        "example": "RECEIVED"
-      }
-     ,
+      },
       "description": "고장 접수 진행 상태로 거른다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_BREAKDOWN_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재) — 응답 스키마와 «같은 값 집합»이다"
      },
      {
@@ -922,8 +921,7 @@
       "schema": {
        "type": "string",
        "example": "ISSUED"
-      }
-     ,
+      },
       "description": "보전 지시 진행 상태로 거른다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=MAINTENANCE_ORDER_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재) — 응답 스키마와 «같은 값 집합»이다"
      },
      {
