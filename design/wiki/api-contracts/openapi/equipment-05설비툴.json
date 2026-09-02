@@ -288,6 +288,8 @@
        "type": "string",
        "example": "RECEIVED"
       }
+     ,
+      "description": "고장 접수 진행 상태로 거른다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_BREAKDOWN_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재) — 응답 스키마와 «같은 값 집합»이다"
      },
      {
       "name": "openOnly",
@@ -921,6 +923,8 @@
        "type": "string",
        "example": "ISSUED"
       }
+     ,
+      "description": "보전 지시 진행 상태로 거른다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=MAINTENANCE_ORDER_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재) — 응답 스키마와 «같은 값 집합»이다"
      },
      {
       "name": "maintenanceTypeCode",
@@ -3303,7 +3307,8 @@
      },
      "statusCode": {
       "type": "string",
-      "description": "접수(RECEIVED) · 처리중(HANDLING) · 완료(DONE)",
+      "description": "고장 접수의 진행 상태 — 접수(RECEIVED) · 처리중(HANDLING) · 완료(DONE). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_BREAKDOWN_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-internal-note": "⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 그룹의 값을 편집하면 안 된다. 상태 전이·버튼 활성이 값에 걸려 있어 지우면 화면이 «조용히» 멈춘다. ⚠ 그런데 그것을 막을 플래그가 코드그룹 마스터에 아직 없다 — W-06-06 §8 미결 9(「셋째 축이 필요하다」)가 그 자리이고 WORK_SESSION_EVENT_TYPE 이 같은 형태의 선례다. ⭐ 사전의 소유 열 registry-system 이 그것의 첫 「기계가 읽는 근거」다(design/schema/code-dictionary.md).",
       "example": "RECEIVED"
      },
      "notifyAssignee": {
@@ -3443,7 +3448,8 @@
      },
      "statusCode": {
       "type": "string",
-      "description": "계획(PLANNED) · 완료(DONE) · 해당없음(NA)",
+      "description": "보전 지시 «항목»의 진행 상태 — 계획(PLANNED) · 완료(DONE) · 해당없음(NA). ⚠ 지시 전체의 상태와 «다른 축»이다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=MAINTENANCE_ORDER_ITEM_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-internal-note": "⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 그룹의 값을 편집하면 안 된다. 상태 전이·버튼 활성이 값에 걸려 있어 지우면 화면이 «조용히» 멈춘다. ⚠ 그런데 그것을 막을 플래그가 코드그룹 마스터에 아직 없다 — W-06-06 §8 미결 9(「셋째 축이 필요하다」)가 그 자리이고 WORK_SESSION_EVENT_TYPE 이 같은 형태의 선례다. ⭐ 사전의 소유 열 registry-system 이 그것의 첫 「기계가 읽는 근거」다(design/schema/code-dictionary.md).",
       "example": "PLANNED"
      },
      "inspectionItemId": {
@@ -3595,7 +3601,8 @@
      },
      "statusCode": {
       "type": "string",
-      "description": "발행(ISSUED) · 완료(DONE) · 취소(CANCELLED)",
+      "description": "보전 지시의 진행 상태 — 발행(ISSUED) · 완료(DONE) · 취소(CANCELLED). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=MAINTENANCE_ORDER_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-internal-note": "⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 그룹의 값을 편집하면 안 된다. 상태 전이·버튼 활성이 값에 걸려 있어 지우면 화면이 «조용히» 멈춘다. ⚠ 그런데 그것을 막을 플래그가 코드그룹 마스터에 아직 없다 — W-06-06 §8 미결 9(「셋째 축이 필요하다」)가 그 자리이고 WORK_SESSION_EVENT_TYPE 이 같은 형태의 선례다. ⭐ 사전의 소유 열 registry-system 이 그것의 첫 「기계가 읽는 근거」다(design/schema/code-dictionary.md).",
       "example": "ISSUED"
      },
      "items": {
