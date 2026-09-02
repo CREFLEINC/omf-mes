@@ -1473,7 +1473,8 @@
         "WARNED",
         "OVERRIDDEN"
        ]
-      }
+      },
+      "x-code-key": "CD-DECISION"
      },
      {
       "name": "decidedFrom",
@@ -4168,7 +4169,8 @@
      "reasonCode": {
       "type": "string",
       "example": "값",
-      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CONTROL_OVERRIDE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CONTROL_OVERRIDE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-CONTROL-OVERRIDE-REASON"
      },
      "note": {
       "type": "string",
@@ -4796,7 +4798,8 @@
       ],
       "x-source-column": "control_level_code",
       "description": "판정 시점에 적용된 통제 수준의 스냅샷. app.operation_policy 의 PRECHECK_CONTROL_LEVEL 을 읽은 값이다 — 정책이 나중에 바뀌어도 이 기록은 바뀌지 않는다",
-      "example": "WARN"
+      "example": "WARN",
+      "x-code-key": "CD-CONTROL-LEVEL"
      },
      "decisionCode": {
       "type": "string",
@@ -4809,7 +4812,8 @@
       ],
       "x-source-column": "decision_code",
       "description": "PASSED = 통과 · BLOCKED = 차단 · WARNED = 경고 후 진행 · OVERRIDDEN = 긴급 W/O 우회",
-      "example": "PASSED"
+      "example": "PASSED",
+      "x-code-key": "CD-DECISION"
      },
      "basisInspectionId": {
       "type": [
@@ -4878,7 +4882,8 @@
        "OFF"
       ],
       "description": "화면이 읽은 통제 수준. 적용 정책이 없으면 WARN 이다(P-02-02 §6)",
-      "example": "WARN"
+      "example": "WARN",
+      "x-code-key": "CD-CONTROL-LEVEL"
      },
      "decisionCode": {
       "type": "string",
@@ -4888,7 +4893,8 @@
        "WARNED",
        "OVERRIDDEN"
       ],
-      "example": "PASSED"
+      "example": "PASSED",
+      "x-code-key": "CD-DECISION"
      },
      "basisInspectionId": {
       "type": [
@@ -5004,7 +5010,8 @@
       ],
       "example": "SUCCEEDED",
       "x-source-column": "repair_result_code",
-      "description": "⚠ 반출할 때 정해진다 — 투입 시점에는 비어 있다"
+      "description": "⚠ 반출할 때 정해진다 — 투입 시점에는 비어 있다",
+      "x-code-key": "CD-REPAIR-RESULT"
      },
      "reintroducedLotId": {
       "type": [
@@ -5097,7 +5104,8 @@
        "SUCCEEDED",
        "FAILED"
       ],
-      "example": "SUCCEEDED"
+      "example": "SUCCEEDED",
+      "x-code-key": "CD-REPAIR-RESULT"
      }
     }
    },
@@ -5199,7 +5207,8 @@
        "PROCEED"
       ],
       "example": "APPLY",
-      "description": "마지막 확인의 판정 — 반영 / 강행. ProductionOrderAcknowledge.decisionCode 와 같은 값 집합이다"
+      "description": "마지막 확인의 판정 — 반영 / 강행. ProductionOrderAcknowledge.decisionCode 와 같은 값 집합이다",
+      "x-code-key": "CD-ACKNOWLEDGE-DECISION"
      },
      "remarks": {
       "type": "string",
@@ -5243,7 +5252,8 @@
        "PROCEED"
       ],
       "description": "반영 / 강행. 근거: W-02-06 §5",
-      "example": "APPLY"
+      "example": "APPLY",
+      "x-code-key": "CD-ACKNOWLEDGE-DECISION"
      },
      "reason": {
       "type": "string",
@@ -5484,7 +5494,8 @@
       "type": "string",
       "description": "러닝체인지 분할 사유. 값 목록은 공통코드 마스터가 갖는다 — 공통코드 그룹 이름은 PRODUCTION_PLAN_SPLIT_REASON 이다. ⛔ 화면이 이 값을 로직에 박지 않는다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PRODUCTION_PLAN_SPLIT_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-no-example": "값 목록이 미확정이라 코드 문자열을 못 박지 않는다 — 임의 코드를 example 로 넣으면 확정값처럼 읽힌다",
-      "x-internal-note": "example 이 'NORMAL' 이었다 — 이 자리 고유의 제안값이 아니라 작성자가 여러 무관한 칸에 반복 사용한 자리채움이고, 형제 칸 workOrderTypeCode 의 확정 기본값이기도 하다(2026-08-13 2차 제안안 §15 실측). 값 5종 제안·시드는 omf-mes#198(CLOSED). 그룹 이름은 공유계약 G-32·G-31."
+      "x-internal-note": "example 이 'NORMAL' 이었다 — 이 자리 고유의 제안값이 아니라 작성자가 여러 무관한 칸에 반복 사용한 자리채움이고, 형제 칸 workOrderTypeCode 의 확정 기본값이기도 하다(2026-08-13 2차 제안안 §15 실측). 값 5종 제안·시드는 omf-mes#198(CLOSED). 그룹 이름은 공유계약 G-32·G-31.",
+      "x-code-key": "CD-PRODUCTION-PLAN-SPLIT-REASON"
      }
     },
     "description": "러닝체인지로 계획을 나눌 때 원본을 가리킨다. 근거: W-02-02 §5"
@@ -5967,7 +5978,8 @@
        "MOLD"
       ],
       "description": "자원 유형 — R23",
-      "example": "EQUIPMENT"
+      "example": "EQUIPMENT",
+      "x-code-key": "CD-RESOURCE-TYPE"
      },
      "resourceId": {
       "type": "integer",
@@ -5991,7 +6003,8 @@
        "WORKER",
        "MOLD"
       ],
-      "example": "EQUIPMENT"
+      "example": "EQUIPMENT",
+      "x-code-key": "CD-RESOURCE-TYPE"
      },
      "resourceId": {
       "type": "integer",
@@ -6307,7 +6320,8 @@
      "reasonCode": {
       "type": "string",
       "example": "값",
-      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_ORDER_CANCEL_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_ORDER_CANCEL_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-WORK-ORDER-CANCEL-REASON"
      },
      "note": {
       "type": "string",
@@ -6329,12 +6343,14 @@
        "WRITE_OFF"
       ],
       "description": "잔량 처분 — 이월 / 소멸. ⭐ 미달 판정일 때만 보낸다(조건부 필수). 정상·초과 마감에서는 이 칸을 «비운다» — 넘길 잔량도 없앨 잔량도 없어 두 값 중 어느 것도 뜻이 맞지 않는다. ⛔ 그래서 정상·초과용 세 번째 값을 두지 않았다 — 없는 업무 개념을 만들게 된다(공유계약 A-21 · R81 은 「미달 잔량 = 이월/소멸」 둘만 정했다 · ✓확정 QA #27). 평면적인 required 로는 「미달일 때만」을 적을 수 없어 목록에서 뺐고 서버가 판정과 대조해 검증한다. 근거: W-02-05 §5-2·§5-7 · omf-mes#209",
-      "example": "CARRY_OVER"
+      "example": "CARRY_OVER",
+      "x-code-key": "CD-REMAINDER-DISPOSITION"
      },
      "reasonCode": {
       "type": "string",
       "example": "값",
-      "description": "미달·초과 사유 — work_order.completion_variance_reason_code 에 실린다. ⭐ 미달·초과일 때 조건부 필수이고 정상이면 비운다(W-02-05 §5-7 · R80) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_ORDER_COMPLETION_VARIANCE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "미달·초과 사유 — work_order.completion_variance_reason_code 에 실린다. ⭐ 미달·초과일 때 조건부 필수이고 정상이면 비운다(W-02-05 §5-7 · R80) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_ORDER_COMPLETION_VARIANCE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-WORK-ORDER-COMPLETION-VARIANCE-REASON"
      },
      "erpSendItems": {
       "type": "array",
@@ -6812,7 +6828,8 @@
      "eventTypeCode": {
       "type": "string",
       "description": "중단·재개·통제 우회 등. 값 목록은 공통코드가 갖는다. 근거: P-02-10 §8-1 · 공유계약 A-16 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_SESSION_EVENT_TYPE 로 받는다(공유계약 G-32 · 2026-08-31 등재 · ⛔ 시스템 소유 — 고객이 값을 늘리지 않는다). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "NORMAL"
+      "example": "NORMAL",
+      "x-code-key": "CD-WORK-SESSION-EVENT-TYPE"
      },
      "occurredAt": {
       "type": "string",
@@ -6829,7 +6846,8 @@
      "reasonCode": {
       "type": "string",
       "example": "값",
-      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_SESSION_EVENT_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_SESSION_EVENT_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-WORK-SESSION-EVENT-REASON"
      },
      "reasonName": {
       "type": "string",
@@ -6858,7 +6876,8 @@
      "eventTypeCode": {
       "type": "string",
       "example": "값",
-      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_SESSION_EVENT_TYPE 로 받는다(공유계약 G-32 · 2026-08-31 등재 · ⛔ 시스템 소유 — 고객이 값을 늘리지 않는다). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_SESSION_EVENT_TYPE 로 받는다(공유계약 G-32 · 2026-08-31 등재 · ⛔ 시스템 소유 — 고객이 값을 늘리지 않는다). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-WORK-SESSION-EVENT-TYPE"
      },
      "occurredAt": {
       "type": "string",
@@ -6868,7 +6887,8 @@
      "reasonCode": {
       "type": "string",
       "example": "값",
-      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_SESSION_EVENT_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_SESSION_EVENT_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-WORK-SESSION-EVENT-REASON"
      }
     },
     "required": [
@@ -7050,7 +7070,8 @@
        "OVER"
       ],
       "description": "마감 3분류 판정 — 미달 · 정상 · 초과. ⛔ 서버가 판정한다(W-02-08 §5-2 — 조회와 마감이 다른 값을 내면 안 된다). ⚠ 「정상」의 폭(허용 오차)은 아직 미정이라 서버 정책이 정해지면 그 기준을 따른다 — 계약과 화면은 그대로다(W-02-05 §5-1·§8-1). 초과도 실적으로 인정한다(R81)",
-      "example": "UNDER"
+      "example": "UNDER",
+      "x-code-key": "CD-COMPLETION-JUDGMENT"
      },
      "delayStatusCode": {
       "type": "string",
@@ -7060,7 +7081,8 @@
        "UNDETERMINABLE"
       ],
       "example": "ON_TIME",
-      "description": "지연 판정 — 서버가 낸다. DELAYED = 계획 종료 시각이 지났고 아직 완료되지 않았다 · UNDETERMINABLE = 계획 종료 시각이 비어 판정할 수 없다. ⛔ UNDETERMINABLE 을 ON_TIME 으로 접지 않는다 — 「판정 불가」를 「정상」으로 보이면 요약의 지연 건수가 실제보다 적게 나온다"
+      "description": "지연 판정 — 서버가 낸다. DELAYED = 계획 종료 시각이 지났고 아직 완료되지 않았다 · UNDETERMINABLE = 계획 종료 시각이 비어 판정할 수 없다. ⛔ UNDETERMINABLE 을 ON_TIME 으로 접지 않는다 — 「판정 불가」를 「정상」으로 보이면 요약의 지연 건수가 실제보다 적게 나온다",
+      "x-code-key": "CD-DELAY-STATUS"
      }
     },
     "required": [
