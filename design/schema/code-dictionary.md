@@ -116,6 +116,8 @@ CD-<계열>-<축>
 | `CD-EQUIPMENT-BREAKDOWN-STATUS` | `RECEIVED` `HANDLING` `DONE` | `EQUIPMENT_BREAKDOWN_STATUS` | `statusCode` | `registry-system` | 2 | 고장 접수. **값이 계약 산문에 이미 있었다**(2026-09-02 꺼냄) · `W-05-04` |
 | `CD-MAINTENANCE-ORDER-STATUS` | `ISSUED` `DONE` `CANCELLED` | `MAINTENANCE_ORDER_STATUS` | `statusCode` | `registry-system` | 2 | 보전 지시. 같음 · `W-05-05` |
 | `CD-MAINTENANCE-ORDER-ITEM-STATUS` | `PLANNED` `DONE` `NA` | `MAINTENANCE_ORDER_ITEM_STATUS` | `statusCode` | `registry-system` | 1 | 보전 지시 **항목**. ⚠ 지시 전체와 **다른 축**이다 |
+| `CD-LOGISTICS-DOCUMENT-STATUS` | `REGISTERED` `POSTED` `CANCEL_REQUESTED` `CANCELLED` | `LOGISTICS_DOCUMENT_STATUS` | `statusCode` | `registry-system` | 7 | 물류 전표 9종 공용. ⭐ `W-01-13` §3 목업이 네 값을 이미 그렸다 — 꺼낸 것이지 정한 것이 아니다. 9종은 `CD-LOGISTICS-DOCUMENT-TYPE` 과 같은 집합이다 · 사용자 결정 2026-09-02 |
+| `CD-INVENTORY-COUNT-STATUS` | `PLANNED` `IN_PROGRESS` `COMPLETED` | `INVENTORY_COUNT_STATUS` | `statusCode` | `registry-system` | 1 | 재고 실사. ⚠ **전표 상태와 다른 축** — 전기·취소가 없다. `W-01-04` §3 목업 · 사용자 결정 2026-09-02 |
 
 ### ⭐ 이 표가 증명하려는 것 셋
 
