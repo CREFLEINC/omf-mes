@@ -43,8 +43,17 @@
   ㉰ ⛔ **등록부 밖 포인터** — 화면이 적은 `codeGroupCode=X` 의 X 가 `G-32`
         등록부에 없다. 프론트가 그대로 호출하면 «빈 목록»을 받는다
         (`W-01-12` 의 `ADJUST_REASON` 이 실제로 그랬다).
+  ㉲ ⛔ **「코드 아님」도 판정이다** — 계약이 `x-no-code-key` 로 「이 자리는 코드
+        그룹이 아니다」라고 «판정»했는데 화면이 아직 「값 목록 미확정」이라 적는다.
+        ⭐ 화면이 기다릴 값 목록이 **영영 오지 않는다** — ㉮ 와 똑같이 프론트를 굳힌다.
+        ⛔ 2026-09-03 실측 4건. `W-01-09` 가 대표다 — `Asn.statusCode` 는 「코드
+        그룹을 세우지 않는다 … 사용자 결정 2026-09-02」로 이미 판정됐는데 §8-1 이
+        「회신 대기」로 남아 **오지 않을 회신을 기다리고 있었다.**
   ㉱ ⚠  **래칫** — 화면 스펙 전체에 남은 「값 목록 미확정」류 줄 수. 다리가 안 닿는
         자리(§3 목업·§8 미결·산문)까지 센다. 게이트로 못 거는 이유는 아래.
+        ⛔ **이력·회고 절은 세지 않는다** — 「v0.3 이 무엇을 고쳤나」는 «그때의
+        기록»이라 지금 낡은 문면이 아니다(작성 규칙 5 · `verify-stale-terms.py` 와
+        같은 판정 함수를 그대로 쓴다).
 
 ⚠ 왜 ㉱ 만 래칫인가
 --------------------
@@ -84,6 +93,12 @@ _cd = importlib.import_module("check-code-dictionary")
 _ptr = importlib.import_module("check-code-group-pointer")
 _rift = importlib.import_module("check-required-in-fieldtable")
 
+# ⭐ 이력·회고 절 판정은 `verify-stale-terms.py` 것을 «그대로» 쓴다 — 작성 규칙 5 가
+#    「회고·이력을 담은 절에는 표시를 달지 않아도 된다」로 정한 그 절이다. 같은 판정을
+#    두 곳에 따로 두면 갈린다.
+sys.path.insert(0, os.path.dirname(HERE))
+_stale = importlib.import_module("verify-stale-terms")
+
 ROOT = os.path.normpath(os.path.join(HERE, "..", "..", "..", ".."))
 DICT = os.path.join(ROOT, "design", "schema", "code-dictionary.md")
 CONTRACTS = os.path.join(ROOT, "design", "wiki", "api-contracts", "openapi", "*.json")
@@ -93,6 +108,7 @@ SCREEN_ID = re.compile(r"^([WPM]-(?:CO|\d{2})-\d{2})")
 SOURCE_COL = re.compile(r"^`([a-z][a-z0-9_]*)`$")
 VALUE = re.compile(r"`([A-Z][A-Z0-9_]{2,})`")
 POINTER = re.compile(r"codeGroupCode=([A-Za-z_][A-Za-z0-9_]*)")
+HEADING = re.compile(r"^#{1,6}\s*(.+?)\s*$")
 
 # 「값 목록이 아직 없다」고 적은 문면. ⛔ 오프라인 「미확정 «표식»」과 갈라야 한다 —
 #    그것은 코드와 무관한 동기화 상태 표시다(`M-01-08` §5-3).
@@ -116,18 +132,21 @@ NOT_A_VALUE = {
 
 # 기준선 — 2026-09-03 실측. ⛔ 늘리지 않는다. 줄었으면 이 수를 낮춘다.
 #
-# ⭐ 104 → 54. ㉮ 가 짚은 §4 행 25개와 그 화면들의 §3 목업·§5 산문·§8 미결을
-#    함께 고쳤다(18장). 남은 54의 절별 분포는 §4 20 · §8 13 · §5 13 · §3 4 · 그 밖 4.
+# ⭐ 104 → 54 → **4**. 두 회차로 닫았다.
+#    ① ㉮ 가 짚은 §4 행 25개 + 그 화면들의 §3 목업·§5 산문·§8 미결(18장) — 104 → 54
+#    ② 다리가 «안 닿는» 자리를 사람이 한 줄씩 읽어 판정 — 54 → 4
+#       (33장 · §3 목업·§5 산문·§8 미결. 「어느 코드인가」를 계약 조회로 확정한 뒤
+#        값이 있으면 값을, 「코드 아님」이면 그 판정 이유를 옮겨 적었다)
+#    ⛔ 이력·회고 절을 세지 않게 고치며 2줄이 빠졌다(작성 규칙 5).
 #
-# ⚠ 남은 것을 «전부 결손»으로 읽지 않는다 — 두 갈래가 섞여 있다.
-#    (가) 사전이 값을 «아직 안 가진» 키(⬜ 14키). 고객이 `W-06-06` 에서 운영 중에
-#         채우는 `registry` 갈래라 우리가 값을 지어낼 자리가 아니다 — 그 줄은
-#         「값 목록 미확정」이 아니라 「값은 고객이 정한다 · 받는 곳은 있다」로
-#         적는 것이 맞다(`G-31` 마스터안전형).
-#    (나) 다리가 «안 닿는» 자리. §4 소절에 테이블 이름을 backtick 으로 안 적었거나
-#         계약 프로퍼티에 `x-source-column` 이 없어 기계가 어느 코드인지 모른다.
-#    ⇒ 기계가 그 둘을 가르지 못하므로 게이트가 아니라 래칫이다.
-BASELINE_STALE = 54
+# ⚠ 남은 4 는 «진짜 미결»이다 — 고치면 안 되는 자리다.
+#    · `P-02-03` 3줄 — `allocation_method_code`·`trace_accuracy_code` 는 계약에
+#      프로퍼티 «자체»가 없다. `x-code-key` 도 `x-no-code-key` 도 없는 ⬜ 다.
+#      판정 전에 이름을 붙이라는 말이 되므로 그대로 둔다.
+#    · `P-04-02` 1줄 — 「②로 물러난 이유」의 «인용문»이고 바로 두 줄 뒤가 스스로
+#      반박한다. 고치면 반박 대상이 사라진다.
+# ⇒ 그래서 0 이 아니다. 새로 쓰는 스펙이 같은 구멍을 반복하는 것만 막는다.
+BASELINE_STALE = 4
 
 
 def norm(x) -> list:
@@ -148,6 +167,44 @@ def code_key_by_column() -> dict[tuple[str, str], set[str]]:
             doc = json.load(fh)
         for pair, keys in columns_from_doc(doc).items():
             out.setdefault(pair, set()).update(keys)
+    return out
+
+
+def no_code_from_doc(doc: dict) -> dict[tuple[str, str], str]:
+    """한 계약 문서 → {(테이블, 컬럼): 「코드 아님」 이유}. 파일을 읽지 않는다.
+
+    ⭐ **「코드 아님」도 판정이다.** 화면이 기다릴 값 목록이 «영영 오지 않는다»는 뜻이라,
+       그 자리에 「값 목록 미확정」이 남아 있으면 ㉮ 와 똑같이 프론트를 굳힌다.
+       ⛔ 2026-09-03 실측 — `Asn.statusCode` 는 계약이 「코드 그룹을 세우지 않는다 …
+       사용자 결정 2026-09-02」로 판정했는데 `W-01-09` 는 여전히 「값 목록 미확정 ·
+       §8-1 회신 대기」였다. **오지 않을 회신을 기다리고 있었다.**
+    """
+    out: dict[tuple[str, str], str] = {}
+    for schema in (doc.get("components", {}).get("schemas") or {}).values():
+        if not isinstance(schema, dict):
+            continue
+        tables = norm(schema.get("x-source-table"))
+        if not tables:
+            continue
+        for prop in (schema.get("properties") or {}).values():
+            if not isinstance(prop, dict):
+                continue
+            reason = prop.get("x-no-code-key")
+            cols = norm(prop.get("x-source-column"))
+            if not reason or not cols:
+                continue
+            for table in tables:
+                for col in cols:
+                    out[(table, col)] = reason
+    return out
+
+
+def no_code_by_column() -> dict[tuple[str, str], str]:
+    """계약 7벌 → {(테이블, 컬럼): 「코드 아님」 이유}."""
+    out: dict[tuple[str, str], str] = {}
+    for path in sorted(glob.glob(CONTRACTS)):
+        with open(path, encoding="utf-8") as fh:
+            out.update(no_code_from_doc(json.load(fh)))
     return out
 
 
@@ -226,9 +283,11 @@ def judge_row(line: str, keys: set, dic: dict, registry: set) -> tuple[list, lis
 
 def main() -> int:
     pairs = code_key_by_column()
+    nocode = no_code_by_column()
     dic = dictionary()
     registry = set(_ptr.load_registry())
 
+    nocode_rows: list[tuple] = []
     stale_rows: list[tuple] = []
     off_values: list[tuple] = []
     bad_pointer: list[tuple] = []
@@ -245,15 +304,27 @@ def main() -> int:
             text = fh.read()
 
         # ㉰ 화면이 적은 그룹 포인터가 등록부 안인가
+        heading = None
         for i, line in enumerate(text.split("\n"), 1):
+            hm = HEADING.match(line)
+            if hm:
+                heading = hm.group(1)
             for group in POINTER.findall(line):
                 if group not in registry:
                     bad_pointer.append((screen, i, group))
-            if STALE.search(line) and not SETTLED.search(line):
+            # ⛔ 이력·회고 절은 세지 않는다 — 「v0.3 이 무엇을 고쳤나」는 «그때의 기록»이라
+            #    지금 낡은 문면이 아니다(작성 규칙 5 · `verify-stale-terms.py` 와 같은 판정).
+            if STALE.search(line) and not SETTLED.search(line) \
+                    and not _stale.in_history_section(heading):
                 stale_lines += 1                          # ㉱ 래칫
 
-        # ㉮㉯ 다리가 닿은 §4 필드표 행
+        # ㉮㉯㉲ 다리가 닿은 §4 필드표 행
         for table, col, line in field_rows(text):
+            # ㉲ 계약이 「코드 아님」으로 «판정»한 자리인데 아직 기다리고 있다
+            reason = nocode.get((table, col))
+            if reason and STALE.search(line) and not SETTLED.search(line):
+                nocode_rows.append((screen, table, col,
+                                    " ".join(reason.split())[:60]))
             keys = pairs.get((table, col))
             if not keys:
                 continue
@@ -286,6 +357,16 @@ def main() -> int:
     if off_values:
         fail = True
         print("   ⭐ 화면과 사전 중 «어느 쪽이 맞는지» 판정한다 — 둘 다 근거가 있으면 사람에게 묻는다.")
+    print()
+
+    print("㉲ 계약이 「코드 아님」으로 판정했는데 §4 행이 아직 「값 목록 미확정」 — %d"
+          % len(nocode_rows))
+    for row in nocode_rows:
+        print("     %-8s %-34s %-24s %s" % row)
+    if nocode_rows:
+        fail = True
+        print("   ⛔ 화면이 «오지 않을» 값 목록을 기다리고 있다 — 「코드 아님」도 판정이다.")
+        print("   ⭐ 닫는 법 — 그 행에 계약의 판정 이유를 옮겨 적는다(§8 미결도 함께 해소).")
     print()
 
     print("㉰ 화면이 적은 codeGroupCode 가 등록부(G-32) 밖 — %d" % len(bad_pointer))

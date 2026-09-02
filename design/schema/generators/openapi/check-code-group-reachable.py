@@ -84,6 +84,8 @@ SCREENS = os.path.join(HERE, "..", "..", "..", "wiki", "screens", "**", "*.md")
 
 POINTER = re.compile(r"codeGroupCode=([A-Z][A-Z0-9_]*)")
 DOC_SCREEN = re.compile(r"^### 3-\d+\.[^\n`]*`([WMP]-(?:CO|\d{2})-\d{2})`", re.M)
+# 화면 절은 `###` 이다 — 같은 높이 이상의 다음 제목에서 끊는다.
+ANY_HEADING = re.compile(r"^#{1,3}\s", re.M)
 
 # 기준선 — 2026-09-03 실측(직전 2026-09-01 은 31 / 63). ⛔ 늘리지 않는다. 줄었으면 낮춘다.
 #
@@ -96,7 +98,21 @@ DOC_SCREEN = re.compile(r"^### 3-\d+\.[^\n`]*`([WMP]-(?:CO|\d{2})-\d{2})`", re.M
 #    ⛔ 그러므로 이 1 은 «행을 넣어» 닫지 않는다 — 넣으면 화면이 안 하는 호출을
 #    한다고 적는 것이다. **공정 마스터 관리 화면이 서면 그때 0 이 된다.**
 BASELINE = 1
-BASELINE_SCREEN = 58
+#
+# ⭐ 화면 축 58 → 21 (2026-09-03). 두 가지가 함께 일어났다:
+#    ① `screen_sections()` 결함을 고치자 «가려져 있던» 결손 하나가 더 드러났다
+#       (58 → 59). 파일 마지막 화면 절이 `len(text)` 까지 뻗어 꼬리 절
+#       (「커버리지 집계」·「대상 유형 대응표」·「변경 이력」)을 통째로 삼켜,
+#       그 안의 경로·그룹이 그 화면의 것으로 세어지고 있었다.
+#    ② 그중 «그 칸을 화면이 실제로 §4 에 갖고 있는» 34자리에 표시명 호출을 실었다.
+#
+# ⚠ 남은 21 을 «전부 결손»으로 읽지 않는다 — **그 칸이 화면 §4 에 «없다».**
+#    형제가 같은 테이블을 쓴다고 같은 칸을 보이는 것은 아니다. 예 — `W-04-08`(재고
+#    조회)은 `trace.lot_hold` 를 쓰지만 «해제 사유»(`release_reason_code`)를 보이지
+#    않는다. 그 화면에 그 호출을 적으면 **화면이 안 하는 일을 적는 것**이다.
+#    ⇒ 닫으려면 먼저 「그 칸을 이 화면이 보여야 하는가」를 판정해야 한다 —
+#    기계가 못 가르는 물음이라 래칫으로 둔다.
+BASELINE_SCREEN = 21
 
 
 def table_groups_from_doc(doc: dict) -> dict[str, set[str]]:
@@ -146,16 +162,31 @@ def table_screens() -> dict[str, set[str]]:
     return out
 
 
+def sections_from_text(text: str) -> dict[str, str]:
+    """한 요구서 → {화면 ID: §3 소절 본문}. 파일을 읽지 않는다 — 테스트가 부른다.
+
+    ⛔ 절의 «끝»을 다음 «화면» 절이 아니라 «다음 제목»으로 잡는다.
+       2026-09-03 실측 — 파일 «마지막» 화면 절이 `len(text)` 까지 뻗어 꼬리 절
+       (「커버리지 집계」·「대상 유형 대응표」·「변경 이력」)을 통째로 삼켰다.
+       그 안의 경로·그룹이 그 화면의 것으로 세어져, 실제로는 안 부르는 화면이
+       「부른다」로 초록이 됐다 — ②축 판정이 그만큼 헐거웠다(고치자 59로 늘었다).
+    """
+    out: dict[str, str] = collections.defaultdict(str)
+    marks = [(m.group(1), m.start()) for m in DOC_SCREEN.finditer(text)]
+    heads = [m.start() for m in ANY_HEADING.finditer(text)]
+    for screen, start in marks:
+        after = [h for h in heads if h > start]
+        out[screen] += text[start:min(after) if after else len(text)]
+    return out
+
+
 def screen_sections() -> dict[str, str]:
     """화면 ID → 요구서 §3 소절 본문(전 요구서 병합)."""
     out: dict[str, str] = collections.defaultdict(str)
     for f in sorted(glob.glob(os.path.join(REQUIREMENTS, "06-API-요구서*.md"))):
         with open(f, encoding="utf-8") as fh:
-            text = fh.read()
-        marks = [(m.group(1), m.start()) for m in DOC_SCREEN.finditer(text)]
-        for i, (screen, start) in enumerate(marks):
-            end = marks[i + 1][1] if i + 1 < len(marks) else len(text)
-            out[screen] += text[start:end]
+            for screen, body in sections_from_text(fh.read()).items():
+                out[screen] += body
     return out
 
 

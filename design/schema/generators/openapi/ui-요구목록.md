@@ -98,7 +98,7 @@
 | --- | --- |
 | 조회 | 기간 지정됨 |
 | 상세 보기 | 행 선택 |
-| 재처리(단건) | status_code=실패 AND locked_by IS NULL |
+| 재처리(단건) | status_code=FAILED AND locked_by IS NULL |
 | 재처리(선택 일괄) | 위 조건 만족 행 1건 이상 선택 |
 | 즉시 시도(대기 건) | status_code=대기 AND available_at 미래 |
 | 중단·폐기 | 실패 건 |

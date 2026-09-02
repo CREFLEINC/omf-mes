@@ -119,6 +119,7 @@
 | 결재 취소·수정 | **없음 — API 불필요.** `approval_step`이 기록 전용이라 오퍼레이션을 두지 않는다 | §5-6 · **J-6** |
 | 대리 지정 | **없음 — 범위 밖**(2026-08-07 사용자 결정) | §5-8 |
 | 상신 철회 | **없음 — 범위 밖.** 승인자 반려로 대신한다 | §5-8 · **J-6·G-24** |
+| ⭐ **선택지·표시명 — `APPROVAL_REQUEST_STATUS`** | **`GET /mdm/code-values?codeGroupCode=APPROVAL_REQUEST_STATUS`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = PENDING·APPROVED·REJECTED · ⛔ 고객이 편집할 수 없다 | G-32 |
 
 **계약이 정본으로 갖는 것 셋**
 
