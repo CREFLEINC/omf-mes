@@ -1527,9 +1527,14 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "PRODUCT"
+       "example": "PRODUCT",
+       "enum": [
+        "PRODUCT",
+        "RETURN"
+       ]
       },
-      "description": "PRODUCT(제품)·RETURN(반품). ⭐ 서버가 대상 LOT 의 입고 유형으로 파생하는 축이다 — 화면이 보내지 않는다. W-03-10 §5-4 원천 필터가 쓴다. 이력: 2026-08-30 신설(W-03-10 원천 필터 되살리기) · 2026-09-01 서버 파생으로 재정의(omf-mes#303)"
+      "description": "부적합 원천 — 제품(PRODUCT) · 반품(RETURN). ⭐ 서버가 대상 LOT 의 입고 유형으로 «파생»하는 축이라 화면이 보내지 않는다(2026-09-01). W-03-10 §5-4 원천 필터가 쓴다. ⛔ DefectRecord 의 sourceCode(CD-DEFECT-RECORD-SOURCE)와 이름만 같고 축이 다르다 — 저쪽은 «어디서 발견했나», 여기는 «어디서 들어온 물건인가»다",
+      "x-code-key": "CD-NONCONFORMANCE-SOURCE"
      },
      {
       "name": "warehouseId",
@@ -1564,7 +1569,9 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-code-key": "CD-NONCONFORMANCE-SEVERITY",
+      "description": "부적합 심각도 — 중대(CRITICAL) · 중(MAJOR) · 경(MINOR). ⭐ 화면 목업이 「심각도 중대」(W-03-10 §3)·「심각도 중」(W-04-07 §3)을 그려 3단계 축이 이미 서 있다. ⭐ 고객이 늘릴 수 있다 — 아래는 초기값(기본값)이지 닫힌 목록이 아니다. 값 목록은 GET /mdm/code-values?codeGroupCode=NONCONFORMANCE_SEVERITY 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "openedFrom",

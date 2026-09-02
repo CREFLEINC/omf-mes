@@ -86,9 +86,15 @@
       "name": "overallResultCode",
       "in": "query",
       "schema": {
-       "type": "string"
+       "type": "string",
+       "enum": [
+        "PASS",
+        "FAIL"
+       ],
+       "example": "PASS"
       },
-      "description": "종합 판정으로 거른다 — 합격(OK) 또는 불합격(NG). 보전 지시 발행 화면이 불합격만 트리거 목록으로 부른다(W-05-05 §4)"
+      "description": "점검 종합 판정 — 합격(PASS) · 불합격(FAIL). 보전 지시 발행 화면이 «불합격만» 트리거 목록으로 부른다(W-05-05 §4). ⭐ 문자열을 PASS·FAIL 로 정한 근거는 «같은 계약 파일의 일관성»이다 — Calibration.resultCode 가 이미 합격(PASS)·불합격(FAIL)을 쓴다. 「OK」는 저장소 다른 곳에 용례가 없다(2026-09-02 실측 · 사용자 위임 판단)",
+      "x-code-key": "CD-MAINTENANCE-INSPECTION-RESULT"
      },
      {
       "name": "withoutMaintenanceOrder",
@@ -905,8 +911,14 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "EQUIPMENT"
-      }
+       "example": "EQUIPMENT",
+       "enum": [
+        "EQUIPMENT",
+        "MOLD"
+       ]
+      },
+      "x-code-key": "CD-MAINTENANCE-TARGET-TYPE",
+      "description": "보전 대상 유형 — EQUIPMENT → 설비(계측기 포함 · 계측기는 설비의 한 종류라 equipmentId 를 그대로 쓴다) · MOLD → 툴·금형. ⭐ 값 문자열을 확정했다(2026-09-02). ⛔ 다형 참조 판별자라 고객이 늘릴 수 없다(A-10 · A-16)"
      },
      {
       "name": "targetId",
@@ -932,9 +944,14 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "PREVENTIVE"
+       "example": "PREVENTIVE",
+       "enum": [
+        "CORRECTIVE",
+        "PREVENTIVE"
+       ]
       },
-      "description": "보전 유형으로 거른다 — 사후(CORRECTIVE)·예방(PREVENTIVE). 사람이 고르는 값이 아니라 발행 시 트리거 조합이 정한 값이다."
+      "description": "보전 유형 — 사후(CORRECTIVE) · 예방(PREVENTIVE). 사람이 고르는 값이 아니라 발행 시 트리거 조합이 정한다 — 고장이 하나라도 섞이면 사후로 고정된다(W-05-05 §5-3). ⭐ 「예지(PREDICTIVE)」를 두지 않는다(사용자 결정 2026-09-02) — WF05 S5 Trigger ④ 가 「(향후) 상태 기반 예지보전」이라 적어 «촉발할 트리거가 아직 없고», 트리거가 정하는 축에 트리거 없는 값을 두면 사람이 손으로 고를 수밖에 없어 규칙이 무너진다(A-21). ⚠ 예지 트리거가 서면 그때 값을 더한다",
+      "x-code-key": "CD-MAINTENANCE-TYPE"
      },
      {
       "name": "plannedFrom",
@@ -1233,8 +1250,14 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "MOLD"
-      }
+       "example": "MOLD",
+       "enum": [
+        "EQUIPMENT",
+        "MOLD"
+       ]
+      },
+      "x-code-key": "CD-MAINTENANCE-TARGET-TYPE",
+      "description": "보전 대상 유형 — EQUIPMENT → 설비(계측기 포함 · 계측기는 설비의 한 종류라 equipmentId 를 그대로 쓴다) · MOLD → 툴·금형. ⭐ 값 문자열을 확정했다(2026-09-02). ⛔ 다형 참조 판별자라 고객이 늘릴 수 없다(A-10 · A-16)"
      },
      {
       "name": "targetId",
@@ -2698,7 +2721,8 @@
        "type": "string",
        "example": "CALIBRATION"
       },
-      "description": "이력 유형으로 거른다. 값은 Calibration.historyTypeCode 와 같다."
+      "description": "이력 유형으로 거른다. 계측기 이력 유형 — 검교정(CALIBRATION) · 점검(CHECK) · 그 밖(고객이 늘린다). ⭐ 2026-09-02 사용자 결정으로 «시스템이 이름으로 지목하는 값은 CALIBRATION 하나»가 됐다 — 설비 마스터의 검교정일 갱신과 agencyTypeCode 표시가 그것에 걸린다. ⛔ 사용 가부 판정은 더 이상 이 값을 읽지 않는다 — 「열린 수리 이력이 없다」를 blocksUse + clearedAt 로 바꿨다(W-05-11 §5-2). 그래서 「수리」·「폐기」의 코드 문자열을 우리가 정할 필요가 없고, 계약이 원래 적은 「관리자 설정형」이 그제서야 성립한다. 값 목록은 GET /mdm/code-values?codeGroupCode=CALIBRATION_HISTORY_TYPE 로 받는다.",
+      "x-code-key": "CD-CALIBRATION-HISTORY-TYPE"
      },
      {
       "name": "dueBefore",
@@ -2895,6 +2919,52 @@
       }
      }
     }
+   }
+  },
+  "/maintenance/calibrations/{calibrationId}:clear": {
+   "post": {
+    "summary": "계측기 이력의 사용 차단을 해소한다",
+    "description": "blocksUse=true 인 이력의 clearedAt 을 세운다 — 그 순간부터 이 계측기가 다시 사용 가능해진다(W-05-11 §5-2 판정식). ⛔ 이미 해소된 이력에 다시 부르면 409 다. ⚠ blocksUse=false 인 이력에 부르면 400 이다 — 막고 있지 않은 것을 풀 수 없다. ⭐ 행을 지우지 않는다 — 언제 누가 풀었는지가 남아야 한다.",
+    "operationId": "clearCalibrationBlock",
+    "parameters": [
+     {
+      "name": "calibrationId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "해소됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Calibration"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "막고 있지 않은 이력이다"
+     },
+     "404": {
+      "description": "없는 이력이다"
+     },
+     "409": {
+      "description": "이미 해소됐다"
+     }
+    },
+    "tags": [
+     "maintenance"
+    ]
    }
   }
  },
@@ -3578,8 +3648,13 @@
      },
      "targetTypeCode": {
       "type": "string",
-      "description": "설비(EQUIPMENT) 또는 툴(MOLD)",
-      "example": "EQUIPMENT"
+      "description": "보전 대상 유형 — EQUIPMENT → 설비(계측기 포함 · 계측기는 설비의 한 종류라 equipmentId 를 그대로 쓴다) · MOLD → 툴·금형. ⭐ 값 문자열을 확정했다(2026-09-02). ⛔ 다형 참조 판별자라 고객이 늘릴 수 없다(A-10 · A-16)",
+      "example": "EQUIPMENT",
+      "x-code-key": "CD-MAINTENANCE-TARGET-TYPE",
+      "enum": [
+       "EQUIPMENT",
+       "MOLD"
+      ]
      },
      "targetId": {
       "type": "integer",
@@ -3674,7 +3749,13 @@
     "properties": {
      "targetTypeCode": {
       "type": "string",
-      "example": "EQUIPMENT"
+      "example": "EQUIPMENT",
+      "x-code-key": "CD-MAINTENANCE-TARGET-TYPE",
+      "description": "보전 대상 유형 — EQUIPMENT → 설비(계측기 포함 · 계측기는 설비의 한 종류라 equipmentId 를 그대로 쓴다) · MOLD → 툴·금형. ⭐ 값 문자열을 확정했다(2026-09-02). ⛔ 다형 참조 판별자라 고객이 늘릴 수 없다(A-10 · A-16)",
+      "enum": [
+       "EQUIPMENT",
+       "MOLD"
+      ]
      },
      "targetId": {
       "type": "integer",
@@ -3862,7 +3943,13 @@
      },
      "targetTypeCode": {
       "type": "string",
-      "example": "EQUIPMENT"
+      "example": "EQUIPMENT",
+      "x-code-key": "CD-MAINTENANCE-TARGET-TYPE",
+      "description": "보전 대상 유형 — EQUIPMENT → 설비(계측기 포함 · 계측기는 설비의 한 종류라 equipmentId 를 그대로 쓴다) · MOLD → 툴·금형. ⭐ 값 문자열을 확정했다(2026-09-02). ⛔ 다형 참조 판별자라 고객이 늘릴 수 없다(A-10 · A-16)",
+      "enum": [
+       "EQUIPMENT",
+       "MOLD"
+      ]
      },
      "targetId": {
       "type": "integer",
@@ -3981,7 +4068,13 @@
      },
      "targetTypeCode": {
       "type": "string",
-      "example": "EQUIPMENT"
+      "example": "EQUIPMENT",
+      "x-code-key": "CD-MAINTENANCE-TARGET-TYPE",
+      "description": "보전 대상 유형 — EQUIPMENT → 설비(계측기 포함 · 계측기는 설비의 한 종류라 equipmentId 를 그대로 쓴다) · MOLD → 툴·금형. ⭐ 값 문자열을 확정했다(2026-09-02). ⛔ 다형 참조 판별자라 고객이 늘릴 수 없다(A-10 · A-16)",
+      "enum": [
+       "EQUIPMENT",
+       "MOLD"
+      ]
      },
      "targetId": {
       "type": "integer",
@@ -4836,8 +4929,9 @@
      },
      "historyTypeCode": {
       "type": "string",
-      "description": "계측기 이력 유형. 확정된 유형은 넷이다 — 검교정(CALIBRATION) · 점검(CHECK) · 수리 · 폐기. ⚠ 뒤 둘의 코드값 이름은 아직 확정되지 않았다 — 관리자 설정형이라 값이 늘 수 있고 공통코드 마스터(W-06-06)가 정한다. ⚠ 「열린 수리 이력이 없다」가 설비 사용 가부 판정식의 한 항이므로 수리 유형을 뺄 수 없다(W-05-11 §5-2). ⛔ enum 으로 좁히지 않는다",
-      "example": "CALIBRATION"
+      "description": "계측기 이력 유형 — 검교정(CALIBRATION) · 점검(CHECK) · 그 밖(고객이 늘린다). ⭐ 2026-09-02 사용자 결정으로 «시스템이 이름으로 지목하는 값은 CALIBRATION 하나»가 됐다 — 설비 마스터의 검교정일 갱신과 agencyTypeCode 표시가 그것에 걸린다. ⛔ 사용 가부 판정은 더 이상 이 값을 읽지 않는다 — 「열린 수리 이력이 없다」를 blocksUse + clearedAt 로 바꿨다(W-05-11 §5-2). 그래서 「수리」·「폐기」의 코드 문자열을 우리가 정할 필요가 없고, 계약이 원래 적은 「관리자 설정형」이 그제서야 성립한다. 값 목록은 GET /mdm/code-values?codeGroupCode=CALIBRATION_HISTORY_TYPE 로 받는다.",
+      "example": "CALIBRATION",
+      "x-code-key": "CD-CALIBRATION-HISTORY-TYPE"
      },
      "performedOn": {
       "type": "string",
@@ -4919,6 +5013,21 @@
       ],
       "description": "비고",
       "example": "정정 재검교정 — 1차 성적서 오기"
+     },
+     "blocksUse": {
+      "type": "boolean",
+      "default": false,
+      "description": "이 이력이 해소될 때까지 «이 계측기를 쓸 수 없게» 막는가. ⭐ 2026-09-02 신설 (사용자 결정) — 전에는 W-05-11 §5-2 가 「열린 «수리» 이력이 없다」로 historyTypeCode 의 «뜻»을 읽었는데, ⛔ 그 방식은 두 가지가 깨져 있었다: ① 이력에 열림/닫힘 축이 아예 없어 「한 번이라도 수리하면 영원히 사용 불가」가 됐고 ② 「수리」의 코드 문자열이 고객 몫이라 우리 판정식이 «고객이 지을 이름»을 지목하고 있었다. ⭐ 사람이 직접 정한다 — 고장·수리는 달력이 아니라 사람이 만드는 사건이라 파생으로 둘 이유가 없다(만료는 다르다 — 그쪽은 달력이 만들어 파생으로 남긴다).",
+      "example": false
+     },
+     "clearedAt": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "format": "date-time",
+      "description": "사용 차단이 해소된 시각. 비어 있으면 «아직 막고 있다». ⭐ 구간 형 리소스의 그 방식이다 — LOT 보류(released_at) · 작업 세션(:end) · repair-executions?open=true 와 같다. ⚠ blocksUse 가 false 면 의미가 없다.",
+      "example": null
      }
     },
     "required": [
@@ -4926,7 +5035,8 @@
      "equipmentId",
      "historyTypeCode",
      "performedOn",
-     "resultCode"
+     "resultCode",
+     "blocksUse"
     ]
    },
    "CalibrationCreate": {
@@ -4935,7 +5045,8 @@
      "historyTypeCode": {
       "type": "string",
       "example": "CALIBRATION",
-      "description": "계측기 이력 유형. 확정된 유형은 넷이다 — 검교정(CALIBRATION) · 점검(CHECK) · 수리 · 폐기. ⚠ 뒤 둘의 코드값 이름은 아직 확정되지 않았다 — 관리자 설정형이라 값이 늘 수 있고 공통코드 마스터(W-06-06)가 정한다. ⚠ 「열린 수리 이력이 없다」가 설비 사용 가부 판정식의 한 항이므로 수리 유형을 뺄 수 없다(W-05-11 §5-2). ⛔ enum 으로 좁히지 않는다"
+      "description": "계측기 이력 유형 — 검교정(CALIBRATION) · 점검(CHECK) · 그 밖(고객이 늘린다). ⭐ 2026-09-02 사용자 결정으로 «시스템이 이름으로 지목하는 값은 CALIBRATION 하나»가 됐다 — 설비 마스터의 검교정일 갱신과 agencyTypeCode 표시가 그것에 걸린다. ⛔ 사용 가부 판정은 더 이상 이 값을 읽지 않는다 — 「열린 수리 이력이 없다」를 blocksUse + clearedAt 로 바꿨다(W-05-11 §5-2). 그래서 「수리」·「폐기」의 코드 문자열을 우리가 정할 필요가 없고, 계약이 원래 적은 「관리자 설정형」이 그제서야 성립한다. 값 목록은 GET /mdm/code-values?codeGroupCode=CALIBRATION_HISTORY_TYPE 로 받는다.",
+      "x-code-key": "CD-CALIBRATION-HISTORY-TYPE"
      },
      "performedOn": {
       "type": "string",
@@ -5007,13 +5118,20 @@
       ],
       "description": "비고",
       "example": "정정 재검교정 — 1차 성적서 오기"
+     },
+     "blocksUse": {
+      "type": "boolean",
+      "default": false,
+      "description": "이 이력이 해소될 때까지 «이 계측기를 쓸 수 없게» 막는가. ⭐ 2026-09-02 신설 (사용자 결정) — 전에는 W-05-11 §5-2 가 「열린 «수리» 이력이 없다」로 historyTypeCode 의 «뜻»을 읽었는데, ⛔ 그 방식은 두 가지가 깨져 있었다: ① 이력에 열림/닫힘 축이 아예 없어 「한 번이라도 수리하면 영원히 사용 불가」가 됐고 ② 「수리」의 코드 문자열이 고객 몫이라 우리 판정식이 «고객이 지을 이름»을 지목하고 있었다. ⭐ 사람이 직접 정한다 — 고장·수리는 달력이 아니라 사람이 만드는 사건이라 파생으로 둘 이유가 없다(만료는 다르다 — 그쪽은 달력이 만들어 파생으로 남긴다).",
+      "example": false
      }
     },
     "required": [
      "equipmentId",
      "historyTypeCode",
      "performedOn",
-     "resultCode"
+     "resultCode",
+     "blocksUse"
     ]
    },
    "DowntimeEquipmentSummary": {

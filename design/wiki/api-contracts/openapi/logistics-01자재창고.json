@@ -1818,14 +1818,24 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 방향은 라인의 from*/to* 가, 성격은 sourceDocumentTypeCode 가 이미 말한다. 같은 사실을 두 자리에 적지 않는다(L-2-1 · A-21 · 2026-09-02 판정)."
      },
      {
       "name": "sourceDocumentTypeCode",
       "in": "query",
       "schema": {
-       "type": "string"
-      }
+       "type": "string",
+       "enum": [
+        "GOODS_RECEIPT",
+        "GOODS_ISSUE",
+        "INVENTORY_ADJUSTMENT",
+        "STOCK_TRANSFER"
+       ],
+       "example": "GOODS_RECEIPT"
+      },
+      "x-code-key": "CD-INVENTORY-TRANSACTION-SOURCE-DOCUMENT-TYPE",
+      "description": "원천 문서 유형으로 거른다. 원천 문서 유형. **A-10 다형 참조 판별자**이고 값은 «대상 테이블 이름»이다 — sourceDocumentId 는 그 표의 식별자다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다. 넷이다 — 입고(GOODS_RECEIPT) · 출고(GOODS_ISSUE) · 재고조정(INVENTORY_ADJUSTMENT) · 재고이동(STOCK_TRANSFER). ⭐ 근거 — W-04-05 가 「입고·출고 전기 각 1건」을 명시하고, W-01-12 §5-2 가 「inventory_transaction.source_document_type_code 에 「재고조정」 값이 있으면 source_document_id = inventory_adjustment_id 로 잇는다」로 적었다. ⚠ STOCK_TRANSFER 는 «재고를 움직이므로 원장을 남긴다»는 추론이다 — 다른 셋보다 근거가 얕다. ⭐ 이 축이 원장 한 줄의 «성격»을 말한다 — 방향(입고·출고·이동)은 라인의 from*/to* 가 이미 말하므로 transactionTypeCode 를 따로 두지 않는다(L-2-1 · 2026-09-02 판정)."
      },
      {
       "name": "page",
@@ -5860,7 +5870,9 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "x-code-key": "CD-STOCK-TRANSFER-TYPE",
+      "description": "재고 이동 유형 — 일반 이동(NORMAL) · 불량 반출(DEFECT_RETURN). ⭐ M-01-10 §4 가 「불량 반출일 때만 사유 칸을 연다」로 «동작»을 이 값에 걸었다 — 값이 늘면 화면 분기가 따라가지 못한다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 값 목록은 GET /mdm/code-values?codeGroupCode=STOCK_TRANSFER_TYPE 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "statusCode",
@@ -6374,10 +6386,17 @@
       "name": "receiptDispositionCode",
       "in": "query",
       "schema": {
-       "type": "string"
+       "type": "string",
+       "enum": [
+        "IQC_PASSED",
+        "SAMPLING_NOT_REQUIRED",
+        "URGENT_IQC_WAIVED"
+       ],
+       "example": "IQC_PASSED"
       },
-      "description": "입고 확정 대기 큐의 판정 축 — IQC 합격 · 샘플링 미대상 · 긴급 IQC 생략 한도승인 세 갈래다. ⚠ 값 집합은 확정이나 코드 문자열이 아직 정해지지 않아 enum 을 못 박지 않는다 — 서버가 내려주는 선택지를 그대로 쓴다. ⭐ 서버가 판정한다 — 화면이 검사 결과·승인 요청을 따로 조회해 조합하면 세 갈래가 화면마다 갈린다. 근거: W-01-10 §3·§5-1·§5-5",
-      "x-internal-note": "코드 그룹 신설 필요 — 후보 INSPECTION_PASSED·SAMPLING_EXEMPT·CONCESSION_APPROVED."
+      "description": "입고 확정 대기 큐의 판정 축 — IQC 합격(IQC_PASSED) · 샘플링 미대상(SAMPLING_NOT_REQUIRED) · 긴급 IQC 생략 한도승인(URGENT_IQC_WAIVED). ⭐ 값 집합은 W-01-10 §3·§5-1·§5-5 가 이미 확정했고 문자열만 없었다 — 2026-09-02 §G 로 도출. ⭐ 서버가 판정한다 — 화면이 검사 결과·승인 요청을 따로 조회해 조합하면 세 갈래가 화면마다 갈린다",
+      "x-internal-note": "코드 그룹 신설 필요 — 후보 INSPECTION_PASSED·SAMPLING_EXEMPT·CONCESSION_APPROVED.",
+      "x-code-key": "CD-GOODS-RECEIPT-DISPOSITION"
      },
      {
       "name": "awaitingReceiptOnly",
@@ -7824,7 +7843,7 @@
        "GOODS_RECEIPT",
        "DISPOSITION_DECISION"
       ],
-      "x-code-key": "CD-SOURCE-DOCUMENT-TYPE"
+      "x-code-key": "CD-GOODS-ISSUE-SOURCE-DOCUMENT-TYPE"
      },
      "sourceDocumentId": {
       "x-source-column": "source_document_id",
@@ -7964,7 +7983,7 @@
        "GOODS_RECEIPT",
        "DISPOSITION_DECISION"
       ],
-      "x-code-key": "CD-SOURCE-DOCUMENT-TYPE"
+      "x-code-key": "CD-GOODS-ISSUE-SOURCE-DOCUMENT-TYPE"
      },
      "sourceDocumentId": {
       "x-source-column": "source_document_id",
@@ -8322,9 +8341,17 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "원천 문서 유형. ⭐ **비울 수 있다**(2026-08-31 사용자 확정) — 출하가 완료된 뒤 되돌아오는 반품 입고처럼 가리킬 원천 문서가 없는 갈래가 성립한다. ⛔ 「없음(NONE)」을 값으로 두지 않는다 — 가리킬 대상이 없는 값을 다형 참조 판별자에 섞지 않는다(공유계약 A-10). 값 목록은 아직 확정 전이다(omf-mes#145).",
+      "description": "원천 문서 유형. **A-10 다형 참조 판별자**이고 값은 «대상 테이블 이름»이다 — sourceDocumentId 는 그 표의 식별자다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다. 넷이다 — 입하(INBOUND_RECEIPT → logistics.inbound_receipt · W-01-10 정상품 입하 · W-01-13 「입하 → 입고」) · 출하(SHIPMENT → logistics.shipment · W-04-06 반품 클레임 입고) · 생산 실적(PRODUCTION_RESULT → production.production_result · M-04-04 제품 입고 적치) · 외주 출고(SUBCONTRACT_ISSUE · M-04-04 외주 회수 — 나갔던 외주분이 돌아온다). ⭐ **비울 수 있다**(2026-08-31 사용자 확정) — 「반품인 것은 확실한데 어느 출하인지 모르는」 갈래가 성립한다. sourceDocumentId 와 «함께» 비운다. ⛔ 「없음(NONE)」을 값으로 두지 않는다 — 가리킬 대상이 없는 값을 판별자에 섞지 않는다.",
       "x-internal-note": "2026-08-31 사용자 확정 — 「없음(NONE)」을 값으로 두지 않고 칸을 비울 수 있게 한다. 저장 컬럼의 NOT NULL 해제는 데이터 모델 담당에게 통지한다 — 기다리지 않는다(schema/data-model-boundary.md). 근거: W-04-06 §5-3 · omf-mes#302.",
-      "x-no-example": "값 목록이 아직 확정 전이다(omf-mes#145) — 확정 전에는 예시를 지어내지 않는다."
+      "x-no-example": "값 목록이 아직 확정 전이다(omf-mes#145) — 확정 전에는 예시를 지어내지 않는다.",
+      "x-code-key": "CD-GOODS-RECEIPT-SOURCE-DOCUMENT-TYPE",
+      "enum": [
+       "INBOUND_RECEIPT",
+       "SHIPMENT",
+       "PRODUCTION_RESULT",
+       "SUBCONTRACT_ISSUE"
+      ],
+      "example": "INBOUND_RECEIPT"
      },
      "sourceDocumentId": {
       "x-source-column": "source_document_id",
@@ -8411,9 +8438,16 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "원천 문서 유형. ⭐ **비울 수 있다**(2026-08-31 사용자 확정) — 출하가 완료된 뒤 되돌아오는 반품 입고처럼 가리킬 원천 문서가 없는 갈래가 성립한다. ⛔ 「없음(NONE)」을 값으로 두지 않는다 — 가리킬 대상이 없는 값을 다형 참조 판별자에 섞지 않는다(공유계약 A-10). 값 목록은 아직 확정 전이다(omf-mes#145).",
+      "description": "원천 문서 유형. **A-10 다형 참조 판별자**이고 값은 «대상 테이블 이름»이다 — sourceDocumentId 는 그 표의 식별자다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다. 넷이다 — 입하(INBOUND_RECEIPT → logistics.inbound_receipt · W-01-10 정상품 입하 · W-01-13 「입하 → 입고」) · 출하(SHIPMENT → logistics.shipment · W-04-06 반품 클레임 입고) · 생산 실적(PRODUCTION_RESULT → production.production_result · M-04-04 제품 입고 적치) · 외주 출고(SUBCONTRACT_ISSUE · M-04-04 외주 회수 — 나갔던 외주분이 돌아온다). ⭐ **비울 수 있다**(2026-08-31 사용자 확정) — 「반품인 것은 확실한데 어느 출하인지 모르는」 갈래가 성립한다. sourceDocumentId 와 «함께» 비운다. ⛔ 「없음(NONE)」을 값으로 두지 않는다 — 가리킬 대상이 없는 값을 판별자에 섞지 않는다.",
       "example": "INBOUND_RECEIPT",
-      "x-internal-note": "2026-08-31 사용자 확정 — 「없음(NONE)」을 값으로 두지 않고 칸을 비울 수 있게 한다. 저장 컬럼의 NOT NULL 해제는 데이터 모델 담당에게 통지한다 — 기다리지 않는다(schema/data-model-boundary.md). 근거: W-04-06 §5-3 · omf-mes#302."
+      "x-internal-note": "2026-08-31 사용자 확정 — 「없음(NONE)」을 값으로 두지 않고 칸을 비울 수 있게 한다. 저장 컬럼의 NOT NULL 해제는 데이터 모델 담당에게 통지한다 — 기다리지 않는다(schema/data-model-boundary.md). 근거: W-04-06 §5-3 · omf-mes#302.",
+      "x-code-key": "CD-GOODS-RECEIPT-SOURCE-DOCUMENT-TYPE",
+      "enum": [
+       "INBOUND_RECEIPT",
+       "SHIPMENT",
+       "PRODUCTION_RESULT",
+       "SUBCONTRACT_ISSUE"
+      ]
      },
      "sourceDocumentId": {
       "x-source-column": "source_document_id",
@@ -11082,9 +11116,14 @@
       "x-source-column": "source_document_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "원천 문서 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
+      "description": "원천 문서 유형. **A-10 다형 참조 판별자**이고 값은 «대상 테이블 이름»이다 — sourceDocumentId 는 그 표의 식별자다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다. 지금은 하나다 — 생산오더(PRODUCTION_ORDER → production.production_order). ⭐ W-02-01 §5-4 가 「P/O 의 «자재예약정보»가 production_order 에 없고 inventory_reservation 이 P/O 를 가리킨다」로 이 축을 세웠고 2026-09-02 에 「서버가 건다」로 해소됐다. ⚠ 값이 하나라고 축이 없는 것이 아니다 — 판별자는 «무엇을 가리키는지»를 말하고, 가리킬 표가 늘면 계약을 고친다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-code-key": "CD-INVENTORY-RESERVATION-SOURCE-DOCUMENT-TYPE",
+      "enum": [
+       "PRODUCTION_ORDER"
+      ],
+      "example": "PRODUCTION_ORDER"
      },
      "sourceDocumentId": {
       "x-source-column": "source_document_id",
@@ -11199,7 +11238,8 @@
       "maxLength": 50,
       "description": "거래 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 원장 한 줄이 «무엇인가»를 말하는 축이 이미 셋이다: 어느 전표가 만들었나(sourceDocumentTypeCode + sourceDocumentId) · 취소인가(reversalOfTransactionId) · 재고가 들어왔나 나갔나 옮겼나(라인의 from*/to* — 계약이 「출발지와 도착지 중 적어도 한쪽은 있어야 한다」로 못박았다). 「입고·출고·이동」은 from/to 조합으로 이미 판정되고 「조정」은 원천 전표가 말한다. 한 칸 더 두면 어긋났을 때 어느 쪽이 맞는지 판정할 수 없다(L-2-1). ⚠ 「거래유형·수불유형」을 읽는 화면은 전건 0 건이다(A-21 · 사용자 위임 판단 2026-09-02)."
      },
      "plantId": {
       "x-source-column": "plant_id",
@@ -11225,9 +11265,17 @@
       "x-source-column": "source_document_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "원천 전표 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
+      "description": "원천 문서 유형. **A-10 다형 참조 판별자**이고 값은 «대상 테이블 이름»이다 — sourceDocumentId 는 그 표의 식별자다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다. 넷이다 — 입고(GOODS_RECEIPT) · 출고(GOODS_ISSUE) · 재고조정(INVENTORY_ADJUSTMENT) · 재고이동(STOCK_TRANSFER). ⭐ 근거 — W-04-05 가 「입고·출고 전기 각 1건」을 명시하고, W-01-12 §5-2 가 「inventory_transaction.source_document_type_code 에 「재고조정」 값이 있으면 source_document_id = inventory_adjustment_id 로 잇는다」로 적었다. ⚠ STOCK_TRANSFER 는 «재고를 움직이므로 원장을 남긴다»는 추론이다 — 다른 셋보다 근거가 얕다. ⭐ 이 축이 원장 한 줄의 «성격»을 말한다 — 방향(입고·출고·이동)은 라인의 from*/to* 가 이미 말하므로 transactionTypeCode 를 따로 두지 않는다(L-2-1 · 2026-09-02 판정).",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-code-key": "CD-INVENTORY-TRANSACTION-SOURCE-DOCUMENT-TYPE",
+      "enum": [
+       "GOODS_RECEIPT",
+       "GOODS_ISSUE",
+       "INVENTORY_ADJUSTMENT",
+       "STOCK_TRANSFER"
+      ],
+      "example": "GOODS_RECEIPT"
      },
      "sourceDocumentId": {
       "x-source-column": "source_document_id",
@@ -11934,9 +11982,16 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "외부 시스템. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
+      "description": "외부 시스템 구분 — 설비 표준 IF(EQUIPMENT_STANDARD_IF) · 추적 시스템(TRACKING_SYSTEM) · ERP(UNIERP). ⭐ 같은 축이 이미 계약에 닫혀 있다 — InterfaceDefinition 이 쓰는 그 값집합이다(2026-09-02 확인). ⛔ 공통코드 그룹이 아니라 계약이 enum 으로 닫는다 — 우리가 붙이는 연계 상대의 목록이라 고객이 늘리는 값이 아니다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-code-key": "CD-EXTERNAL-SYSTEM",
+      "enum": [
+       "EQUIPMENT_STANDARD_IF",
+       "TRACKING_SYSTEM",
+       "UNIERP"
+      ],
+      "example": "UNIERP"
      }
     }
    },
@@ -11994,9 +12049,16 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "외부 시스템. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
+      "description": "외부 시스템 구분 — 설비 표준 IF(EQUIPMENT_STANDARD_IF) · 추적 시스템(TRACKING_SYSTEM) · ERP(UNIERP). ⭐ 같은 축이 이미 계약에 닫혀 있다 — InterfaceDefinition 이 쓰는 그 값집합이다(2026-09-02 확인). ⛔ 공통코드 그룹이 아니라 계약이 enum 으로 닫는다 — 우리가 붙이는 연계 상대의 목록이라 고객이 늘리는 값이 아니다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-code-key": "CD-EXTERNAL-SYSTEM",
+      "enum": [
+       "EQUIPMENT_STANDARD_IF",
+       "TRACKING_SYSTEM",
+       "UNIERP"
+      ],
+      "example": "UNIERP"
      }
     }
    },
@@ -12077,7 +12139,8 @@
       "maxLength": 50,
       "description": "⛔ 이 값으로 보류 여부를 판정하지 않는다 — 정본은 해제 칼럼(released_by · released_at)이다(사용자 결정 2026-09-02). 비어 있으면 보류중, 채워졌으면 해제됨이고 해제한 사람·시각까지 한 자리에 남는다. 같은 사실을 두 자리에 적으면 어긋났을 때 어느 쪽이 맞는지 판정할 수 없다 — AppUser 의 「인사 상태 vs isActive」를 가른 것과 같은 형태다(W-CO-02 §8-4). ⚠ 목록을 「보류중」으로 거르는 것은 서버가 released_at IS NULL 로 한다. 근거: W-03-02 §4-B.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 이 값으로 보류 여부를 판정하지 않는다. 정본은 해제 칼럼(released_by · released_at)이라고 이 자리의 산문이 이미 못박았다(사용자 결정 2026-09-02). 판정에 안 쓰는 값에 선택지 목록을 붙이면 화면이 그것으로 거르기 시작한다(A-21)."
      },
      "heldBy": {
       "x-source-column": "held_by",
@@ -13013,9 +13076,15 @@
       "x-source-column": "source_document_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "원천 문서 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
+      "description": "원천 문서 유형. **A-10 다형 참조 판별자**이고 값은 «대상 테이블 이름»이다 — sourceDocumentId 는 그 표의 식별자다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다. 둘이다 — 자재 출고요청(MATERIAL_ISSUE_REQUEST → logistics.material_issue_request · M-01-08 자재 출고 피킹) · 출하 지시(SHIPMENT_REQUEST → logistics.shipment_request · M-04-01 제품 LOT 피킹 스캔). ⭐ 자재 피킹과 제품 피킹이 같은 표를 쓰고 이 값이 둘을 가른다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-code-key": "CD-PICKING-ORDER-SOURCE-DOCUMENT-TYPE",
+      "enum": [
+       "MATERIAL_ISSUE_REQUEST",
+       "SHIPMENT_REQUEST"
+      ],
+      "example": "MATERIAL_ISSUE_REQUEST"
      },
      "sourceDocumentId": {
       "x-source-column": "source_document_id",
@@ -14162,9 +14231,10 @@
       "x-source-column": "transfer_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "이동 유형. 일반 이동과 불량 반출을 가른다. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
+      "description": "재고 이동 유형 — 일반 이동(NORMAL) · 불량 반출(DEFECT_RETURN). ⭐ M-01-10 §4 가 「불량 반출일 때만 사유 칸을 연다」로 «동작»을 이 값에 걸었다 — 값이 늘면 화면 분기가 따라가지 못한다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 값 목록은 GET /mdm/code-values?codeGroupCode=STOCK_TRANSFER_TYPE 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-code-key": "CD-STOCK-TRANSFER-TYPE"
      },
      "fromBusinessUnitId": {
       "x-source-column": "from_business_unit_id",
@@ -14232,8 +14302,9 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "불량 반출·분실 사유. 「불량 반출이 몇 건인가」를 세려면 자유 텍스트가 아니라 코드 축이어야 한다 — 적치 사유와 같은 성격이다. 근거: 공유계약 §I-41 · omf-mes#84",
-      "x-no-example": true
+      "description": "재고 이동 사유 — 불량 반출·분실 사유를 코드로 받는다. ⭐ 「불량 반출이 몇 건인가」를 세려면 자유 텍스트가 아니라 코드 축이어야 한다(공유계약 §I-41 · omf-mes#84). ⭐ 고객이 늘릴 수 있다 — 아래는 초기값(기본값)이지 닫힌 목록이 아니다. 사유 코드 17자리가 이미 같은 형태다(스키마별 전용 그룹 + 고객이 늘림). 값 목록은 GET /mdm/code-values?codeGroupCode=STOCK_TRANSFER_REASON 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-no-example": true,
+      "x-code-key": "CD-STOCK-TRANSFER-REASON"
      }
     },
     "x-internal-note": "한 행에 shipped_at·received_at 이 둘 다 있다 — 두 문서가 아니라 한 문서의 두 전이다(02-URL동작규약 §2-4). ⚠ 창고 간(from_warehouse_id ≠ to_warehouse_id)만 받는다 — 창고 «안» Location·파렛트 간 이동을 담을 헤더가 없어 M-01-07 임시 적치의 복귀 경로가 막힌다. 후보 ① CHECK를 from_location_id ≠ to_location_id 로 완화 ② handling_unit_content 파렛트 재편성 이력 신설. 근거: 공유계약 §I-19 · M-01-10 §5-1 · omf-mes#82"
@@ -14315,9 +14386,10 @@
       "x-source-column": "transfer_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "이동 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
+      "description": "재고 이동 유형 — 일반 이동(NORMAL) · 불량 반출(DEFECT_RETURN). ⭐ M-01-10 §4 가 「불량 반출일 때만 사유 칸을 연다」로 «동작»을 이 값에 걸었다 — 값이 늘면 화면 분기가 따라가지 못한다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 값 목록은 GET /mdm/code-values?codeGroupCode=STOCK_TRANSFER_TYPE 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-code-key": "CD-STOCK-TRANSFER-TYPE"
      },
      "fromBusinessUnitId": {
       "x-source-column": "from_business_unit_id",

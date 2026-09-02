@@ -846,7 +846,8 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 잠정 뜻 3종 중 둘이 다른 축으로 빠져 남는 것이 하나뿐이다(A-21 · 2026-09-02 판정)."
      },
      {
       "name": "occurredFrom",
@@ -4434,7 +4435,8 @@
       "type": "string",
       "description": "투입 유형이며 물리 컬럼은 production.material_consumption.consumption_type_code 다. 보내지 않으면 서버가 기본 투입 유형으로 기록한다 — 화면이 값을 지어내지 않는다. 값 목록은 아직 확정 전이고, 확정 전에는 이 칸을 보내지 않는다.",
       "example": "값",
-      "x-internal-note": "뜻 목록 세 값 중 「재생재」는 품목 축(mdm.item.mes_category_code = NEW/RECYCLED · 확정 기록 DR-006 2026-08-10 · 재생재 등록 화면 M-01-12)에, 「대체·교체」는 구조 축(replacedConsumptionId + changeReasonCode · 러닝체인지 화면 P-02-11 §5-2)에 이미 자리가 있어 한 칸이 두 축을 겸하려는 상태다. 축을 정합화한 뒤에 문자열을 정한다(공유계약 A-21 — 일부만 채워진 것이 빈 것보다 위험하다). 추적은 P-02-03 §8 미결 1 이 갖는다(omf-mes#252)."
+      "x-internal-note": "뜻 목록 세 값 중 「재생재」는 품목 축(mdm.item.mes_category_code = NEW/RECYCLED · 확정 기록 DR-006 2026-08-10 · 재생재 등록 화면 M-01-12)에, 「대체·교체」는 구조 축(replacedConsumptionId + changeReasonCode · 러닝체인지 화면 P-02-11 §5-2)에 이미 자리가 있어 한 칸이 두 축을 겸하려는 상태다. 축을 정합화한 뒤에 문자열을 정한다(공유계약 A-21 — 일부만 채워진 것이 빈 것보다 위험하다). 추적은 P-02-03 §8 미결 1 이 갖는다(omf-mes#252).",
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 계약이 스스로 「뜻 목록 3종은 축 정합화 전의 잠정 서술이라 코드값이 아니다」로 무효화했고, 셋 중 둘이 이미 다른 축으로 빠져 남는 것이 「정상」 하나다. 값이 하나뿐인 축은 축이 아니다(A-21 · 2026-09-02 판정)."
      },
      "actualUseProcessId": {
       "type": "integer",

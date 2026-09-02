@@ -691,7 +691,7 @@
        ]
       },
       "description": "업무 화면이 자기 문서의 승인 상태를 찾을 때 targetId 와 함께 쓴다",
-      "x-code-key": "CD-TARGET-TYPE"
+      "x-code-key": "CD-APPROVAL-TARGET-TYPE"
      },
      {
       "name": "targetId",
@@ -1081,9 +1081,20 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "maxLength": 40
+       "maxLength": 40,
+       "enum": [
+        "LOT",
+        "SERIAL_NUMBER",
+        "HANDLING_UNIT",
+        "GOODS_ISSUE_LINE",
+        "MOLD",
+        "LOCATION",
+        "INSPECTION_RESULT"
+       ],
+       "example": "LOT"
       },
-      "description": "targetId 와 함께 준다. 하나만 주면 400 이다."
+      "description": "targetId 와 함께 준다. 하나만 주면 400 이다. 대상 유형. 이 값이 targetId 의 해석을 정한다 — LOT → 자재·생산·제품 로트 · SERIAL_NUMBER → 개체 일련번호 · HANDLING_UNIT → 취급 단위(포장) · GOODS_ISSUE_LINE → 출고 전표 라인 · MOLD → 툴·금형 마스터 · LOCATION → 위치 마스터 · INSPECTION_RESULT → 검사 결과. ⭐ 값 문자열을 확정했다(2026-09-02) — 뜻 일곱은 §3-7 대응표가 이미 못박았고 남은 것은 문자열뿐이었다(공유계약 §G — 확정된 뜻을 영문 SNAKE 로). ⚠ 대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다 — 어디로 갈지 모른다",
+      "x-code-key": "CD-DOCUMENT-ISSUE-TARGET-TYPE"
      },
      {
       "name": "targetId",
@@ -1500,10 +1511,21 @@
       "required": true,
       "schema": {
        "type": "string",
-       "maxLength": 40
+       "maxLength": 40,
+       "enum": [
+        "LOT",
+        "SERIAL_NUMBER",
+        "HANDLING_UNIT",
+        "GOODS_ISSUE_LINE",
+        "MOLD",
+        "LOCATION",
+        "INSPECTION_RESULT"
+       ],
+       "example": "LOT"
       },
       "example": "HANDLING_UNIT",
-      "description": "대상 유형. 한 번에 한 유형만 묻는다 — 유형이 섞이면 `targetId` 의 뜻이 갈린다."
+      "description": "대상 유형. 한 번에 한 유형만 묻는다 — 유형이 섞이면 targetId 의 뜻이 갈린다. 대상 유형. 이 값이 targetId 의 해석을 정한다 — LOT → 자재·생산·제품 로트 · SERIAL_NUMBER → 개체 일련번호 · HANDLING_UNIT → 취급 단위(포장) · GOODS_ISSUE_LINE → 출고 전표 라인 · MOLD → 툴·금형 마스터 · LOCATION → 위치 마스터 · INSPECTION_RESULT → 검사 결과. ⭐ 값 문자열을 확정했다(2026-09-02) — 뜻 일곱은 §3-7 대응표가 이미 못박았고 남은 것은 문자열뿐이었다(공유계약 §G — 확정된 뜻을 영문 SNAKE 로). ⚠ 대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다 — 어디로 갈지 모른다",
+      "x-code-key": "CD-DOCUMENT-ISSUE-TARGET-TYPE"
      },
      {
       "name": "targetIds",
@@ -1751,7 +1773,8 @@
       "schema": {
        "type": "string",
        "x-no-example": true
-      }
+      },
+      "x-no-code-key": "코드 그룹이 아니다 — 알림 이벤트는 «전용 마스터»가 목록을 갖는다. 계약 산문이 이미 「목록은 이벤트 조회 경로가 준다 … GET /app/notification-events 의 eventName 을 찾아 쓴다」로 출처를 지정했다. ⛔ 공통코드에 같은 목록을 또 두면 두 벌이 되고, 이벤트마다 딸린 제목·수신자 규칙은 공통코드가 담지 못한다(L-2-1 · 2026-09-02 판정)."
      },
      {
       "name": "occurredFrom",
@@ -1993,7 +2016,8 @@
        "type": "string",
        "x-no-example": true
       },
-      "description": "이벤트 하나로 좁힌다. 생략하면 전건을 내린다 — 이벤트 목록의 수신자 수 표시가 이것을 쓴다(응답 recipients 의 길이)."
+      "description": "이벤트 하나로 좁힌다. 생략하면 전건을 내린다 — 이벤트 목록의 수신자 수 표시가 이것을 쓴다(응답 recipients 의 길이).",
+      "x-no-code-key": "코드 그룹이 아니다 — 알림 이벤트는 «전용 마스터»(GET /app/notification-events)가 목록을 갖는다. ⛔ 공통코드에 같은 목록을 또 두면 두 벌이 된다(L-2-1 · 2026-09-02 판정)."
      }
     ],
     "responses": {
@@ -2053,7 +2077,8 @@
        "type": "string",
        "x-no-example": true
       },
-      "required": true
+      "required": true,
+      "x-no-code-key": "코드 그룹이 아니다 — 알림 이벤트는 «전용 마스터»(GET /app/notification-events)가 목록을 갖는다. ⛔ 공통코드에 같은 목록을 또 두면 두 벌이 된다(L-2-1 · 2026-09-02 판정)."
      },
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -3243,8 +3268,15 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "maxLength": 40
-      }
+       "maxLength": 40,
+       "enum": [
+        "WAREHOUSE",
+        "NOTICE"
+       ],
+       "example": "WAREHOUSE"
+      },
+      "x-code-key": "CD-ATTACHMENT-TARGET-TYPE",
+      "description": "무엇에 붙은 첨부인가 — WAREHOUSE → 창고 도면(W-CO-08 §3) · NOTICE → 공지 첨부(W-CO-04 §4). ⭐ 값 문자열을 확정했다(2026-09-02) — 두 화면이 이미 이 문자열을 스펙에 적어 두고 있었다. ⛔ 다형 참조 판별자라 값이 «우리 계약의 대상 표 이름»이다 — 고객이 늘릴 수 없고, 붙일 곳이 늘면 계약을 고친다(공유계약 A-10 · A-16 「가」·「나」 참)"
      },
      {
       "name": "targetId",
@@ -4017,7 +4049,7 @@
        "SHIPMENT",
        "INBOUND_LOT"
       ],
-      "x-code-key": "CD-TARGET-TYPE"
+      "x-code-key": "CD-APPROVAL-TARGET-TYPE"
      },
      "targetId": {
       "x-source-column": "target_id",
@@ -4077,8 +4109,13 @@
        "string",
        "null"
       ],
-      "description": "비어 있으면 아직 결재하지 않은 단계다. 값 목록은 공통코드 소관이다",
-      "example": "APPROVED"
+      "description": "결재 단계의 판정 — 승인(APPROVED) · 반려(REJECTED). ⚠ 비어 있으면 아직 결재하지 않은 단계다 — 「대기」를 값으로 두지 않는다(부재로 판정한다). ⛔ 생산 사전점검의 decisionCode(CD-DECISION · BLOCKED·OVERRIDDEN·PASSED·WARNED)와 이름만 같고 축이 다르다",
+      "example": "APPROVED",
+      "x-code-key": "CD-APPROVAL-STEP-DECISION",
+      "enum": [
+       "APPROVED",
+       "REJECTED"
+      ]
      },
      "decisionAt": {
       "x-source-column": "decision_at",
@@ -4269,8 +4306,19 @@
      "targetTypeCode": {
       "type": "string",
       "maxLength": 40,
-      "description": "대상 유형. 이 값이 targetId 의 해석을 정한다. LOT → 자재·생산·제품 로트 · 개체 → 개체 일련번호 · 포장 → 취급 단위 · 출고 라인 → 출고 전표 라인 · 툴 → 툴·금형 마스터 · Location → 위치 마스터 · 검사 결과 → 검사 결과. ⚠ 값 문자열은 아직 확정되지 않았다 — 화면은 유형 선택을 비활성으로 두고 사유를 보인다. ⚠ 대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다 — 어디로 갈지 모른다",
-      "x-no-example": true
+      "description": "대상 유형. 이 값이 targetId 의 해석을 정한다 — LOT → 자재·생산·제품 로트 · SERIAL_NUMBER → 개체 일련번호 · HANDLING_UNIT → 취급 단위(포장) · GOODS_ISSUE_LINE → 출고 전표 라인 · MOLD → 툴·금형 마스터 · LOCATION → 위치 마스터 · INSPECTION_RESULT → 검사 결과. ⭐ 값 문자열을 확정했다(2026-09-02) — 뜻 일곱은 §3-7 대응표가 이미 못박았고 남은 것은 문자열뿐이었다(공유계약 §G — 확정된 뜻을 영문 SNAKE 로). ⚠ 대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다 — 어디로 갈지 모른다",
+      "x-no-example": true,
+      "x-code-key": "CD-DOCUMENT-ISSUE-TARGET-TYPE",
+      "enum": [
+       "LOT",
+       "SERIAL_NUMBER",
+       "HANDLING_UNIT",
+       "GOODS_ISSUE_LINE",
+       "MOLD",
+       "LOCATION",
+       "INSPECTION_RESULT"
+      ],
+      "example": "LOT"
      },
      "targetId": {
       "type": "integer",
@@ -4679,7 +4727,19 @@
      "targetTypeCode": {
       "type": "string",
       "maxLength": 40,
-      "x-no-example": true
+      "x-no-example": true,
+      "x-code-key": "CD-DOCUMENT-ISSUE-TARGET-TYPE",
+      "description": "대상 유형. 이 값이 targetId 의 해석을 정한다 — LOT → 자재·생산·제품 로트 · SERIAL_NUMBER → 개체 일련번호 · HANDLING_UNIT → 취급 단위(포장) · GOODS_ISSUE_LINE → 출고 전표 라인 · MOLD → 툴·금형 마스터 · LOCATION → 위치 마스터 · INSPECTION_RESULT → 검사 결과. ⭐ 값 문자열을 확정했다(2026-09-02) — 뜻 일곱은 §3-7 대응표가 이미 못박았고 남은 것은 문자열뿐이었다(공유계약 §G — 확정된 뜻을 영문 SNAKE 로). ⚠ 대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다 — 어디로 갈지 모른다",
+      "enum": [
+       "LOT",
+       "SERIAL_NUMBER",
+       "HANDLING_UNIT",
+       "GOODS_ISSUE_LINE",
+       "MOLD",
+       "LOCATION",
+       "INSPECTION_RESULT"
+      ],
+      "example": "LOT"
      },
      "targetId": {
       "type": "integer",
@@ -5767,7 +5827,13 @@
       "type": "string",
       "maxLength": 40,
       "x-no-example": true,
-      "description": "무엇에 붙은 첨부인가. ⚠ 값 문자열은 아직 확정되지 않았다."
+      "description": "무엇에 붙은 첨부인가 — WAREHOUSE → 창고 도면(W-CO-08 §3) · NOTICE → 공지 첨부(W-CO-04 §4). ⭐ 값 문자열을 확정했다(2026-09-02) — 두 화면이 이미 이 문자열을 스펙에 적어 두고 있었다. ⛔ 다형 참조 판별자라 값이 «우리 계약의 대상 표 이름»이다 — 고객이 늘릴 수 없고, 붙일 곳이 늘면 계약을 고친다(공유계약 A-10 · A-16 「가」·「나」 참)",
+      "x-code-key": "CD-ATTACHMENT-TARGET-TYPE",
+      "enum": [
+       "WAREHOUSE",
+       "NOTICE"
+      ],
+      "example": "WAREHOUSE"
      },
      "targetId": {
       "type": "integer",
