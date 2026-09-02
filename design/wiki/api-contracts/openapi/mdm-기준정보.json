@@ -7995,7 +7995,7 @@
      "lookup"
     ],
     "summary": "공정 목록",
-    "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 화면이 쓰는 것은 processId·processName 이다. 근거: W-06-01 §4-B 공정 · W-06-02 §4-A 검사 대상 공정 · W-06-03 §4-A·§4-C 공정 · W-06-05 §4-F 실제 사용 공정 · W-06-06 §4-E 자격 대상 공정.",
+    "description": "공정 목록. 선택 목록으로도 쓰고 W-06-01 《공정 마스터》 탭의 목록으로도 쓴다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 선택 목록으로 «읽는» 화면이 쓰는 것은 processId·processName 이다. 근거: W-06-01 §4-D 공정 마스터(소유) · W-06-01 §4-B 공정 · W-06-02 §4-A 검사 대상 공정 · W-06-03 §4-A·§4-C 공정 · W-06-05 §4-F 실제 사용 공정 · W-06-06 §4-E 자격 대상 공정.",
     "parameters": [
      {
       "name": "q",
@@ -8057,7 +8057,299 @@
       }
      }
     },
-    "x-internal-note": "⚠ 공정 마스터의 관리 화면이 어디인지 자체가 미결이다 — W-06-01 §8-5"
+    "x-internal-note": "✅ 해소 2026-09-03 — 공정 마스터의 관리 화면은 W-06-01 《공정 마스터》 탭이다(사용자 확정). 근거 — ① WF06 S4 Action 이 이미 「공정 순서·«공정코드»·외주공정 구분 … 직접 CRUD」를 이 화면에 배정했다 ② REQ-PR-0026 이 MES 정본임을 확정했다(ERP 에서 오지 않으므로 만드는 곳이 없으면 데이터가 생길 길이 없다) ③ 화면명이 이미 「Routing(공정) 등록·관리」다. 흡수 선례 = quality.cause_code → W-06-03(2026-08-03 사용자 확정)."
+   },
+   "post": {
+    "tags": [
+     "mdm"
+    ],
+    "summary": "공정 등록",
+    "description": "공정 마스터는 MES 정본이라 여기서만 생긴다(REQ-PR-0026 — ERP 에서 오지 않는다). processCode 는 전역 유일 — 중복이면 400. 근거: W-06-01 §5-1 「공정 추가」 · 공유계약 A-1",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProcessCreate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "등록됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Process"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패 — processCode 중복 포함",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "권한 없음. 근거: W-06-01 §6",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/mdm/processes/{processId}": {
+   "parameters": [
+    {
+     "name": "processId",
+     "in": "path",
+     "required": true,
+     "schema": {
+      "type": "integer",
+      "format": "int64"
+     }
+    }
+   ],
+   "get": {
+    "tags": [
+     "mdm"
+    ],
+    "summary": "공정 상세",
+    "description": "편집 진입용. editability 가 공정코드 수정 가부와 사유·참조 건수를 담는다(공유계약 B-4). ⭐ 공정의 참조처는 전부 process_id FK 라 «셀 수 있다» — code_value 처럼 NOT_COUNTABLE 로 무조건 잠그는 갈래가 아니다. 근거: W-06-01 §4-D · 공유계약 B-4",
+    "responses": {
+     "200": {
+      "description": "상세",
+      "headers": {
+       "ETag": {
+        "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로는 내리지 않는다 — 표시하지 않되 전달한다",
+        "schema": {
+         "type": "string"
+        },
+        "x-internal-note": "본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다"
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProcessDetailResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-internal-note": "참조처(전부 FK) — planning.routing_operation.process_id(W-06-01 §4-B) · W-06-02 §4-A 검사 대상 공정 · W-06-03 §4-A·§4-C · W-06-05 §4-F · W-06-06 §4-E 자격 대상 공정"
+   },
+   "put": {
+    "tags": [
+     "mdm"
+    ],
+    "summary": "공정 수정",
+    "description": "processCode 는 참조 건수 0 일 때만 바꿀 수 있다(공유계약 B-4) — 서버가 검사한다. 낙관적 잠금은 공유계약 B-1. 근거: W-06-01 §4-D·§5-1",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProcessUpdate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "수정됨",
+      "headers": {
+       "ETag": {
+        "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로는 내리지 않는다 — 표시하지 않되 전달한다",
+        "schema": {
+         "type": "string"
+        },
+        "x-internal-note": "본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다"
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Process"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패 — 참조가 있는데 processCode 를 바꾸려 함(B-4) 포함",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "권한 없음. 근거: W-06-01 §6",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "낙관적 잠금 충돌 — ConflictResponse.conflictCause 3값. 사용 중지도 is_active·version_no 를 쓰는 행 갱신이라 다른 쓰기와 같은 규칙을 적용한다(공유계약 A-4 「version_no 가 있으면 B-1 을 반드시 구현」). 업무 규칙 위반(참조 존재)은 409 가 아니라 400 이다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/mdm/processes/{processId}:deactivate": {
+   "parameters": [
+    {
+     "name": "processId",
+     "in": "path",
+     "required": true,
+     "schema": {
+      "type": "integer",
+      "format": "int64"
+     }
+    }
+   ],
+   "post": {
+    "tags": [
+     "mdm"
+    ],
+    "summary": "공정 사용 중지",
+    "description": "물리 삭제는 제공하지 않는다(공유계약 B-4). ⭐ 이미 확정된 Routing 은 영향받지 않는다 — 중지는 «앞으로 새 라인에서 고를 수 없다»는 뜻이다. 참조 중이면 확인 다이얼로그 + 참조 건수. 근거: W-06-01 §5-1 · 공유계약 B-4",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "중지됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Process"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "권한 없음. 근거: W-06-01 §6",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "낙관적 잠금 충돌 — ConflictResponse.conflictCause 3값. 사용 중지도 is_active·version_no 를 쓰는 행 갱신이라 다른 쓰기와 같은 규칙을 적용한다(공유계약 A-4 「version_no 가 있으면 B-1 을 반드시 구현」). 업무 규칙 위반(참조 존재)은 409 가 아니라 400 이다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/mdm/processes/{processId}:activate": {
+   "parameters": [
+    {
+     "name": "processId",
+     "in": "path",
+     "required": true,
+     "schema": {
+      "type": "integer",
+      "format": "int64"
+     }
+    }
+   ],
+   "post": {
+    "tags": [
+     "mdm"
+    ],
+    "summary": "공정 다시 사용",
+    "description": "사용 중지한 것을 다시 켠다. 물리 삭제를 두지 않으므로 되돌리는 경로가 이 하나다.",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersion"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "재사용됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Process"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "권한 없음. 근거: W-06-01 §6",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "낙관적 잠금 충돌 — ConflictResponse.conflictCause 3값. 사용 중지도 is_active·version_no 를 쓰는 행 갱신이라 다른 쓰기와 같은 규칙을 적용한다(공유계약 A-4 「version_no 가 있으면 B-1 을 반드시 구현」). 업무 규칙 위반(참조 존재)은 409 가 아니라 400 이다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
    }
   },
   "/mdm/equipments": {
@@ -19170,7 +19462,7 @@
      "processTypeCode",
      "isActive"
     ],
-    "description": "선택 목록용. 관리 화면이 인벤토리 108건에 없다. 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 화면이 쓰는 것은 processId·processName 이다. 근거: W-06-01 §4-B 공정 · W-06-02 §4-A 검사 대상 공정 · W-06-03 §4-A·§4-C 공정 · W-06-05 §4-F 실제 사용 공정 · W-06-06 §4-E 자격 대상 공정.",
+    "description": "공정 마스터 — **MES 정본**이다(REQ-PR-0026 「ERP 에 공정 정보가 없는 경우가 전제」 · 개념데이터모델 「공정(Routing)·툴은 ERP 연계 대상에서 제외」). 관리 화면은 W-06-01 《공정 마스터》 탭이다(2026-09-03 사용자 확정 — 최상위 탭 2개로 Routing 축과 나눴다). 유효성 판정은 서버가 하며 기본은 유효한 것만 내린다 — 공유계약 G-8. 과거 데이터 표시용은 includeInactive=true 로 켜고 isActive 표식을 함께 본다. 선택 목록으로 «읽는» 화면이 쓰는 것은 processId·processName 이다. 근거: W-06-01 §4-D 공정 마스터(소유·CRUD) · W-06-01 §4-B 공정 라인 · W-06-02 §4-A 검사 대상 공정 · W-06-03 §4-A·§4-C 공정 · W-06-05 §4-F 실제 사용 공정 · W-06-06 §4-E 자격 대상 공정.",
     "properties": {
      "processId": {
       "x-source-column": "process_id",
@@ -19206,7 +19498,90 @@
       "example": true
      }
     },
-    "x-internal-note": "⚠ 공정 마스터의 관리 화면이 어디인지 자체가 미결이다 — W-06-01 §8-5"
+    "x-internal-note": "✅ 해소 2026-09-03 — 공정 마스터의 관리 화면은 W-06-01 《공정 마스터》 탭이다(사용자 확정). 근거 — ① WF06 S4 Action 이 이미 「공정 순서·«공정코드»·외주공정 구분 … 직접 CRUD」를 이 화면에 배정했다 ② REQ-PR-0026 이 MES 정본임을 확정했다(ERP 에서 오지 않으므로 만드는 곳이 없으면 데이터가 생길 길이 없다) ③ 화면명이 이미 「Routing(공정) 등록·관리」다. 흡수 선례 = quality.cause_code → W-06-03(2026-08-03 사용자 확정)."
+   },
+   "ProcessCreate": {
+    "x-source-table": "mdm.process",
+    "type": "object",
+    "required": [
+     "processCode",
+     "processName",
+     "processTypeCode"
+    ],
+    "description": "공정 등록 요청. isActive 는 받지 않는다 — 등록은 항상 사용중으로 선다. 근거: W-06-01 §4-D·§5-1 「공정 추가」",
+    "properties": {
+     "processCode": {
+      "x-source-column": "process_code",
+      "type": "string",
+      "maxLength": 50,
+      "description": "uq — 전역 유일. 참조 건수가 0 일 때만 수정할 수 있다(공유계약 B-4) — 가부와 사유는 ProcessDetailResponse.editability 가 내린다",
+      "example": "OP-INJ",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 「가르는 물음 넷」 · 2026-09-02 판정). 공정 마스터 «자기 행»의 코드다. ⛔ 코드 사전 키를 붙이지 않는다 — 붙이면 «값의 목록»을 공통코드가 갖는다는 뜻이 되어, 실제로는 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
+     },
+     "processName": {
+      "x-source-column": "process_name",
+      "type": "string",
+      "maxLength": 200,
+      "example": "사출"
+     },
+     "processTypeCode": {
+      "x-source-column": "process_type_code",
+      "type": "string",
+      "maxLength": 50,
+      "description": "공통코드 — 값 = MACHINING·ASSEMBLY·INSPECTION·PACKAGING (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PROCESS_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "MACHINING",
+      "x-code-key": "CD-PROCESS-TYPE"
+     }
+    }
+   },
+   "ProcessUpdate": {
+    "x-source-table": "mdm.process",
+    "type": "object",
+    "required": [
+     "processCode",
+     "processName",
+     "processTypeCode"
+    ],
+    "description": "공정 수정 요청. isActive 는 별도 :deactivate·:activate. processCode 는 참조 건수 0 일 때만 바꿀 수 있다(공유계약 B-4) — 참조가 있으면 화면이 입력란을 잠그고 사유·건수를 표시한다(F-1). 낙관적 잠금은 공유계약 B-1. 근거: W-06-01 §4-D",
+    "properties": {
+     "processCode": {
+      "x-source-column": "process_code",
+      "type": "string",
+      "maxLength": 50,
+      "description": "uq — 전역 유일. 참조 건수가 0 일 때만 수정할 수 있다(공유계약 B-4) — 가부와 사유는 ProcessDetailResponse.editability 가 내린다",
+      "example": "OP-INJ",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 「가르는 물음 넷」 · 2026-09-02 판정). 공정 마스터 «자기 행»의 코드다. ⛔ 코드 사전 키를 붙이지 않는다 — 붙이면 «값의 목록»을 공통코드가 갖는다는 뜻이 되어, 실제로는 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
+     },
+     "processName": {
+      "x-source-column": "process_name",
+      "type": "string",
+      "maxLength": 200,
+      "example": "사출"
+     },
+     "processTypeCode": {
+      "x-source-column": "process_type_code",
+      "type": "string",
+      "maxLength": 50,
+      "description": "공통코드 — 값 = MACHINING·ASSEMBLY·INSPECTION·PACKAGING (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PROCESS_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "MACHINING",
+      "x-code-key": "CD-PROCESS-TYPE"
+     }
+    }
+   },
+   "ProcessDetailResponse": {
+    "type": "object",
+    "required": [
+     "process",
+     "editability"
+    ],
+    "properties": {
+     "process": {
+      "$ref": "#/components/schemas/Process"
+     },
+     "editability": {
+      "$ref": "#/components/schemas/Editability"
+     }
+    }
    },
    "Equipment": {
     "x-source-table": "mdm.equipment",

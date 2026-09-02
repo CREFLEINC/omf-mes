@@ -1,7 +1,7 @@
 # 코드 사전 (2026-09-02)
 
-> ⭐ **완성 — 175키 / 497자리.** 공유계약 `G-32` 등록부 **103그룹 전부**와 계약이
-> `enum` 으로 닫은 자리를 담는다. 계약 `*Code(s)` 자리 **647 전건**이 판정을
+> ⭐ **완성 — 175키 / 499자리.** 공유계약 `G-32` 등록부 **103그룹 전부**와 계약이
+> `enum` 으로 닫은 자리를 담는다. 계약 `*Code(s)` 자리 **651 전건**이 판정을
 > 받았다(판정 없음 0 · 2026-09-03). ⚠ 「639」로 적었던 앞선 수는 **경로 안에 «인라인»으로 정의된 스키마와 배열 `items` 안의 자리를 세지 않은 분모**였다 — 검사기 ㉨ 가 그 사각지대를 없앴다. `check-code-dictionary.py` 가 ⓪ 규칙으로 «막는다» —
 > 등록부에 이름이 오르면 여기에도 행이 있어야 한다.
 > «(정합주: 2026-09-03 — 1차 완성 시점의 「103키 / 257자리 · 62그룹 · 41종」을 지금 수치로
@@ -92,7 +92,7 @@ CD-<계열>-<축>
 
 ---
 
-## 사전 — **175키 / 497자리**
+## 사전 — **175키 / 499자리**
 
 | 소유 | 키 |
 | --- | :-: |
@@ -259,7 +259,7 @@ CD-<계열>-<축>
 | `CD-PM-DUE-AXIS` | `SHOT` `DATE` | — | `pmDueAxisCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `MaintenanceOrderTrigger`(`equipment-05설비툴`) · `Mold`(`mdm-기준정보`). ⭐ 서버가 파생한다 — `pmTriggerTypeCode` 가 「무엇으로 판정할지」라면 이 칸은 「무엇이 «먼저» 걸렸는지」다. 근거: `W-05-02` §5-A |
 | `CD-POLICY` | `FIFO_ENFORCEMENT_LEVEL` `MINOR_STOP_THRESHOLD_MINUTES` `PRECHECK_CONTROL_LEVEL` `SHOT_CONVERSION_ENABLED` `SHOT_CONVERSION_RATIO` | — | `policyCode` | `enum` | 5 | 계약이 `enum` 으로 닫은 값 — `OperationPolicy` · `OperationPolicyCreate`(`app-공통`) |
 | `CD-PRINT-DOCUMENT-TYPE` | `MATERIAL_LOT_LABEL` `GOODS_ISSUE_QR` `PRODUCTION_LOT_LABEL` `IDENTIFICATION_TAG` `PACKING_LABEL` `DELIVERY_LABEL` `CERTIFICATE_OF_ANALYSIS` `TOOL_LABEL` `LOCATION_LABEL` | — | `documentTypeCode` `supportedDocumentTypeCodes` | `enum` | 6 | 출력물 종류. `app-공통.json` — `omf-mes#145` · `22c08f5` · 요구서 `app공통출력물` §3-8 |
-| `CD-PROCESS-TYPE` | `MACHINING` `ASSEMBLY` `INSPECTION` `PACKAGING` | `PROCESS_TYPE` | `processTypeCode` | `registry` | 1 | 공정 유형. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
+| `CD-PROCESS-TYPE` | `MACHINING` `ASSEMBLY` `INSPECTION` `PACKAGING` | `PROCESS_TYPE` | `processTypeCode` | `registry` | 3 | 공정 유형. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-PRODUCTION-LINE-TYPE` | `LINE` `WORK_AREA` | — | `lineTypeCode` `groupTypeCode` | `enum` | 4 | 계약이 `enum` 으로 닫은 값 — `ProductionLine`·`EquipmentGroup`(`mdm-기준정보`). ⚠ 둘은 «같은 물리 컬럼**(`mdm.production_line.line_type_code`)을 다른 API 이름으로 노출한 것이다 |
 | `CD-PRODUCTION-ORDER-STATUS` | `RECEIVED` `UPDATED` `CANCELLED` | `PRODUCTION_ORDER_STATUS` | `statusCode` | `registry-system` | 2 | P/O 상태. ⭐ 「수정됨(UPDATED)」은 사용자가 추가했다 — `W-02-06` 이 P/O 변경 이벤트를 다루는데 그 사실을 담을 값이 없었다 · ERP 매핑 없음(사용자 결정 2026-09-02) |
 | `CD-PRODUCTION-PLAN-SPLIT-REASON` | `ENGINEERING_CHANGE` `PART_SHORTAGE` `QUALITY_ISSUE` `SUPPLIER_CHANGE` `OTHER` | `PRODUCTION_PLAN_SPLIT_REASON` | `reasonCode` | `registry` | 1 | 생산계획 분할 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
