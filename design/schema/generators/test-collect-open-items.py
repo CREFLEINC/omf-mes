@@ -96,6 +96,29 @@ class 해소판정(unittest.TestCase):
         self.assertFalse(coi.resolved("3 값 목록 미정 공통코드 W-06-06 · #145"))
 
 
+class 좁힘은_살아있다(unittest.TestCase):
+    """⛔ 2026-09-02 실측 — 좁힘 16행 중 3행이 대장에서 «통째로» 사라져 있었다.
+
+    부분 해소 표기의 문면은 거의 언제나 「X 는 해소됐다. 남은 것은 Y」 꼴이라
+    DONE 의 「해소」에 걸린다. 그런데 그 행은 «남은 물음»만 담고 있어 사라지면
+    대장의 존재 이유(「확정이 오면 어느 화면이 걸리나」)가 그 자리에서 깨진다.
+    """
+
+    def test_좁힘이_적히면_해소가_같이_있어도_열림이다(self):
+        문면 = ("1 reissue_reason_code 값 목록 미확정 공통코드 조정 "
+                "⭐ 2026-09-02 좁힘 — 제목을 갈았다. document_type_code 는 해소됐다")
+        self.assertFalse(coi.resolved(문면))
+
+    def test_좁힘이_없으면_해소는_그대로_해소다(self):
+        문면 = "1 document_type_code 값 목록 공통코드 ✅ 종결 — 계약이 enum 9종으로 닫았다"
+        self.assertTrue(coi.resolved(문면))
+
+    def test_인용_안의_좁힘은_남의_말이라_안_본다(self):
+        # 「」 안은 남의 판정이다 — QUOTED 가 먼저 걷으므로 좁힘으로 살아나지 않는다.
+        문면 = "2 이 건은 종결됐다 — 「W-01-01 은 2026-09-02 좁힘」 과 다른 자리다"
+        self.assertTrue(coi.resolved(문면))
+
+
 class 표를_읽어서도_같은가(unittest.TestCase):
     """단위 판정이 맞아도 표를 거쳐 오면 달라질 수 있다 — 끝까지 한 번 태운다."""
 

@@ -286,7 +286,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 취소 | **없음 — API 불필요.** 변경 파기 확인 후 로컬 폐기 | §5-1 |
 | 사용 중지 | `POST /mdm/warehouses/{id}:deactivate` · `POST /mdm/locations/{id}:deactivate` | §5-1·§8-6 · B-4 |
 | Location 추가 / 하위 추가 | `POST /mdm/locations` — 하위는 `parentLocationId` 지정 | §5-1 |
-| 라벨 이미지 생성 | `POST /app/document-issues` — **`documentTypeCode = LOCATION_LABEL`**(출력물 요구서 **§3-8**) → 이미지는 `GET /app/document-issues/{documentIssueLogId}/rendition`(`app-공통.json`). 대상 유형은 위치(`LOCATION`) 이고 `targetId` 는 `locationId` 다 — **대상 유형 값은 출력물 요구서 §3-7 이 정한다**(⚠ 문서 «유형»과 «대상» 유형은 다른 축이다). ⛔ **물리 인쇄는 범위 밖** | §5-1 · K-1·K-5 |
+| 라벨 이미지 생성 | `POST /app/document-issues` — **`documentTypeCode = LOCATION_LABEL`**(출력물 요구서 **§3-8**) → 이미지는 `GET /app/document-issues/{documentIssueLogId}/rendition`(`app-공통.json`). 대상 유형은 **위치(Location)** 이고 `targetId` 는 `locationId` 다 — ⚠ **대상 유형의 «문자열»은 아직 없다**(출력물 요구서 §3-7 이 「잠정」으로 잡고 있고 `A-10` 다형 참조 대응표 소관이다 — 이 문서 §5 미착지와 같은 건). ⛔ **문서 «유형»과 «대상» 유형은 다른 축이다** — 앞의 `documentTypeCode` 는 확정이고 이쪽은 미정이다. ⛔ **물리 인쇄는 범위 밖** | §5-1 · K-1·K-5 |
 | 변경 이력 | `GET /audit/events` | §5-1 · ✅REQ-PR-0021 |
 
 - 외부창고 토글이 켜지면 거래처가 **조건부 필수**가 된다(`ck_external_warehouse_partner`) — 위반은 400, 오류는 **거래처 필드에 인라인**(A-2).

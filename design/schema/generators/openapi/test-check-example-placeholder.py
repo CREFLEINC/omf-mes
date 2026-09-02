@@ -103,6 +103,62 @@ class 복수형_배열을_본다(unittest.TestCase):
         self.assertFalse(ep.in_enum(prop, "PACKING_LABEL"))
 
 
+class 스키마_자리도_운다(unittest.TestCase):
+    """⛔ 「배열 사각을 닫았다」가 «절반만» 참이었다(2026-09-02 검증).
+
+    in_enum() 에 배열 분기를 더한 것은 오탐을 막을 뿐이고, check_one 에는 «울릴
+    규칙»이 없었다. 그래서 Printer.supportedDocumentTypeCodes.example 을
+    ["LABEL"] 로 되돌려도 findings 가 0 이었다 — 검사기는 초록인데 구멍이 그대로다.
+    ⑥ 규칙을 check_one 에도 두고, 그 회귀를 여기서 잠근다.
+    """
+
+    @staticmethod
+    def one(prop):
+        import json, os, tempfile
+        doc = {"components": {"schemas": {"Printer": {"properties": {
+            "supportedDocumentTypeCodes": prop}}}}}
+        path = os.path.join(tempfile.mkdtemp(), "x.json")
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(doc, fh, ensure_ascii=False)
+        return ep.check_one(path)
+
+    def test_배열_example이_items_enum_밖이면_운다(self):
+        # ⛔ 이것이 실제로 놓쳤던 자리다.
+        out = self.one({"type": "array", "items": {"type": "string", "enum": ENUM9},
+                        "example": ["LABEL"]})
+        self.assertEqual(len(out), 1, out)
+        self.assertIn("자기 enum 밖", out[0])
+
+    def test_배열_example이_안이면_통과(self):
+        out = self.one({"type": "array", "items": {"type": "string", "enum": ENUM9},
+                        "example": ["PACKING_LABEL", "DELIVERY_LABEL"]})
+        self.assertEqual(out, [])
+
+    def test_enum이_없으면_안_운다(self):
+        # 「enum 이 없다」와 「enum 이 있는데 밖」을 가른다 — 없으면 ⑥ 대상이 아니다.
+        out = self.one({"type": "array", "items": {"type": "string"},
+                        "example": ["아무거나"]})
+        self.assertEqual([o for o in out if "자기 enum 밖" in o], [])
+
+    def test_단수도_enum_밖이면_운다(self):
+        out = self.one({"type": "string", "enum": ENUM9, "example": "LABEL"})
+        self.assertEqual(len(out), 1, out)
+        self.assertIn("자기 enum 밖", out[0])
+
+
+class enum_of는_단수와_배열을_가른다(unittest.TestCase):
+    def test_단수(self):
+        self.assertEqual(ep.enum_of({"type": "string", "enum": ENUM9}), ENUM9)
+
+    def test_배열은_items에서_꺼낸다(self):
+        self.assertEqual(
+            ep.enum_of({"type": "array", "items": {"type": "string", "enum": ENUM9}}), ENUM9)
+
+    def test_없으면_None(self):
+        self.assertIsNone(ep.enum_of({"type": "string"}))
+        self.assertIsNone(ep.enum_of({"type": "array", "items": {"type": "string"}}))
+
+
 class 단수는_그대로_본다(unittest.TestCase):
     """기존 동작이 안 깨졌는지 — 배열 갈래를 더하며 단수를 건드리지 않았다."""
 

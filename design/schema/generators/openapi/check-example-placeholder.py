@@ -150,6 +150,18 @@ def pointed_group(prop: dict) -> str | None:
     return match.group(1) if match else None
 
 
+def enum_of(prop: dict) -> list | None:
+    """이 자리의 확정 값 목록. 배열이면 items 쪽에 있다.
+
+    ⛔ 「enum 이 없다」와 「enum 이 있는데 example 이 밖」을 갈라야 한다 —
+       in_enum() 이 False 하나로 둘을 뭉개고 있었고, 그래서 ⑥ 규칙을 세울 수
+       없었다(2026-09-02 · omf-mes#145 검증에서 드러났다).
+    """
+    src = (prop.get("items") or {}) if prop.get("type") == "array" else prop
+    values = src.get("enum")
+    return values if isinstance(values, list) else None
+
+
 def in_enum(prop: dict, example: object) -> bool:
     # ⭐ 배열이면 «items» 가 enum 을 갖고 example 은 목록이다(2026-09-02 · 복수형 지원).
     if prop.get("type") == "array":
@@ -208,9 +220,10 @@ def check_parameters(doc: dict, name: str) -> list[str]:
                 if isinstance(example, str) and example in PLACEHOLDER:
                     out.append("① 자리채움 상수 — %s : example %r" % (where, example))
                     continue
-                if merged.get("enum") and example not in merged["enum"]:
+                values = enum_of(merged)
+                if values is not None:
                     out.append("⑥ 자기 enum 밖 — %s : example %r · enum = %s"
-                               % (where, example, "·".join(map(str, merged["enum"]))))
+                               % (where, example, "·".join(map(str, values))))
     return out
 
 
@@ -273,6 +286,18 @@ def check_one(path: str) -> list[str]:
 
             if in_enum(prop, example):
                 continue                       # 자기 enum 안 — 통과
+
+            # ⑥ 자기 enum 밖 — 확정 값 목록이 «있는데» example 이 그 밖이다.
+            #    ⛔ 2026-09-02 신설(omf-mes#145). 이 규칙이 없어서
+            #    Printer.supportedDocumentTypeCodes 의 example ["LABEL"] 이
+            #    documentTypeCode enum 9종 밖인데도 초록이었다 — 배열 지원을
+            #    더해도 «울릴 규칙»이 없으면 아무것도 안 잡힌다.
+            values = enum_of(prop)
+            if values is not None:
+                findings.append(
+                    "⑥ 자기 enum 밖 — %s : example %r · enum = %s"
+                    % (where, example, "·".join(map(str, values))))
+                continue
 
             group = pointed_group(prop)
             if group in CONFIRMED_GROUPS:

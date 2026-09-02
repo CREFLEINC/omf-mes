@@ -107,7 +107,7 @@
 | 취소 | 폼 하단 | 변경 있음 | 변경 파기 확인 |
 | **사용 중지** | 폼 | 사용 중일 때 | **물리 삭제 없음** — FK 참조가 걸려 있어 `is_active=false`로만 처리 §8-6 |
 | Location 추가 / 하위 추가 | Location 탭 | 창고 선택됨 / 행 선택됨 | 하위 추가는 `parent_location_id` 자동 설정 |
-| **라벨 이미지 생성** | Location 탭 | **1건 이상 선택** | 서버 렌더링 호출 → 미리보기 → 다운로드. **다중 선택 일괄** · 물리 인쇄 범위 밖. ⭐ **`POST /app/document-issues` 에 `documentTypeCode = LOCATION_LABEL`** · `targetTypeCode = LOCATION` · `targetId = locationId` (2026-09-02 확정) |
+| **라벨 이미지 생성** | Location 탭 | **1건 이상 선택** | 서버 렌더링 호출 → 미리보기 → 다운로드. **다중 선택 일괄** · 물리 인쇄 범위 밖. ⭐ **`POST /app/document-issues` 에 `documentTypeCode = LOCATION_LABEL`**(2026-09-02 확정) · `targetId = locationId`. ⚠ **`targetTypeCode` 문자열은 아직 없다** — 다형 참조 대응표(`A-10`) 소관이고 출력물 요구서 §3-7 이 「잠정」으로 잡고 있다. **두 축을 같이 확정된 것으로 읽지 않는다** |
 | 변경 이력 | 폼 | 저장 이력 있음 | ✅REQ-PR-0021 「변경 이력 필수」 — **저장 방식 미결 §8-4** |
 
 > ⭐ **「물리 인쇄는 범위 밖」이 「발행 기록을 안 남긴다」는 뜻이 아니다**(2026-09-02 명시). 이 화면은
