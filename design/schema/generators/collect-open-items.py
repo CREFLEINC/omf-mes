@@ -83,8 +83,11 @@ ANY_HEAD = re.compile(r"^#{1,4}\s", re.M)
 # ⛔ 「회신」을 따로 두지 않는다 — 정규식이 「조항」과 «글자 그대로 겹쳤다»(2026-09-02).
 #    `E-\d` 는 `[A-J]-\d` 의 부분집합이라 같은 문자열이 나오고, 아래 dedup 이
 #    둘을 하나로 합쳐 «어느 쪽인지가 사라졌다.» 갈라 내는 일은 tag_e_codes() 가 한다.
+#
+# ⛔ 「이슈」도 따로 두지 않는다 — `#N` 을 «고객 질의응답 번호»가 같은 모양으로 쓴다.
+#    「보류 등록이 알림 대상인가(QA #24)」의 `#24` 를 이슈 #24(도식스펙-04 정합)로
+#    잡고 있었다. 갈라 내는 일은 tag_issues() 가 한다.
 TRACKS = (
-    ("이슈", re.compile(r"#(\d{1,3})\b")),
     ("DR", re.compile(r"\bDR-(\d{3})\b")),
     ("조항", re.compile(r"\b([A-DF-J]-\d{1,2})\b")),
 )
@@ -117,6 +120,32 @@ def tag_e_codes(text: str) -> list[str]:
         if tag not in out:
             out.append(tag)
     return out
+
+
+# ⛔ `#N` 도 «두 가지»가 쓴다 — `E-n` 과 같은 형태의 오독이다(2026-09-02 실측).
+#
+#    ① 이슈 번호        #145 「공통코드 값 목록」 — 답이 오면 그 이슈가 움직인다
+#    ② 고객 질의응답     QA #24 「보류 등록이 알림 대상인가」 — 답이 «이미» 온 근거다
+#
+# ⚠ ② 를 이슈로 세면 «엉뚱한 이슈»에 걸린다. `W-03-03` 미결 6 의 「QA #24」가
+#    이슈 #24(도식스펙-04 정합 4건)로 잡혀 있었다 — 그 이슈가 닫혀도 이 행은 안 움직인다.
+#    실측 — 미결 표의 `#N` 227 개 중 10 개가 QA 번호였다.
+ISSUE_NO = re.compile(r"#(\d{1,3})\b")
+QA_MARK = re.compile(r"(QA|질의응답)\s*$")
+
+
+def tag_issues(text: str) -> list[str]:
+    """`#N` 을 앞 낱말로 갈라 이슈 표지만 남긴다. QA 번호는 «버린다»."""
+    out = []
+    for m in ISSUE_NO.finditer(text):
+        if QA_MARK.search(text[max(0, m.start() - 12):m.start()]):
+            continue                      # ② 고객 질의응답 번호 — 이슈가 아니다
+        tag = f"#{m.group(1)}"
+        if tag not in out:
+            out.append(tag)
+    return out
+
+
 DONE = re.compile(r"✅|해소|종결|~~")
 
 # ⛔ 해소 판정을 «두 번» 거른다 — 그냥 찾으면 반대말과 남의 말을 삼킨다(2026-09-02 · #349).
@@ -211,10 +240,11 @@ def parse(path: str) -> dict | None:
         grade = next((v for k, v in col.items() if "등급" in k), "")
         whole = " ".join(cs)
         marks = []
+        for tag in tag_issues(whole):       # `#N` 은 QA 번호와 갈라야 한다
+            marks.append(tag)
         for kind, pat in TRACKS:
             for hit in pat.findall(whole):
-                tag = f"#{hit}" if kind == "이슈" else (
-                    f"DR-{hit}" if kind == "DR" else hit)
+                tag = f"DR-{hit}" if kind == "DR" else hit
                 if tag not in marks:
                     marks.append(tag)
         for tag in tag_e_codes(whole):      # `E-n` 은 앞 낱말로 갈라야 한다
