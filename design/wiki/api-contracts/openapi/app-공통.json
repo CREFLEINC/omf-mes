@@ -5082,8 +5082,13 @@
     "properties": {
      "recipientTypeCode": {
       "type": "string",
-      "x-no-example": true,
-      "description": "어떻게 지정했나. ROLE → 조직×역할 묶음 (businessUnitId + roleId) · USER → 사람 하나 (userId)"
+      "description": "수신자를 어떻게 지정했나 — ROLE → 조직×역할 묶음(businessUnitId + roleId) · USER → 사람 하나(userId). ⛔ 값이 어느 «짝 필드»를 채우는지 가르므로 계약이 닫는다",
+      "x-code-key": "CD-NOTIFICATION-RECIPIENT-TYPE",
+      "enum": [
+       "ROLE",
+       "USER"
+      ],
+      "example": "ROLE"
      },
      "businessUnitId": {
       "type": "integer",
@@ -5442,8 +5447,17 @@
     "properties": {
      "cardCode": {
       "type": "string",
-      "x-no-example": true,
-      "description": "어느 지표인가. 화면이 이 코드로 드릴다운 대상을 안다"
+      "description": "어느 지표인가 — 생산량 · 양품률 · 성능가동률 · 시간가동률 · 미처리 알람 · OEE. ⭐ 화면이 이 코드로 «드릴다운 대상»을 안다 — 각 카드가 자기 소유 화면으로 간다(W-CO-05 §5). ⛔ 카드가 늘면 드릴다운 대상도 함께 정해야 하므로 계약이 닫는다",
+      "x-code-key": "CD-DASHBOARD-CARD",
+      "enum": [
+       "PRODUCTION_QTY",
+       "YIELD_RATE",
+       "PERFORMANCE_RATE",
+       "AVAILABILITY_RATE",
+       "UNHANDLED_ALARM",
+       "OEE"
+      ],
+      "example": "PRODUCTION_QTY"
      },
      "label": {
       "type": "string",
@@ -5816,7 +5830,15 @@
        "null"
       ],
       "example": "ITEM",
-      "description": "이긴 정책이 어느 축으로 맞았는가 — ITEM · PROCESS · PLANT · BUSINESS_UNIT · ALL 중 하나. resolved 가 거짓이면 비어 있다"
+      "description": "이긴 정책이 «어느 축»으로 맞았는가 — 품목 · 공정 · 공장 · 사업부 · 전사. resolved 가 거짓이면 비어 있다. ⛔ 정책 우선순위 축이라 값이 늘면 판정 순서가 함께 늘어야 한다 — 계약이 닫는다",
+      "x-code-key": "CD-OPERATION-POLICY-MATCHED-SCOPE",
+      "enum": [
+       "ITEM",
+       "PROCESS",
+       "PLANT",
+       "BUSINESS_UNIT",
+       "ALL"
+      ]
      }
     }
    },

@@ -2943,7 +2943,9 @@
      },
      "responsibilityTypeCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-DEFECT-RESPONSIBILITY-TYPE",
+      "description": "귀책 구분 — 이 불량의 책임이 어디에 있는가. responsibleDepartmentId 와 짝이다. ⚠ «원천 축이 아니다» — 어디서 «발견»했나(sourceCode)와 다르다(W-03-05 §5-2). ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=DEFECT_RESPONSIBILITY_TYPE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "responsibleDepartmentId": {
       "type": "integer",
@@ -3617,7 +3619,9 @@
      },
      "reinspectionReasonCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-REINSPECTION-REASON",
+      "description": "재검사 사유 — 왜 회차를 더 돌리는가. ⭐ 번복은 「수정」이 아니라 «재검사 회차»라 이 사유가 그 회차의 근거다(W-04-03 §5). ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=REINSPECTION_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "remarks": {
       "type": "string",
@@ -3745,7 +3749,9 @@
      },
      "reinspectionReasonCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-REINSPECTION-REASON",
+      "description": "재검사 사유 — 왜 회차를 더 돌리는가. ⭐ 번복은 「수정」이 아니라 «재검사 회차»라 이 사유가 그 회차의 근거다(W-04-03 §5). ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=REINSPECTION_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "measurements": {
       "type": "array",
@@ -4293,7 +4299,9 @@
      },
      "latestReasonCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-LOT-HOLD-REASON",
+      "description": "「최근 전이」의 사유. ⛔ 변경이력 표가 없어 «보류» 기록의 최신 건으로 낸다 — 합격·불합격·재판정 전이는 여기 나타나지 않는다(W-03-01 §5-1). 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      }
     },
     "required": [
@@ -4427,7 +4435,9 @@
      },
      "currentLotStatusCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-LOT-STATUS",
+      "description": "전이를 걸 때 화면이 «본» 현재 상태. 서버가 이것과 실제가 다르면 409 로 막는다. LOT 상태. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "transitions": {
       "type": "array",
@@ -4535,8 +4545,9 @@
      },
      "currentLotStatusCode": {
       "type": "string",
-      "description": "VERSION_CONFLICT 일 때 서버의 현재 lot.status_code — 충돌 문구에 최신 상태를 담는다(「다른 사용자가 먼저 전이했습니다. 현재 상태는 불량입니다」 W-03-02 §6). ⛔ message 자유 텍스트에서 파싱하지 않는다 — 이 구조화 필드가 정본이다. 근거: W-03-02 §6 · omf-mes#225",
-      "example": "DEFECTIVE"
+      "description": "VERSION_CONFLICT 일 때 서버의 «현재» LOT 상태 — 충돌 문구에 최신 상태를 담는다(W-03-02 §6). ⛔ message 자유 텍스트에서 파싱하지 않는다 — 이 구조화 필드가 정본이다. LOT 상태. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "DEFECTIVE",
+      "x-code-key": "CD-LOT-STATUS"
      },
      "conflictCause": {
       "type": "string",

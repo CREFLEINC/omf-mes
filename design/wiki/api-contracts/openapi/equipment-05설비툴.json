@@ -3083,13 +3083,19 @@
      },
      "judgeMethodCode": {
       "type": "string",
-      "description": "판정 방식 — 육안(VISUAL) 또는 측정값(MEASUREMENT). ⛔ 2026-09-02 정정 — 종전 설명이 「측정(MEASURE)」였는데 확정값은 MEASUREMENT 다(EQUIPMENT_INSPECTION_JUDGMENT_METHOD · 사용자 확정 2026-08-21 · omf-mes#186 · W-05-12 §4-C-1). 계약 7벌에서 MEASURE 는 이 자리 하나뿐이었고 나머지 6곳은 전부 MEASUREMENT 였다. ⚠ 이름이 기준정보 계약의 judgmentMethodCode 와 다르지만 «같은 값 집합»이다. 근거: omf-mes#338",
-      "example": "VISUAL"
+      "description": "판정 방식 — 육안(VISUAL) · 측정값(MEASUREMENT). ⚠ 이름이 기준정보 계약의 judgmentMethodCode 와 다르지만 «같은 값 집합»이다(사용자 확정 2026-08-21 · omf-mes#186 · W-05-12 §4-C-1). 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_INSPECTION_JUDGMENT_METHOD 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "VISUAL",
+      "x-code-key": "CD-EQUIPMENT-INSPECTION-JUDGMENT-METHOD"
      },
      "resultCode": {
       "type": "string",
-      "description": "합격(OK) 또는 불합격(NG)",
-      "example": "OK"
+      "description": "항목별 판정 — 합격(PASS) · 불합격(FAIL). ⭐ 2026-09-03 정정 — 종전 산문이 「OK / NG」였는데 같은 축의 종합 판정(overallResultCode)이 PASS·FAIL 을 쓴다. 한 화면에서 항목 판정과 종합 판정이 다른 낱말을 쓰면 어느 쪽이 정본인지 갈린다",
+      "example": "PASS",
+      "x-code-key": "CD-MAINTENANCE-INSPECTION-RESULT",
+      "enum": [
+       "PASS",
+       "FAIL"
+      ]
      },
      "measuredValue": {
       "type": [
@@ -3124,8 +3130,13 @@
      },
      "resultCode": {
       "type": "string",
-      "example": "OK",
-      "description": "합격(OK) 또는 불합격(NG)"
+      "example": "PASS",
+      "description": "항목별 판정 — 합격(PASS) · 불합격(FAIL). ⭐ 2026-09-03 정정 — 종합 판정과 낱말을 맞췄다",
+      "x-code-key": "CD-MAINTENANCE-INSPECTION-RESULT",
+      "enum": [
+       "PASS",
+       "FAIL"
+      ]
      },
      "measuredValue": {
       "type": [
@@ -3366,8 +3377,9 @@
      },
      "occurrenceStateCode": {
       "type": "string",
-      "description": "멈췄다(STOPPED) 또는 돌지만 이상하다(ABNORMAL)",
-      "example": "STOPPED"
+      "description": "고장 시점의 설비 상태 — 멈췄다(STOPPED) · 돌지만 이상하다(ABNORMAL). ⭐ 현장이 보고할 때 «고르는» 값이다(M-05-02). ⛔ 시스템 소유다 — 비가동 집계에 드는가가 이 값으로 갈린다. 값 목록은 GET /mdm/code-values?codeGroupCode=BREAKDOWN_OCCURRENCE_STATE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-BREAKDOWN-OCCURRENCE-STATE",
+      "x-no-example": true
      },
      "stoppedAt": {
       "type": [
@@ -3451,7 +3463,9 @@
      },
      "occurrenceStateCode": {
       "type": "string",
-      "example": "STOPPED"
+      "x-code-key": "CD-BREAKDOWN-OCCURRENCE-STATE",
+      "description": "고장 시점의 설비 상태 — 멈췄다(STOPPED) · 돌지만 이상하다(ABNORMAL). ⭐ 현장이 보고할 때 «고르는» 값이다(M-05-02). ⛔ 시스템 소유다 — 비가동 집계에 드는가가 이 값으로 갈린다. 값 목록은 GET /mdm/code-values?codeGroupCode=BREAKDOWN_OCCURRENCE_STATE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-no-example": true
      },
      "stoppedAt": {
       "type": [
@@ -3619,8 +3633,13 @@
        "string",
        "null"
       ],
-      "description": "먼저 도달한 축 — SHOT 또는 DATE. triggerTypeCode=PM_DUE 일 때만 채운다. 근거: W-05-02 §5-A",
-      "example": "SHOT"
+      "description": "먼저 도달한 축 — 타발수(SHOT) · 날짜(DATE). 둘 다 쓰는 툴이 있어 「왜 도래했는가」를 화면이 밝힌다. 도래하지 않았으면 null 이다. ⚠ pmTriggerTypeCode 가 «무엇으로 판정할지»라면 이 칸은 «무엇이 먼저 걸렸는지»다. 근거: W-05-02 §5-A",
+      "example": "SHOT",
+      "x-code-key": "CD-PM-DUE-AXIS",
+      "enum": [
+       "SHOT",
+       "DATE"
+      ]
      },
      "shotCountAtDue": {
       "type": [
@@ -3860,8 +3879,9 @@
      },
      "resultCode": {
       "type": "string",
-      "description": "항목·부위별 결과. ⚠ 값 집합이 대상에 따라 다르다 — 설비 보전은 완료·미완·해당없음(MaintenanceOrderItem.statusCode 의 PLANNED·DONE·NA 와 같은 집합), 툴 예방보전은 양호·조정·교체·불가다. ⛔ 값 이름은 아직 확정되지 않았다 — 공통코드 마스터(W-06-06)가 정하며 그때까지 화면은 선택칸을 비활성 + 사유로 둔다(공유계약 G-2). ⛔ enum 으로 못박지 않는다",
-      "x-no-example": true
+      "description": "보전 실적의 항목·부위별 결과. ⚠ 값 집합이 «대상에 따라 다르다» — 설비 보전은 완료·미완·해당없음, 툴 예방보전은 양호·조정·교체·불가다. ⛔ 설비 점검·계측기 이력의 resultCode 와 이름만 같고 값집합이 다르다(B-28). ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=MAINTENANCE_RESULT_LINE_RESULT 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-no-example": true,
+      "x-code-key": "CD-MAINTENANCE-RESULT-LINE-RESULT"
      },
      "remarks": {
       "type": [
@@ -4585,8 +4605,13 @@
      },
      "collectionMethodCode": {
       "type": "string",
-      "description": "직접 입력(DIRECT) 또는 환산(CONVERTED)",
-      "example": "DIRECT"
+      "description": "타발수를 어떻게 얻었나 — 직접 입력(DIRECT) · 환산(CONVERTED). ⛔ 두 갈래뿐이라 계약이 닫는다 — 환산 파라미터가 걸리는 갈래가 CONVERTED 하나다",
+      "example": "DIRECT",
+      "x-code-key": "CD-TOOL-USAGE-COLLECTION-METHOD",
+      "enum": [
+       "DIRECT",
+       "CONVERTED"
+      ]
      },
      "conversionBaseQty": {
       "type": [
@@ -4655,7 +4680,13 @@
      },
      "collectionMethodCode": {
       "type": "string",
-      "example": "DIRECT"
+      "example": "DIRECT",
+      "x-code-key": "CD-TOOL-USAGE-COLLECTION-METHOD",
+      "description": "타발수를 어떻게 얻었나 — 직접 입력(DIRECT) · 환산(CONVERTED). ⛔ 두 갈래뿐이라 계약이 닫는다 — 환산 파라미터가 걸리는 갈래가 CONVERTED 하나다",
+      "enum": [
+       "DIRECT",
+       "CONVERTED"
+      ]
      },
      "conversionBaseQty": {
       "type": [
@@ -4717,7 +4748,8 @@
      },
      "unitCode": {
       "type": "string",
-      "example": "CELSIUS"
+      "example": "CELSIUS",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16). 단위 마스터의 «행»을 가리킨다 — MaintenanceResultPart.uomCode 가 같은 판정으로 이미 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "inspectionItemId": {
       "type": [
@@ -4786,8 +4818,9 @@
        "string",
        "null"
       ],
-      "description": "연결된 검사 항목의 «저장» 단위. 이 행의 unitCode(수신값의 단위)와 다르면 화면이 경고한다 — ⛔ 자동 변환하지 않는다(W-05-07 §5-5 · A-8). 이 값이 없으면 그 경고를 판정할 수 없다",
-      "example": "SECOND"
+      "description": "연결된 검사 항목의 «저장» 단위. 이 행의 unitCode(수신값의 단위)와 다르면 화면이 경고한다 — ⛔ 자동 변환하지 않는다(W-05-07 §5-5 · A-8). 이 값이 없으면 그 경고를 판정할 수 없다.",
+      "example": "SECOND",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16). 단위 마스터의 «행»을 가리킨다 — MaintenanceResultPart.uomCode 가 같은 판정으로 이미 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "inspectionPlanVersionId": {
       "type": [
@@ -4844,7 +4877,8 @@
      },
      "unitCode": {
       "type": "string",
-      "example": "CELSIUS"
+      "example": "CELSIUS",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16). 단위 마스터의 «행»을 가리킨다 — MaintenanceResultPart.uomCode 가 같은 판정으로 이미 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "inspectionItemId": {
       "type": [
@@ -4888,7 +4922,8 @@
      },
      "unitCode": {
       "type": "string",
-      "example": "CELSIUS"
+      "example": "CELSIUS",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16). 단위 마스터의 «행»을 가리킨다 — MaintenanceResultPart.uomCode 가 같은 판정으로 이미 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "inspectionItemId": {
       "type": [
@@ -4970,8 +5005,9 @@
      },
      "resultCode": {
       "type": "string",
-      "description": "이력 결과. ⚠ 값 집합이 이력 유형마다 다르다 — 검교정은 합격·조정 후 합격·불합격, 점검은 정상·이상, 수리는 완료·불가다. 화면은 historyTypeCode 로 걸러 보인다. ⚠ 합격(PASS)·불합격(FAIL) 밖의 코드값 이름은 아직 확정되지 않았다 — 공통코드 마스터(W-06-06)가 정하며 그때까지 화면은 선택칸을 비활성 + 사유로 둔다(공유계약 G-2). ⭐ 설비 마스터의 검교정일 갱신은 검교정 유형의 합격 계열에서만 일어난다. ⛔ enum 으로 못박지 않는다. 근거: W-05-10 §5-2·§5-3",
-      "example": "PASS"
+      "description": "계측기 이력의 결과. ⚠ 값 집합이 «이력 유형마다 다르다» — 검교정은 합격·조정 후 합격·불합격, 점검은 정상·이상, 수리는 완료·불가다. 화면은 historyTypeCode 로 걸러 보인다. ⭐ 설비 마스터의 검교정일 갱신은 «검교정 유형의 합격 계열»에서만 일어난다. ⛔ 설비 점검의 resultCode(합격·불합격)와 이름만 같고 값집합이 다르다 — 한 그룹으로 묶으면 화면이 남의 선택지를 본다(B-28). ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=CALIBRATION_RESULT 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "PASS",
+      "x-code-key": "CD-CALIBRATION-RESULT"
      },
      "certificateNo": {
       "type": [
@@ -4985,8 +5021,9 @@
        "string",
        "null"
       ],
-      "description": "교정 기관 구분 — 내부 교정인가 외부 기관 교정인가. historyTypeCode 가 검교정일 때만 쓴다. ⛔ 값 이름은 아직 확정되지 않았다 — 공통코드 마스터(W-06-06)가 정하며 그때까지 화면은 선택칸을 비활성 + 사유로 둔다(공유계약 G-2). 근거: W-05-10 §3-2·§5-4",
-      "x-no-example": true
+      "description": "교정 기관 구분 — 내부 교정(INTERNAL) · 외부 기관 교정(EXTERNAL). historyTypeCode 가 검교정일 때만 쓴다. ⚠ 외부 기관이면 agencyName 이 필수이고 performedByUserId 를 비운다(A-2 짝 제약). 근거: W-05-10 §3-2·§5-4. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 값 목록은 GET /mdm/code-values?codeGroupCode=CALIBRATION_AGENCY_TYPE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-no-example": true,
+      "x-code-key": "CD-CALIBRATION-AGENCY-TYPE"
      },
      "agencyName": {
       "type": [
@@ -5087,7 +5124,8 @@
      "resultCode": {
       "type": "string",
       "example": "PASS",
-      "description": "이력 결과. ⚠ 값 집합이 이력 유형마다 다르다 — 검교정은 합격·조정 후 합격·불합격, 점검은 정상·이상, 수리는 완료·불가다. 화면은 historyTypeCode 로 걸러 보인다. ⚠ 합격(PASS)·불합격(FAIL) 밖의 코드값 이름은 아직 확정되지 않았다 — 공통코드 마스터(W-06-06)가 정하며 그때까지 화면은 선택칸을 비활성 + 사유로 둔다(공유계약 G-2). ⭐ 설비 마스터의 검교정일 갱신은 검교정 유형의 합격 계열에서만 일어난다. ⛔ enum 으로 못박지 않는다. 근거: W-05-10 §5-2·§5-3"
+      "description": "계측기 이력의 결과. ⚠ 값 집합이 «이력 유형마다 다르다» — 검교정은 합격·조정 후 합격·불합격, 점검은 정상·이상, 수리는 완료·불가다. 화면은 historyTypeCode 로 걸러 보인다. ⭐ 설비 마스터의 검교정일 갱신은 «검교정 유형의 합격 계열»에서만 일어난다. ⛔ 설비 점검의 resultCode(합격·불합격)와 이름만 같고 값집합이 다르다 — 한 그룹으로 묶으면 화면이 남의 선택지를 본다(B-28). ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=CALIBRATION_RESULT 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-CALIBRATION-RESULT"
      },
      "certificateNo": {
       "type": [
@@ -5101,8 +5139,9 @@
        "string",
        "null"
       ],
-      "description": "교정 기관 구분 — 내부 교정인가 외부 기관 교정인가. historyTypeCode 가 검교정일 때만 쓴다. ⛔ 값 이름은 아직 확정되지 않았다 — 공통코드 마스터(W-06-06)가 정하며 그때까지 화면은 선택칸을 비활성 + 사유로 둔다(공유계약 G-2). 근거: W-05-10 §3-2·§5-4",
-      "x-no-example": true
+      "description": "교정 기관 구분 — 내부 교정(INTERNAL) · 외부 기관 교정(EXTERNAL). historyTypeCode 가 검교정일 때만 쓴다. ⚠ 외부 기관이면 agencyName 이 필수이고 performedByUserId 를 비운다(A-2 짝 제약). 근거: W-05-10 §3-2·§5-4. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 값 목록은 GET /mdm/code-values?codeGroupCode=CALIBRATION_AGENCY_TYPE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-no-example": true,
+      "x-code-key": "CD-CALIBRATION-AGENCY-TYPE"
      },
      "agencyName": {
       "type": [

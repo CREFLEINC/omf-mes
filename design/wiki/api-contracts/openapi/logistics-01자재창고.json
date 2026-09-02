@@ -7583,8 +7583,12 @@
        "string",
        "null"
       ],
-      "description": "유형 안의 구분. 입고면 정상·반품 같은 값이다",
-      "example": "NORMAL"
+      "description": "유형 «안»의 구분 — 입고면 자재·제품·반품·이관, 출고면 생산·공급사 반품·출하·그 밖. ⚠ documentTypeCode 에 따라 «가리키는 그룹이 다르다» — 입고 계열은 RECEIPT_TYPE, 출고 계열은 ISSUE_TYPE 이다. 그 밖의 유형에는 비어 있다. 값 목록은 GET /mdm/code-values?codeGroupCode=RECEIPT_TYPE 또는 GET /mdm/code-values?codeGroupCode=ISSUE_TYPE 로 받는다(공유계약 G-32).",
+      "example": "NORMAL",
+      "x-code-key": [
+       "CD-RECEIPT-TYPE",
+       "CD-ISSUE-TYPE"
+      ]
      },
      "statusCode": {
       "type": "string",
@@ -7622,8 +7626,15 @@
        "string",
        "null"
       ],
-      "description": "cancellable 이 거짓인 이유. SUCCESSOR_EXISTS · ALREADY_CANCELLED · CANCEL_IN_PROGRESS · STATE_LOCKED",
-      "example": "SUCCESSOR_EXISTS"
+      "description": "cancellable 이 «거짓인 이유» — 후속 문서가 있다 · 이미 취소됐다 · 취소 진행 중이다 · 상태가 잠겼다. ⭐ 화면이 이 값으로 안내 문구와 다음 경로를 가른다(G-3). ⛔ 서버가 판정한다 — 화면이 조건을 따로 조합하면 화면마다 갈린다",
+      "example": "SUCCESSOR_EXISTS",
+      "x-code-key": "CD-CANCEL-BLOCKED-REASON",
+      "enum": [
+       "SUCCESSOR_EXISTS",
+       "ALREADY_CANCELLED",
+       "CANCEL_IN_PROGRESS",
+       "STATE_LOCKED"
+      ]
      },
      "cancelApprovalRequestId": {
       "type": [
@@ -7680,7 +7691,9 @@
     "properties": {
      "stepCode": {
       "type": "string",
-      "example": "POSTED"
+      "example": "POSTED",
+      "x-code-key": "CD-LOGISTICS-DOCUMENT-STATUS",
+      "description": "이 경과 줄이 «어느 상태에 도달한» 시점인가 — 등록 · 전기 · 취소 요청 · 취소. ⭐ 전표의 진행 상태와 «같은 값집합»이다 — 단계는 그 상태에 닿은 순간이다. 값 목록은 GET /mdm/code-values?codeGroupCode=LOGISTICS_DOCUMENT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "occurredAt": {
       "type": "string",
@@ -11084,8 +11097,15 @@
        "string",
        "null"
       ],
-      "description": "closable 이 거짓인 이유 — 미실사 잔여 · 차이 미조정 · 이미 마감 · 상태 잠김. 화면은 이 값으로 안내 문구와 「조정 등록」 경로를 가른다(공유계약 G-3). ⚠ 값 집합은 확정이나 코드 문자열이 아직 정해지지 않아 enum 을 못 박지 않는다 — 서버가 내려주는 선택지를 그대로 쓴다",
-      "example": "값"
+      "description": "closable 이 «거짓인 이유» — 미실사 잔여(COUNT_REMAINING) · 차이 미조정(VARIANCE_UNADJUSTED) · 이미 마감(ALREADY_CLOSED) · 상태 잠김(STATE_LOCKED). ⭐ 화면은 이 값으로 안내 문구와 「조정 등록」 경로를 가른다(G-3). ⛔ 서버가 판정한다 — 화면이 조건을 따로 조합하면 화면마다 갈린다",
+      "example": "COUNT_REMAINING",
+      "x-code-key": "CD-INVENTORY-COUNT-CLOSE-BLOCKED-REASON",
+      "enum": [
+       "COUNT_REMAINING",
+       "VARIANCE_UNADJUSTED",
+       "ALREADY_CLOSED",
+       "STATE_LOCKED"
+      ]
      }
     }
    },
@@ -11765,9 +11785,10 @@
        "string",
        "null"
       ],
-      "description": "미달 마감 사유. 계획 수량에 미달하면 필수이고 서버가 400 으로 막는다. work_order.completion_variance_reason_code 로 간다. 근거: P-02-06 §5-5 ⚠ 같은 칸을 W/O 마감(02 계약 POST /production/work-orders/{workOrderId}:close 본문 reasonCode)도 쓴다. 생산LOT 완료는 S10, W/O 마감은 S12 라 마감이 나중이다.",
+      "description": "미달 마감 사유. 계획 수량에 미달하면 필수이고 서버가 400 으로 막는다(P-02-06 §5-5). ⚠ W/O 마감(POST /production/work-orders/{id}:close 의 reasonCode)이 «같은 축»을 쓴다 — 생산LOT 완료는 S10, W/O 마감은 S12 라 마감이 나중이다. 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_ORDER_COMPLETION_VARIANCE_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "MATERIAL_SHORTAGE",
-      "x-internal-note": "공유계약 B-13(한 컬럼을 여러 경로가 바꾸면 누가 정하고 누가 반영하나를 계약이 가른다)이 미충족이다. LOT 단위 사유를 보존하려면 trace.lot 쪽 칸이 필요하다 — 데이터모델 소관(P-02-06 §8 미결 2). ⚠ LOT 은 미달인데 W/O 합계는 정상인 조합에서 마감이 빈 값으로 앞 사유를 지우는지 유지하는지 아직 정해지지 않았다 — 서버가 한 곳에서 정한다."
+      "x-internal-note": "공유계약 B-13(한 컬럼을 여러 경로가 바꾸면 누가 정하고 누가 반영하나를 계약이 가른다)이 미충족이다. LOT 단위 사유를 보존하려면 trace.lot 쪽 칸이 필요하다 — 데이터모델 소관(P-02-06 §8 미결 2). ⚠ LOT 은 미달인데 W/O 합계는 정상인 조합에서 마감이 빈 값으로 앞 사유를 지우는지 유지하는지 아직 정해지지 않았다 — 서버가 한 곳에서 정한다.",
+      "x-code-key": "CD-WORK-ORDER-COMPLETION-VARIANCE-REASON"
      },
      "remarks": {
       "x-source-column": "remarks",
@@ -12273,11 +12294,14 @@
        "null"
       ],
       "x-no-example": true,
-      "description": "전이 전 상태. 최초 등록 전이(C4·C6·C14)는 null"
+      "description": "전이 «전» 상태. 최초 등록 전이(C4·C6·C14)는 null 이다. LOT 상태. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-LOT-STATUS"
      },
      "toStatusCode": {
       "type": "string",
-      "x-no-example": true
+      "x-no-example": true,
+      "x-code-key": "CD-LOT-STATUS",
+      "description": "전이 «후» 상태. LOT 상태. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "transitionCode": {
       "type": "string",
@@ -12362,11 +12386,14 @@
        "null"
       ],
       "x-no-example": true,
-      "description": "전이 전 생명주기 상태. 최초 전이(L1)는 null"
+      "description": "전이 «전» 생명주기 상태. 최초 전이(L1)는 null 이다. LOT 선발행 슬롯의 생명주기 상태 — 품질 판정 축과 «다르다». 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_LIFECYCLE_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-LOT-LIFECYCLE-STATUS"
      },
      "toLifecycleStatusCode": {
       "type": "string",
-      "x-no-example": true
+      "x-no-example": true,
+      "x-code-key": "CD-LOT-LIFECYCLE-STATUS",
+      "description": "전이 «후» 생명주기 상태. LOT 선발행 슬롯의 생명주기 상태 — 품질 판정 축과 «다르다». 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_LIFECYCLE_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "transitionCode": {
       "type": "string",
@@ -13639,9 +13666,10 @@
      "warehouseManagementLevelCode": {
       "type": "string",
       "maxLength": 50,
-      "description": "이 지시가 속한 창고의 위치 관리 수준. 위치 스캔을 요구할지가 이 값으로 갈린다. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
+      "description": "이 지시가 속한 창고의 위치 관리 수준 — 창고(WAREHOUSE) · 구역(ZONE) · 랙(RACK) · 셀(CELL). ⭐ «위치 스캔을 요구할지»가 이 값으로 갈린다. 값 목록은 GET /mdm/code-values?codeGroupCode=MANAGEMENT_LEVEL 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-code-key": "CD-MANAGEMENT-LEVEL"
      },
      "priorityNo": {
       "x-source-column": "priority_no",
