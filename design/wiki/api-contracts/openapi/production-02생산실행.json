@@ -4313,8 +4313,9 @@
      },
      "changeReasonCode": {
       "type": "string",
-      "description": "러닝체인지 교체 사유. 근거: P-02-11 §5-2",
-      "example": "NORMAL"
+      "description": "러닝체인지 교체 사유 — 왜 자재를 바꿔 넣었는가. 근거: P-02-11 §5-2. ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=MATERIAL_CHANGE_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "NORMAL",
+      "x-code-key": "CD-MATERIAL-CHANGE-REASON"
      },
      "actualUseProcessId": {
       "type": "integer",
@@ -4360,7 +4361,9 @@
      },
      "lateEntryReasonCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-LATE-ENTRY-REASON",
+      "description": "지연 입력 사유 — 실적·투입을 «나중에» 적을 때 왜 늦었는지. ⭐ 「지연 입력이 몇 건이고 왜인가」를 세려면 자유 텍스트가 아니라 코드 축이어야 한다. ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=LATE_ENTRY_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "workerId": {
       "type": "integer",
@@ -4448,7 +4451,9 @@
      },
      "changeReasonCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-MATERIAL-CHANGE-REASON",
+      "description": "러닝체인지 교체 사유 — 왜 자재를 바꿔 넣었는가. 근거: P-02-11 §5-2. ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=MATERIAL_CHANGE_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "replacedConsumptionId": {
       "type": "integer",
@@ -4483,7 +4488,9 @@
      },
      "lateEntryReasonCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-LATE-ENTRY-REASON",
+      "description": "지연 입력 사유 — 실적·투입을 «나중에» 적을 때 왜 늦었는지. ⭐ 「지연 입력이 몇 건이고 왜인가」를 세려면 자유 텍스트가 아니라 코드 축이어야 한다. ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=LATE_ENTRY_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "remarks": {
       "type": "string",
@@ -5629,8 +5636,13 @@
      },
      "resultSourceCode": {
       "type": "string",
-      "x-no-example": "값 목록이 미확정이라 코드 문자열을 못 박지 않는다",
-      "description": "실적을 무엇이 만들었는가 — 수기 입력 · IoT 자동수집. ⚠ 값 목록·그룹 이름 모두 미확정 — 정해질 때까지 화면은 선택칸을 비활성 + 사유 표시로 둔다. 확정되면 GET /mdm/code-values?codeGroupCode=… 로 받는다. ⛔ enum 으로 못박지 않는다."
+      "description": "실적을 «무엇이» 만들었는가 — 수기 입력(MANUAL) · IoT 자동수집(IOT). ⭐ 서버가 안다 — 화면이 고르는 값이 아니다. ⛔ 두 갈래뿐이라 계약이 닫는다",
+      "x-code-key": "CD-PRODUCTION-RESULT-SOURCE",
+      "enum": [
+       "MANUAL",
+       "IOT"
+      ],
+      "example": "MANUAL"
      },
      "occurredAt": {
       "type": "string",
@@ -5644,7 +5656,9 @@
      },
      "lateEntryReasonCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-LATE-ENTRY-REASON",
+      "description": "지연 입력 사유 — 실적·투입을 «나중에» 적을 때 왜 늦었는지. ⭐ 「지연 입력이 몇 건이고 왜인가」를 세려면 자유 텍스트가 아니라 코드 축이어야 한다. ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=LATE_ENTRY_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "workerId": {
       "type": "integer",
@@ -5788,8 +5802,13 @@
      },
      "resultSourceCode": {
       "type": "string",
-      "x-no-example": "값 목록이 미확정이라 코드 문자열을 못 박지 않는다",
-      "description": "실적을 무엇이 만들었는가 — 수기 입력 · IoT 자동수집. ⚠ 값 목록·그룹 이름 모두 미확정 — 정해질 때까지 화면은 선택칸을 비활성 + 사유 표시로 둔다. 확정되면 GET /mdm/code-values?codeGroupCode=… 로 받는다. ⛔ enum 으로 못박지 않는다."
+      "description": "실적을 «무엇이» 만들었는가 — 수기 입력(MANUAL) · IoT 자동수집(IOT). ⭐ 서버가 안다 — 화면이 고르는 값이 아니다. ⛔ 두 갈래뿐이라 계약이 닫는다",
+      "x-code-key": "CD-PRODUCTION-RESULT-SOURCE",
+      "enum": [
+       "MANUAL",
+       "IOT"
+      ],
+      "example": "MANUAL"
      },
      "occurredAt": {
       "type": "string",
@@ -5798,7 +5817,9 @@
      },
      "lateEntryReasonCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-LATE-ENTRY-REASON",
+      "description": "지연 입력 사유 — 실적·투입을 «나중에» 적을 때 왜 늦었는지. ⭐ 「지연 입력이 몇 건이고 왜인가」를 세려면 자유 텍스트가 아니라 코드 축이어야 한다. ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=LATE_ENTRY_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "equipmentId": {
       "type": "integer",
@@ -6232,7 +6253,9 @@
      },
      "completionVarianceReasonCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-WORK-ORDER-COMPLETION-VARIANCE-REASON",
+      "description": "W/O 마감 시의 미달·초과 사유. 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_ORDER_COMPLETION_VARIANCE_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "closedAt": {
       "type": "string",
@@ -6761,7 +6784,8 @@
       "type": "string",
       "example": "값",
       "description": "⛔ 쓰지 않는다 — 비운다. 값 목록을 못 정한 것이 아니라 «비우기로 정했다». 근거: 공유계약 A-21 · A-25",
-      "x-internal-note": "세션 종료 사유를 요구한 문서가 없다. 요구 원천은 「비가동 및 작업중단 사유 기록」 한 줄인데 그 뜻은 work_session_event.reason_code 가 받는다(논리 모델 §9.7 만 설명이 붙어 있다). 데이터모델 CHANGELOG 144행도 「작업 세션 기반 중지는 work_session_event 로 커버」라 적었다. 세션 종료 화면도 인벤토리에 없어 채울 사람이 없다. 다시 여는 조건 — 세션 종료 화면이 생기고 「왜 닫는가」를 사람에게 묻기로 하면 그때 연다."
+      "x-internal-note": "세션 종료 사유를 요구한 문서가 없다. 요구 원천은 「비가동 및 작업중단 사유 기록」 한 줄인데 그 뜻은 work_session_event.reason_code 가 받는다(논리 모델 §9.7 만 설명이 붙어 있다). 데이터모델 CHANGELOG 144행도 「작업 세션 기반 중지는 work_session_event 로 커버」라 적었다. 세션 종료 화면도 인벤토리에 없어 채울 사람이 없다. 다시 여는 조건 — 세션 종료 화면이 생기고 「왜 닫는가」를 사람에게 묻기로 하면 그때 연다.",
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 이 칸을 «쓰지 않는다». 계약 산문이 이미 「값 목록을 못 정한 것이 아니라 «비우기로 정했다»」로 판정했다(공유계약 A-21 · A-25). 중단 사유는 비가동 실적(P-05-02)이 받는다."
      },
      "remarks": {
       "type": "string",
@@ -6844,7 +6868,8 @@
       "type": "string",
       "example": "값",
       "description": "⛔ 쓰지 않는다 — 비운다. 값 목록을 못 정한 것이 아니라 «비우기로 정했다». 근거: 공유계약 A-21 · A-25",
-      "x-internal-note": "세션 종료 사유를 요구한 문서가 없다. 요구 원천은 「비가동 및 작업중단 사유 기록」 한 줄인데 그 뜻은 work_session_event.reason_code 가 받는다(논리 모델 §9.7 만 설명이 붙어 있다). 데이터모델 CHANGELOG 144행도 「작업 세션 기반 중지는 work_session_event 로 커버」라 적었다. 세션 종료 화면도 인벤토리에 없어 채울 사람이 없다. 다시 여는 조건 — 세션 종료 화면이 생기고 「왜 닫는가」를 사람에게 묻기로 하면 그때 연다."
+      "x-internal-note": "세션 종료 사유를 요구한 문서가 없다. 요구 원천은 「비가동 및 작업중단 사유 기록」 한 줄인데 그 뜻은 work_session_event.reason_code 가 받는다(논리 모델 §9.7 만 설명이 붙어 있다). 데이터모델 CHANGELOG 144행도 「작업 세션 기반 중지는 work_session_event 로 커버」라 적었다. 세션 종료 화면도 인벤토리에 없어 채울 사람이 없다. 다시 여는 조건 — 세션 종료 화면이 생기고 「왜 닫는가」를 사람에게 묻기로 하면 그때 연다.",
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 이 칸을 «쓰지 않는다». 계약 산문이 이미 「값 목록을 못 정한 것이 아니라 «비우기로 정했다»」로 판정했다(공유계약 A-21 · A-25). 중단 사유는 비가동 실적(P-05-02)이 받는다."
      }
     },
     "required": [

@@ -2943,7 +2943,9 @@
      },
      "responsibilityTypeCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-DEFECT-RESPONSIBILITY-TYPE",
+      "description": "귀책 구분 — 이 불량의 책임이 어디에 있는가. responsibleDepartmentId 와 짝이다. ⚠ «원천 축이 아니다» — 어디서 «발견»했나(sourceCode)와 다르다(W-03-05 §5-2). ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=DEFECT_RESPONSIBILITY_TYPE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "responsibleDepartmentId": {
       "type": "integer",
@@ -3425,8 +3427,14 @@
      },
      "targetTypeCode": {
       "type": "string",
-      "description": "다형 참조의 유형. ⬜ 유형 코드 ↔ 대상 테이블 대응표는 미정이다 — 공유계약 A-10 · omf-mes#68(→ 지금은 omf-mes-server#74) 과 함께 정한다. 값 목록이 정해지기 전까지 이 example 을 값으로 읽지 않는다. 근거: 공유계약 A-10",
-      "example": "값"
+      "description": "A-10 다형 참조 판별자 — 값이 «대상 리소스 이름»이고 짝 id 가 그 리소스의 식별자다. ⭐ 대응표는 «설계»가 정한다(A-10 규칙 1 · 2026-09-03 사용자 결정). 검사 대상 — LOT(IQC 입하 LOT · OQC 제품 LOT) · 작업지시(WORK_ORDER · PQC) · 출하 지시(SHIPMENT_REQUEST · OQC). ⭐ W-04-03 §4 가 「다형 — 출하작업지시 · LOT」로, P-02-13 §4 가 작업지시를 적어 두었다. ⚠ 이 스키마는 lotId · workOrderId · productionResultId 를 «따로» 갖는다 — A-10 규칙 3 대로 둘이 같은 대상을 가리키면 FK 쪽을 쓰고, 다르면 이 판별자로 판정한다.",
+      "example": "LOT",
+      "x-code-key": "CD-INSPECTION-REQUEST-TARGET-TYPE",
+      "enum": [
+       "LOT",
+       "WORK_ORDER",
+       "SHIPMENT_REQUEST"
+      ]
      },
      "targetId": {
       "type": "integer",
@@ -3617,7 +3625,9 @@
      },
      "reinspectionReasonCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-REINSPECTION-REASON",
+      "description": "재검사 사유 — 왜 회차를 더 돌리는가. ⭐ 번복은 「수정」이 아니라 «재검사 회차»라 이 사유가 그 회차의 근거다(W-04-03 §5). ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=REINSPECTION_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "remarks": {
       "type": "string",
@@ -3745,7 +3755,9 @@
      },
      "reinspectionReasonCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-REINSPECTION-REASON",
+      "description": "재검사 사유 — 왜 회차를 더 돌리는가. ⭐ 번복은 「수정」이 아니라 «재검사 회차»라 이 사유가 그 회차의 근거다(W-04-03 §5). ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=REINSPECTION_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "measurements": {
       "type": "array",
@@ -4293,7 +4305,9 @@
      },
      "latestReasonCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-LOT-HOLD-REASON",
+      "description": "「최근 전이」의 사유. ⛔ 변경이력 표가 없어 «보류» 기록의 최신 건으로 낸다 — 합격·불합격·재판정 전이는 여기 나타나지 않는다(W-03-01 §5-1). 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      }
     },
     "required": [
@@ -4427,7 +4441,9 @@
      },
      "currentLotStatusCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-LOT-STATUS",
+      "description": "전이를 걸 때 화면이 «본» 현재 상태. 서버가 이것과 실제가 다르면 409 로 막는다. LOT 상태. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "transitions": {
       "type": "array",
@@ -4535,8 +4551,9 @@
      },
      "currentLotStatusCode": {
       "type": "string",
-      "description": "VERSION_CONFLICT 일 때 서버의 현재 lot.status_code — 충돌 문구에 최신 상태를 담는다(「다른 사용자가 먼저 전이했습니다. 현재 상태는 불량입니다」 W-03-02 §6). ⛔ message 자유 텍스트에서 파싱하지 않는다 — 이 구조화 필드가 정본이다. 근거: W-03-02 §6 · omf-mes#225",
-      "example": "DEFECTIVE"
+      "description": "VERSION_CONFLICT 일 때 서버의 «현재» LOT 상태 — 충돌 문구에 최신 상태를 담는다(W-03-02 §6). ⛔ message 자유 텍스트에서 파싱하지 않는다 — 이 구조화 필드가 정본이다. LOT 상태. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "DEFECTIVE",
+      "x-code-key": "CD-LOT-STATUS"
      },
      "conflictCause": {
       "type": "string",
