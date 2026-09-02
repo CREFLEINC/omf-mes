@@ -86,9 +86,15 @@
       "name": "overallResultCode",
       "in": "query",
       "schema": {
-       "type": "string"
+       "type": "string",
+       "enum": [
+        "PASS",
+        "FAIL"
+       ],
+       "example": "PASS"
       },
-      "description": "종합 판정으로 거른다 — 합격(OK) 또는 불합격(NG). 보전 지시 발행 화면이 불합격만 트리거 목록으로 부른다(W-05-05 §4)"
+      "description": "점검 종합 판정 — 합격(PASS) · 불합격(FAIL). 보전 지시 발행 화면이 «불합격만» 트리거 목록으로 부른다(W-05-05 §4). ⭐ 문자열을 PASS·FAIL 로 정한 근거는 «같은 계약 파일의 일관성»이다 — Calibration.resultCode 가 이미 합격(PASS)·불합격(FAIL)을 쓴다. 「OK」는 저장소 다른 곳에 용례가 없다(2026-09-02 실측 · 사용자 위임 판단)",
+      "x-code-key": "CD-MAINTENANCE-INSPECTION-RESULT"
      },
      {
       "name": "withoutMaintenanceOrder",
@@ -905,8 +911,14 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "EQUIPMENT"
-      }
+       "example": "EQUIPMENT",
+       "enum": [
+        "EQUIPMENT",
+        "MOLD"
+       ]
+      },
+      "x-code-key": "CD-MAINTENANCE-TARGET-TYPE",
+      "description": "보전 대상 유형 — EQUIPMENT → 설비(계측기 포함 · 계측기는 설비의 한 종류라 equipmentId 를 그대로 쓴다) · MOLD → 툴·금형. ⭐ 값 문자열을 확정했다(2026-09-02). ⛔ 다형 참조 판별자라 고객이 늘릴 수 없다(A-10 · A-16)"
      },
      {
       "name": "targetId",
@@ -932,9 +944,14 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "PREVENTIVE"
+       "example": "PREVENTIVE",
+       "enum": [
+        "CORRECTIVE",
+        "PREVENTIVE"
+       ]
       },
-      "description": "보전 유형으로 거른다 — 사후(CORRECTIVE)·예방(PREVENTIVE). 사람이 고르는 값이 아니라 발행 시 트리거 조합이 정한 값이다."
+      "description": "보전 유형 — 사후(CORRECTIVE) · 예방(PREVENTIVE). 사람이 고르는 값이 아니라 발행 시 트리거 조합이 정한다 — 고장이 하나라도 섞이면 사후로 고정된다(W-05-05 §5-3). ⭐ 「예지(PREDICTIVE)」를 두지 않는다(사용자 결정 2026-09-02) — WF05 S5 Trigger ④ 가 「(향후) 상태 기반 예지보전」이라 적어 «촉발할 트리거가 아직 없고», 트리거가 정하는 축에 트리거 없는 값을 두면 사람이 손으로 고를 수밖에 없어 규칙이 무너진다(A-21). ⚠ 예지 트리거가 서면 그때 값을 더한다",
+      "x-code-key": "CD-MAINTENANCE-TYPE"
      },
      {
       "name": "plannedFrom",
@@ -1233,8 +1250,14 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "MOLD"
-      }
+       "example": "MOLD",
+       "enum": [
+        "EQUIPMENT",
+        "MOLD"
+       ]
+      },
+      "x-code-key": "CD-MAINTENANCE-TARGET-TYPE",
+      "description": "보전 대상 유형 — EQUIPMENT → 설비(계측기 포함 · 계측기는 설비의 한 종류라 equipmentId 를 그대로 쓴다) · MOLD → 툴·금형. ⭐ 값 문자열을 확정했다(2026-09-02). ⛔ 다형 참조 판별자라 고객이 늘릴 수 없다(A-10 · A-16)"
      },
      {
       "name": "targetId",
@@ -2698,7 +2721,8 @@
        "type": "string",
        "example": "CALIBRATION"
       },
-      "description": "이력 유형으로 거른다. 값은 Calibration.historyTypeCode 와 같다."
+      "description": "이력 유형으로 거른다. 계측기 이력 유형 — 검교정(CALIBRATION) · 점검(CHECK) · 그 밖(고객이 늘린다). ⭐ 2026-09-02 사용자 결정으로 «시스템이 이름으로 지목하는 값은 CALIBRATION 하나»가 됐다 — 설비 마스터의 검교정일 갱신과 agencyTypeCode 표시가 그것에 걸린다. ⛔ 사용 가부 판정은 더 이상 이 값을 읽지 않는다 — 「열린 수리 이력이 없다」를 blocksUse + clearedAt 로 바꿨다(W-05-11 §5-2). 그래서 「수리」·「폐기」의 코드 문자열을 우리가 정할 필요가 없고, 계약이 원래 적은 「관리자 설정형」이 그제서야 성립한다. 값 목록은 GET /mdm/code-values?codeGroupCode=CALIBRATION_HISTORY_TYPE 로 받는다.",
+      "x-code-key": "CD-CALIBRATION-HISTORY-TYPE"
      },
      {
       "name": "dueBefore",
@@ -2895,6 +2919,52 @@
       }
      }
     }
+   }
+  },
+  "/maintenance/calibrations/{calibrationId}:clear": {
+   "post": {
+    "summary": "계측기 이력의 사용 차단을 해소한다",
+    "description": "blocksUse=true 인 이력의 clearedAt 을 세운다 — 그 순간부터 이 계측기가 다시 사용 가능해진다(W-05-11 §5-2 판정식). ⛔ 이미 해소된 이력에 다시 부르면 409 다. ⚠ blocksUse=false 인 이력에 부르면 400 이다 — 막고 있지 않은 것을 풀 수 없다. ⭐ 행을 지우지 않는다 — 언제 누가 풀었는지가 남아야 한다.",
+    "operationId": "clearCalibrationBlock",
+    "parameters": [
+     {
+      "name": "calibrationId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "해소됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Calibration"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "막고 있지 않은 이력이다"
+     },
+     "404": {
+      "description": "없는 이력이다"
+     },
+     "409": {
+      "description": "이미 해소됐다"
+     }
+    },
+    "tags": [
+     "maintenance"
+    ]
    }
   }
  },
@@ -3097,7 +3167,8 @@
      },
      "equipmentCode": {
       "type": "string",
-      "example": "PRS-01"
+      "example": "PRS-01",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 설비 마스터의 행을 가리킨다 — Equipment.equipmentCode 가 같은 판정으로 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "inspectionTypeCode": {
       "type": "string",
@@ -3107,8 +3178,13 @@
      },
      "overallResultCode": {
       "type": "string",
-      "description": "라인이 하나라도 불합격이면 불합격이다. 값은 합격(OK)·불합격(NG) 둘이다. ⛔ 작업 전 점검 통제(P-02-02 §5-7)가 이 값으로 «수준과 무관한 차단»을 판정하므로 화면이 문자열을 흩어 박지 않는다",
-      "example": "NG"
+      "description": "점검 종합 판정 — 합격(PASS) · 불합격(FAIL). 보전 지시 발행이 불합격만 트리거로 부른다",
+      "example": "PASS",
+      "x-code-key": "CD-MAINTENANCE-INSPECTION-RESULT",
+      "enum": [
+       "PASS",
+       "FAIL"
+      ]
      },
      "inspectedAt": {
       "type": "string",
@@ -3223,7 +3299,8 @@
        "null"
       ],
       "description": "원인 코드 — 완료로 갈 때 필요하다",
-      "example": "HYD_LEAK"
+      "example": "HYD_LEAK",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 원인코드 마스터(mdm.cause_code)의 행을 가리킨다 — 선택 목록은 그 마스터가 준다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "handlingNote": {
       "type": [
@@ -3279,7 +3356,8 @@
      },
      "equipmentCode": {
       "type": "string",
-      "example": "PRS-01"
+      "example": "PRS-01",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 설비 마스터의 행을 가리킨다 — Equipment.equipmentCode 가 같은 판정으로 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "symptom": {
       "type": "string",
@@ -3410,7 +3488,8 @@
        "string",
        "null"
       ],
-      "example": "HYD_LEAK"
+      "example": "HYD_LEAK",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 원인코드 마스터(mdm.cause_code)의 행을 가리킨다 — 선택 목록은 그 마스터가 준다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "handlingNote": {
       "type": [
@@ -3427,7 +3506,8 @@
      "causeCode": {
       "type": "string",
       "description": "완료에는 반드시 있어야 한다",
-      "example": "HYD_LEAK"
+      "example": "HYD_LEAK",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 원인코드 마스터(mdm.cause_code)의 행을 가리킨다 — 선택 목록은 그 마스터가 준다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "handlingNote": {
       "type": "string",
@@ -3513,8 +3593,9 @@
     "properties": {
      "triggerTypeCode": {
       "type": "string",
-      "description": "고장(BREAKDOWN) · 점검 불합격(INSPECTION_NG) · 주기 도래(PM_DUE)",
-      "example": "BREAKDOWN"
+      "description": "보전 지시를 촉발한 것 — 고장(BREAKDOWN) · 점검 불합격(INSPECTION_NG) · 주기 도래(PM_DUE). ⛔ 연계 정의의 triggerTypeCode(CD-TRIGGER-TYPE · EVENT·TIME_SCHEDULE)와 이름만 같고 축이 다르다. ⭐ 이 조합이 maintenanceTypeCode 를 정한다 — 고장이 하나라도 섞이면 사후로 고정된다(W-05-05 §5-3). 값 목록은 GET /mdm/code-values?codeGroupCode=MAINTENANCE_ORDER_TRIGGER_TYPE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "BREAKDOWN",
+      "x-code-key": "CD-MAINTENANCE-ORDER-TRIGGER-TYPE"
      },
      "sourceId": {
       "type": [
@@ -3578,8 +3659,13 @@
      },
      "targetTypeCode": {
       "type": "string",
-      "description": "설비(EQUIPMENT) 또는 툴(MOLD)",
-      "example": "EQUIPMENT"
+      "description": "보전 대상 유형 — EQUIPMENT → 설비(계측기 포함 · 계측기는 설비의 한 종류라 equipmentId 를 그대로 쓴다) · MOLD → 툴·금형. ⭐ 값 문자열을 확정했다(2026-09-02). ⛔ 다형 참조 판별자라 고객이 늘릴 수 없다(A-10 · A-16)",
+      "example": "EQUIPMENT",
+      "x-code-key": "CD-MAINTENANCE-TARGET-TYPE",
+      "enum": [
+       "EQUIPMENT",
+       "MOLD"
+      ]
      },
      "targetId": {
       "type": "integer",
@@ -3588,12 +3674,18 @@
      },
      "targetCode": {
       "type": "string",
-      "example": "PRS-01"
+      "example": "PRS-01",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 보전 «대상» 개체의 코드다 — targetTypeCode 가 설비인지 금형인지 말하고 이 칸은 그 마스터의 행을 가리킨다. 값의 목록이 아니라 개체의 목록이다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "maintenanceTypeCode": {
       "type": "string",
-      "description": "사후(CORRECTIVE) 또는 예방(PREVENTIVE) — 트리거 조합이 정한다",
-      "example": "CORRECTIVE"
+      "description": "보전 유형 — 사후(CORRECTIVE) · 예방(PREVENTIVE). 트리거 조합이 정하며 사람이 고르지 않는다",
+      "example": "CORRECTIVE",
+      "x-code-key": "CD-MAINTENANCE-TYPE",
+      "enum": [
+       "CORRECTIVE",
+       "PREVENTIVE"
+      ]
      },
      "plannedDate": {
       "type": "string",
@@ -3674,7 +3766,13 @@
     "properties": {
      "targetTypeCode": {
       "type": "string",
-      "example": "EQUIPMENT"
+      "example": "EQUIPMENT",
+      "x-code-key": "CD-MAINTENANCE-TARGET-TYPE",
+      "description": "보전 대상 유형 — EQUIPMENT → 설비(계측기 포함 · 계측기는 설비의 한 종류라 equipmentId 를 그대로 쓴다) · MOLD → 툴·금형. ⭐ 값 문자열을 확정했다(2026-09-02). ⛔ 다형 참조 판별자라 고객이 늘릴 수 없다(A-10 · A-16)",
+      "enum": [
+       "EQUIPMENT",
+       "MOLD"
+      ]
      },
      "targetId": {
       "type": "integer",
@@ -3827,7 +3925,8 @@
       ],
       "readOnly": true,
       "description": "사용 수량의 단위",
-      "example": "EA"
+      "example": "EA",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 단위 마스터(mdm.uom)의 행을 가리킨다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      }
     },
     "required": [
@@ -3862,7 +3961,13 @@
      },
      "targetTypeCode": {
       "type": "string",
-      "example": "EQUIPMENT"
+      "example": "EQUIPMENT",
+      "x-code-key": "CD-MAINTENANCE-TARGET-TYPE",
+      "description": "보전 대상 유형 — EQUIPMENT → 설비(계측기 포함 · 계측기는 설비의 한 종류라 equipmentId 를 그대로 쓴다) · MOLD → 툴·금형. ⭐ 값 문자열을 확정했다(2026-09-02). ⛔ 다형 참조 판별자라 고객이 늘릴 수 없다(A-10 · A-16)",
+      "enum": [
+       "EQUIPMENT",
+       "MOLD"
+      ]
      },
      "targetId": {
       "type": "integer",
@@ -3981,7 +4086,13 @@
      },
      "targetTypeCode": {
       "type": "string",
-      "example": "EQUIPMENT"
+      "example": "EQUIPMENT",
+      "x-code-key": "CD-MAINTENANCE-TARGET-TYPE",
+      "description": "보전 대상 유형 — EQUIPMENT → 설비(계측기 포함 · 계측기는 설비의 한 종류라 equipmentId 를 그대로 쓴다) · MOLD → 툴·금형. ⭐ 값 문자열을 확정했다(2026-09-02). ⛔ 다형 참조 판별자라 고객이 늘릴 수 없다(A-10 · A-16)",
+      "enum": [
+       "EQUIPMENT",
+       "MOLD"
+      ]
      },
      "targetId": {
       "type": "integer",
@@ -4138,12 +4249,15 @@
      },
      "equipmentCode": {
       "type": "string",
-      "example": "PRS-01"
+      "example": "PRS-01",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 설비 마스터의 행을 가리킨다 — Equipment.equipmentCode 가 같은 판정으로 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "reasonCode": {
       "type": "string",
       "example": "MOLD_CHANGE",
-      "x-internal-note": "⚠ 대·소분류 2단 여부는 아직 정해지지 않았다 — P-05-02 §8-2 · W-06-06 소관(표지 G-2). 계약은 현재 1단이다. 그룹 이름의 출처는 design/raw/process/uiux/2026-08-13-공통코드값목록-제안안/01-2차-제안안.md §2 21번(2026-08-22 작업 통지) — wiki 정본에는 아직 없다."
+      "x-internal-note": "⚠ 대·소분류 2단 여부는 아직 정해지지 않았다 — P-05-02 §8-2 · W-06-06 소관(표지 G-2). 계약은 현재 1단이다. 그룹 이름의 출처는 design/raw/process/uiux/2026-08-13-공통코드값목록-제안안/01-2차-제안안.md §2 21번(2026-08-22 작업 통지) — wiki 정본에는 아직 없다.",
+      "x-code-key": "CD-DOWNTIME-REASON",
+      "description": "비가동 사유. 값 목록은 GET /mdm/code-values?codeGroupCode=DOWNTIME_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "reasonName": {
       "type": "string",
@@ -4221,7 +4335,9 @@
      "reasonCode": {
       "type": "string",
       "example": "MOLD_CHANGE",
-      "x-internal-note": "⚠ 대·소분류 2단 여부는 아직 정해지지 않았다 — P-05-02 §8-2 · W-06-06 소관(표지 G-2). 계약은 현재 1단이다. 그룹 이름의 출처는 design/raw/process/uiux/2026-08-13-공통코드값목록-제안안/01-2차-제안안.md §2 21번(2026-08-22 작업 통지) — wiki 정본에는 아직 없다."
+      "x-internal-note": "⚠ 대·소분류 2단 여부는 아직 정해지지 않았다 — P-05-02 §8-2 · W-06-06 소관(표지 G-2). 계약은 현재 1단이다. 그룹 이름의 출처는 design/raw/process/uiux/2026-08-13-공통코드값목록-제안안/01-2차-제안안.md §2 21번(2026-08-22 작업 통지) — wiki 정본에는 아직 없다.",
+      "x-code-key": "CD-DOWNTIME-REASON",
+      "description": "비가동 사유. 값 목록은 GET /mdm/code-values?codeGroupCode=DOWNTIME_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "startedAt": {
       "type": "string",
@@ -4267,7 +4383,9 @@
      "reasonCode": {
       "type": "string",
       "example": "MOLD_CHANGE",
-      "x-internal-note": "⚠ 대·소분류 2단 여부는 아직 정해지지 않았다 — P-05-02 §8-2 · W-06-06 소관(표지 G-2). 계약은 현재 1단이다. 그룹 이름의 출처는 design/raw/process/uiux/2026-08-13-공통코드값목록-제안안/01-2차-제안안.md §2 21번(2026-08-22 작업 통지) — wiki 정본에는 아직 없다."
+      "x-internal-note": "⚠ 대·소분류 2단 여부는 아직 정해지지 않았다 — P-05-02 §8-2 · W-06-06 소관(표지 G-2). 계약은 현재 1단이다. 그룹 이름의 출처는 design/raw/process/uiux/2026-08-13-공통코드값목록-제안안/01-2차-제안안.md §2 21번(2026-08-22 작업 통지) — wiki 정본에는 아직 없다.",
+      "x-code-key": "CD-DOWNTIME-REASON",
+      "description": "비가동 사유. 값 목록은 GET /mdm/code-values?codeGroupCode=DOWNTIME_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "endedAt": {
       "type": [
@@ -4301,7 +4419,8 @@
      "reasonCode": {
       "type": "string",
       "example": "MOLD_CHANGE",
-      "x-internal-note": "⚠ 대·소분류 2단 여부는 아직 정해지지 않았다 — P-05-02 §8-2 · W-06-06 소관(표지 G-2). 계약은 현재 1단이다. 그룹 이름의 출처는 design/raw/process/uiux/2026-08-13-공통코드값목록-제안안/01-2차-제안안.md §2 21번(2026-08-22 작업 통지) — wiki 정본에는 아직 없다. 이 스키마는 응답 집계라 저장 문장을 담지 않는다."
+      "x-internal-note": "⚠ 대·소분류 2단 여부는 아직 정해지지 않았다 — P-05-02 §8-2 · W-06-06 소관(표지 G-2). 계약은 현재 1단이다. 그룹 이름의 출처는 design/raw/process/uiux/2026-08-13-공통코드값목록-제안안/01-2차-제안안.md §2 21번(2026-08-22 작업 통지) — wiki 정본에는 아직 없다. 이 스키마는 응답 집계라 저장 문장을 담지 않는다.",
+      "x-code-key": "CD-DOWNTIME-REASON"
      },
      "reasonName": {
       "type": "string",
@@ -4451,7 +4570,8 @@
      },
      "moldCode": {
       "type": "string",
-      "example": "MLD-0207"
+      "example": "MLD-0207",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 툴·금형 마스터의 행을 가리킨다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "workOrderId": {
       "type": "integer",
@@ -4583,7 +4703,8 @@
      },
      "equipmentCode": {
       "type": "string",
-      "example": "PRS-01"
+      "example": "PRS-01",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 설비 마스터의 행을 가리킨다 — Equipment.equipmentCode 가 같은 판정으로 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "channelKey": {
       "type": "string",
@@ -4622,7 +4743,8 @@
        "null"
       ],
       "description": "품목 조건의 표시용 코드 — 비면 「전체」",
-      "example": "ABC-123"
+      "example": "ABC-123",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 품목 마스터의 행을 가리킨다 — Item.itemCode 가 같은 판정으로 이미 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "processId": {
       "type": [
@@ -4639,7 +4761,8 @@
        "null"
       ],
       "description": "공정 조건의 표시용 코드 — 비면 「전체」",
-      "example": "PRS"
+      "example": "PRS",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 공정 마스터의 행을 가리킨다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "inspectionItemName": {
       "type": [
@@ -4655,7 +4778,8 @@
        "null"
       ],
       "description": "연결된 검사 항목의 코드",
-      "example": "CYCLE_TIME"
+      "example": "CYCLE_TIME",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 검사 항목의 행을 가리킨다 — 버전 내 유일 제약이 없어 코드값 집합이 아니다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "inspectionItemUnitCode": {
       "type": [
@@ -4835,8 +4959,9 @@
      },
      "historyTypeCode": {
       "type": "string",
-      "description": "계측기 이력 유형. 확정된 유형은 넷이다 — 검교정(CALIBRATION) · 점검(CHECK) · 수리 · 폐기. ⚠ 뒤 둘의 코드값 이름은 아직 확정되지 않았다 — 관리자 설정형이라 값이 늘 수 있고 공통코드 마스터(W-06-06)가 정한다. ⚠ 「열린 수리 이력이 없다」가 설비 사용 가부 판정식의 한 항이므로 수리 유형을 뺄 수 없다(W-05-11 §5-2). ⛔ enum 으로 좁히지 않는다",
-      "example": "CALIBRATION"
+      "description": "계측기 이력 유형 — 검교정(CALIBRATION) · 점검(CHECK) · 그 밖(고객이 늘린다). ⭐ 2026-09-02 사용자 결정으로 «시스템이 이름으로 지목하는 값은 CALIBRATION 하나»가 됐다 — 설비 마스터의 검교정일 갱신과 agencyTypeCode 표시가 그것에 걸린다. ⛔ 사용 가부 판정은 더 이상 이 값을 읽지 않는다 — 「열린 수리 이력이 없다」를 blocksUse + clearedAt 로 바꿨다(W-05-11 §5-2). 그래서 「수리」·「폐기」의 코드 문자열을 우리가 정할 필요가 없고, 계약이 원래 적은 「관리자 설정형」이 그제서야 성립한다. 값 목록은 GET /mdm/code-values?codeGroupCode=CALIBRATION_HISTORY_TYPE 로 받는다.",
+      "example": "CALIBRATION",
+      "x-code-key": "CD-CALIBRATION-HISTORY-TYPE"
      },
      "performedOn": {
       "type": "string",
@@ -4909,7 +5034,8 @@
      },
      "equipmentCode": {
       "type": "string",
-      "example": "GAU-0031"
+      "example": "GAU-0031",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 설비 마스터의 행을 가리킨다 — Equipment.equipmentCode 가 같은 판정으로 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "remarks": {
       "type": [
@@ -4918,6 +5044,21 @@
       ],
       "description": "비고",
       "example": "정정 재검교정 — 1차 성적서 오기"
+     },
+     "blocksUse": {
+      "type": "boolean",
+      "default": false,
+      "description": "이 이력이 해소될 때까지 «이 계측기를 쓸 수 없게» 막는가. ⭐ 2026-09-02 신설 (사용자 결정) — 전에는 W-05-11 §5-2 가 「열린 «수리» 이력이 없다」로 historyTypeCode 의 «뜻»을 읽었는데, ⛔ 그 방식은 두 가지가 깨져 있었다: ① 이력에 열림/닫힘 축이 아예 없어 「한 번이라도 수리하면 영원히 사용 불가」가 됐고 ② 「수리」의 코드 문자열이 고객 몫이라 우리 판정식이 «고객이 지을 이름»을 지목하고 있었다. ⭐ 사람이 직접 정한다 — 고장·수리는 달력이 아니라 사람이 만드는 사건이라 파생으로 둘 이유가 없다(만료는 다르다 — 그쪽은 달력이 만들어 파생으로 남긴다).",
+      "example": false
+     },
+     "clearedAt": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "format": "date-time",
+      "description": "사용 차단이 해소된 시각. 비어 있으면 «아직 막고 있다». ⭐ 구간 형 리소스의 그 방식이다 — LOT 보류(released_at) · 작업 세션(:end) · repair-executions?open=true 와 같다. ⚠ blocksUse 가 false 면 의미가 없다.",
+      "example": null
      }
     },
     "required": [
@@ -4925,7 +5066,8 @@
      "equipmentId",
      "historyTypeCode",
      "performedOn",
-     "resultCode"
+     "resultCode",
+     "blocksUse"
     ]
    },
    "CalibrationCreate": {
@@ -4934,7 +5076,8 @@
      "historyTypeCode": {
       "type": "string",
       "example": "CALIBRATION",
-      "description": "계측기 이력 유형. 확정된 유형은 넷이다 — 검교정(CALIBRATION) · 점검(CHECK) · 수리 · 폐기. ⚠ 뒤 둘의 코드값 이름은 아직 확정되지 않았다 — 관리자 설정형이라 값이 늘 수 있고 공통코드 마스터(W-06-06)가 정한다. ⚠ 「열린 수리 이력이 없다」가 설비 사용 가부 판정식의 한 항이므로 수리 유형을 뺄 수 없다(W-05-11 §5-2). ⛔ enum 으로 좁히지 않는다"
+      "description": "계측기 이력 유형 — 검교정(CALIBRATION) · 점검(CHECK) · 그 밖(고객이 늘린다). ⭐ 2026-09-02 사용자 결정으로 «시스템이 이름으로 지목하는 값은 CALIBRATION 하나»가 됐다 — 설비 마스터의 검교정일 갱신과 agencyTypeCode 표시가 그것에 걸린다. ⛔ 사용 가부 판정은 더 이상 이 값을 읽지 않는다 — 「열린 수리 이력이 없다」를 blocksUse + clearedAt 로 바꿨다(W-05-11 §5-2). 그래서 「수리」·「폐기」의 코드 문자열을 우리가 정할 필요가 없고, 계약이 원래 적은 「관리자 설정형」이 그제서야 성립한다. 값 목록은 GET /mdm/code-values?codeGroupCode=CALIBRATION_HISTORY_TYPE 로 받는다.",
+      "x-code-key": "CD-CALIBRATION-HISTORY-TYPE"
      },
      "performedOn": {
       "type": "string",
@@ -5006,6 +5149,12 @@
       ],
       "description": "비고",
       "example": "정정 재검교정 — 1차 성적서 오기"
+     },
+     "blocksUse": {
+      "type": "boolean",
+      "default": false,
+      "description": "이 이력이 해소될 때까지 «이 계측기를 쓸 수 없게» 막는가. ⭐ 2026-09-02 신설 (사용자 결정) — 전에는 W-05-11 §5-2 가 「열린 «수리» 이력이 없다」로 historyTypeCode 의 «뜻»을 읽었는데, ⛔ 그 방식은 두 가지가 깨져 있었다: ① 이력에 열림/닫힘 축이 아예 없어 「한 번이라도 수리하면 영원히 사용 불가」가 됐고 ② 「수리」의 코드 문자열이 고객 몫이라 우리 판정식이 «고객이 지을 이름»을 지목하고 있었다. ⭐ 사람이 직접 정한다 — 고장·수리는 달력이 아니라 사람이 만드는 사건이라 파생으로 둘 이유가 없다(만료는 다르다 — 그쪽은 달력이 만들어 파생으로 남긴다). ⚠ 선택이다 — 보내지 않으면 서버가 false 로 기록한다. 요청 스키마에 required 를 더하면 안 보내던 쪽이 400 을 받는다.",
+      "example": false
      }
     },
     "required": [
@@ -5032,7 +5181,8 @@
      },
      "equipmentCode": {
       "type": "string",
-      "example": "PRS-01"
+      "example": "PRS-01",
+      "x-no-code-key": "코드 그룹이 아니다 — DowntimeEquipment 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "equipmentName": {
       "type": [

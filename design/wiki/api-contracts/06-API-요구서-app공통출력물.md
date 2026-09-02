@@ -93,6 +93,8 @@
 | 라벨 출력 | `POST /app/document-issues` — **`documentTypeCode = PRODUCTION_LOT_LABEL`**(§3-8) · `targetType` = LOT, `lotId` = 같은 값 | §5-2 · K-1 |
 | 미리보기 | `GET /app/document-issues/{id}/rendition` | K-5 |
 | 2단 출력 — 두 화면이 나눠 가진다 | 계약은 **한 경로**다. 「누가 어느 단을 찍는가」는 화면이 정한다 | §5-3 |
+| ⭐ **LOT 발생 원천 표시명** | **`GET /mdm/code-values?codeGroupCode=LOT_SOURCE_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `INBOUND_RECEIPT_LINE`·`RECYCLE_ENTRY`(**2026-09-02 등재**) | G-32 · K-5 |
+| ⭐ **LOT 생명주기 표시명** | **`GET /mdm/code-values?codeGroupCode=LOT_LIFECYCLE_STATUS`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `WAITING`·`ACTIVE`·`VOIDED`(**2026-09-02 등재**) | G-32 · K-5 |
 
 ⭐ **A-10 규칙 3(FK 우선)이 여기서 갈린다.** LOT 라벨은 `targetId` 와 `lotId` 가 같은 값이고 인식표는 다르다 → **`targetTypeCode` 로 먼저 판정한다.** 계약의 `DocumentTarget.targetTypeCode` 가 그 판정 입력이다.
 

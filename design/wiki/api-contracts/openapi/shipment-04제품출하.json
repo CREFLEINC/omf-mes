@@ -46,7 +46,8 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 편성 여부는 계약이 이미 unassignedOnly(boolean)로 받고 있고 이 칸의 쿼리를 부르는 화면이 0건이다. ⛔ 이 리소스는 수신본이라 등록·수정 경로가 없다 — 상태를 «올릴» 주체가 MES 안에 없다(A-21 · 사용자 결정 2026-09-02)."
      },
      {
       "name": "orderDateFrom",
@@ -525,7 +526,8 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 화면이 그리는 「미편성·피킹중·검사대기·출하완료」는 «파생 진행» 축이지 이 칸이 아니다. 한 칸에 두 축을 담으면 어느 쪽도 못 읽는다. ⭐ 선례가 같은 계약 파일에 있다 — Nonconformance 가 statusCode 옆에 dispositionProgressCode(enum)를 «따로» 두고 「statusCode 와 축이 다르다 — 「판정 대기」 한 값이 NOT_STARTED 와 PARTIAL 을 함께 담아 이 열을 대신할 수 없다」로 못박았다. ⚠ 진행 축 필드 신설은 별건이다. 이 칸을 «움직이는» 액션도 계약에 0건이다(A-21 · 사용자 결정 2026-09-02)."
      },
      {
       "name": "timeSlotCode",
@@ -736,7 +738,8 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 화면이 그리는 「미편성·피킹중·검사대기·출하완료」는 «파생 진행» 축이지 이 칸이 아니다. 한 칸에 두 축을 담으면 어느 쪽도 못 읽는다. ⭐ 선례가 같은 계약 파일에 있다 — Nonconformance 가 statusCode 옆에 dispositionProgressCode(enum)를 «따로» 두고 「statusCode 와 축이 다르다 — 「판정 대기」 한 값이 NOT_STARTED 와 PARTIAL 을 함께 담아 이 열을 대신할 수 없다」로 못박았다. ⚠ 진행 축 필드 신설은 별건이다. 이 칸을 «움직이는» 액션도 계약에 0건이다(A-21 · 사용자 결정 2026-09-02)."
      },
      {
       "name": "timeSlotCode",
@@ -995,7 +998,9 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-code-key": "CD-SHIPMENT-STATUS",
+      "description": "출하의 진행 상태 — 미확정(UNCONFIRMED) · 확정(CONFIRMED) · 취소(CANCELLED). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 확정이 PGI 송신을 부르고 취소가 그것을 되돌린다(W-04-04 §5-1 · W-04-12 §5-2). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=SHIPMENT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "warehouseId",
@@ -1514,16 +1519,22 @@
        "type": "string",
        "example": "값"
       },
-      "description": "의뢰 전 · 판정 대기 · 판정 완료"
+      "description": "부적합 건의 진행 상태 — 의뢰 전(NOT_REQUESTED) · 판정 대기(PENDING_DECISION) · 판정 완료(DECIDED). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 이 값이 처분 판정 화면의 진입 목록을 가른다(W-04-07 §3 · W-03-10 §5-5). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=NONCONFORMANCE_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-NONCONFORMANCE-STATUS"
      },
      {
       "name": "sourceCode",
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "PRODUCT"
+       "example": "PRODUCT",
+       "enum": [
+        "PRODUCT",
+        "RETURN"
+       ]
       },
-      "description": "PRODUCT(제품)·RETURN(반품). ⭐ 서버가 대상 LOT 의 입고 유형으로 파생하는 축이다 — 화면이 보내지 않는다. W-03-10 §5-4 원천 필터가 쓴다. 이력: 2026-08-30 신설(W-03-10 원천 필터 되살리기) · 2026-09-01 서버 파생으로 재정의(omf-mes#303)"
+      "description": "부적합 원천 — 제품(PRODUCT) · 반품(RETURN). ⭐ 서버가 대상 LOT 의 입고 유형으로 «파생»하는 축이라 화면이 보내지 않는다(2026-09-01). W-03-10 §5-4 원천 필터가 쓴다. ⛔ DefectRecord 의 sourceCode(CD-DEFECT-RECORD-SOURCE)와 이름만 같고 축이 다르다 — 저쪽은 «어디서 발견했나», 여기는 «어디서 들어온 물건인가»다",
+      "x-code-key": "CD-NONCONFORMANCE-SOURCE"
      },
      {
       "name": "warehouseId",
@@ -1558,7 +1569,9 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-code-key": "CD-NONCONFORMANCE-SEVERITY",
+      "description": "부적합 심각도 — 중대(CRITICAL) · 중(MAJOR) · 경(MINOR). ⭐ 화면 목업이 「심각도 중대」(W-03-10 §3)·「심각도 중」(W-04-07 §3)을 그려 3단계 축이 이미 서 있다. ⭐ 고객이 늘릴 수 있다 — 아래는 초기값(기본값)이지 닫힌 목록이 아니다. 값 목록은 GET /mdm/code-values?codeGroupCode=NONCONFORMANCE_SEVERITY 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "openedFrom",
@@ -1999,12 +2012,19 @@
      },
      "sourceCode": {
       "type": "string",
-      "x-no-example": true,
-      "description": "⭐ 서버 파생 값이다 — 저장 컬럼이 아니고 화면이 보내지 않는다(W-CO-03 의 openable 과 같은 형태). 파생 규칙: 대상 LOT 이 receiptTypeCode=RETURN 인 입고 전표로 들어왔으면 RETURN, 그 밖은 전부 PRODUCT. ⛔ NonconformanceCreate 에 이 칸이 없는 것은 결손이 아니라 이 결정의 귀결이다 — 다음 사람이 또 「Create 에 칸이 없다」로 이슈를 열지 않도록 남긴다. 부적합을 만드는 화면은 W-04-07 하나다(요구서 §3-6 · 2026-08-29 확정). 쓰는 곳: W-03-10 의 원천 필터(§5-4) · W-04-07 상세의 「원천」 표시(§3). ⚠ 값 이름 충돌 주의 — GoodsReceipt.receiptTypeCode 의 PRODUCT(제품입고)와 뜻이 다르다. 이력: 2026-08-30 신설(W-03-10 원천 필터 되살리기) · 2026-09-01 서버 파생으로 재정의(omf-mes#303)"
+      "description": "부적합 원천 — 제품(PRODUCT) · 반품(RETURN). 서버가 대상 LOT 의 입고 유형으로 파생한다",
+      "x-code-key": "CD-NONCONFORMANCE-SOURCE",
+      "enum": [
+       "PRODUCT",
+       "RETURN"
+      ],
+      "example": "PRODUCT"
      },
      "severityCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-NONCONFORMANCE-SEVERITY",
+      "description": "부적합 심각도 — 중대 · 중 · 경. 값 목록은 GET /mdm/code-values?codeGroupCode=NONCONFORMANCE_SEVERITY 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "description": {
       "type": "string",
@@ -2037,9 +2057,10 @@
      },
      "statusCode": {
       "type": "string",
-      "description": "의뢰 전 · 판정 대기 · 판정 완료. ⭐ 세 값짜리 진행 단계라 구간 형이 아니다 — 끝 시각의 부재로는 앞의 둘을 못 가른다. ⭐ 코드 문자열이 아직 확정되지 않아 예시를 못 박지 않는다(omf-mes#145). ⚠ 판정 진행은 이 값으로 가르지 않는다 — dispositionProgressCode 가 그 자리다",
+      "description": "부적합 건의 진행 상태 — 의뢰 전(NOT_REQUESTED) · 판정 대기(PENDING_DECISION) · 판정 완료(DECIDED). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 이 값이 처분 판정 화면의 진입 목록을 가른다(W-04-07 §3 · W-03-10 §5-5). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=NONCONFORMANCE_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "값",
-      "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 04 계약 1단계 §3. 값 목록 확정 추적은 W-03-10 §8 이 갖는다."
+      "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 04 계약 1단계 §3. 값 목록 확정 추적은 W-03-10 §8 이 갖는다.",
+      "x-code-key": "CD-NONCONFORMANCE-STATUS"
      },
      "openedAt": {
       "type": "string",
@@ -2132,7 +2153,9 @@
      },
      "severityCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-NONCONFORMANCE-SEVERITY",
+      "description": "부적합 심각도 — 중대 · 중 · 경. 값 목록은 GET /mdm/code-values?codeGroupCode=NONCONFORMANCE_SEVERITY 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "description": {
       "type": "string",
@@ -2289,7 +2312,8 @@
      },
      "statusCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 편성 여부는 계약이 이미 unassignedOnly(boolean)로 받고 있고 이 칸의 쿼리를 부르는 화면이 0건이다. ⛔ 이 리소스는 수신본이라 등록·수정 경로가 없다 — 상태를 «올릴» 주체가 MES 안에 없다(A-21 · 사용자 결정 2026-09-02)."
      },
      "lines": {
       "type": "array",
@@ -2310,7 +2334,7 @@
      "orderDate",
      "statusCode"
     ],
-    "description": "고객사 출하지시서 수신본. ⛔ 등록 경로를 두지 않는다 — 연계 수신이 기본이라 목록에 그냥 나타난다(W-04-01 §5-6). 파일 업로드는 고객사마다 형식이 달라 요청 본문을 정할 수 없고 화면도 비활성이다. ⭐ 상위지시는 nullable 이 확정이다 — 무지시 standalone 이 예외가 아니라 상시 구조다"
+    "description": "고객사 출하지시서 수신본. ⛔ 등록 경로를 두지 않는다 — ⭐ 원천이 «둘»이다 — 고객사 출하지시서(엑셀) import 와 ERP 연계 수신을 «모두» 쓴다(사용자 확정 2026-09-02). 어느 쪽이든 MES 는 받기만 하므로 목록에 그냥 나타난다(W-04-01 §5-6). 파일 업로드는 고객사마다 형식이 달라 요청 본문을 정할 수 없고 화면도 비활성이다. ⭐ 상위지시는 nullable 이 확정이다 — 무지시 standalone 이 예외가 아니라 상시 구조다"
    },
    "SalesOrderLine": {
     "type": "object",
@@ -2428,8 +2452,9 @@
      },
      "statusCode": {
       "type": "string",
-      "description": "생애주기는 여기가 갖는다 — 미확정 → 확정 / 취소. 근거: W-04-12 §5",
-      "example": "SHIPPED"
+      "description": "출하의 진행 상태 — 미확정(UNCONFIRMED) · 확정(CONFIRMED) · 취소(CANCELLED). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 확정이 PGI 송신을 부르고 취소가 그것을 되돌린다(W-04-04 §5-1 · W-04-12 §5-2). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=SHIPMENT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "SHIPPED",
+      "x-code-key": "CD-SHIPMENT-STATUS"
      },
      "erpDeliveryNo": {
       "type": [
@@ -2726,7 +2751,8 @@
       "type": "string",
       "maxLength": 50,
       "example": "ABC-123",
-      "description": "화면에 그대로 그리는 품목 코드. ⛔ 화면이 itemId→코드 대응을 따로 조회하지 않는다 — 계약이 표시 문자열까지 내려 준다(공유계약 A-10 보강 · W-02-06 ProductionOrderChangedField.label 과 같은 형태). P-04-01 §3 포장 구성 표의 「품목」 열과 불일치 문구(「이 납품라벨은 FG-1002 용입니다」)가 이 값이다. ⚠ itemName 은 두지 않는다 — POP 1024×768 의 세로·가로 예산(E-1·E-2)에 이름 열이 들어갈 자리가 없다"
+      "description": "화면에 그대로 그리는 품목 코드. ⛔ 화면이 itemId→코드 대응을 따로 조회하지 않는다 — 계약이 표시 문자열까지 내려 준다(공유계약 A-10 보강 · W-02-06 ProductionOrderChangedField.label 과 같은 형태). P-04-01 §3 포장 구성 표의 「품목」 열과 불일치 문구(「이 납품라벨은 FG-1002 용입니다」)가 이 값이다. ⚠ itemName 은 두지 않는다 — POP 1024×768 의 세로·가로 예산(E-1·E-2)에 이름 열이 들어갈 자리가 없다",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 품목 마스터의 행을 가리킨다 — Item.itemCode 가 같은 판정으로 이미 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "lotId": {
       "type": "integer",
@@ -2884,7 +2910,8 @@
      },
      "statusCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 화면이 그리는 「미편성·피킹중·검사대기·출하완료」는 «파생 진행» 축이지 이 칸이 아니다. 한 칸에 두 축을 담으면 어느 쪽도 못 읽는다. ⭐ 선례가 같은 계약 파일에 있다 — Nonconformance 가 statusCode 옆에 dispositionProgressCode(enum)를 «따로» 두고 「statusCode 와 축이 다르다 — 「판정 대기」 한 값이 NOT_STARTED 와 PARTIAL 을 함께 담아 이 열을 대신할 수 없다」로 못박았다. ⚠ 진행 축 필드 신설은 별건이다. 이 칸을 «움직이는» 액션도 계약에 0건이다(A-21 · 사용자 결정 2026-09-02)."
      },
      "shippingInspectionStatusCode": {
       "type": "string",
@@ -3363,9 +3390,10 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "재등록 사유 — 「재등록이 몇 건인가」를 세려면 자유 텍스트가 아니라 코드 축이어야 한다. 근거: 공유계약 §I-41 · omf-mes#84",
+      "description": "재등록 사유. ⭐ 「재등록이 몇 건인가」를 세려면 코드 축이어야 한다(§I-41 · omf-mes#84). 값 목록은 GET /mdm/code-values?codeGroupCode=STOCK_REINSTATEMENT_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-no-example": "값 목록이 아직 확정 전이다(공유계약 G-2) — 확정 전에는 예시를 지어내지 않는다.",
-      "x-internal-note": "만들어지는 이동 문서의 logistics.stock_transfer.reason_code 에 실린다."
+      "x-internal-note": "만들어지는 이동 문서의 logistics.stock_transfer.reason_code 에 실린다.",
+      "x-code-key": "CD-STOCK-REINSTATEMENT-REASON"
      },
      "businessDate": {
       "type": "string",

@@ -220,6 +220,73 @@ class 키로_대조한다(unittest.TestCase):
         self.assertEqual([(g[4], g[3]) for g in ptr_gap], [], "㉢ 그룹 어긋남")
 
 
+class 소유와_자리의_모양이_맞는가(unittest.TestCase):
+    """⑤ ㉤㉥ — 2026-09-03 신설. 둘 다 ⛔ 다.
+
+    ⭐ 소유는 「값이 어디 사나」다 — `enum` 이면 계약 안, `registry*` 면 공통코드
+       마스터. 어긋나면 사전이 「계약이 닫는다」는데 자리는 열려 있거나, 마스터의
+       값을 계약이 또 갖는다(두 벌).
+    ⛔ 이 구멍을 «어느 검사기도 안 보고 있었다» — ㉡ 는 enum 이 있을 때만 값을
+       비교하고 없다는 사실 자체는 안 본다.
+    """
+
+    def test_소유가_enum인데_자리에_enum이_없으면_잡는다(self):
+        sites = cd.key_sites({"typeCode": [자리(st="bare", key="CD-X")]})
+        miss, sur = cd.check_owner_shape(sites, [사전행("CD-X", values=("A", "B"))])
+        self.assertEqual(len(miss), 1)
+        self.assertEqual(sur, [])
+        self.assertEqual(miss[0][4], "CD-X")
+
+    def test_소유가_enum이고_자리에_enum이_있으면_안_잡는다(self):
+        sites = cd.key_sites({"typeCode": [자리(enum=("A", "B"), key="CD-X")]})
+        e = 사전행("CD-X", values=("A", "B"))
+        self.assertEqual(cd.check_owner_shape(sites, [e]), ([], []))
+
+    def test_사전_값이_비면_enum을_요구하지_않는다(self):
+        # ⚠ 넣을 값이 없는데 요구할 수 없다 — ⬜ 로 세어서 남긴 키가 그것이다.
+        sites = cd.key_sites({"typeCode": [자리(st="bare", key="CD-X")]})
+        self.assertEqual(cd.check_owner_shape(sites, [사전행("CD-X")]), ([], []))
+
+    def test_소유가_registry인데_enum이_있으면_잡는다(self):
+        sites = cd.key_sites({"typeCode": [자리(enum=("A", "B"), key="CD-X")]})
+        e = 사전행("CD-X", values=("A", "B"), group=("G",), owner="registry")
+        miss, sur = cd.check_owner_shape(sites, [e])
+        self.assertEqual(miss, [])
+        self.assertEqual(len(sur), 1)
+        self.assertEqual(sur[0][5], ["A", "B"])
+
+    def test_소유가_registry_system이어도_같다(self):
+        sites = cd.key_sites({"typeCode": [자리(enum=("A",), key="CD-X")]})
+        e = 사전행("CD-X", values=("A",), group=("G",), owner="registry-system")
+        _, sur = cd.check_owner_shape(sites, [e])
+        self.assertEqual(len(sur), 1)
+
+    def test_소유가_registry이고_enum이_없으면_안_잡는다(self):
+        sites = cd.key_sites({"typeCode": [자리(st="ptr", ptr=("G",), key="CD-X")]})
+        e = 사전행("CD-X", values=("A",), group=("G",), owner="registry")
+        self.assertEqual(cd.check_owner_shape(sites, [e]), ([], []))
+
+    def test_사전에_없는_키는_넘긴다(self):
+        # ㉠ 가 이미 잡는다 — 여기서 또 내면 한 사고가 두 줄로 보인다.
+        sites = cd.key_sites({"typeCode": [자리(st="bare", key="CD-없는키")]})
+        self.assertEqual(cd.check_owner_shape(sites, [사전행("CD-X")]), ([], []))
+
+    def test_키가_배열이고_소유가_섞이면_판정하지_않는다(self):
+        # ⚠ 한 자리가 enum 키와 registry 키를 함께 가리키면 어느 모양이어야
+        #    하는지 정할 수 없다 — 그 판정은 사람이 한다.
+        sites = cd.key_sites({"typeCode": [자리(st="bare", key=["CD-A", "CD-B"])]})
+        entries = [사전행("CD-A", values=("X",)),
+                   사전행("CD-B", values=("Y",), group=("G",), owner="registry")]
+        self.assertEqual(cd.check_owner_shape(sites, entries), ([], []))
+
+    def test_실물에는_모양_위반이_없다(self):
+        """⛔ 게이트다 — 실물 계약 7벌이 초록이어야 한다."""
+        entries = cd.read_dictionary(cd.DICT)
+        miss, sur = cd.check_owner_shape(cd.key_sites(cd.scan()), entries)
+        self.assertEqual([(m[4], m[3]) for m in miss], [], "㉤ 소유 enum 인데 enum 없음")
+        self.assertEqual([(s[4], s[3]) for s in sur], [], "㉥ 소유 registry 인데 enum 있음")
+
+
 class 키가_없는_착지_자리를_센다(unittest.TestCase):
     """㉣ ⚠ **막지 않는다 — 센다.**
 

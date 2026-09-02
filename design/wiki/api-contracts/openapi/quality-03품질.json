@@ -60,7 +60,8 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 특채의 승인 상태는 approval_request 가 갖는다(approval_request_id 가 NOT NULL). 값 후보 셋이 APPROVAL_REQUEST_STATUS 와 정확히 겹치고, 이 리소스를 움직이는 오퍼레이션이 0건이다. ⭐ usable 은 「상태 유효 ∧ validTo ∧ 잔여>0」 3항 논리곱이라 만료·소진은 이 축이 아니다."
      },
      {
       "name": "usableOnly",
@@ -227,13 +228,14 @@
       }
      },
      {
-      "name": "sourceAxisCode",
+      "name": "sourceCode",
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "x-no-example": true
       },
-      "description": "현장 · PQC · OQC · 원천미상"
+      "description": "불량 기록의 원천으로 거른다 — 현장(FIELD) · 공정검사(PQC) · 출하검사(OQC) · 수리(REPAIR) · 클레임(CLAIM) 5값(✓설계확정 결정 09). ⭐ **2026-09-02 정정** — 전에는 이 자리가 sourceAxisCode 라는 «다른 이름»이었고 「서버가 유도한 4축(현장/PQC/OQC/원천미상)」을 받았다. W-03-05 §5-2 가 「유도로는 결정 09 의 5축이 서지 않는다」를 확인하고 sourceCode 명시 축을 «신설»했는데 이 필터만 옛 축에 남아 있었다. ⛔ 한 사실에 두 축을 두면 화면마다 다른 수를 본다(L-2-1). ⚠ 「원천 미상」은 값이 아니라 «표시»다 — sourceCode 가 비어 있으면 화면이 「원천 미상」으로 묶어 보인다(W-03-05 §5-2 · L-8). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=DEFECT_RECORD_SOURCE 로 받는다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⚠ 2026-09-03 — enum 을 걷었다. 이 그룹은 registry-system 이라 값 목록이 계약이 아니라 공통코드 마스터에 산다 — 계약에 박으면 두 벌이 된다.",
+      "x-code-key": "CD-DEFECT-RECORD-SOURCE"
      },
      {
       "name": "detectedFrom",
@@ -325,13 +327,14 @@
       "description": "발생 공정으로 묶어야 개선 대상이 나온다"
      },
      {
-      "name": "sourceAxisCode",
+      "name": "sourceCode",
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "x-no-example": true
       },
-      "description": "현장 · PQC · OQC · 원천미상"
+      "description": "불량 기록의 원천으로 거른다 — 현장(FIELD) · 공정검사(PQC) · 출하검사(OQC) · 수리(REPAIR) · 클레임(CLAIM) 5값(✓설계확정 결정 09). ⭐ **2026-09-02 정정** — 전에는 이 자리가 sourceAxisCode 라는 «다른 이름»이었고 「서버가 유도한 4축(현장/PQC/OQC/원천미상)」을 받았다. W-03-05 §5-2 가 「유도로는 결정 09 의 5축이 서지 않는다」를 확인하고 sourceCode 명시 축을 «신설»했는데 이 필터만 옛 축에 남아 있었다. ⛔ 한 사실에 두 축을 두면 화면마다 다른 수를 본다(L-2-1). ⚠ 「원천 미상」은 값이 아니라 «표시»다 — sourceCode 가 비어 있으면 화면이 「원천 미상」으로 묶어 보인다(W-03-05 §5-2 · L-8). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=DEFECT_RECORD_SOURCE 로 받는다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⚠ 2026-09-03 — enum 을 걷었다. 이 그룹은 registry-system 이라 값 목록이 계약이 아니라 공통코드 마스터에 산다 — 계약에 박으면 두 벌이 된다.",
+      "x-code-key": "CD-DEFECT-RECORD-SOURCE"
      },
      {
       "name": "itemId",
@@ -2727,7 +2730,8 @@
      },
      "statusCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 특채의 승인 상태는 approval_request 가 갖는다(approval_request_id 가 NOT NULL). 값 후보 셋이 APPROVAL_REQUEST_STATUS 와 정확히 겹치고, 이 리소스를 움직이는 오퍼레이션이 0건이다. ⭐ usable 은 「상태 유효 ∧ validTo ∧ 잔여>0」 3항 논리곱이라 만료·소진은 이 축이 아니다."
      },
      "usable": {
       "type": "boolean",
@@ -2905,7 +2909,8 @@
       "x-source-column": "source_code",
       "type": "string",
       "x-no-example": true,
-      "description": "원천 축 — FIELD(현장)·PQC·OQC·REPAIR(수리)·CLAIM(클레임) 5종(공유계약 결정 09). REPAIR 는 M-02-02 착수 전까지 실적 0건. 2026-08-30 되살림 — productionResultId/inspectionResultId 2단 조인 대신 이 축으로 직접 필터한다"
+      "description": "불량 기록의 원천 — 현장(FIELD) · 공정검사(PQC) · 출하검사(OQC) · 수리(REPAIR) · 클레임(CLAIM) 5값(✓설계확정 결정 09). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=DEFECT_RECORD_SOURCE 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⭐ **2026-09-02 — 이 축이 «유일한» 원천 축이 됐다**(사용자 결정 결정 5). 함께 있던 sourceAxisCode(서버가 유도한 4축)를 지웠다 — 유도로는 결정 09 의 「수리」·「클레임」이 나오지 않아 5축이 서지 않았고, W-03-05 §5-2 가 그래서 이 명시 축을 신설했다. ⚠ workOrderId 의 NOT NULL 해제가 클레임 원천의 전제다 — 데이터 모델 통지 대상이며 기다리지 않는다.",
+      "x-code-key": "CD-DEFECT-RECORD-SOURCE"
      },
      "workOrderId": {
       "type": [
@@ -2993,11 +2998,6 @@
       "type": "string",
       "format": "date-time",
       "example": "2026-08-12T10:22:00+09:00"
-     },
-     "sourceAxisCode": {
-      "type": "string",
-      "description": "서버가 유도한 원천 축 — 현장 / PQC / OQC / 원천미상. ⛔ 결정 09 의 5축 중 「수리」와 「클레임」은 나오지 않는다(omf-mes#83 · workOrderId NOT NULL). 근거: W-03-05 §5-2",
-      "example": "값"
      }
     },
     "required": [
@@ -3094,7 +3094,8 @@
       "maxLength": 50,
       "readOnly": true,
       "description": "화면이 보이는 품목 코드. 식별자를 사람이 읽는 값으로 바꾸려 마스터를 다시 부르지 않게 한다",
-      "example": "값"
+      "example": "값",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 품목 마스터의 행을 가리킨다 — Item.itemCode 가 같은 판정으로 이미 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "itemName": {
       "type": "string",
@@ -3957,7 +3958,8 @@
       "maxLength": 50,
       "description": "⛔ 이 값으로 보류 여부를 판정하지 않는다 — 정본은 해제 칼럼(released_by · released_at)이다(사용자 결정 2026-09-02). 비어 있으면 보류중, 채워졌으면 해제됨이고 해제한 사람·시각까지 한 자리에 남는다. 같은 사실을 두 자리에 적으면 어긋났을 때 어느 쪽이 맞는지 판정할 수 없다 — AppUser 의 「인사 상태 vs isActive」를 가른 것과 같은 형태다(W-CO-02 §8-4). ⚠ 목록을 「보류중」으로 거르는 것은 서버가 released_at IS NULL 로 한다. 근거: W-03-02 §4-B.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 이 값으로 보류 여부를 판정하지 않는다. 정본은 해제 칼럼(released_by · released_at)이라고 이 자리의 산문이 이미 못박았다(사용자 결정 2026-09-02). 판정에 안 쓰는 값에 선택지 목록을 붙이면 화면이 그것으로 거르기 시작한다(A-21)."
      },
      "heldBy": {
       "x-source-column": "held_by",
@@ -4043,7 +4045,8 @@
      },
      "reasonCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-LOT-HOLD-REASON"
      },
      "releaseCondition": {
       "type": "string",
@@ -4124,8 +4127,9 @@
        "string",
        "null"
       ],
-      "description": "보류 사유. ⚠ 해제 사건에는 없을 수 있다",
-      "example": "QUALITY_HOLD"
+      "description": "보류 사유. ⚠ 해제 사건에는 없을 수 있다. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "QUALITY_HOLD",
+      "x-code-key": "CD-LOT-HOLD-REASON"
      },
      "holdQty": {
       "type": [
@@ -4156,8 +4160,9 @@
        "string",
        "null"
       ],
-      "description": "해제 사건이 LOT 을 어느 상태로 보냈나. 값 목록은 LOT_STATUS",
-      "example": "NORMAL"
+      "description": "해제 사건이 LOT 을 어느 상태로 보냈나 — 값 목록은 LOT_STATUS 다. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "NORMAL",
+      "x-code-key": "CD-LOT-STATUS"
      }
     },
     "required": [
