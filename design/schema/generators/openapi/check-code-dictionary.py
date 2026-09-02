@@ -38,7 +38,9 @@
     python3 design/schema/generators/openapi/check-code-dictionary.py
     python3 design/schema/generators/openapi/check-code-dictionary.py --split   # ④ 만
 
-⛔ **막지 않는다** — 시험판이라 종료 코드는 언제나 0 이다. 사전이 계약 527자리를
+⛔ **⓪ 만 막는다**(2026-09-02) — 등록부↔사전 1:1 · 소유 일치 · 그룹이 등록부 안.
+계수 규칙(①②④)은 여전히 막지 않는다 — 닫을 수 없는 수라 흐름만 본다.
+옛 서술: ~~시험판이라 종료 코드는 언제나 0 이다.~~ 사전이 계약 527자리를
    다 덮고 ④ 가 0 이 되면 게이트로 올린다.
 """
 from __future__ import annotations
@@ -188,9 +190,11 @@ def main() -> int:
     print()
 
     # ⓪ 사전이 가리킨 «그룹» 이 등록부 안인가 — 사전이 셋째 사본이 되지 않게 대조한다.
+    gate: list[str] = []          # ⛔ 여기에 담긴 것만 종료 코드를 바꾼다
     registry = load_registry()
     outside = sorted({g for e in entries for g in e["group"]} - registry)
     if outside:
+        gate.append("사전의 그룹이 등록부 밖 %d" % len(outside))
         print("⛔ 사전의 «그룹» 열이 등록부 밖입니다 %d건 — 공유계약 G-32 표에 없습니다"
               % len(outside))
         for g in outside:
@@ -198,6 +202,21 @@ def main() -> int:
     else:
         print("⓪ 사전의 «그룹» 열 %d종 전부 등록부 안 (등록부 %d개)"
               % (len({g for e in entries for g in e["group"]}), len(registry)))
+
+    # ⓪-a ⛔ **게이트** — 등록부에 이름이 올랐으면 사전에도 행이 있어야 한다.
+    #     걸어 두지 않으면 새 그룹이 사전을 건너뛰고, 값은 다시 계약 산문으로 흩어진다.
+    #     (2026-09-02 1단계로 62/62 가 초록이 된 뒤에 건다)
+    covered = {g for e in entries for g in e["group"]}
+    orphan = sorted(registry - covered)
+    if orphan:
+        gate.append("등록부에 있는데 사전에 없는 그룹 %d" % len(orphan))
+        print()
+        print("⛔ 등록부에 있는데 «사전에 없는» 그룹 %d건 — 값이 어디에도 안 적힌다"
+              % len(orphan))
+        for g in orphan:
+            print("   %s" % g)
+        print("   ⭐ 닫는 법 — design/schema/code-dictionary.md 에 행을 더한다.")
+        print("      값을 모르면 ⬜ 로 «세어서» 남긴다 — 비워 두지 않는다.")
 
     # ⓪-b 소유가 «두 곳»에 적힌다 — 갈라지지 않게 기계가 맞춘다.
     #     사람이 맞추게 두면 등록부 이관 전의 병이 소유 축에서 그대로 재발한다.
@@ -207,6 +226,7 @@ def main() -> int:
              if g in owners and owners[g] != "미판정" and e["owner"] != owners[g]]
     if clash:
         print()
+        gate.append("사전↔등록부 소유 불일치 %d" % len(clash))
         print("⛔ 사전의 «소유» 가 등록부와 다릅니다 %d건 — 정본은 공유계약 G-32 표입니다"
               % len(clash))
         for key, g, mine, theirs in clash:
@@ -295,7 +315,11 @@ def main() -> int:
     print("   (b) 원래 «다른 코드»인데 이름이 같다        → 키를 가른다")
     print("   ⭐ 그 구분이 곧 사전이 할 일이다.")
     print()
-    print("⛔ 이 검사기는 «막지 않는다» — 시험판이라 종료 코드는 언제나 0 이다.")
+    if gate:
+        print("⛔ 막는 규칙에 걸렸습니다 — %s" % " · ".join(gate))
+        return 1
+    print("⭐ 계수 규칙(①②④)은 «막지 않는다» — 흐름을 보는 수다.")
+    print("   ⛔ 막는 것은 ⓪ 뿐이다 — 등록부↔사전 1:1 과 소유 일치.")
     return 0
 
 
