@@ -397,7 +397,8 @@
         "NORMAL"
        ]
       },
-      "description": "재작업 · 폐기 · 정상"
+      "description": "재작업 · 폐기 · 정상",
+      "x-code-key": "CD-DISPOSITION-DECISION-DISPOSITION-TYPE"
      },
      {
       "name": "nonconformanceId",
@@ -579,7 +580,8 @@
        "type": "string",
        "example": "값"
       },
-      "description": "IQC · PQC · OQC"
+      "description": "IQC · PQC · OQC",
+      "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
      },
      {
       "name": "statusCode",
@@ -588,7 +590,8 @@
        "type": "string",
        "example": "REQUESTED"
       },
-      "description": "검사 의뢰 상태로 좁힌다 — 확정 5값: REQUESTED(대기) · IN_PROGRESS(진행) · COMPLETED(완료) · SKIPPED(생략) · CANCELLED(취소). ⛔ 값 목록을 화면에 고정하지 않는다 — 표시명은 06 계약 GET /mdm/code-values 로 채운다(공유계약 G-6). ⚠ 「아직 안 끝난 것」을 보려면 이것이 아니라 pendingOnly 를 쓴다 — 큐는 상태 하나가 아니다. 근거: W-01-01 §3 · 확정 2026-08-21"
+      "description": "검사 의뢰 상태로 좁힌다 — 확정 5값: REQUESTED(대기) · IN_PROGRESS(진행) · COMPLETED(완료) · SKIPPED(생략) · CANCELLED(취소). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_REQUEST_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-INSPECTION-REQUEST-STATUS"
      },
      {
       "name": "pendingOnly",
@@ -761,7 +764,8 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
      },
      {
       "name": "overallJudgmentCode",
@@ -769,7 +773,9 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "description": "검사 종합 판정으로 거른다 — 합격(ACCEPTED) · 불합격(REJECTED) · 보류(HELD). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_OVERALL_JUDGMENT 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-INSPECTION-OVERALL-JUDGMENT"
      },
      {
       "name": "statusCode",
@@ -777,7 +783,9 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-code-key": "CD-INSPECTION-RESULT-STATUS",
+      "description": "검사 성적서 상태로 거른다 — 임시저장(DRAFT) · 확정(CONFIRMED). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "processId",
@@ -991,7 +999,8 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
      },
      {
       "name": "itemId",
@@ -1009,7 +1018,8 @@
       "schema": {
        "type": "string"
       },
-      "description": "판정 필터 — 목록·요약과 같은 축. 근거: omf-mes#192 문1"
+      "description": "판정 필터 — 목록·요약과 같은 축. 합격(ACCEPTED) · 불합격(REJECTED) · 보류(HELD). 근거: omf-mes#192 문1. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_OVERALL_JUDGMENT 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-INSPECTION-OVERALL-JUDGMENT"
      },
      {
       "name": "processId",
@@ -1100,7 +1110,8 @@
        "type": "string",
        "example": "값"
       },
-      "description": "⚠ IQC·PQC·OQC 를 합치지 않는다 — 자재 불량률과 제품 불량률을 더하면 뜻이 없다(L-7)"
+      "description": "⚠ IQC·PQC·OQC 를 합치지 않는다 — 자재 불량률과 제품 불량률을 더하면 뜻이 없다(L-7)",
+      "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
      },
      {
       "name": "itemId",
@@ -1126,7 +1137,9 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "description": "검사 종합 판정으로 거른다 — 목록과 같은 축. 합격(ACCEPTED) · 불합격(REJECTED) · 보류(HELD). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_OVERALL_JUDGMENT 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-INSPECTION-OVERALL-JUDGMENT"
      },
      {
       "name": "inspectedFrom",
@@ -1183,7 +1196,9 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-code-key": "CD-INSPECTION-RESULT-STATUS",
+      "description": "검사 성적서 상태로 거른다 — 목록과 같은 축. 임시저장(DRAFT) · 확정(CONFIRMED). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      }
     ],
     "responses": {
@@ -1564,7 +1579,8 @@
         "RELEASED"
        ]
       },
-      "description": "등록만 / 해제만. 비우면 둘 다"
+      "description": "등록만 / 해제만. 비우면 둘 다",
+      "x-code-key": "CD-EVENT-TYPE"
      },
      {
       "name": "actorId",
@@ -1604,7 +1620,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "x-code-key": "CD-LOT-HOLD-REASON"
      },
      {
       "name": "lotTypeCode",
@@ -1612,7 +1629,8 @@
       "schema": {
        "type": "string"
       },
-      "description": "자재·생산·제품 3종(결정 10). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_TYPE 로 받는다(MATERIAL·PRODUCTION·PRODUCT). ⚠ 셋을 합쳐 집계하지 않는다(공유계약 L-7) — 같은 「보류 38건」이라도 자재와 제품은 대응이 다르다. 근거: omf-mes#176"
+      "description": "자재·생산·제품 3종(결정 10). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_TYPE 로 받는다(MATERIAL·PRODUCTION·PRODUCT). ⚠ 셋을 합쳐 집계하지 않는다(공유계약 L-7) — 같은 「보류 38건」이라도 자재와 제품은 대응이 다르다. 근거: omf-mes#176",
+      "x-code-key": "CD-LOT-TYPE"
      },
      {
       "name": "sort",
@@ -1724,7 +1742,8 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-code-key": "CD-LOT-HOLD-REASON"
      },
      {
       "name": "heldBy",
@@ -2047,7 +2066,8 @@
        "type": "string",
        "example": "값"
       },
-      "description": "자재·생산·제품 3종(결정 10). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_TYPE 로 받는다(MATERIAL·PRODUCTION·PRODUCT). ⚠ 셋을 합쳐 집계하지 않는다(공유계약 L-7) — 같은 「보류 38건」이라도 자재와 제품은 대응이 다르다. 근거: omf-mes#176"
+      "description": "자재·생산·제품 3종(결정 10). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_TYPE 로 받는다(MATERIAL·PRODUCTION·PRODUCT). ⚠ 셋을 합쳐 집계하지 않는다(공유계약 L-7) — 같은 「보류 38건」이라도 자재와 제품은 대응이 다르다. 근거: omf-mes#176",
+      "x-code-key": "CD-LOT-TYPE"
      },
      {
       "name": "itemId",
@@ -2082,7 +2102,8 @@
       "schema": {
        "type": "string"
       },
-      "description": "품질 판정 축 — 정상·불량·검사 대기·폐기. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). ⚠ 보류 건의 진행 상태와 다른 축이다(W-03-01 §5-3). 근거: 회신 E-3 종결 2026-08-07 · omf-mes#176"
+      "description": "품질 판정 축 — 정상·불량·검사 대기·폐기. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). ⚠ 보류 건의 진행 상태와 다른 축이다(W-03-01 §5-3). 근거: 회신 E-3 종결 2026-08-07 · omf-mes#176",
+      "x-code-key": "CD-LOT-STATUS"
      },
      {
       "name": "locationId",
@@ -2210,7 +2231,8 @@
        "type": "string",
        "example": "값"
       },
-      "description": "품질 판정 축 — 정상·불량·검사 대기·폐기. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). ⚠ 보류 건의 진행 상태와 다른 축이다(W-03-01 §5-3). 근거: 회신 E-3 종결 2026-08-07 · omf-mes#176"
+      "description": "품질 판정 축 — 정상·불량·검사 대기·폐기. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). ⚠ 보류 건의 진행 상태와 다른 축이다(W-03-01 §5-3). 근거: 회신 E-3 종결 2026-08-07 · omf-mes#176",
+      "x-code-key": "CD-LOT-STATUS"
      },
      {
       "name": "lotTypeCode",
@@ -2219,7 +2241,8 @@
        "type": "string",
        "example": "값"
       },
-      "description": "자재·생산·제품 3종(결정 10). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_TYPE 로 받는다(MATERIAL·PRODUCTION·PRODUCT). ⚠ 셋을 합쳐 집계하지 않는다(공유계약 L-7) — 같은 「보류 38건」이라도 자재와 제품은 대응이 다르다. 근거: omf-mes#176"
+      "description": "자재·생산·제품 3종(결정 10). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_TYPE 로 받는다(MATERIAL·PRODUCTION·PRODUCT). ⚠ 셋을 합쳐 집계하지 않는다(공유계약 L-7) — 같은 「보류 38건」이라도 자재와 제품은 대응이 다르다. 근거: omf-mes#176",
+      "x-code-key": "CD-LOT-TYPE"
      },
      {
       "name": "itemId",
@@ -3015,7 +3038,8 @@
        "REWORK",
        "SCRAP",
        "NORMAL"
-      ]
+      ],
+      "x-code-key": "CD-DISPOSITION-DECISION-DISPOSITION-TYPE"
      },
      "decisionQty": {
       "type": "number",
@@ -3094,7 +3118,8 @@
        "COMPLETED"
       ],
       "description": "후속 처리 진행. NOT_STARTED=아직 안 함 · PARTIAL=일부 수량 처리 · COMPLETED=처리 수량 = decisionQty. ⭐ 서버가 후속 전표를 롤업해 낸다(공유계약 L-2). ⛔ 화면이 후속 전표를 세어 판정하지 않는다",
-      "example": "NOT_STARTED"
+      "example": "NOT_STARTED",
+      "x-code-key": "CD-DISPOSITION-PROGRESS"
      },
      "followUpQty": {
       "type": "number",
@@ -3166,7 +3191,8 @@
        "REWORK",
        "SCRAP",
        "NORMAL"
-      ]
+      ],
+      "x-code-key": "CD-DISPOSITION-DECISION-DISPOSITION-TYPE"
      },
      "decisionQty": {
       "type": "number",
@@ -3286,7 +3312,8 @@
      "judgmentCode": {
       "type": "string",
       "example": "ACCEPTED",
-      "description": "항목별 측정치의 판정. ⛔ enum 으로 못박지 않는다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_MEASUREMENT_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격) «두 개»다. ⚠ 종합 판정과 그룹이 «다르다» — 항목 판정에는 「보류」가 없다. 보류는 검사 결과 수준의 개념이고(held_qty) 항목은 규격에 드는지 아닌지 둘뿐이다(P-02-13 §5 「항목 판정(합격/불합격)」). ⛔ 측정값이 규격 밖이어도 판정이 «확정»되지는 않는다 — 항목 규격의 automaticJudgment 가 참이고 데이터 유형이 NUMERIC 이며 상·하한 중 하나 이상이 있으면 화면이 이 칸을 «채운 채로» 시작하되 사람이 바꿀 수 있고, 그 밖의 경우에는 비운 채로 사람이 고른다(P-02-13 §5-11). ⛔ 종합 판정(overallJudgmentCode)은 어떤 경우에도 자동으로 내리지 않는다(P-02-13 §6). 근거: omf-mes#179 · omf-mes#257"
+      "description": "항목별 측정치의 판정. ⛔ enum 으로 못박지 않는다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_MEASUREMENT_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격) «두 개»다. ⚠ 종합 판정과 그룹이 «다르다» — 항목 판정에는 「보류」가 없다. 보류는 검사 결과 수준의 개념이고(held_qty) 항목은 규격에 드는지 아닌지 둘뿐이다(P-02-13 §5 「항목 판정(합격/불합격)」). ⛔ 측정값이 규격 밖이어도 판정이 «확정»되지는 않는다 — 항목 규격의 automaticJudgment 가 참이고 데이터 유형이 NUMERIC 이며 상·하한 중 하나 이상이 있으면 화면이 이 칸을 «채운 채로» 시작하되 사람이 바꿀 수 있고, 그 밖의 경우에는 비운 채로 사람이 고른다(P-02-13 §5-11). ⛔ 종합 판정(overallJudgmentCode)은 어떤 경우에도 자동으로 내리지 않는다(P-02-13 §6). 근거: omf-mes#179 · omf-mes#257",
+      "x-code-key": "CD-INSPECTION-MEASUREMENT-JUDGMENT"
      },
      "measuredAt": {
       "type": "string",
@@ -3345,7 +3372,8 @@
      "judgmentCode": {
       "type": "string",
       "example": "ACCEPTED",
-      "description": "항목별 측정치의 판정. ⛔ enum 으로 못박지 않는다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_MEASUREMENT_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격) «두 개»다. ⚠ 종합 판정과 그룹이 «다르다» — 항목 판정에는 「보류」가 없다. 보류는 검사 결과 수준의 개념이고(held_qty) 항목은 규격에 드는지 아닌지 둘뿐이다(P-02-13 §5 「항목 판정(합격/불합격)」). ⛔ 측정값이 규격 밖이어도 판정이 «확정»되지는 않는다 — 항목 규격의 automaticJudgment 가 참이고 데이터 유형이 NUMERIC 이며 상·하한 중 하나 이상이 있으면 화면이 이 칸을 «채운 채로» 시작하되 사람이 바꿀 수 있고, 그 밖의 경우에는 비운 채로 사람이 고른다(P-02-13 §5-11). ⛔ 종합 판정(overallJudgmentCode)은 어떤 경우에도 자동으로 내리지 않는다(P-02-13 §6). 근거: omf-mes#179 · omf-mes#257"
+      "description": "항목별 측정치의 판정. ⛔ enum 으로 못박지 않는다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_MEASUREMENT_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격) «두 개»다. ⚠ 종합 판정과 그룹이 «다르다» — 항목 판정에는 「보류」가 없다. 보류는 검사 결과 수준의 개념이고(held_qty) 항목은 규격에 드는지 아닌지 둘뿐이다(P-02-13 §5 「항목 판정(합격/불합격)」). ⛔ 측정값이 규격 밖이어도 판정이 «확정»되지는 않는다 — 항목 규격의 automaticJudgment 가 참이고 데이터 유형이 NUMERIC 이며 상·하한 중 하나 이상이 있으면 화면이 이 칸을 «채운 채로» 시작하되 사람이 바꿀 수 있고, 그 밖의 경우에는 비운 채로 사람이 고른다(P-02-13 §5-11). ⛔ 종합 판정(overallJudgmentCode)은 어떤 경우에도 자동으로 내리지 않는다(P-02-13 §6). 근거: omf-mes#179 · omf-mes#257",
+      "x-code-key": "CD-INSPECTION-MEASUREMENT-JUDGMENT"
      },
      "measuredAt": {
       "type": "string",
@@ -3382,7 +3410,8 @@
      "inspectionTypeCode": {
       "type": "string",
       "description": "IQC · PQC · OQC. ⭐ 결정 09 의 「원천 축」을 유도하는 유일한 근거다. 근거: W-03-05 §5-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=QUALITY_INSPECTION_TYPE 로 받는다(IQC·PQC·OQC). ⚠ 설비 점검의 inspectionTypeCode(DAILY·MONTHLY·MAINTENANCE)와 «같은 이름 다른 값» 이라 그룹을 가른다. 근거: omf-mes#186",
-      "example": "IQC"
+      "example": "IQC",
+      "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
      },
      "inspectionPlanVersionId": {
       "type": [
@@ -3450,7 +3479,8 @@
       "type": "string",
       "example": "REQUESTED",
       "description": "검사 의뢰의 진행 상태 — 확정 5값: REQUESTED(대기) · IN_PROGRESS(진행) · COMPLETED(완료) · SKIPPED(생략) · CANCELLED(취소). ⛔ enum 으로 못박지 않는다 — 값 목록은 공통코드가 갖고 늘 수 있다(공유계약 G-2·G-6). 표시명은 06 계약 GET /mdm/code-values 로 채운다. ⭐ 전이는 전부 «이미 있는 액션의 부수 효과»다 — 새 경로가 없다: 서버가 입하·실적·출하 시점에 REQUESTED 로 만들고 · 첫 임시 저장이 IN_PROGRESS (⛔ 「검사 시작」 액션을 두지 않는다 — 화면에 시작 버튼이 없다) · :confirm 이 COMPLETED · 재검사 회차 추가가 다시 IN_PROGRESS · W-01-02 긴급 IQC 생략 한도승인이 SKIPPED · 입고 취소(FR-IM-076)가 CANCELLED. ⚠ SKIPPED 와 CANCELLED 를 합치지 않는다 — 앞은 검사를 안 하기로 «승인»된 정상 종결이고(LOT 은 Release 로 입고된다) 뒤는 의뢰가 «무효»가 된 것이다. 합치면 「검사를 몇 건 생략했나」를 셀 수 없다. ⚠ LOT 품질 상태(정상·불량·검사 대기·폐기)와 «다른 축»이다 — 같이 움직이지 않는다. 근거: 확정 2026-08-21 · FR-QM-050 · omf-mes#170 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_REQUEST_STATUS 로 받는다(공유계약 G-32 · omf-mes#170 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "x-internal-note": "확정 전문: uiux/2026-08-21-검사의뢰상태-확정/검사의뢰상태-확정기록.md — 표기 근거(계약 enum 76개 중 한글 1개) · SKIPPED/CANCELLED 분리 이유 · 공통코드 시드 요청문이 그 문서에 있다"
+      "x-internal-note": "확정 전문: uiux/2026-08-21-검사의뢰상태-확정/검사의뢰상태-확정기록.md — 표기 근거(계약 enum 76개 중 한글 1개) · SKIPPED/CANCELLED 분리 이유 · 공통코드 시드 요청문이 그 문서에 있다",
+      "x-code-key": "CD-INSPECTION-REQUEST-STATUS"
      },
      "requestedAt": {
       "type": "string",
@@ -3503,7 +3533,8 @@
      "inspectionTypeCode": {
       "type": "string",
       "description": "의뢰에서 따온 읽기 전용 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=QUALITY_INSPECTION_TYPE 로 받는다(IQC·PQC·OQC). ⚠ 설비 점검의 inspectionTypeCode(DAILY·MONTHLY·MAINTENANCE)와 «같은 이름 다른 값» 이라 그룹을 가른다. 근거: omf-mes#186",
-      "example": "IQC"
+      "example": "IQC",
+      "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
      },
      "itemId": {
       "type": "integer",
@@ -3548,7 +3579,8 @@
      "overallJudgmentCode": {
       "type": "string",
       "description": "합격·불합격·보류 3값. ⛔ enum 으로 못박지 않는다 — 값 목록은 공통코드가 갖고 늘 수 있다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_OVERALL_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격)·HELD(보류) — 검사 결과 수량 세 칸(accepted/rejected/held)과 같은 이름이다. 근거: 회신 E-3 종결 2026-08-07 · omf-mes#179",
-      "example": "ACCEPTED"
+      "example": "ACCEPTED",
+      "x-code-key": "CD-INSPECTION-OVERALL-JUDGMENT"
      },
      "inspectorId": {
       "type": "integer",
@@ -3573,8 +3605,9 @@
      },
      "statusCode": {
       "type": "string",
-      "description": "작성중 · 확정. 임시 저장은 작성중으로 남는다",
-      "example": "작성중"
+      "description": "검사 성적서의 상태 — 임시저장(DRAFT) · 확정(CONFIRMED). ⛔ **코드 문자열은 영문이다**(§G — 확정된 뜻을 영문 대문자 SNAKE 로 옮긴다). 2026-09-02 이전에는 이 자리에 한국어 enum 「작성중」·「확정」이 박혀 있었고, 계약 7벌에서 «유일한» 한국어 enum 이었다. ⛔ enum 으로 못박지 않는다 — 표시명이 한국어·베트남어 2개국어라 enum 이면 화면이 표시명을 갖게 된다(INSPECTION_REQUEST_STATUS 선례 · K-5). ⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 값을 편집하면 안 된다. 확정이면 Lot Status 전이와 보류 해제가 따른다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "DRAFT",
+      "x-code-key": "CD-INSPECTION-RESULT-STATUS"
      },
      "previousResultId": {
       "type": "integer",
@@ -3642,7 +3675,8 @@
      "overallJudgmentCode": {
       "type": "string",
       "description": "비우면 저장된 값을 쓴다. 합격·불합격·보류 3값. ⛔ enum 으로 못박지 않는다 — 값 목록은 공통코드가 갖고 늘 수 있다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_OVERALL_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격)·HELD(보류) — 검사 결과 수량 세 칸(accepted/rejected/held)과 같은 이름이다. 근거: 회신 E-3 종결 2026-08-07 · omf-mes#179",
-      "example": "ACCEPTED"
+      "example": "ACCEPTED",
+      "x-code-key": "CD-INSPECTION-OVERALL-JUDGMENT"
      },
      "remarks": {
       "type": "string",
@@ -3687,7 +3721,8 @@
      "overallJudgmentCode": {
       "type": "string",
       "description": "statusCode=확정 이면 필수다. 합격·불합격·보류 3값. ⛔ enum 으로 못박지 않는다 — 값 목록은 공통코드가 갖고 늘 수 있다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_OVERALL_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격)·HELD(보류) — 검사 결과 수량 세 칸(accepted/rejected/held)과 같은 이름이다. 근거: 회신 E-3 종결 2026-08-07 · omf-mes#179",
-      "example": "ACCEPTED"
+      "example": "ACCEPTED",
+      "x-code-key": "CD-INSPECTION-OVERALL-JUDGMENT"
      },
      "inspectedAt": {
       "type": "string",
@@ -3696,13 +3731,10 @@
      },
      "statusCode": {
       "type": "string",
-      "enum": [
-       "작성중",
-       "확정"
-      ],
-      "description": "⭐ 오프라인 큐는 언제나 확정으로 보낸다 — 임시 저장은 단말에 남고 서버로 오지 않는다.",
-      "example": "작성중",
-      "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 3단계 §3-2"
+      "description": "임시 저장이면 DRAFT, 즉시 확정이면 CONFIRMED 를 보낸다. ⭐ 오프라인 큐는 언제나 CONFIRMED 로 보낸다 — 임시 저장은 단말에 남고 서버로 오지 않는다. 임시저장(DRAFT) · 확정(CONFIRMED). ⛔ **코드 문자열은 영문이다**(§G — 확정된 뜻을 영문 대문자 SNAKE 로 옮긴다). 2026-09-02 이전에는 이 자리에 한국어 enum 「작성중」·「확정」이 박혀 있었고, 계약 7벌에서 «유일한» 한국어 enum 이었다. ⛔ enum 으로 못박지 않는다 — 표시명이 한국어·베트남어 2개국어라 enum 이면 화면이 표시명을 갖게 된다(INSPECTION_REQUEST_STATUS 선례 · K-5). ⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 값을 편집하면 안 된다. 확정이면 Lot Status 전이와 보류 해제가 따른다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "DRAFT",
+      "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 3단계 §3-2",
+      "x-code-key": "CD-INSPECTION-RESULT-STATUS"
      },
      "previousResultId": {
       "type": "integer",
@@ -3766,7 +3798,8 @@
      "overallJudgmentCode": {
       "type": "string",
       "example": "ACCEPTED",
-      "description": "합격·불합격·보류 3값. ⛔ enum 으로 못박지 않는다 — 값 목록은 공통코드가 갖고 늘 수 있다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_OVERALL_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격)·HELD(보류) — 검사 결과 수량 세 칸(accepted/rejected/held)과 같은 이름이다. 근거: 회신 E-3 종결 2026-08-07 · omf-mes#179"
+      "description": "합격·불합격·보류 3값. ⛔ enum 으로 못박지 않는다 — 값 목록은 공통코드가 갖고 늘 수 있다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_OVERALL_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격)·HELD(보류) — 검사 결과 수량 세 칸(accepted/rejected/held)과 같은 이름이다. 근거: 회신 E-3 종결 2026-08-07 · omf-mes#179",
+      "x-code-key": "CD-INSPECTION-OVERALL-JUDGMENT"
      },
      "inspectedAt": {
       "type": "string",
@@ -3906,7 +3939,8 @@
       "maxLength": 50,
       "description": "보류 사유. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_REASON 로 받는다. 고객이 운영 중 W-06-06 공통코드 마스터에서 정하는 실행 시점 자료라 계약에 enum 을 두지 않는다. 근거: 공유계약 G-31·G-32 · 시드 omf-mes#198",
       "example": "INCOMING_INSPECTION_WAIT",
-      "x-internal-note": "omf-mes#198 로 초기 시드가 나간 마스터안전형 그룹(공유계약 G-31). enum 을 두지 않는 것이 정상이다 — 「미확정」이 아니다."
+      "x-internal-note": "omf-mes#198 로 초기 시드가 나간 마스터안전형 그룹(공유계약 G-31). enum 을 두지 않는 것이 정상이다 — 「미확정」이 아니다.",
+      "x-code-key": "CD-LOT-HOLD-REASON"
      },
      "releaseCondition": {
       "x-source-column": "release_condition",
@@ -3967,7 +4001,8 @@
       ],
       "maxLength": 50,
       "description": "해제 사유(코드형) — 2026-08-30 되살림. 등록 사유(reasonCode)와 대칭 축이다 — C7(재판정 합격)·C8(재판정 불합격)이 왜 갈렸는지를 이 값으로 가른다. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_RELEASE_REASON 로 받는다(공유계약 G-32). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-03-02 §5-4 · omf-mes#87",
-      "example": "RETEST_PASS"
+      "example": "RETEST_PASS",
+      "x-code-key": "CD-LOT-HOLD-RELEASE-REASON"
      },
      "remarks": {
       "x-source-column": "remarks",
@@ -3980,7 +4015,8 @@
      "lotStatusCode": {
       "type": "string",
       "description": "이 보류가 걸었을 때 LOT 이 간 상태 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). 근거: 공유계약 G-32 · omf-mes#176",
-      "example": "NORMAL"
+      "example": "NORMAL",
+      "x-code-key": "CD-LOT-STATUS"
      }
     },
     "x-internal-note": "해제 사유(releaseReasonCode)를 등록 사유와 대칭으로 되살렸다(2026-08-30) — 등록·해제 비대칭이 해소됐다(#87 요청분). / ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 01 요구서 §7 · 03 계약 2단계 §4"
@@ -4019,7 +4055,8 @@
       "type": "string",
       "description": "⭐ 도착 상태. 의심자재 등록(C10)은 INSPECTION_PENDING(검사 대기), 클레임·리콜 재Hold(C9)는 DEFECTIVE(불량)다. 두 화면이 같은 행을 만들고 도착 상태만 다르다. 「보류」는 lot.status_code 축에 없는 값이다 — Hold(보류 «문서»의 진행 상태)는 lot_hold.status_code 가 별도로 갖고 서버가 자동으로 채운다(공유계약 §I-32 · omf-mes#227). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). 근거: 공유계약 G-32 · omf-mes#176",
       "example": "INSPECTION_PENDING",
-      "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 2단계 §5"
+      "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 2단계 §5",
+      "x-code-key": "CD-LOT-STATUS"
      },
      "remarks": {
       "type": "string",
@@ -4048,7 +4085,8 @@
        "RELEASED"
       ],
       "description": "등록(HELD) 또는 해제(RELEASED). 한 보류 문서가 최대 두 사건을 낸다",
-      "example": "HELD"
+      "example": "HELD",
+      "x-code-key": "CD-EVENT-TYPE"
      },
      "occurredAt": {
       "type": "string",
@@ -4138,7 +4176,8 @@
      "targetLotStatusCode": {
       "type": "string",
       "description": "재판정 합격이면 정상, 재판정 불합격이면 불량이다(C7 · C8). 근거: W-03-02 §5-1 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). 근거: 공유계약 G-32 · omf-mes#176",
-      "example": "NORMAL"
+      "example": "NORMAL",
+      "x-code-key": "CD-LOT-STATUS"
      },
      "releaseQty": {
       "type": "number",
@@ -4149,7 +4188,8 @@
      "releaseReasonCode": {
       "type": "string",
       "description": "해제 사유(코드형) — 2026-08-30 되살림. 등록 사유(reasonCode)와 대칭 축이다 — C7(재판정 합격)·C8(재판정 불합격)이 왜 갈렸는지 이 값으로 센다(「기록하라는데 자리가 없다」 7번째, omf-mes#87 해소). 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_RELEASE_REASON. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-03-02 §5-4",
-      "example": "RETEST_PASS"
+      "example": "RETEST_PASS",
+      "x-code-key": "CD-LOT-HOLD-RELEASE-REASON"
      },
      "remarks": {
       "type": [
@@ -4185,12 +4225,14 @@
      "lotTypeCode": {
       "type": "string",
       "example": "값",
-      "description": "자재·생산·제품 3종(결정 10). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_TYPE 로 받는다(MATERIAL·PRODUCTION·PRODUCT). ⚠ 셋을 합쳐 집계하지 않는다(공유계약 L-7) — 같은 「보류 38건」이라도 자재와 제품은 대응이 다르다. 근거: omf-mes#176"
+      "description": "자재·생산·제품 3종(결정 10). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_TYPE 로 받는다(MATERIAL·PRODUCTION·PRODUCT). ⚠ 셋을 합쳐 집계하지 않는다(공유계약 L-7) — 같은 「보류 38건」이라도 자재와 제품은 대응이 다르다. 근거: omf-mes#176",
+      "x-code-key": "CD-LOT-TYPE"
      },
      "lotStatusCode": {
       "type": "string",
       "description": "품질 판정 축 — 정상·불량·검사 대기·폐기. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). ⚠ 보류 건의 진행 상태와 다른 축이다(W-03-01 §5-3). 근거: 회신 E-3 종결 2026-08-07 · omf-mes#176",
-      "example": "NORMAL"
+      "example": "NORMAL",
+      "x-code-key": "CD-LOT-STATUS"
      },
      "versionNo": {
       "type": "integer",
@@ -4266,7 +4308,8 @@
      "statusCode": {
       "type": "string",
       "example": "NORMAL",
-      "description": "품질 판정 축 — 정상·불량·검사 대기·폐기. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). ⚠ 보류 건의 진행 상태와 다른 축이다(W-03-01 §5-3). 근거: 회신 E-3 종결 2026-08-07 · omf-mes#176"
+      "description": "품질 판정 축 — 정상·불량·검사 대기·폐기. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). ⚠ 보류 건의 진행 상태와 다른 축이다(W-03-01 §5-3). 근거: 회신 E-3 종결 2026-08-07 · omf-mes#176",
+      "x-code-key": "CD-LOT-STATUS"
      },
      "lotCount": {
       "type": "integer",
@@ -4275,7 +4318,8 @@
      "lotTypeCode": {
       "type": "string",
       "description": "자재·생산·제품 3종(결정 10). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_TYPE 로 받는다(MATERIAL·PRODUCTION·PRODUCT). ⚠ 셋을 합쳐 집계하지 않는다(공유계약 L-7) — 같은 「보류 38건」이라도 자재와 제품은 대응이 다르다. 근거: omf-mes#176",
-      "example": "MATERIAL"
+      "example": "MATERIAL",
+      "x-code-key": "CD-LOT-TYPE"
      }
     },
     "required": [
@@ -4315,7 +4359,8 @@
      "targetLotStatusCode": {
       "type": "string",
       "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). 근거: 공유계약 G-32 · omf-mes#176",
-      "example": "NORMAL"
+      "example": "NORMAL",
+      "x-code-key": "CD-LOT-STATUS"
      },
      "allowed": {
       "type": "boolean",
@@ -4328,7 +4373,8 @@
        "CREATE_HOLD"
       ],
       "description": "이 전이를 «어느 쓰기 경로»로 실행하는가. RELEASE_HOLD = POST /quality/lot-holds/{lotHoldId}:release (재판정 — 합격이면 정상 C7, 불합격이면 불량 C8). CREATE_HOLD = POST /quality/lot-holds (새 보류를 건다 — 의심자재 등록 C10, 클레임·리콜 재Hold C9). ⭐ 목표 상태만으로는 가를 수 없다 — 「불량」이 두 경로에서 도달한다(C8 재판정 불합격 · C9 재Hold). 화면이 현재 상태로 추론하면 그 분기가 곧 전이표가 되어 전이가 하나 늘 때마다 세 셸을 다시 배포해야 한다(공유계약 G-8 — 전이 규칙을 화면이 갖지 않는다). ⛔ 어느 보류를 풀지는 여기서 정하지 않는다 — 열린 보류가 여럿일 수 있어 사용자가 GET /quality/lot-holds?lotId=…&open=true 에서 고른다. 근거: W-03-02 §5-1 · omf-mes#190 질문2",
-      "example": "CREATE_HOLD"
+      "example": "CREATE_HOLD",
+      "x-code-key": "CD-ACTION"
      },
      "blockedReason": {
       "type": "string",

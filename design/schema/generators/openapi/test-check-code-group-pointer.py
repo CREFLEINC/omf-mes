@@ -90,10 +90,13 @@ class 등록부_대조(unittest.TestCase):
 
     def test_등록부_밖_이름은_걸린다(self):
         # 짓기 규칙으로 «도출»할 수 있어도 그 행이 «있는» 것은 다른 문제다(G-32).
+        # ⚠ 예시를 WORK_ORDER_STATUS 로 두었다가 2026-09-02 에 그것이 «등재되면서»
+        #    이 테스트가 깨졌다. 실재하지 않을 이름으로 바꾼다 — 등재 가능한 이름을
+        #    「등록부 밖」의 표본으로 쓰면 그 이름이 확정되는 날 테스트가 거짓말을 한다.
         d = {"components": {"schemas": {"A": {"properties": {
-            "statusCode": {"description": P % "WORK_ORDER_STATUS"}}}}}}
+            "statusCode": {"description": P % "NEVER_REGISTERED_SAMPLE"}}}}}}
         names = found(d)
-        self.assertEqual(names, {"WORK_ORDER_STATUS"})
+        self.assertEqual(names, {"NEVER_REGISTERED_SAMPLE"})
         self.assertTrue(names - cg.REGISTRY, "등록부 밖이어야 한다")
 
     def test_등록부는_공유계약의_사본이다(self):

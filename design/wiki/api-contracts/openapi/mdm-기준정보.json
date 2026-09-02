@@ -68,7 +68,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "x-code-key": "CD-WAREHOUSE-TYPE"
      },
      {
       "name": "isDefect",
@@ -861,7 +862,8 @@
       "schema": {
        "type": "string"
       },
-      "description": "상태 필터"
+      "description": "사용자의 «인사» 상태로 거른다. ⛔ 계정 사용 가부는 이 값이 아니라 isActive 가 정한다 — 로그인 차단 여부로 거르려면 isActive 를 쓴다(W-CO-02 §8-4). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=APP_USER_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-APP-USER-STATUS"
      },
      {
       "name": "includeInactive",
@@ -5257,7 +5259,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
      },
      {
       "name": "itemId",
@@ -7066,7 +7069,8 @@
       "schema": {
        "type": "string"
       },
-      "description": "공통코드 — 값 목록이 아직 서지 않았다. 최소 구분: 대기/처리중/완료/실패. 추적처는 omf-mes#213(리소스별 상태값 코드 문자열)이다."
+      "description": "ERP 연계 메시지의 처리 상태로 거른다 — 대기(PENDING) · 처리중(PROCESSING) · 완료(DONE) · 실패(FAILED). 재처리 대상은 FAILED 로 거른다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INTEGRATION_MESSAGE_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-INTEGRATION-MESSAGE-STATUS"
      },
      {
       "name": "interfaceCode",
@@ -7086,7 +7090,8 @@
         "OUTBOUND"
        ]
       },
-      "description": "수신(INBOUND) 또는 송신(OUTBOUND). 연계 정의의 방향 값과 같은 어휘다"
+      "description": "수신(INBOUND) 또는 송신(OUTBOUND). 연계 정의의 방향 값과 같은 어휘다",
+      "x-code-key": "CD-DIRECTION"
      },
      {
       "name": "targetTypeCode",
@@ -7575,7 +7580,8 @@
        ],
        "example": "DISPOSAL"
       },
-      "description": "역할로 거른다. ⭐ 폐기 출고 화면이 폐기처리 거래처만 고를 때 쓴다(W-01-06 · W-04-10 · DR-013)."
+      "description": "역할로 거른다. ⭐ 폐기 출고 화면이 폐기처리 거래처만 고를 때 쓴다(W-01-06 · W-04-10 · DR-013).",
+      "x-code-key": "CD-ROLE-TYPE"
      },
      {
       "name": "includeInactive",
@@ -8081,7 +8087,7 @@
        "MICROMETER",
        "GAUGE"
       ],
-      "description": "설비 유형으로 거른다 — 값 여럿을 쉼표로 이어 보낸다. 한 화면이 «계열 전체»를 한 번에 걸러야 해서 여럿을 받는다. 계측기 마스터 관리(W-05-11)는 계측기 계열 그룹(INSTRUMENT_TYPE)의 값 전체를, 설비·설비그룹 마스터(W-05-12)는 설비 계열 그룹(EQUIPMENT_TYPE)의 값 전체를 싣는다. 두 그룹 다 값이 확정됐다 — 계측기 3값 · 설비 3값(INJECTION_MOLDING·PRESS·WATER_HEATER). 걸지 않으면 두 계열이 함께 나온다."
+      "description": "설비 유형으로 거른다 — 값 여럿을 쉼표로 이어 보낸다. 한 화면이 «계열 전체»를 한 번에 걸러야 해서 여럿을 받는다. 계측기 마스터 관리(W-05-11)는 계측기 계열 그룹(INSTRUMENT_TYPE)의 값 전체를, 설비·설비그룹 마스터(W-05-12)는 설비 계열 그룹(EQUIPMENT_TYPE)의 값 전체를 싣는다. 두 그룹 다 값이 확정됐다 — 계측기 3값 · 설비 3값(INJECTION_MOLDING·PRESS·WATER_HEATER). 걸지 않으면 두 계열이 함께 나온다. ⭐ 값 목록은 화면이 쓰는 «계열»의 그룹에서 받는다 — GET /mdm/code-values?codeGroupCode=INSTRUMENT_TYPE(W-05-11) 또는 GET /mdm/code-values?codeGroupCode=EQUIPMENT_TYPE(W-05-12). ⛔ 한 그룹만 불러 다른 계열을 거르면 목록이 조용히 빈다 — 계열마다 그룹이 갈려 있다(공유계약 G-32 · omf-mes#219). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "calibrationRequired",
@@ -8097,7 +8103,8 @@
       "schema": {
        "type": "string"
       },
-      "description": "자산 수명주기로 거른다 — 운용(IN_SERVICE) 또는 폐기(DISPOSED). 사용 여부(includeInactive)와 «다른 축» 이다. 현장 화면은 폐기된 설비를 목록에서 뺀다 — statusCode=IN_SERVICE 로 부른다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_STATUS. 근거: omf-mes#185"
+      "description": "자산 수명주기로 거른다 — 운용(IN_SERVICE) 또는 폐기(DISPOSED). 사용 여부(includeInactive)와 «다른 축» 이다. 현장 화면은 폐기된 설비를 목록에서 뺀다 — statusCode=IN_SERVICE 로 부른다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_STATUS. 근거: omf-mes#185",
+      "x-code-key": "CD-EQUIPMENT-STATUS"
      },
      {
       "name": "includeInactive",
@@ -10365,7 +10372,8 @@
       "schema": {
        "type": "string"
       },
-      "description": "점검 유형으로 거른다"
+      "description": "점검 유형으로 거른다",
+      "x-code-key": "CD-EQUIPMENT-INSPECTION-TYPE"
      },
      {
       "name": "includeInactive",
@@ -10868,7 +10876,8 @@
       "schema": {
        "type": "string"
       },
-      "description": "자산 수명주기로 거른다 — 운용(IN_SERVICE) 또는 폐기(DISPOSED). 사용 여부(includeInactive)와 «다른 축» 이다. 툴 보전오더 생성 화면이 폐기된 툴을 목록에서 버릴 때 건다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_STATUS 로 받는다"
+      "description": "자산 수명주기로 거른다 — 운용(IN_SERVICE) 또는 폐기(DISPOSED). 사용 여부(includeInactive)와 «다른 축» 이다. 툴 보전오더 생성 화면이 폐기된 툴을 목록에서 버릴 때 건다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_STATUS 로 받는다",
+      "x-code-key": "CD-EQUIPMENT-STATUS"
      },
      {
       "name": "withOpenMaintenanceOrder",
@@ -12522,7 +12531,8 @@
         "PLANT",
         "EQUIPMENT_GROUP"
        ]
-      }
+      },
+      "x-code-key": "CD-LEVEL"
      },
      {
       "name": "plantId",
@@ -12692,7 +12702,8 @@
         "INBOUND",
         "OUTBOUND"
        ]
-      }
+      },
+      "x-code-key": "CD-DIRECTION"
      },
      {
       "name": "targetCode",
@@ -12711,7 +12722,8 @@
         "TRACKING_SYSTEM",
         "EQUIPMENT_STANDARD_IF"
        ]
-      }
+      },
+      "x-code-key": "CD-EXTERNAL-SYSTEM"
      },
      {
       "name": "includeInactive",
@@ -13559,14 +13571,16 @@
       "type": "string",
       "maxLength": 50,
       "description": "창고 유형(코드형). 값 목록은 GET /mdm/code-values?codeGroupCode=WAREHOUSE_TYPE 로 받는다 (공유계약 G-31·G-32 — 동작이 값에 걸리지 않는 분류용이라 고객 마스터). 근거: W-05-06 §3-3",
-      "example": "MATERIAL"
+      "example": "MATERIAL",
+      "x-code-key": "CD-WAREHOUSE-TYPE"
      },
      "managementLevelCode": {
       "x-source-column": "management_level_code",
       "type": "string",
       "maxLength": 50,
       "example": "WAREHOUSE",
-      "description": "창고 관리 수준. ✅ **값 목록 확정 2026-08-31(사용자)** — 창고(WAREHOUSE) · 구역(ZONE) · 랙(RACK) · 셀(CELL) 넷이며 **이 순서가 계층 깊이를 뜻한다**. 이 값이 위치 입력을 가른다 — 창고면 위치를 받지 않고, 셀이면 셀까지 받는다(W-06-07 §5-3). 값 목록은 GET /mdm/code-values?codeGroupCode=MANAGEMENT_LEVEL 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "창고 관리 수준. ✅ **값 목록 확정 2026-08-31(사용자)** — 창고(WAREHOUSE) · 구역(ZONE) · 랙(RACK) · 셀(CELL) 넷이며 **이 순서가 계층 깊이를 뜻한다**. 이 값이 위치 입력을 가른다 — 창고면 위치를 받지 않고, 셀이면 셀까지 받는다(W-06-07 §5-3). 값 목록은 GET /mdm/code-values?codeGroupCode=MANAGEMENT_LEVEL 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-MANAGEMENT-LEVEL"
      },
      "isExternal": {
       "x-source-column": "is_external",
@@ -13644,14 +13658,16 @@
       "type": "string",
       "maxLength": 50,
       "description": "창고 유형(코드형). 값 목록은 GET /mdm/code-values?codeGroupCode=WAREHOUSE_TYPE 로 받는다 (공유계약 G-31·G-32 — 동작이 값에 걸리지 않는 분류용이라 고객 마스터). 근거: W-05-06 §3-3",
-      "example": "MATERIAL"
+      "example": "MATERIAL",
+      "x-code-key": "CD-WAREHOUSE-TYPE"
      },
      "managementLevelCode": {
       "x-source-column": "management_level_code",
       "type": "string",
       "maxLength": 50,
       "example": "WAREHOUSE",
-      "description": "창고 관리 수준. ✅ **값 목록 확정 2026-08-31(사용자)** — 창고(WAREHOUSE) · 구역(ZONE) · 랙(RACK) · 셀(CELL) 넷이며 **이 순서가 계층 깊이를 뜻한다**. 이 값이 위치 입력을 가른다 — 창고면 위치를 받지 않고, 셀이면 셀까지 받는다(W-06-07 §5-3). 값 목록은 GET /mdm/code-values?codeGroupCode=MANAGEMENT_LEVEL 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "창고 관리 수준. ✅ **값 목록 확정 2026-08-31(사용자)** — 창고(WAREHOUSE) · 구역(ZONE) · 랙(RACK) · 셀(CELL) 넷이며 **이 순서가 계층 깊이를 뜻한다**. 이 값이 위치 입력을 가른다 — 창고면 위치를 받지 않고, 셀이면 셀까지 받는다(W-06-07 §5-3). 값 목록은 GET /mdm/code-values?codeGroupCode=MANAGEMENT_LEVEL 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-MANAGEMENT-LEVEL"
      },
      "isExternal": {
       "x-source-column": "is_external",
@@ -13717,14 +13733,16 @@
       "type": "string",
       "maxLength": 50,
       "description": "창고 유형(코드형). 값 목록은 GET /mdm/code-values?codeGroupCode=WAREHOUSE_TYPE 로 받는다 (공유계약 G-31·G-32 — 동작이 값에 걸리지 않는 분류용이라 고객 마스터). 근거: W-05-06 §3-3",
-      "example": "MATERIAL"
+      "example": "MATERIAL",
+      "x-code-key": "CD-WAREHOUSE-TYPE"
      },
      "managementLevelCode": {
       "x-source-column": "management_level_code",
       "type": "string",
       "maxLength": 50,
       "example": "WAREHOUSE",
-      "description": "창고 관리 수준. ✅ **값 목록 확정 2026-08-31(사용자)** — 창고(WAREHOUSE) · 구역(ZONE) · 랙(RACK) · 셀(CELL) 넷이며 **이 순서가 계층 깊이를 뜻한다**. 이 값이 위치 입력을 가른다 — 창고면 위치를 받지 않고, 셀이면 셀까지 받는다(W-06-07 §5-3). 값 목록은 GET /mdm/code-values?codeGroupCode=MANAGEMENT_LEVEL 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "창고 관리 수준. ✅ **값 목록 확정 2026-08-31(사용자)** — 창고(WAREHOUSE) · 구역(ZONE) · 랙(RACK) · 셀(CELL) 넷이며 **이 순서가 계층 깊이를 뜻한다**. 이 값이 위치 입력을 가른다 — 창고면 위치를 받지 않고, 셀이면 셀까지 받는다(W-06-07 §5-3). 값 목록은 GET /mdm/code-values?codeGroupCode=MANAGEMENT_LEVEL 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-MANAGEMENT-LEVEL"
      },
      "isExternal": {
       "x-source-column": "is_external",
@@ -13835,7 +13853,8 @@
       ],
       "maxLength": 50,
       "example": "STANDARD",
-      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=STORAGE_CONDITION 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=STORAGE_CONDITION 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-STORAGE-CONDITION"
      },
      "allowMixedItem": {
       "x-source-column": "allow_mixed_item",
@@ -13940,7 +13959,8 @@
       ],
       "maxLength": 50,
       "example": "STANDARD",
-      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=STORAGE_CONDITION 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=STORAGE_CONDITION 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-STORAGE-CONDITION"
      },
      "allowMixedItem": {
       "x-source-column": "allow_mixed_item",
@@ -14034,7 +14054,8 @@
       ],
       "maxLength": 50,
       "example": "STANDARD",
-      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=STORAGE_CONDITION 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=STORAGE_CONDITION 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-STORAGE-CONDITION"
      },
      "allowMixedItem": {
       "x-source-column": "allow_mixed_item",
@@ -14162,7 +14183,8 @@
       "maxLength": 50,
       "default": "ACTIVE",
       "description": "사용자의 «인사» 상태 — 재직·휴직·퇴사 등. ⛔ **계정을 쓸 수 있는가는 이 값이 아니라 isActive 가 정한다**(사용자 결정 2026-09-01 · W-CO-02 §8-4 해소). 둘이 겹쳐 읽히던 자리라 축을 갈랐다 — 휴직인데 계정은 살려 두는 경우가 실재하므로 하나로 합칠 수 없다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=APP_USER_STATUS 로 받는다(공유계약 G-31 마스터안전형 · G-32 · 2026-09-01 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "ACTIVE"
+      "example": "ACTIVE",
+      "x-code-key": "CD-APP-USER-STATUS"
      },
      "isActive": {
       "x-source-column": "is_active",
@@ -14221,7 +14243,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "사용자의 «인사» 상태. 미지정 시 서버가 물리 모델 DEFAULT('ACTIVE')로 채운다. ⛔ 계정을 쓸 수 있는가는 이 값이 아니라 isActive 가 정한다(사용자 결정 2026-09-01 · W-CO-02 §8-4 해소). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=APP_USER_STATUS 로 받는다(공유계약 G-31 마스터안전형 · G-32 · 2026-09-01 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "ACTIVE"
+      "example": "ACTIVE",
+      "x-code-key": "CD-APP-USER-STATUS"
      }
     }
    },
@@ -14263,7 +14286,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "사용자의 «인사» 상태. ⛔ 계정을 쓸 수 있는가는 이 값이 아니라 isActive 가 정한다 — isActive 는 이 본문으로 못 바꾼다(:deactivate / :activate 액션 전용). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=APP_USER_STATUS 로 받는다(공유계약 G-31 마스터안전형 · G-32 · 2026-09-01 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "ACTIVE"
+      "example": "ACTIVE",
+      "x-code-key": "CD-APP-USER-STATUS"
      }
     }
    },
@@ -14644,7 +14668,8 @@
       "maxLength": 50,
       "description": "마스터 버전의 편집 잠금 상태 — 작성중(DRAFT · 편집 가능) · 확정(CONFIRMED · 편집 잠김) · 폐기(OBSOLETE). ⛔ 확정본은 in-place 수정하지 않고 새 Rev 를 발행한다(결정 07). ⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 값을 편집하면 안 된다. 편집 가부가 이 값에 걸려 있어 값을 지우면 잠금이 «조용히» 안 걸리고, 이미 그 Rev 로 전개된 W/O 와 어긋난다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=MASTER_VERSION_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. 근거: 결정 07(W-06-01 §4) — Routing 이 정한 세 값을 BOM·검사기준 버전이 준용한다(사용자 결정 2026-09-02). ⭐ Routing 은 결정 07 이 값을 «직접» 확정한 자리다.",
       "example": "값",
-      "x-internal-note": "example 이 'ACTIVE' 였다 — 결정 07 이 확정한 뜻은 작성중·확정·폐기 셋이고 그중 어느 것도 아니다. 공유계약 G-32 가 설비 자산 상태에서 같은 결함을 잡아 「사용 여부(is_active)와 수명주기에 같은 낱말을 쓰지 않는다」로 고쳤다(ACTIVE → IN_SERVICE·DISPOSED). 여기도 코드 문자열이 정해질 때까지 자리표시로 되돌린다 — 등록은 W-06-06 소관이고 폐기 전이 액션 이름 :obsolete 와 짝을 맞추는 것이 후보다. omf-mes#259 요청 밖 확인에서 드러났다."
+      "x-internal-note": "example 이 'ACTIVE' 였다 — 결정 07 이 확정한 뜻은 작성중·확정·폐기 셋이고 그중 어느 것도 아니다. 공유계약 G-32 가 설비 자산 상태에서 같은 결함을 잡아 「사용 여부(is_active)와 수명주기에 같은 낱말을 쓰지 않는다」로 고쳤다(ACTIVE → IN_SERVICE·DISPOSED). 여기도 코드 문자열이 정해질 때까지 자리표시로 되돌린다 — 등록은 W-06-06 소관이고 폐기 전이 액션 이름 :obsolete 와 짝을 맞추는 것이 후보다. omf-mes#259 요청 밖 확인에서 드러났다.",
+      "x-code-key": "CD-MASTER-VERSION-STATUS"
      },
      "effectiveFrom": {
       "x-source-column": "effective_from",
@@ -15692,7 +15717,8 @@
        "MES"
       ],
       "description": "이 행의 출처 — ERP(Legacy 수신본, 수정/삭제 불가) · MES(자체 등록). WF06 S7 Result 「'Legacy 출처' 플래그 + MES 원천 등록분과 연계분의 구분 플래그」를 되살린 하나의 축이다(2026-08-30). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-09 §4-D · W-06-05 §9-1 · W-06-06 §5-4",
-      "example": "MES"
+      "example": "MES",
+      "x-code-key": "CD-SOURCE-SYSTEM"
      }
     },
     "x-internal-note": "미착지: 수신본 식별 플래그 — 되살렸다(sourceSystemCode, 2026-08-30). DepartmentUpdate가 노출하는 필드는 이 값으로 편집 잠금을 판정한다(editability). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다."
@@ -15979,7 +16005,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "공통코드 — 값 목록 미정 §8-5 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=QUALIFICATION_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "STANDARD"
+      "example": "STANDARD",
+      "x-code-key": "CD-QUALIFICATION-TYPE"
      },
      "processId": {
       "x-source-column": "process_id",
@@ -16167,7 +16194,8 @@
       ],
       "maxLength": 50,
       "description": "MES 확장 · 공통코드 — location.storage_condition_code 와 같은 코드계 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=STORAGE_CONDITION 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "STANDARD"
+      "example": "STANDARD",
+      "x-code-key": "CD-STORAGE-CONDITION"
      },
      "openedShelfLifeHours": {
       "x-source-column": "opened_shelf_life_hours",
@@ -16284,7 +16312,8 @@
       ],
       "maxLength": 50,
       "example": "STANDARD",
-      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=STORAGE_CONDITION 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=STORAGE_CONDITION 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-STORAGE-CONDITION"
      },
      "openedShelfLifeHours": {
       "x-source-column": "opened_shelf_life_hours",
@@ -16468,7 +16497,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "공통코드",
-      "example": "STANDARD"
+      "example": "STANDARD",
+      "x-code-key": "CD-EXTERNAL-SYSTEM"
      },
      "partnerId": {
       "x-source-column": "partner_id",
@@ -16626,7 +16656,8 @@
       "maxLength": 50,
       "description": "마스터 버전의 편집 잠금 상태 — 작성중(DRAFT · 편집 가능) · 확정(CONFIRMED · 편집 잠김) · 폐기(OBSOLETE). ⛔ 확정본은 in-place 수정하지 않고 새 Rev 를 발행한다(결정 07). ⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 값을 편집하면 안 된다. 편집 가부가 이 값에 걸려 있어 값을 지우면 잠금이 «조용히» 안 걸리고, 이미 그 Rev 로 전개된 W/O 와 어긋난다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=MASTER_VERSION_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. 근거: 결정 07(W-06-01 §4) — Routing 이 정한 세 값을 BOM·검사기준 버전이 준용한다(사용자 결정 2026-09-02). ⭐ W-06-11 「작성중만 편집」 규칙의 판정 컬럼이다.",
       "example": "값",
-      "x-internal-note": "example 이 'ACTIVE' 였다 — 공유계약 G-32 가 설비 자산 상태에서 같은 결함을 잡아 「사용 여부(is_active)와 수명주기에 같은 낱말을 쓰지 않는다」로 고쳤다(ACTIVE → IN_SERVICE·DISPOSED). 여기도 코드 문자열이 정해질 때까지 자리표시로 되돌린다 — 등록은 W-06-06 소관이고 폐기 전이 액션 이름 :obsolete 와 짝을 맞추는 것이 후보다. omf-mes#259 요청 밖 확인에서 드러났다."
+      "x-internal-note": "example 이 'ACTIVE' 였다 — 공유계약 G-32 가 설비 자산 상태에서 같은 결함을 잡아 「사용 여부(is_active)와 수명주기에 같은 낱말을 쓰지 않는다」로 고쳤다(ACTIVE → IN_SERVICE·DISPOSED). 여기도 코드 문자열이 정해질 때까지 자리표시로 되돌린다 — 등록은 W-06-06 소관이고 폐기 전이 액션 이름 :obsolete 와 짝을 맞추는 것이 후보다. omf-mes#259 요청 밖 확인에서 드러났다.",
+      "x-code-key": "CD-MASTER-VERSION-STATUS"
      },
      "isDefault": {
       "x-source-column": "is_default",
@@ -16963,7 +16994,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "공통코드 — IQC/PQC(공정·초중종·자주)/OQC ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=QUALITY_INSPECTION_TYPE 로 받는다(IQC·PQC·OQC). ⚠ 설비 점검의 inspectionTypeCode(DAILY·MONTHLY·MAINTENANCE)와 «같은 이름 다른 값» 이라 그룹을 가른다. 근거: omf-mes#186",
-      "example": "IQC"
+      "example": "IQC",
+      "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
      },
      "approvedBy": {
       "x-source-column": "approved_by",
@@ -17075,7 +17107,8 @@
       "type": "string",
       "maxLength": 50,
       "example": "IQC",
-      "description": "공통코드 — IQC/PQC(공정·초중종·자주)/OQC ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=QUALITY_INSPECTION_TYPE 로 받는다(IQC·PQC·OQC). ⚠ 설비 점검의 inspectionTypeCode(DAILY·MONTHLY·MAINTENANCE)와 «같은 이름 다른 값» 이라 그룹을 가른다. 근거: omf-mes#186"
+      "description": "공통코드 — IQC/PQC(공정·초중종·자주)/OQC ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=QUALITY_INSPECTION_TYPE 로 받는다(IQC·PQC·OQC). ⚠ 설비 점검의 inspectionTypeCode(DAILY·MONTHLY·MAINTENANCE)와 «같은 이름 다른 값» 이라 그룹을 가른다. 근거: omf-mes#186",
+      "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
      },
      "pqcSkipAllowed": {
       "x-source-column": "pqc_skip_allowed",
@@ -17159,7 +17192,8 @@
       "type": "string",
       "maxLength": 50,
       "example": "IQC",
-      "description": "공통코드 — IQC/PQC(공정·초중종·자주)/OQC ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=QUALITY_INSPECTION_TYPE 로 받는다(IQC·PQC·OQC). ⚠ 설비 점검의 inspectionTypeCode(DAILY·MONTHLY·MAINTENANCE)와 «같은 이름 다른 값» 이라 그룹을 가른다. 근거: omf-mes#186"
+      "description": "공통코드 — IQC/PQC(공정·초중종·자주)/OQC ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=QUALITY_INSPECTION_TYPE 로 받는다(IQC·PQC·OQC). ⚠ 설비 점검의 inspectionTypeCode(DAILY·MONTHLY·MAINTENANCE)와 «같은 이름 다른 값» 이라 그룹을 가른다. 근거: omf-mes#186",
+      "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
      },
      "pqcSkipAllowed": {
       "x-source-column": "pqc_skip_allowed",
@@ -17238,7 +17272,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "공통코드 — 「전수/샘플」+「제품 단위/LOT 단위」가 여기 들어간다. 값 목록 §8-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_SAMPLING_METHOD 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "STANDARD"
+      "example": "STANDARD",
+      "x-code-key": "CD-INSPECTION-SAMPLING-METHOD"
      },
      "aqlValue": {
       "x-source-column": "aql_value",
@@ -17275,7 +17310,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "공통코드 — 값 목록 미정 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "STANDARD"
+      "example": "STANDARD",
+      "x-code-key": "CD-INSPECTION-FREQUENCY"
      },
      "frequencyIntervalValue": {
       "x-source-column": "frequency_interval_value",
@@ -17301,7 +17337,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "마스터 버전의 편집 잠금 상태 — 작성중(DRAFT · 편집 가능) · 확정(CONFIRMED · 편집 잠김) · 폐기(OBSOLETE). ⛔ 확정본은 in-place 수정하지 않고 새 Rev 를 발행한다(결정 07). ⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 값을 편집하면 안 된다. 편집 가부가 이 값에 걸려 있어 값을 지우면 잠금이 «조용히» 안 걸리고, 이미 그 Rev 로 전개된 W/O 와 어긋난다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=MASTER_VERSION_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. 근거: 결정 07(W-06-01 §4) — Routing 이 정한 세 값을 BOM·검사기준 버전이 준용한다(사용자 결정 2026-09-02). ⭐ Routing 이 확정한 세 값을 그대로 준용한다(2026-09-02 확정).",
-      "example": "CONFIRMED"
+      "example": "CONFIRMED",
+      "x-code-key": "CD-MASTER-VERSION-STATUS"
      },
      "samplingRatio": {
       "type": [
@@ -17355,7 +17392,8 @@
       "type": "string",
       "maxLength": 50,
       "example": "STANDARD",
-      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_SAMPLING_METHOD 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_SAMPLING_METHOD 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-INSPECTION-SAMPLING-METHOD"
      },
      "aqlValue": {
       "x-source-column": "aql_value",
@@ -17388,7 +17426,8 @@
       "type": "string",
       "maxLength": 50,
       "example": "STANDARD",
-      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-INSPECTION-FREQUENCY"
      },
      "frequencyIntervalValue": {
       "x-source-column": "frequency_interval_value",
@@ -17451,7 +17490,8 @@
       "type": "string",
       "maxLength": 50,
       "example": "STANDARD",
-      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_SAMPLING_METHOD 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_SAMPLING_METHOD 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-INSPECTION-SAMPLING-METHOD"
      },
      "aqlValue": {
       "x-source-column": "aql_value",
@@ -17484,7 +17524,8 @@
       "type": "string",
       "maxLength": 50,
       "example": "STANDARD",
-      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-INSPECTION-FREQUENCY"
      },
      "frequencyIntervalValue": {
       "x-source-column": "frequency_interval_value",
@@ -17622,7 +17663,8 @@
       "maxLength": 50,
       "description": "측정치를 «어느 칸에» 담는지 정한다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_ITEM_SPEC_DATA_TYPE 로 받는다. 값은 NUMERIC(수치)·TEXT(텍스트)·BOOLEAN(불리언) 셋이고 각각 InspectionMeasurement 의 numericValue·textValue·booleanValue 에 대응한다 — 값 이름이 곧 칸 이름이다. ⛔ 셋 중 «하나만» 채운다(ck_inspection_measurement num_nonnulls ≤ 1). ⚠ 모르는 값이 오면 화면은 그 항목의 입력을 «비활성 + 사유»로 둔다(공유계약 G-2) — 담을 칸을 고를 수 없으므로 추측해서 그리지 않는다. 근거: 공유계약 G-31·G-32 · omf-mes#179",
       "example": "NUMERIC",
-      "x-internal-note": "⛔ 값의 «모양»으로 유형을 추론하지 않는다 — 「상하한·단위가 있으면 수치, 없으면 텍스트」로 가르면 불리언 항목이 텍스트로 떨어져 사용자가 OK/NG 를 text_value 에 적게 되고 자료의 모양이 틀어진다(구현팀 실측 · #179). ⭐ 이 값은 «설계»가 정한다 — 화면의 입력 위젯과 저장 칸이 걸리므로 G-31 의 가르는 기준상 고객이 정할 마스터가 아니다. 99-인계대장 §2 의 46종에 섞여 있던 것을 이번에 걷어냈다. ⚠ enum 을 두지 않는다 — 좁히면 ⛔ 등급 통지가 되고 이미 만든 코드가 틀린다."
+      "x-internal-note": "⛔ 값의 «모양»으로 유형을 추론하지 않는다 — 「상하한·단위가 있으면 수치, 없으면 텍스트」로 가르면 불리언 항목이 텍스트로 떨어져 사용자가 OK/NG 를 text_value 에 적게 되고 자료의 모양이 틀어진다(구현팀 실측 · #179). ⭐ 이 값은 «설계»가 정한다 — 화면의 입력 위젯과 저장 칸이 걸리므로 G-31 의 가르는 기준상 고객이 정할 마스터가 아니다. 99-인계대장 §2 의 46종에 섞여 있던 것을 이번에 걷어냈다. ⚠ enum 을 두지 않는다 — 좁히면 ⛔ 등급 통지가 되고 이미 만든 코드가 틀린다.",
+      "x-code-key": "CD-INSPECTION-ITEM-SPEC-DATA-TYPE"
      },
      "uomId": {
       "x-source-column": "uom_id",
@@ -17676,7 +17718,8 @@
       ],
       "maxLength": 50,
       "example": "STANDARD",
-      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_ITEM_SPEC_METHOD 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_ITEM_SPEC_METHOD 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-INSPECTION-ITEM-SPEC-METHOD"
      },
      "defaultInspectionEquipmentId": {
       "x-source-column": "default_inspection_equipment_id",
@@ -17777,7 +17820,8 @@
       "maxLength": 50,
       "description": "측정치를 «어느 칸에» 담는지 정한다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_ITEM_SPEC_DATA_TYPE 로 받는다. 값은 NUMERIC(수치)·TEXT(텍스트)·BOOLEAN(불리언) 셋이고 각각 InspectionMeasurement 의 numericValue·textValue·booleanValue 에 대응한다 — 값 이름이 곧 칸 이름이다. ⛔ 셋 중 «하나만» 채운다(ck_inspection_measurement num_nonnulls ≤ 1). ⚠ 모르는 값이 오면 화면은 그 항목의 입력을 «비활성 + 사유»로 둔다(공유계약 G-2) — 담을 칸을 고를 수 없으므로 추측해서 그리지 않는다. 근거: 공유계약 G-31·G-32 · omf-mes#179",
       "example": "NUMERIC",
-      "x-internal-note": "⛔ 값의 «모양»으로 유형을 추론하지 않는다 — 「상하한·단위가 있으면 수치, 없으면 텍스트」로 가르면 불리언 항목이 텍스트로 떨어져 사용자가 OK/NG 를 text_value 에 적게 되고 자료의 모양이 틀어진다(구현팀 실측 · #179). ⭐ 이 값은 «설계»가 정한다 — 화면의 입력 위젯과 저장 칸이 걸리므로 G-31 의 가르는 기준상 고객이 정할 마스터가 아니다. 99-인계대장 §2 의 46종에 섞여 있던 것을 이번에 걷어냈다. ⚠ enum 을 두지 않는다 — 좁히면 ⛔ 등급 통지가 되고 이미 만든 코드가 틀린다."
+      "x-internal-note": "⛔ 값의 «모양»으로 유형을 추론하지 않는다 — 「상하한·단위가 있으면 수치, 없으면 텍스트」로 가르면 불리언 항목이 텍스트로 떨어져 사용자가 OK/NG 를 text_value 에 적게 되고 자료의 모양이 틀어진다(구현팀 실측 · #179). ⭐ 이 값은 «설계»가 정한다 — 화면의 입력 위젯과 저장 칸이 걸리므로 G-31 의 가르는 기준상 고객이 정할 마스터가 아니다. 99-인계대장 §2 의 46종에 섞여 있던 것을 이번에 걷어냈다. ⚠ enum 을 두지 않는다 — 좁히면 ⛔ 등급 통지가 되고 이미 만든 코드가 틀린다.",
+      "x-code-key": "CD-INSPECTION-ITEM-SPEC-DATA-TYPE"
      },
      "uomId": {
       "x-source-column": "uom_id",
@@ -17831,7 +17875,8 @@
       ],
       "maxLength": 50,
       "example": "STANDARD",
-      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_ITEM_SPEC_METHOD 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_ITEM_SPEC_METHOD 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-INSPECTION-ITEM-SPEC-METHOD"
      },
      "defaultInspectionEquipmentId": {
       "x-source-column": "default_inspection_equipment_id",
@@ -17950,7 +17995,8 @@
        "SCRAP"
       ],
       "description": "처분구분(재작업가능/폐기) — ✅REQ-PR-0025·결정 12 확정. 2026-08-30 되살림. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-03 §4-A",
-      "example": "REWORKABLE"
+      "example": "REWORKABLE",
+      "x-code-key": "CD-DEFECT-CODE-DISPOSITION-TYPE"
      },
      "isActive": {
       "x-source-column": "is_active",
@@ -18034,7 +18080,8 @@
        null
       ],
       "description": "처분구분(재작업가능/폐기) — 결정 12. 상세 코드에만 의미가 있다. 2026-08-30 되살림",
-      "example": "REWORKABLE"
+      "example": "REWORKABLE",
+      "x-code-key": "CD-DEFECT-CODE-DISPOSITION-TYPE"
      }
     }
    },
@@ -18108,7 +18155,8 @@
        "SCRAP",
        null
       ],
-      "example": "REWORKABLE"
+      "example": "REWORKABLE",
+      "x-code-key": "CD-DEFECT-CODE-DISPOSITION-TYPE"
      }
     }
    },
@@ -18415,7 +18463,8 @@
       "enum": [
        "INBOUND",
        "OUTBOUND"
-      ]
+      ],
+      "x-code-key": "CD-DIRECTION"
      },
      "targetTypeCode": {
       "x-source-column": "target_type_code",
@@ -18437,7 +18486,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "ERP 연계 메시지 한 건의 처리 상태 — 대기(PENDING) · 처리중(PROCESSING) · 완료(DONE) · 실패(FAILED). ⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 값을 편집하면 안 된다. 재처리 대상 판정이 이 값에 걸린다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INTEGRATION_MESSAGE_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. 근거: 이 계약이 적어 둔 「최소 구분」 넷을 그대로 확정했다(사용자 결정 2026-09-02).",
-      "example": "FAILED"
+      "example": "FAILED",
+      "x-code-key": "CD-INTEGRATION-MESSAGE-STATUS"
      },
      "retryCount": {
       "x-source-column": "retry_count",
@@ -18998,7 +19048,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "공통코드 — 값 목록 미정 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PROCESS_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "STANDARD"
+      "example": "STANDARD",
+      "x-code-key": "CD-PROCESS-TYPE"
      },
      "isActive": {
       "x-source-column": "is_active",
@@ -19090,7 +19141,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "자산 수명주기 — 운용 또는 폐기 두 값. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_STATUS 로 받는다(IN_SERVICE·DISPOSED). ⚠ 사용 여부(is_active·includeInactive)와 «다른 축» 이다 — 그래서 ACTIVE 라는 낱말을 쓰지 않는다. 두 축이 같은 낱말을 가지면 혼동한다. ⛔ 값을 늘리지 않는다 — 고장·보전중·비가동은 트랜잭션 조건이지 자산 상태가 아니다(공유계약 A-14 · W-05-12 §5-2). 근거: omf-mes#185",
-      "example": "IN_SERVICE"
+      "example": "IN_SERVICE",
+      "x-code-key": "CD-EQUIPMENT-STATUS"
      },
      "calibrationRequired": {
       "x-source-column": "calibration_required",
@@ -19130,7 +19182,8 @@
       ],
       "example": "MONTH",
       "maxLength": 50,
-      "description": "검교정 주기 단위. calibrationRequired 가 참이면 주기 두 칸이 함께 필요하다 — 주기 없이는 차기 예정일을 산출할 수 없다. 주기 단위 — 일(DAY)·주(WEEK)·월(MONTH)·년(YEAR). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 검교정 주기와 점검 부여 주기가 «같은 그룹»이다 — 같은 종류의 값(기간 단위)이라 어휘를 두 벌 만들지 않는다. ⛔ 검사 «유형»(품질 IQC·PQC·OQC ↔ 설비 DAILY·MONTHLY·MAINTENANCE)은 종류가 달라 그룹을 가른다 — 공유계약 G-32. 근거: omf-mes#188"
+      "description": "검교정 주기 단위. calibrationRequired 가 참이면 주기 두 칸이 함께 필요하다 — 주기 없이는 차기 예정일을 산출할 수 없다. 주기 단위 — 일(DAY)·주(WEEK)·월(MONTH)·년(YEAR). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 검교정 주기와 점검 부여 주기가 «같은 그룹»이다 — 같은 종류의 값(기간 단위)이라 어휘를 두 벌 만들지 않는다. ⛔ 검사 «유형»(품질 IQC·PQC·OQC ↔ 설비 DAILY·MONTHLY·MAINTENANCE)은 종류가 달라 그룹을 가른다 — 공유계약 G-32. 근거: omf-mes#188",
+      "x-code-key": "CD-CYCLE-TYPE"
      },
      "calibrationCycleInterval": {
       "type": [
@@ -19428,7 +19481,8 @@
        "OTHER"
       ],
       "example": "SUPPLIER",
-      "x-internal-note": "값 목록이 확정돼 enum 을 못박았다(2026-08-16). 그 전에는 「미확정이면 못박지 않는다」(공유계약 G-2)로 비워 두었으나, G-2 는 «미확정일 때» 규칙이고 업무가 확정했으므로 계약이 말해야 한다. ⚠ CUSTOMER·SUBCONTRACTOR·OTHER 는 뜻이 확정이고 «철자»가 잠정이다 — 다른 표기로 확정되면 ⛔ 변경 통지 대상이다."
+      "x-internal-note": "값 목록이 확정돼 enum 을 못박았다(2026-08-16). 그 전에는 「미확정이면 못박지 않는다」(공유계약 G-2)로 비워 두었으나, G-2 는 «미확정일 때» 규칙이고 업무가 확정했으므로 계약이 말해야 한다. ⚠ CUSTOMER·SUBCONTRACTOR·OTHER 는 뜻이 확정이고 «철자»가 잠정이다 — 다른 표기로 확정되면 ⛔ 변경 통지 대상이다.",
+      "x-code-key": "CD-ROLE-TYPE"
      },
      "roleTypeName": {
       "type": [
@@ -19466,7 +19520,8 @@
       "example": [
        "SUPPLIER",
        "DISPOSAL"
-      ]
+      ],
+      "x-code-key": "CD-ROLE-TYPE"
      }
     },
     "description": "거래처 역할 통째 교체. 빈 배열이면 역할을 모두 해제한다."
@@ -19544,7 +19599,8 @@
       "x-source-column": "status_code",
       "type": "string",
       "x-no-example": true,
-      "description": "단말의 가동 상태 — 가동중(RUNNING) · 정지(STOPPED) 둘뿐이다(사용자 결정 2026-09-02 — 폐기·분실은 이 축이 아니다). ⛔ isActive 와 «다른 축»이다 — isActive 는 켬/끔 스위치이고 폐기 수단이 아니다(W-CO-06 §5-4 — 끄고 다시 켜면 유출 토큰이 되살아난다. 실측 200 → 401 → 200). 분실·폐기는 이 값도 isActive 도 아닌 «재발급»이 담당한다(§5-4). ⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=TERMINAL_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. 근거: W-CO-06 §3 목업이 「가동중」을 그린다."
+      "description": "단말의 가동 상태 — 가동중(RUNNING) · 정지(STOPPED) 둘뿐이다(사용자 결정 2026-09-02 — 폐기·분실은 이 축이 아니다). ⛔ isActive 와 «다른 축»이다 — isActive 는 켬/끔 스위치이고 폐기 수단이 아니다(W-CO-06 §5-4 — 끄고 다시 켜면 유출 토큰이 되살아난다. 실측 200 → 401 → 200). 분실·폐기는 이 값도 isActive 도 아닌 «재발급»이 담당한다(§5-4). ⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=TERMINAL_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. 근거: W-CO-06 §3 목업이 「가동중」을 그린다.",
+      "x-code-key": "CD-TERMINAL-STATUS"
      },
      "isActive": {
       "type": "boolean",
@@ -20120,7 +20176,8 @@
       ],
       "example": "MONTH",
       "maxLength": 50,
-      "description": "검교정 주기 단위. calibrationRequired 가 참이면 주기 두 칸이 함께 필요하다 — 주기 없이는 차기 예정일을 산출할 수 없다. 주기 단위 — 일(DAY)·주(WEEK)·월(MONTH)·년(YEAR). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 검교정 주기와 점검 부여 주기가 «같은 그룹»이다 — 같은 종류의 값(기간 단위)이라 어휘를 두 벌 만들지 않는다. ⛔ 검사 «유형»(품질 IQC·PQC·OQC ↔ 설비 DAILY·MONTHLY·MAINTENANCE)은 종류가 달라 그룹을 가른다 — 공유계약 G-32. 근거: omf-mes#188"
+      "description": "검교정 주기 단위. calibrationRequired 가 참이면 주기 두 칸이 함께 필요하다 — 주기 없이는 차기 예정일을 산출할 수 없다. 주기 단위 — 일(DAY)·주(WEEK)·월(MONTH)·년(YEAR). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 검교정 주기와 점검 부여 주기가 «같은 그룹»이다 — 같은 종류의 값(기간 단위)이라 어휘를 두 벌 만들지 않는다. ⛔ 검사 «유형»(품질 IQC·PQC·OQC ↔ 설비 DAILY·MONTHLY·MAINTENANCE)은 종류가 달라 그룹을 가른다 — 공유계약 G-32. 근거: omf-mes#188",
+      "x-code-key": "CD-CYCLE-TYPE"
      },
      "calibrationCycleInterval": {
       "type": [
@@ -20206,7 +20263,8 @@
       ],
       "example": "MONTH",
       "maxLength": 50,
-      "description": "검교정 주기 단위. calibrationRequired 가 참이면 주기 두 칸이 함께 필요하다 — 주기 없이는 차기 예정일을 산출할 수 없다. 주기 단위 — 일(DAY)·주(WEEK)·월(MONTH)·년(YEAR). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 검교정 주기와 점검 부여 주기가 «같은 그룹»이다 — 같은 종류의 값(기간 단위)이라 어휘를 두 벌 만들지 않는다. ⛔ 검사 «유형»(품질 IQC·PQC·OQC ↔ 설비 DAILY·MONTHLY·MAINTENANCE)은 종류가 달라 그룹을 가른다 — 공유계약 G-32. 근거: omf-mes#188"
+      "description": "검교정 주기 단위. calibrationRequired 가 참이면 주기 두 칸이 함께 필요하다 — 주기 없이는 차기 예정일을 산출할 수 없다. 주기 단위 — 일(DAY)·주(WEEK)·월(MONTH)·년(YEAR). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 검교정 주기와 점검 부여 주기가 «같은 그룹»이다 — 같은 종류의 값(기간 단위)이라 어휘를 두 벌 만들지 않는다. ⛔ 검사 «유형»(품질 IQC·PQC·OQC ↔ 설비 DAILY·MONTHLY·MAINTENANCE)은 종류가 달라 그룹을 가른다 — 공유계약 G-32. 근거: omf-mes#188",
+      "x-code-key": "CD-CYCLE-TYPE"
      },
      "calibrationCycleInterval": {
       "type": [
@@ -20330,13 +20388,15 @@
       "type": "string",
       "example": "DAILY",
       "maxLength": 50,
-      "description": "점검 유형 — 일상(DAILY)·정기(MONTHLY)·보전(MAINTENANCE). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_INSPECTION_TYPE 로 받는다. ⚠ 품질 검사의 inspectionTypeCode(IQC·PQC·OQC)와 «같은 이름 다른 값» 이다 — 그룹을 가른다(공유계약 B-28 과 같은 원리). ⭐ 보전 항목은 이 마스터에 함께 있고 보전 지시(W-05-05)가 FK 로 참조한다 — 점검 입력 화면은 앞 둘만 보인다. 근거: 확정 QA #10 · omf-mes#186"
+      "description": "점검 유형 — 일상(DAILY)·정기(MONTHLY)·보전(MAINTENANCE). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_INSPECTION_TYPE 로 받는다. ⚠ 품질 검사의 inspectionTypeCode(IQC·PQC·OQC)와 «같은 이름 다른 값» 이다 — 그룹을 가른다(공유계약 B-28 과 같은 원리). ⭐ 보전 항목은 이 마스터에 함께 있고 보전 지시(W-05-05)가 FK 로 참조한다 — 점검 입력 화면은 앞 둘만 보인다. 근거: 확정 QA #10 · omf-mes#186",
+      "x-code-key": "CD-EQUIPMENT-INSPECTION-TYPE"
      },
      "judgmentMethodCode": {
       "type": "string",
       "example": "VISUAL",
       "maxLength": 50,
-      "description": "판정 방식 — 육안(VISUAL) 또는 측정값(MEASUREMENT). ⛔ 측정값이면 단위(uomId)·상하한(lowerLimit·upperLimit)이 «함께 필요하다». ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_INSPECTION_JUDGMENT_METHOD 로 받는다 — 이 값을 모르면 화면이 짝 제약을 걸 수 없어 등록·수정이 반드시 실패하는 경로가 된다(구현팀 실측 · omf-mes#186). 근거: WF05 S2"
+      "description": "판정 방식 — 육안(VISUAL) 또는 측정값(MEASUREMENT). ⛔ 측정값이면 단위(uomId)·상하한(lowerLimit·upperLimit)이 «함께 필요하다». ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_INSPECTION_JUDGMENT_METHOD 로 받는다 — 이 값을 모르면 화면이 짝 제약을 걸 수 없어 등록·수정이 반드시 실패하는 경로가 된다(구현팀 실측 · omf-mes#186). 근거: WF05 S2",
+      "x-code-key": "CD-EQUIPMENT-INSPECTION-JUDGMENT-METHOD"
      },
      "uomId": {
       "type": [
@@ -20422,13 +20482,15 @@
       "type": "string",
       "example": "DAILY",
       "maxLength": 50,
-      "description": "점검 유형 — 일상(DAILY)·정기(MONTHLY)·보전(MAINTENANCE). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_INSPECTION_TYPE 로 받는다. ⚠ 품질 검사의 inspectionTypeCode(IQC·PQC·OQC)와 «같은 이름 다른 값» 이다 — 그룹을 가른다(공유계약 B-28 과 같은 원리). ⭐ 보전 항목은 이 마스터에 함께 있고 보전 지시(W-05-05)가 FK 로 참조한다 — 점검 입력 화면은 앞 둘만 보인다. 근거: 확정 QA #10 · omf-mes#186"
+      "description": "점검 유형 — 일상(DAILY)·정기(MONTHLY)·보전(MAINTENANCE). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_INSPECTION_TYPE 로 받는다. ⚠ 품질 검사의 inspectionTypeCode(IQC·PQC·OQC)와 «같은 이름 다른 값» 이다 — 그룹을 가른다(공유계약 B-28 과 같은 원리). ⭐ 보전 항목은 이 마스터에 함께 있고 보전 지시(W-05-05)가 FK 로 참조한다 — 점검 입력 화면은 앞 둘만 보인다. 근거: 확정 QA #10 · omf-mes#186",
+      "x-code-key": "CD-EQUIPMENT-INSPECTION-TYPE"
      },
      "judgmentMethodCode": {
       "type": "string",
       "example": "VISUAL",
       "maxLength": 50,
-      "description": "판정 방식 — 육안(VISUAL) 또는 측정값(MEASUREMENT). ⛔ 측정값이면 단위(uomId)·상하한(lowerLimit·upperLimit)이 «함께 필요하다». ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_INSPECTION_JUDGMENT_METHOD 로 받는다 — 이 값을 모르면 화면이 짝 제약을 걸 수 없어 등록·수정이 반드시 실패하는 경로가 된다(구현팀 실측 · omf-mes#186). 근거: WF05 S2"
+      "description": "판정 방식 — 육안(VISUAL) 또는 측정값(MEASUREMENT). ⛔ 측정값이면 단위(uomId)·상하한(lowerLimit·upperLimit)이 «함께 필요하다». ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_INSPECTION_JUDGMENT_METHOD 로 받는다 — 이 값을 모르면 화면이 짝 제약을 걸 수 없어 등록·수정이 반드시 실패하는 경로가 된다(구현팀 실측 · omf-mes#186). 근거: WF05 S2",
+      "x-code-key": "CD-EQUIPMENT-INSPECTION-JUDGMENT-METHOD"
      },
      "uomId": {
       "type": [
@@ -20504,13 +20566,15 @@
       "type": "string",
       "example": "DAILY",
       "maxLength": 50,
-      "description": "점검 유형 — 일상(DAILY)·정기(MONTHLY)·보전(MAINTENANCE). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_INSPECTION_TYPE 로 받는다. ⚠ 품질 검사의 inspectionTypeCode(IQC·PQC·OQC)와 «같은 이름 다른 값» 이다 — 그룹을 가른다(공유계약 B-28 과 같은 원리). ⭐ 보전 항목은 이 마스터에 함께 있고 보전 지시(W-05-05)가 FK 로 참조한다 — 점검 입력 화면은 앞 둘만 보인다. 근거: 확정 QA #10 · omf-mes#186"
+      "description": "점검 유형 — 일상(DAILY)·정기(MONTHLY)·보전(MAINTENANCE). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_INSPECTION_TYPE 로 받는다. ⚠ 품질 검사의 inspectionTypeCode(IQC·PQC·OQC)와 «같은 이름 다른 값» 이다 — 그룹을 가른다(공유계약 B-28 과 같은 원리). ⭐ 보전 항목은 이 마스터에 함께 있고 보전 지시(W-05-05)가 FK 로 참조한다 — 점검 입력 화면은 앞 둘만 보인다. 근거: 확정 QA #10 · omf-mes#186",
+      "x-code-key": "CD-EQUIPMENT-INSPECTION-TYPE"
      },
      "judgmentMethodCode": {
       "type": "string",
       "example": "VISUAL",
       "maxLength": 50,
-      "description": "판정 방식 — 육안(VISUAL) 또는 측정값(MEASUREMENT). ⛔ 측정값이면 단위(uomId)·상하한(lowerLimit·upperLimit)이 «함께 필요하다». ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_INSPECTION_JUDGMENT_METHOD 로 받는다 — 이 값을 모르면 화면이 짝 제약을 걸 수 없어 등록·수정이 반드시 실패하는 경로가 된다(구현팀 실측 · omf-mes#186). 근거: WF05 S2"
+      "description": "판정 방식 — 육안(VISUAL) 또는 측정값(MEASUREMENT). ⛔ 측정값이면 단위(uomId)·상하한(lowerLimit·upperLimit)이 «함께 필요하다». ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_INSPECTION_JUDGMENT_METHOD 로 받는다 — 이 값을 모르면 화면이 짝 제약을 걸 수 없어 등록·수정이 반드시 실패하는 경로가 된다(구현팀 실측 · omf-mes#186). 근거: WF05 S2",
+      "x-code-key": "CD-EQUIPMENT-INSPECTION-JUDGMENT-METHOD"
      },
      "uomId": {
       "type": [
@@ -20623,13 +20687,15 @@
       "type": "string",
       "example": "DAILY",
       "maxLength": 50,
-      "description": "점검 유형 — 일상(DAILY)·정기(MONTHLY)·보전(MAINTENANCE). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_INSPECTION_TYPE 로 받는다. ⚠ 품질 검사의 inspectionTypeCode(IQC·PQC·OQC)와 «같은 이름 다른 값» 이다 — 그룹을 가른다(공유계약 B-28 과 같은 원리). ⭐ 보전 항목은 이 마스터에 함께 있고 보전 지시(W-05-05)가 FK 로 참조한다 — 점검 입력 화면은 앞 둘만 보인다. 근거: 확정 QA #10 · omf-mes#186"
+      "description": "점검 유형 — 일상(DAILY)·정기(MONTHLY)·보전(MAINTENANCE). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_INSPECTION_TYPE 로 받는다. ⚠ 품질 검사의 inspectionTypeCode(IQC·PQC·OQC)와 «같은 이름 다른 값» 이다 — 그룹을 가른다(공유계약 B-28 과 같은 원리). ⭐ 보전 항목은 이 마스터에 함께 있고 보전 지시(W-05-05)가 FK 로 참조한다 — 점검 입력 화면은 앞 둘만 보인다. 근거: 확정 QA #10 · omf-mes#186",
+      "x-code-key": "CD-EQUIPMENT-INSPECTION-TYPE"
      },
      "judgmentMethodCode": {
       "type": "string",
       "example": "VISUAL",
       "maxLength": 50,
-      "description": "판정 방식 — 육안(VISUAL) 또는 측정값(MEASUREMENT). ⛔ 측정값이면 단위(uomId)·상하한(lowerLimit·upperLimit)이 «함께 필요하다». ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_INSPECTION_JUDGMENT_METHOD 로 받는다 — 이 값을 모르면 화면이 짝 제약을 걸 수 없어 등록·수정이 반드시 실패하는 경로가 된다(구현팀 실측 · omf-mes#186). 근거: WF05 S2"
+      "description": "판정 방식 — 육안(VISUAL) 또는 측정값(MEASUREMENT). ⛔ 측정값이면 단위(uomId)·상하한(lowerLimit·upperLimit)이 «함께 필요하다». ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_INSPECTION_JUDGMENT_METHOD 로 받는다 — 이 값을 모르면 화면이 짝 제약을 걸 수 없어 등록·수정이 반드시 실패하는 경로가 된다(구현팀 실측 · omf-mes#186). 근거: WF05 S2",
+      "x-code-key": "CD-EQUIPMENT-INSPECTION-JUDGMENT-METHOD"
      },
      "uomId": {
       "type": [
@@ -20679,7 +20745,8 @@
       "type": "string",
       "example": "DAY",
       "maxLength": 50,
-      "description": "주기 단위 — 일(DAY)·주(WEEK)·월(MONTH)·년(YEAR). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 검교정 주기와 점검 부여 주기가 «같은 그룹»이다 — 같은 종류의 값(기간 단위)이라 어휘를 두 벌 만들지 않는다. ⛔ 검사 «유형»(품질 IQC·PQC·OQC ↔ 설비 DAILY·MONTHLY·MAINTENANCE)은 종류가 달라 그룹을 가른다 — 공유계약 G-32. 근거: omf-mes#188"
+      "description": "주기 단위 — 일(DAY)·주(WEEK)·월(MONTH)·년(YEAR). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 검교정 주기와 점검 부여 주기가 «같은 그룹»이다 — 같은 종류의 값(기간 단위)이라 어휘를 두 벌 만들지 않는다. ⛔ 검사 «유형»(품질 IQC·PQC·OQC ↔ 설비 DAILY·MONTHLY·MAINTENANCE)은 종류가 달라 그룹을 가른다 — 공유계약 G-32. 근거: omf-mes#188",
+      "x-code-key": "CD-CYCLE-TYPE"
      },
      "cycleInterval": {
       "type": "integer",
@@ -20720,7 +20787,8 @@
       "type": "string",
       "example": "DAY",
       "maxLength": 50,
-      "description": "주기 단위 — 일(DAY)·주(WEEK)·월(MONTH)·년(YEAR). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 검교정 주기와 점검 부여 주기가 «같은 그룹»이다 — 같은 종류의 값(기간 단위)이라 어휘를 두 벌 만들지 않는다. ⛔ 검사 «유형»(품질 IQC·PQC·OQC ↔ 설비 DAILY·MONTHLY·MAINTENANCE)은 종류가 달라 그룹을 가른다 — 공유계약 G-32. 근거: omf-mes#188"
+      "description": "주기 단위 — 일(DAY)·주(WEEK)·월(MONTH)·년(YEAR). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 검교정 주기와 점검 부여 주기가 «같은 그룹»이다 — 같은 종류의 값(기간 단위)이라 어휘를 두 벌 만들지 않는다. ⛔ 검사 «유형»(품질 IQC·PQC·OQC ↔ 설비 DAILY·MONTHLY·MAINTENANCE)은 종류가 달라 그룹을 가른다 — 공유계약 G-32. 근거: omf-mes#188",
+      "x-code-key": "CD-CYCLE-TYPE"
      },
      "cycleInterval": {
       "type": "integer",
@@ -20797,7 +20865,8 @@
        "EQUIPMENT_GROUP",
        "NONE"
       ],
-      "description": "effective 가 어느 층에서 왔는가. NONE 이면 점검 대상이 아니며 화면은 입력을 열지 않는다"
+      "description": "effective 가 어느 층에서 왔는가. NONE 이면 점검 대상이 아니며 화면은 입력을 열지 않는다",
+      "x-code-key": "CD-RESOLVED-FROM-LEVEL"
      },
      "resolvedFromGroupId": {
       "type": [
@@ -20898,7 +20967,8 @@
       "example": "IN_SERVICE",
       "maxLength": 50,
       "description": "자산 수명주기 — 운용 또는 폐기 두 값. 고장·보전 중·비가동은 거래가 만드는 조건이라 마스터에 적지 않는다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_STATUS 로 받는다 — 설비·툴·계측기가 같은 규칙을 쓴다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다",
-      "x-source-column": "status_code"
+      "x-source-column": "status_code",
+      "x-code-key": "CD-EQUIPMENT-STATUS"
      },
      "isActive": {
       "type": "boolean",
@@ -20929,7 +20999,8 @@
       ],
       "maxLength": 50,
       "example": "MONTH",
-      "description": "날짜 주기 단위 — 일(DAY)·주(WEEK)·월(MONTH)·년(YEAR). ⚠ 2026-09-02 정정 — 이 자리가 「일 또는 월」 2값으로 적혀 있었으나 omf-mes#188 이 검교정 주기 단위와 «한 그룹»으로 합치며 4값으로 확정했고 형제 자리(calibrationCycleTypeCode)는 4값을 적고 있었다. 같은 그룹을 가리키는 두 자리가 다른 목록을 말하던 것을 맞춘다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다"
+      "description": "날짜 주기 단위 — 일(DAY)·주(WEEK)·월(MONTH)·년(YEAR). ⚠ 2026-09-02 정정 — 이 자리가 「일 또는 월」 2값으로 적혀 있었으나 omf-mes#188 이 검교정 주기 단위와 «한 그룹»으로 합치며 4값으로 확정했고 형제 자리(calibrationCycleTypeCode)는 4값을 적고 있었다. 같은 그룹을 가리키는 두 자리가 다른 목록을 말하던 것을 맞춘다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다",
+      "x-code-key": "CD-CYCLE-TYPE"
      },
      "lastPmDate": {
       "type": [
@@ -21044,7 +21115,8 @@
       ],
       "maxLength": 50,
       "example": "MONTH",
-      "description": "날짜 주기 단위 — 일(DAY)·주(WEEK)·월(MONTH)·년(YEAR). ⚠ 2026-09-02 정정 — 이 자리가 「일 또는 월」 2값으로 적혀 있었으나 omf-mes#188 이 검교정 주기 단위와 «한 그룹»으로 합치며 4값으로 확정했고 형제 자리(calibrationCycleTypeCode)는 4값을 적고 있었다. 같은 그룹을 가리키는 두 자리가 다른 목록을 말하던 것을 맞춘다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다"
+      "description": "날짜 주기 단위 — 일(DAY)·주(WEEK)·월(MONTH)·년(YEAR). ⚠ 2026-09-02 정정 — 이 자리가 「일 또는 월」 2값으로 적혀 있었으나 omf-mes#188 이 검교정 주기 단위와 «한 그룹»으로 합치며 4값으로 확정했고 형제 자리(calibrationCycleTypeCode)는 4값을 적고 있었다. 같은 그룹을 가리키는 두 자리가 다른 목록을 말하던 것을 맞춘다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다",
+      "x-code-key": "CD-CYCLE-TYPE"
      }
     }
    },
@@ -21113,7 +21185,8 @@
       ],
       "maxLength": 50,
       "example": "MONTH",
-      "description": "날짜 주기 단위 — 일(DAY)·주(WEEK)·월(MONTH)·년(YEAR). ⚠ 2026-09-02 정정 — 이 자리가 「일 또는 월」 2값으로 적혀 있었으나 omf-mes#188 이 검교정 주기 단위와 «한 그룹»으로 합치며 4값으로 확정했고 형제 자리(calibrationCycleTypeCode)는 4값을 적고 있었다. 같은 그룹을 가리키는 두 자리가 다른 목록을 말하던 것을 맞춘다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다"
+      "description": "날짜 주기 단위 — 일(DAY)·주(WEEK)·월(MONTH)·년(YEAR). ⚠ 2026-09-02 정정 — 이 자리가 「일 또는 월」 2값으로 적혀 있었으나 omf-mes#188 이 검교정 주기 단위와 «한 그룹»으로 합치며 4값으로 확정했고 형제 자리(calibrationCycleTypeCode)는 4값을 적고 있었다. 같은 그룹을 가리키는 두 자리가 다른 목록을 말하던 것을 맞춘다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다",
+      "x-code-key": "CD-CYCLE-TYPE"
      }
     }
    },
@@ -21415,7 +21488,8 @@
        "HOLIDAY",
        "PARTIAL"
       ],
-      "description": "가동 · 휴무 · 부분 가동. 부분 가동은 반일 근무를 담는다 — 휴무로 처리하면 조업시간이 통째로 빠져 가동률이 틀린다"
+      "description": "가동 · 휴무 · 부분 가동. 부분 가동은 반일 근무를 담는다 — 휴무로 처리하면 조업시간이 통째로 빠져 가동률이 틀린다",
+      "x-code-key": "CD-DAY-TYPE"
      },
      "startTime": {
       "type": [
@@ -21440,7 +21514,8 @@
       ],
       "example": "PUBLIC_HOLIDAY",
       "maxLength": 50,
-      "description": "공통코드 — 값 목록이 확정되지 않았다 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_CALENDAR_DAY_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "공통코드 — 값 목록이 확정되지 않았다 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_CALENDAR_DAY_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-WORK-CALENDAR-DAY-REASON"
      },
      "remarks": {
       "type": [
@@ -21512,7 +21587,8 @@
        "PLANT",
        "EQUIPMENT_GROUP"
       ],
-      "description": "대상 유형. 한 칸이 상황에 따라 다른 표를 가리키므로 대응을 계약이 정한다 — PLANT → mdm.plant · EQUIPMENT_GROUP → mdm.production_line"
+      "description": "대상 유형. 한 칸이 상황에 따라 다른 표를 가리키므로 대응을 계약이 정한다 — PLANT → mdm.plant · EQUIPMENT_GROUP → mdm.production_line",
+      "x-code-key": "CD-LEVEL"
      },
      "targetId": {
       "type": "integer",
@@ -21551,7 +21627,8 @@
        "PLANT",
        "EQUIPMENT_GROUP"
       ],
-      "description": "PLANT → mdm.plant · EQUIPMENT_GROUP → mdm.production_line"
+      "description": "PLANT → mdm.plant · EQUIPMENT_GROUP → mdm.production_line",
+      "x-code-key": "CD-LEVEL"
      },
      "targetId": {
       "type": "integer",
@@ -21584,7 +21661,8 @@
       "enum": [
        "EQUIPMENT_GROUP",
        "PLANT"
-      ]
+      ],
+      "x-code-key": "CD-LEVEL"
      },
      "targetId": {
       "type": "integer",
@@ -21719,7 +21797,8 @@
        "INBOUND",
        "OUTBOUND"
       ],
-      "description": "수신 또는 송신"
+      "description": "수신 또는 송신",
+      "x-code-key": "CD-DIRECTION"
      },
      "targetCode": {
       "type": "string",
@@ -21736,7 +21815,8 @@
        "TRACKING_SYSTEM",
        "EQUIPMENT_STANDARD_IF"
       ],
-      "description": "외부 시스템 셋. 기간계(UNIERP)는 마스터 연계, 추적관리시스템은 제품 바코드 이력, 설비 표준 연계는 실적·측정값을 나른다 — 성격이 전혀 다른데 같은 「연계」로 불리므로 축을 나눠 둔다"
+      "description": "외부 시스템 셋. 기간계(UNIERP)는 마스터 연계, 추적관리시스템은 제품 바코드 이력, 설비 표준 연계는 실적·측정값을 나른다 — 성격이 전혀 다른데 같은 「연계」로 불리므로 축을 나눠 둔다",
+      "x-code-key": "CD-EXTERNAL-SYSTEM"
      },
      "triggerTypeCode": {
       "type": "string",
@@ -21745,7 +21825,8 @@
        "TIME_SCHEDULE",
        "EVENT"
       ],
-      "description": "주기로 도는가 사건에 반응하는가"
+      "description": "주기로 도는가 사건에 반응하는가",
+      "x-code-key": "CD-TRIGGER-TYPE"
      },
      "scheduleExpression": {
       "type": [
@@ -21816,7 +21897,8 @@
        "INBOUND",
        "OUTBOUND"
       ],
-      "description": "수신 또는 송신"
+      "description": "수신 또는 송신",
+      "x-code-key": "CD-DIRECTION"
      },
      "targetCode": {
       "type": "string",
@@ -21833,7 +21915,8 @@
        "TRACKING_SYSTEM",
        "EQUIPMENT_STANDARD_IF"
       ],
-      "description": "외부 시스템 셋. 기간계(UNIERP)는 마스터 연계, 추적관리시스템은 제품 바코드 이력, 설비 표준 연계는 실적·측정값을 나른다 — 성격이 전혀 다른데 같은 「연계」로 불리므로 축을 나눠 둔다"
+      "description": "외부 시스템 셋. 기간계(UNIERP)는 마스터 연계, 추적관리시스템은 제품 바코드 이력, 설비 표준 연계는 실적·측정값을 나른다 — 성격이 전혀 다른데 같은 「연계」로 불리므로 축을 나눠 둔다",
+      "x-code-key": "CD-EXTERNAL-SYSTEM"
      },
      "triggerTypeCode": {
       "type": "string",
@@ -21842,7 +21925,8 @@
        "TIME_SCHEDULE",
        "EVENT"
       ],
-      "description": "주기로 도는가 사건에 반응하는가"
+      "description": "주기로 도는가 사건에 반응하는가",
+      "x-code-key": "CD-TRIGGER-TYPE"
      },
      "scheduleExpression": {
       "type": [
@@ -21908,7 +21992,8 @@
        "INBOUND",
        "OUTBOUND"
       ],
-      "description": "수신 또는 송신"
+      "description": "수신 또는 송신",
+      "x-code-key": "CD-DIRECTION"
      },
      "targetCode": {
       "type": "string",
@@ -21925,7 +22010,8 @@
        "TRACKING_SYSTEM",
        "EQUIPMENT_STANDARD_IF"
       ],
-      "description": "외부 시스템 셋. 기간계(UNIERP)는 마스터 연계, 추적관리시스템은 제품 바코드 이력, 설비 표준 연계는 실적·측정값을 나른다 — 성격이 전혀 다른데 같은 「연계」로 불리므로 축을 나눠 둔다"
+      "description": "외부 시스템 셋. 기간계(UNIERP)는 마스터 연계, 추적관리시스템은 제품 바코드 이력, 설비 표준 연계는 실적·측정값을 나른다 — 성격이 전혀 다른데 같은 「연계」로 불리므로 축을 나눠 둔다",
+      "x-code-key": "CD-EXTERNAL-SYSTEM"
      },
      "triggerTypeCode": {
       "type": "string",
@@ -21934,7 +22020,8 @@
        "TIME_SCHEDULE",
        "EVENT"
       ],
-      "description": "주기로 도는가 사건에 반응하는가"
+      "description": "주기로 도는가 사건에 반응하는가",
+      "x-code-key": "CD-TRIGGER-TYPE"
      },
      "scheduleExpression": {
       "type": [
@@ -22049,7 +22136,8 @@
        "RETURN",
        "STOCK_ADJUSTMENT"
       ],
-      "description": "생산 실적 · 입고 · 출하 · 반품 · 실사 조정 다섯. 검사 결과는 목록에 없다"
+      "description": "생산 실적 · 입고 · 출하 · 반품 · 실사 조정 다섯. 검사 결과는 목록에 없다",
+      "x-code-key": "CD-OUTBOUND-ITEM"
      },
      "outboundItemName": {
       "type": "string",
@@ -22141,7 +22229,8 @@
        "SHIPMENT_PGI",
        "RETURN",
        "STOCK_ADJUSTMENT"
-      ]
+      ],
+      "x-code-key": "CD-OUTBOUND-ITEM"
      },
      "enabled": {
       "type": "boolean",
