@@ -274,7 +274,13 @@ def judge_row(line: str, keys: set, dic: dict, registry: set) -> tuple[list, lis
         union |= values
         if values and STALE.search(line) and not settled:
             stale.append((key, "·".join(sorted(values))))
-    if not union:
+    # ⛔ 「이미 판단했다」 표식이 붙은 줄은 ㉯ 도 보지 않는다 — ㉮ 와 같은 이유다.
+    #    그 줄은 값을 «주장»하는 것이 아니라 «인용»한다. 작성 규칙 5 가 정한 자리다:
+    #    「회고·반박 서술이라 옛 이름을 인용해야 뜻이 통할 때 «(구표기 보존)»」.
+    #    ⛔ 2026-09-03 실측 — `W-CO-02` 가 「⛔ `ACTIVE` 를 «쓰지 않는다»」로 적은
+    #    부정문의 토큰을 ㉯ 가 값으로 셌다. 폐기한 이름을 «왜 안 쓰는지» 적는 것은
+    #    이 저장소가 권장하는 일이라(`G-32` v3.5 선례), 그것을 ⛔ 로 세면 안 된다.
+    if not union or settled:
         return stale, []
     off = [t for t in sorted(set(VALUE.findall(line)))
            if t not in union and t not in registry and t not in NOT_A_VALUE]
