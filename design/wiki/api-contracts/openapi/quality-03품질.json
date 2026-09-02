@@ -2905,7 +2905,8 @@
       "x-source-column": "source_code",
       "type": "string",
       "x-no-example": true,
-      "description": "원천 축 — FIELD(현장)·PQC·OQC·REPAIR(수리)·CLAIM(클레임) 5종(공유계약 결정 09). REPAIR 는 M-02-02 착수 전까지 실적 0건. 2026-08-30 되살림 — productionResultId/inspectionResultId 2단 조인 대신 이 축으로 직접 필터한다"
+      "description": "불량 기록의 원천 — 현장(FIELD) · 공정검사(PQC) · 출하검사(OQC) · 수리(REPAIR) · 클레임(CLAIM) 5값(✓설계확정 결정 09). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=DEFECT_RECORD_SOURCE 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-DEFECT-RECORD-SOURCE"
      },
      "workOrderId": {
       "type": [
@@ -4043,7 +4044,8 @@
      },
      "reasonCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-LOT-HOLD-REASON"
      },
      "releaseCondition": {
       "type": "string",

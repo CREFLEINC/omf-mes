@@ -4917,7 +4917,8 @@
        "null"
       ],
       "description": "OVERRIDDEN 일 때만 보낸다. 자유 텍스트가 아니라 코드다",
-      "example": "EMERGENCY_WORK_ORDER"
+      "example": "EMERGENCY_WORK_ORDER",
+      "x-code-key": "CD-CONTROL-OVERRIDE-REASON"
      }
     }
    },

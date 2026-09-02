@@ -8087,7 +8087,11 @@
        "MICROMETER",
        "GAUGE"
       ],
-      "description": "설비 유형으로 거른다 — 값 여럿을 쉼표로 이어 보낸다. 한 화면이 «계열 전체»를 한 번에 걸러야 해서 여럿을 받는다. 계측기 마스터 관리(W-05-11)는 계측기 계열 그룹(INSTRUMENT_TYPE)의 값 전체를, 설비·설비그룹 마스터(W-05-12)는 설비 계열 그룹(EQUIPMENT_TYPE)의 값 전체를 싣는다. 두 그룹 다 값이 확정됐다 — 계측기 3값 · 설비 3값(INJECTION_MOLDING·PRESS·WATER_HEATER). 걸지 않으면 두 계열이 함께 나온다. ⭐ 값 목록은 화면이 쓰는 «계열»의 그룹에서 받는다 — GET /mdm/code-values?codeGroupCode=INSTRUMENT_TYPE(W-05-11) 또는 GET /mdm/code-values?codeGroupCode=EQUIPMENT_TYPE(W-05-12). ⛔ 한 그룹만 불러 다른 계열을 거르면 목록이 조용히 빈다 — 계열마다 그룹이 갈려 있다(공유계약 G-32 · omf-mes#219). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "설비 유형으로 거른다 — 값 여럿을 쉼표로 이어 보낸다. 한 화면이 «계열 전체»를 한 번에 걸러야 해서 여럿을 받는다. 계측기 마스터 관리(W-05-11)는 계측기 계열 그룹(INSTRUMENT_TYPE)의 값 전체를, 설비·설비그룹 마스터(W-05-12)는 설비 계열 그룹(EQUIPMENT_TYPE)의 값 전체를 싣는다. 두 그룹 다 값이 확정됐다 — 계측기 3값 · 설비 3값(INJECTION_MOLDING·PRESS·WATER_HEATER). 걸지 않으면 두 계열이 함께 나온다. ⭐ 값 목록은 화면이 쓰는 «계열»의 그룹에서 받는다 — GET /mdm/code-values?codeGroupCode=INSTRUMENT_TYPE(W-05-11) 또는 GET /mdm/code-values?codeGroupCode=EQUIPMENT_TYPE(W-05-12). ⛔ 한 그룹만 불러 다른 계열을 거르면 목록이 조용히 빈다 — 계열마다 그룹이 갈려 있다(공유계약 G-32 · omf-mes#219). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": [
+       "CD-EQUIPMENT-TYPE",
+       "CD-INSTRUMENT-TYPE"
+      ]
      },
      {
       "name": "calibrationRequired",
@@ -16176,8 +16180,9 @@
       "type": "string",
       "maxLength": 50,
       "default": "FIFO",
-      "description": "MES 확장 · 확정(QA #28) — 유효기한 관리 품목=FEFO, 나머지=FIFO",
-      "example": "FIFO"
+      "description": "선입선출 정책 — 입고순(FIFO) · 유효기한순(FEFO). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 피킹 정렬이 이 값에 걸린다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=FIFO_POLICY 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "FIFO",
+      "x-code-key": "CD-FIFO-POLICY"
      },
      "negativeStockAllowed": {
       "x-source-column": "negative_stock_allowed",
@@ -16219,8 +16224,9 @@
       "type": "string",
       "maxLength": 50,
       "x-no-example": true,
-      "description": "신재와 재생재를 가르는 MES 안쪽 구분. 기간계로 보내지 않는다 — 기간계에는 신재와 똑같이 처리한다. 근거: DR-006 확정 · M-01-12 §5-B. ⚠ 값 목록이 아직 확정되지 않았다 — 서버가 내려주는 선택지를 그대로 쓴다(공유계약 G-2)",
-      "x-internal-note": "물리 모델에 아직 없는 컬럼이다(M-01-12 §5-B 가 [신설] 로 표시). 함께 바뀌는 것이 유일 제약이다 — item_code 단독 UNIQUE 가 (item_code, mes_category_code) 복합 유일이 된다. 부분 유일 인덱스가 아니라 복합 유일인 이유는 구분 코드가 모든 행에 있기 때문이다(기본 NEW). W-05-07 채널 매핑과 해법이 갈리는 자리다 — 공유계약 A-19 둘째 사례. 모델 요청은 omf-mes#64 「재생재 하위 코드」 항목."
+      "description": "MES 구분 — 신재(NEW) · 재생재(RECYCLED). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. `(item_code, mes_category_code)` 복합 유일 인덱스가 이 값에 걸려 있어 같은 품목코드의 신재·재생재를 두 행으로 가른다(M-01-12 §5-B). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=MES_CATEGORY 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-internal-note": "물리 모델에 아직 없는 컬럼이다(M-01-12 §5-B 가 [신설] 로 표시). 함께 바뀌는 것이 유일 제약이다 — item_code 단독 UNIQUE 가 (item_code, mes_category_code) 복합 유일이 된다. 부분 유일 인덱스가 아니라 복합 유일인 이유는 구분 코드가 모든 행에 있기 때문이다(기본 NEW). W-05-07 채널 매핑과 해법이 갈리는 자리다 — 공유계약 A-19 둘째 사례. 모델 요청은 omf-mes#64 「재생재 하위 코드」 항목.",
+      "x-code-key": "CD-MES-CATEGORY"
      },
      "developmentItem": {
       "type": "boolean",
@@ -16296,8 +16302,9 @@
       "type": "string",
       "maxLength": 50,
       "example": "FIFO",
-      "description": "MES 확장 · 확정(QA #28) — 유효기한 관리 품목=FEFO, 나머지=FIFO",
-      "x-internal-note": "값 목록의 정본은 Item.fifoPolicyCode 의 description 이다 — 편집 본문에만 값을 다시 적으면 두 벌이 되어 갈린다. 06-API-요구서.md v0.4 620행이 「동작이 걸릴 법한 이름」 후속을 남겼고 그 후속은 이번 회차 범위 밖이다."
+      "description": "선입선출 정책 — 입고순(FIFO) · 유효기한순(FEFO). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 피킹 정렬이 이 값에 걸린다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=FIFO_POLICY 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-internal-note": "값 목록의 정본은 Item.fifoPolicyCode 의 description 이다 — 편집 본문에만 값을 다시 적으면 두 벌이 되어 갈린다. 06-API-요구서.md v0.4 620행이 「동작이 걸릴 법한 이름」 후속을 남겼고 그 후속은 이번 회차 범위 밖이다.",
+      "x-code-key": "CD-FIFO-POLICY"
      },
      "negativeStockAllowed": {
       "x-source-column": "negative_stock_allowed",
@@ -19105,7 +19112,11 @@
       "type": "string",
       "maxLength": 50,
       "description": "공통코드 — 계열마다 그룹이 다르다. ⭐ 계측기 계열은 GET /mdm/code-values?codeGroupCode=INSTRUMENT_TYPE 로 받는다(CALIPER·MICROMETER·GAUGE). 설비 계열은 codeGroupCode=EQUIPMENT_TYPE 이며 INJECTION_MOLDING(사출기)·PRESS(프레스)·WATER_HEATER(온수기) 세 값이다. ⚠ 한 컬럼에 두 계열이 착지하므로 화면은 «자기 계열의 그룹만» 부른다",
-      "example": "CALIPER"
+      "example": "CALIPER",
+      "x-code-key": [
+       "CD-EQUIPMENT-TYPE",
+       "CD-INSTRUMENT-TYPE"
+      ]
      },
      "locationId": {
       "x-source-column": "location_id",
@@ -19665,7 +19676,8 @@
      },
      "statusCode": {
       "type": "string",
-      "x-no-example": true
+      "x-no-example": true,
+      "x-code-key": "CD-TERMINAL-STATUS"
      }
     }
    },
@@ -19704,7 +19716,8 @@
      },
      "statusCode": {
       "type": "string",
-      "x-no-example": true
+      "x-no-example": true,
+      "x-code-key": "CD-TERMINAL-STATUS"
      }
     }
    },
@@ -20145,7 +20158,11 @@
       "type": "string",
       "example": "CALIPER",
       "maxLength": 50,
-      "description": "공통코드 — 계열마다 그룹이 다르다. ⭐ 계측기 계열은 GET /mdm/code-values?codeGroupCode=INSTRUMENT_TYPE 로 받는다(CALIPER·MICROMETER·GAUGE). 설비 계열은 codeGroupCode=EQUIPMENT_TYPE 이며 INJECTION_MOLDING(사출기)·PRESS(프레스)·WATER_HEATER(온수기) 세 값이다. ⚠ 한 컬럼에 두 계열이 착지하므로 화면은 «자기 계열의 그룹만» 부른다 — 합치면 계측기 등록 선택칸에 설비 유형이 뜬다"
+      "description": "공통코드 — 계열마다 그룹이 다르다. ⭐ 계측기 계열은 GET /mdm/code-values?codeGroupCode=INSTRUMENT_TYPE 로 받는다(CALIPER·MICROMETER·GAUGE). 설비 계열은 codeGroupCode=EQUIPMENT_TYPE 이며 INJECTION_MOLDING(사출기)·PRESS(프레스)·WATER_HEATER(온수기) 세 값이다. ⚠ 한 컬럼에 두 계열이 착지하므로 화면은 «자기 계열의 그룹만» 부른다 — 합치면 계측기 등록 선택칸에 설비 유형이 뜬다",
+      "x-code-key": [
+       "CD-EQUIPMENT-TYPE",
+       "CD-INSTRUMENT-TYPE"
+      ]
      },
      "productionLineId": {
       "type": [
@@ -20232,7 +20249,11 @@
       "type": "string",
       "example": "CALIPER",
       "maxLength": 50,
-      "description": "공통코드 — 계열마다 그룹이 다르다. ⭐ 계측기 계열은 GET /mdm/code-values?codeGroupCode=INSTRUMENT_TYPE 로 받는다(CALIPER·MICROMETER·GAUGE). 설비 계열은 codeGroupCode=EQUIPMENT_TYPE 이며 INJECTION_MOLDING(사출기)·PRESS(프레스)·WATER_HEATER(온수기) 세 값이다. ⚠ 한 컬럼에 두 계열이 착지하므로 화면은 «자기 계열의 그룹만» 부른다 — 합치면 계측기 등록 선택칸에 설비 유형이 뜬다"
+      "description": "공통코드 — 계열마다 그룹이 다르다. ⭐ 계측기 계열은 GET /mdm/code-values?codeGroupCode=INSTRUMENT_TYPE 로 받는다(CALIPER·MICROMETER·GAUGE). 설비 계열은 codeGroupCode=EQUIPMENT_TYPE 이며 INJECTION_MOLDING(사출기)·PRESS(프레스)·WATER_HEATER(온수기) 세 값이다. ⚠ 한 컬럼에 두 계열이 착지하므로 화면은 «자기 계열의 그룹만» 부른다 — 합치면 계측기 등록 선택칸에 설비 유형이 뜬다",
+      "x-code-key": [
+       "CD-EQUIPMENT-TYPE",
+       "CD-INSTRUMENT-TYPE"
+      ]
      },
      "productionLineId": {
       "type": [

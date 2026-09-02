@@ -32,7 +32,9 @@
    (`MATERIAL`·`SHIPMENT`·`PRODUCTION`)은 앞의 둘이 겹친다. 값으로 세는 한
    「이 자리가 어느 키인가」는 **검사기가 답할 수 없는 물음**이었다.
 
-⇒ 계약이 `*Code` 자리에 `x-code-key: "CD-…"` 를 «직접» 적는다(275자리 · 2026-09-02).
+⇒ 계약이 `*Code` 자리에 `x-code-key: "CD-…"` 를 «직접» 적는다(2026-09-02).
+   ⭐ 값은 문자열 «또는 배열»이다 — 한 자리가 두 «계열»을 함께 받는 경우가 있다
+   (`equipment_type_code` = 설비 계열 ＋ 계측기 계열 · `omf-mes#219`).
    스키마 프로퍼티는 프로퍼티 객체 안에, 쿼리 파라미터는 파라미터 객체 안에 둔다.
    그러면 판정이 **자리 자신이 말하는 것**이 되고 검사기는 대조만 한다.
 
@@ -204,9 +206,21 @@ def scan() -> dict[str, list[tuple]]:
 # ⭐ 아래 넷은 «순수 함수»다 — 파일을 읽지 않는다. 테스트가 지어낸 자리·사전으로
 #    부를 수 있어야 ㉠㉡㉢ 이 실제로 ⛔ 를 내는지 잠글 수 있다.
 
-def place_key(place: tuple) -> str | None:
-    """이 자리에 적힌 `x-code-key`. 옛 여섯 칸 튜플이면 None 이다."""
+def place_key(place: tuple):
+    """이 자리에 적힌 `x-code-key`. 옛 여섯 칸 튜플이면 None 이다.
+
+    ⭐ 문자열 «또는 배열»이다(2026-09-02 확장). 한 자리가 두 «계열»을 함께 받는 경우가
+    실재한다 — `mdm.equipment.equipment_type_code` 는 설비 계열과 계측기 계열 둘 다에서
+    값이 온다(`G-32` · `omf-mes#219`). 1:1 을 전제하면 그 자리는 «영영» 키를 못 갖는다.
+    """
     return place[6] if len(place) > 6 else None
+
+
+def key_list(key) -> list:
+    """키를 언제나 목록으로 — 문자열 하나든 배열이든."""
+    if key is None:
+        return []
+    return list(key) if isinstance(key, (list, tuple)) else [key]
 
 
 def place_landed(place: tuple) -> bool:
@@ -222,7 +236,8 @@ def key_sites(found: dict[str, list[tuple]]) -> list[tuple]:
             key = place_key(p)
             if key:
                 out.append((name, p[0], p[1], p[2], p[4], p[5], key))
-    return sorted(out, key=lambda x: (x[6], x[1], x[3]))
+    # ⚠ 키가 «배열»일 수 있어 그대로 정렬하면 list < str 로 터진다 — 문자열로 눕힌다.
+    return sorted(out, key=lambda x: (" + ".join(key_list(x[6])), x[1], x[3]))
 
 
 def check_keys(sites: list[tuple], entries: list[dict]) -> tuple[list, list, list]:
@@ -241,20 +256,25 @@ def check_keys(sites: list[tuple], entries: list[dict]) -> tuple[list, list, lis
     enum_gap: list = []
     ptr_gap: list = []
     for name, f, kind, path, enum, ptr, key in sites:
-        e = by_key.get(key)
-        if e is None:
-            unknown.append((name, f, kind, path, key))
+        keys = key_list(key)
+        es = [by_key.get(k) for k in keys]
+        if any(e is None for e in es):
+            unknown.append((name, f, kind, path,
+                            " + ".join(k for k, e in zip(keys, es) if e is None)))
             continue
+        # ⭐ 키가 여럿이면 «합집합» 으로 본다 — 「이 자리는 이 키들 중 하나다」이므로
+        #    값도 그룹도 그 합이 그 자리가 받을 수 있는 전부다.
+        shown = " + ".join(keys)
         if enum:
-            want = set(e["values"])
+            want = set().union(*(set(e["values"]) for e in es))
             got = {x for x in enum if x is not None}   # nullable 자리는 None 이 섞인다
             if want and want != got:
-                enum_gap.append((name, f, kind, path, key, sorted(want), sorted(got)))
+                enum_gap.append((name, f, kind, path, shown, sorted(want), sorted(got)))
         if ptr:
-            want_g = set(e["group"])
+            want_g = set().union(*(set(e["group"]) for e in es))
             got_g = set(ptr)
             if want_g != got_g:
-                ptr_gap.append((name, f, kind, path, key,
+                ptr_gap.append((name, f, kind, path, shown,
                                 sorted(want_g), sorted(got_g)))
     return unknown, enum_gap, ptr_gap
 
@@ -442,8 +462,8 @@ def main() -> int:
         tagged_by_key: dict[str, list] = defaultdict(list)
         for name, places in found.items():
             for p in places:
-                k = place_key(p)
-                if k:
+                # ⭐ 키가 배열이면 그 자리는 «키마다» 센다 — 두 계열을 함께 받는 자리다.
+                for k in key_list(place_key(p)):
                     tagged_by_key[k].append((p[0], p[1], p[2], p[3], name))
 
         for e in entries:

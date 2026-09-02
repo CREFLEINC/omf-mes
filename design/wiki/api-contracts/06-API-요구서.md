@@ -227,6 +227,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 변경 이력 | `GET /audit/events` | §5-1 · B-5 |
 | 품목 추가 | **없음 — 범위 밖(의도적).** 품목은 **ERP 정본 수신본**이라 이 화면이 만들지 않는다 | §5-1 원문 · QA #3 |
 | ⭐ **버전 상태 표시명** | **`GET /mdm/code-values?codeGroupCode=MASTER_VERSION_STATUS`** — ⛔ **계약은 `statusCode` 만 내리고 표시명을 안 내린다.** 값 = `DRAFT`·`CONFIRMED`·`OBSOLETE`(**2026-09-02 신설** · 결정 07 을 `Bom`·`InspectionPlanVersion` 이 준용) | G-32 · K-5 |
+| ⭐ **선입선출 정책 표시명** | **`GET /mdm/code-values?codeGroupCode=FIFO_POLICY`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `FIFO`(입고순)·`FEFO`(유효기한순)(**2026-09-02 등재**) | G-32 · K-5 |
 
 - **`bom`은 읽기 전용**이다(QA #3 ERP 정본). 예외가 하나 있다 — `POST /planning/boms/{bomId}:set-default`. §5-1 액션 목록에는 없고 **§6 예외표의 「기본 BOM 전환」**이 요구한 것이다. 부분 유일 인덱스 `uq_bom_default`는 **동시에 둘을 막을 뿐 자동 전환을 해 주지 않으므로**, 화면이 「해제 → 설정」 2회를 부르면 그 사이에 **기본 BOM이 0개인 상태**가 생긴다. 단일 액션으로 노출하고 서버가 한 트랜잭션으로 처리한다(A-6).
 - `bom_component`를 **컬렉션 전체 치환이 아니라 행 단위 PUT**으로 뒀다. 순번이 ERP 원본이라 재배치가 이 API의 대상이 아니고, 편집 가능한 4열이 서로 독립적이라 A-5의 전제(중간 상태가 유일 제약을 위반)가 성립하지 않는다.
