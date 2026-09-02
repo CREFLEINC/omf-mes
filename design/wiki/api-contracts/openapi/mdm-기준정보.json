@@ -7392,7 +7392,7 @@
        ],
        "example": "APP_USER"
       },
-      "description": "감사 대상으로 거른다. 감사 대상 유형 — 사용자(APP_USER) · 역할(ROLE) · 작업자(WORKER) · 단말(TERMINAL) · 품목(ITEM) · 라우팅(ROUTING) · 검사기준 버전(INSPECTION_PLAN_VERSION). ⭐ 값 일곱은 공유계약 B-6 이 「회수 기록은 audit.audit_event 다」로 «명시»한 부여·회수 9테이블의 «소유 마스터»다(사용자 결정 2026-09-03) — user_role · user_data_scope → APP_USER · role_permission → ROLE · worker_qualification → WORKER · terminal_process → TERMINAL · item_uom_conversion·item_external_code → ITEM · routing_operation_dependency → ROUTING · inspection_item_spec → INSPECTION_PLAN_VERSION. ⛔ 다형 참조 판별자라 값이 «우리 계약의 대상 표 이름»이다 — 고객이 늘릴 수 없고 공통코드 그룹으로 받지 않는다(A-10 · A-16 「가르는 물음 넷」 — 「가」·「나」 참). ⚠ 대상이 늘면 «화면이 문자열을 정해 넣기 전에» 계약이 먼저 값을 갖는다(A-16). ⚠ 개체 마스터(창고·위치·설비·금형·거래처 등)는 여기 들지 않는다 — 「무엇이 있나」가 바뀔 뿐 과거 판정이 소급해 달라지지 않고, B-4 물리 삭제 금지와 version_no 낙관적 잠금이 이미 받는다. 버전을 가진 마스터도 빠진다 — 결정 07 이 「변경 이력 요구는 Rev 이력 그 자체로 충족」이라 했다.",
+      "description": "감사 대상으로 거른다. 감사 대상 유형 — 사용자(APP_USER) · 역할(ROLE) · 작업자(WORKER) · 단말(TERMINAL) · 품목(ITEM) · 라우팅(ROUTING) · 검사기준 버전(INSPECTION_PLAN_VERSION). ⭐ 값 일곱은 사용자와 협의해 확정했다(2026-09-03) — 변경 이력이 «남아야 하는» 마스터만 든다. ⛔ 다형 참조 판별자라 값이 «우리 계약의 대상 표 이름»이다 — 고객이 늘릴 수 없고 공통코드 그룹으로 받지 않는다(A-10 · A-16 「가르는 물음 넷」 — 「가」·「나」 참). ⚠ 대상이 늘면 «화면이 문자열을 정해 넣기 전에» 계약이 먼저 값을 갖는다(A-16). ⚠ 개체 마스터(창고·위치·설비·금형·거래처 등)는 여기 들지 않는다 — 「무엇이 있나」가 바뀔 뿐 과거 판정이 소급해 달라지지 않고, B-4 물리 삭제 금지와 version_no 낙관적 잠금이 이미 받는다. 버전을 가진 마스터도 빠진다 — 결정 07 이 「변경 이력 요구는 Rev 이력 그 자체로 충족」이라 했다.",
       "x-code-key": "CD-AUDIT-TARGET-TYPE"
      },
      {
@@ -15191,7 +15191,7 @@
       "type": "string",
       "maxLength": 50,
       "default": "FINISH_TO_START",
-      "description": "공정 선후관계 유형 — 종료-시작(FINISH_TO_START · 기본) · 시작-시작 · 종료-종료 · 시작-종료. ⭐ 물리 모델이 이미 DEFAULT 'FINISH_TO_START' 를 갖고 있어 기본값은 확정이다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 일정 계산의 의미론이라 고객 관행으로 늘지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=ROUTING_OPERATION_DEPENDENCY_TYPE 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "공정 선후관계 유형 — 종료-시작(FINISH_TO_START · 기본) · 시작-시작 · 종료-종료 · 시작-종료. ⭐ 기본은 종료-시작(FINISH_TO_START)이다 — 사용자와 협의해 확정했다(2026-09-03). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 일정 계산의 의미론이라 고객 관행으로 늘지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=ROUTING_OPERATION_DEPENDENCY_TYPE 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "FINISH_TO_START",
       "x-code-key": "CD-ROUTING-OPERATION-DEPENDENCY-TYPE"
      }
@@ -16208,7 +16208,7 @@
      "lotControlled": {
       "x-source-column": "lot_controlled",
       "type": "boolean",
-      "description": "LOT 단위로 재고를 관리하는 품목인가. ⭐ 코드형(lot_control_type_code)에서 boolean 으로 접었다(사용자 결정 2026-09-02) — 「관리 여부」 한 축뿐이고 «방식»을 가르는 값이 계약·스펙·시드 어디에도 0건이었다. 같은 필드표가 이미 여부를 boolean 으로 둔다(inspectionRequired · negativeStockAllowed). ⛔ 물리 컬럼 변경이 필요하다 — 현재 mdm.item.lot_control_type_code(code_t)를 lot_controlled(boolean)로 바꾼다. ⚠ 유효기한 관리처럼 «플래그 없이» 표현할 수는 없다 — 담을 짝 컬럼이 없다.",
+      "description": "LOT 단위로 재고를 관리하는 품목인가. ⭐ 코드형(lot_control_type_code)에서 boolean 으로 접었다(사용자 결정 2026-09-02) — 「관리 여부」 한 축뿐이고 «방식»을 가르는 값이 계약·스펙·시드 어디에도 0건이었다. 같은 필드표가 이미 여부를 boolean 으로 둔다(inspectionRequired · negativeStockAllowed). ⛔ 설계가 정한 모양이 boolean 이므로 모델이 그것을 따라온다 — 📨 데이터 모델 작업 통지 대상이고 기다리지 않는다(00-화면스펙서식 §2 「물리 데이터 모델은 설계 결정을 앞설 수 없다」 · 사용자 확정 2026-08-18).",
       "example": true
      },
      "serialControlTypeCode": {
@@ -16335,7 +16335,7 @@
      "lotControlled": {
       "x-source-column": "lot_controlled",
       "type": "boolean",
-      "description": "LOT 단위로 재고를 관리하는 품목인가. ⭐ 코드형(lot_control_type_code)에서 boolean 으로 접었다(사용자 결정 2026-09-02) — 「관리 여부」 한 축뿐이고 «방식»을 가르는 값이 계약·스펙·시드 어디에도 0건이었다. 같은 필드표가 이미 여부를 boolean 으로 둔다(inspectionRequired · negativeStockAllowed). ⛔ 물리 컬럼 변경이 필요하다 — 현재 mdm.item.lot_control_type_code(code_t)를 lot_controlled(boolean)로 바꾼다. ⚠ 유효기한 관리처럼 «플래그 없이» 표현할 수는 없다 — 담을 짝 컬럼이 없다.",
+      "description": "LOT 단위로 재고를 관리하는 품목인가. ⭐ 코드형(lot_control_type_code)에서 boolean 으로 접었다(사용자 결정 2026-09-02) — 「관리 여부」 한 축뿐이고 «방식»을 가르는 값이 계약·스펙·시드 어디에도 0건이었다. 같은 필드표가 이미 여부를 boolean 으로 둔다(inspectionRequired · negativeStockAllowed). ⛔ 설계가 정한 모양이 boolean 이므로 모델이 그것을 따라온다 — 📨 데이터 모델 작업 통지 대상이고 기다리지 않는다(00-화면스펙서식 §2 「물리 데이터 모델은 설계 결정을 앞설 수 없다」 · 사용자 확정 2026-08-18).",
       "example": true
      },
      "serialControlTypeCode": {
@@ -17412,7 +17412,7 @@
       "maxLength": 50,
       "example": "STANDARD",
       "x-code-key": "CD-INSPECTION-FREQUENCY-INTERVAL-UOM",
-      "description": "검사 주기의 단위 — 시간(HOUR) · 수량(QUANTITY). ⭐ 물리 모델 주석이 「주기 파라미터: N시간·N수량」이라 적어 두 축을 확정했다(W-06-02 §4). ⚠ frequencyIntervalValue 와 짝이다 — 한쪽만 채우면 안 되나 DB CHECK 가 없어 화면·서버가 진다(A-2). ⛔ 기준단위 마스터(mdm.uom)와 다른 축이다 — 여기는 «주기»의 단위다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY_INTERVAL_UOM 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "검사 주기의 단위 — 시간(HOUR) · 수량(QUANTITY). ⭐ 두 축은 사용자와 협의해 확정했다(2026-09-03). ⚠ frequencyIntervalValue 와 짝이다 — 한쪽만 채우면 안 되고 그 짝 제약은 화면·서버가 진다(A-2 · W-06-02 §8-3). ⛔ 품목의 기준단위(uomCode)와 다른 축이다 — 여기는 «주기»의 단위다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY_INTERVAL_UOM 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "statusCode": {
       "x-source-column": "status_code",
@@ -17528,7 +17528,7 @@
       "maxLength": 50,
       "example": "STANDARD",
       "x-code-key": "CD-INSPECTION-FREQUENCY-INTERVAL-UOM",
-      "description": "검사 주기의 단위 — 시간(HOUR) · 수량(QUANTITY). ⭐ 물리 모델 주석이 「주기 파라미터: N시간·N수량」이라 적어 두 축을 확정했다(W-06-02 §4). ⚠ frequencyIntervalValue 와 짝이다 — 한쪽만 채우면 안 되나 DB CHECK 가 없어 화면·서버가 진다(A-2). ⛔ 기준단위 마스터(mdm.uom)와 다른 축이다 — 여기는 «주기»의 단위다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY_INTERVAL_UOM 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "검사 주기의 단위 — 시간(HOUR) · 수량(QUANTITY). ⭐ 두 축은 사용자와 협의해 확정했다(2026-09-03). ⚠ frequencyIntervalValue 와 짝이다 — 한쪽만 채우면 안 되고 그 짝 제약은 화면·서버가 진다(A-2 · W-06-02 §8-3). ⛔ 품목의 기준단위(uomCode)와 다른 축이다 — 여기는 «주기»의 단위다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY_INTERVAL_UOM 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "samplingRatio": {
       "type": [
@@ -17628,7 +17628,7 @@
       "maxLength": 50,
       "example": "STANDARD",
       "x-code-key": "CD-INSPECTION-FREQUENCY-INTERVAL-UOM",
-      "description": "검사 주기의 단위 — 시간(HOUR) · 수량(QUANTITY). ⭐ 물리 모델 주석이 「주기 파라미터: N시간·N수량」이라 적어 두 축을 확정했다(W-06-02 §4). ⚠ frequencyIntervalValue 와 짝이다 — 한쪽만 채우면 안 되나 DB CHECK 가 없어 화면·서버가 진다(A-2). ⛔ 기준단위 마스터(mdm.uom)와 다른 축이다 — 여기는 «주기»의 단위다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY_INTERVAL_UOM 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "검사 주기의 단위 — 시간(HOUR) · 수량(QUANTITY). ⭐ 두 축은 사용자와 협의해 확정했다(2026-09-03). ⚠ frequencyIntervalValue 와 짝이다 — 한쪽만 채우면 안 되고 그 짝 제약은 화면·서버가 진다(A-2 · W-06-02 §8-3). ⛔ 품목의 기준단위(uomCode)와 다른 축이다 — 여기는 «주기»의 단위다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY_INTERVAL_UOM 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "samplingRatio": {
       "type": [
@@ -18709,7 +18709,7 @@
       "x-source-column": "target_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "감사 대상 유형 — 사용자(APP_USER) · 역할(ROLE) · 작업자(WORKER) · 단말(TERMINAL) · 품목(ITEM) · 라우팅(ROUTING) · 검사기준 버전(INSPECTION_PLAN_VERSION). ⭐ 값 일곱은 공유계약 B-6 이 「회수 기록은 audit.audit_event 다」로 «명시»한 부여·회수 9테이블의 «소유 마스터»다(사용자 결정 2026-09-03) — user_role · user_data_scope → APP_USER · role_permission → ROLE · worker_qualification → WORKER · terminal_process → TERMINAL · item_uom_conversion·item_external_code → ITEM · routing_operation_dependency → ROUTING · inspection_item_spec → INSPECTION_PLAN_VERSION. ⛔ 다형 참조 판별자라 값이 «우리 계약의 대상 표 이름»이다 — 고객이 늘릴 수 없고 공통코드 그룹으로 받지 않는다(A-10 · A-16 「가르는 물음 넷」 — 「가」·「나」 참). ⚠ 대상이 늘면 «화면이 문자열을 정해 넣기 전에» 계약이 먼저 값을 갖는다(A-16). ⚠ 개체 마스터(창고·위치·설비·금형·거래처 등)는 여기 들지 않는다 — 「무엇이 있나」가 바뀔 뿐 과거 판정이 소급해 달라지지 않고, B-4 물리 삭제 금지와 version_no 낙관적 잠금이 이미 받는다. 버전을 가진 마스터도 빠진다 — 결정 07 이 「변경 이력 요구는 Rev 이력 그 자체로 충족」이라 했다.",
+      "description": "감사 대상 유형 — 사용자(APP_USER) · 역할(ROLE) · 작업자(WORKER) · 단말(TERMINAL) · 품목(ITEM) · 라우팅(ROUTING) · 검사기준 버전(INSPECTION_PLAN_VERSION). ⭐ 값 일곱은 사용자와 협의해 확정했다(2026-09-03) — 변경 이력이 «남아야 하는» 마스터만 든다. ⛔ 다형 참조 판별자라 값이 «우리 계약의 대상 표 이름»이다 — 고객이 늘릴 수 없고 공통코드 그룹으로 받지 않는다(A-10 · A-16 「가르는 물음 넷」 — 「가」·「나」 참). ⚠ 대상이 늘면 «화면이 문자열을 정해 넣기 전에» 계약이 먼저 값을 갖는다(A-16). ⚠ 개체 마스터(창고·위치·설비·금형·거래처 등)는 여기 들지 않는다 — 「무엇이 있나」가 바뀔 뿐 과거 판정이 소급해 달라지지 않고, B-4 물리 삭제 금지와 version_no 낙관적 잠금이 이미 받는다. 버전을 가진 마스터도 빠진다 — 결정 07 이 「변경 이력 요구는 Rev 이력 그 자체로 충족」이라 했다.",
       "example": "APP_USER",
       "x-code-key": "CD-AUDIT-TARGET-TYPE",
       "enum": [
