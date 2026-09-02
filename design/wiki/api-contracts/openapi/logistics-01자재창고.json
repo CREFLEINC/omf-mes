@@ -7584,7 +7584,7 @@
        "null"
       ],
       "description": "유형 «안»의 구분 — 입고면 자재·제품·반품·이관, 출고면 생산·공급사 반품·출하·그 밖. ⚠ documentTypeCode 에 따라 «가리키는 그룹이 다르다» — 입고 계열은 RECEIPT_TYPE, 출고 계열은 ISSUE_TYPE 이다. 그 밖의 유형에는 비어 있다. 값 목록은 GET /mdm/code-values?codeGroupCode=RECEIPT_TYPE 또는 GET /mdm/code-values?codeGroupCode=ISSUE_TYPE 로 받는다(공유계약 G-32).",
-      "example": "NORMAL",
+      "example": "PRODUCTION",
       "x-code-key": [
        "CD-RECEIPT-TYPE",
        "CD-ISSUE-TYPE"
@@ -7941,8 +7941,8 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "반품·폐기 등의 사유. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=GOODS_ISSUE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "SUPPLIER_RETURN",
+      "description": "반품·폐기 등의 사유. 값 = IQC_FAIL·OVER_RECEIPT·DEFECT_AFTER_RECEIPT·WRONG_SHIPMENT·OTHER (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=GOODS_ISSUE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "IQC_FAIL",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-GOODS-ISSUE-REASON"
      },
@@ -8072,8 +8072,8 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "사유. 반품·기타 출고에서는 필수. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=GOODS_ISSUE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "SUPPLIER_RETURN",
+      "description": "사유. 반품·기타 출고에서는 필수. 값 = IQC_FAIL·OVER_RECEIPT·DEFECT_AFTER_RECEIPT·WRONG_SHIPMENT·OTHER (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=GOODS_ISSUE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "IQC_FAIL",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-GOODS-ISSUE-REASON"
      },
@@ -8810,7 +8810,7 @@
       "x-source-column": "handling_unit_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "취급 단위 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=HANDLING_UNIT_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "취급 단위 유형. 값 = BOX·CART·PALLET (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=HANDLING_UNIT_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "PALLET",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-HANDLING-UNIT-TYPE"
@@ -8966,7 +8966,7 @@
       "x-source-column": "handling_unit_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "취급 단위 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=HANDLING_UNIT_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "취급 단위 유형. 값 = BOX·CART·PALLET (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=HANDLING_UNIT_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "PALLET",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-HANDLING-UNIT-TYPE"
@@ -9247,8 +9247,8 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "P/O 없이 도착한 예외 입하의 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INBOUND_RECEIPT_EXCEPTION_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "NO_PO",
+      "description": "P/O 없이 도착한 예외 입하의 유형. 값 = CUSTOMER_SUPPLY·FREE_SAMPLE·URGENT_RECEIPT·OVER_DELIVERY (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INBOUND_RECEIPT_EXCEPTION_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "CUSTOMER_SUPPLY",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-INBOUND-RECEIPT-EXCEPTION-TYPE"
      },
@@ -9365,8 +9365,8 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "P/O 를 고르지 않고 진행할 때 필수. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INBOUND_RECEIPT_EXCEPTION_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "NO_PO",
+      "description": "P/O 를 고르지 않고 진행할 때 필수. 값 = CUSTOMER_SUPPLY·FREE_SAMPLE·URGENT_RECEIPT·OVER_DELIVERY (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INBOUND_RECEIPT_EXCEPTION_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "CUSTOMER_SUPPLY",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-INBOUND-RECEIPT-EXCEPTION-TYPE"
      },
@@ -9534,7 +9534,7 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "supplierLotMissing 이 참일 때의 사유. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=SUBSTITUTE_LOT_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "supplierLotMissing 이 참일 때의 사유. 값 = NO_LABEL·LABEL_DAMAGED·FORMAT_UNRECOGNIZED·BULK_UNLABELED·OTHER (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=SUBSTITUTE_LOT_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "NO_LABEL",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-SUBSTITUTE-LOT-REASON"
@@ -9684,7 +9684,7 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "supplierLotMissing 이 참일 때 필수. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=SUBSTITUTE_LOT_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "supplierLotMissing 이 참일 때 필수. 값 = NO_LABEL·LABEL_DAMAGED·FORMAT_UNRECOGNIZED·BULK_UNLABELED·OTHER (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=SUBSTITUTE_LOT_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "NO_LABEL",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-SUBSTITUTE-LOT-REASON"
@@ -9763,7 +9763,7 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "초과분 쪽에서 쓰는 예외 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INBOUND_RECEIPT_EXCEPTION_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "초과분 쪽에서 쓰는 예외 유형. 값 = CUSTOMER_SUPPLY·FREE_SAMPLE·URGENT_RECEIPT·OVER_DELIVERY (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INBOUND_RECEIPT_EXCEPTION_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "OVER_DELIVERY",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-INBOUND-RECEIPT-EXCEPTION-TYPE"
@@ -9960,7 +9960,7 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "차이 사유. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⛔ 선택이다 — 「무엇이 틀렸나」는 varianceTypeCode 가 이미 필수로 받는다. 현장이 사유를 모를 때 오류 기록 자체가 막히면 안 된다. 근거: M-01-06 §4-A(2026-08-18 정정) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INBOUND_VARIANCE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "차이 사유. 값 = DAMAGED·MISLABELED·SUPPLIER_MISSHIP·PACKAGING_DEFECT·OTHER (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⛔ 선택이다 — 「무엇이 틀렸나」는 varianceTypeCode 가 이미 필수로 받는다. 현장이 사유를 모를 때 오류 기록 자체가 막히면 안 된다. 근거: M-01-06 §4-A(2026-08-18 정정) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INBOUND_VARIANCE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "DAMAGED",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-INBOUND-VARIANCE-REASON"
@@ -10013,7 +10013,7 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "차이 사유. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⛔ 선택이다 — 「무엇이 틀렸나」는 varianceTypeCode 가 이미 필수로 받는다. 현장이 사유를 모를 때 오류 기록 자체가 막히면 안 된다. 근거: M-01-06 §4-A(2026-08-18 정정) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INBOUND_VARIANCE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "차이 사유. 값 = DAMAGED·MISLABELED·SUPPLIER_MISSHIP·PACKAGING_DEFECT·OTHER (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⛔ 선택이다 — 「무엇이 틀렸나」는 varianceTypeCode 가 이미 필수로 받는다. 현장이 사유를 모를 때 오류 기록 자체가 막히면 안 된다. 근거: M-01-06 §4-A(2026-08-18 정정) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INBOUND_VARIANCE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "DAMAGED",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-INBOUND-VARIANCE-REASON"
@@ -10071,7 +10071,7 @@
       "x-source-column": "reason_code",
       "type": "string",
       "maxLength": 50,
-      "description": "헤더 사유. 비울 수 없다. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INVENTORY_ADJUSTMENT_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "헤더 사유. 비울 수 없다. 값 = COUNT_VARIANCE·TRANSPORT_DAMAGE·HOPPER_MEASUREMENT·SYSTEM_ERROR_CORRECTION·OTHER (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INVENTORY_ADJUSTMENT_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "COUNT_VARIANCE",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-INVENTORY-ADJUSTMENT-REASON"
@@ -10134,7 +10134,7 @@
       "x-source-column": "reason_code",
       "type": "string",
       "maxLength": 50,
-      "description": "헤더 사유. 비울 수 없다. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INVENTORY_ADJUSTMENT_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "헤더 사유. 비울 수 없다. 값 = COUNT_VARIANCE·TRANSPORT_DAMAGE·HOPPER_MEASUREMENT·SYSTEM_ERROR_CORRECTION·OTHER (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INVENTORY_ADJUSTMENT_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "COUNT_VARIANCE",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-INVENTORY-ADJUSTMENT-REASON"
@@ -10678,7 +10678,7 @@
       "x-source-column": "count_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "실사 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INVENTORY_COUNT_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "실사 유형. 값 = PERIODIC·ADHOC·CYCLE (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INVENTORY_COUNT_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "CYCLE",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-INVENTORY-COUNT-TYPE"
@@ -10742,7 +10742,7 @@
       "x-source-column": "count_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "실사 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INVENTORY_COUNT_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "실사 유형. 값 = PERIODIC·ADHOC·CYCLE (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INVENTORY_COUNT_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "CYCLE",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-INVENTORY-COUNT-TYPE"
@@ -10874,7 +10874,7 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "차이 사유. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=VARIANCE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "차이 사유. 값 = MISPLACED·DAMAGED_IN_TRANSIT·SPILL·COUNT_ERROR·THEFT_LOSS·EVAPORATION_LOSS (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=VARIANCE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "MISPLACED",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-VARIANCE-REASON"
@@ -11052,7 +11052,7 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "차이가 0 이 아니면 필수. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=VARIANCE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "차이가 0 이 아니면 필수. 값 = MISPLACED·DAMAGED_IN_TRANSIT·SPILL·COUNT_ERROR·THEFT_LOSS·EVAPORATION_LOSS (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=VARIANCE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "MISPLACED",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-VARIANCE-REASON"
@@ -11153,7 +11153,7 @@
       "x-source-column": "reservation_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "예약 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=RESERVATION_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "예약 유형. 값 = MATERIAL·SHIPMENT·PRODUCTION (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=RESERVATION_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "MATERIAL",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-RESERVATION-TYPE"
@@ -11630,7 +11630,7 @@
       "x-source-column": "lot_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "LOT 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
+      "description": "LOT 유형. 값 = MATERIAL·PRODUCTION·PRODUCT (2026-09-03 코드 사전 등재) — ⛔ 고객이 편집할 수 없다 — 우리가 정한 값이다",
       "example": "MATERIAL",
       "x-internal-note": "⛔ PRODUCTION → PRODUCT 전이 쓰기가 계약 7벌에 0건이다(실측). 갈래가 둘이다 — ⓐ 동일 행 유지(제품LOT 은 완제품 창고에 선 PRODUCTION LOT 을 부르는 이름) ⓑ 제품 LOT 별도 발번(발번 화면·POST 경로·W-03-01 유형별 분리 집계를 함께 세워야 한다). 사람 결정 대기 — 경계 B6-01. CLOSED 영향: W-01-07·W-01-04·W-02-04·W-02-05·W-03-01·W-03-02·W-03-03·M-01-04.",
       "x-code-key": "CD-LOT-TYPE"
@@ -11866,7 +11866,7 @@
       "x-source-column": "lot_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "LOT 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
+      "description": "LOT 유형. 값 = MATERIAL·PRODUCTION·PRODUCT (2026-09-03 코드 사전 등재) — ⛔ 고객이 편집할 수 없다 — 우리가 정한 값이다",
       "example": "MATERIAL",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-LOT-TYPE"
@@ -12008,7 +12008,7 @@
       "x-source-column": "identifier_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "식별자 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_EXTERNAL_IDENTIFIER_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "식별자 유형. 값 = SUPPLIER_LOT·ERP_LOT·CUSTOMER_LOT·SUBCONTRACTOR_LOT (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_EXTERNAL_IDENTIFIER_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "SUPPLIER_LOT",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-LOT-EXTERNAL-IDENTIFIER-TYPE"
@@ -12075,7 +12075,7 @@
       "x-source-column": "identifier_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "식별자 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_EXTERNAL_IDENTIFIER_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "식별자 유형. 값 = SUPPLIER_LOT·ERP_LOT·CUSTOMER_LOT·SUBCONTRACTOR_LOT (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_EXTERNAL_IDENTIFIER_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "SUPPLIER_LOT",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-LOT-EXTERNAL-IDENTIFIER-TYPE"
@@ -13003,8 +13003,8 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "held 가 참일 때의 사유. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "QUALITY_HOLD",
+      "description": "held 가 참일 때의 사유. 값 = INCOMING_INSPECTION_WAIT·FOREIGN_MATTER_SUSPECTED·DIMENSION_ABNORMAL·APPEARANCE_ABNORMAL·CLAIM_RECALL·OTHER (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "INCOMING_INSPECTION_WAIT",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-LOT-HOLD-REASON"
      },
@@ -13140,7 +13140,7 @@
       "x-source-column": "picking_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "피킹 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PICKING_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "피킹 유형. 값 = MATERIAL·SHIPMENT (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PICKING_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "MATERIAL",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-PICKING-TYPE"
@@ -13795,7 +13795,7 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "임시 적재 사유. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PUTAWAY_TASK_TEMPORARY_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "임시 적재 사유. 값 = NO_SPACE·INSPECTION_HOLD·LOCATION_UNASSIGNED·OTHER (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PUTAWAY_TASK_TEMPORARY_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "NO_SPACE",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-PUTAWAY-TASK-TEMPORARY-REASON"
@@ -14204,7 +14204,7 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "차이 사유. 차이가 0 이 아니면 필수. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=VARIANCE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "차이 사유. 차이가 0 이 아니면 필수. 값 = MISPLACED·DAMAGED_IN_TRANSIT·SPILL·COUNT_ERROR·THEFT_LOSS·EVAPORATION_LOSS (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=VARIANCE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "SPILL",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-VARIANCE-REASON"
@@ -14267,7 +14267,7 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "차이가 0 이 아니면 필수. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=VARIANCE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "차이가 0 이 아니면 필수. 값 = MISPLACED·DAMAGED_IN_TRANSIT·SPILL·COUNT_ERROR·THEFT_LOSS·EVAPORATION_LOSS (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=VARIANCE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "SPILL",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-VARIANCE-REASON"

@@ -380,5 +380,111 @@ class 등록부와_사전이_1대1인가(unittest.TestCase):
         self.assertEqual(len(keys), len(set(keys)))
 
 
+# ── ㉦㉧ 계약의 예시·산문이 사전과 같은 말을 하는가 ──────────────────────
+#
+# ⛔ 2026-09-03 신설. 사전이 닫힌(639/639) 뒤에도 계약 83자리가 낡아 있었다 —
+# `example` 이 값집합 밖 52 · 산문이 「확정된 값 목록이 아직 없다」 31.
+# ㉡ 는 `enum` 만 봤고, 값을 나르는 나머지 두 자리는 아무도 안 보고 있었다.
+
+def prop(key, example=None, desc=None):
+    node = {"type": "string", "x-code-key": key}
+    if example is not None:
+        node["example"] = example
+    if desc is not None:
+        node["description"] = desc
+    return {"components": {"schemas": {"S": {"properties": {"aCode": node}}}}}
+
+
+class ProseExampleGapsTest(unittest.TestCase):
+    VALS = {"CD-A": {"ALPHA", "BETA"}, "CD-B": {"GAMMA"}}
+
+    def test_example_이_값집합_밖이면_잡는다(self):
+        ex, pr = cd.prose_example_gaps(prop("CD-A", example="STANDARD"), self.VALS)
+        self.assertEqual(len(ex), 1)
+        self.assertEqual(ex[0][2], "STANDARD")
+        self.assertEqual(pr, [])
+
+    def test_example_이_값집합_안이면_잡지_않는다(self):
+        ex, _ = cd.prose_example_gaps(prop("CD-A", example="ALPHA"), self.VALS)
+        self.assertEqual(ex, [])
+
+    def test_자리채움_값도_같은_규칙으로_잡힌다(self):
+        for junk in ("값", "STANDARD", "NORMAL"):
+            ex, _ = cd.prose_example_gaps(prop("CD-A", example=junk), self.VALS)
+            self.assertEqual(len(ex), 1, junk)
+
+    def test_사전에_값이_없으면_예시를_판정하지_않는다(self):
+        # ⬜ 갈래(고객이 운영 중에 채운다)는 우리가 예시를 정할 근거가 없다.
+        ex, _ = cd.prose_example_gaps(prop("CD-C", example="ANY"), self.VALS)
+        self.assertEqual(ex, [])
+
+    def test_키가_둘이면_합집합으로_본다(self):
+        doc = {"components": {"schemas": {"S": {"properties": {"aCode": {
+            "type": "string", "x-code-key": ["CD-A", "CD-B"], "example": "GAMMA"}}}}}}
+        ex, _ = cd.prose_example_gaps(doc, self.VALS)
+        self.assertEqual(ex, [])
+
+    def test_산문이_아직_없다고_적는데_사전은_값을_가지면_잡는다(self):
+        doc = prop("CD-A", desc="확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 쓴다")
+        _, pr = cd.prose_example_gaps(doc, self.VALS)
+        self.assertEqual(len(pr), 1)
+
+    def test_값_목록_미정도_같은_문면으로_본다(self):
+        _, pr = cd.prose_example_gaps(prop("CD-A", desc="공통코드 — 값 목록 미정"), self.VALS)
+        self.assertEqual(len(pr), 1)
+
+    def test_값을_적은_산문은_잡지_않는다(self):
+        doc = prop("CD-A", desc="값 = ALPHA·BETA (2026-09-03 코드 사전 등재)")
+        _, pr = cd.prose_example_gaps(doc, self.VALS)
+        self.assertEqual(pr, [])
+
+    def test_키가_없는_자리는_보지_않는다(self):
+        doc = {"components": {"schemas": {"S": {"properties": {"aCode": {
+            "type": "string", "example": "STANDARD", "description": "값 목록 미정"}}}}}}
+        ex, pr = cd.prose_example_gaps(doc, self.VALS)
+        self.assertEqual((ex, pr), ([], []))
+
+
+class SelfCountGapsTest(unittest.TestCase):
+    FACTS = {"키": 174, "자리": 491, "그룹": 103}
+
+    def test_문면이_실물과_같으면_통과한다(self):
+        text = "⭐ **174키 / 491자리.** 등록부 **103그룹 전부**와 …"
+        self.assertEqual(cd.self_count_gaps(text, self.FACTS), [])
+
+    def test_키_수가_어긋나면_잡는다(self):
+        gaps = cd.self_count_gaps("**103키 / 491자리.** 등록부 **103그룹 전부**", self.FACTS)
+        self.assertEqual(len(gaps), 1)
+        self.assertIn("문면 103", gaps[0])
+
+    def test_자리_수가_어긋나면_잡는다(self):
+        gaps = cd.self_count_gaps("**174키 / 257자리.**", self.FACTS)
+        self.assertEqual(len(gaps), 1)
+        self.assertIn("자리", gaps[0])
+
+    def test_등록부_그룹_수가_어긋나면_잡는다(self):
+        gaps = cd.self_count_gaps("등록부 **62그룹 전부**", self.FACTS)
+        self.assertEqual(len(gaps), 1)
+        self.assertIn("그룹", gaps[0])
+
+    def test_같은_수를_두_번_적으면_두_번_본다(self):
+        text = "**174키 / 491자리.** … 사전 — **103키 / 257자리**"
+        gaps = cd.self_count_gaps(text, self.FACTS)
+        self.assertEqual(len(gaps), 2)
+
+    def test_수를_안_적으면_잡을_것이_없다(self):
+        self.assertEqual(cd.self_count_gaps("계수를 적지 않았다", self.FACTS), [])
+
+    def test_실물_사전이_자기_계수와_맞는다(self):
+        import importlib
+        ptr = importlib.import_module("check-code-group-pointer")
+        entries = cd.read_dictionary(cd.DICT)
+        facts = {"키": len(entries),
+                 "자리": sum(e["places"] or 0 for e in entries),
+                 "그룹": len(ptr.load_registry())}
+        with open(cd.DICT, encoding="utf-8") as fh:
+            self.assertEqual(cd.self_count_gaps(fh.read(), facts), [])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

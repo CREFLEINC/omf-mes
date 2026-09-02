@@ -68,7 +68,7 @@
 | 품목 | `item_id` | FK → `mdm.item` | ✅ | 유일키 구성 | 좌측 선택 품목으로 고정 | 신규만 |
 | Routing 코드 / *(미정)* | `routing_code` | `code_t` varchar(50) | ✅ | 유일키 구성 | | ⚠ B-4 |
 | Rev | `routing_version` | integer | ✅ | 유일키 구성 | `CHECK > 0` · `uq_routing(item_id, routing_code, routing_version)` — **결정 07의 헤더 키 그대로** | ⛔ 시스템 채번 §5-4 |
-| 상태 / *(미정)* | `status_code` | `code_t` | ✅ | | 공통코드 — **결정 07이 값을 정했다: 작성중 / 확정 / 폐기.** 코드 값 등록은 `W-06-06` 소관 §8-4 | ⚠ 전이만 §5-4 |
+| 상태 / *(미정)* | `status_code` | `code_t` | ✅ | | `DRAFT`(작성중) · `CONFIRMED`(확정) · `OBSOLETE`(폐기) **3값** — 결정 07 이 정한 값이 그대로 등재됐다. 값 목록은 `GET /mdm/code-values?codeGroupCode=MASTER_VERSION_STATUS` 로 받는다(공유계약 `G-32` · 코드 사전 `CD-MASTER-VERSION-STATUS` — Routing·BOM·검사기준 버전 공용). ⛔ **고객이 편집할 수 없다**(`registry-system`) · §8-4 | ⚠ 전이만 §5-4 |
 | 유효시작 / *(미정)* | `effective_from` | date | **—** | | ⭐ **선택이다 — 결정 07 그대로**(2026-08-18 정정). 앞서 「하류가 `NOT NULL` 이니 필수」로 뒤집었던 것을 되돌린다. **물리 모델은 설계 결정을 앞설 수 없다**(사용자 확정 2026-08-18). 📨 모델 결손은 작업 통지 · §8-3 | ✅(작성중) |
 | 유효종료 / *(미정)* | `effective_to` | date | — | | `ck_routing_dates` 짝 제약(A-2) | ✅(작성중) |
 
@@ -134,7 +134,7 @@
 | --- | --- | --- | :-: | --- |
 | 선행 공정 | `predecessor_operation_id` | FK → `routing_operation` | ✅ | `ck_routing_dependency_self` — **자기 자신 금지** |
 | 후행 공정 | `successor_operation_id` | FK → `routing_operation` | ✅ | 유일: `uq_routing_dependency(선행, 후행)` |
-| 의존 유형 | `dependency_type_code` | `code_t` 기본 `'FINISH_TO_START'` | ✅ | 공통코드 — 값 목록 미정 |
+| 의존 유형 | `dependency_type_code` | `code_t` 기본 `'FINISH_TO_START'` | ✅ | `FINISH_TO_START`(종료-시작 · 기본) · `START_TO_START`(시작-시작) · `FINISH_TO_FINISH`(종료-종료) · `START_TO_FINISH`(시작-종료) **4값** — 값 목록은 `GET /mdm/code-values?codeGroupCode=ROUTING_OPERATION_DEPENDENCY_TYPE` 로 받는다(공유계약 `G-32` · 사용자 확정 2026-09-03). ⛔ **고객이 편집할 수 없다**(`registry-system`) |
 
 > **⚠ 상류가 요구하지 않은 것이 하류에 있다.** 결정 07은 라인을 **Sequence 일렬**로 정했고 선후행 그래프를 말하지 않았다. 그런데 하류에 의존 테이블이 있다 — `uiux/CLAUDE.md` §데이터모델의 「**하류가 앞서간다**」 사례다. 순차 진행만 필요하면 이 테이블은 비어 있어도 되므로, 화면은 **선택 기능([선후행 설정])으로 두고 기본은 Sequence 순**으로 본다 → §8-6.
 > **순환 방지는 DB가 하지 않는다** — 자기참조만 막고 A→B→A는 통과한다. 화면·서버 책임(`W-06-06` §8-6과 같은 형태).
@@ -235,7 +235,7 @@
 | --- | --- | --- | --- |
 | **1** | ✅ **되살렸다**(2026-08-30) — `Routing.isDefault` + `:set-default` 신설로 `Bom`과 대칭을 이뤘다 | — | **해소** — 📨 데이터 모델 통지(저장 컬럼) |
 | **2** | **외주공정 구분 · L/T · UPH** | **상류↔하류 불일치 — 부분 해소** | **외주 구분: ✅ 완전 해소(2026-08-30)** — `isOutsourced` 계약 반영. 물리 컬럼은 이미 `is_subcontract`로 존재(`omf-mes-server#42`) — 이름 정합화만 데이터 모델 통지(§4-B-1).<br>**L/T·UPH: 미해소 유지** — 「목표관리(3.2.3) 연계」용이고 **목표관리 화면이 인벤토리에 없다.** 범위 밖일 가능성이 높아 확인 대상으로 남긴다 |
-| 4 | `status_code` 값 목록 — 결정 07이 **작성중/확정/폐기**로 정했으나 공통코드 등록은 미완 | 공통코드 | `W-06-06` 소관. **값이 확정돼 있으므로 G-2(비활성) 대상이 아니다** — 코드 적재만 하면 된다 |
+| 4 | ~~`status_code` 값 목록 — 결정 07이 **작성중/확정/폐기**로 정했으나 공통코드 등록은 미완~~ | 공통코드 | ✅ **해소(2026-09-03)** — 코드 사전에 등재됐다. `MASTER_VERSION_STATUS` = `DRAFT`(작성중)·`CONFIRMED`(확정)·`OBSOLETE`(폐기) 3값(`registry-system` — 고객 편집 불가)이고 **BOM·검사기준 버전이 이 그룹을 준용**한다(사용자 결정 2026-09-02). `GET /mdm/code-values?codeGroupCode=MASTER_VERSION_STATUS` 로 받는다 |
 | 5 | **공정 마스터(`mdm.process`) 관리 화면이 어디인가** | 화면 도출 | `process_code`·`process_name`·`process_type_code`를 등록하는 화면이 인벤토리 108건에 **명시적으로 없다.** `W-06-01`이 겸하는지, `W-06-06`(공통코드·조직)에 속하는지 미정. 화면명이 「Routing(**공정**) 등록·관리」라 이 화면일 가능성이 높다 `[추정]` — **결정 필요** |
 | 6 | **선후행 그래프를 쓸 것인가** — 상류(결정 07)는 Sequence 일렬만 정했는데 하류에 의존 테이블이 있다 | 설계 결정 | 쓰지 않으면 테이블이 비고, 쓰면 Sequence와 두 체계가 공존한다. **하류가 앞서간 사례**라 상류 확정이 필요 |
 | 8 | **Sequence 재배치 시 유일 제약 충돌** | 설계 | 10↔20을 맞바꾸려면 중간에 반드시 중복이 생긴다. **서버가 한 트랜잭션으로 일괄 갱신**해야 한다(`W-06-05` §9-3과 같은 형태) ✅ **해소 2026-09-02** — 공유계약 A-5 해당 목록에 `routing_operation.operation_seq` 가 있고 「— `W-06-01` §8-8」로 이 미결을 명시 인용한다(화면은 최종 순서만·서버 일괄) |

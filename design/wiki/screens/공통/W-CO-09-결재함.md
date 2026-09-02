@@ -83,12 +83,12 @@
 | 라벨(한/베) | 출처 컬럼 | 타입 | 표시 | 비고 |
 | --- | --- | --- | :-: | --- |
 | 요청번호 | `approval_request_no` | `business_no_t` | ✅ | UNIQUE — 목록 검색 대상 |
-| 승인 유형 | `approval_type_code` | `code_t` | ✅ | ⚠ 값 목록 미정 — `W-06-15` §8-2와 같은 미결 |
+| 승인 유형 | `approval_type_code` | `code_t` | ✅ | `GOODS_ISSUE_DISPOSAL`(기타출고 품의=폐기) · `INVENTORY_ADJUSTMENT`(재고조정) · `PURCHASE_ORDER`(신규 P/O) · `INBOUND_RECEIPT_CANCEL`(입하 취소) · `GOODS_RECEIPT_CANCEL`(입고 취소) · `GOODS_ISSUE_CANCEL`(출고 취소) · `SHIPMENT_CANCEL`(출하 취소) · `IQC_SKIP`(긴급 IQC 생략) **8값** — ⭐ **계약이 `enum` 으로 닫았다 — 생성 타입(`api.d.ts`)이 값을 갖는다**(코드 사전 `CD-APPROVAL-TYPE` · `omf-mes#336` · 사용자 확정 2026-09-01). **`W-06-15` §8-2 와 같은 뿌리이고 그쪽도 함께 해소됐다.** ⛔ **공통코드 그룹으로 받지 않는다** — `codeGroupCode=` 호출이 «없다». ⛔ 화면이 «고르는» 값이 아니다 — 서버가 상신 오퍼레이션에서 채운다. 이 화면은 **필터·표시**로만 쓴다 |
 | 대상 유형 | `target_type_code` | `code_t` | ✅ | **다형 참조** — ⚠ 유형↔테이블 규약 부재(#68) §5-2 |
 | 대상 | `target_id` | bigint | ✅ | 위와 짝 |
 | 상신자 | `requested_by` | bigint FK → `app_user` | ✅ | |
 | 상신 일시 | `requested_at` | timestamptz | ✅ | |
-| 상태 | `status_code` | `code_t` | ✅ | ⚠ 값 목록 미정(§8-2) |
+| 상태 | `status_code` | `code_t` | ✅ | `PENDING`(대기) · `APPROVED`(승인) · `REJECTED`(반려) **3값** — 값 목록은 `GET /mdm/code-values?codeGroupCode=APPROVAL_REQUEST_STATUS` 로 받는다(공유계약 `G-32` · 2026-09-02 등재 · 코드 사전 `CD-APPROVAL-REQUEST-STATUS` · 근거는 이 화면 §3 목업 · 사용자 결정 2026-09-02). ⛔ **고객이 편집할 수 없다**(`registry-system`) — **내 차례 판정과 버튼 활성이 이 값에 걸린다**(§5-4). ⚠ 목록의 「진행중 1/2」는 `PENDING` + 단계 진행 표시다 — 별도의 상태 값이 아니다 |
 | **사유** | `reason` | text **NOT NULL** | ✅ | **목록에 보일 유일한 업무 값**(§5-3) · J-4 |
 
 **감사 컬럼·`version_no` 제외**(A-4). `version_no`가 있으므로 **B-1 낙관적 잠금 적용**(§5-6).
@@ -99,7 +99,7 @@
 | --- | --- | --- | :-: | --- |
 | 순서 | `step_no` | integer | ⛔ | 상신 시 `approval_route_step`에서 전개 |
 | 승인자 | `approver_id` | bigint FK → `app_user` **NOT NULL** | ⛔ | **J-3** — 요청 시점에 사람으로 확정 |
-| 결재 | `decision_code` | `code_t` | ✅ **1회** | null = 미결 · ⚠ 값 목록 미정(§8-2) |
+| 결재 | `decision_code` | `code_t` | ✅ **1회** | `APPROVED`(승인) · `REJECTED`(반려) **2값** — ⭐ **계약이 `enum` 으로 닫았다 — 생성 타입(`api.d.ts`)이 값을 갖는다**(코드 사전 `CD-APPROVAL-STEP-DECISION`). ⛔ 공통코드 그룹으로 받지 않는다 — `codeGroupCode=` 호출이 «없다». ⚠ **「대기」를 값으로 두지 않는다** — 비어 있으면(null) 아직 결재하지 않은 단계다(§5-4). ⛔ 생산 사전점검의 `decision_code`(`CD-DECISION`)와 이름만 같고 축이 다르다 |
 | 결재 일시 | `decision_at` | timestamptz | ⛔ | 서버가 채운다 |
 | **의견** | `decision_comment` | text | ✅ **1회** | **반려 시 필수**(§5-5 · A-12) |
 
@@ -317,7 +317,7 @@ orientation?: 'horizontal' | 'vertical'
 | # | 항목 | 성격 | 등급 | 처리 |
 | --- | --- | --- | :-: | --- |
 | 1 | ⛔ **되살리기 잔여 — 대상 요약을 목록에 보이지 못하고 있다**(§5-3) | 상류↔하류 불일치 | **조정** | 막는 것은 **다형 참조 규약(#68)** 이고 **우리 소관**이다. 규약이 서면 계약에 요약 축을 세운다(2026-08-31 재판정) |
-| 2 | **`approval_type_code`·`status_code`·`decision_code` 값 목록 미정** | 공통코드 | **조정** | `W-06-06` 소관 · `W-06-15` §8-2와 같은 미결 ⭐ **2026-09-02 좁힘** — 승인 유형은 `enum` 8값으로 닫혔다(`omf-mes#336` · 2026-09-01). 남은 것은 `status_code`·`decision_code` |
+| ~~2~~ | ~~**`approval_type_code`·`status_code`·`decision_code` 값 목록 미정**~~ | 공통코드 | **조정** | ✅ **해소(2026-09-03)** — 셋 다 코드 사전에 등재됐다. `CD-APPROVAL-TYPE` 8값(`enum` · `omf-mes#336` · 사용자 확정 2026-09-01 — `W-06-15` §8-2 와 같은 뿌리이고 그쪽도 함께 해소) · `CD-APPROVAL-REQUEST-STATUS` 3값 `PENDING`·`APPROVED`·`REJECTED`(그룹 `APPROVAL_REQUEST_STATUS` · 사용자 결정 2026-09-02) · `CD-APPROVAL-STEP-DECISION` 2값 `APPROVED`·`REJECTED`(`enum`). ⛔ 셋 중 둘은 `enum` 이라 `W-06-06` 소관이 아니다 — `codeGroupCode=` 호출이 «없다». 값은 §4-A·§4-B 에 적었다 |
 | 3 | **다형 참조 유형↔테이블 규약 부재** — 대상 열기 경로를 화면이 지어낼 수 없다(§5-2) | 상류↔하류 불일치 | **표시** | **#68** — ⚠ 결재함은 **차단되지 않는다**(대상은 링크로 연다) |
 | 4 | **순차 결재가 DB에 강제되지 않는다** — 화면만 막으면 API 직접 호출로 뚫린다(§5-4) | 설계 결정 | **조정** | **계약이 정본**(§9-1) ✅ **해소 2026-09-02** — 계약이 「순차 결재를 계약이 강제한다 — 앞 단계가 전부 승인이 아니면 400(`NOT_YOUR_TURN`) … (`W-CO-09` §5-4)」로 이 미결을 명시 인용한다 |
 | 5 | **부재 시 결재가 멈춘다** — 결재함이 그 요청을 계속 「대기」로 보인다 | 설계 결정 | **표시** | ✅ **확정 2026-08-07 — 감수한다**(`W-06-15` §5-8) |

@@ -85,9 +85,18 @@ SCREENS = os.path.join(HERE, "..", "..", "..", "wiki", "screens", "**", "*.md")
 POINTER = re.compile(r"codeGroupCode=([A-Z][A-Z0-9_]*)")
 DOC_SCREEN = re.compile(r"^### 3-\d+\.[^\n`]*`([WMP]-(?:CO|\d{2})-\d{2})`", re.M)
 
-# 기준선 — 2026-09-01 실측. ⛔ 늘리지 않는다. 줄었으면 이 수를 낮춘다.
-BASELINE = 31
-BASELINE_SCREEN = 63
+# 기준선 — 2026-09-03 실측(직전 2026-09-01 은 31 / 63). ⛔ 늘리지 않는다. 줄었으면 낮춘다.
+#
+# ⭐ 그룹 축 31 → 1. 코드 사전이 닫히면서(639/639) 30그룹의 표시명 호출을 요구서 §3
+#    액션표에 실었다. 남은 **하나는 요구서의 결손이 아니라 «화면의 부재»다** —
+#    `PROCESS_TYPE` 을 «등록»하는 화면이 인벤토리 108건에 없다(`W-06-01` §8-5 미결 5 —
+#    「`process_code`·`process_name`·`process_type_code` 를 등록하는 화면이 명시적으로
+#    없다 … 결정 필요」). 다른 화면들은 공정을 «선택 목록»으로 읽을 뿐이라
+#    `GET /mdm/processes` 만 부르고 이 그룹의 값 목록은 필요 없다.
+#    ⛔ 그러므로 이 1 은 «행을 넣어» 닫지 않는다 — 넣으면 화면이 안 하는 호출을
+#    한다고 적는 것이다. **공정 마스터 관리 화면이 서면 그때 0 이 된다.**
+BASELINE = 1
+BASELINE_SCREEN = 58
 
 
 def table_groups_from_doc(doc: dict) -> dict[str, set[str]]:

@@ -147,8 +147,9 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 기능 권한 체크·해제 | `PUT /app/roles/{id}/permissions` — 전체 치환. ✅ **화면을 연다**(2026-09-01) — 회신 **E-9 를 기다리지 않는다**: 권한은 앱 기능 목록이라 고객이 정할 성질이 아니다(`G-31`). ⛔ 400 `LAST_ADMIN` — 관리 권한 보유자가 0이 되는 치환은 막힌다 | §4-E · B-6 |
 | 변경 이력 | `GET /audit/events?targetTypeCode=…&targetId=…` — 리소스별 `/history`는 **없다**(#68) | §5-1 · B-5 |
 | 비밀번호 초기화 | `POST /app/users/{appUserId}:reset-password` — 임시 비밀번호를 생성해 **한 번만** 응답에 싣는다 | §5-1·§8-2 · DR-002 2-B ③ — 2026-08-30 되살림 |
-| ⭐ **감사 대상 유형 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=AUDIT_TARGET_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `APP_USER`·`ROLE` ⬜(**2026-09-02 등재**) | G-32 · K-5 |
-| ⭐ **감사 이벤트 유형 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=AUDIT_EVENT_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `CREATE`·`UPDATE`·`DELETE`·`GRANT`·`REVOKE`(**2026-09-02 등재**) | G-32 · K-5 |
+| ⭐ **감사 대상 유형 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=AUDIT_TARGET_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `APP_USER`·`ROLE` ⬜(**2026-09-02 등재**) | G-32 |
+| ⭐ **감사 이벤트 유형 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=AUDIT_EVENT_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `CREATE`·`UPDATE`·`DELETE`·`GRANT`·`REVOKE`(**2026-09-02 등재**) | G-32 |
+| ⭐ **사용자 상태 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=APP_USER_STATUS`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. ⬜ **값은 고객이 정한다** — `W-06-06` 공통코드 마스터에서 운영 중에 채운다(**2026-09-03 등재**) · ⭐ **고객이 늘린다** — 위 값은 초기 시드다 | G-32 |
 
 - **역할 중복 부여 경합**(§6)은 유일 위반으로 거부하지 않고 **이미 반영된 상태로 조용히 갱신**한다 — `PUT …/roles`의 계약에 명시.
 - 접근범위의 유일 인덱스가 `COALESCE(…,0)`로 빈 축을 접으므로 화면은 빈 축을 **`(전체)`**로 표기한다(A-7).
@@ -166,8 +167,8 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 폐기 | `POST /planning/routings/{id}:obsolete` | §5-4 |
 | Rev 비교 | **전용 엔드포인트 없음 — API 불필요.** 비교 대상 Rev마다 `GET /planning/routings/{id}` + `…/operations`를 부르고 **화면이 대조**한다 | §5-1 *(스펙 자신이 `[추정]` — 근거 문구 없음)* |
 | 변경 이력 | `GET /audit/events` — 다만 **Rev 자체가 이력**이다(결정 07 「변경 이력 요구는 Rev 이력으로 충족」) | §5-1 · B-5 |
-| ⭐ **버전 상태 표시명** | **`GET /mdm/code-values?codeGroupCode=MASTER_VERSION_STATUS`** — ⛔ **계약은 `statusCode` 만 내리고 표시명을 안 내린다.** 값 = `DRAFT`·`CONFIRMED`·`OBSOLETE`(**2026-09-02 신설** · 결정 07 을 `Bom`·`InspectionPlanVersion` 이 준용) | G-32 · K-5 |
-| ⭐ **공정 선후 유형 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=ROUTING_OPERATION_DEPENDENCY_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `FINISH_TO_START`(기본)·`START_TO_START`·`FINISH_TO_FINISH`·`START_TO_FINISH`(**2026-09-02 등재**) | G-32 · K-5 |
+| ⭐ **버전 상태 표시명** | **`GET /mdm/code-values?codeGroupCode=MASTER_VERSION_STATUS`** — ⛔ **계약은 `statusCode` 만 내리고 표시명을 안 내린다.** 값 = `DRAFT`·`CONFIRMED`·`OBSOLETE`(**2026-09-02 신설** · 결정 07 을 `Bom`·`InspectionPlanVersion` 이 준용) | G-32 |
+| ⭐ **공정 선후 유형 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=ROUTING_OPERATION_DEPENDENCY_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `FINISH_TO_START`(기본)·`START_TO_START`·`FINISH_TO_FINISH`·`START_TO_FINISH`(**2026-09-02 등재**) | G-32 |
 
 - **폐기는 dead end다.** `§5-4` 상태표가 「폐기 → (없음)」이라 되돌리기도, 신규 Rev의 원본으로 쓰기도 불가하다. `:new-revision`은 **확정 Rev에서만** 걸린다.
 - 좌측 품목 검색은 `GET /mdm/items`를 쓴다. §6의 「Routing 미보유 품목 필터」를 위해 **`hasRouting` 파라미터를 이번에 신설**했다(§4 ❌-4).
@@ -186,7 +187,8 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 폐기 | `POST /quality/inspection-plan-versions/{id}:obsolete` | §5-1 |
 | 엑셀 업로드 | **없음 — 선행 미결.** As-Is 엑셀 양식이 **미수집**이라 지금 만들면 필드를 지어내게 된다 | §8-6 |
 | 변경 이력 | `GET /audit/events` | §5-1 · B-5 |
-| ⭐ **검사 주기 단위 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY_INTERVAL_UOM`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `HOUR`·`QUANTITY`(**2026-09-02 등재**) | G-32 · K-5 |
+| ⭐ **검사 주기 단위 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY_INTERVAL_UOM`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `HOUR`·`QUANTITY`(**2026-09-02 등재**) | G-32 |
+| ⭐ **검사유형 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=QUALITY_INSPECTION_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `IQC`·`PQC`·`OQC`(**2026-09-03 등재**) · ⛔ **고객이 편집할 수 없다** — 우리가 정한 값이다 | G-32 |
 
 - **승인에 짝 제약 CHECK가 없다**(§8-3). 서버가 두 컬럼을 항상 함께 채우는 방식으로 짝을 보장한다 — 요청 바디로는 받지 않는다. **승인 해제**는 제공 여부가 미결이라 만들지 않았다.
 - `sampling_qty`의 단위 해석(비율 % ↔ 수량)이 미결이다 — **30%가 30개로 저장될 위험**을 계약이 경고로 담고 있다(A-8 · §5 미착지 5).
@@ -216,6 +218,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 사용 중지 | `POST /mdm/code-values/{id}:deactivate` | §5-1 · B-4 |
 | 통제 속성 편집 | ✅ **되살렸다(2026-08-30 · PR #290)** — 결정 10이 요구한 6속성(출고차단·출하차단 등)을 계약이 갖는다. 📨 담을 컬럼은 통지 대상이다 | §8-1 |
 | 변경 이력 | `GET /audit/events` | §5-1 · B-5 |
+| ⭐ **판정유형 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=JUDGMENT_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. ⬜ **값은 고객이 정한다** — `W-06-06` 공통코드 마스터에서 운영 중에 채운다(**2026-09-03 등재**) · ⭐ **고객이 늘린다** — 위 값은 초기 시드다 | G-32 |
 
 > ⚠ **이 화면은 현재 `W-06-06`의 코드값 편집기와 같은 경로를 공유한다.** 통제 속성 컬럼이 생기기 전까지 전용 리소스가 성립하지 않으며, **그 컬럼이 이 화면의 존재 근거**다. `[docs→데이터모델]` #64가 이 화면의 운명을 좌우한다.
 >
@@ -230,9 +233,9 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 구성품 확장 열 편집 | `GET`+`PUT /planning/boms/{bomId}/components/{id}` — 편집 가능한 것은 **MES 확장 4열**뿐 | §4-F·§8-5 |
 | 변경 이력 | `GET /audit/events` | §5-1 · B-5 |
 | 품목 추가 | **없음 — 범위 밖(의도적).** 품목은 **ERP 정본 수신본**이라 이 화면이 만들지 않는다 | §5-1 원문 · QA #3 |
-| ⭐ **버전 상태 표시명** | **`GET /mdm/code-values?codeGroupCode=MASTER_VERSION_STATUS`** — ⛔ **계약은 `statusCode` 만 내리고 표시명을 안 내린다.** 값 = `DRAFT`·`CONFIRMED`·`OBSOLETE`(**2026-09-02 신설** · 결정 07 을 `Bom`·`InspectionPlanVersion` 이 준용) | G-32 · K-5 |
-| ⭐ **선입선출 정책 표시명** | **`GET /mdm/code-values?codeGroupCode=FIFO_POLICY`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `FIFO`(입고순)·`FEFO`(유효기한순)(**2026-09-02 등재**) | G-32 · K-5 |
-| ⭐ **품목 유형 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=ITEM_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `RAW_MATERIAL`·`SEMI_FINISHED`·`FINISHED`·`MERCHANDISE` ⬜(**2026-09-02 등재**) | G-32 · K-5 |
+| ⭐ **버전 상태 표시명** | **`GET /mdm/code-values?codeGroupCode=MASTER_VERSION_STATUS`** — ⛔ **계약은 `statusCode` 만 내리고 표시명을 안 내린다.** 값 = `DRAFT`·`CONFIRMED`·`OBSOLETE`(**2026-09-02 신설** · 결정 07 을 `Bom`·`InspectionPlanVersion` 이 준용) | G-32 |
+| ⭐ **선입선출 정책 표시명** | **`GET /mdm/code-values?codeGroupCode=FIFO_POLICY`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `FIFO`(입고순)·`FEFO`(유효기한순)(**2026-09-02 등재**) | G-32 |
+| ⭐ **품목 유형 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=ITEM_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `RAW_MATERIAL`·`SEMI_FINISHED`·`FINISHED`·`MERCHANDISE` ⬜(**2026-09-02 등재**) | G-32 |
 
 - **`bom`은 읽기 전용**이다(QA #3 ERP 정본). 예외가 하나 있다 — `POST /planning/boms/{bomId}:set-default`. §5-1 액션 목록에는 없고 **§6 예외표의 「기본 BOM 전환」**이 요구한 것이다. 부분 유일 인덱스 `uq_bom_default`는 **동시에 둘을 막을 뿐 자동 전환을 해 주지 않으므로**, 화면이 「해제 → 설정」 2회를 부르면 그 사이에 **기본 BOM이 0개인 상태**가 생긴다. 단일 액션으로 노출하고 서버가 한 트랜잭션으로 처리한다(A-6).
 - `bom_component`를 **컬렉션 전체 치환이 아니라 행 단위 PUT**으로 뒀다. 순번이 ERP 원본이라 재배치가 이 API의 대상이 아니고, 편집 가능한 4열이 서로 독립적이라 A-5의 전제(중간 상태가 유일 제약을 위반)가 성립하지 않는다.
@@ -250,6 +253,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 자격 추가 / 삭제 | `PUT /mdm/workers/{id}/qualifications` — 전체 치환 | §4-E · B-6 · A-7 |
 | 변경 이력 | `GET /audit/events` | §5-1 · B-5 |
 | 수신 동기화 상태 보기 | **없음 — 소관 이동.** `W-06-10`의 `GET /integration/messages?targetTypeCode=…`로 이동한다(중복 구현 금지). ⚠ `targetTypeCode` 에 넣을 문자열이 아직 없다(다형 참조 대응표 미정) — 그때까지 `GET /integration/interface-definitions?directionCode=INBOUND` 로 정의를 받아 그 `interfaceCode` 로 거른다. §3-13 이 같은 경로를 이미 쓴다 | §5-1 원문 · B-4-1 ④ |
+| ⭐ **작업자 자격유형 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=QUALIFICATION_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `PROCESS_OPERATION`·`INSPECTOR`·`SAFETY`·`EQUIPMENT_OPERATION`(**2026-09-03 등재**) · ⭐ **고객이 늘린다** — 위 값은 초기 시드다 | G-32 |
 
 - **작업자 기본 정보는 쓰기 경로 자체가 없다.** 테이블 **전체**가 ERP 수신본이라 행 단위 식별 플래그(#65) 없이도 판정에 모호함이 없다 → `editability.reason`을 `RECEIVED_FROM_ERP`로 고정했다. 편집 가능한 것은 **MES 확장인 자격·인증**뿐이다.
 - ⚠ **`department`가 그 판정을 할 수 없다** — §5 미착지 8. 지금 API는 부서의 **쓰기를 열어 두고 있다.** `code_group`·`code_value`는 2026-08-22 확정으로 수신 대상에서 빠져 이 시스템이 정본이라 쓰기가 열려 있는 것이 옳다.
@@ -267,7 +271,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 중단·폐기 | **없음 — 선행 미결.** 제공 여부 자체가 미결이다 — 폐기하면 **그 데이터는 ERP에 영원히 가지 않는다** | §8-5 |
 | 내보내기 | **없음 — API 불필요**(2026-08-03 사용자 확정 — §8-2 항목 3). 서버측 export 엔드포인트를 이 스펙 전체에 두지 않았고, 목록 응답을 클라이언트가 파일로 변환하는 것을 전제로 한다. `payload`는 목록 응답에 없고 상세 GET에서만 제공되며 내려받기 파일에도 포함하지 않으므로 **대외비 범위가 자동으로 지켜진다** | §5-1 |
 | 알람 설정 보기 | **없음 — 범위 밖.** 알람 규칙은 `W-CO-03`(알림센터) 소관이며 그 화면은 확대 2차다 | §8-3 |
-| ⭐ **연계 상태 표시명** | **`GET /mdm/code-values?codeGroupCode=INTEGRATION_MESSAGE_STATUS`** — ⛔ **계약은 `statusCode` 만 내리고 표시명을 안 내린다.** 값 = `PENDING`·`PROCESSING`·`DONE`·`FAILED`(**2026-09-02 신설** · 계약이 적어 둔 「최소 구분」 넷을 그대로 확정). ⚠ 재처리 대상 필터가 이 값에 걸린다 | G-32 · K-5 |
+| ⭐ **연계 상태 표시명** | **`GET /mdm/code-values?codeGroupCode=INTEGRATION_MESSAGE_STATUS`** — ⛔ **계약은 `statusCode` 만 내리고 표시명을 안 내린다.** 값 = `PENDING`·`PROCESSING`·`DONE`·`FAILED`(**2026-09-02 신설** · 계약이 적어 둔 「최소 구분」 넷을 그대로 확정). ⚠ 재처리 대상 필터가 이 값에 걸린다 | G-32 |
 
 > **`message_key`가 `UNIQUE`라 재처리는 중복 전송이 아니다.** 이 사실을 화면 문구가 보장해야 하며(C-4), 계약이 같은 문장을 담고 있다 — **같은 개념을 두 이름으로 부르지 않기** 위함이다.
 
@@ -281,7 +285,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 마스터 화면으로 이동 | **없음 — 소관 이동.** 데이터는 `W-06-01`·`W-06-05`의 GET으로 온다 | §5-1 |
 | 재동기화 안내 | **없음 — 소관 이동.** 실행은 `W-06-10`(`:retry`)이 소유한다 | §5-1 · B-4-1 ④ |
 | 신규 Rev 발행 | **없음 — 소관 이동.** 버튼은 두되 동작은 `W-06-01`이 소유한다(2026-08-03 사용자 확정) | §8-1 |
-| ⭐ **버전 상태 표시명** | **`GET /mdm/code-values?codeGroupCode=MASTER_VERSION_STATUS`** — ⛔ **계약은 `statusCode` 만 내리고 표시명을 안 내린다.** 값 = `DRAFT`·`CONFIRMED`·`OBSOLETE`(**2026-09-02 신설** · 결정 07 을 `Bom`·`InspectionPlanVersion` 이 준용) | G-32 · K-5 |
+| ⭐ **버전 상태 표시명** | **`GET /mdm/code-values?codeGroupCode=MASTER_VERSION_STATUS`** — ⛔ **계약은 `statusCode` 만 내리고 표시명을 안 내린다.** 값 = `DRAFT`·`CONFIRMED`·`OBSOLETE`(**2026-09-02 신설** · 결정 07 을 `Bom`·`InspectionPlanVersion` 이 준용) | G-32 |
 
 - **Rev 현황 탭**(§4-B)은 §5-1에 별도 액션 행이 없지만 화면의 절반이다 — `GET /planning/routings?itemId=` + `GET /planning/boms?parentItemId=`를 **화면이 합성**한다. 「참조 중 W/O」 열은 **산출 방법 자체가 미결**(§8-5)이라 응답에 없다.
 - **이 화면은 전용 테이블이 없다.** 편집 상태 자체가 없고, `beforeValue`/`afterValue`를 **해석하지 않고 원본 그대로** 내린다 — 「모르는 키도 원문 그대로」(B-5 diff 규약 4)를 지키기 위해서다.
@@ -298,8 +302,8 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | Location 추가 / 하위 추가 | `POST /mdm/locations` — 하위는 `parentLocationId` 지정 | §5-1 |
 | 라벨 이미지 생성 | `POST /app/document-issues` — **`documentTypeCode = LOCATION_LABEL`**(출력물 요구서 **§3-8**) → 이미지는 `GET /app/document-issues/{documentIssueLogId}/rendition`(`app-공통.json`). 대상 유형은 **위치(Location)** 이고 `targetId` 는 `locationId` 다 — ⚠ **대상 유형의 «문자열»은 아직 없다**(출력물 요구서 §3-7 이 「잠정」으로 잡고 있고 `A-10` 다형 참조 대응표 소관이다 — 이 문서 §5 미착지와 같은 건). ⛔ **문서 «유형»과 «대상» 유형은 다른 축이다** — 앞의 `documentTypeCode` 는 확정이고 이쪽은 미정이다. ⛔ **물리 인쇄는 범위 밖** | §5-1 · K-1·K-5 |
 | 변경 이력 | `GET /audit/events` | §5-1 · ✅REQ-PR-0021 |
-| ⭐ **위치 유형 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=LOCATION_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `RACK`·`FLOOR`·`TEMP`·`HOPPER`·`DEFAULT`(**2026-09-02 등재**) | G-32 · K-5 |
-| ⭐ **품질 구역 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=QUALITY_ZONE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = 고객이 정한다 — ⛔ LOT 보류와의 관계가 미정이라 판정에 쓰지 않는다(**2026-09-02 등재**) | G-32 · K-5 |
+| ⭐ **위치 유형 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=LOCATION_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `RACK`·`FLOOR`·`TEMP`·`HOPPER`·`DEFAULT`(**2026-09-02 등재**) | G-32 |
+| ⭐ **품질 구역 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=QUALITY_ZONE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = 고객이 정한다 — ⛔ LOT 보류와의 관계가 미정이라 판정에 쓰지 않는다(**2026-09-02 등재**) | G-32 |
 
 - 외부창고 토글이 켜지면 거래처가 **조건부 필수**가 된다(`ck_external_warehouse_partner`) — 위반은 400, 오류는 **거래처 필드에 인라인**(A-2).
 - `location`에는 **자기참조 CHECK가 없다**(§5 미착지 11) — 계층 순환을 서버가 막는다.
@@ -357,7 +361,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 매핑 행 추가·삭제 | **없음 — API 불필요.** 저장이 정의와 한 번에 가므로 `PUT` 의 `columnMappings` 가 통째로 교체한다. 행마다 경로를 두면 「연결 시험 전에 절반만 저장된 정의」가 생긴다 | §3 |
 | 동기화 현황 보기 | **없음 — 소관 이동.** `W-06-10` 의 `GET /integration/messages?interfaceCode=` 로 간다(중복 구현 금지) | §9-2 · B-4-1 ④ |
 | 변경 이력 | `GET /audit/events` | §5-1 · B-5 |
-| ⭐ **연계 대상 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=INTERFACE_TARGET`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `ITEM`·`BOM`·`ORGANIZATION`·`WORKER`·`PURCHASE_ORDER` ⬜(**2026-09-02 등재**) | G-32 · K-5 |
+| ⭐ **연계 대상 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=INTERFACE_TARGET`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `ITEM`·`BOM`·`ORGANIZATION`·`WORKER`·`PURCHASE_ORDER` ⬜(**2026-09-02 등재**) | G-32 |
 
 ⛔ **변환 규칙 칸을 두지 않았다** — 근거가 없다(§4-C). ⛔ **이 절이 못 푸는 결손이 하나 남는다** — 「Legacy 출처 플래그」가 대상 마스터 다섯 곳에 없어 수신본 편집 게이트가 서지 않는다(§8-2). **다른 마스터의 컬럼 문제라 이 계약이 혼자 풀 수 없다.**
 
