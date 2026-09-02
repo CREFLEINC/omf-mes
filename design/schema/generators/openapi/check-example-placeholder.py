@@ -150,9 +150,81 @@ def pointed_group(prop: dict) -> str | None:
     return match.group(1) if match else None
 
 
+def enum_of(prop: dict) -> list | None:
+    """이 자리의 확정 값 목록. 배열이면 items 쪽에 있다.
+
+    ⛔ 「enum 이 없다」와 「enum 이 있는데 example 이 밖」을 갈라야 한다 —
+       in_enum() 이 False 하나로 둘을 뭉개고 있었고, 그래서 ⑥ 규칙을 세울 수
+       없었다(2026-09-02 · omf-mes#145 검증에서 드러났다).
+    """
+    src = (prop.get("items") or {}) if prop.get("type") == "array" else prop
+    values = src.get("enum")
+    return values if isinstance(values, list) else None
+
+
 def in_enum(prop: dict, example: object) -> bool:
+    # ⭐ 배열이면 «items» 가 enum 을 갖고 example 은 목록이다(2026-09-02 · 복수형 지원).
+    if prop.get("type") == "array":
+        items = prop.get("items") or {}
+        values = items.get("enum")
+        if not isinstance(values, list) or not isinstance(example, list):
+            return False
+        return all(x in values for x in example)
     values = prop.get("enum")
     return isinstance(values, list) and example in values
+
+
+def check_parameters(doc: dict, name: str) -> list[str]:
+    """paths 아래 쿼리·경로 파라미터의 example 을 본다.
+
+    ⚠ 파라미터는 OpenAPI 상 example 이 «파라미터 객체» 쪽에 있고 enum 은 «schema» 쪽에
+       있다. 둘을 합친 사전을 만들어 프로퍼티와 같은 규칙으로 판정한다.
+    """
+    out: list[str] = []
+    for route, ops in (doc.get("paths") or {}).items():
+        if not isinstance(ops, dict):
+            continue
+        for method, op in ops.items():
+            if method == "parameters":
+                params, opid = op, "(공용)"
+            elif isinstance(op, dict):
+                params, opid = op.get("parameters") or [], op.get("operationId", method)
+            else:
+                continue
+            if not isinstance(params, list):
+                continue
+            for p in params:
+                if not isinstance(p, dict) or "example" not in p:
+                    continue
+                pname = p.get("name") or ""
+                if not pname.endswith(("Code", "Codes", "No")):
+                    continue
+                schema = p.get("schema") or {}
+                merged = dict(schema)
+                merged["example"] = p["example"]
+                if p.get("description"):
+                    merged["description"] = p["description"]
+                if is_exempt(merged):
+                    continue
+                where = "%s · %s %s ?%s" % (name, method.upper(), route, pname)
+                example = p["example"]
+                if in_enum(merged, example):
+                    continue
+                group = pointed_group(merged)
+                if group in CONFIRMED_GROUPS:
+                    if example in CONFIRMED_GROUPS[group]:
+                        continue
+                    out.append("③ 확정 그룹 밖 — %s : example %r · %s = %s"
+                               % (where, example, group, "·".join(CONFIRMED_GROUPS[group])))
+                    continue
+                if isinstance(example, str) and example in PLACEHOLDER:
+                    out.append("① 자리채움 상수 — %s : example %r" % (where, example))
+                    continue
+                values = enum_of(merged)
+                if values is not None:
+                    out.append("⑥ 자기 enum 밖 — %s : example %r · enum = %s"
+                               % (where, example, "·".join(map(str, values))))
+    return out
 
 
 def check_one(path: str) -> list[str]:
@@ -163,6 +235,12 @@ def check_one(path: str) -> list[str]:
 
     findings: list[str] = []
     top: dict[str, dict] = {}          # 쌍둥이 대조용 — 스키마의 «최상위» 프로퍼티만
+
+    # ⭐ 2026-09-02 «쿼리 파라미터» 를 훑는다(omf-mes#145) — 이 함수는 components.schemas
+    #    만 보고 있어 paths 아래의 parameters 가 통째로 사각이었다. 목 서버·문서는 그
+    #    example 도 그대로 쓴다. 실측 — 계약 7벌에 example 을 가진 *Code 쿼리는 3개뿐이라
+    #    범위가 작다. 파라미터는 example 을 «자기 자리»에 두므로 schema 와 합쳐서 본다.
+    findings += check_parameters(doc, name)
 
     for schema_name, schema in schemas.items():
         if not isinstance(schema, dict):
@@ -176,7 +254,11 @@ def check_one(path: str) -> list[str]:
             #    값도 그대로 내려주므로 증상은 코드 필드와 «똑같다» — Worker.workerNo
             #    의 example "문자열" 이 모바일 9화면 시험을 막았고 검사기는 초록이었다.
             #    넓히면 +27(133→160)이고 전부 omf-mes#191 트랙이다.
-            if not prop_name.endswith(("Code", "No")):
+            # ⭐ 2026-09-02 «Codes»(복수) 를 더했다(omf-mes#145) — 값 «배열» 자리가
+            #    통째로 사각이었다. Printer.supportedDocumentTypeCodes 의
+            #    example ["LABEL"] 이 documentTypeCode enum 9종 밖인데 초록이었다.
+            #    실측 — 계약 7벌에 복수형 프로퍼티는 2개뿐이라 범위가 작다.
+            if not prop_name.endswith(("Code", "Codes", "No")):
                 continue
             where = "%s · %s.%s" % (name, schema_name, prop_path)
             if is_exempt(prop):
@@ -204,6 +286,18 @@ def check_one(path: str) -> list[str]:
 
             if in_enum(prop, example):
                 continue                       # 자기 enum 안 — 통과
+
+            # ⑥ 자기 enum 밖 — 확정 값 목록이 «있는데» example 이 그 밖이다.
+            #    ⛔ 2026-09-02 신설(omf-mes#145). 이 규칙이 없어서
+            #    Printer.supportedDocumentTypeCodes 의 example ["LABEL"] 이
+            #    documentTypeCode enum 9종 밖인데도 초록이었다 — 배열 지원을
+            #    더해도 «울릴 규칙»이 없으면 아무것도 안 잡힌다.
+            values = enum_of(prop)
+            if values is not None:
+                findings.append(
+                    "⑥ 자기 enum 밖 — %s : example %r · enum = %s"
+                    % (where, example, "·".join(map(str, values))))
+                continue
 
             group = pointed_group(prop)
             if group in CONFIRMED_GROUPS:
