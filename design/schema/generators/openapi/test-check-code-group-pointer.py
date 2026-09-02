@@ -177,5 +177,42 @@ class 등록부를_조항_표에서_읽는다(unittest.TestCase):
             self.assertIn(n, got)
 
 
+
+class 소유_칸도_읽는다(unittest.TestCase):
+    """⭐ 소유는 등록부 표와 코드 사전 «두 곳»에 적힌다 — 기계가 맞춘다.
+
+    사용자 결정 2026-09-02 로 미판정 19가 0 이 됐다(시스템 12 · 고객 7).
+    사람이 맞추게 두면 등록부 이관 전의 병이 소유 축에서 그대로 재발한다.
+    """
+
+    HEAD = 등록부를_조항_표에서_읽는다.HEAD
+    write = staticmethod(등록부를_조항_표에서_읽는다.write)
+
+    def test_registry_와_system_을_가른다(self):
+        md = self.HEAD + (
+            "| `RECEIPT_TYPE` | `registry` (고객 편집 가능) | 2026-08-31 | 근거 |\n"
+            "| `LOT_STATUS` | `registry-system` ⛔ **시스템 소유** | G-32 확정 | 근거 |\n")
+        got = cg.load_registry_owners(self.write(md))
+        self.assertEqual(got, {"RECEIPT_TYPE": "registry",
+                               "LOT_STATUS": "registry-system"})
+
+    def test_미판정은_미판정으로_남는다(self):
+        # ⛔ 빈칸을 registry 로 «추정»하지 않는다 — 근거 없는 판정이 규칙을 틀린 방향으로 키운다.
+        md = self.HEAD + "| `LOT_TYPE` | ⬜ **미판정** | G-32 확정 | 근거 |\n"
+        self.assertEqual(cg.load_registry_owners(self.write(md)), {"LOT_TYPE": "미판정"})
+
+    def test_근거_칸의_registry_를_안_줍는다(self):
+        # 소유는 «둘째» 칸에서만 읽는다.
+        md = self.HEAD + (
+            "| `LOT_TYPE` | ⬜ **미판정** | G-32 확정 | `registry-system` 선례를 참고 |\n")
+        self.assertEqual(cg.load_registry_owners(self.write(md)), {"LOT_TYPE": "미판정"})
+
+    def test_실물_조항에_미판정이_없다(self):
+        got = cg.load_registry_owners()
+        self.assertEqual([g for g, o in got.items() if o == "미판정"], [])
+        self.assertEqual(sum(1 for o in got.values() if o == "registry-system"), 16)
+        self.assertEqual(sum(1 for o in got.values() if o == "registry"), 40)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=1)

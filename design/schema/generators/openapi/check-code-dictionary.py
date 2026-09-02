@@ -56,6 +56,7 @@ import importlib
 #    그것이 정확히 이 사전이 고치려는 병이다(2026-09-02 이관). 파서는 저장소에 하나뿐이다.
 _ptr = importlib.import_module("check-code-group-pointer")
 load_registry = _ptr.load_registry
+load_registry_owners = _ptr.load_registry_owners
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, "..", "..", "..", ".."))
@@ -197,6 +198,19 @@ def main() -> int:
     else:
         print("⓪ 사전의 «그룹» 열 %d종 전부 등록부 안 (등록부 %d개)"
               % (len({g for e in entries for g in e["group"]}), len(registry)))
+
+    # ⓪-b 소유가 «두 곳»에 적힌다 — 갈라지지 않게 기계가 맞춘다.
+    #     사람이 맞추게 두면 등록부 이관 전의 병이 소유 축에서 그대로 재발한다.
+    owners = load_registry_owners()
+    clash = [(e["key"], g, e["owner"], owners[g])
+             for e in entries for g in e["group"]
+             if g in owners and owners[g] != "미판정" and e["owner"] != owners[g]]
+    if clash:
+        print()
+        print("⛔ 사전의 «소유» 가 등록부와 다릅니다 %d건 — 정본은 공유계약 G-32 표입니다"
+              % len(clash))
+        for key, g, mine, theirs in clash:
+            print("   %-38s %-38s 사전 %-16s 등록부 %s" % (key, g, mine, theirs))
     print()
 
     if not args.split:

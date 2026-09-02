@@ -69,9 +69,11 @@ CLAUSE = os.path.join(HERE, "..", "..", "..", "wiki", "decisions-policy", "공�
 # 표 머리 — 조항의 소제목. 바뀌면 «조용히» 비는 대신 ⛔ 로 죽는다(load_registry 참조).
 REGISTRY_HEAD = re.compile(r"^#### .*등록부 — 이름이 «있는» 그룹", re.M)
 GROUP_CELL = re.compile(r"^`([A-Z][A-Z0-9_]+)`$")
+# 소유 칸 — `registry` / `registry-system` / 그 밖은 «미판정»
+OWNER_CELL = re.compile(r"`(registry(?:-system)?)`")
 
 
-def load_registry(path: str = CLAUSE) -> set:
+def load_registry_owners(path: str = CLAUSE) -> dict:
     """공유계약 G-32 등록부 표의 **첫 칸**을 읽는다.
 
     ⛔ **첫 칸만 읽는다.** 「근거」 칸에는 값(`RETEST_PASS`·`MORNING` …)과 다른 그룹
@@ -90,7 +92,7 @@ def load_registry(path: str = CLAUSE) -> set:
     nxt = re.search(r"^#{2,4} ", tail, re.M)      # 다음 소제목 전까지가 이 절이다
     body = tail[:nxt.start()] if nxt else tail
 
-    names = set()
+    owners = {}
     for line in body.split("\n"):
         if not line.startswith("|"):
             continue
@@ -99,10 +101,16 @@ def load_registry(path: str = CLAUSE) -> set:
             continue
         m = GROUP_CELL.match(cells[0])
         if m:
-            names.add(m.group(1))
-    if not names:
+            owners[m.group(1)] = OWNER_CELL.search(cells[1]) and \
+                OWNER_CELL.search(cells[1]).group(1) or "미판정"
+    if not owners:
         raise SystemExit("⛔ 등록부 표에서 그룹 이름을 하나도 못 읽었습니다 — %s" % path)
-    return names
+    return owners
+
+
+def load_registry(path: str = CLAUSE) -> set:
+    """그룹 이름만 — 대부분의 부르는 쪽이 원하는 것이다."""
+    return set(load_registry_owners(path))
 
 
 REGISTRY = load_registry()
