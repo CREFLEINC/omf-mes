@@ -23,14 +23,43 @@
    자리에는 «맨몸»이면 그 맨몸을 보는 사람은 「값 목록이 없다」로 읽는다.
    ⚠ 이것을 보는 검사기가 지금 «없다» — check-code-group-pointer 는 가리킨 이름이
    등록부 안인가만, check-code-group-reachable 은 화면이 닿는가만 본다.
+⑤ ⭐ **키(`x-code-key`)가 사전과 맞는가** — 2026-09-02 신설. 아래 ⑤절 참조.
+
+⑤ 값 대조에서 «키 대조»로 (2026-09-02)
+---------------------------------------
+⛔ 값집합으로 자리를 찾으면 **값이 우연히 같은 다른 코드를 못 가른다.** 실물이
+   있다 — `CD-PICKING-TYPE`(`MATERIAL`·`SHIPMENT`)과 `CD-RESERVATION-TYPE`
+   (`MATERIAL`·`SHIPMENT`·`PRODUCTION`)은 앞의 둘이 겹친다. 값으로 세는 한
+   「이 자리가 어느 키인가」는 **검사기가 답할 수 없는 물음**이었다.
+
+⇒ 계약이 `*Code` 자리에 `x-code-key: "CD-…"` 를 «직접» 적는다(275자리 · 2026-09-02).
+   스키마 프로퍼티는 프로퍼티 객체 안에, 쿼리 파라미터는 파라미터 객체 안에 둔다.
+   그러면 판정이 **자리 자신이 말하는 것**이 되고 검사기는 대조만 한다.
+
+| 규칙 | 무엇 | 게이트 |
+| :-: | --- | :-: |
+| ㉠ | `x-code-key` 가 사전에 **없는 키** | ⛔ 막는다 |
+| ㉡ | 키는 있는데 그 자리의 `enum` 값집합이 **사전의 값과 다르다** | ⛔ 막는다 |
+| ㉢ | 키는 있는데 그 자리의 `codeGroupCode=` 포인터가 **사전의 그룹과 다르다** | ⛔ 막는다 |
+| ㉣ | 착지한(`x-source-column` 있는) `*Code` 자리에 **키가 없다** | ⚠ 계수만 |
+
+⭐ **㉠㉢ 셋만 막는 이유** — 이 셋은 「이미 붙인 키가 «틀렸다»」이고, 틀린 키는
+   고치는 데 다른 결정이 필요 없다. 반면 ㉣ 는 「아직 안 붙였다」이고 기준선이
+   크다(2026-09-02 실측 109). 게이트로 걸면 초록을 기준선으로 쓸 수 없다.
+
+⛔ **㉣ 는 래칫도 아닌 «단순 계수»다.** `check-code-group-reachable.py` 는 같은
+   자리에서 래칫(`BASELINE`)을 쓰지만, ㉣ 는 **지금 여러 손이 동시에 줄이는 중인
+   수**라 래칫을 걸면 서로 방해한다 — 한쪽이 줄여 기준선을 낮추면 다른 쪽의
+   작업 트리가 곧바로 ⛔ 가 된다. 줄어드는 것이 확실한 수는 세기만 한다.
 
 ⚠ 이 검사기가 못 보는 것
 ------------------------
-- **키가 «맞는지»는 안 본다.** 사전이 「이 자리는 이 키」라 적은 것을 믿는다.
-  그 판정은 사람이 `A-16` 으로 한다.
+- **키가 «맞는지»는 안 본다.** 계약이 「이 자리는 이 키」라 적은 것을 믿는다 —
+  ⑤ 는 그 선언이 사전과 어긋나지 않는가만 본다. 「이 자리에 이 코드가 맞나」는
+  사람이 `A-16` 으로 판정한다.
 - **④ 의 두 갈래를 못 가른다** — (a) 같은 코드인데 값이 빠졌다 / (b) 원래 다른
   코드인데 이름이 같다. **그 구분이 곧 사전이 할 일**이고, 사전에 없는 이름은
-  일단 (?) 로 낸다.
+  일단 (?) 로 낸다. ⭐ 키가 붙은 자리에서는 ⑤ 가 이 구분을 대신한다.
 - **물리 모델·프론트·서버 시드는 안 본다.** 우리 계약 7벌만 본다.
 
 쓰기
@@ -38,8 +67,9 @@
     python3 design/schema/generators/openapi/check-code-dictionary.py
     python3 design/schema/generators/openapi/check-code-dictionary.py --split   # ④ 만
 
-⛔ **⓪ 만 막는다**(2026-09-02) — 등록부↔사전 1:1 · 소유 일치 · 그룹이 등록부 안.
-계수 규칙(①②④)은 여전히 막지 않는다 — 닫을 수 없는 수라 흐름만 본다.
+⛔ **⓪ 와 ⑤㉠㉡㉢ 을 막는다**(2026-09-02) — 등록부↔사전 1:1 · 소유 일치 ·
+그룹이 등록부 안 · 키가 사전과 어긋나지 않음.
+계수 규칙(①②④㉣)은 여전히 막지 않는다 — 닫을 수 없는 수라 흐름만 본다.
 옛 서술: ~~시험판이라 종료 코드는 언제나 0 이다.~~ 사전이 계약 527자리를
    다 덮고 ④ 가 0 이 되면 게이트로 올린다.
 """
@@ -123,7 +153,13 @@ def state(node: dict, desc: str | None) -> str:
 def scan() -> dict[str, list[tuple]]:
     """계약 7벌의 *Code(s) 자리를 이름별로 모은다.
 
-    반환 — 이름 -> [(계약, 자리종류, 경로, 상태, enum튜플, 포인터튜플)]
+    반환 — 이름 -> [(계약, 자리종류, 경로, 상태, enum튜플, 포인터튜플, 키, 착지)]
+
+    ⭐ 뒤 두 칸은 2026-09-02 «키 대조»로 넘어오며 붙였다 —
+       `키`   = 그 자리에 적힌 `x-code-key`(없으면 None)
+       `착지` = 그 자리에 `x-source-column` 이 있는가(물리 컬럼에 내려앉았는가).
+    ⚠ 칸을 «뒤에» 붙인 것은 뜻이 있다 — 앞 여섯 칸을 읽던 자리(split_siblings ·
+       기존 테스트)가 그대로 돈다. 튜플을 앞에서 늘리면 그 전부를 같이 고쳐야 한다.
     """
     out: dict[str, list[tuple]] = defaultdict(list)
     for path in sorted(glob.glob(CONTRACTS)):
@@ -140,14 +176,20 @@ def scan() -> dict[str, list[tuple]]:
                         out[k].append((name, "스키마", where + "/" + k,
                                        state(v, v.get("description")),
                                        tuple(src.get("enum") or ()),
-                                       tuple(POINTER.findall(v.get("description") or ""))))
+                                       tuple(POINTER.findall(v.get("description") or "")),
+                                       v.get("x-code-key"),
+                                       "x-source-column" in v))
                     if k == "name" and isinstance(v, str) and \
                             (v.endswith("Code") or v.endswith("Codes")) and "schema" in node:
                         sc = node.get("schema") or {}
+                        # ⭐ 쿼리는 키가 «파라미터 객체» 안에 있다 — 스키마 안이 아니다.
+                        #    파라미터에는 물리 컬럼이 없으므로 착지는 언제나 거짓이다.
                         out[v].append((name, "쿼리", where,
                                        state(sc, node.get("description")),
                                        tuple(sc.get("enum") or ()),
-                                       tuple(POINTER.findall(node.get("description") or ""))))
+                                       tuple(POINTER.findall(node.get("description") or "")),
+                                       node.get("x-code-key"),
+                                       False))
                     walk(v, where + "/" + str(k))
             elif isinstance(node, list):
                 for i, v in enumerate(node):
@@ -157,14 +199,113 @@ def scan() -> dict[str, list[tuple]]:
     return out
 
 
+# ── ⑤ 키 대조 ─────────────────────────────────────────────────────────────
+#
+# ⭐ 아래 넷은 «순수 함수»다 — 파일을 읽지 않는다. 테스트가 지어낸 자리·사전으로
+#    부를 수 있어야 ㉠㉡㉢ 이 실제로 ⛔ 를 내는지 잠글 수 있다.
+
+def place_key(place: tuple) -> str | None:
+    """이 자리에 적힌 `x-code-key`. 옛 여섯 칸 튜플이면 None 이다."""
+    return place[6] if len(place) > 6 else None
+
+
+def place_landed(place: tuple) -> bool:
+    """이 자리가 물리 컬럼에 «착지»했는가(`x-source-column`)."""
+    return bool(place[7]) if len(place) > 7 else False
+
+
+def key_sites(found: dict[str, list[tuple]]) -> list[tuple]:
+    """키가 붙은 자리만 뽑는다 — (이름, 계약, 자리종류, 경로, enum, 포인터, 키)."""
+    out = []
+    for name, places in found.items():
+        for p in places:
+            key = place_key(p)
+            if key:
+                out.append((name, p[0], p[1], p[2], p[4], p[5], key))
+    return sorted(out, key=lambda x: (x[6], x[1], x[3]))
+
+
+def check_keys(sites: list[tuple], entries: list[dict]) -> tuple[list, list, list]:
+    """㉠㉡㉢ — 계약이 선언한 키를 사전과 대조한다. 셋 다 ⛔ 다.
+
+    반환 — (㉠ 사전에 없는 키, ㉡ 값집합 어긋남, ㉢ 그룹 포인터 어긋남)
+
+    ⭐ 왜 셋을 막나 — 전부 「이미 붙인 키가 «틀렸다»」이기 때문이다. 틀린 키는
+       맞는 자리를 가리키는 척하면서 값·그룹을 남의 것으로 읽게 만든다. 고치는 데
+       다른 결정이 필요 없으므로 기준선을 둘 이유가 없다.
+    ⚠ 사전의 값 열이 비어 있으면(⬜ 로 세어서 남긴 키) ㉡ 를 건너뛴다 — 대조할
+       것이 없는 자리를 ⛔ 로 내면 「값을 모른다」가 「키가 틀렸다」로 둔갑한다.
+    """
+    by_key = {e["key"]: e for e in entries}
+    unknown: list = []
+    enum_gap: list = []
+    ptr_gap: list = []
+    for name, f, kind, path, enum, ptr, key in sites:
+        e = by_key.get(key)
+        if e is None:
+            unknown.append((name, f, kind, path, key))
+            continue
+        if enum:
+            want = set(e["values"])
+            got = {x for x in enum if x is not None}   # nullable 자리는 None 이 섞인다
+            if want and want != got:
+                enum_gap.append((name, f, kind, path, key, sorted(want), sorted(got)))
+        if ptr:
+            want_g = set(e["group"])
+            got_g = set(ptr)
+            if want_g != got_g:
+                ptr_gap.append((name, f, kind, path, key,
+                                sorted(want_g), sorted(got_g)))
+    return unknown, enum_gap, ptr_gap
+
+
+def keyless_landed(found: dict[str, list[tuple]]) -> list[tuple]:
+    """㉣ — 착지했는데 키가 «없는» 자리. ⚠ 막지 않는다, 센다.
+
+    ⭐ 착지(`x-source-column`)를 문턱으로 삼는 이유 — 물리 컬럼이 정해진 자리는
+       「어느 코드인가」가 이미 판정된 자리다. 아직 착지 안 한 자리에 키를 요구하면
+       판정 전에 이름을 붙이라는 말이 된다.
+    """
+    out = []
+    for name, places in found.items():
+        for p in places:
+            if place_landed(p) and not place_key(p):
+                out.append((name, p[0], p[1], p[2]))
+    return sorted(out)
+
+
+def matches(e: dict, place: tuple) -> bool:
+    """이 자리가 이 사전 행의 것인가 — ③ 「사전이 «키로» 자리를 센다」.
+
+    ⭐ 키가 붙었으면 **키로만** 판정한다. 값집합이 우연히 같아도 키가 다르면
+       남의 자리다 — `CD-PICKING-TYPE`(MATERIAL·SHIPMENT)과
+       `CD-RESERVATION-TYPE`(MATERIAL·SHIPMENT·PRODUCTION)이 실물이다.
+    ⚠ 키가 «아직» 안 붙은 자리는 옛 방식(값집합·그룹)으로 짚는다 — 부착이
+       진행될수록 그 갈래가 줄고 계수가 정확해진다.
+    """
+    key = place_key(place)
+    if key:
+        return key == e["key"]
+    enum, ptr = place[4], place[5]
+    if e["owner"] == "enum":
+        return bool(enum) and set(e["values"]) == {x for x in enum if x is not None}
+    # registry 갈래는 «그룹 이름»으로 자리를 찾는다 — 값은 계약에 없고 서버 마스터에
+    # 있기 때문이다. 값 열은 사람이 읽고 나중에 서버 시드와 대조할 근거다.
+    return bool(ptr) and bool(set(e["group"]) & set(ptr))
+
+
 # ── ④ 형제 자리가 갈렸는가 ────────────────────────────────────────────────
 
 def split_siblings(found: dict[str, list[tuple]]) -> list[tuple]:
-    """같은 계약 안에서 같은 이름이 「값 있음」과 「맨몸」으로 갈린 자리."""
+    """같은 계약 안에서 같은 이름이 「값 있음」과 「맨몸」으로 갈린 자리.
+
+    ⚠ 자리 튜플을 «앞 네 칸만» 읽는다 — 뒤에 칸이 붙어도(키·착지) 그대로 돈다.
+    """
     out = []
     for name, places in found.items():
         by_file = defaultdict(list)
-        for f, kind, path, st, _, _ in places:
+        for p in places:
+            f, kind, path, st = p[0], p[1], p[2], p[3]
             by_file[f].append((kind, path, st))
         for f, ps in by_file.items():
             sts = {s for _, _, s in ps}
@@ -183,10 +324,13 @@ def main() -> int:
     entries = read_dictionary(DICT)
     found = scan()
     total = sum(len(v) for v in found.values())
+    tagged = key_sites(found)
 
     print("코드 사전 검사 — 시험판")
     print("─" * 70)
-    print("사전 %d 키 · 계약 *Code(s) 자리 %d" % (len(entries), total))
+    print("사전 %d 키 · 계약 *Code(s) 자리 %d · 그중 키(x-code-key)가 붙은 자리 %d (%d%%)"
+          % (len(entries), total, len(tagged),
+             round(len(tagged) * 100 / max(total, 1))))
     print()
 
     # ⓪ 사전이 가리킨 «그룹» 이 등록부 안인가 — 사전이 셋째 사본이 되지 않게 대조한다.
@@ -233,43 +377,101 @@ def main() -> int:
             print("   %-38s %-38s 사전 %-16s 등록부 %s" % (key, g, mine, theirs))
     print()
 
+    # ⑤ ⛔ **게이트** — 계약이 «자리마다» 적은 키가 사전과 맞는가(2026-09-02 신설).
+    #    값집합으로 찾던 것을 키로 바꾸는 자리다 — 값이 우연히 같은 다른 코드를
+    #    값으로는 영영 못 가른다(CD-PICKING-TYPE ↔ CD-RESERVATION-TYPE).
+    unknown, enum_gap, ptr_gap = check_keys(tagged, entries)
+    if unknown:
+        gate.append("사전에 없는 키 %d" % len(unknown))
+        print("⛔ ㉠ 계약이 «사전에 없는» 키를 적었습니다 %d건 — 대조할 행이 없습니다"
+              % len(unknown))
+        for name, f, kind, path, key in unknown[:12]:
+            print("   %-30s %-20s %-5s %s" % (key, f[:20], kind, name))
+        if len(unknown) > 12:
+            print("   … 그 밖 %d건" % (len(unknown) - 12))
+        print("   ⭐ 닫는 법 — 사전에 행을 세우거나, 자리의 키를 맞는 것으로 고친다.")
+    if enum_gap:
+        gate.append("키의 값집합 어긋남 %d" % len(enum_gap))
+        print("⛔ ㉡ 키는 맞는데 그 자리의 «값집합»이 사전과 다릅니다 %d건"
+              % len(enum_gap))
+        for name, f, kind, path, key, want, got in enum_gap[:8]:
+            print("   %-30s %-20s %-5s %s" % (key, f[:20], kind, path[-42:]))
+            print("        사전 %s" % " ".join(want))
+            print("        계약 %s" % " ".join(got))
+        if len(enum_gap) > 8:
+            print("   … 그 밖 %d건" % (len(enum_gap) - 8))
+        print("   ⭐ 두 갈래다 — (a) 계약이 값을 빠뜨렸다 → 채운다")
+        print("                  (b) 원래 «다른 코드»다      → 키를 가른다")
+    if ptr_gap:
+        gate.append("키의 그룹 포인터 어긋남 %d" % len(ptr_gap))
+        print("⛔ ㉢ 키는 맞는데 그 자리의 «codeGroupCode= 포인터»가 사전과 다릅니다 %d건"
+              % len(ptr_gap))
+        for name, f, kind, path, key, want, got in ptr_gap[:8]:
+            print("   %-30s %-20s %-5s 사전 %s ← 계약 %s"
+                  % (key, f[:20], kind, " ".join(want) or "—", " ".join(got) or "—"))
+        if len(ptr_gap) > 8:
+            print("   … 그 밖 %d건" % (len(ptr_gap) - 8))
+    if not (unknown or enum_gap or ptr_gap):
+        print("⑤ ✅ 키가 붙은 %d자리 전부 사전과 맞다 — ㉠ 미등록 0 · ㉡ 값 0 · ㉢ 그룹 0"
+              % len(tagged))
+
+    # ㉣ ⚠ **막지 않는다 — 센다.** 착지했는데 키가 없는 자리.
+    #    래칫도 걸지 않는다: 지금 여러 손이 동시에 줄이는 수라 기준선을 두면
+    #    한쪽이 줄이는 순간 다른 쪽 작업 트리가 ⛔ 가 되어 서로 방해한다.
+    orphan_places = keyless_landed(found)
+    by_name = defaultdict(int)
+    for name, _f, _kind, _p in orphan_places:
+        by_name[name] += 1
+    print("㉣ ⚠ 착지(x-source-column)했는데 «키가 없는» 자리: %d — 이름 %d종"
+          % (len(orphan_places), len(by_name)))
+    for name, n in sorted(by_name.items(), key=lambda x: (-x[1], x[0]))[:8]:
+        print("      %-30s %d" % (name, n))
+    if len(by_name) > 8:
+        print("      … 그 밖 %d종" % (len(by_name) - 8))
+    print("   ⭐ 이 수는 «게이트가 아니다» — 줄어드는 중인 수라 세기만 한다.")
+    print()
+
     if not args.split:
         bad = 0
         claimed = 0
+        by_this_key = 0                # ③ 그중 «키로» 짚은 자리
+        # ⭐ ③ 키가 붙은 자리는 «이름 열»을 거치지 않고 키로 바로 모은다(2026-09-02).
+        #    이름 열은 사람이 손으로 적은 사본이라 자리 이름이 늘면 뒤처진다 —
+        #    실제로 cycleTypeCode 자리 2개가 CD-CYCLE-TYPE 의 이름 열에 없었다.
+        #    키는 계약 «자리 자신»이 말하는 것이라 뒤처질 데가 없다.
+        tagged_by_key: dict[str, list] = defaultdict(list)
+        for name, places in found.items():
+            for p in places:
+                k = place_key(p)
+                if k:
+                    tagged_by_key[k].append((p[0], p[1], p[2], p[3], name))
+
         for e in entries:
-            want = e["values"]
-            got = []
+            # ③ ⭐ 키로 짚은 자리가 «먼저»다 — 값집합이 우연히 같아도 남의 자리는 안 센다.
+            got = [(f, kind, path, st)
+                   for f, kind, path, st, _n in tagged_by_key.get(e["key"], [])]
+            by_this_key += len(got)
             bare = []
             # ⛔ 「맨몸」은 «같은 계약 파일» 안에서만 센다(2026-09-02).
             #    statusCode 처럼 이름이 여러 코드에 공유되면 이름으로 세는 순간
             #    «남의 자리»를 삼킨다 — 실제로 맨몸 2 를 80 으로 셌다.
-            #    ⭐ 이것이 이 사전의 전제 그대로다 — 값은 중복해도 키는 유일하고,
-            #    그래서 «이름»이 아니라 «값»으로 가른다.
-            mine = {f for f, _, _, _, _, _ in
-                    [x for n in e["names"] for x in found.get(n, [])]
-                    if True}
-            hit_files = set()
+            hit_files = {f for f, _, _, _ in got}
             for n in e["names"]:
-                for f, kind, path, st, enum, ptr in found.get(n, []):
-                    if e["owner"] == "enum":
-                        if enum and set(want) == {x for x in enum if x is not None}:
-                            hit_files.add(f)
-                    elif ptr and set(e["group"]) & set(ptr):
-                        hit_files.add(f)
+                for p in found.get(n, []):
+                    if matches(e, p):
+                        hit_files.add(p[0])
             for n in e["names"]:
-                for f, kind, path, st, enum, ptr in found.get(n, []):
-                    # ⭐ «값»으로 가른다 — 이름이 같아도 값집합이 다르면 남의 자리다.
+                for p in found.get(n, []):
+                    f, kind, path, st = p[0], p[1], p[2], p[3]
+                    if place_key(p):
+                        # ⭐ 키가 붙은 자리는 위에서 «키로» 이미 셌다 — 두 번 세지 않는다.
+                        #    키가 남의 것이면 여기서도 안 센다. 그것이 키 대조의 뜻이다.
+                        continue
+                    # ⚠ 아직 키가 «안 붙은» 자리만 옛 방식(값·그룹)으로 짚는다.
                     # registry-system 은 registry 와 «계약에서는» 같다 — 포인터다.
                     # 다른 것은 W-06-06 에서 고객이 편집할 수 있는가뿐이고,
                     # 그것은 계약이 아니라 화면·마스터 소관이다(2026-09-02 신설).
-                    if e["owner"] == "enum":
-                        hit = enum and set(want) == {x for x in enum if x is not None}
-                    else:
-                        # registry 갈래는 «그룹 이름»으로 자리를 찾는다 — 값은 계약에
-                        # 없고 서버 마스터에 있기 때문이다. 값 열은 사람이 읽고
-                        # 나중에 서버 시드와 대조할 근거다.
-                        hit = ptr and set(e["group"]) & set(ptr)
-                    if hit:
+                    if matches(e, p):
                         got.append((f, kind, path, st))
                     elif st == "bare" and f in hit_files:
                         # ⛔ 값도 포인터도 없는 «형제» 자리 — 단 이 키가 실제로 걸린
@@ -281,18 +483,41 @@ def main() -> int:
             mark = "✅" if ok else "⛔"
             if not ok:
                 bad += 1
-            print("%s %-38s %-9s 사전 %-3s 값있음 %-3d 맨몸 %-3d %s"
-                  % (mark, e["key"], e["owner"],
-                     want_n if want_n is not None else "?", len(got), len(bare),
-                     "" if ok else "← 맨몸 자리가 그만큼이다"))
+            n_key = len(tagged_by_key.get(e["key"], []))
+            # ⭐ 두 방향을 가른다 — 「모자란다」와 「넘친다」는 고칠 곳이 다르다.
+            #    모자람 = 계약이 비어 있다(맨몸 자리를 채운다)
+            #    넘침   = 사전의 «자리» 수가 뒤처졌다(키가 붙으면서 드러난다)
+            why = ""
             if not ok:
+                why = ("← 맨몸 자리가 그만큼이다" if len(got) < (want_n or 0)
+                       else "← 사전의 자리 수가 뒤처졌다(키가 %d자리를 짚는다)" % n_key)
+            print("%s %-38s %-9s 사전 %-3s 값있음 %-3d (키 %-3d) 맨몸 %-3d %s"
+                  % (mark, e["key"], e["owner"],
+                     want_n if want_n is not None else "?", len(got), n_key, len(bare),
+                     why))
+            if not ok and len(got) < (want_n or 0):
                 for f, kind, path in bare[:4]:
                     print("      ⛔ %-20s %-5s %s" % (f[:20], kind, path[-58:]))
+            elif not ok:
+                # ⭐ 넘칠 때는 «사전의 이름 열에 없는» 자리를 먼저 보인다 —
+                #    키가 붙으면서 드러난 자리가 바로 그것이라 고칠 곳을 짚어 준다.
+                extra = [x for x in tagged_by_key.get(e["key"], [])
+                         if x[4] not in e["names"]]
+                for f, kind, path, _st, n in (extra or
+                                              tagged_by_key.get(e["key"], []))[:4]:
+                    print("      ⚠ %-20s %-5s %-22s %s"
+                          % (f[:20], kind, n[:22], path[-40:]))
         print()
-        print("① 사전이 선언한 자리 수를 «못 채운» 키: %d" % bad)
-        print("   ⭐ 이것은 검사기 오류가 아니라 «계약이 비어 있다»는 뜻이다 —")
+        print("① 사전이 선언한 자리 수와 «어긋난» 키: %d" % bad)
+        print("   ⭐ 모자라면 검사기 오류가 아니라 «계약이 비어 있다»는 뜻이다 —")
         print("      사전이 「여기도 이 코드다」라 선언해야 그 빈자리가 보인다.")
-        print("② 사전이 «값으로» 짚어 낸 자리: %d / 계약 %d" % (claimed, total))
+        print("   ⭐ 넘치면 «사전의 자리 수가 뒤처졌다»는 뜻이다 — 키가 붙으면서")
+        print("      이름 열에 없던 자리가 드러난 것이고, 사전 쪽을 고친다.")
+        print("② 사전이 짚어 낸 자리: %d / 계약 %d" % (claimed, total))
+        print("③ 그중 «키로» 짚은 자리: %d — 나머지 %d 는 값·그룹으로 짚었다"
+              % (by_this_key, claimed - by_this_key))
+        print("   ⭐ 부착이 진행될수록 이 비율이 오르고 계수가 정확해진다 —")
+        print("      값·그룹 매칭은 값집합이 우연히 같은 코드를 못 가른다.")
         print()
 
     splits = split_siblings(found)
@@ -318,8 +543,9 @@ def main() -> int:
     if gate:
         print("⛔ 막는 규칙에 걸렸습니다 — %s" % " · ".join(gate))
         return 1
-    print("⭐ 계수 규칙(①②④)은 «막지 않는다» — 흐름을 보는 수다.")
-    print("   ⛔ 막는 것은 ⓪ 뿐이다 — 등록부↔사전 1:1 과 소유 일치.")
+    print("⭐ 계수 규칙(①②③④㉣)은 «막지 않는다» — 흐름을 보는 수다.")
+    print("   ⛔ 막는 것은 ⓪ 와 ⑤ 다 — 등록부↔사전 1:1 · 소유 일치 ·")
+    print("      그리고 계약이 적은 키가 사전과 어긋나지 않는가(㉠㉡㉢).")
     return 0
 
 

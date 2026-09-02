@@ -42,7 +42,8 @@
       "schema": {
        "type": "string",
        "example": "DAILY"
-      }
+      },
+      "x-code-key": "CD-EQUIPMENT-INSPECTION-TYPE"
      },
      {
       "name": "inspectedFrom",

@@ -56,7 +56,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "x-code-key": "CD-INVENTORY-ADJUSTMENT-REASON"
      },
      {
       "name": "adjustedAtFrom",
@@ -587,7 +588,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "x-code-key": "CD-FROM-INVENTORY-STATUS"
      },
      {
       "name": "ownershipTypeCode",
@@ -766,7 +768,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "x-code-key": "CD-INVENTORY-COUNT-TYPE"
      },
      {
       "name": "statusCode",
@@ -1211,7 +1214,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "x-code-key": "CD-HANDLING-UNIT-TYPE"
      },
      {
       "name": "statusCode",
@@ -2362,7 +2366,8 @@
       "schema": {
        "type": "string"
       },
-      "description": "출고 유형"
+      "description": "출고 유형",
+      "x-code-key": "CD-ISSUE-TYPE"
      },
      {
       "name": "sourceWarehouseId",
@@ -2386,7 +2391,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "x-code-key": "CD-GOODS-ISSUE-REASON"
      },
      {
       "name": "supplierId",
@@ -3079,7 +3085,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "x-code-key": "CD-RECEIPT-TYPE"
      },
      {
       "name": "statusCode",
@@ -11516,7 +11523,8 @@
       "maxLength": 50,
       "description": "LOT 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
       "example": "MATERIAL",
-      "x-internal-note": "⛔ PRODUCTION → PRODUCT 전이 쓰기가 계약 7벌에 0건이다(실측). 갈래가 둘이다 — ⓐ 동일 행 유지(제품LOT 은 완제품 창고에 선 PRODUCTION LOT 을 부르는 이름) ⓑ 제품 LOT 별도 발번(발번 화면·POST 경로·W-03-01 유형별 분리 집계를 함께 세워야 한다). 사람 결정 대기 — 경계 B6-01. CLOSED 영향: W-01-07·W-01-04·W-02-04·W-02-05·W-03-01·W-03-02·W-03-03·M-01-04."
+      "x-internal-note": "⛔ PRODUCTION → PRODUCT 전이 쓰기가 계약 7벌에 0건이다(실측). 갈래가 둘이다 — ⓐ 동일 행 유지(제품LOT 은 완제품 창고에 선 PRODUCTION LOT 을 부르는 이름) ⓑ 제품 LOT 별도 발번(발번 화면·POST 경로·W-03-01 유형별 분리 집계를 함께 세워야 한다). 사람 결정 대기 — 경계 B6-01. CLOSED 영향: W-01-07·W-01-04·W-02-04·W-02-05·W-03-01·W-03-02·W-03-03·M-01-04.",
+      "x-code-key": "CD-LOT-TYPE"
      },
      "plantId": {
       "x-source-column": "plant_id",
@@ -11742,7 +11750,8 @@
       "maxLength": 50,
       "description": "LOT 유형. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
       "example": "MATERIAL",
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-code-key": "CD-LOT-TYPE"
      },
      "plantId": {
       "x-source-column": "plant_id",

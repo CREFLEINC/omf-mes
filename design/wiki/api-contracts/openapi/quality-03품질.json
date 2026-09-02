@@ -580,7 +580,8 @@
        "type": "string",
        "example": "값"
       },
-      "description": "IQC · PQC · OQC"
+      "description": "IQC · PQC · OQC",
+      "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
      },
      {
       "name": "statusCode",
@@ -763,7 +764,8 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
      },
      {
       "name": "overallJudgmentCode",
@@ -995,7 +997,8 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
      },
      {
       "name": "itemId",
@@ -1105,7 +1108,8 @@
        "type": "string",
        "example": "값"
       },
-      "description": "⚠ IQC·PQC·OQC 를 합치지 않는다 — 자재 불량률과 제품 불량률을 더하면 뜻이 없다(L-7)"
+      "description": "⚠ IQC·PQC·OQC 를 합치지 않는다 — 자재 불량률과 제품 불량률을 더하면 뜻이 없다(L-7)",
+      "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
      },
      {
       "name": "itemId",
@@ -1612,7 +1616,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "x-code-key": "CD-LOT-HOLD-REASON"
      },
      {
       "name": "lotTypeCode",
@@ -1733,7 +1738,8 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-code-key": "CD-LOT-HOLD-REASON"
      },
      {
       "name": "heldBy",

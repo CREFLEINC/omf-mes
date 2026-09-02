@@ -3508,7 +3508,8 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-code-key": "CD-WORK-SESSION-EVENT-TYPE"
      }
     ],
     "responses": {
@@ -4833,7 +4834,8 @@
       "maxLength": 50,
       "x-source-column": "override_reason_code",
       "description": "⚠ decisionCode 가 OVERRIDDEN 일 때만 값이 있다",
-      "example": "EMERGENCY_WORK_ORDER"
+      "example": "EMERGENCY_WORK_ORDER",
+      "x-code-key": "CD-CONTROL-OVERRIDE-REASON"
      },
      "workerNo": {
       "type": [

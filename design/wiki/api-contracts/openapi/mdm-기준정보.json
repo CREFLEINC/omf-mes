@@ -68,7 +68,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "x-code-key": "CD-WAREHOUSE-TYPE"
      },
      {
       "name": "isDefect",
@@ -5258,7 +5259,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
      },
      {
       "name": "itemId",
@@ -10370,7 +10372,8 @@
       "schema": {
        "type": "string"
       },
-      "description": "점검 유형으로 거른다"
+      "description": "점검 유형으로 거른다",
+      "x-code-key": "CD-EQUIPMENT-INSPECTION-TYPE"
      },
      {
       "name": "includeInactive",
@@ -16494,7 +16497,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "공통코드",
-      "example": "STANDARD"
+      "example": "STANDARD",
+      "x-code-key": "CD-EXTERNAL-SYSTEM"
      },
      "partnerId": {
       "x-source-column": "partner_id",

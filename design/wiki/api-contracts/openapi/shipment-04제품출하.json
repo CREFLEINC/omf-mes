@@ -534,7 +534,8 @@
        "type": "string",
        "example": "MORNING"
       },
-      "description": "출하 희망 시간대 필터 — 공통코드 그룹 `SHIPMENT_TIME_SLOT`(`MORNING`·`AFTERNOON`·`NIGHT`). W-04-02 시간대 필터 축. 근거: W-04-02 §5-2, 2026-08-31 결정(omf-mes-server#41)"
+      "description": "출하 희망 시간대 필터 — 공통코드 그룹 `SHIPMENT_TIME_SLOT`(`MORNING`·`AFTERNOON`·`NIGHT`). W-04-02 시간대 필터 축. 근거: W-04-02 §5-2, 2026-08-31 결정(omf-mes-server#41)",
+      "x-code-key": "CD-SHIPMENT-TIME-SLOT"
      },
      {
       "name": "shippingInspectionRequired",
@@ -744,7 +745,8 @@
        "type": "string",
        "example": "MORNING"
       },
-      "description": "출하 희망 시간대 필터 — 목록(GET /logistics/shipment-requests)과 같은 축. 공통코드 그룹 `SHIPMENT_TIME_SLOT`(`MORNING`·`AFTERNOON`·`NIGHT`). 근거: W-04-02 §5-2, 2026-08-31 결정(omf-mes-server#41)"
+      "description": "출하 희망 시간대 필터 — 목록(GET /logistics/shipment-requests)과 같은 축. 공통코드 그룹 `SHIPMENT_TIME_SLOT`(`MORNING`·`AFTERNOON`·`NIGHT`). 근거: W-04-02 §5-2, 2026-08-31 결정(omf-mes-server#41)",
+      "x-code-key": "CD-SHIPMENT-TIME-SLOT"
      },
      {
       "name": "shippingInspectionRequired",
