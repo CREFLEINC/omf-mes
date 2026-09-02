@@ -20927,7 +20927,7 @@
       ],
       "maxLength": 50,
       "example": "MONTH",
-      "description": "날짜 주기 단위 — 일(DAY) 또는 월(MONTH). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다"
+      "description": "날짜 주기 단위 — 일(DAY)·주(WEEK)·월(MONTH)·년(YEAR). ⚠ 2026-09-02 정정 — 이 자리가 「일 또는 월」 2값으로 적혀 있었으나 omf-mes#188 이 검교정 주기 단위와 «한 그룹»으로 합치며 4값으로 확정했고 형제 자리(calibrationCycleTypeCode)는 4값을 적고 있었다. 같은 그룹을 가리키는 두 자리가 다른 목록을 말하던 것을 맞춘다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다"
      },
      "lastPmDate": {
       "type": [
@@ -21042,7 +21042,7 @@
       ],
       "maxLength": 50,
       "example": "MONTH",
-      "description": "날짜 주기 단위 — 일(DAY) 또는 월(MONTH). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다"
+      "description": "날짜 주기 단위 — 일(DAY)·주(WEEK)·월(MONTH)·년(YEAR). ⚠ 2026-09-02 정정 — 이 자리가 「일 또는 월」 2값으로 적혀 있었으나 omf-mes#188 이 검교정 주기 단위와 «한 그룹»으로 합치며 4값으로 확정했고 형제 자리(calibrationCycleTypeCode)는 4값을 적고 있었다. 같은 그룹을 가리키는 두 자리가 다른 목록을 말하던 것을 맞춘다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다"
      }
     }
    },
@@ -21111,7 +21111,7 @@
       ],
       "maxLength": 50,
       "example": "MONTH",
-      "description": "날짜 주기 단위 — 일(DAY) 또는 월(MONTH). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다"
+      "description": "날짜 주기 단위 — 일(DAY)·주(WEEK)·월(MONTH)·년(YEAR). ⚠ 2026-09-02 정정 — 이 자리가 「일 또는 월」 2값으로 적혀 있었으나 omf-mes#188 이 검교정 주기 단위와 «한 그룹»으로 합치며 4값으로 확정했고 형제 자리(calibrationCycleTypeCode)는 4값을 적고 있었다. 같은 그룹을 가리키는 두 자리가 다른 목록을 말하던 것을 맞춘다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=CYCLE_TYPE 로 받는다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다"
      }
     }
    },

@@ -65,29 +65,36 @@ VALUE = re.compile(r"`([A-Z][A-Z0-9_]+)`")     # 코드 문자열·그룹 이름
 # ── 사전 읽기 ─────────────────────────────────────────────────────────────
 
 def read_dictionary(path: str) -> list[dict]:
-    """사전 표를 읽는다. 「| 키 | 값(이름) | 소유 | 자리 | 근거 |」 표만 본다."""
+    """사전 표를 읽는다. 「| 키 | 값 | 그룹 | 프로퍼티 | 소유 | 자리 | 근거 |」 표만 본다.
+
+    ⭐ 값 열은 «언제나» 실제 코드 문자열이다. 그룹(codeGroupCode)은 따로 둔다 —
+       한 열에 두 종류를 섞으면 읽는 사람이 헷갈리고, registry 갈래의 실제 값이
+       «산문에만» 남는다(2026-09-02 사용자 지적으로 갈랐다).
+    """
     rows: list[dict] = []
     with open(path, encoding="utf-8") as fh:
         for line in fh:
             if not line.startswith("|"):
                 continue
             cs = [c.strip() for c in line.strip().strip("|").split("|")]
-            # ⛔ 열이 «정확히 여섯»인 표만 본다 — 같은 문서의 결과·설명 표가 첫 칸에
+            # ⛔ 열이 «정확히 일곱»인 표만 본다 — 같은 문서의 결과·설명 표가 첫 칸에
             #    같은 키를 다시 적어 사전 행으로 세어졌다(2026-09-02 · 10 → 13).
-            if len(cs) != 6:
+            if len(cs) != 7:
                 continue
             m = KEY.match(cs[0])
             if not m:
                 continue                      # 머리·구분선·다른 표
             rows.append({
                 "key": m.group(1),
-                # ⭐ 값 — enum 갈래면 코드 문자열들, registry 갈래면 그룹 이름.
-                #    ⛔ 이름이 아니라 «값»으로 대조해야 같은 이름 다른 값집합이 갈린다.
+                # ⭐ 값 — «언제나» 실제 코드 문자열이다. 그룹 이름은 따로 둔다.
+                #    ⛔ 첫 판은 enum 갈래만 코드 문자열이고 registry 갈래는 그룹 이름이라
+                #    한 열에 두 종류가 섞였고, registry 쪽 실제 값이 «산문에만» 남았다.
                 "values": VALUE.findall(cs[1]),
-                "names": CODE_NAME.findall(cs[2]),
-                "owner": cs[3].strip("`"),
-                "places": int(cs[4]) if cs[4].isdigit() else None,
-                "basis": cs[5] if len(cs) > 5 else "",
+                "group": VALUE.findall(cs[2]),
+                "names": CODE_NAME.findall(cs[3]),
+                "owner": cs[4].strip("`"),
+                "places": int(cs[5]) if cs[5].isdigit() else None,
+                "basis": cs[6],
             })
     return rows
 
@@ -194,7 +201,7 @@ def main() -> int:
                     if e["owner"] == "enum":
                         if enum and set(want) == {x for x in enum if x is not None}:
                             hit_files.add(f)
-                    elif ptr and set(want) & set(ptr):
+                    elif ptr and set(e["group"]) & set(ptr):
                         hit_files.add(f)
             for n in e["names"]:
                 for f, kind, path, st, enum, ptr in found.get(n, []):
@@ -205,7 +212,10 @@ def main() -> int:
                     if e["owner"] == "enum":
                         hit = enum and set(want) == {x for x in enum if x is not None}
                     else:
-                        hit = ptr and set(want) & set(ptr)
+                        # registry 갈래는 «그룹 이름»으로 자리를 찾는다 — 값은 계약에
+                        # 없고 서버 마스터에 있기 때문이다. 값 열은 사람이 읽고
+                        # 나중에 서버 시드와 대조할 근거다.
+                        hit = ptr and set(e["group"]) & set(ptr)
                     if hit:
                         got.append((f, kind, path, st))
                     elif st == "bare" and f in hit_files:
