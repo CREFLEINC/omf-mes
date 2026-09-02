@@ -1055,8 +1055,20 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "maxLength": 40
-      }
+       "maxLength": 40,
+       "enum": [
+        "MATERIAL_LOT_LABEL",
+        "GOODS_ISSUE_QR",
+        "PRODUCTION_LOT_LABEL",
+        "IDENTIFICATION_TAG",
+        "PACKING_LABEL",
+        "DELIVERY_LABEL",
+        "CERTIFICATE_OF_ANALYSIS",
+        "TOOL_LABEL",
+        "LOCATION_LABEL"
+       ]
+      },
+      "description": "출력물 종류로 거른다. 값은 DocumentIssue.documentTypeCode 와 같은 9종이다."
      },
      {
       "name": "targetTypeCode",
@@ -1436,7 +1448,18 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "maxLength": 40
+       "maxLength": 40,
+       "enum": [
+        "MATERIAL_LOT_LABEL",
+        "GOODS_ISSUE_QR",
+        "PRODUCTION_LOT_LABEL",
+        "IDENTIFICATION_TAG",
+        "PACKING_LABEL",
+        "DELIVERY_LABEL",
+        "CERTIFICATE_OF_ANALYSIS",
+        "TOOL_LABEL",
+        "LOCATION_LABEL"
+       ]
       },
       "description": "이 종류를 찍을 수 있는 프린터만 거른다."
      }
@@ -1503,9 +1526,20 @@
       "required": false,
       "schema": {
        "type": "string",
-       "maxLength": 40
+       "maxLength": 40,
+       "enum": [
+        "MATERIAL_LOT_LABEL",
+        "GOODS_ISSUE_QR",
+        "PRODUCTION_LOT_LABEL",
+        "IDENTIFICATION_TAG",
+        "PACKING_LABEL",
+        "DELIVERY_LABEL",
+        "CERTIFICATE_OF_ANALYSIS",
+        "TOOL_LABEL",
+        "LOCATION_LABEL"
+       ]
       },
-      "example": "LABEL",
+      "example": "PACKING_LABEL",
       "description": "주면 그 종류만 센다. 한 대상에 라벨과 성적서가 따로 붙을 수 있다."
      }
     ],
@@ -4260,8 +4294,19 @@
      "documentTypeCode": {
       "type": "string",
       "maxLength": 40,
-      "description": "출력물 종류(라벨·검사성적서·추적보고서 등).",
-      "x-no-example": true
+      "enum": [
+       "MATERIAL_LOT_LABEL",
+       "GOODS_ISSUE_QR",
+       "PRODUCTION_LOT_LABEL",
+       "IDENTIFICATION_TAG",
+       "PACKING_LABEL",
+       "DELIVERY_LABEL",
+       "CERTIFICATE_OF_ANALYSIS",
+       "TOOL_LABEL",
+       "LOCATION_LABEL"
+      ],
+      "description": "출력물 종류. 라벨 6종·검사성적서·툴 QR·Location 라벨 — 값마다 «찍는 화면»과 «서버가 그리는 렌디션»이 다르다(공유계약 K-5). ⛔ 고객이 늘리는 공통코드 그룹이 아니다 — 값을 늘려도 렌디션이 없어 안 찍힌다(A-16 「가르는 물음 넷」: 가 거짓 + 다 참 ⇒ 설계가 정하는 업무 코드). MATERIAL_LOT_LABEL=자재 LOT 라벨(P-01-01) · GOODS_ISSUE_QR=출고 QR(P-01-02) · PRODUCTION_LOT_LABEL=생산 LOT 라벨(P-02-07) · IDENTIFICATION_TAG=인식표(P-02-05·P-02-09) · PACKING_LABEL=포장 라벨(P-02-09·P-04-02·P-04-04) · DELIVERY_LABEL=납품 라벨(P-04-02) · CERTIFICATE_OF_ANALYSIS=검사성적서(W-04-03) · TOOL_LABEL=툴 QR 라벨(W-05-13) · LOCATION_LABEL=Location 코드 라벨(W-06-07)",
+      "example": "PACKING_LABEL"
      },
      "target": {
       "$ref": "#/components/schemas/DocumentTarget"
@@ -4376,7 +4421,19 @@
       "type": "string",
       "maxLength": 40,
       "minLength": 1,
-      "x-no-example": true
+      "enum": [
+       "MATERIAL_LOT_LABEL",
+       "GOODS_ISSUE_QR",
+       "PRODUCTION_LOT_LABEL",
+       "IDENTIFICATION_TAG",
+       "PACKING_LABEL",
+       "DELIVERY_LABEL",
+       "CERTIFICATE_OF_ANALYSIS",
+       "TOOL_LABEL",
+       "LOCATION_LABEL"
+      ],
+      "description": "찍을 출력물 종류. 값 ↔ 발행 화면 대응은 06-API-요구서-app공통출력물.md §3-8 이 정본이다.",
+      "example": "PACKING_LABEL"
      },
      "targets": {
       "type": "array",
@@ -4437,7 +4494,7 @@
       "example": null
      }
     },
-    "x-internal-note": "값 목록·그룹 이름 소관 = omf-mes#145(OPEN). 이 한 축에 발행 화면 8장이 걸린다 — P-01-01·P-01-02·P-02-05·P-02-07·P-02-09·P-04-02·P-04-04 + W-05-13(구현 완료 · omf-mes-client#212). 대상 유형 대응표의 정본은 06-API-요구서-app공통출력물.md §3-7 이다. example 을 되살리지 마라 — omf-mes#191(example 오염) 대상이다. ⚠ reissueReasonCode 의 example 이던 PRINT_FAILED 는 우리 제안안(01-2차-제안안.md 492행)의 PRINT_FAILURE 와 한 단어 어긋난 값이었다 — 그래서 지웠다."
+    "x-internal-note": "⭐ documentTypeCode 는 2026-09-02 에 enum 9종으로 닫았다(omf-mes#145). A-16 「가르는 물음 넷」에서 «가 거짓 + 다 참» ⇒ 설계가 정하는 업무 코드다 — ⛔ 등록부(G-32)에 올리지 않는다. 값 ↔ 발행 화면 대응의 정본은 06-API-요구서-app공통출력물.md §3-8 이다. 이 한 축에 발행 화면 9장이 걸린다 — P-01-01·P-01-02·P-02-05·P-02-07·P-02-09·P-04-02·P-04-04 + W-05-13(구현 완료 · omf-mes-client#212) + W-06-07(Location 라벨). 예정 1장 = W-04-03(검사성적서 · 양식 미정이라 아직 안 부른다). ⚠ 아직 열린 것 둘 — reissueReasonCode 값 목록(omf-mes#145) · CoC(적합증명서)를 CoA 와 가를지(W-04-03 §8-3). TRACE_REPORT 는 발행 화면이 0건이라 값을 두지 않았다 — 생기면 enum 확장이다. 대상 유형(targetTypeCode) 대응표의 정본은 같은 문서 §3-7 이고 «다른 축»이다. ⛔ reissueReasonCode 의 example 은 되살리지 마라 — omf-mes#191(example 오염) 대상이다. ⚠ reissueReasonCode 의 example 이던 PRINT_FAILED 는 우리 제안안(01-2차-제안안.md 492행)의 PRINT_FAILURE 와 한 단어 어긋난 값이었다 — 그래서 지웠다."
    },
    "DocumentIssueListResponse": {
     "type": "object",
@@ -4551,10 +4608,23 @@
       "type": "array",
       "items": {
        "type": "string",
-       "maxLength": 40
+       "maxLength": 40,
+       "enum": [
+        "MATERIAL_LOT_LABEL",
+        "GOODS_ISSUE_QR",
+        "PRODUCTION_LOT_LABEL",
+        "IDENTIFICATION_TAG",
+        "PACKING_LABEL",
+        "DELIVERY_LABEL",
+        "CERTIFICATE_OF_ANALYSIS",
+        "TOOL_LABEL",
+        "LOCATION_LABEL"
+       ]
       },
+      "description": "이 프린터가 찍을 수 있는 출력물 종류. 값 집합은 DocumentIssue.documentTypeCode 와 같다.",
       "example": [
-       "LABEL"
+       "PACKING_LABEL",
+       "DELIVERY_LABEL"
       ]
      }
     }
