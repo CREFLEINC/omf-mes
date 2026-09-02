@@ -2175,7 +2175,9 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-code-key": "CD-WORK-ORDER-STATUS",
+      "description": "작업지시 상태로 거른다 — 편성(PLANNED) · 확정(CONFIRMED) · 배포(RELEASED) · 진행(IN_PROGRESS) · 완료(COMPLETED) · 마감(CLOSED) · 중단(SUSPENDED) · 취소(CANCELLED) «8종»(결정 14 · 사용자 확정 2026-09-02). ⛔ 「진행불가」는 상태가 «아니다» — 자원 Validation NG 는 확정 버튼을 막는 게이트이고 W/O 는 편성에 머문다(W-02-04 §5 · W-02-03 §5-3 A-9 3등급). 「재시작」을 상태에서 뺀 것과 같은 논리다(중단→진행 전이 이벤트). ⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 값을 편집하면 안 된다. 상태 전이와 버튼 활성이 이 값에 걸린다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_ORDER_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "released",
@@ -2260,7 +2262,9 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-code-key": "CD-WORK-ORDER-TYPE",
+      "description": "작업지시 유형으로 거른다 — NORMAL(양산) · EMERGENCY(긴급) · REWORK(재작업). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_ORDER_TYPE 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 값을 편집하면 안 된다. 계약 자신이 「이 값으로 갈리는 것이 셋」이라 적어 두었다."
      },
      {
       "name": "plannedStartFrom",
@@ -6100,7 +6104,8 @@
       "type": "string",
       "description": "작업지시 유형. NORMAL(양산) 기본 · EMERGENCY(긴급) · REWORK(재작업) 셋이다. 공통코드 그룹 이름은 WORK_ORDER_TYPE 이다(공유계약 G-32). ⛔ 화면이 이 값을 로직에 흩어 박지 않는다 — 한 곳에 모아 두고 그 한 곳만 참조한다. ⭐ 이 값으로 갈리는 것이 셋이다 — 긴급 현장 투입 화면(P-02-12)의 진입 목록 · 확정·배포 화면(W-02-04)의 대기 목록 · 자재 출고요청 자동 발행의 긴급 제외(R29).",
       "example": "NORMAL",
-      "x-internal-note": "값 셋을 함께 못박은 이유는 공유계약 A-21 이다 — 일부만 채워진 것이 빈 것보다 위험하다. 뜻 목록은 R15 가 「양산/긴급/개발품」으로 이름 지었으나 omf-mes#70 이 2026-08-24 에 「개발품 구분은 품목이다」로 닫아 유형 축에서 빠졌고(mdm.item.developmentItem · omf-mes#215), 그 자리를 이 계약이 이미 「긴급·재작업」으로 적고 있어 합이 셋이다. 문자열 EMERGENCY 는 새로 지은 것이 아니라 06-API-요구서-02생산실행.md §3-20 이 P-02-12 진입 쿼리로 이미 쓰고 있던 것을 스키마에 앉힌 것이다(omf-mes#259). ⚠ 같은 계약의 PrecheckDecision.overrideReasonCode 예시 EMERGENCY_WORK_ORDER 는 통제 우회 «사유» 코드라 다른 그룹이다 — 충돌하지 않는다. 공통코드 마스터 등록은 W-06-06 소관이고 우리를 막지 않는다(공유계약 G-31 표기 — 작업 통지)."
+      "x-internal-note": "값 셋을 함께 못박은 이유는 공유계약 A-21 이다 — 일부만 채워진 것이 빈 것보다 위험하다. 뜻 목록은 R15 가 「양산/긴급/개발품」으로 이름 지었으나 omf-mes#70 이 2026-08-24 에 「개발품 구분은 품목이다」로 닫아 유형 축에서 빠졌고(mdm.item.developmentItem · omf-mes#215), 그 자리를 이 계약이 이미 「긴급·재작업」으로 적고 있어 합이 셋이다. 문자열 EMERGENCY 는 새로 지은 것이 아니라 06-API-요구서-02생산실행.md §3-20 이 P-02-12 진입 쿼리로 이미 쓰고 있던 것을 스키마에 앉힌 것이다(omf-mes#259). ⚠ 같은 계약의 PrecheckDecision.overrideReasonCode 예시 EMERGENCY_WORK_ORDER 는 통제 우회 «사유» 코드라 다른 그룹이다 — 충돌하지 않는다. 공통코드 마스터 등록은 W-06-06 소관이고 우리를 막지 않는다(공유계약 G-31 표기 — 작업 통지).",
+      "x-code-key": "CD-WORK-ORDER-TYPE"
      },
      "parentWorkOrderId": {
       "type": "integer",
@@ -6190,8 +6195,9 @@
      "statusCode": {
       "type": "string",
       "x-no-example": "상태 코드 문자열이 아직 확정되지 않았다 — 임의 코드를 example 로 넣으면 확정값처럼 읽힌다",
-      "description": "편성 → 확정 → 배포 → 진행 → 완료 → 마감. 중단↕재개 반복. 취소가 값으로 붙는다. ⚠ 진행불가(자원 유효성 NG — 해소되면 배포로 복귀)도 결정 14 그래프의 노드다(W-02-03 §5 · W-02-04 §5 가 쓴다). ⚠ 코드 문자열은 아직 확정되지 않았다 — 뜻과 식별자는 다른 산출물이다(공유계약 G-32 v3.4). ⛔ 화면이 이 값을 로직에 흩어 박지 않는다 — 한 곳에 모아 두고 그 한 곳만 참조한다(omf-mes#247). 근거: ✓설계확정 결정 14 · 예외 E-4 ④ ⭐ 「확정 대기」는 저장하는 상태 값이 아니다 — 아직 배포되지 않은 편성 W/O 를 가리키는 화면 용어이며, 상태는 :release 가 「확정」으로 한 번에 옮긴다. 화면이 별도 전이를 부르지 않는다.",
-      "x-internal-note": "example 이 'NORMAL' 이었다 — 그것은 형제 칸 workOrderTypeCode 의 확정 기본값이고 상태 값이 아니다. 상태 칸에 유형 칸 값이 들어가 있어 「상태 기본값이 NORMAL」로 읽힐 자리였다(omf-mes#247 실측). ⚠ 결정 14 본문은 「상태 값 8종」이라 적었으나 같은 결정의 그래프 노드는 아홉이다(편성·확정·배포·진행·완료·마감·중단·진행불가·취소). 그 8 이 이 설명과 P-02-01 §2 에 그대로 복사되면서 「진행불가」가 두 하류에서 함께 탈락했다 — 코드 문자열 확정은 이 뜻 목록을 먼저 정합화한 뒤에 한다(공유계약 A-21 — 일부만 채워진 것이 빈 것보다 위험하다). 화면 쪽 추적은 P-02-01 §8 미결 7 이 갖는다(omf-mes#247). ⭐ 「확정 대기」의 실제 게이트는 「배포 시각 없음 AND 계획 자원 배정 1건 이상 AND 4M 유효성 BLOCK 0건」이고 서버가 releasable 질의축으로 판정한다(W-02-03 §5-6 · W-02-04 §3). 화면이 상태 문자열로 거르지 않는다."
+      "description": "작업지시의 진행 상태 — 편성(PLANNED) · 확정(CONFIRMED) · 배포(RELEASED) · 진행(IN_PROGRESS) · 완료(COMPLETED) · 마감(CLOSED) · 중단(SUSPENDED) · 취소(CANCELLED) «8종»(결정 14 · 사용자 확정 2026-09-02). ⛔ 「진행불가」는 상태가 «아니다» — 자원 Validation NG 는 확정 버튼을 막는 게이트이고 W/O 는 편성에 머문다(W-02-04 §5 · W-02-03 §5-3 A-9 3등급). 「재시작」을 상태에서 뺀 것과 같은 논리다(중단→진행 전이 이벤트). ⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 값을 편집하면 안 된다. 상태 전이와 버튼 활성이 이 값에 걸린다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_ORDER_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-internal-note": "example 이 'NORMAL' 이었다 — 그것은 형제 칸 workOrderTypeCode 의 확정 기본값이고 상태 값이 아니다. 상태 칸에 유형 칸 값이 들어가 있어 「상태 기본값이 NORMAL」로 읽힐 자리였다(omf-mes#247 실측). ⚠ 결정 14 본문은 「상태 값 8종」이라 적었으나 같은 결정의 그래프 노드는 아홉이다(편성·확정·배포·진행·완료·마감·중단·진행불가·취소). 그 8 이 이 설명과 P-02-01 §2 에 그대로 복사되면서 「진행불가」가 두 하류에서 함께 탈락했다 — 코드 문자열 확정은 이 뜻 목록을 먼저 정합화한 뒤에 한다(공유계약 A-21 — 일부만 채워진 것이 빈 것보다 위험하다). 화면 쪽 추적은 P-02-01 §8 미결 7 이 갖는다(omf-mes#247). ⭐ 「확정 대기」의 실제 게이트는 「배포 시각 없음 AND 계획 자원 배정 1건 이상 AND 4M 유효성 BLOCK 0건」이고 서버가 releasable 질의축으로 판정한다(W-02-03 §5-6 · W-02-04 §3). 화면이 상태 문자열로 거르지 않는다.",
+      "x-code-key": "CD-WORK-ORDER-STATUS"
      },
      "releasedAt": {
       "type": "string",
@@ -6406,7 +6412,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "작업지시 유형. 보내지 않으면 서버가 NORMAL(양산)로 채운다. ⛔ 긴급 발행 화면(W-02-07)은 이 칸을 반드시 EMERGENCY 로 채워 보낸다 — 비우면 화면이 「유형: 긴급」이라 적어 놓고 양산 작업지시가 만들어지고, 오류가 나지 않아 아무 데서도 드러나지 않는다. 값 집합은 셋이다 — NORMAL(양산) · EMERGENCY(긴급) · REWORK(재작업). 공통코드 그룹 이름은 WORK_ORDER_TYPE 이다(공유계약 G-32).",
-      "example": "EMERGENCY"
+      "example": "EMERGENCY",
+      "x-code-key": "CD-WORK-ORDER-TYPE"
      },
      "priorityNo": {
       "type": "integer",

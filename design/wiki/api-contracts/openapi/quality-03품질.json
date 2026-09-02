@@ -783,7 +783,9 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-code-key": "CD-INSPECTION-RESULT-STATUS",
+      "description": "검사 성적서 상태로 거른다 — 임시저장(DRAFT) · 확정(CONFIRMED). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "processId",
@@ -1194,7 +1196,9 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-code-key": "CD-INSPECTION-RESULT-STATUS",
+      "description": "검사 성적서 상태로 거른다 — 목록과 같은 축. 임시저장(DRAFT) · 확정(CONFIRMED). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      }
     ],
     "responses": {
@@ -3601,8 +3605,9 @@
      },
      "statusCode": {
       "type": "string",
-      "description": "작성중 · 확정. 임시 저장은 작성중으로 남는다",
-      "example": "작성중"
+      "description": "검사 성적서의 상태 — 임시저장(DRAFT) · 확정(CONFIRMED). ⛔ **코드 문자열은 영문이다**(§G — 확정된 뜻을 영문 대문자 SNAKE 로 옮긴다). 2026-09-02 이전에는 이 자리에 한국어 enum 「작성중」·「확정」이 박혀 있었고, 계약 7벌에서 «유일한» 한국어 enum 이었다. ⛔ enum 으로 못박지 않는다 — 표시명이 한국어·베트남어 2개국어라 enum 이면 화면이 표시명을 갖게 된다(INSPECTION_REQUEST_STATUS 선례 · K-5). ⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 값을 편집하면 안 된다. 확정이면 Lot Status 전이와 보류 해제가 따른다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "DRAFT",
+      "x-code-key": "CD-INSPECTION-RESULT-STATUS"
      },
      "previousResultId": {
       "type": "integer",
@@ -3726,13 +3731,10 @@
      },
      "statusCode": {
       "type": "string",
-      "enum": [
-       "작성중",
-       "확정"
-      ],
-      "description": "⭐ 오프라인 큐는 언제나 확정으로 보낸다 — 임시 저장은 단말에 남고 서버로 오지 않는다.",
-      "example": "작성중",
-      "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 3단계 §3-2"
+      "description": "임시 저장이면 DRAFT, 즉시 확정이면 CONFIRMED 를 보낸다. ⭐ 오프라인 큐는 언제나 CONFIRMED 로 보낸다 — 임시 저장은 단말에 남고 서버로 오지 않는다. 임시저장(DRAFT) · 확정(CONFIRMED). ⛔ **코드 문자열은 영문이다**(§G — 확정된 뜻을 영문 대문자 SNAKE 로 옮긴다). 2026-09-02 이전에는 이 자리에 한국어 enum 「작성중」·「확정」이 박혀 있었고, 계약 7벌에서 «유일한» 한국어 enum 이었다. ⛔ enum 으로 못박지 않는다 — 표시명이 한국어·베트남어 2개국어라 enum 이면 화면이 표시명을 갖게 된다(INSPECTION_REQUEST_STATUS 선례 · K-5). ⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 값을 편집하면 안 된다. 확정이면 Lot Status 전이와 보류 해제가 따른다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "DRAFT",
+      "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 3단계 §3-2",
+      "x-code-key": "CD-INSPECTION-RESULT-STATUS"
      },
      "previousResultId": {
       "type": "integer",

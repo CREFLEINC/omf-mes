@@ -2581,7 +2581,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th class="nw">S12</th><td>W/O 완료·마감 — +중단·홀드·취소·재개, 축5(생산관리자·웹)</td></tr>
 </tbody></table>
 <p>사이드 구조 9종 (02-S-A~I — 도식02 §2): 02-S-A 작업 홀드(중단→재개 N회 반복) · 02-S-B 러닝체인지(W/O 무분할·LOT BOM 스냅샷별 분할) · 02-S-C P/O 변경 수신(반영 vs 강행·리셉션-only) · 02-S-D 긴급 W/O 직행(P/O 비귀속·통제 우회·배정 null·리셉션-only) · 02-S-E PQC(수행 지점 02·거버넌스 03) · 02-S-F BOM 미비 처리(<strong>미정 골격</strong> — 행위 0) · 02-S-G 점검 이력 없음 처리(<strong>미정 골격</strong>) · 02-S-H 비가동 처리(<strong>미정 골격</strong>) · 02-S-I 수리 왕복·재투입(구 03 사이드 A 이관).</p>
-<p>W/O 상태 체계 (✓설계확정 2026-07-06 결정 14): 편성→확정→배포→진행→완료→마감 / 진행↕중단(반복) / 진행불가(자원 Validation NG — 해소 시 배포 복귀) / 확정·배포·진행→취소. 단계별 태스크·행위자·예외 상세 → <strong>05-사용자-프로세스-태스크플로우.md</strong> 참조.</p>
+<p>W/O 상태 체계 (✓설계확정 2026-07-06 결정 14 · ⭐ <strong>8종 확정 2026-09-02 사용자</strong>): <code>PLANNED</code>(편성)→<code>CONFIRMED</code>(확정)→<code>RELEASED</code>(배포)→<code>IN_PROGRESS</code>(진행)→<code>COMPLETED</code>(완료)→<code>CLOSED</code>(마감) / 진행↕<code>SUSPENDED</code>(중단, 반복) / 확정·배포·진행→<code>CANCELLED</code>(취소). ⛔ <strong>「진행불가」는 상태가 아니다</strong> — 자원 Validation NG 는 확정 버튼을 막는 «게이트»이고 W/O 는 편성에 머문다(<code>W-02-04</code> §5 · <code>W-02-03</code> §5-3 <code>A-9</code> 3등급). 「재시작」을 상태에서 뺀 것과 같은 논리다. 구 표기: <del>진행불가(자원 Validation NG — 해소 시 배포 복귀)</del>. 단계별 태스크·행위자·예외 상세 → <strong>05-사용자-프로세스-태스크플로우.md</strong> 참조.</p>
 <h4>설계 규칙·정책 전건 — 93건 (검산: W/O·상태 6 + P/O·편성 11 + 긴급·개발품 5 + 자원배정 3 + 배포·선발행 6 + 점검·인증 4 + 4M 투입 12 + 작업실적 6 + PQC 6 + 불량·비가동 9 + LOT 완료·포장 6 + 이동·WIP·수리 5 + 마감·ERP 8 + 화면 절단 6 = 93)</h4>
 <p><strong>[W/O·상태 체계] R01~R06 (6건)</strong></p>
 <table>
