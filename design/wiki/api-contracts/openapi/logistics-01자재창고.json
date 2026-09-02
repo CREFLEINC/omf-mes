@@ -49,7 +49,9 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "x-code-key": "CD-LOGISTICS-DOCUMENT-STATUS",
+      "description": "전표 상태로 거른다 — 등록(REGISTERED) · 전기완료(POSTED) · 취소요청(CANCEL_REQUESTED) · 취소완료(CANCELLED). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOGISTICS_DOCUMENT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "reasonCode",
@@ -1691,7 +1693,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 예약의 유효·소진은 수량 축이 담고 이 칸을 움직이는 오퍼레이션이 없다(A-21)."
      },
      {
       "name": "openOnly",
@@ -1980,7 +1983,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 진행은 파생으로 나오고 이 칸을 «올릴» 주체가 없다. ASN 은 ERP 수신본이라 경로가 GET 셋뿐이고(등록·수정·삭제 없음) 소비 화면은 W-01-09 조회 하나다. 예정 대비 실입하는 AsnLine.expectedQty ↔ receivedQty 로 서버가 계산한다 — InventoryCountLine 이 라인 진행을 counted 로 두고 「이 필드로 하지 않는다」고 한 것과 같은 형태다(사용자 결정 2026-09-02). ⚠ ERP 가 ASN 을 안 보내면 W-01-09 는 빈다 — 입하는 P/O 기준으로 그대로 돈다."
      },
      {
       "name": "itemId",
@@ -5256,7 +5260,9 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "x-code-key": "CD-PUTAWAY-TASK-STATUS",
+      "description": "적치 작업 상태로 거른다 — 적치 대기(PENDING) · 적치 완료(COMPLETED) · 임시 적치 완료(COMPLETED_TEMPORARY). ⚠ 임시 적치는 사유가 함께 필수다(PUTAWAY_TASK_TEMPORARY_REASON). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PUTAWAY_TASK_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "lotId",
@@ -5652,7 +5658,9 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "x-code-key": "CD-LOGISTICS-DOCUMENT-STATUS",
+      "description": "전표 상태로 거른다 — 등록(REGISTERED) · 전기완료(POSTED) · 취소요청(CANCEL_REQUESTED) · 취소완료(CANCELLED). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOGISTICS_DOCUMENT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "page",
@@ -7282,7 +7290,8 @@
       "maxLength": 50,
       "description": "전표의 진행 상태. 확정된 값 목록이 아직 없으므로 화면은 서버가 내려주는 값을 그대로 표시하고 값 자체로 분기하지 않는다. 근거: 공유계약 G-2",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 진행은 파생으로 나오고 이 칸을 «올릴» 주체가 없다. ASN 은 ERP 수신본이라 경로가 GET 셋뿐이고(등록·수정·삭제 없음) 소비 화면은 W-01-09 조회 하나다. 예정 대비 실입하는 AsnLine.expectedQty ↔ receivedQty 로 서버가 계산한다 — InventoryCountLine 이 라인 진행을 counted 로 두고 「이 필드로 하지 않는다」고 한 것과 같은 형태다(사용자 결정 2026-09-02). ⚠ ERP 가 ASN 을 안 보내면 W-01-09 는 빈다 — 입하는 P/O 기준으로 그대로 돈다."
      },
      "remarks": {
       "x-source-column": "remarks",
@@ -9494,7 +9503,8 @@
       "maxLength": 50,
       "description": "전표의 진행 상태. 확정된 값 목록이 아직 없으므로 화면은 서버가 내려주는 값을 그대로 표시하고 값 자체로 분기하지 않는다. 근거: 공유계약 G-2",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 라인 진행은 supplierLotMissing · labelIssued · inspectionRequired · lotId 네 축이 이미 담는다(A-21)."
      },
      "lotId": {
       "type": [
@@ -10011,9 +10021,10 @@
       "x-source-column": "status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "전표의 진행 상태. 확정된 값 목록이 아직 없으므로 화면은 서버가 내려주는 값을 그대로 표시하고 값 자체로 분기하지 않는다. 근거: 공유계약 G-2",
+      "description": "전표의 진행 상태 — 등록(REGISTERED) · 전기완료(POSTED) · 취소요청(CANCEL_REQUESTED) · 취소완료(CANCELLED). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOGISTICS_DOCUMENT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-code-key": "CD-LOGISTICS-DOCUMENT-STATUS"
      },
      "adjustedAt": {
       "x-source-column": "adjusted_at",
@@ -11140,7 +11151,8 @@
       "maxLength": 50,
       "description": "전표의 진행 상태. 확정된 값 목록이 아직 없으므로 화면은 서버가 내려주는 값을 그대로 표시하고 값 자체로 분기하지 않는다. 근거: 공유계약 G-2",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 예약의 유효·소진은 수량 축이 담고 이 칸을 움직이는 오퍼레이션이 없다(A-21)."
      }
     }
    },
@@ -11228,7 +11240,8 @@
       "maxLength": 50,
       "description": "전표의 진행 상태. 확정된 값 목록이 아직 없으므로 화면은 서버가 내려주는 값을 그대로 표시하고 값 자체로 분기하지 않는다. 근거: 공유계약 G-2",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 이 칸을 쓰자던 유일한 근거가 W-01-12 §5-2 ②안(미확정 원장 행)인데, 그것은 ③안이 없어서 쓰던 임시책이었다. ③(조정 라인)이 2026-09-02 에 계약에 들어와(/inventory/adjustments/{id}/lines · InventoryAdjustmentLine) 근거가 소멸했다."
      },
      "reversalOfTransactionId": {
       "x-source-column": "reversal_of_transaction_id",
@@ -12841,7 +12854,8 @@
       "maxLength": 50,
       "description": "전표의 진행 상태. 확정된 값 목록이 아직 없으므로 화면은 서버가 내려주는 값을 그대로 표시하고 값 자체로 분기하지 않는다. 근거: 공유계약 G-2",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 라인 진행은 plannedQty ↔ pickedQty 와 held 가 이미 담는다. InventoryCountLine 의 counted 선례와 같다(A-21)."
      },
      "held": {
       "type": "boolean",
@@ -13553,9 +13567,10 @@
       "x-source-column": "status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "전표의 진행 상태. 확정된 값 목록이 아직 없으므로 화면은 서버가 내려주는 값을 그대로 표시하고 값 자체로 분기하지 않는다. 근거: 공유계약 G-2",
+      "description": "적치 작업의 상태 — 적치 대기(PENDING) · 적치 완료(COMPLETED) · 임시 적치 완료(COMPLETED_TEMPORARY). ⚠ 임시 적치는 사유가 함께 필수다(PUTAWAY_TASK_TEMPORARY_REASON). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PUTAWAY_TASK_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-code-key": "CD-PUTAWAY-TASK-STATUS"
      },
      "completedAt": {
       "x-source-column": "completed_at",
@@ -13851,9 +13866,10 @@
       "x-source-column": "status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "전표의 진행 상태. 확정된 값 목록이 아직 없으므로 화면은 서버가 내려주는 값을 그대로 표시하고 값 자체로 분기하지 않는다. 근거: 공유계약 G-2",
+      "description": "전표의 진행 상태 — 등록(REGISTERED) · 전기완료(POSTED) · 취소요청(CANCEL_REQUESTED) · 취소완료(CANCELLED). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOGISTICS_DOCUMENT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-code-key": "CD-LOGISTICS-DOCUMENT-STATUS"
      },
      "lines": {
       "type": "array",

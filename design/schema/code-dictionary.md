@@ -133,7 +133,7 @@ CD-<계열>-<축>
 | `CD-EQUIPMENT-BREAKDOWN-STATUS` | `RECEIVED` `HANDLING` `DONE` | `EQUIPMENT_BREAKDOWN_STATUS` | `statusCode` | `registry-system` | 2 | 고장 접수. **값이 계약 산문에 이미 있었다**(2026-09-02 꺼냄) · `W-05-04` |
 | `CD-MAINTENANCE-ORDER-STATUS` | `ISSUED` `DONE` `CANCELLED` | `MAINTENANCE_ORDER_STATUS` | `statusCode` | `registry-system` | 2 | 보전 지시. 같음 · `W-05-05` |
 | `CD-MAINTENANCE-ORDER-ITEM-STATUS` | `PLANNED` `DONE` `NA` | `MAINTENANCE_ORDER_ITEM_STATUS` | `statusCode` | `registry-system` | 1 | 보전 지시 **항목**. ⚠ 지시 전체와 **다른 축**이다 |
-| `CD-LOGISTICS-DOCUMENT-STATUS` | `REGISTERED` `POSTED` `CANCEL_REQUESTED` `CANCELLED` | `LOGISTICS_DOCUMENT_STATUS` | `statusCode` | `registry-system` | 15 | 물류 전표 9종 공용. ⭐ `W-01-13` §3 목업이 네 값을 이미 그렸다 — 꺼낸 것이지 정한 것이 아니다. 9종은 `CD-LOGISTICS-DOCUMENT-TYPE` 과 같은 집합이다 · 사용자 결정 2026-09-02 |
+| `CD-LOGISTICS-DOCUMENT-STATUS` | `REGISTERED` `POSTED` `CANCEL_REQUESTED` `CANCELLED` | `LOGISTICS_DOCUMENT_STATUS` | `statusCode` | `registry-system` | 19 | 물류 전표 9종 공용. ⭐ `W-01-13` §3 목업이 네 값을 이미 그렸다 — 꺼낸 것이지 정한 것이 아니다. 9종은 `CD-LOGISTICS-DOCUMENT-TYPE` 과 같은 집합이다 · 사용자 결정 2026-09-02 |
 | `CD-INVENTORY-COUNT-STATUS` | `PLANNED` `IN_PROGRESS` `COMPLETED` | `INVENTORY_COUNT_STATUS` | `statusCode` | `registry-system` | 2 | 재고 실사. ⚠ **전표 상태와 다른 축** — 전기·취소가 없다. `W-01-04` §3 목업 · 사용자 결정 2026-09-02 |
 | `CD-MASTER-VERSION-STATUS` | `DRAFT` `CONFIRMED` `OBSOLETE` | `MASTER_VERSION_STATUS` | `statusCode` | `registry-system` | 3 | 마스터 버전 편집 잠금 — `Routing`·`Bom`·`InspectionPlanVersion` 공용. ⭐ 결정 07 이 Routing 에서 확정한 값을 둘이 준용한다 · 사용자 결정 2026-09-02 |
 | `CD-APPROVAL-REQUEST-STATUS` | `PENDING` `APPROVED` `REJECTED` | `APPROVAL_REQUEST_STATUS` | `statusCode` | `registry-system` | 2 | 결재 요청. `W-CO-09` §3 목업 · 사용자 결정 2026-09-02 |
@@ -150,9 +150,12 @@ CD-<계열>-<축>
 | `CD-SHIPMENT-STATUS` | `UNCONFIRMED` `CONFIRMED` `CANCELLED` | `SHIPMENT_STATUS` | `statusCode` | `registry-system` | 2 | 출하 확정·취소 축 |
 | `CD-NONCONFORMANCE-STATUS` | `NOT_REQUESTED` `PENDING_DECISION` `DECIDED` | `NONCONFORMANCE_STATUS` | `statusCode` | `registry-system` | 2 | 부적합 의뢰·판정 축 |
 | `CD-LOT-LIFECYCLE-STATUS` | `WAITING` `ACTIVE` `VOIDED` | `LOT_LIFECYCLE_STATUS` | `lifecycleStatusCode` | `registry-system` | 1 | LOT 선발행 슬롯 생명주기 — 품질 판정 축과 다르다 |
+| `CD-PRODUCTION-ORDER-STATUS` | `RECEIVED` `UPDATED` `CANCELLED` | `PRODUCTION_ORDER_STATUS` | `statusCode` | `registry-system` | 2 | P/O 상태. ⭐ 「수정됨(UPDATED)」은 사용자가 추가했다 — `W-02-06` 이 P/O 변경 이벤트를 다루는데 그 사실을 담을 값이 없었다 · ERP 매핑 없음(사용자 결정 2026-09-02) |
+| `CD-PRODUCTION-PLAN-STATUS` | `DRAFT` `CONFIRMED` | `PRODUCTION_PLAN_STATUS` | `statusCode` | `registry-system` | 2 | 생산계획 편집 잠금. ⭐ `MASTER_VERSION_STATUS`(작성중·확정·폐기)와 «같은 축»이라 낱말을 맞췄다 — 다만 「폐기」가 이 리소스에 없어 둘이다 |
+| `CD-PUTAWAY-TASK-STATUS` | `PENDING` `COMPLETED` `COMPLETED_TEMPORARY` | `PUTAWAY_TASK_STATUS` | `statusCode` | `registry-system` | 2 | 적치 작업. ⭐ **「완료」를 `COMPLETED` 로 정한 근거** — 실측하니 저장소가 도메인으로 갈려 있다: `COMPLETED` 는 실사(01)·작업지시(02)·검사의뢰(03)·처분진행(04) · `DONE` 은 설비 고장(05)·보전지시(05)·보전 항목(05)·연계 메시지. 적치는 물류(01)라 `COMPLETED` 다(사용자 위임 판단 2026-09-02) |
 | `CD-APP-USER-STATUS` | ⬜ **미상** | `APP_USER_STATUS` | `statusCode` | `registry` | 4 | ⬜ **뜻은 확정, 코드 문자열이 없다** — 계약이 「재직·휴직·퇴사 등」으로 «한국어 뜻»만 적었다. `§G` 규약대로 「확정된 뜻을 영문 SNAKE 로 옮긴다」를 적용할 자리이나 그 도출은 아직 안 했다. ⛔ 계정 사용 가부는 이 값이 아니라 `isActive` 가 정한다 |
 | `CD-CONTROL-OVERRIDE-REASON` | `EMERGENCY_WORK_ORDER` `OTHER` | `CONTROL_OVERRIDE_REASON` | `reasonCode` | `registry` | 3 | 통제 우회 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
-| `CD-DOWNTIME-REASON` | `EQUIPMENT_FAILURE` `MOLD_CHANGE` `MATERIAL_WAIT` `LABOR_WAIT` `PREVENTIVE_MAINTENANCE` `OTHER` | `DOWNTIME_REASON` | `reasonCode`(쿼리) | `registry` | 1 | 설비 비가동 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
+| `CD-DOWNTIME-REASON` | `EQUIPMENT_FAILURE` `MOLD_CHANGE` `MATERIAL_WAIT` `LABOR_WAIT` `PREVENTIVE_MAINTENANCE` `OTHER` | `DOWNTIME_REASON` | `reasonCode`(쿼리) | `registry` | 2 | 설비 비가동 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-EQUIPMENT-INSPECTION-JUDGMENT-METHOD` | `VISUAL` `MEASUREMENT` | `EQUIPMENT_INSPECTION_JUDGMENT_METHOD` | `judgmentMethodCode` | `registry-system` | 4 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
 | `CD-EQUIPMENT-INSPECTION-TYPE` | `DAILY` `MONTHLY` `MAINTENANCE` | `EQUIPMENT_INSPECTION_TYPE` | `inspectionTypeCode` | `registry` | 8 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
 | `CD-EQUIPMENT-STATUS` | `IN_SERVICE` `DISPOSED` | `EQUIPMENT_STATUS` | `statusCode` | `registry-system` | 4 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |

@@ -60,7 +60,8 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 특채의 승인 상태는 approval_request 가 갖는다(approval_request_id 가 NOT NULL). 값 후보 셋이 APPROVAL_REQUEST_STATUS 와 정확히 겹치고, 이 리소스를 움직이는 오퍼레이션이 0건이다. ⭐ usable 은 「상태 유효 ∧ validTo ∧ 잔여>0」 3항 논리곱이라 만료·소진은 이 축이 아니다."
      },
      {
       "name": "usableOnly",
@@ -2727,7 +2728,8 @@
      },
      "statusCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 특채의 승인 상태는 approval_request 가 갖는다(approval_request_id 가 NOT NULL). 값 후보 셋이 APPROVAL_REQUEST_STATUS 와 정확히 겹치고, 이 리소스를 움직이는 오퍼레이션이 0건이다. ⭐ usable 은 「상태 유효 ∧ validTo ∧ 잔여>0」 3항 논리곱이라 만료·소진은 이 축이 아니다."
      },
      "usable": {
       "type": "boolean",

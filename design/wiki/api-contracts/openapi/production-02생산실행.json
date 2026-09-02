@@ -37,7 +37,9 @@
       "schema": {
        "type": "string",
        "x-no-example": "값 목록이 미확정이라 코드 문자열을 못 박지 않는다"
-      }
+      },
+      "x-code-key": "CD-PRODUCTION-ORDER-STATUS",
+      "description": "P/O 상태로 거른다 — 수신(RECEIVED) · 수정됨(UPDATED) · 취소(CANCELLED). ⭐ ERP 가 발행하고 MES 는 수신본을 갖지만 **코드는 우리 어휘로 저장한다** — ERP 코드를 그대로 담거나 매핑 테이블을 두지 않는다(사용자 결정 2026-09-02). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PRODUCTION_ORDER_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "unacknowledgedOnly",
@@ -392,7 +394,9 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-code-key": "CD-PRODUCTION-PLAN-STATUS",
+      "description": "생산계획 상태로 거른다 — 작성중(DRAFT) · 확정(CONFIRMED). ⛔ 확정 뒤에는 수정·삭제가 막힌다(400 STATE_LOCKED) — :confirm 이 그 전이를 만든다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PRODUCTION_PLAN_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "planDateFrom",
@@ -1045,7 +1049,8 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 부르는 화면이 0건이고(02 요구서 §5 미착지 5 — 경로가 고아다) 전이 액션도 없다. 구간 형 리소스라 진행은 requestedAt ↔ receivedAt 의 유무로 판정한다 — 작업 세션·LOT 보류가 쓴 그 방식이다(A-21)."
      },
      {
       "name": "requestedFrom",
@@ -1256,7 +1261,8 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 계약이 인계·인수를 «한 행위»로 접어 (receivedAt 을 같은 시각에 찍는다) 전이가 0개다. 구간 형 리소스로 handedOverAt ↔ receivedAt 의 유무로 판정한다. ⚠ M-02-01 §8 미결 2 는 그 접기 자체를 열어 두었다 — 축이 갈리면 그때 다시 본다."
      },
      {
       "name": "handedOverFrom",
@@ -3975,7 +3981,8 @@
       "schema": {
        "type": "string",
        "example": "값"
-      }
+      },
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 전이 액션이 계약 7벌에 0건이고 축이 품질(⇒ LOT_STATUS 파생)인지 생애인지 안 정해졌다. R69 「불량품 미부착」이라 「불량」 값의 생산자도 없다(A-21)."
      },
      {
       "name": "producedFrom",
@@ -4518,7 +4525,8 @@
      },
      "statusCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 부르는 화면이 0건이고(02 요구서 §5 미착지 5 — 경로가 고아다) 전이 액션도 없다. 구간 형 리소스라 진행은 requestedAt ↔ receivedAt 의 유무로 판정한다 — 작업 세션·LOT 보류가 쓴 그 방식이다(A-21)."
      },
      "requestedAt": {
       "type": "string",
@@ -4641,7 +4649,8 @@
      },
      "statusCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 계약이 인계·인수를 «한 행위»로 접어 (receivedAt 을 같은 시각에 찍는다) 전이가 0개다. 구간 형 리소스로 handedOverAt ↔ receivedAt 의 유무로 판정한다. ⚠ M-02-01 §8 미결 2 는 그 접기 자체를 열어 두었다 — 축이 갈리면 그때 다시 본다."
      },
      "handedOverAt": {
       "type": "string",
@@ -5193,7 +5202,8 @@
      "statusCode": {
       "type": "string",
       "x-no-example": "값 목록이 미확정이라 코드 문자열을 못 박지 않는다",
-      "description": "P/O 상태. ⚠ 값 목록은 아직 확정 전이다 — 화면은 서버가 내려주는 값을 그대로 표시하고 값 자체로 분기하지 않는다."
+      "description": "P/O(생산오더)의 상태 — 수신(RECEIVED) · 수정됨(UPDATED) · 취소(CANCELLED). ⭐ ERP 가 발행하고 MES 는 수신본을 갖지만 **코드는 우리 어휘로 저장한다** — ERP 코드를 그대로 담거나 매핑 테이블을 두지 않는다(사용자 결정 2026-09-02). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PRODUCTION_ORDER_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-PRODUCTION-ORDER-STATUS"
      },
      "acknowledgedAt": {
       "type": "string",
@@ -5399,7 +5409,9 @@
      },
      "statusCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-PRODUCTION-PLAN-STATUS",
+      "description": "생산계획의 상태 — 작성중(DRAFT) · 확정(CONFIRMED). ⛔ 확정 뒤에는 수정·삭제가 막힌다(400 STATE_LOCKED) — :confirm 이 그 전이를 만든다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PRODUCTION_PLAN_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "confirmedAt": {
       "type": "string",
@@ -5857,7 +5869,8 @@
      },
      "statusCode": {
       "type": "string",
-      "x-no-example": true
+      "x-no-example": true,
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 전이 액션이 계약 7벌에 0건이고 축이 품질(⇒ LOT_STATUS 파생)인지 생애인지 안 정해졌다. R69 「불량품 미부착」이라 「불량」 값의 생산자도 없다(A-21)."
      },
      "producedAt": {
       "type": "string",
