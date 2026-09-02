@@ -194,20 +194,31 @@ def check_parameters(doc: dict, name: str) -> list[str]:
             if not isinstance(params, list):
                 continue
             for p in params:
-                if not isinstance(p, dict) or "example" not in p:
+                if not isinstance(p, dict):
                     continue
                 pname = p.get("name") or ""
                 if not pname.endswith(("Code", "Codes", "No")):
                     continue
                 schema = p.get("schema") or {}
+                # ⛔ example 은 «두 자리» 에 올 수 있다 — 파라미터 객체와 그 schema.
+                #    2026-09-02 이전에는 객체쪽만 봤고, 실측하니 객체 3 · schema 43 이었다.
+                #    43자리가 통째로 안 걸렸고 그중 30이 자리채움이었다.
+                #    배열이면 schema.items.example 도 본다.
+                if "example" in p:
+                    example = p["example"]
+                elif "example" in schema:
+                    example = schema["example"]
+                elif "example" in (schema.get("items") or {}):
+                    example = schema["items"]["example"]
+                else:
+                    continue
                 merged = dict(schema)
-                merged["example"] = p["example"]
+                merged["example"] = example
                 if p.get("description"):
                     merged["description"] = p["description"]
                 if is_exempt(merged):
                     continue
                 where = "%s · %s %s ?%s" % (name, method.upper(), route, pname)
-                example = p["example"]
                 if in_enum(merged, example):
                     continue
                 group = pointed_group(merged)
