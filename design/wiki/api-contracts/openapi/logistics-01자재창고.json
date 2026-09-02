@@ -1225,7 +1225,8 @@
       "in": "query",
       "schema": {
        "type": "string"
-      }
+      },
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 이 리소스는 «전표»가 아니라 «물건»(팔레트·박스 같은 담는 그릇)이다. ⛔ 2026-09-02 이전에는 이 자리에 「전표의 진행 상태」라는 «남의 설명»이 복사돼 있었다. 담긴 것의 진행은 :pack · /contents · /repack-events 가 이미 담고, 라벨 발행 여부는 boolean 축이면 충분하다(InboundReceiptLine.labelIssued 선례). ⚠ P-02-08 §8-4 가 「포장 해체 화면이 없다」고 적어 뒤쪽 값이 업무에 없다 — 해체 업무가 서면 그때 세운다(A-21 · 사용자 결정 2026-09-02)."
      },
      {
       "name": "q",
@@ -8778,9 +8779,9 @@
       "x-source-column": "status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "전표의 진행 상태. 확정된 값 목록이 아직 없으므로 화면은 서버가 내려주는 값을 그대로 표시하고 값 자체로 분기하지 않는다. 근거: 공유계약 G-2",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 이 리소스는 «전표»가 아니라 «물건»(팔레트·박스 같은 담는 그릇)이다. ⛔ 2026-09-02 이전에는 이 자리에 「전표의 진행 상태」라는 «남의 설명»이 복사돼 있었다. 담긴 것의 진행은 :pack · /contents · /repack-events 가 이미 담고, 라벨 발행 여부는 boolean 축이면 충분하다(InboundReceiptLine.labelIssued 선례). ⚠ P-02-08 §8-4 가 「포장 해체 화면이 없다」고 적어 뒤쪽 값이 업무에 없다 — 해체 업무가 서면 그때 세운다(A-21 · 사용자 결정 2026-09-02)."
      }
     }
    },
