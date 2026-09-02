@@ -45,6 +45,10 @@
 | ㉢ | 키는 있는데 그 자리의 `codeGroupCode=` 포인터가 **사전의 그룹과 다르다** | ⛔ 막는다 |
 | ㉣ | 착지한(`x-source-column` 있는) `*Code` 자리에 **키가 없다** | ⚠ 계수만 |
 
+⭐ ㉣ 에서 빠지는 자리 — `x-no-code-key: "<이유>"` 가 적힌 자리. 인스턴스 식별자
+(마스터 «한 건»을 가리키는 코드)와 표준값(ISO 국가·IANA 시간대)이 그것이다.
+⛔ **이유 없이 빼는 길은 없다.**
+
 ⭐ **㉠㉢ 셋만 막는 이유** — 이 셋은 「이미 붙인 키가 «틀렸다»」이고, 틀린 키는
    고치는 데 다른 결정이 필요 없다. 반면 ㉣ 는 「아직 안 붙였다」이고 기준선이
    크다(2026-09-02 실측 109). 게이트로 걸면 초록을 기준선으로 쓸 수 없다.
@@ -180,7 +184,8 @@ def scan() -> dict[str, list[tuple]]:
                                        tuple(src.get("enum") or ()),
                                        tuple(POINTER.findall(v.get("description") or "")),
                                        v.get("x-code-key"),
-                                       "x-source-column" in v))
+                                       "x-source-column" in v,
+                                       v.get("x-no-code-key")))
                     if k == "name" and isinstance(v, str) and \
                             (v.endswith("Code") or v.endswith("Codes")) and "schema" in node:
                         sc = node.get("schema") or {}
@@ -279,6 +284,11 @@ def check_keys(sites: list[tuple], entries: list[dict]) -> tuple[list, list, lis
     return unknown, enum_gap, ptr_gap
 
 
+def place_excused(place: tuple):
+    """이 자리가 「코드 그룹이 아니다」로 «명시»됐는가 — `x-no-code-key` 의 이유."""
+    return place[8] if len(place) > 8 else None
+
+
 def keyless_landed(found: dict[str, list[tuple]]) -> list[tuple]:
     """㉣ — 착지했는데 키가 «없는» 자리. ⚠ 막지 않는다, 센다.
 
@@ -289,7 +299,9 @@ def keyless_landed(found: dict[str, list[tuple]]) -> list[tuple]:
     out = []
     for name, places in found.items():
         for p in places:
-            if place_landed(p) and not place_key(p):
+            if place_landed(p) and not place_key(p) and not place_excused(p):
+                # ⛔ `x-no-code-key` 로 «이유를 적어» 뺀 자리는 세지 않는다.
+                #    이유 없이 빼는 길은 없다 — 빈 문자열도 이유가 아니다.
                 out.append((name, p[0], p[1], p[2]))
     return sorted(out)
 

@@ -13562,7 +13562,8 @@
       "x-source-column": "warehouse_code",
       "type": "string",
       "maxLength": 50,
-      "example": "WH-01"
+      "example": "WH-01",
+      "x-no-code-key": "코드 그룹이 아니다 — Warehouse 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "warehouseName": {
       "x-source-column": "warehouse_name",
@@ -13649,7 +13650,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "uq_warehouse — plantId 내 유일. 공백만 불가",
-      "example": "WH-01"
+      "example": "WH-01",
+      "x-no-code-key": "코드 그룹이 아니다 — Warehouse 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "warehouseName": {
       "x-source-column": "warehouse_name",
@@ -13724,7 +13726,8 @@
       "maxLength": 50,
       "description": "uq_warehouse — plantId 내 유일. 실제 편집 가능 여부는 GET 응답의 editability를 따른다",
       "example": "WH-01",
-      "x-internal-note": "(§8-7 미결 반영)"
+      "x-internal-note": "(§8-7 미결 반영)",
+      "x-no-code-key": "코드 그룹이 아니다 — Warehouse 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "warehouseName": {
       "x-source-column": "warehouse_name",
@@ -13826,7 +13829,8 @@
       "x-source-column": "location_code",
       "type": "string",
       "maxLength": 50,
-      "example": "A-01-03"
+      "example": "A-01-03",
+      "x-no-code-key": "코드 그룹이 아니다 — Location 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "locationName": {
       "x-source-column": "location_name",
@@ -13932,7 +13936,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "uq_location — warehouseId 내 유일",
-      "example": "A-01-03"
+      "example": "A-01-03",
+      "x-no-code-key": "코드 그룹이 아니다 — Location 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "locationName": {
       "x-source-column": "location_name",
@@ -14027,7 +14032,8 @@
       "maxLength": 50,
       "description": "uq_location — warehouseId 내 유일. 실제 편집 가능 여부는 GET 응답의 editability를 따른다",
       "example": "A-01-03",
-      "x-internal-note": "(§8-7 미결 반영)"
+      "x-internal-note": "(§8-7 미결 반영)",
+      "x-no-code-key": "코드 그룹이 아니다 — Location 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "locationName": {
       "x-source-column": "location_name",
@@ -14331,7 +14337,8 @@
       "x-source-column": "role_code",
       "type": "string",
       "maxLength": 50,
-      "example": "ROLE_PROD_MGR"
+      "example": "ROLE_PROD_MGR",
+      "x-no-code-key": "코드 그룹이 아니다 — Role 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "roleName": {
       "x-source-column": "role_name",
@@ -14369,7 +14376,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "uq — 전역 유일. 공백만 불가",
-      "example": "ROLE_PROD_MGR"
+      "example": "ROLE_PROD_MGR",
+      "x-no-code-key": "코드 그룹이 아니다 — Role 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "roleName": {
       "x-source-column": "role_name",
@@ -14402,7 +14410,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "uq — 전역 유일. 실제 편집 가능 여부는 GET 응답의 editability 를 따른다",
-      "example": "ROLE_PROD_MGR"
+      "example": "ROLE_PROD_MGR",
+      "x-no-code-key": "코드 그룹이 아니다 — Role 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "roleName": {
       "x-source-column": "role_name",
@@ -14551,7 +14560,8 @@
       "type": "string",
       "maxLength": 50,
       "example": "W-01-03",
-      "description": "부여된 기능 권한 코드. ⭐ **고를 수 있는 «후보» 전부는 GET /app/permissions 가 준다** — 이 경로의 응답은 「이미 부여된 것」뿐이라 그것만으로는 권한을 새로 줄 수 없다. ⛔ 공통코드가 아니다 — 앱 기능 목록이라 고객이 늘리거나 지우지 않는다. 값은 화면 코드와 1:1 이다(입도 = 화면 단위 · 사용자 결정 2026-09-01). 근거: W-CO-02 §4-E"
+      "description": "부여된 기능 권한 코드. ⭐ **고를 수 있는 «후보» 전부는 GET /app/permissions 가 준다** — 이 경로의 응답은 「이미 부여된 것」뿐이라 그것만으로는 권한을 새로 줄 수 없다. ⛔ 공통코드가 아니다 — 앱 기능 목록이라 고객이 늘리거나 지우지 않는다. 값은 화면 코드와 1:1 이다(입도 = 화면 단위 · 사용자 결정 2026-09-01). 근거: W-CO-02 §4-E",
+      "x-no-code-key": "코드 그룹이 아니다 — RolePermission 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      }
     },
     "x-internal-note": "미착지: permission_code 값 목록이 회신 E-9 대기 — 화면은 비활성+사유로 둔다(공유계약 G-2·G-6)"
@@ -14657,7 +14667,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "uq_routing(item_id, routing_code, routing_version) 구성 — 결정 07 헤더 키",
-      "example": "STANDARD"
+      "example": "STANDARD",
+      "x-no-code-key": "코드 그룹이 아니다 — Routing 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "routingVersion": {
       "x-source-column": "routing_version",
@@ -14722,7 +14733,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "uq_routing — itemId 내 유일. 공백만 불가",
-      "example": "STANDARD"
+      "example": "STANDARD",
+      "x-no-code-key": "코드 그룹이 아니다 — Routing 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "effectiveFrom": {
       "x-source-column": "effective_from",
@@ -14754,7 +14766,8 @@
       "x-source-column": "routing_code",
       "type": "string",
       "maxLength": 50,
-      "example": "STANDARD"
+      "example": "STANDARD",
+      "x-no-code-key": "코드 그룹이 아니다 — Routing 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "effectiveFrom": {
       "x-source-column": "effective_from",
@@ -15182,7 +15195,8 @@
       "x-source-column": "group_code",
       "type": "string",
       "maxLength": 50,
-      "example": "STANDARD"
+      "example": "STANDARD",
+      "x-no-code-key": "코드 그룹이 아니다 — CodeGroup 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "groupName": {
       "x-source-column": "group_name",
@@ -15221,7 +15235,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "uq — 전역 유일. 공백만 불가",
-      "example": "STANDARD"
+      "example": "STANDARD",
+      "x-no-code-key": "코드 그룹이 아니다 — CodeGroup 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "groupName": {
       "x-source-column": "group_name",
@@ -15252,7 +15267,8 @@
       "x-source-column": "group_code",
       "type": "string",
       "maxLength": 50,
-      "example": "STANDARD"
+      "example": "STANDARD",
+      "x-no-code-key": "코드 그룹이 아니다 — CodeGroup 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "groupName": {
       "x-source-column": "group_name",
@@ -15660,7 +15676,8 @@
       "x-source-column": "department_code",
       "type": "string",
       "maxLength": 50,
-      "example": "DEPT-P1"
+      "example": "DEPT-P1",
+      "x-no-code-key": "코드 그룹이 아니다 — Department 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "departmentName": {
       "x-source-column": "department_name",
@@ -15741,7 +15758,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "uq — 전역 유일",
-      "example": "DEPT-P1"
+      "example": "DEPT-P1",
+      "x-no-code-key": "코드 그룹이 아니다 — Department 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "departmentName": {
       "x-source-column": "department_name",
@@ -15802,7 +15820,8 @@
       "x-source-column": "department_code",
       "type": "string",
       "maxLength": 50,
-      "example": "DEPT-P1"
+      "example": "DEPT-P1",
+      "x-no-code-key": "코드 그룹이 아니다 — Department 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "departmentName": {
       "x-source-column": "department_name",
@@ -16101,7 +16120,8 @@
       "x-source-column": "item_code",
       "type": "string",
       "maxLength": 50,
-      "example": "ABC-123"
+      "example": "ABC-123",
+      "x-no-code-key": "코드 그룹이 아니다 — Item 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "itemName": {
       "x-source-column": "item_name",
@@ -16648,7 +16668,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "uq_bom(parent_item_id, bom_code, bom_version) 구성",
-      "example": "STANDARD"
+      "example": "STANDARD",
+      "x-no-code-key": "코드 그룹이 아니다 — Bom 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "bomVersion": {
       "x-source-column": "bom_version",
@@ -16936,7 +16957,8 @@
       "x-source-column": "inspection_plan_code",
       "type": "string",
       "maxLength": 50,
-      "example": "STANDARD"
+      "example": "STANDARD",
+      "x-no-code-key": "코드 그룹이 아니다 — InspectionPlan 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "inspectionPlanName": {
       "x-source-column": "inspection_plan_name",
@@ -17054,7 +17076,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "uq — 전역 유일",
-      "example": "STANDARD"
+      "example": "STANDARD",
+      "x-no-code-key": "코드 그룹이 아니다 — InspectionPlan 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "inspectionPlanName": {
       "x-source-column": "inspection_plan_name",
@@ -17139,7 +17162,8 @@
       "x-source-column": "inspection_plan_code",
       "type": "string",
       "maxLength": 50,
-      "example": "STANDARD"
+      "example": "STANDARD",
+      "x-no-code-key": "코드 그룹이 아니다 — InspectionPlan 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "inspectionPlanName": {
       "x-source-column": "inspection_plan_name",
@@ -18717,7 +18741,8 @@
       "x-source-column": "uom_code",
       "type": "string",
       "maxLength": 50,
-      "example": "EA"
+      "example": "EA",
+      "x-no-code-key": "코드 그룹이 아니다 — Uom 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "uomName": {
       "x-source-column": "uom_name",
@@ -18763,7 +18788,8 @@
       "x-source-column": "partner_code",
       "type": "string",
       "maxLength": 50,
-      "example": "SUP-014"
+      "example": "SUP-014",
+      "x-no-code-key": "코드 그룹이 아니다 — Partner 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "partnerName": {
       "x-source-column": "partner_name",
@@ -18778,7 +18804,8 @@
        "null"
       ],
       "maxLength": 3,
-      "x-no-example": true
+      "x-no-example": true,
+      "x-no-code-key": "ISO 3166 국가 코드 — 표준값이라 우리가 정하지 않는다"
      },
      "erpPartnerCode": {
       "x-source-column": "erp_partner_code",
@@ -18820,7 +18847,8 @@
       "x-source-column": "legal_entity_code",
       "type": "string",
       "maxLength": 50,
-      "example": "LE-01"
+      "example": "LE-01",
+      "x-no-code-key": "코드 그룹이 아니다 — LegalEntity 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "legalEntityName": {
       "x-source-column": "legal_entity_name",
@@ -18832,13 +18860,15 @@
       "x-source-column": "country_code",
       "type": "string",
       "maxLength": 3,
-      "x-no-example": true
+      "x-no-example": true,
+      "x-no-code-key": "ISO 3166 국가 코드 — 표준값이라 우리가 정하지 않는다"
      },
      "timezoneCode": {
       "x-source-column": "timezone_code",
       "type": "string",
       "maxLength": 64,
-      "x-no-example": true
+      "x-no-example": true,
+      "x-no-code-key": "IANA 시간대 이름 — 표준값이라 우리가 정하지 않는다"
      },
      "isActive": {
       "x-source-column": "is_active",
@@ -18878,7 +18908,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "uq_business_unit(legal_entity_id, business_unit_code)",
-      "example": "BU-01"
+      "example": "BU-01",
+      "x-no-code-key": "코드 그룹이 아니다 — BusinessUnit 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "businessUnitName": {
       "x-source-column": "business_unit_name",
@@ -18933,7 +18964,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "uq_plant(legal_entity_id, plant_code)",
-      "example": "PLT-01"
+      "example": "PLT-01",
+      "x-no-code-key": "코드 그룹이 아니다 — Plant 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "plantName": {
       "x-source-column": "plant_name",
@@ -18945,7 +18977,8 @@
       "x-source-column": "timezone_code",
       "type": "string",
       "maxLength": 64,
-      "x-no-example": true
+      "x-no-example": true,
+      "x-no-code-key": "IANA 시간대 이름 — 표준값이라 우리가 정하지 않는다"
      },
      "isActive": {
       "x-source-column": "is_active",
@@ -19042,7 +19075,8 @@
       "x-source-column": "process_code",
       "type": "string",
       "maxLength": 50,
-      "example": "OP-INJ"
+      "example": "OP-INJ",
+      "x-no-code-key": "코드 그룹이 아니다 — Process 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "processName": {
       "x-source-column": "process_name",
@@ -19099,7 +19133,8 @@
       "type": "string",
       "maxLength": 50,
       "description": "uq_equipment(plant_id, equipment_code)",
-      "example": "EQ-03"
+      "example": "EQ-03",
+      "x-no-code-key": "코드 그룹이 아니다 — Equipment 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "equipmentName": {
       "x-source-column": "equipment_name",
@@ -19560,7 +19595,8 @@
       "type": "string",
       "maxLength": 50,
       "example": "POP-A-01",
-      "description": "설치 후에는 바꾸지 않는다 — 키다"
+      "description": "설치 후에는 바꾸지 않는다 — 키다",
+      "x-no-code-key": "코드 그룹이 아니다 — Terminal 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "plantId": {
       "type": "integer",
@@ -19648,7 +19684,8 @@
      "terminalCode": {
       "type": "string",
       "maxLength": 50,
-      "example": "POP-A-01"
+      "example": "POP-A-01",
+      "x-no-code-key": "코드 그룹이 아니다 — Terminal 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "plantId": {
       "type": "integer",
@@ -20001,7 +20038,8 @@
       "example": "PRESS-A",
       "maxLength": 50,
       "description": "uq_production_line(plant_id, line_code)",
-      "x-source-column": "line_code"
+      "x-source-column": "line_code",
+      "x-no-code-key": "코드 그룹이 아니다 — EquipmentGroup 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "groupName": {
       "type": "string",
@@ -20051,7 +20089,8 @@
      "groupCode": {
       "type": "string",
       "example": "PRESS-A",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-no-code-key": "코드 그룹이 아니다 — EquipmentGroup 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "groupName": {
       "type": "string",
@@ -20084,7 +20123,8 @@
      "groupCode": {
       "type": "string",
       "example": "PRESS-A",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-no-code-key": "코드 그룹이 아니다 — EquipmentGroup 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "groupName": {
       "type": "string",
@@ -20147,7 +20187,8 @@
       "type": "string",
       "example": "PRS-01",
       "maxLength": 50,
-      "description": "uq_equipment(plant_id, equipment_code). 호기를 포함하는 채번 규약으로 흡수한다"
+      "description": "uq_equipment(plant_id, equipment_code). 호기를 포함하는 채번 규약으로 흡수한다",
+      "x-no-code-key": "코드 그룹이 아니다 — Equipment 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "equipmentName": {
       "type": "string",
@@ -20238,7 +20279,8 @@
      "equipmentCode": {
       "type": "string",
       "example": "PRS-01",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-no-code-key": "코드 그룹이 아니다 — Equipment 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "equipmentName": {
       "type": "string",
@@ -20934,7 +20976,8 @@
       "example": "MLD-0207",
       "maxLength": 50,
       "description": "uq_mold(plant_id, mold_code)",
-      "x-source-column": "mold_code"
+      "x-source-column": "mold_code",
+      "x-no-code-key": "코드 그룹이 아니다 — Mold 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "moldName": {
       "type": "string",
@@ -21083,7 +21126,8 @@
      "moldCode": {
       "type": "string",
       "example": "MLD-0207",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-no-code-key": "코드 그룹이 아니다 — Mold 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "moldName": {
       "type": "string",
@@ -21153,7 +21197,8 @@
      "moldCode": {
       "type": "string",
       "example": "MLD-0207",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-no-code-key": "코드 그룹이 아니다 — Mold 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "moldName": {
       "type": "string",
@@ -21258,7 +21303,8 @@
       "type": "string",
       "example": "SP-0142",
       "maxLength": 50,
-      "description": "공장 안에서 유일하다"
+      "description": "공장 안에서 유일하다",
+      "x-no-code-key": "코드 그룹이 아니다 — SparePart 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "sparePartName": {
       "type": "string",
@@ -21288,7 +21334,8 @@
      "sparePartCode": {
       "type": "string",
       "example": "SP-0142",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-no-code-key": "코드 그룹이 아니다 — SparePart 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "sparePartName": {
       "type": "string",
@@ -21307,7 +21354,8 @@
      "sparePartCode": {
       "type": "string",
       "example": "SP-0142",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-no-code-key": "코드 그룹이 아니다 — SparePart 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "sparePartName": {
       "type": "string",
@@ -21414,7 +21462,8 @@
       "type": "string",
       "example": "CAL-HCM-2026",
       "maxLength": 50,
-      "description": "전역에서 유일하다"
+      "description": "전역에서 유일하다",
+      "x-no-code-key": "코드 그룹이 아니다 — WorkCalendar 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "calendarName": {
       "type": "string",
@@ -21438,7 +21487,8 @@
      "calendarCode": {
       "type": "string",
       "example": "CAL-HCM-2026",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-no-code-key": "코드 그룹이 아니다 — WorkCalendar 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "calendarName": {
       "type": "string",
@@ -21457,7 +21507,8 @@
      "calendarCode": {
       "type": "string",
       "example": "CAL-HCM-2026",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-no-code-key": "코드 그룹이 아니다 — WorkCalendar 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "calendarName": {
       "type": "string",
@@ -22293,7 +22344,8 @@
      "shiftCode": {
       "type": "string",
       "description": "교대 코드(공장 내 유일)",
-      "example": "D"
+      "example": "D",
+      "x-no-code-key": "코드 그룹이 아니다 — Shift 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
      },
      "shiftName": {
       "type": "string",
