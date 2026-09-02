@@ -3179,8 +3179,12 @@
      "overallResultCode": {
       "type": "string",
       "description": "점검 종합 판정 — 합격(PASS) · 불합격(FAIL). 보전 지시 발행이 불합격만 트리거로 부른다",
-      "example": "NG",
-      "x-code-key": "CD-MAINTENANCE-INSPECTION-RESULT"
+      "example": "PASS",
+      "x-code-key": "CD-MAINTENANCE-INSPECTION-RESULT",
+      "enum": [
+       "PASS",
+       "FAIL"
+      ]
      },
      "inspectedAt": {
       "type": "string",
@@ -3677,7 +3681,11 @@
       "type": "string",
       "description": "보전 유형 — 사후(CORRECTIVE) · 예방(PREVENTIVE). 트리거 조합이 정하며 사람이 고르지 않는다",
       "example": "CORRECTIVE",
-      "x-code-key": "CD-MAINTENANCE-TYPE"
+      "x-code-key": "CD-MAINTENANCE-TYPE",
+      "enum": [
+       "CORRECTIVE",
+       "PREVENTIVE"
+      ]
      },
      "plannedDate": {
       "type": "string",

@@ -2012,9 +2012,13 @@
      },
      "sourceCode": {
       "type": "string",
-      "x-no-example": true,
       "description": "부적합 원천 — 제품(PRODUCT) · 반품(RETURN). 서버가 대상 LOT 의 입고 유형으로 파생한다",
-      "x-code-key": "CD-NONCONFORMANCE-SOURCE"
+      "x-code-key": "CD-NONCONFORMANCE-SOURCE",
+      "enum": [
+       "PRODUCT",
+       "RETURN"
+      ],
+      "example": "PRODUCT"
      },
      "severityCode": {
       "type": "string",

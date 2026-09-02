@@ -589,7 +589,14 @@
       "name": "inventoryStatusCode",
       "in": "query",
       "schema": {
-       "type": "string"
+       "type": "string",
+       "enum": [
+        "AVAILABLE",
+        "BLOCKED",
+        "IN_TRANSIT",
+        "ON_HOLD"
+       ],
+       "example": "AVAILABLE"
       },
       "x-code-key": "CD-FROM-INVENTORY-STATUS"
      },
@@ -11733,9 +11740,14 @@
        "null"
       ],
       "readOnly": true,
-      "example": "값",
+      "example": "IQC_PASSED",
       "description": "입고 확정 대기 큐의 판정 축 — IQC 합격 · 샘플링 미대상 · 긴급 IQC 생략 한도승인. 서버가 판정한다",
-      "x-code-key": "CD-GOODS-RECEIPT-DISPOSITION"
+      "x-code-key": "CD-GOODS-RECEIPT-DISPOSITION",
+      "enum": [
+       "IQC_PASSED",
+       "SAMPLING_NOT_REQUIRED",
+       "URGENT_IQC_WAIVED"
+      ]
      }
     },
     "x-internal-note": "입하 시점의 LOT 은 Hold 로 생긴다 — 가용 재고가 아니다(M-01-01 §5-4 · ✓확정 §재정의 #5). 📨 「W/O 내 순번」(별도 속성 — 선발행 슬롯 구간 지정용)은 계약이 앞서 세울 자리이고 저장 컬럼은 통지 대상이다 — 기다리지 않는다. 근거: 02-SW설계사양서 §4.6 · omf-mes#46."

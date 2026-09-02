@@ -149,6 +149,7 @@ CD-<계열>-<축>
 | `CD-DOWNTIME-REASON` | `EQUIPMENT_FAILURE` `MOLD_CHANGE` `MATERIAL_WAIT` `LABOR_WAIT` `PREVENTIVE_MAINTENANCE` `OTHER` | `DOWNTIME_REASON` | `reasonCode`(쿼리) | `registry` | 5 | 설비 비가동 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-EQUIPMENT-BREAKDOWN-STATUS` | `RECEIVED` `HANDLING` `DONE` | `EQUIPMENT_BREAKDOWN_STATUS` | `statusCode` | `registry-system` | 2 | 고장 접수. **값이 계약 산문에 이미 있었다**(2026-09-02 꺼냄) · `W-05-04` |
 | `CD-EQUIPMENT-INSPECTION-JUDGMENT-METHOD` | `VISUAL` `MEASUREMENT` | `EQUIPMENT_INSPECTION_JUDGMENT_METHOD` | `judgmentMethodCode` | `registry-system` | 4 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
+| `CD-EQUIPMENT-INSPECTION-RESOLVED-FROM-LEVEL` | `EQUIPMENT` `EQUIPMENT_GROUP` `NONE` | — | `resolvedFromLevelCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `EquipmentInspectionItemAssignmentsResponse`(`mdm-기준정보`). ⭐ **2026-09-03 개명·가름** — 작업 캘린더의 같은 이름과 «값집합이 다르다»(그쪽은 `EQUIPMENT_GROUP`·`PLANT`). 한 그룹으로 묶으면 화면이 남의 선택지를 본다(`B-28`). 접두 규약은 결정 1 「가」 |
 | `CD-EQUIPMENT-INSPECTION-TYPE` | `DAILY` `MONTHLY` `MAINTENANCE` | `EQUIPMENT_INSPECTION_TYPE` | `inspectionTypeCode` | `registry` | 8 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
 | `CD-EQUIPMENT-STATUS` | `IN_SERVICE` `DISPOSED` | `EQUIPMENT_STATUS` | `statusCode` | `registry-system` | 4 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
 | `CD-EQUIPMENT-TYPE` | `INJECTION_MOLDING` `PRESS` `WATER_HEATER` | `EQUIPMENT_TYPE` | `equipmentTypeCode` | `registry` | 4 | 설비 계열. `#186` · 통지 `client#415` |
@@ -238,7 +239,6 @@ CD-<계열>-<축>
 | `CD-REPACK-TYPE` | `MERGE` `RECONFIGURE` `SPLIT` | — | `repackTypeCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `HandlingUnitRepackEvent`(`logistics-01자재창고`) |
 | `CD-REPAIR-RESULT` | `FAILED` `SUCCEEDED` | — | `repairResultCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `RepairExecution` · `RepairExecutionReturn`(`production-02생산실행`) |
 | `CD-RESERVATION-TYPE` | `MATERIAL` `SHIPMENT` `PRODUCTION` | `RESERVATION_TYPE` | `reservationTypeCode` | `registry` | 1 | 재고예약 유형. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
-| `CD-RESOLVED-FROM-LEVEL` | `EQUIPMENT` `EQUIPMENT_GROUP` `NONE` | — | `resolvedFromLevelCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `EquipmentInspectionItemAssignmentsResponse`(`mdm-기준정보`) |
 | `CD-RESOURCE-TYPE` | `EQUIPMENT` `MOLD` `WORKER` | — | `resourceTypeCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `WorkOrderResourcePlan` · `WorkOrderResourcePlanCreate`(`production-02생산실행`) |
 | `CD-ROLE` | `RESULT` `SOURCE` | — | `roleCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `HandlingUnitRepackEventLine`(`logistics-01자재창고`) |
 | `CD-ROLE-TYPE` | `CUSTOMER` `DISPOSAL` `OTHER` `SUBCONTRACTOR` `SUPPLIER` | — | `roleTypeCode` `roleTypeCodes` | `enum` | 3 | 계약이 `enum` 으로 닫은 값 — `PartnerRole` · `PartnerRolesReplace`(`mdm-기준정보`) |
@@ -262,6 +262,7 @@ CD-<계열>-<축>
 | `CD-VARIANCE-REASON` | `MISPLACED` `DAMAGED_IN_TRANSIT` `SPILL` `COUNT_ERROR` `THEFT_LOSS` `EVAPORATION_LOSS` | `VARIANCE_REASON` | `varianceReasonCode` | `registry` | 4 | 재고실사·생산창고입고 차이 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-WAREHOUSE-TYPE` | `MATERIAL` `PRODUCT` `SPARE_PART` `GENERAL` | `WAREHOUSE_TYPE` | `warehouseTypeCode` | `registry` | 4 | 공유계약 `G-32` 등록부 표의 근거 칸에서 옮겼다 |
 | `CD-WORK-CALENDAR-DAY-REASON` | `PUBLIC_HOLIDAY` `COMPANY_FOUNDING_DAY` `SUMMER_VACATION` `PLANNED_MAINTENANCE` `MAKEUP_WORKING_DAY` `OTHER` | `WORK_CALENDAR_DAY_REASON` | `reasonCode` | `registry` | 1 | 근무캘린더 예외일 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
+| `CD-WORK-CALENDAR-RESOLVED-FROM-LEVEL` | `EQUIPMENT_GROUP` `PLANT` | — | `resolvedFromLevelCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `WorkCalendarEffectiveResponse`(`mdm-기준정보`). ⭐ **2026-09-03 신설** — 부재를 `null` 로 표현한다(설비 점검 쪽은 `NONE` «값»으로 표현해 값집합이 다르다 · `B-28`) |
 | `CD-WORK-ORDER-CANCEL-REASON` | `CUSTOMER_ORDER_CHANGE` `PLAN_CHANGE` `MATERIAL_SHORTAGE` `EQUIPMENT_FAILURE` `QUALITY_ISSUE` `OTHER` | `WORK_ORDER_CANCEL_REASON` | `reasonCode` | `registry` | 1 | WO 취소 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-WORK-ORDER-COMPLETION-VARIANCE-REASON` | `MATERIAL_SHORTAGE` `EQUIPMENT_FAILURE` `QUALITY_DEFECT` `PLAN_CHANGE` `OVER_PRODUCTION` `OTHER` | `WORK_ORDER_COMPLETION_VARIANCE_REASON` | `reasonCode` | `registry` | 1 | WO 완료 미달·초과 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-WORK-ORDER-HOLD-REASON` | ⬜ | `WORK_ORDER_HOLD_REASON` | `reasonCode` | `registry` | 1 | 작업지시 보류 사유. 사유 코드의 선례를 따른다 — 스키마별 전용 그룹 + 고객이 늘림 |

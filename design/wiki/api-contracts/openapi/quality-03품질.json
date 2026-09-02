@@ -232,16 +232,9 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "PQC",
-       "enum": [
-        "FIELD",
-        "PQC",
-        "OQC",
-        "REPAIR",
-        "CLAIM"
-       ]
+       "x-no-example": true
       },
-      "description": "불량 기록의 원천으로 거른다 — 현장(FIELD) · 공정검사(PQC) · 출하검사(OQC) · 수리(REPAIR) · 클레임(CLAIM) 5값(✓설계확정 결정 09). ⭐ **2026-09-02 정정** — 전에는 이 자리가 sourceAxisCode 라는 «다른 이름»이었고 「서버가 유도한 4축(현장/PQC/OQC/원천미상)」을 받았다. W-03-05 §5-2 가 「유도로는 결정 09 의 5축이 서지 않는다」를 확인하고 sourceCode 명시 축을 «신설»했는데 이 필터만 옛 축에 남아 있었다. ⛔ 한 사실에 두 축을 두면 화면마다 다른 수를 본다(L-2-1). ⚠ 「원천 미상」은 값이 아니라 «표시»다 — sourceCode 가 비어 있으면 화면이 「원천 미상」으로 묶어 보인다(W-03-05 §5-2 · L-8). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=DEFECT_RECORD_SOURCE 로 받는다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "불량 기록의 원천으로 거른다 — 현장(FIELD) · 공정검사(PQC) · 출하검사(OQC) · 수리(REPAIR) · 클레임(CLAIM) 5값(✓설계확정 결정 09). ⭐ **2026-09-02 정정** — 전에는 이 자리가 sourceAxisCode 라는 «다른 이름»이었고 「서버가 유도한 4축(현장/PQC/OQC/원천미상)」을 받았다. W-03-05 §5-2 가 「유도로는 결정 09 의 5축이 서지 않는다」를 확인하고 sourceCode 명시 축을 «신설»했는데 이 필터만 옛 축에 남아 있었다. ⛔ 한 사실에 두 축을 두면 화면마다 다른 수를 본다(L-2-1). ⚠ 「원천 미상」은 값이 아니라 «표시»다 — sourceCode 가 비어 있으면 화면이 「원천 미상」으로 묶어 보인다(W-03-05 §5-2 · L-8). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=DEFECT_RECORD_SOURCE 로 받는다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⚠ 2026-09-03 — enum 을 걷었다. 이 그룹은 registry-system 이라 값 목록이 계약이 아니라 공통코드 마스터에 산다 — 계약에 박으면 두 벌이 된다.",
       "x-code-key": "CD-DEFECT-RECORD-SOURCE"
      },
      {
@@ -338,16 +331,9 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "PQC",
-       "enum": [
-        "FIELD",
-        "PQC",
-        "OQC",
-        "REPAIR",
-        "CLAIM"
-       ]
+       "x-no-example": true
       },
-      "description": "불량 기록의 원천으로 거른다 — 현장(FIELD) · 공정검사(PQC) · 출하검사(OQC) · 수리(REPAIR) · 클레임(CLAIM) 5값(✓설계확정 결정 09). ⭐ **2026-09-02 정정** — 전에는 이 자리가 sourceAxisCode 라는 «다른 이름»이었고 「서버가 유도한 4축(현장/PQC/OQC/원천미상)」을 받았다. W-03-05 §5-2 가 「유도로는 결정 09 의 5축이 서지 않는다」를 확인하고 sourceCode 명시 축을 «신설»했는데 이 필터만 옛 축에 남아 있었다. ⛔ 한 사실에 두 축을 두면 화면마다 다른 수를 본다(L-2-1). ⚠ 「원천 미상」은 값이 아니라 «표시»다 — sourceCode 가 비어 있으면 화면이 「원천 미상」으로 묶어 보인다(W-03-05 §5-2 · L-8). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=DEFECT_RECORD_SOURCE 로 받는다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "불량 기록의 원천으로 거른다 — 현장(FIELD) · 공정검사(PQC) · 출하검사(OQC) · 수리(REPAIR) · 클레임(CLAIM) 5값(✓설계확정 결정 09). ⭐ **2026-09-02 정정** — 전에는 이 자리가 sourceAxisCode 라는 «다른 이름»이었고 「서버가 유도한 4축(현장/PQC/OQC/원천미상)」을 받았다. W-03-05 §5-2 가 「유도로는 결정 09 의 5축이 서지 않는다」를 확인하고 sourceCode 명시 축을 «신설»했는데 이 필터만 옛 축에 남아 있었다. ⛔ 한 사실에 두 축을 두면 화면마다 다른 수를 본다(L-2-1). ⚠ 「원천 미상」은 값이 아니라 «표시»다 — sourceCode 가 비어 있으면 화면이 「원천 미상」으로 묶어 보인다(W-03-05 §5-2 · L-8). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=DEFECT_RECORD_SOURCE 로 받는다. ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⚠ 2026-09-03 — enum 을 걷었다. 이 그룹은 registry-system 이라 값 목록이 계약이 아니라 공통코드 마스터에 산다 — 계약에 박으면 두 벌이 된다.",
       "x-code-key": "CD-DEFECT-RECORD-SOURCE"
      },
      {

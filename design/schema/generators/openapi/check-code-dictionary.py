@@ -44,6 +44,16 @@
 | ㉡ | 키는 있는데 그 자리의 `enum` 값집합이 **사전의 값과 다르다** | ⛔ 막는다 |
 | ㉢ | 키는 있는데 그 자리의 `codeGroupCode=` 포인터가 **사전의 그룹과 다르다** | ⛔ 막는다 |
 | ㉣ | 착지한(`x-source-column` 있는) `*Code` 자리에 **키가 없다** | ⚠ 계수만 |
+| ㉤ | 사전이 **소유 = `enum`** 이라 적었는데 그 자리에 `enum` 이 **없다** | ⛔ 막는다 |
+| ㉥ | 사전이 **소유 = `registry*`** 라 적었는데 계약이 `enum` 으로 **닫았다** | ⛔ 막는다 |
+
+⭐ **㉤㉥ 는 2026-09-03 신설** — 소유는 「값이 어디 사나」를 말한다. `enum` 이면 값이
+계약 안에 살아 생성 타입의 유니온으로 가고, `registry*` 면 공통코드 마스터에 살아
+표시명(`nameKo`·`nameVi`)·정렬(`displayOrder`)과 함께 온다. 어긋나면 사전이 「계약이
+닫는다」고 말하는데 그 자리는 열려 있거나, 마스터의 값을 계약이 또 갖는다(**두 벌**).
+⛔ **어느 검사기도 이것을 안 보고 있었다** — ㉡ 는 `enum` 이 «있을 때만» 값을 비교하고
+없다는 사실 자체는 안 본다. 그래서 소유가 `enum` 인 키를 자리에 붙이면서 `enum` 배열을
+빠뜨려도 전부 초록이었다(실측 11자리 · `omf-mes#400` 3회차에서 7자리를 그렇게 냈다).
 
 ⭐ ㉣ 에서 빠지는 자리 — `x-no-code-key: "<이유>"` 가 적힌 자리. 인스턴스 식별자
 (마스터 «한 건»을 가리키는 코드)와 표준값(ISO 국가·IANA 시간대)이 그것이다.
@@ -191,9 +201,11 @@ def scan() -> dict[str, list[tuple]]:
                         sc = node.get("schema") or {}
                         # ⭐ 쿼리는 키가 «파라미터 객체» 안에 있다 — 스키마 안이 아니다.
                         #    파라미터에는 물리 컬럼이 없으므로 착지는 언제나 거짓이다.
+                        # ⚠ 배열 파라미터는 enum 이 items 안에 산다 — 스키마 쪽과 같게 본다.
+                        qsrc = sc.get("items") or sc
                         out[v].append((name, "쿼리", where,
                                        state(sc, node.get("description")),
-                                       tuple(sc.get("enum") or ()),
+                                       tuple(qsrc.get("enum") or ()),
                                        tuple(POINTER.findall(node.get("description") or "")),
                                        node.get("x-code-key"),
                                        False))
@@ -282,6 +294,40 @@ def check_keys(sites: list[tuple], entries: list[dict]) -> tuple[list, list, lis
                 ptr_gap.append((name, f, kind, path, shown,
                                 sorted(want_g), sorted(got_g)))
     return unknown, enum_gap, ptr_gap
+
+
+def check_owner_shape(sites: list[tuple], entries: list[dict]) -> tuple[list, list]:
+    """㉤㉥ — 사전이 적은 «소유» 와 그 자리의 «모양» 이 맞는가. 둘 다 ⛔ 다.
+
+    반환 — (㉤ 소유가 enum 인데 자리에 enum 이 없다, ㉥ 소유가 registry* 인데 enum 이 있다)
+
+    ⭐ 왜 막나 — 소유는 「값이 어디 사나」를 말한다.
+       `enum`      → 값이 «계약 안»에 산다. 프론트는 생성 타입의 유니온으로 받는다.
+       `registry*` → 값이 «공통코드 마스터»에 산다. `GET /mdm/code-values` 로 받고
+                     표시명(nameKo·nameVi)·정렬(displayOrder)이 함께 온다.
+       어긋나면 사전이 「계약이 닫는다」고 말하는데 그 자리는 열려 있거나, 반대로
+       마스터에 사는 값을 계약이 또 갖는다 — «두 벌» 이 된다(L-2-1).
+    ⛔ 어느 검사기도 이것을 안 보고 있었다(2026-09-03 신설) — ㉡ 는 enum 이 «있을 때만»
+       값을 비교하지, 없다는 사실 자체는 안 본다. 그래서 소유가 enum 인 키에 자리를
+       붙이면서 enum 배열을 빠뜨려도 전부 초록이었다.
+    ⚠ 값 열이 비어 있는 키(⬜)는 ㉤ 를 건너뛴다 — 넣을 값이 없는데 요구할 수 없다.
+    """
+    by_key = {e["key"]: e for e in entries}
+    missing: list = []
+    surplus: list = []
+    for name, f, kind, path, enum, _ptr, key in sites:
+        es = [by_key.get(k) for k in key_list(key)]
+        if any(e is None for e in es):
+            continue                      # ㉠ 가 이미 잡는다
+        owners = {e["owner"] for e in es}
+        if owners == {"enum"}:
+            if not enum and any(e["values"] for e in es):
+                missing.append((name, f, kind, path, " + ".join(key_list(key))))
+        elif owners and owners <= {"registry", "registry-system"}:
+            if enum:
+                surplus.append((name, f, kind, path, " + ".join(key_list(key)),
+                                sorted(x for x in enum if x is not None)))
+    return missing, surplus
 
 
 def place_excused(place: tuple):
@@ -443,9 +489,33 @@ def main() -> int:
                   % (key, f[:20], kind, " ".join(want) or "—", " ".join(got) or "—"))
         if len(ptr_gap) > 8:
             print("   … 그 밖 %d건" % (len(ptr_gap) - 8))
-    if not (unknown or enum_gap or ptr_gap):
-        print("⑤ ✅ 키가 붙은 %d자리 전부 사전과 맞다 — ㉠ 미등록 0 · ㉡ 값 0 · ㉢ 그룹 0"
-              % len(tagged))
+    # ㉤㉥ ⛔ **게이트** — 소유와 자리의 «모양» 이 맞는가(2026-09-03 신설).
+    shape_missing, shape_surplus = check_owner_shape(tagged, entries)
+    if shape_missing:
+        gate.append("소유 enum 인데 자리에 enum 없음 %d" % len(shape_missing))
+        print("⛔ ㉤ 사전은 «소유 = enum»(계약이 값을 갖는다)이라 적었는데 "
+              "그 자리에 enum 이 없습니다 %d건" % len(shape_missing))
+        for name, f, kind, path, key in shape_missing[:10]:
+            print("   %-38s %-20s %-5s %s" % (key, f[:20], kind, path[-40:]))
+        if len(shape_missing) > 10:
+            print("   … 그 밖 %d건" % (len(shape_missing) - 10))
+        print("   ⭐ 두 갈래다 — (a) enum 을 넣는다(⛔ 변경 통지 대상 — 값이 좁아진다)")
+        print("                  (b) 실은 공통코드다 → 사전의 소유를 registry* 로 고치고")
+        print("                      산문에 codeGroupCode= 포인터를 적는다")
+    if shape_surplus:
+        gate.append("소유 registry 인데 enum 있음 %d" % len(shape_surplus))
+        print("⛔ ㉥ 사전은 «소유 = registry*»(값이 공통코드 마스터에 산다)라 적었는데 "
+              "계약이 enum 으로 닫았습니다 %d건" % len(shape_surplus))
+        for name, f, kind, path, key, got in shape_surplus[:10]:
+            print("   %-38s %-20s %-5s %s" % (key, f[:20], kind, path[-40:]))
+            print("        계약 %s" % " ".join(got))
+        if len(shape_surplus) > 10:
+            print("   … 그 밖 %d건" % (len(shape_surplus) - 10))
+        print("   ⭐ 값이 두 벌이 된다 — 고객이 마스터에 값을 더해도 계약이 막는다.")
+
+    if not (unknown or enum_gap or ptr_gap or shape_missing or shape_surplus):
+        print("⑤ ✅ 키가 붙은 %d자리 전부 사전과 맞다 — "
+              "㉠ 미등록 0 · ㉡ 값 0 · ㉢ 그룹 0 · ㉤㉥ 소유 모양 0" % len(tagged))
 
     # ㉣ ⚠ **막지 않는다 — 센다.** 착지했는데 키가 없는 자리.
     #    래칫도 걸지 않는다: 지금 여러 손이 동시에 줄이는 수라 기준선을 두면
@@ -577,7 +647,8 @@ def main() -> int:
         return 1
     print("⭐ 계수 규칙(①②③④㉣)은 «막지 않는다» — 흐름을 보는 수다.")
     print("   ⛔ 막는 것은 ⓪ 와 ⑤ 다 — 등록부↔사전 1:1 · 소유 일치 ·")
-    print("      그리고 계약이 적은 키가 사전과 어긋나지 않는가(㉠㉡㉢).")
+    print("      계약이 적은 키가 사전과 어긋나지 않는가(㉠㉡㉢) ·")
+    print("      소유와 자리의 «모양» 이 맞는가(㉤㉥).")
     return 0
 
 
