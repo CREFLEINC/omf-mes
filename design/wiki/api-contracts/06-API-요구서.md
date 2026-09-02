@@ -164,6 +164,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 폐기 | `POST /planning/routings/{id}:obsolete` | §5-4 |
 | Rev 비교 | **전용 엔드포인트 없음 — API 불필요.** 비교 대상 Rev마다 `GET /planning/routings/{id}` + `…/operations`를 부르고 **화면이 대조**한다 | §5-1 *(스펙 자신이 `[추정]` — 근거 문구 없음)* |
 | 변경 이력 | `GET /audit/events` — 다만 **Rev 자체가 이력**이다(결정 07 「변경 이력 요구는 Rev 이력으로 충족」) | §5-1 · B-5 |
+| ⭐ **버전 상태 표시명** | **`GET /mdm/code-values?codeGroupCode=MASTER_VERSION_STATUS`** — ⛔ **계약은 `statusCode` 만 내리고 표시명을 안 내린다.** 값 = `DRAFT`·`CONFIRMED`·`OBSOLETE`(**2026-09-02 신설** · 결정 07 을 `Bom`·`InspectionPlanVersion` 이 준용) | G-32 · K-5 |
 
 - **폐기는 dead end다.** `§5-4` 상태표가 「폐기 → (없음)」이라 되돌리기도, 신규 Rev의 원본으로 쓰기도 불가하다. `:new-revision`은 **확정 Rev에서만** 걸린다.
 - 좌측 품목 검색은 `GET /mdm/items`를 쓴다. §6의 「Routing 미보유 품목 필터」를 위해 **`hasRouting` 파라미터를 이번에 신설**했다(§4 ❌-4).
@@ -225,6 +226,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 구성품 확장 열 편집 | `GET`+`PUT /planning/boms/{bomId}/components/{id}` — 편집 가능한 것은 **MES 확장 4열**뿐 | §4-F·§8-5 |
 | 변경 이력 | `GET /audit/events` | §5-1 · B-5 |
 | 품목 추가 | **없음 — 범위 밖(의도적).** 품목은 **ERP 정본 수신본**이라 이 화면이 만들지 않는다 | §5-1 원문 · QA #3 |
+| ⭐ **버전 상태 표시명** | **`GET /mdm/code-values?codeGroupCode=MASTER_VERSION_STATUS`** — ⛔ **계약은 `statusCode` 만 내리고 표시명을 안 내린다.** 값 = `DRAFT`·`CONFIRMED`·`OBSOLETE`(**2026-09-02 신설** · 결정 07 을 `Bom`·`InspectionPlanVersion` 이 준용) | G-32 · K-5 |
 
 - **`bom`은 읽기 전용**이다(QA #3 ERP 정본). 예외가 하나 있다 — `POST /planning/boms/{bomId}:set-default`. §5-1 액션 목록에는 없고 **§6 예외표의 「기본 BOM 전환」**이 요구한 것이다. 부분 유일 인덱스 `uq_bom_default`는 **동시에 둘을 막을 뿐 자동 전환을 해 주지 않으므로**, 화면이 「해제 → 설정」 2회를 부르면 그 사이에 **기본 BOM이 0개인 상태**가 생긴다. 단일 액션으로 노출하고 서버가 한 트랜잭션으로 처리한다(A-6).
 - `bom_component`를 **컬렉션 전체 치환이 아니라 행 단위 PUT**으로 뒀다. 순번이 ERP 원본이라 재배치가 이 API의 대상이 아니고, 편집 가능한 4열이 서로 독립적이라 A-5의 전제(중간 상태가 유일 제약을 위반)가 성립하지 않는다.
@@ -259,6 +261,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 중단·폐기 | **없음 — 선행 미결.** 제공 여부 자체가 미결이다 — 폐기하면 **그 데이터는 ERP에 영원히 가지 않는다** | §8-5 |
 | 내보내기 | **없음 — API 불필요**(2026-08-03 사용자 확정 — §8-2 항목 3). 서버측 export 엔드포인트를 이 스펙 전체에 두지 않았고, 목록 응답을 클라이언트가 파일로 변환하는 것을 전제로 한다. `payload`는 목록 응답에 없고 상세 GET에서만 제공되며 내려받기 파일에도 포함하지 않으므로 **대외비 범위가 자동으로 지켜진다** | §5-1 |
 | 알람 설정 보기 | **없음 — 범위 밖.** 알람 규칙은 `W-CO-03`(알림센터) 소관이며 그 화면은 확대 2차다 | §8-3 |
+| ⭐ **연계 상태 표시명** | **`GET /mdm/code-values?codeGroupCode=INTEGRATION_MESSAGE_STATUS`** — ⛔ **계약은 `statusCode` 만 내리고 표시명을 안 내린다.** 값 = `PENDING`·`PROCESSING`·`DONE`·`FAILED`(**2026-09-02 신설** · 계약이 적어 둔 「최소 구분」 넷을 그대로 확정). ⚠ 재처리 대상 필터가 이 값에 걸린다 | G-32 · K-5 |
 
 > **`message_key`가 `UNIQUE`라 재처리는 중복 전송이 아니다.** 이 사실을 화면 문구가 보장해야 하며(C-4), 계약이 같은 문장을 담고 있다 — **같은 개념을 두 이름으로 부르지 않기** 위함이다.
 
@@ -272,6 +275,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 마스터 화면으로 이동 | **없음 — 소관 이동.** 데이터는 `W-06-01`·`W-06-05`의 GET으로 온다 | §5-1 |
 | 재동기화 안내 | **없음 — 소관 이동.** 실행은 `W-06-10`(`:retry`)이 소유한다 | §5-1 · B-4-1 ④ |
 | 신규 Rev 발행 | **없음 — 소관 이동.** 버튼은 두되 동작은 `W-06-01`이 소유한다(2026-08-03 사용자 확정) | §8-1 |
+| ⭐ **버전 상태 표시명** | **`GET /mdm/code-values?codeGroupCode=MASTER_VERSION_STATUS`** — ⛔ **계약은 `statusCode` 만 내리고 표시명을 안 내린다.** 값 = `DRAFT`·`CONFIRMED`·`OBSOLETE`(**2026-09-02 신설** · 결정 07 을 `Bom`·`InspectionPlanVersion` 이 준용) | G-32 · K-5 |
 
 - **Rev 현황 탭**(§4-B)은 §5-1에 별도 액션 행이 없지만 화면의 절반이다 — `GET /planning/routings?itemId=` + `GET /planning/boms?parentItemId=`를 **화면이 합성**한다. 「참조 중 W/O」 열은 **산출 방법 자체가 미결**(§8-5)이라 응답에 없다.
 - **이 화면은 전용 테이블이 없다.** 편집 상태 자체가 없고, `beforeValue`/`afterValue`를 **해석하지 않고 원본 그대로** 내린다 — 「모르는 키도 원문 그대로」(B-5 diff 규약 4)를 지키기 위해서다.

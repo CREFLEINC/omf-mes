@@ -167,8 +167,15 @@ class 등록부를_조항_표에서_읽는다(unittest.TestCase):
         with self.assertRaises(SystemExit):
             cg.load_registry(self.write(self.HEAD))
 
-    def test_실물_조항에서_56이_나온다(self):
-        self.assertEqual(len(cg.load_registry()), 56)
+    def test_실물_조항이_적은_수와_읽은_수가_같다(self):
+        # ⛔ 수를 여기 박지 않는다 — 박으면 등재할 때마다 고쳐야 하고 그것이 또 사본이다.
+        #    조항이 스스로 적어 둔 「현재 N」과 표에서 읽은 행 수를 맞춘다.
+        import re
+        with open(cg.CLAUSE, encoding="utf-8") as fh:
+            text = fh.read()
+        said = int(re.search(r"위 표에 오른 것뿐이다 — 현재 (\d+)", text).group(1))
+        self.assertEqual(len(cg.load_registry()), said)
+        self.assertGreater(said, 50)
 
     def test_계약이_가리키는_넷이_들어_있다(self):
         # ⛔ 이관 전 「확정된 것 —」 문단에 없던 넷 — 사라지면 계약 9자리가 빨강이 된다.
@@ -208,10 +215,10 @@ class 소유_칸도_읽는다(unittest.TestCase):
         self.assertEqual(cg.load_registry_owners(self.write(md)), {"LOT_TYPE": "미판정"})
 
     def test_실물_조항에_미판정이_없다(self):
+        # ⭐ 불변식은 「미판정이 0」이다 — 갈래별 «수»는 등재마다 바뀌므로 박지 않는다.
         got = cg.load_registry_owners()
         self.assertEqual([g for g, o in got.items() if o == "미판정"], [])
-        self.assertEqual(sum(1 for o in got.values() if o == "registry-system"), 16)
-        self.assertEqual(sum(1 for o in got.values() if o == "registry"), 40)
+        self.assertEqual(set(got.values()), {"registry", "registry-system"})
 
 
 if __name__ == "__main__":
