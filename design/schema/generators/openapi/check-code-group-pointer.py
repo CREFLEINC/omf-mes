@@ -16,6 +16,9 @@
 G-32 의 「그룹 이름 짓는 규칙」은 이름을 *짓는* 법이고, 이 등록부는 이름이
 *있는가* 다. 규칙만 보고 지어낸 이름은 이 검사기가 잡는다.
 
+⭐ **등록부 목록은 이 파일에 없다**(2026-09-02 이관) — 공유계약 G-32 의
+«등록부 표»를 읽는다. 조항이 정본이고 **사본이 없다.**
+
 무엇을 보나
 -----------
 ① ⛔ **`codeGroupCode=<이름>` 포인터가 등록부 밖**인 자리 — 문서 안의 모든
@@ -55,27 +58,62 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 # Tier 0 — OpenAPI JSON 정본. Phase 5 컷오버(2026-08-25)로 design/wiki/api-contracts/openapi/가 정본 위치다.
 CONTRACTS_DIR = os.path.join(HERE, "..", "..", "..", "wiki", "api-contracts", "openapi")
 
-# 등록부 — 공유계약 G-32 확정 11 · omf-mes#198 확정 29 · 2026-08-29 등재 2 · 2026-08-31 등재 5＋4 · 2026-09-01 등재 2 = 53 (겹치는 이름 0).
-# ⛔ 여기에 없는 이름을 계약에 적지 않는다. 늘리려면 «먼저» G-32 를 고친다 —
-#    조항이 정본이고 이 집합은 그 사본이다.
-REGISTRY = set("""
-EQUIPMENT_TYPE INSTRUMENT_TYPE
-INSPECTION_REQUEST_STATUS INSPECTION_RESULT_OVERALL_JUDGMENT INSPECTION_MEASUREMENT_JUDGMENT
-INSPECTION_ITEM_SPEC_DATA_TYPE LOT_STATUS LOT_TYPE EQUIPMENT_STATUS EQUIPMENT_INSPECTION_TYPE
-EQUIPMENT_INSPECTION_JUDGMENT_METHOD QUALITY_INSPECTION_TYPE CYCLE_TYPE
-GOODS_ISSUE_REASON INBOUND_VARIANCE_REASON INVENTORY_ADJUSTMENT_REASON PUTAWAY_TASK_TEMPORARY_REASON
-SUBSTITUTE_LOT_REASON VARIANCE_REASON INBOUND_RECEIPT_EXCEPTION_TYPE HANDLING_UNIT_TYPE
-LOT_EXTERNAL_IDENTIFIER_TYPE OWNERSHIP_TYPE PICKING_TYPE RESERVATION_TYPE INVENTORY_COUNT_TYPE
-CONTROL_OVERRIDE_REASON PRODUCTION_PLAN_SPLIT_REASON WORK_ORDER_CANCEL_REASON
-WORK_ORDER_COMPLETION_VARIANCE_REASON WORK_SESSION_EVENT_REASON WORK_CALENDAR_DAY_REASON
-LOT_HOLD_REASON DOWNTIME_REASON INSPECTION_FREQUENCY INSPECTION_ITEM_SPEC_METHOD
-INSPECTION_SAMPLING_METHOD PROCESS_TYPE QUALIFICATION_TYPE STORAGE_CONDITION REISSUE_REASON
-WORK_SESSION_EVENT_TYPE INBOUND_VARIANCE_TYPE
-LOT_HOLD_RELEASE_REASON MATERIAL_ISSUE_REQUEST_REASON WAREHOUSE_TYPE SHIPMENT_TIME_SLOT
-RECEIPT_TYPE ISSUE_TYPE MANAGEMENT_LEVEL GOODS_RECEIPT_REASON
-APP_USER_STATUS JUDGMENT_TYPE
-EQUIPMENT_BREAKDOWN_STATUS MAINTENANCE_ORDER_STATUS MAINTENANCE_ORDER_ITEM_STATUS
-""".split())
+# 등록부 — ⭐ **여기에 목록이 없다.** 공유계약 G-32 의 «등록부 표»를 읽는다.
+# 2026-09-02 이관 전까지 이 자리에는 56개를 손으로 적은 집합이 있었고, 조항 산문과
+# «따로» 갈라져 있었다. 실측 — 조항의 「확정된 것 —」 문장은 그중 52 만 담고 있었고
+# RECEIPT_TYPE·ISSUE_TYPE·MANAGEMENT_LEVEL·GOODS_RECEIPT_REASON 넷은 계수 괄호에만
+# 있었다(계약 9자리가 그 넷을 가리키는데도). 사본이 갈라지는 것을 막는 법은 사본을
+# 없애는 것뿐이다.
+CLAUSE = os.path.join(HERE, "..", "..", "..", "wiki", "decisions-policy", "공유계약.md")
+
+# 표 머리 — 조항의 소제목. 바뀌면 «조용히» 비는 대신 ⛔ 로 죽는다(load_registry 참조).
+REGISTRY_HEAD = re.compile(r"^#### .*등록부 — 이름이 «있는» 그룹", re.M)
+GROUP_CELL = re.compile(r"^`([A-Z][A-Z0-9_]+)`$")
+# 소유 칸 — `registry` / `registry-system` / 그 밖은 «미판정»
+OWNER_CELL = re.compile(r"`(registry(?:-system)?)`")
+
+
+def load_registry_owners(path: str = CLAUSE) -> dict:
+    """공유계약 G-32 등록부 표의 **첫 칸**을 읽는다.
+
+    ⛔ **첫 칸만 읽는다.** 「근거」 칸에는 값(`RETEST_PASS`·`MORNING` …)과 다른 그룹
+    상호참조가 들어간다 — 줄 전체를 훑으면 산문 시절의 「값과 이름이 같은 모양으로
+    섞인다」가 그대로 재발한다. 그것이 이 이관이 없앤 병이다.
+
+    ⛔ 표를 못 찾거나 0행이면 **죽는다.** 조용히 빈 등록부가 되면 계약의 모든 포인터가
+    빨강이 되고, 그 빨강의 원인이 「계약이 틀렸다」로 읽힌다.
+    """
+    with open(path, encoding="utf-8") as fh:
+        text = fh.read()
+    head = REGISTRY_HEAD.search(text)
+    if not head:
+        raise SystemExit("⛔ 공유계약 G-32 의 등록부 표 머리를 못 찾았습니다 — %s" % path)
+    tail = text[head.end():]
+    nxt = re.search(r"^#{2,4} ", tail, re.M)      # 다음 소제목 전까지가 이 절이다
+    body = tail[:nxt.start()] if nxt else tail
+
+    owners = {}
+    for line in body.split("\n"):
+        if not line.startswith("|"):
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) != 4:                        # 열 설명표(2열)를 삼키지 않는다
+            continue
+        m = GROUP_CELL.match(cells[0])
+        if m:
+            owners[m.group(1)] = OWNER_CELL.search(cells[1]) and \
+                OWNER_CELL.search(cells[1]).group(1) or "미판정"
+    if not owners:
+        raise SystemExit("⛔ 등록부 표에서 그룹 이름을 하나도 못 읽었습니다 — %s" % path)
+    return owners
+
+
+def load_registry(path: str = CLAUSE) -> set:
+    """그룹 이름만 — 대부분의 부르는 쪽이 원하는 것이다."""
+    return set(load_registry_owners(path))
+
+
+REGISTRY = load_registry()
 
 POINTER = re.compile(r"codeGroupCode=([A-Z][A-Z0-9_]*)")
 
@@ -167,7 +205,7 @@ def main() -> int:
     print("\n   ⭐ 둘 중 하나를 «정해서» 닫는다 —\n"
           "      ① 그 이름을 공유계약 G-32 등록부에 올린다(마스터에 행이 실재해야 한다)\n"
           "      ② 등록부에 있는 이름으로 포인터를 고친다\n"
-          "   ⛔ 검사기의 REGISTRY 만 늘려 초록을 만들지 마세요 — 조항이 정본입니다.")
+          "   ⛔ 이 검사기에는 늘릴 목록이 없습니다 — 공유계약 G-32 의 «등록부 표»에 행을 더하세요.")
     return 1
 
 
