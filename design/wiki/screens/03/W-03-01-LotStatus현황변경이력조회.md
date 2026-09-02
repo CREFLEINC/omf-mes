@@ -102,7 +102,7 @@
 | 라벨 | 출처 컬럼 | 비고 |
 | --- | --- | --- |
 | 보류 수량 | `hold_qty` | **NULL = 전량 보류** · `ck_lot_hold_qty_uom`(`uom_id`와 짝) |
-| 사유 | `reason_code` | ⚠ 값 목록 미정 §8-4 |
+| 사유 | `reason_code` | `INCOMING_INSPECTION_WAIT`(수입검사 대기) · `FOREIGN_MATTER_SUSPECTED`(이물 혼입 의심) · `DIMENSION_ABNORMAL`(치수 이상) · `APPEARANCE_ABNORMAL`(외관 이상) · `CLAIM_RECALL`(클레임·리콜) · `OTHER`(기타) **6값** — 값 목록은 `GET /mdm/code-values?codeGroupCode=LOT_HOLD_REASON` 로 받는다(공유계약 `G-32` · 코드 사전 `CD-LOT-HOLD-REASON` · `omf-mes#198`). ⭐ **고객이 늘린다 — 위 여섯은 초기 시드다**(`registry`) |
 | **해제 조건** | `release_condition` | **text** — 「IQC 합격」 같은 문장 |
 | 상태 | `status_code` | ⚠ **`lot.status_code`와 다른 축**이다 §5-3 |
 | 등록 | `held_by` · `held_at` | `app_user` FK — **행위자 축이 여기만 있다** |
@@ -301,7 +301,7 @@ reason             text                       ← 전이 사유
 | 1 | ✅ **되살렸다**(2026-08-30) — `GET /trace/lot-status-events` 전용 이력으로 9건 전건 정의(§5-1) | — | **해소** | **§I-11** — 📨 데이터 모델 통지 |
 | 2 | ⭐ **§I-11과 §I-5의 선후가 정해져야 한다** — 「이력을 전용 테이블에 담나 `audit_event`에 담나」가 먼저다(§5-2) | 상류↔하류 불일치 | **조정** | **#64·#68 양쪽에 코멘트** — **A(전용 테이블) 권고** ✅ **해소 2026-09-02** — 공유계약이 전용 테이블 안을 권고해 선후를 확정했고 `omf-mes-server#59` 항목 7 로 요청이 나갔다 |
 | 3 | ~~**`lot.status_code`와 `lot_hold.status_code`의 관계가 규약이 없다** — 화면마다 다르게 유추한다(§5-3)~~ | 설계 결정 | **조정** | ✅ **종결 — §I-32 · omf-mes#227**(2026-08-25). `lot.status_code`엔 「보류/Hold」 값이 없다 — Hold는 `lot_hold.status_code` 전담, `lot.status_code`는 전이별 4값 중 하나(`W-03-03`이 `INSPECTION_PENDING` 확정) |
-| 4 | `lot_hold.reason_code` 값 목록 *(품질 판정 값은 ✅ **2026-08-07 확정** — 4값)* | 공통코드 | **조정** | `W-06-06` · #145. ⚠ **축이 다르다** — 품질 판정은 `inventory_balance.quality_status_code`(4값 확정)이고 `lot.status_code` 는 **수명주기 축**이다(#46 「폐번」) |
+| 4 | ~~`lot_hold.reason_code` 값 목록~~ *(품질 판정 값은 ✅ **2026-08-07 확정** — 4값)* | — | — | ✅ **해소(2026-09-03)** — 코드 사전에 등재됐다. `LOT_HOLD_REASON` = `INCOMING_INSPECTION_WAIT`·`FOREIGN_MATTER_SUSPECTED`·`DIMENSION_ABNORMAL`·`APPEARANCE_ABNORMAL`·`CLAIM_RECALL`·`OTHER` 6값(`registry` — 고객이 늘린다 · `omf-mes#198`) · `GET /mdm/code-values?codeGroupCode=LOT_HOLD_REASON` 로 받는다. ⚠ **축이 다르다** — 품질 판정은 `inventory_balance.quality_status_code`(4값 확정)이고 `lot.status_code` 는 **수명주기 축**이다(#46 「폐번」) |
 | 6 | **권한 범위 밖과 「없음」이 구분되지 않는다** — `user_data_scope` 필터링의 공통 문제 | 설계 결정 | **표시** | 「범위 밖 N건 제외」 표시 검토 |
 | 7 | **`StatCard`가 숫자 아닌 값을 받나** | DS | **표시** | `ds-gap.md` 확인 대상 ✅ **해소 2026-09-02** — `ds-gap` 해소 2026-08-06 — `StatCard.value` 가 `ReactNode` 라 `a` |
 | 8 | **기능 권한 값 목록** — 회신 E-9(F-3) | 회신 대기 | **표시** | 이력 탭 제한은 그 후 |

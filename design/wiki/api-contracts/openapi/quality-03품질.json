@@ -4057,7 +4057,7 @@
      },
      "reasonCode": {
       "type": "string",
-      "example": "값",
+      "example": "INCOMING_INSPECTION_WAIT",
       "x-code-key": "CD-LOT-HOLD-REASON"
      },
      "releaseCondition": {
@@ -4140,7 +4140,7 @@
        "null"
       ],
       "description": "보류 사유. ⚠ 해제 사건에는 없을 수 있다. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "QUALITY_HOLD",
+      "example": "INCOMING_INSPECTION_WAIT",
       "x-code-key": "CD-LOT-HOLD-REASON"
      },
      "holdQty": {
@@ -4241,7 +4241,7 @@
      },
      "lotTypeCode": {
       "type": "string",
-      "example": "값",
+      "example": "MATERIAL",
       "description": "자재·생산·제품 3종(결정 10). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_TYPE 로 받는다(MATERIAL·PRODUCTION·PRODUCT). ⚠ 셋을 합쳐 집계하지 않는다(공유계약 L-7) — 같은 「보류 38건」이라도 자재와 제품은 대응이 다르다. 근거: omf-mes#176",
       "x-code-key": "CD-LOT-TYPE"
      },
@@ -4305,7 +4305,7 @@
      },
      "latestReasonCode": {
       "type": "string",
-      "example": "값",
+      "example": "INCOMING_INSPECTION_WAIT",
       "x-code-key": "CD-LOT-HOLD-REASON",
       "description": "「최근 전이」의 사유. ⛔ 변경이력 표가 없어 «보류» 기록의 최신 건으로 낸다 — 합격·불합격·재판정 전이는 여기 나타나지 않는다(W-03-01 §5-1). 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      }
@@ -4441,7 +4441,7 @@
      },
      "currentLotStatusCode": {
       "type": "string",
-      "example": "값",
+      "example": "NORMAL",
       "x-code-key": "CD-LOT-STATUS",
       "description": "전이를 걸 때 화면이 «본» 현재 상태. 서버가 이것과 실제가 다르면 409 로 막는다. LOT 상태. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },

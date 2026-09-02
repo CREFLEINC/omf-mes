@@ -1,15 +1,22 @@
 # 코드 사전 (2026-09-02)
 
-> ⭐ **1차 완성 — 103키 / 257자리.** 공유계약 `G-32` 등록부 **62그룹 전부**와 계약이
-> `enum` 으로 닫은 **41종**을 담는다. `check-code-dictionary.py` 가 ⓪ 규칙으로 «막는다» —
+> ⭐ **완성 — 174키 / 491자리.** 공유계약 `G-32` 등록부 **103그룹 전부**와 계약이
+> `enum` 으로 닫은 자리를 담는다. 2026-09-02 에 계약 `*Code(s)` 자리 **639 전건**이 판정을
+> 받았다(판정 없음 0). `check-code-dictionary.py` 가 ⓪ 규칙으로 «막는다» —
 > 등록부에 이름이 오르면 여기에도 행이 있어야 한다.
+> «(정합주: 2026-09-03 — 1차 완성 시점의 「103키 / 257자리 · 62그룹 · 41종」을 지금 수치로
+> 갈았다. ⛔ 이 문단의 수를 손으로 고치지 않는다 — `check-code-dictionary.py` ⑦ 이 실물과
+> 대조한다)»
 >
 > ⛔ **값을 지어내지 않았다.** 원천은 넷이고 행마다 「근거」 칸에 어디서 왔는지 적었다 —
 > ① 계약 `description` 산문 ② `omf-mes#198` 시드(`design/raw/…/공통코드값목록-제안안`)
 > ③ 공유계약 `G-32` 등록부 표 ④ 못 찾으면 **⬜ 로 세어서 남겼다**.
 >
-> ⭐ **드러난 것 — 「안 정한 값」은 3개뿐이었다.** 등록부 62그룹 중 45그룹의 값이
-> **이미 저장소 어딘가에 적혀 있었다.** 미결의 대부분은 결정 부재가 아니라 **기록 분산**이다.
+> ⭐ **드러난 것 — 미결의 대부분은 「안 정했다」가 아니라 「정했는데 이름이 없었다」였다.**
+> 1차 완성 때 등록부 62그룹 중 45그룹의 값이 **이미 저장소 어딘가에 적혀 있었다** —
+> 결정 부재가 아니라 **기록 분산**이다 «(구표기 보존: 그때의 수다 · 지금은 103그룹)».
+> 지금 값이 ⬜ 인 키는 **14** 이고, 그중 대부분은 «없는 것이 정상»이다 — 고객이
+> `W-06-06` 에서 운영 중에 채우는 `registry` 갈래다(아래 「사전」 절 참조).
 > 옛 서술: ~~시험판이다 · 653개 중 41개만 담았다~~ (2026-09-02 1~3단계로 해소)
 
 ## 왜 만드나
@@ -85,16 +92,27 @@ CD-<계열>-<축>
 
 ---
 
-## 사전 — **103키 / 257자리**
+## 사전 — **174키 / 491자리**
 
 | 소유 | 키 |
 | --- | :-: |
-| `enum` — 계약이 닫았다 | **41** |
-| `registry` — 고객이 늘린다 | **40** |
-| `registry-system` — ⛔ 고객 편집 불가 | **22** |
+| `enum` — 계약이 닫았다 | **71** |
+| `registry` — 고객이 늘린다 | **58** |
+| `registry-system` — ⛔ 고객 편집 불가 | **45** |
 
-⬜ **값을 못 찾은 것은 3키뿐이다** — `CD-APP-USER-STATUS`(뜻은 확정, 코드 문자열이 없다) ·
-`CD-GOODS-RECEIPT-REASON`·`CD-JUDGMENT-TYPE`(고객이 운영 중에 설정하는 마스터라 **없는 것이 정상**).
+⬜ **값이 비어 있는 것은 14키다** — 그중 13은 **없는 것이 정상**이다. 고객이 `W-06-06`
+에서 운영 중에 채우는 `registry` 갈래라 우리가 값을 지어낼 자리가 아니다
+(`CD-CALIBRATION-RESULT` · `CD-DEFECT-RESPONSIBILITY-TYPE` · `CD-GOODS-RECEIPT-REASON` ·
+`CD-JUDGMENT-TYPE` · `CD-LATE-ENTRY-REASON` · `CD-MAINTENANCE-RESULT-LINE-RESULT` ·
+`CD-MATERIAL-CHANGE-REASON` · `CD-PRODUCTION-RESULT-CORRECT-REASON` · `CD-QUALITY-ZONE` ·
+`CD-REINSPECTION-REASON` · `CD-STOCK-REINSTATEMENT-REASON` · `CD-STOCK-TRANSFER-REASON` ·
+`CD-WORK-ORDER-HOLD-REASON`).
+
+⚠ **나머지 하나는 진짜 결손이다** — `CD-APP-USER-STATUS` 는 **뜻은 확정인데 코드 문자열이
+없다**(계약이 「재직·휴직·퇴사 등」으로 한국어 뜻만 적었다). `§G` 규약대로 「확정된 뜻을
+영문 SNAKE 로 옮긴다」를 적용할 자리다.
+
+⛔ **위 계수를 손으로 고치지 않는다** — `check-code-dictionary.py` ⑦ 이 실물과 대조한다.
 
 ⛔ **열이 일곱이다 — 「키·값」 둘로는 서지 않는다.** 테스트베드가 그것을 실물로 증명했다
 (§ 아래 「형식이 두 번 틀렸다」).
@@ -156,7 +174,7 @@ CD-<계열>-<축>
 | `CD-DOWNTIME-REASON` | `EQUIPMENT_FAILURE` `MOLD_CHANGE` `MATERIAL_WAIT` `LABOR_WAIT` `PREVENTIVE_MAINTENANCE` `OTHER` | `DOWNTIME_REASON` | `reasonCode`(쿼리) | `registry` | 5 | 설비 비가동 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-EQUIPMENT-BREAKDOWN-STATUS` | `RECEIVED` `HANDLING` `DONE` | `EQUIPMENT_BREAKDOWN_STATUS` | `statusCode` | `registry-system` | 2 | 고장 접수. **값이 계약 산문에 이미 있었다**(2026-09-02 꺼냄) · `W-05-04` |
 | `CD-EQUIPMENT-INSPECTION-JUDGMENT-METHOD` | `VISUAL` `MEASUREMENT` | `EQUIPMENT_INSPECTION_JUDGMENT_METHOD` | `judgmentMethodCode` | `registry-system` | 5 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
-| `CD-EQUIPMENT-INSPECTION-RESOLVED-FROM-LEVEL` | `EQUIPMENT` `EQUIPMENT_GROUP` `NONE` | — | `resolvedFromLevelCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `EquipmentInspectionItemAssignmentsResponse`(`mdm-기준정보`). ⭐ **2026-09-03 개명·가름** — 작업 캘린더의 같은 이름과 «값집합이 다르다»(그쪽은 `EQUIPMENT_GROUP`·`PLANT`). 한 그룹으로 묶으면 화면이 남의 선택지를 본다(`B-28`). 접두 규약은 결정 1 「가」 |
+| `CD-EQUIPMENT-INSPECTION-RESOLVED-FROM-LEVEL` | `EQUIPMENT` `EQUIPMENT_GROUP` `NONE` | — | `resolvedFromLevelCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `EquipmentInspectionItemAssignmentsResponse`(`mdm-기준정보`) **한 자리**. ⚠ 계수 `2` 는 가름 회차(`b0becc5`)의 전사 오류였다 — **가름은 자리를 늘리지 않는다**(옛 `CD-RESOLVED-FROM-LEVEL` 이 1 이었고 설비 점검 1 + 작업 캘린더 1 로 나뉜 것뿐이다 · 2026-09-03 정정). ⭐ **2026-09-03 개명·가름** — 작업 캘린더의 같은 이름과 «값집합이 다르다»(그쪽은 `EQUIPMENT_GROUP`·`PLANT`). 한 그룹으로 묶으면 화면이 남의 선택지를 본다(`B-28`). 접두 규약은 결정 1 「가」 |
 | `CD-EQUIPMENT-INSPECTION-TYPE` | `DAILY` `MONTHLY` `MAINTENANCE` | `EQUIPMENT_INSPECTION_TYPE` | `inspectionTypeCode` | `registry` | 8 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
 | `CD-EQUIPMENT-STATUS` | `IN_SERVICE` `DISPOSED` | `EQUIPMENT_STATUS` | `statusCode` | `registry-system` | 4 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
 | `CD-EQUIPMENT-TYPE` | `INJECTION_MOLDING` `PRESS` `WATER_HEATER` | `EQUIPMENT_TYPE` | `equipmentTypeCode` | `registry` | 4 | 설비 계열. `#186` · 통지 `client#415` |
@@ -192,11 +210,11 @@ CD-<계열>-<축>
 | `CD-INVENTORY-COUNT-CLOSE-BLOCKED-REASON` | `COUNT_REMAINING` `VARIANCE_UNADJUSTED` `ALREADY_CLOSED` `STATE_LOCKED` | — | `closeBlockedReasonCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `InventoryCountSummary`(`logistics-01자재창고`). ⭐ 뜻 넷은 확정이었고 문자열만 없었다. 화면은 이 값으로 안내 문구와 「조정 등록」 경로를 가른다(`G-3`) |
 | `CD-INVENTORY-COUNT-STATUS` | `PLANNED` `IN_PROGRESS` `COMPLETED` | `INVENTORY_COUNT_STATUS` | `statusCode` | `registry-system` | 2 | 재고 실사. ⚠ **전표 상태와 다른 축** — 전기·취소가 없다. `W-01-04` §3 목업 · 사용자 결정 2026-09-02 |
 | `CD-INVENTORY-COUNT-TYPE` | `PERIODIC` `ADHOC` `CYCLE` | `INVENTORY_COUNT_TYPE` | `countTypeCode` | `registry` | 3 | 재고실사 유형. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
-| `CD-INVENTORY-RESERVATION-SOURCE-DOCUMENT-TYPE` | `PRODUCTION_ORDER` | — | `sourceDocumentTypeCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `InventoryReservation`(`logistics-01자재창고`). ⭐ `W-02-01` §5-4 가 「P/O 의 자재예약정보가 `production_order` 에 없고 `inventory_reservation` 이 P/O 를 가리킨다」로 세운 축이다(2026-09-02 해소). ⚠ 값이 하나라고 축이 없는 것이 아니다 |
+| `CD-INVENTORY-RESERVATION-SOURCE-DOCUMENT-TYPE` | `PRODUCTION_ORDER` | — | `sourceDocumentTypeCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `InventoryReservation`(`logistics-01자재창고`) **한 자리**. ⚠ 계수 `2` 는 형제 행(`GoodsIssue`·`GoodsReceipt` 처럼 «조회 + 생성» 두 스키마를 갖는 자리)의 수를 그대로 따라 적은 것이었다 — 이 자원은 **조회만 제공한다**(예약은 출고 요청·피킹의 결과로 서버가 걸고 푼다 · `M-01-08` §5-5). 둘째 자리가 «생길 수 없다»(2026-09-03 정정). ⭐ `W-02-01` §5-4 가 「P/O 의 자재예약정보가 `production_order` 에 없고 `inventory_reservation` 이 P/O 를 가리킨다」로 세운 축이다(2026-09-02 해소). ⚠ 값이 하나라고 축이 없는 것이 아니다 |
 | `CD-INVENTORY-TRANSACTION-SOURCE-DOCUMENT-TYPE` | `GOODS_RECEIPT` `GOODS_ISSUE` `INVENTORY_ADJUSTMENT` `STOCK_TRANSFER` | — | `sourceDocumentTypeCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `InventoryTransaction`(`logistics-01자재창고`). ⭐ 원장 한 줄의 «성격»을 말하는 축이다 — 방향(입고·출고·이동)은 라인의 `from*`/`to*` 가 이미 말한다. ⚠ `STOCK_TRANSFER` 는 추론이라 다른 셋보다 근거가 얕다 |
 | `CD-ISSUE-TYPE` | `PRODUCTION` `SUPPLIER_RETURN` `OTHER` `SHIPMENT` | `ISSUE_TYPE` | `issueTypeCode` | `registry` | 4 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
 | `CD-ITEM-TYPE` | `RAW_MATERIAL` `SEMI_FINISHED` `FINISHED` `MERCHANDISE` ⬜ | `ITEM_TYPE` | `itemTypeCode` | `registry` | 2 | 품목 유형. ⭐ 뜻 넷은 2026-08-22 분류표 20 이 「원자재/반제품/제품/상품」으로 이미 적었다 — 문자열만 없었다. ⛔ 예비품을 여기 넣지 않는다(QA #7 「품목 통합 아님」) |
-| `CD-JUDGMENT-TYPE` | ⬜ **미상** | `JUDGMENT_TYPE` | ⬜ **프로퍼티가 아니다** — 스키마·경로 설명 | `registry` | 2 | ⭐ **값이 없는 것이 정상이다** — `W-06-04` 판정유형 코드 마스터가 «고객 운영»으로 관리한다. 판정유형마다 물류 통제 속성 6종을 붙이는 구조라 값은 고객이 늘린다. ⚠ **① 계수에 남는 2는 결손이 아니다** — 이 그룹의 포인터는 «프로퍼티»가 아니라 스키마·경로 설명에 있어 검사기가 프로퍼티 축에서 못 센다 |
+| `CD-JUDGMENT-TYPE` | ⬜ **미상** | `JUDGMENT_TYPE` | ⬜ **프로퍼티가 아니다** — 스키마·경로 설명 | `registry` | 0 | ⭐ **값이 없는 것이 정상이다** — `W-06-04` 판정유형 코드 마스터가 «고객 운영»으로 관리한다. 판정유형마다 물류 통제 속성 6종을 붙이는 구조라 값은 고객이 늘린다. ⭐ **자리 0 도 정상이다** — 이 그룹은 계약이 «코드 문자열»로 나르지 않는다. `JudgmentTypeControl` 은 판정유형을 `codeValueId`(정수)로 가리키고, 그룹 이름은 그 스키마와 `/mdm/judgment-type-controls` 의 **설명 산문**에만 있다. 사전의 「자리」는 `*Code(s)` 프로퍼티 축이므로 셀 대상이 없다 — ⛔ 결손이 아니다. 그 두 자리는 `check-code-group-pointer.py` 가 자기 축에서 이미 센다(2026-09-03 정정 — 옛 계수 `2` 는 그 검사기의 축을 이 열에 섞어 적은 것이었다) |
 | `CD-LATE-ENTRY-REASON` | ⬜ | `LATE_ENTRY_REASON` | `lateEntryReasonCode` | `registry` | 4 | 지연 입력 사유. ⭐ 「지연 입력이 몇 건이고 왜인가」를 세려면 코드 축이어야 한다 — 사유 코드의 선례를 따른다 |
 | `CD-LEVEL` | `EQUIPMENT_GROUP` `PLANT` | — | `levelCode` `targetTypeCode` | `enum` | 4 | 계약이 `enum` 으로 닫은 값 — `WorkCalendarApplication` · `WorkCalendarApplicationUpdate`(`mdm-기준정보`) |
 | `CD-LOCATION-TYPE` | `RACK` `FLOOR` `TEMP` `HOPPER` `DEFAULT` ⬜ | `LOCATION_TYPE` | `locationTypeCode` | `registry` | 3 | 위치의 «물리적 형태». ⭐ 축은 하나다 — 계층 깊이는 `managementLevelCode` 가 따로 갖는다(2026-08-22 분류표 37). ⭐ 세 화면이 이미 값을 지목했다 — `M-01-07` §5-3 ①안(`TEMP`) · `M-01-09`(`HOPPER`) · `M-01-04`(흡수용 = `DEFAULT`). ⚠ 그 셋은 화면이 «판정»에 쓴다 |

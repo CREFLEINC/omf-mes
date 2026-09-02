@@ -13888,7 +13888,7 @@
        "null"
       ],
       "maxLength": 50,
-      "example": "STANDARD",
+      "example": "REFRIGERATED",
       "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=STORAGE_CONDITION 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-STORAGE-CONDITION"
      },
@@ -13999,7 +13999,7 @@
        "null"
       ],
       "maxLength": 50,
-      "example": "STANDARD",
+      "example": "REFRIGERATED",
       "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=STORAGE_CONDITION 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-STORAGE-CONDITION"
      },
@@ -14099,7 +14099,7 @@
        "null"
       ],
       "maxLength": 50,
-      "example": "STANDARD",
+      "example": "REFRIGERATED",
       "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=STORAGE_CONDITION 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-STORAGE-CONDITION"
      },
@@ -14719,7 +14719,7 @@
       "type": "string",
       "maxLength": 50,
       "description": "마스터 버전의 편집 잠금 상태 — 작성중(DRAFT · 편집 가능) · 확정(CONFIRMED · 편집 잠김) · 폐기(OBSOLETE). ⛔ 확정본은 in-place 수정하지 않고 새 Rev 를 발행한다(결정 07). ⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 값을 편집하면 안 된다. 편집 가부가 이 값에 걸려 있어 값을 지우면 잠금이 «조용히» 안 걸리고, 이미 그 Rev 로 전개된 W/O 와 어긋난다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=MASTER_VERSION_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. 근거: 결정 07(W-06-01 §4) — Routing 이 정한 세 값을 BOM·검사기준 버전이 준용한다(사용자 결정 2026-09-02). ⭐ Routing 은 결정 07 이 값을 «직접» 확정한 자리다.",
-      "example": "값",
+      "example": "DRAFT",
       "x-internal-note": "example 이 'ACTIVE' 였다 — 결정 07 이 확정한 뜻은 작성중·확정·폐기 셋이고 그중 어느 것도 아니다. 공유계약 G-32 가 설비 자산 상태에서 같은 결함을 잡아 「사용 여부(is_active)와 수명주기에 같은 낱말을 쓰지 않는다」로 고쳤다(ACTIVE → IN_SERVICE·DISPOSED). 여기도 코드 문자열이 정해질 때까지 자리표시로 되돌린다 — 등록은 W-06-06 소관이고 폐기 전이 액션 이름 :obsolete 와 짝을 맞추는 것이 후보다. omf-mes#259 요청 밖 확인에서 드러났다.",
       "x-code-key": "CD-MASTER-VERSION-STATUS"
      },
@@ -16069,8 +16069,8 @@
       "x-source-column": "qualification_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "공통코드 — 값 목록 미정 §8-5 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=QUALIFICATION_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "STANDARD",
+      "description": "공통코드 — 값 = PROCESS_OPERATION·INSPECTOR·SAFETY·EQUIPMENT_OPERATION (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=QUALIFICATION_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "PROCESS_OPERATION",
       "x-code-key": "CD-QUALIFICATION-TYPE"
      },
      "processId": {
@@ -16197,7 +16197,7 @@
       "type": "string",
       "maxLength": 50,
       "description": "품목 유형 — 원자재(RAW_MATERIAL) · 반제품(SEMI_FINISHED) · 제품(FINISHED) · 상품(MERCHANDISE). ⭐ 고객이 늘릴 수 있다 — 아래는 초기값(기본값)이지 닫힌 목록이 아니다. ⛔ 예비품을 이 값으로 대신하지 않는다 — QA #7 이 「품목 통합 아님」으로 확정했고, 예비품은 W-06-08 예비품 마스터가 갖는다. 값 목록은 GET /mdm/code-values?codeGroupCode=ITEM_TYPE 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "MATERIAL",
+      "example": "RAW_MATERIAL",
       "x-code-key": "CD-ITEM-TYPE"
      },
      "baseUomId": {
@@ -16262,7 +16262,7 @@
       ],
       "maxLength": 50,
       "description": "MES 확장 · 공통코드 — location.storage_condition_code 와 같은 코드계 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=STORAGE_CONDITION 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "STANDARD",
+      "example": "REFRIGERATED",
       "x-code-key": "CD-STORAGE-CONDITION"
      },
      "openedShelfLifeHours": {
@@ -16382,7 +16382,7 @@
        "null"
       ],
       "maxLength": 50,
-      "example": "STANDARD",
+      "example": "REFRIGERATED",
       "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=STORAGE_CONDITION 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-STORAGE-CONDITION"
      },
@@ -16733,7 +16733,7 @@
       "type": "string",
       "maxLength": 50,
       "description": "마스터 버전의 편집 잠금 상태 — 작성중(DRAFT · 편집 가능) · 확정(CONFIRMED · 편집 잠김) · 폐기(OBSOLETE). ⛔ 확정본은 in-place 수정하지 않고 새 Rev 를 발행한다(결정 07). ⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 값을 편집하면 안 된다. 편집 가부가 이 값에 걸려 있어 값을 지우면 잠금이 «조용히» 안 걸리고, 이미 그 Rev 로 전개된 W/O 와 어긋난다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=MASTER_VERSION_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. 근거: 결정 07(W-06-01 §4) — Routing 이 정한 세 값을 BOM·검사기준 버전이 준용한다(사용자 결정 2026-09-02). ⭐ W-06-11 「작성중만 편집」 규칙의 판정 컬럼이다.",
-      "example": "값",
+      "example": "DRAFT",
       "x-internal-note": "example 이 'ACTIVE' 였다 — 공유계약 G-32 가 설비 자산 상태에서 같은 결함을 잡아 「사용 여부(is_active)와 수명주기에 같은 낱말을 쓰지 않는다」로 고쳤다(ACTIVE → IN_SERVICE·DISPOSED). 여기도 코드 문자열이 정해질 때까지 자리표시로 되돌린다 — 등록은 W-06-06 소관이고 폐기 전이 액션 이름 :obsolete 와 짝을 맞추는 것이 후보다. omf-mes#259 요청 밖 확인에서 드러났다.",
       "x-code-key": "CD-MASTER-VERSION-STATUS"
      },
@@ -17353,7 +17353,7 @@
       "type": "string",
       "maxLength": 50,
       "description": "공통코드 — 「전수/샘플」+「제품 단위/LOT 단위」가 여기 들어간다. 값 목록 §8-2 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_SAMPLING_METHOD 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "STANDARD",
+      "example": "FULL_INSPECTION",
       "x-code-key": "CD-INSPECTION-SAMPLING-METHOD"
      },
      "aqlValue": {
@@ -17390,8 +17390,8 @@
       "x-source-column": "inspection_frequency_code",
       "type": "string",
       "maxLength": 50,
-      "description": "공통코드 — 값 목록 미정 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "STANDARD",
+      "description": "공통코드 — 값 = WORK_ORDER·PRODUCTION_LOT·MATERIAL_LOT·SHIFT·TIME_INTERVAL·QUANTITY_INTERVAL·EQUIPMENT_MOLD_CHANGE·USER_REQUEST (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "WORK_ORDER",
       "x-code-key": "CD-INSPECTION-FREQUENCY"
      },
      "frequencyIntervalValue": {
@@ -17411,7 +17411,7 @@
        "null"
       ],
       "maxLength": 50,
-      "example": "STANDARD",
+      "example": "HOUR",
       "x-code-key": "CD-INSPECTION-FREQUENCY-INTERVAL-UOM",
       "description": "검사 주기의 단위 — 시간(HOUR) · 수량(QUANTITY). ⭐ 두 축은 사용자와 협의해 확정했다(2026-09-03). ⚠ frequencyIntervalValue 와 짝이다 — 한쪽만 채우면 안 되고 그 짝 제약은 화면·서버가 진다(A-2 · W-06-02 §8-3). ⛔ 품목의 기준단위(uomCode)와 다른 축이다 — 여기는 «주기»의 단위다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY_INTERVAL_UOM 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
@@ -17474,7 +17474,7 @@
       "x-source-column": "sampling_method_code",
       "type": "string",
       "maxLength": 50,
-      "example": "STANDARD",
+      "example": "FULL_INSPECTION",
       "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_SAMPLING_METHOD 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-INSPECTION-SAMPLING-METHOD"
      },
@@ -17508,7 +17508,7 @@
       "x-source-column": "inspection_frequency_code",
       "type": "string",
       "maxLength": 50,
-      "example": "STANDARD",
+      "example": "WORK_ORDER",
       "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-INSPECTION-FREQUENCY"
      },
@@ -17527,7 +17527,7 @@
        "null"
       ],
       "maxLength": 50,
-      "example": "STANDARD",
+      "example": "HOUR",
       "x-code-key": "CD-INSPECTION-FREQUENCY-INTERVAL-UOM",
       "description": "검사 주기의 단위 — 시간(HOUR) · 수량(QUANTITY). ⭐ 두 축은 사용자와 협의해 확정했다(2026-09-03). ⚠ frequencyIntervalValue 와 짝이다 — 한쪽만 채우면 안 되고 그 짝 제약은 화면·서버가 진다(A-2 · W-06-02 §8-3). ⛔ 품목의 기준단위(uomCode)와 다른 축이다 — 여기는 «주기»의 단위다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY_INTERVAL_UOM 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
@@ -17574,7 +17574,7 @@
       "x-source-column": "sampling_method_code",
       "type": "string",
       "maxLength": 50,
-      "example": "STANDARD",
+      "example": "FULL_INSPECTION",
       "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_SAMPLING_METHOD 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-INSPECTION-SAMPLING-METHOD"
      },
@@ -17608,7 +17608,7 @@
       "x-source-column": "inspection_frequency_code",
       "type": "string",
       "maxLength": 50,
-      "example": "STANDARD",
+      "example": "WORK_ORDER",
       "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-INSPECTION-FREQUENCY"
      },
@@ -17627,7 +17627,7 @@
        "null"
       ],
       "maxLength": 50,
-      "example": "STANDARD",
+      "example": "HOUR",
       "x-code-key": "CD-INSPECTION-FREQUENCY-INTERVAL-UOM",
       "description": "검사 주기의 단위 — 시간(HOUR) · 수량(QUANTITY). ⭐ 두 축은 사용자와 협의해 확정했다(2026-09-03). ⚠ frequencyIntervalValue 와 짝이다 — 한쪽만 채우면 안 되고 그 짝 제약은 화면·서버가 진다(A-2 · W-06-02 §8-3). ⛔ 품목의 기준단위(uomCode)와 다른 축이다 — 여기는 «주기»의 단위다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_FREQUENCY_INTERVAL_UOM 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
@@ -17805,7 +17805,7 @@
        "null"
       ],
       "maxLength": 50,
-      "example": "STANDARD",
+      "example": "MEASUREMENT",
       "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_ITEM_SPEC_METHOD 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-INSPECTION-ITEM-SPEC-METHOD"
      },
@@ -17963,7 +17963,7 @@
        "null"
       ],
       "maxLength": 50,
-      "example": "STANDARD",
+      "example": "MEASUREMENT",
       "description": "⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_ITEM_SPEC_METHOD 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-INSPECTION-ITEM-SPEC-METHOD"
      },
@@ -18736,7 +18736,7 @@
       "type": "string",
       "maxLength": 50,
       "description": "감사 이벤트 유형 — 생성(CREATE) · 수정(UPDATE) · 삭제(DELETE) · 권한 부여(GRANT) · 권한 회수(REVOKE). ⭐ GRANT·REVOKE 를 둔 근거는 W-CO-02 §8-8 이다 — 「누가 언제 권한을 줬나」가 남는 곳이 그동안 하나도 없었고 감사 이력이 그것을 받기로 했다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 무엇을 기록할지는 시스템이 정한다 — 고객이 늘리면 기록되지 않는 유형이 생긴다. 값 목록은 GET /mdm/code-values?codeGroupCode=AUDIT_EVENT_TYPE 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "STANDARD",
+      "example": "CREATE",
       "x-code-key": "CD-AUDIT-EVENT-TYPE"
      },
      "beforeValue": {
@@ -19181,8 +19181,8 @@
       "x-source-column": "process_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "공통코드 — 값 목록 미정 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PROCESS_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "STANDARD",
+      "description": "공통코드 — 값 = MACHINING·ASSEMBLY·INSPECTION·PACKAGING (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PROCESS_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "MACHINING",
       "x-code-key": "CD-PROCESS-TYPE"
      },
      "isActive": {
@@ -21719,7 +21719,7 @@
       ],
       "example": "PUBLIC_HOLIDAY",
       "maxLength": 50,
-      "description": "공통코드 — 값 목록이 확정되지 않았다 ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_CALENDAR_DAY_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "공통코드 — 값 = PUBLIC_HOLIDAY·COMPANY_FOUNDING_DAY·SUMMER_VACATION·PLANNED_MAINTENANCE·MAKEUP_WORKING_DAY·OTHER (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_CALENDAR_DAY_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-WORK-CALENDAR-DAY-REASON"
      },
      "remarks": {

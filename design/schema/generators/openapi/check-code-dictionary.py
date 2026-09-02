@@ -394,6 +394,88 @@ def split_siblings(found: dict[str, list[tuple]]) -> list[tuple]:
     return sorted(out, key=lambda x: -len(x[2]))
 
 
+# ── ㉦㉧ 계약의 «예시·산문» 이 사전과 같은 말을 하는가 ──────────────────
+#
+# ⭐ ㉡ 는 계약의 `enum` 만 사전과 대조한다. 그런데 값을 «나르는» 자리는 셋이다 —
+#    `enum` · `example` · `description` 산문. 뒤 둘은 아무도 안 보고 있었다.
+#
+# ⛔ 2026-09-03 실측 — 사전이 닫힌(639/639) 뒤에도 계약 **83자리**가 낡아 있었다:
+#      ㉦ `example` 이 사전 값집합 «밖»  52자리
+#         (자리채움 `"값"` 25 · `"STANDARD"` 14 · `"NORMAL"` 3 + 진짜 오값 10)
+#      ㉧ 산문이 「확정된 값 목록이 아직 없다」인데 사전은 값을 갖는다  31자리
+#
+# ⭐ 이것이 왜 무거운가 — `check-example-placeholder.py` 의 머리말이 이미 답했다.
+#    「설비 상태 칸의 `example` 이 `"ACTIVE"` 였고, 구현팀은 그 값을 보고 코드를
+#    만들었다. **시험은 전부 통과했다** — 계약이 그 값을 확정한 적이 없었는데도.」
+#    `description` 은 `openapi-typescript` 가 JSDoc 으로 옮기고 `example` 도 생성
+#    타입·목 서버에 그대로 실린다. **설명이 맞아도 예시가 틀리면 아무도 못 잡는다.**
+#
+# ⚠ 그 검사기와 이 축은 «다른 것»을 본다 — 그쪽은 자기 안에 «손으로 베낀» 확정값
+#    표를 들고 있고(자기 머리말이 「조항이 바뀌면 이 표도 손으로 따라가야 한다」고
+#    적었다) 게이트가 아니다. 이 축은 **코드 사전을 정본으로 읽는다.**
+
+STALE_PROSE = re.compile(r"확정된 값 목록이 아직 없다|값 목록이 아직 확정|"
+                         r"값 목록이 확정되지 않|값 목록 미확정|값 목록 미정")
+
+
+def prose_example_gaps(doc: dict, values_by_key: dict) -> tuple[list, list]:
+    """한 계약 문서 → (㉦ example 이 밖인 자리, ㉧ 산문이 낡은 자리).
+
+    순수 함수다 — 파일을 읽지 않는다. `values_by_key` 는 {사전 키: 값 집합}.
+    ⭐ 한 자리가 «키 둘»에 닿으면 값은 합집합으로 본다(`G-32` · `omf-mes#219`).
+    """
+    bad_example: list[tuple] = []
+    stale_prose: list[tuple] = []
+
+    def walk(node, where):
+        if isinstance(node, dict):
+            keys = key_list(node.get("x-code-key"))
+            if keys:
+                vals: set = set()
+                for k in keys:
+                    vals |= set(values_by_key.get(k) or ())
+                if vals:
+                    ex = node.get("example")
+                    if isinstance(ex, str) and ex not in vals:
+                        bad_example.append((where, " + ".join(sorted(keys)), ex))
+                    if STALE_PROSE.search(node.get("description") or ""):
+                        stale_prose.append((where, " + ".join(sorted(keys))))
+            for k, v in node.items():
+                walk(v, where + "/" + str(k))
+        elif isinstance(node, list):
+            for i, v in enumerate(node):
+                walk(v, where + "/%d" % i)
+
+    walk(doc, "")
+    return bad_example, stale_prose
+
+
+# ── ⑦ 사전이 «자기 계수»를 맞게 적었는가 ────────────────────────────────
+
+SELF_COUNT = [
+    (re.compile(r"\*\*(\d+)키 / (\d+)자리\.?\*\*"), ("키", "자리")),
+    (re.compile(r"등록부 \*\*(\d+)그룹 전부\*\*"), ("그룹",)),
+]
+
+
+def self_count_gaps(text: str, facts: dict) -> list[str]:
+    """머리말이 적은 수 ↔ 실물. 파일을 읽지 않는다 — 테스트가 이 함수를 부른다.
+
+    ⭐ 왜 필요한가 — 실측 «결과»를 문면에 박으면 낡는다. 이 저장소가 같은 뿌리를
+       네 번 겪었다: `B-6`(부여·회수 9테이블) · `A-10`(16쌍) · `#198`(28그룹) ·
+       그리고 이 사전 자신(2026-09-03 — 머리말이 「103키 / 257자리 · 등록부 62그룹」에
+       고착돼 실물 174 / 491 / 103 과 갈려 있었다. 「62그룹이 전부다」로 읽혔다).
+    """
+    gaps: list[str] = []
+    for pattern, names in SELF_COUNT:
+        for m in pattern.finditer(text):
+            for i, name in enumerate(names):
+                said = int(m.group(i + 1))
+                if said != facts[name]:
+                    gaps.append("%s — 문면 %d · 실물 %d" % (name, said, facts[name]))
+    return gaps
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--split", action="store_true", help="④ 형제 갈림만 낸다")
@@ -642,13 +724,71 @@ def main() -> int:
     print("   (b) 원래 «다른 코드»인데 이름이 같다        → 키를 가른다")
     print("   ⭐ 그 구분이 곧 사전이 할 일이다.")
     print()
+    # ⑦ ⛔ **게이트** — 사전이 «자기 자신에 대해» 적은 수가 실물과 맞는가.
+    #    2026-09-03 실측 — 머리말이 「103키 / 257자리 · 등록부 62그룹」에 고착돼 있었다.
+    #    실물은 174키 / 491자리 / 103그룹. 1차 완성 시점의 수가 «완성 선언»의 얼굴로
+    #    남아, 읽는 사람에게 「62그룹이 전부다」로 읽혔다.
+    #    ⭐ 같은 뿌리를 이 저장소가 세 번 겪었다 — `B-6`(부여·회수 9테이블) ·
+    #    `A-10`(16쌍) · `#198`(28그룹). **실측 «결과»를 문면에 박으면 낡는다.**
+    #    고치는 방향은 하나다 — 기계가 그 수를 다시 세게 한다.
+    facts = {
+        "키": len(entries),
+        "자리": sum(e["places"] or 0 for e in entries),
+        "그룹": len(registry),
+    }
+    with open(DICT, encoding="utf-8") as fh:
+        head = fh.read()
+    # ㉦㉧ ⛔ **게이트** — 계약의 예시·산문이 사전과 같은 말을 하는가.
+    values_by_key = {e["key"]: set(e["values"]) for e in entries}
+    bad_ex: list[tuple] = []
+    old_prose: list[tuple] = []
+    for cpath in sorted(glob.glob(CONTRACTS)):
+        with open(cpath, encoding="utf-8") as fh:
+            cdoc = json.load(fh)
+        base = os.path.basename(cpath)
+        ex, pr = prose_example_gaps(cdoc, values_by_key)
+        bad_ex += [(base,) + t for t in ex]
+        old_prose += [(base,) + t for t in pr]
+    if bad_ex:
+        gate.append("example 이 사전 값집합 밖 %d" % len(bad_ex))
+        print("⛔ ㉦ `example` 이 사전 값집합 «밖»입니다 %d자리" % len(bad_ex))
+        for row in bad_ex[:20]:
+            print("   %-26s %s\n      키=%s  example=%s" % (row[0], row[1], row[2], row[3]))
+        print("   ⭐ 생성 타입·목 서버에 그대로 실린다 — 틀린 예시는 설명을 읽지 않는 한 안 잡힌다.")
+    else:
+        print("㉦ ✅ `example` 이 전부 사전 값집합 안이다")
+    if old_prose:
+        gate.append("산문이 「값 목록이 아직 없다」 %d" % len(old_prose))
+        print("⛔ ㉧ 산문이 「값 목록이 아직 없다」인데 사전은 값을 갖습니다 %d자리"
+              % len(old_prose))
+        for row in old_prose[:20]:
+            print("   %-26s %s  (키=%s)" % row)
+        print("   ⭐ 프론트는 그 문면을 보고 선택칸을 «비활성 + 사유»로 만든다(G-2).")
+    else:
+        print("㉧ ✅ 산문에 낡은 「값 목록이 아직 없다」가 없다")
+    print()
+
+    stale = self_count_gaps(head, facts)
+    if stale:
+        gate.append("사전 머리말 계수가 낡음 %d" % len(stale))
+        print("⛔ ⑦ 사전이 자기 계수를 «틀리게» 적고 있습니다 %d건" % len(stale))
+        for s in stale:
+            print("   %s" % s)
+        print("   ⭐ 문면을 실물에 맞춘다 — 실측 결과를 손으로 박아 두면 다시 낡는다.")
+    else:
+        print("⑦ ✅ 사전 머리말 계수가 실물과 같다 — %d키 / %d자리 / 등록부 %d그룹"
+              % (facts["키"], facts["자리"], facts["그룹"]))
+    print()
+
     if gate:
         print("⛔ 막는 규칙에 걸렸습니다 — %s" % " · ".join(gate))
         return 1
     print("⭐ 계수 규칙(①②③④㉣)은 «막지 않는다» — 흐름을 보는 수다.")
-    print("   ⛔ 막는 것은 ⓪ 와 ⑤ 다 — 등록부↔사전 1:1 · 소유 일치 ·")
+    print("   ⛔ 막는 것은 ⓪ · ⑤ · ㉦㉧ · ⑦ 이다 — 등록부↔사전 1:1 · 소유 일치 ·")
     print("      계약이 적은 키가 사전과 어긋나지 않는가(㉠㉡㉢) ·")
-    print("      소유와 자리의 «모양» 이 맞는가(㉤㉥).")
+    print("      소유와 자리의 «모양» 이 맞는가(㉤㉥) ·")
+    print("      계약의 «예시·산문» 이 사전과 같은 말을 하는가(㉦㉧) ·")
+    print("      사전이 «자기 계수»를 맞게 적었는가(⑦).")
     return 0
 
 

@@ -93,8 +93,8 @@
 | 라벨 출력 | `POST /app/document-issues` — **`documentTypeCode = PRODUCTION_LOT_LABEL`**(§3-8) · `targetType` = LOT, `lotId` = 같은 값 | §5-2 · K-1 |
 | 미리보기 | `GET /app/document-issues/{id}/rendition` | K-5 |
 | 2단 출력 — 두 화면이 나눠 가진다 | 계약은 **한 경로**다. 「누가 어느 단을 찍는가」는 화면이 정한다 | §5-3 |
-| ⭐ **LOT 발생 원천 표시명** | **`GET /mdm/code-values?codeGroupCode=LOT_SOURCE_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `INBOUND_RECEIPT_LINE`·`RECYCLE_ENTRY`(**2026-09-02 등재**) | G-32 · K-5 |
-| ⭐ **LOT 생명주기 표시명** | **`GET /mdm/code-values?codeGroupCode=LOT_LIFECYCLE_STATUS`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `WAITING`·`ACTIVE`·`VOIDED`(**2026-09-02 등재**) | G-32 · K-5 |
+| ⭐ **LOT 발생 원천 표시명** | **`GET /mdm/code-values?codeGroupCode=LOT_SOURCE_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `INBOUND_RECEIPT_LINE`·`RECYCLE_ENTRY`(**2026-09-02 등재**) | G-32 |
+| ⭐ **LOT 생명주기 표시명** | **`GET /mdm/code-values?codeGroupCode=LOT_LIFECYCLE_STATUS`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `WAITING`·`ACTIVE`·`VOIDED`(**2026-09-02 등재**) | G-32 |
 
 ⭐ **A-10 규칙 3(FK 우선)이 여기서 갈린다.** LOT 라벨은 `targetId` 와 `lotId` 가 같은 값이고 인식표는 다르다 → **`targetTypeCode` 로 먼저 판정한다.** 계약의 `DocumentTarget.targetTypeCode` 가 그 판정 입력이다.
 
@@ -110,6 +110,7 @@
 | 재출력 사유 선택 | ⚠ **값 목록 미착지** — 공통코드다. **「인쇄 실패」 값 요청은 #64 코멘트로 올렸다** | K-7 · #64 |
 | 대상 유형이 갈린다(LOT ↔ 개체) | `targetTypeCode` 로 판정 — 계약이 **FK 가 아니라 유형을 먼저** 보게 만든다 | §5-3 |
 | 단말 게이팅 | `POST` 403 | §6 · F-1 |
+| ⭐ **재발행 사유 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=REISSUE_REASON`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `DAMAGED`·`LOST`·`PRINT_FAILURE`·`PACKAGING`·`QUANTITY_CHANGE`(**2026-09-03 등재**) · ⭐ **고객이 늘린다** — 위 값은 초기 시드다 | G-32 |
 
 ### 3-4. `P-04-02` 납품 포장 라벨 출력 *(POP)*
 

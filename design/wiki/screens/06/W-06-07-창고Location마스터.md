@@ -87,8 +87,8 @@
 | 상위 위치 | `parent_location_id` | FK → `mdm.location` (자기참조) | — | | **계층 구성** · 자기 자신·순환 금지 «§8-5» | ✅ |
 | 위치코드 | `location_code` | `code_t` varchar(50) | ✅ | ✅ **(창고 내)** | 「같은 창고에 이미 있는 위치코드입니다」 | ⚠ §8-7 |
 | 위치명 | `location_name` | `name_t` varchar(200) | ✅ | | | ✅ |
-| 위치유형 | `location_type_code` | `code_t` | ✅ | | 공통코드 — **값 목록 미정 §8-2** | ✅ |
-| 품질구역 | `quality_zone_code` | `code_t` | — | | 공통코드 — **값 목록 미정** · Hold/Release 물류 통제와의 관계 §8-2 | ✅ |
+| 위치유형 | `location_type_code` | `code_t` | ✅ | | `RACK`(랙) · `FLOOR`(바닥) · `TEMP`(임시) · `HOPPER`(호퍼) · `DEFAULT`(대표) **5값** — 값 목록은 `GET /mdm/code-values?codeGroupCode=LOCATION_TYPE` 로 받는다(공유계약 `G-32` · 2026-09-02 등재 · 코드 사전 `CD-LOCATION-TYPE`). ⭐ **고객이 늘린다 — 위 다섯은 초기 시드다**(`registry`). ⚠ `TEMP`·`HOPPER`·`DEFAULT` 셋은 **화면이 판정에 쓴다**(`M-01-07` §5-3 · `M-01-09` · `M-01-04`) — 지우면 그 화면이 선다 | ✅ |
+| 품질구역 | `quality_zone_code` | `code_t` | — | | ⭐ **값은 고객이 정한다 — 「회신 대기」가 아니라 마스터다**(`G-31` 마스터안전형). 창고 배치·품질관리 절차가 현장마다 달라 계약이 닫지 않는다. **받는 곳은 이미 있다** — `GET /mdm/code-values?codeGroupCode=QUALITY_ZONE`(공유계약 `G-32` · 2026-09-02 등재 · 코드 사전 `CD-QUALITY-ZONE`). ⛔ 화면은 **정상 동작한다** — 어느 값이 와도 화면이 같게 돈다. ⛔ **이 값으로 출고 가부를 판정하지 않는다** — 판정의 정본은 LOT 보류다. Hold/Release 와의 관계는 §8-2 | ✅ |
 | 보관조건 | `storage_condition_code` | `code_t` | — | | 온도·습도·위험물 (물리 모델 주석 `[L] 1-3 SCN-22`) | ✅ |
 | 품목 혼적 허용 | `allow_mixed_item` | boolean | ✅ 기본 `true` | | | ✅ |
 | LOT 혼적 허용 | `allow_mixed_lot` | boolean | ✅ 기본 `true` | | ✓확정 QA #14 「혼적 실재」와 정합 | ✅ |
@@ -175,7 +175,7 @@
 
 | # | 항목 | 성격 | 처리 |
 | --- | --- | --- | --- |
-| 2 | ~~`management_level_code`~~ ✅ **확정 2026-08-31** · `location_type_code` · `quality_zone_code` 값 목록 미정 | 공통코드 | `W-06-06` 공통코드 마스터 소관 · 확정 전까지 선택 목록 비움. 특히 `quality_zone_code`와 **Lot Status Hold/Release 물류 통제의 관계**가 정의되지 않음 |
+| 2 | ~~`management_level_code`~~ ✅ **확정 2026-08-31** · ~~`location_type_code`~~ ✅ **해소(2026-09-03)** — 코드 사전 `CD-LOCATION-TYPE` 5값(§4-B) · **남은 것은 `quality_zone_code` 하나다** | 공통코드 | `quality_zone_code` 는 **값이 «없는 것이 정상»이다** — 고객이 `W-06-06` 에서 운영 중에 채우는 `registry` 갈래이고 그룹 `QUALITY_ZONE` 은 이미 등재돼 있다(`G-32` · 2026-09-02). ⛔ **남은 진짜 미결은 값이 아니라 관계다** — `quality_zone_code` ↔ Lot Status Hold/Release 물류 통제의 관계가 정의되지 않아 **이 값으로 출고 가부를 판정하지 않는다**(판정의 정본은 LOT 보류) |
 | 3 | 창고유형 5종(자재·제품·반제품·상품·생산)이 `warehouse_type_code` 공통코드 값과 1:1인지 미확인 | 정합 | 확인 필요 |
 | 4 | **마스터 변경 이력 저장 방식** — REQ-PR-0021이 「변경 이력 필수」인데 **확인 범위의 물리 모델에서 범용 이력 테이블이 발견되지 않음**(감사 컬럼 4개는 최신 상태만 보존하므로 이력이 아님) | 데이터 | 하류 확인 후 부재 시 **`[docs→데이터모델]` 이슈**(assignee 필수) |
 | 5 | **Location 계층 최대 깊이** — 2단 이내면 `Table`+`groupBy`로 충분해 §7-2 갭이 성립하지 않음 | 설계 | 운영 실태 확인 필요. **DS 갭 판정의 선행 조건** |
