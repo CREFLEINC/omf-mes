@@ -262,7 +262,7 @@ production_result.corrects_production_result_id
 | 4 | **취소 시 선발행 LOT 회수** — R82는 「마감 시점 전용」이라 취소를 커버하지 않는다 | 프로세스 | **조정** | ✅ **종결 — DR-007**(2026-08-12) · `:cancel` 이 전건 즉시 폐번한다 |
 | 5 | **마감된 W/O에 상쇄 실적을 넣을 수 있는가** — 데이터상 가능하나 R83과의 관계가 미정 | 규칙 | **조정** | 허용으로 시작. ⚠ **`:correct` 를 부르는 화면이 아직 지정되지 않았다**(06-API-요구서-02생산실행 §4 역방향 · `#61`) |
 | 6 | ✅ **해소(2026-08-31)** — 판정 축이 확정됐고(「개발품 구분은 품목이다」 · 사용자 2026-08-24 · `#70`) 계약에 `Item.developmentItem` 이 앉았다. 화면은 확정대로 제외 송신한다. 📨 `mdm.item` 컬럼 신설은 **작업 통지**이지 우리를 막지 않는다 | **상류↔하류 불일치** | **해소** | 종결 — 컬럼은 통지 |
-| 7 | **송신 항목 on/off 설정 테이블 부재**(§I-13 · #66) | 데이터 | **조정** | #66 종료(2026-08-25 · PR #236 · 계약 완전 흡수) — `GET/PUT /integration/outbound-item-settings` 와 `/integration/interface-definitions` 가 그 답이다 |
+| 7 | **송신 항목 on/off 설정 테이블 부재**(§I-13 · #66) | 데이터 | **조정** | #66 종료(2026-08-25 · PR #236 · 계약 완전 흡수) — `GET/PUT /integration/outbound-item-settings` 와 `/integration/interface-definitions` 가 그 답이다 ✅ **해소 2026-09-02** — `GET/PUT /integration/outbound-item-settings` 가 계약에 있다 |
 
 **차단 0건 — 이 화면은 지금 지어도 된다**(물러난 수준 셋을 명시한 채로).
 
