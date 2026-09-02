@@ -7380,9 +7380,19 @@
       "name": "targetTypeCode",
       "in": "query",
       "schema": {
-       "type": "string"
+       "type": "string",
+       "enum": [
+        "APP_USER",
+        "ROLE",
+        "WORKER",
+        "TERMINAL",
+        "ITEM",
+        "ROUTING",
+        "INSPECTION_PLAN_VERSION"
+       ],
+       "example": "APP_USER"
       },
-      "description": "감사 대상으로 거른다. 감사 대상 유형. ⭐ 두 값은 확정됐다 — APP_USER · ROLE(사용자 결정 2026-09-01 · W-CO-02 §8-8). 사용자·역할의 마스터 수정뿐 아니라 «권한 부여·회수»까지 이 이력에 남는다. ⚠ 나머지 값은 여전히 미정이라 enum 으로 닫지 않는다 — 둘이 들었다고 목록이 닫힌 것이 아니다(A-21). 값 목록은 GET /mdm/code-values?codeGroupCode=AUDIT_TARGET_TYPE 로 받는다. ⛔ 시스템 소유다 — 감사 대상은 우리 표 이름이라 고객이 W-06-06 에서 편집하면 안 된다",
+      "description": "감사 대상으로 거른다. 감사 대상 유형 — 사용자(APP_USER) · 역할(ROLE) · 작업자(WORKER) · 단말(TERMINAL) · 품목(ITEM) · 라우팅(ROUTING) · 검사기준 버전(INSPECTION_PLAN_VERSION). ⭐ 값 일곱은 공유계약 B-6 이 「회수 기록은 audit.audit_event 다」로 «명시»한 부여·회수 9테이블의 «소유 마스터»다(사용자 결정 2026-09-03) — user_role · user_data_scope → APP_USER · role_permission → ROLE · worker_qualification → WORKER · terminal_process → TERMINAL · item_uom_conversion·item_external_code → ITEM · routing_operation_dependency → ROUTING · inspection_item_spec → INSPECTION_PLAN_VERSION. ⛔ 다형 참조 판별자라 값이 «우리 계약의 대상 표 이름»이다 — 고객이 늘릴 수 없고 공통코드 그룹으로 받지 않는다(A-10 · A-16 「가르는 물음 넷」 — 「가」·「나」 참). ⚠ 대상이 늘면 «화면이 문자열을 정해 넣기 전에» 계약이 먼저 값을 갖는다(A-16). ⚠ 개체 마스터(창고·위치·설비·금형·거래처 등)는 여기 들지 않는다 — 「무엇이 있나」가 바뀔 뿐 과거 판정이 소급해 달라지지 않고, B-4 물리 삭제 금지와 version_no 낙관적 잠금이 이미 받는다. 버전을 가진 마스터도 빠진다 — 결정 07 이 「변경 이력 요구는 Rev 이력 그 자체로 충족」이라 했다.",
       "x-code-key": "CD-AUDIT-TARGET-TYPE"
      },
      {
@@ -18699,9 +18709,18 @@
       "x-source-column": "target_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "감사 대상 유형. ⭐ 두 값은 확정됐다 — APP_USER · ROLE(사용자 결정 2026-09-01 · W-CO-02 §8-8). 사용자·역할의 마스터 수정뿐 아니라 «권한 부여·회수»까지 이 이력에 남는다. ⚠ 나머지 값은 여전히 미정이라 enum 으로 닫지 않는다 — 둘이 들었다고 목록이 닫힌 것이 아니다(A-21). 값 목록은 GET /mdm/code-values?codeGroupCode=AUDIT_TARGET_TYPE 로 받는다. ⛔ 시스템 소유다 — 감사 대상은 우리 표 이름이라 고객이 W-06-06 에서 편집하면 안 된다",
-      "example": "WAREHOUSE",
-      "x-code-key": "CD-AUDIT-TARGET-TYPE"
+      "description": "감사 대상 유형 — 사용자(APP_USER) · 역할(ROLE) · 작업자(WORKER) · 단말(TERMINAL) · 품목(ITEM) · 라우팅(ROUTING) · 검사기준 버전(INSPECTION_PLAN_VERSION). ⭐ 값 일곱은 공유계약 B-6 이 「회수 기록은 audit.audit_event 다」로 «명시»한 부여·회수 9테이블의 «소유 마스터»다(사용자 결정 2026-09-03) — user_role · user_data_scope → APP_USER · role_permission → ROLE · worker_qualification → WORKER · terminal_process → TERMINAL · item_uom_conversion·item_external_code → ITEM · routing_operation_dependency → ROUTING · inspection_item_spec → INSPECTION_PLAN_VERSION. ⛔ 다형 참조 판별자라 값이 «우리 계약의 대상 표 이름»이다 — 고객이 늘릴 수 없고 공통코드 그룹으로 받지 않는다(A-10 · A-16 「가르는 물음 넷」 — 「가」·「나」 참). ⚠ 대상이 늘면 «화면이 문자열을 정해 넣기 전에» 계약이 먼저 값을 갖는다(A-16). ⚠ 개체 마스터(창고·위치·설비·금형·거래처 등)는 여기 들지 않는다 — 「무엇이 있나」가 바뀔 뿐 과거 판정이 소급해 달라지지 않고, B-4 물리 삭제 금지와 version_no 낙관적 잠금이 이미 받는다. 버전을 가진 마스터도 빠진다 — 결정 07 이 「변경 이력 요구는 Rev 이력 그 자체로 충족」이라 했다.",
+      "example": "APP_USER",
+      "x-code-key": "CD-AUDIT-TARGET-TYPE",
+      "enum": [
+       "APP_USER",
+       "ROLE",
+       "WORKER",
+       "TERMINAL",
+       "ITEM",
+       "ROUTING",
+       "INSPECTION_PLAN_VERSION"
+      ]
      },
      "targetId": {
       "x-source-column": "target_id",

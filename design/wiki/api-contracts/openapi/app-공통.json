@@ -4979,9 +4979,20 @@
      },
      "targetTypeCode": {
       "type": "string",
-      "x-no-example": true,
-      "description": "무엇에 대한 알림인가 — 설비 · 툴/금형 · 계측기 · 구매발주 · 연계 메시지 · 승인 요청 · LOT · 작업지시 · 부적합. ⛔ 다형 참조 판별자라 값이 «우리 계약의 대상 표 이름»이다(A-10 · A-16). ⚠ 대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다",
-      "x-code-key": "CD-NOTIFICATION-TARGET-TYPE"
+      "description": "무엇에 대한 알림인가 — EQUIPMENT → 설비(설비 고장 발생) · MOLD → 툴·금형(적정타수 초과) · INSTRUMENT → 계측기(검교정 만료 임박) · PURCHASE_ORDER → 구매발주(P/O 변경 수신) · INTEGRATION_SYNC → 연계 메시지(연계 실패) · APPROVAL_REQUEST → 승인 요청(승인·결재 도착) · LOT / WORK_ORDER / NONCONFORMANCE. ⚠ 뒤 셋은 대응 이벤트가 알림센터 목록에 아직 없다. ⛔ 다형 참조 판별자라 값이 «우리 계약의 대상 표 이름»이다 — 공통코드 그룹으로 받지 않는다(A-10 · A-16 · 2026-09-03 정정). ⚠ 대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다",
+      "x-code-key": "CD-NOTIFICATION-TARGET-TYPE",
+      "enum": [
+       "EQUIPMENT",
+       "MOLD",
+       "INSTRUMENT",
+       "PURCHASE_ORDER",
+       "INTEGRATION_SYNC",
+       "APPROVAL_REQUEST",
+       "LOT",
+       "WORK_ORDER",
+       "NONCONFORMANCE"
+      ],
+      "example": "EQUIPMENT"
      },
      "targetId": {
       "type": "integer",
