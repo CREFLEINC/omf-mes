@@ -445,6 +445,49 @@ class ProseExampleGapsTest(unittest.TestCase):
         self.assertEqual((ex, pr), ([], []))
 
 
+# ── ㉨ 자리의 «모양»에 관계없이 판정이 있는가 ────────────────────────────
+#
+# ⛔ 2026-09-03 신설. 「639/639 = 100%」로 보고한 분모가 **경로 인라인 스키마와
+# 배열 items 안의 자리를 세지 않았다.** 그 자리 9곳이 판정 없이 남아 있었고,
+# 첨부 등록(POST) 본문의 targetTypeCode 는 읽는 쪽이 값·근거를 다 갖는데
+# **쓰는 쪽만 맨몸**이었다 — 프론트가 «보내는» 자리에 안내가 0이었다.
+
+def place(key=None, excuse=None, kind="스키마", landed=False):
+    return ("logi", kind, "/x", "bare", (), (), key, landed, excuse)
+
+
+class UndecidedTest(unittest.TestCase):
+    def test_키도_이유도_없으면_잡는다(self):
+        self.assertEqual(len(cd.undecided({"aCode": [place()]})), 1)
+
+    def test_키가_있으면_잡지_않는다(self):
+        self.assertEqual(cd.undecided({"aCode": [place(key="CD-A")]}), [])
+
+    def test_코드_아님_이유가_적혀_있으면_잡지_않는다(self):
+        self.assertEqual(cd.undecided({"aCode": [place(excuse="식별자다")]}), [])
+
+    def test_착지_여부와_무관하게_본다(self):
+        # ⛔ ㉣ 는 착지를 문턱으로 삼는다. ㉨ 는 그 문턱이 «없다» — 그것이 사각지대였다.
+        self.assertEqual(len(cd.undecided({"aCode": [place(landed=False)]})), 1)
+        self.assertEqual(len(cd.undecided({"aCode": [place(landed=True)]})), 1)
+
+    def test_쿼리_자리도_이유를_읽는다(self):
+        # ⛔ 쿼리 갈래만 튜플이 여덟 칸이라 place_excused 가 늘 None 이었다.
+        #    「코드 아님」으로 이유를 적어 둔 쿼리 파라미터 19자리가 판정 없음으로 보였다.
+        self.assertEqual(
+            cd.undecided({"aCode": [place(excuse="채번 식별자다", kind="쿼리")]}), [])
+
+    def test_실물_계약에_판정_없는_자리가_없다(self):
+        self.assertEqual(cd.undecided(cd.scan()), [])
+
+    def test_스키마_이름이_Code_로_끝나는_object_는_자리가_아니다(self):
+        # `ItemExternalCode`·`DefectCode`·`CauseCode` 셋이 「판정 없는 자리」로 세어졌다.
+        names = {n for n, _ in
+                 ((n, p) for n, ps in cd.scan().items() for p in ps)}
+        for junk in ("ItemExternalCode", "DefectCode", "CauseCode"):
+            self.assertNotIn(junk, names)
+
+
 class SelfCountGapsTest(unittest.TestCase):
     FACTS = {"키": 174, "자리": 491, "그룹": 103}
 
@@ -471,6 +514,14 @@ class SelfCountGapsTest(unittest.TestCase):
         text = "**174키 / 491자리.** … 사전 — **103키 / 257자리**"
         gaps = cd.self_count_gaps(text, self.FACTS)
         self.assertEqual(len(gaps), 2)
+
+    def test_볼드_안에_앞말이_붙어도_본다(self):
+        # ⛔ `**완성 — 174키 / 491자리.**` 가 정규식에서 빠져 있었다(2026-09-03).
+        gaps = cd.self_count_gaps("⭐ **완성 — 103키 / 257자리.**", self.FACTS)
+        self.assertEqual(len(gaps), 2)
+
+    def test_볼드_안에_앞말이_붙고_수가_맞으면_통과한다(self):
+        self.assertEqual(cd.self_count_gaps("⭐ **완성 — 174키 / 491자리.**", self.FACTS), [])
 
     def test_수를_안_적으면_잡을_것이_없다(self):
         self.assertEqual(cd.self_count_gaps("계수를 적지 않았다", self.FACTS), [])

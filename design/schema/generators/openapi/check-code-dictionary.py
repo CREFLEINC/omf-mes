@@ -46,6 +46,16 @@
 | ㉣ | 착지한(`x-source-column` 있는) `*Code` 자리에 **키가 없다** | ⚠ 계수만 |
 | ㉤ | 사전이 **소유 = `enum`** 이라 적었는데 그 자리에 `enum` 이 **없다** | ⛔ 막는다 |
 | ㉥ | 사전이 **소유 = `registry*`** 라 적었는데 계약이 `enum` 으로 **닫았다** | ⛔ 막는다 |
+| ㉦ | 그 자리의 `example` 이 **사전 값집합 밖**이다 | ⛔ 막는다 |
+| ㉧ | 산문이 「값 목록이 아직 없다」인데 **사전은 값을 갖는다** | ⛔ 막는다 |
+| ㉨ | `*Code(s)` 자리에 **판정이 «전혀» 없다**(키도 `x-no-code-key` 도) | ⛔ 막는다 |
+| ⑦ | 사전 머리말이 **자기 계수를 틀리게** 적었다 | ⛔ 막는다 |
+
+⭐ **㉦㉧㉨⑦ 은 2026-09-03 신설.** ㉡ 는 `enum` 만 봤는데 값을 «나르는» 자리는 셋이다 —
+`enum` · `example` · 산문. 뒤 둘은 아무도 안 보고 있었다(실측 83자리가 낡아 있었다).
+⭐ **㉨ 는 ㉣ 의 사각지대를 없앤다** — ㉣ 는 «착지»를 문턱으로 삼아, 경로 안에 인라인으로
+정의된 스키마와 배열 `items` 안의 자리를 **아예 안 봤다.** 「639/639 = 100%」로 보고한
+그 분모가 바로 그 자리들을 빼고 낸 수였고, 실제로 9자리가 판정 없이 남아 있었다.
 
 ⭐ **㉤㉥ 는 2026-09-03 신설** — 소유는 「값이 어디 사나」를 말한다. `enum` 이면 값이
 계약 안에 살아 생성 타입의 유니온으로 가고, `registry*` 면 공통코드 마스터에 살아
@@ -186,8 +196,12 @@ def scan() -> dict[str, list[tuple]]:
         def walk(node, where):
             if isinstance(node, dict):
                 for k, v in node.items():
+                    # ⛔ 스키마 «이름»이 Code 로 끝나는 object 는 코드 «자리»가 아니다 —
+                    #    `ItemExternalCode`·`DefectCode`·`CauseCode` 셋이 그렇다.
+                    #    2026-09-03 까지 이 셋이 「판정 없는 자리」로 세어졌다.
                     if (k.endswith("Code") or k.endswith("Codes")) and \
-                            isinstance(v, dict) and ("type" in v or "enum" in v):
+                            isinstance(v, dict) and ("type" in v or "enum" in v) \
+                            and v.get("type") != "object":
                         src = v.get("items") or v
                         out[k].append((name, "스키마", where + "/" + k,
                                        state(v, v.get("description")),
@@ -203,12 +217,17 @@ def scan() -> dict[str, list[tuple]]:
                         #    파라미터에는 물리 컬럼이 없으므로 착지는 언제나 거짓이다.
                         # ⚠ 배열 파라미터는 enum 이 items 안에 산다 — 스키마 쪽과 같게 본다.
                         qsrc = sc.get("items") or sc
+                        # ⛔ 아홉째 칸(`x-no-code-key`)을 «반드시» 함께 넣는다 —
+                        #    2026-09-03 까지 쿼리 갈래만 여덟 칸이라 `place_excused`
+                        #    가 늘 None 을 냈다. 「코드 아님」으로 이유를 적어 둔
+                        #    쿼리 파라미터 19자리가 «판정 없음»으로 보였다.
                         out[v].append((name, "쿼리", where,
                                        state(sc, node.get("description")),
                                        tuple(qsrc.get("enum") or ()),
                                        tuple(POINTER.findall(node.get("description") or "")),
                                        node.get("x-code-key"),
-                                       False))
+                                       False,
+                                       node.get("x-no-code-key")))
                     walk(v, where + "/" + str(k))
             elif isinstance(node, list):
                 for i, v in enumerate(node):
@@ -352,6 +371,32 @@ def keyless_landed(found: dict[str, list[tuple]]) -> list[tuple]:
     return sorted(out)
 
 
+def undecided(found: dict[str, list[tuple]]) -> list[tuple]:
+    """㉨ — 판정이 «전혀» 없는 자리. ⛔ 게이트다(0 이어야 한다).
+
+    ⭐ ㉣ 와 무엇이 다른가 — ㉣ 는 «착지(`x-source-column`)»를 문턱으로 삼는다.
+       사전을 채워 가는 동안에는 그 문턱이 옳았다(판정 전에 이름을 붙이라는 말이
+       되지 않게). **사전이 닫힌 지금은 문턱이 곧 사각지대다.**
+
+    ⛔ 2026-09-03 실측이 그것을 드러냈다 — 「639/639 = 100%」로 보고한 그 분모가
+       **경로 안에 «인라인»으로 정의된 스키마와 배열 `items` 안의 자리를 아예 세지
+       않았다.** 그 자리 9곳이 판정 없이 남아 있었고, 그중 첨부 등록(POST) 본문의
+       `targetTypeCode` 는 **읽는 쪽이 값·근거를 다 갖는데 쓰는 쪽만 맨몸**이었다.
+       프론트가 «보내는» 자리에 아무 안내가 없었다는 뜻이다.
+
+    ⭐ 이 저장소가 같은 뿌리를 다섯 번째 겪었다 — `B-6`(부여·회수 9테이블) ·
+       `A-10`(16쌍) · `#198`(28그룹) · 사전 머리말(⑦) · 그리고 이 분모.
+       **실측 «결과»를 규칙의 «범위»로 쓰면 모델이 자라는 동안 조항이 조용히 좁아진다.**
+       그래서 이 축은 «모양»으로 적는다 — 어디에 있든 `*Code(s)` 자리면 판정을 요구한다.
+    """
+    out = []
+    for name, places in found.items():
+        for p in places:
+            if not place_key(p) and not place_excused(p):
+                out.append((name, p[0], p[1], p[2]))
+    return sorted(out)
+
+
 def matches(e: dict, place: tuple) -> bool:
     """이 자리가 이 사전 행의 것인가 — ③ 「사전이 «키로» 자리를 센다」.
 
@@ -452,8 +497,10 @@ def prose_example_gaps(doc: dict, values_by_key: dict) -> tuple[list, list]:
 
 # ── ⑦ 사전이 «자기 계수»를 맞게 적었는가 ────────────────────────────────
 
+# ⛔ 볼드 «안에 앞말이 붙은» 꼴을 놓치지 않는다 — `**완성 — 174키 / 491자리.**` 이
+#    그렇게 빠져 있었다(2026-09-03. `\*\*(\d+)키` 는 `**` 바로 뒤 숫자만 봤다).
 SELF_COUNT = [
-    (re.compile(r"\*\*(\d+)키 / (\d+)자리\.?\*\*"), ("키", "자리")),
+    (re.compile(r"\*\*[^*\n]*?(\d+)키 / (\d+)자리"), ("키", "자리")),
     (re.compile(r"등록부 \*\*(\d+)그룹 전부\*\*"), ("그룹",)),
 ]
 
@@ -738,6 +785,20 @@ def main() -> int:
     }
     with open(DICT, encoding="utf-8") as fh:
         head = fh.read()
+    # ㉨ ⛔ **게이트** — 자리의 «모양»에 관계없이 판정이 있는가.
+    #    인라인 스키마·배열 items 안의 자리도 «똑같이» 센다.
+    nodec = undecided(found)
+    if nodec:
+        gate.append("판정이 전혀 없는 자리 %d" % len(nodec))
+        print("⛔ ㉨ 판정(x-code-key · x-no-code-key)이 «전혀» 없는 자리 %d" % len(nodec))
+        for row in nodec[:20]:
+            print("   %-28s %-20s %-6s %s" % (row[0][:28], row[1][:20], row[2], row[3][:70]))
+        print("   ⭐ 키를 붙이거나, 「코드 아님」이면 x-no-code-key 에 «이유»를 적는다.")
+    else:
+        print("㉨ ✅ 자리 %d 전부 판정이 있다 — 인라인 스키마·배열 items 까지 셌다"
+              % sum(len(v) for v in found.values()))
+    print()
+
     # ㉦㉧ ⛔ **게이트** — 계약의 예시·산문이 사전과 같은 말을 하는가.
     values_by_key = {e["key"]: set(e["values"]) for e in entries}
     bad_ex: list[tuple] = []
@@ -784,9 +845,10 @@ def main() -> int:
         print("⛔ 막는 규칙에 걸렸습니다 — %s" % " · ".join(gate))
         return 1
     print("⭐ 계수 규칙(①②③④㉣)은 «막지 않는다» — 흐름을 보는 수다.")
-    print("   ⛔ 막는 것은 ⓪ · ⑤ · ㉦㉧ · ⑦ 이다 — 등록부↔사전 1:1 · 소유 일치 ·")
+    print("   ⛔ 막는 것은 ⓪ · ⑤ · ㉨ · ㉦㉧ · ⑦ 이다 — 등록부↔사전 1:1 · 소유 일치 ·")
     print("      계약이 적은 키가 사전과 어긋나지 않는가(㉠㉡㉢) ·")
     print("      소유와 자리의 «모양» 이 맞는가(㉤㉥) ·")
+    print("      «모든» 자리에 판정이 있는가 — 인라인·배열 items 포함(㉨) ·")
     print("      계약의 «예시·산문» 이 사전과 같은 말을 하는가(㉦㉧) ·")
     print("      사전이 «자기 계수»를 맞게 적었는가(⑦).")
     return 0
