@@ -20305,6 +20305,7 @@
     "properties": {
      "equipmentInspectionItemId": {
       "type": "integer",
+      "description": "설비 점검 항목 마스터의 식별자. ⭐ 점검을 «기록할» 때는 설비툴 계약이 이 값을 inspectionItemId 라는 이름으로 받는다(InspectionLineCreate.inspectionItemId · MaintenanceOrderItemInput.inspectionItemId) — 이름만 다르고 같은 것이다. ⛔ 설비툴 계약의 CollectionChannel.inspectionItemId 는 «다른 표»다 — 그쪽은 품질 검사 항목이다. 근거: omf-mes#338",
       "example": 1001,
       "format": "int64"
      },
@@ -20602,6 +20603,7 @@
     "properties": {
      "equipmentInspectionItemId": {
       "type": "integer",
+      "description": "설비 점검 항목 마스터의 식별자. ⭐ 점검을 «기록할» 때는 설비툴 계약이 이 값을 inspectionItemId 라는 이름으로 받는다(InspectionLineCreate.inspectionItemId · MaintenanceOrderItemInput.inspectionItemId) — 이름만 다르고 같은 것이다. ⛔ 설비툴 계약의 CollectionChannel.inspectionItemId 는 «다른 표»다 — 그쪽은 품질 검사 항목이다. 근거: omf-mes#338",
       "example": 1001,
       "format": "int64"
      },
