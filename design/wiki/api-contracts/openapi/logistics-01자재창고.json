@@ -7739,7 +7739,16 @@
     "properties": {
      "successorTypeCode": {
       "type": "string",
-      "example": "GOODS_ISSUE"
+      "example": "GOODS_RECEIPT",
+      "x-code-key": "CD-DOCUMENT-SUCCESSOR-TYPE",
+      "description": "A-10 다형 참조 판별자 — 값이 «대상 리소스 이름»이고 짝 id 가 그 리소스의 식별자다. ⭐ 대응표는 «설계»가 정한다(A-10 규칙 1 · 2026-09-03 사용자 결정). 후속이 무엇인가 — 입고 · 출고 · 피킹 · 수불 원장 · 자재 투입. ⭐ W-01-13 §5-3 이 「후속 판정이 두 갈래」로 이미 적어 두었다 — 앞 넷은 sourceDocument* 로 거꾸로 조회하는 «문서 하류»이고, 자재 투입은 원천 문서가 아니라 LOT 을 가리키는 «재고 사용»이다. ⛔ 취소하려면 이것들을 역순으로 먼저 취소해야 한다.",
+      "enum": [
+       "GOODS_RECEIPT",
+       "GOODS_ISSUE",
+       "PICKING_ORDER",
+       "INVENTORY_TRANSACTION",
+       "MATERIAL_CONSUMPTION"
+      ]
      },
      "successorId": {
       "type": "integer",
@@ -12332,8 +12341,14 @@
        "string",
        "null"
       ],
-      "x-no-example": true,
-      "description": "이 전이를 일으킨 문서 유형 — 다형 참조(공유계약 A-10)"
+      "description": "A-10 다형 참조 판별자 — 값이 «대상 리소스 이름»이고 짝 id 가 그 리소스의 식별자다. ⭐ 대응표는 «설계»가 정한다(A-10 규칙 1 · 2026-09-03 사용자 결정). 이 전이를 일으킨 것 — 검사 결과(INSPECTION_RESULT) · LOT 보류/해제(LOT_HOLD) · 부적합(NONCONFORMANCE). ⭐ 전이 9종에서 도출했다(W-03-01 §5-1 표) — C4「합격」·C6「불합격」·C14「합격판정개수 초과」·C15「전수 재검 양품」은 검사 결과가, C5·C10「의심자재등록」은 보류가, C7·C8「재판정」은 검사 결과가, C9「클레임·리콜」은 부적합이 일으킨다.",
+      "x-code-key": "CD-LOT-STATUS-EVENT-SOURCE-DOCUMENT-TYPE",
+      "enum": [
+       "INSPECTION_RESULT",
+       "LOT_HOLD",
+       "NONCONFORMANCE"
+      ],
+      "example": "INSPECTION_RESULT"
      },
      "sourceDocumentId": {
       "type": [
@@ -12411,8 +12426,14 @@
        "string",
        "null"
       ],
-      "x-no-example": true,
-      "description": "이 전이를 일으킨 문서 유형 — 다형 참조(공유계약 A-10). L2=work_order_closing, L3=work_order"
+      "description": "A-10 다형 참조 판별자 — 값이 «대상 리소스 이름»이고 짝 id 가 그 리소스의 식별자다. ⭐ 대응표는 «설계»가 정한다(A-10 규칙 1 · 2026-09-03 사용자 결정). 이 전이를 일으킨 것 — 생산 실적(PRODUCTION_RESULT · L1 대기→활성, 첫 실적이 붙을 때) · 작업지시 마감(WORK_ORDER_CLOSING · L2 대기→폐번) · 작업지시 취소(WORK_ORDER · L3 활성→폐번). ⭐ 전이 셋의 산문이 이미 뒤 둘을 적어 두었다.",
+      "x-code-key": "CD-LOT-LIFECYCLE-EVENT-SOURCE-DOCUMENT-TYPE",
+      "enum": [
+       "PRODUCTION_RESULT",
+       "WORK_ORDER_CLOSING",
+       "WORK_ORDER"
+      ],
+      "example": "PRODUCTION_RESULT"
      },
      "sourceDocumentId": {
       "type": [
