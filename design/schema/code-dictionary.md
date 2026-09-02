@@ -293,6 +293,7 @@ CD-<계열>-<축>
 | `CD-WORK-SESSION-EVENT-REASON` | `URGENT_ORDER_INTERRUPT` `EQUIPMENT_FAILURE` `TOOL_FAILURE` `MATERIAL_SHORTAGE` `MOLD_CHANGE` `QUALITY_ISSUE` `OTHER` | `WORK_SESSION_EVENT_REASON` | `reasonCode` | `registry` | 2 | 작업세션 이벤트 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-WORK-SESSION-EVENT-TYPE` | `START` `STOP` `RESUME` `END` `CONTROL_OVERRIDE` | `WORK_SESSION_EVENT_TYPE` | `eventTypeCode` | `registry-system` | 3 | 작업세션 사건 유형. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-WORK-SESSION-STATUS` | `RUNNING` `STOPPED` `ENDED` | `WORK_SESSION_STATUS` | `statusCode` | `registry-system` | 1 | 작업 세션 상태. ⭐ 뜻 셋은 `A-25` 전이표가 이미 확정했다 — `START`·`RESUME`→진행 · `STOP`→중단 · `END`→종료. 문자열만 없었고 2026-09-02 §G 로 도출했다. ⛔ 시스템 소유 — 전이 액션이 값을 정하므로 고객이 늘리면 갈 곳 없는 값이 생긴다 |
+| `CD-WORK-SESSION-WORKER-ROLE` | `MAIN` `SUB` ⬜ | `WORK_SESSION_WORKER_ROLE` | `workerRoleCode` | `registry` | 2 | 작업 세션에서 «맡은 역할» — 주작업자·부작업자(사용자 결정 2026-09-03). ⛔ 사람의 «직위·권한» 축이 아니다 — 관리자/실무자 구분은 `app.role` 이 갖는다(`L-2-1`). ⭐ `joinedAt`·`leftAt` 이 붙은 «참여 구간»의 속성이라 같은 사람이 다른 세션에서 다른 값을 가질 수 있다. ⚠ POP 은 사번만 받아(`REQ-PR-0023`) 계정 권한을 알 수 없다 — 그래서 따로 받는다 |
 
 ### ⭐ 이 표가 증명하려는 것 셋
 
