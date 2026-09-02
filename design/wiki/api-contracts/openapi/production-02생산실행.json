@@ -6972,7 +6972,9 @@
      "workerRoleCode": {
       "type": "string",
       "default": "OPERATOR",
-      "example": "NORMAL"
+      "example": "NORMAL",
+      "x-code-key": "CD-WORK-SESSION-WORKER-ROLE",
+      "description": "이 세션에서 «맡은 역할» — 주작업자(MAIN) · 부작업자(SUB). ⛔ 사람의 «직위·권한» 축이 아니다 — 관리자/실무자 구분은 역할·권한(app.role · W-CO-02)이 갖고, 자격은 작업자 자격(W-02-03 4M 배정 유효성)이 갖는다. 여기에 「관리자」를 넣으면 권한 축과 두 벌이 된다(L-2-1). ⭐ 같은 사람이 다른 세션에서 다른 값을 가질 수 있다 — joinedAt·leftAt 이 붙은 «참여 구간»의 속성이다. ⚠ POP 은 로그인 없이 사번만 받으므로(REQ-PR-0023) 계정 권한을 알 수 없다 — 그래서 이 값을 따로 받는다. ⭐ 고객이 늘릴 수 있다 — 위 둘은 초기값(기본값)이지 닫힌 목록이 아니다. 2인 1조인지, 반장이 함께 붙는지가 공장마다 다르다. 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_SESSION_WORKER_ROLE 로 받는다(공유계약 G-32 · 2026-09-03 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "joinedAt": {
       "type": "string",
@@ -7003,7 +7005,9 @@
      },
      "workerRoleCode": {
       "type": "string",
-      "example": "값"
+      "example": "값",
+      "x-code-key": "CD-WORK-SESSION-WORKER-ROLE",
+      "description": "이 세션에서 «맡은 역할» — 주작업자(MAIN) · 부작업자(SUB). ⛔ 사람의 «직위·권한» 축이 아니다 — 관리자/실무자 구분은 역할·권한(app.role · W-CO-02)이 갖고, 자격은 작업자 자격(W-02-03 4M 배정 유효성)이 갖는다. 여기에 「관리자」를 넣으면 권한 축과 두 벌이 된다(L-2-1). ⭐ 같은 사람이 다른 세션에서 다른 값을 가질 수 있다 — joinedAt·leftAt 이 붙은 «참여 구간»의 속성이다. ⚠ POP 은 로그인 없이 사번만 받으므로(REQ-PR-0023) 계정 권한을 알 수 없다 — 그래서 이 값을 따로 받는다. ⭐ 고객이 늘릴 수 있다 — 위 둘은 초기값(기본값)이지 닫힌 목록이 아니다. 2인 1조인지, 반장이 함께 붙는지가 공장마다 다르다. 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_SESSION_WORKER_ROLE 로 받는다(공유계약 G-32 · 2026-09-03 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "joinedAt": {
       "type": "string",
