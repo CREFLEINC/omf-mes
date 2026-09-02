@@ -11594,8 +11594,9 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "⭐ 생명주기 축(대기·활성·폐번 — 영문 표기 미정, 후보 WAITING·ACTIVE·VOIDED) — statusCode(품질 판정)와는 다른 축이다. 생산LOT 선발행(W-02-04)에서만 쓴다 — 대기: 번호 슬롯만 예약(R26 「완료 전 실물 미귀속」) · 활성: 실적이 붙어 실물에 귀속 · 폐번: 마감 시 미달 슬롯 자동 폐번(R27). 자재·제품 LOT 은 null. ⚠ 영문 코드 값 목록은 아직 확정 전이다(omf-mes#145). 근거: 02-SW설계사양서 §4.6 · W-02-04 §5-3 · W-02-05 §5-3 · omf-mes#46 ⛔ 「완료」·「미달 마감」도 이 축에 넣지 않는다 — 폐번은 「실적이 붙지 않은 슬롯」이고 미달 마감은 「실적이 붙었는데 계획에 못 미친 것」이라 뜻이 겹치지 않는다. 완료 축은 completedAt 이 담는다. 근거: omf-mes#269",
-      "example": "WAITING"
+      "description": "LOT 번호 슬롯의 생명주기 — 대기(WAITING · 번호 슬롯만 예약) · 활성(ACTIVE · 실적이 붙어 실물에 귀속) · 폐번(VOIDED · 마감 시 미달 슬롯 자동 폐번). ⛔ statusCode(품질 판정)와 «다른 축»이다. 생산 LOT 선발행(W-02-04)에서만 쓰고 자재·제품 LOT 은 null 이다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_LIFECYCLE_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "WAITING",
+      "x-code-key": "CD-LOT-LIFECYCLE-STATUS"
      },
      "parentLotId": {
       "x-source-column": "parent_lot_id",

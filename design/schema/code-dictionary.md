@@ -147,6 +147,9 @@ CD-<계열>-<축>
 | `CD-DEFECT-RECORD-SOURCE` | `FIELD` `PQC` `OQC` `REPAIR` `CLAIM` | `DEFECT_RECORD_SOURCE` | `sourceCode` | `registry-system` | 1 | CD-DEFECT-RECORD-SOURCE 는 불량 기록 원천 5값. 결정 09 |
 | `CD-LOT-SOURCE-TYPE` | `INBOUND_RECEIPT_LINE` `RECYCLE_ENTRY` | `LOT_SOURCE_TYPE` | `sourceTypeCode` | `registry-system` | 1 | CD-LOT-SOURCE-TYPE 는 LOT 발생 원천 |
 | `CD-LOT-CREATE-SOURCE-TYPE` | `INBOUND_RECEIPT_LINE` | — | `sourceTypeCode` | `enum` | 1 | ⭐ 쓰는 쪽은 **1값으로 닫혀 있다**(`#354`). 읽는 쪽(`CD-LOT-SOURCE-TYPE`)과 «값집합이 달라» 키를 가른다 — `B-28` |
+| `CD-SHIPMENT-STATUS` | `UNCONFIRMED` `CONFIRMED` `CANCELLED` | `SHIPMENT_STATUS` | `statusCode` | `registry-system` | 2 | 출하 확정·취소 축 |
+| `CD-NONCONFORMANCE-STATUS` | `NOT_REQUESTED` `PENDING_DECISION` `DECIDED` | `NONCONFORMANCE_STATUS` | `statusCode` | `registry-system` | 2 | 부적합 의뢰·판정 축 |
+| `CD-LOT-LIFECYCLE-STATUS` | `WAITING` `ACTIVE` `VOIDED` | `LOT_LIFECYCLE_STATUS` | `lifecycleStatusCode` | `registry-system` | 1 | LOT 선발행 슬롯 생명주기 — 품질 판정 축과 다르다 |
 | `CD-APP-USER-STATUS` | ⬜ **미상** | `APP_USER_STATUS` | `statusCode` | `registry` | 4 | ⬜ **뜻은 확정, 코드 문자열이 없다** — 계약이 「재직·휴직·퇴사 등」으로 «한국어 뜻»만 적었다. `§G` 규약대로 「확정된 뜻을 영문 SNAKE 로 옮긴다」를 적용할 자리이나 그 도출은 아직 안 했다. ⛔ 계정 사용 가부는 이 값이 아니라 `isActive` 가 정한다 |
 | `CD-CONTROL-OVERRIDE-REASON` | `EMERGENCY_WORK_ORDER` `OTHER` | `CONTROL_OVERRIDE_REASON` | `reasonCode` | `registry` | 3 | 통제 우회 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-DOWNTIME-REASON` | `EQUIPMENT_FAILURE` `MOLD_CHANGE` `MATERIAL_WAIT` `LABOR_WAIT` `PREVENTIVE_MAINTENANCE` `OTHER` | `DOWNTIME_REASON` | `reasonCode`(쿼리) | `registry` | 1 | 설비 비가동 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
