@@ -14,6 +14,9 @@
 무엇을 보나
 -----------
 ① 사전이 적은 «자리 수»가 계약 실물과 같은가
+   ⚠ 소유 값 넷 — enum · registry · registry-system · derived.
+     registry-system 은 「설계가 정한 값을 마스터에 싣는다」이고 계약에서는
+     registry 와 같이 포인터다. 갈리는 곳은 W-06-06 편집 가부다(미결 9).
 ② 사전이 `enum` 이라 한 키가 정말 계약에 값 목록을 갖는가
 ③ 사전이 `registry` 라 한 키가 정말 `codeGroupCode=` 포인터를 갖는가
 ④ ⭐ **형제 자리가 갈리지 않았는가** — 같은 이름이 어떤 자리에는 값이 있고 어떤
@@ -177,18 +180,37 @@ def main() -> int:
             want = e["values"]
             got = []
             bare = []
+            # ⛔ 「맨몸」은 «같은 계약 파일» 안에서만 센다(2026-09-02).
+            #    statusCode 처럼 이름이 여러 코드에 공유되면 이름으로 세는 순간
+            #    «남의 자리»를 삼킨다 — 실제로 맨몸 2 를 80 으로 셌다.
+            #    ⭐ 이것이 이 사전의 전제 그대로다 — 값은 중복해도 키는 유일하고,
+            #    그래서 «이름»이 아니라 «값»으로 가른다.
+            mine = {f for f, _, _, _, _, _ in
+                    [x for n in e["names"] for x in found.get(n, [])]
+                    if True}
+            hit_files = set()
+            for n in e["names"]:
+                for f, kind, path, st, enum, ptr in found.get(n, []):
+                    if e["owner"] == "enum":
+                        if enum and set(want) == {x for x in enum if x is not None}:
+                            hit_files.add(f)
+                    elif ptr and set(want) & set(ptr):
+                        hit_files.add(f)
             for n in e["names"]:
                 for f, kind, path, st, enum, ptr in found.get(n, []):
                     # ⭐ «값»으로 가른다 — 이름이 같아도 값집합이 다르면 남의 자리다.
+                    # registry-system 은 registry 와 «계약에서는» 같다 — 포인터다.
+                    # 다른 것은 W-06-06 에서 고객이 편집할 수 있는가뿐이고,
+                    # 그것은 계약이 아니라 화면·마스터 소관이다(2026-09-02 신설).
                     if e["owner"] == "enum":
                         hit = enum and set(want) == {x for x in enum if x is not None}
                     else:
                         hit = ptr and set(want) & set(ptr)
                     if hit:
                         got.append((f, kind, path, st))
-                    elif st == "bare":
-                        # ⛔ 값도 포인터도 없는 «형제» 자리. 사전이 「여기도 이 코드다」라
-                        #    선언했는데 계약이 비어 있으면 그것이 곧 결손이다.
+                    elif st == "bare" and f in hit_files:
+                        # ⛔ 값도 포인터도 없는 «형제» 자리 — 단 이 키가 실제로 걸린
+                        #    계약 파일 안에서만 센다. 다른 파일의 같은 이름은 남의 코드다.
                         bare.append((f, kind, path))
             claimed += len(got)
             want_n = e["places"]
