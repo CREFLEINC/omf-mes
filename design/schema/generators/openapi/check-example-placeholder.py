@@ -108,7 +108,10 @@ GROUP_ONLY = {
     "CONTROL_OVERRIDE_REASON",               # 공유계약 A-25 — 동상(2값)
 }
 
-PLACEHOLDER = ("STANDARD", "값")     # ⚠ NORMAL·IQC 는 넣지 않는다 — 맞는 자리가 실재한다
+PLACEHOLDER = ("STANDARD", "값", "문자열")   # ⚠ NORMAL·IQC 는 넣지 않는다 — 맞는 자리가 실재한다
+# ⭐ 2026-09-02 「문자열」 추가(omf-mes#367) — 목 서버가 그 값을 그대로 내려 «모바일 9화면»
+#    시험이 통째로 막혔는데 이 검사기는 초록이었다. 자리표시자 목록에 없었기 때문이다.
+#    ⛔ 늘어난 자리는 omf-mes#191 트랙이다 — 이 회차는 Worker.workerNo 하나만 고쳤다.
 GROUP_POINTER = re.compile(r"codeGroupCode=([A-Z][A-Z0-9_]*)")
 UNDECIDED = ("확정되지 않았다", "미확정", "미정", "아직 정해지지 않았다", "확정된 값 목록이 아직 없다")
 TWIN_SUFFIXES = ("Create", "Update", "Upsert", "Input")
@@ -168,7 +171,12 @@ def check_one(path: str) -> list[str]:
                             if isinstance(v, dict)}
 
         for prop_path, prop_name, prop in walk_props(schema, "", []):
-            if not prop_name.endswith("Code"):
+            # ⭐ 2026-09-02 «No» 를 더했다(omf-mes#367) — 「Code 로 끝나는 필드」만 보던
+            #    동안 사번·LOT 번호·작업지시 번호가 통째로 사각이었다. 목 서버는 그
+            #    값도 그대로 내려주므로 증상은 코드 필드와 «똑같다» — Worker.workerNo
+            #    의 example "문자열" 이 모바일 9화면 시험을 막았고 검사기는 초록이었다.
+            #    넓히면 +27(133→160)이고 전부 omf-mes#191 트랙이다.
+            if not prop_name.endswith(("Code", "No")):
                 continue
             where = "%s · %s.%s" % (name, schema_name, prop_path)
             if is_exempt(prop):
