@@ -1982,7 +1982,8 @@
           "type": "array",
           "items": {
            "type": "string"
-          }
+          },
+          "x-no-code-key": "권한 식별자다 — 공통코드 그룹이 아니다. 값은 우리 계약이 정의하는 «권한 이름»이고 고객이 늘리지 않는다(W-CO-02 소관 · 공유계약 A-16 「가」 참)."
          }
         }
        }
@@ -2628,7 +2629,9 @@
             "dependencyTypeCode": {
              "type": "string",
              "maxLength": 50,
-             "description": "미지정 시 서버가 물리 모델 DEFAULT('FINISH_TO_START')로 채운다"
+             "description": "공정 선후관계 유형 — 값 = FINISH_TO_START·START_TO_START·FINISH_TO_FINISH·START_TO_FINISH (2026-09-03 코드 사전 등재). ⭐ 미지정 시 종료-시작(FINISH_TO_START)으로 본다 — 사용자와 협의해 확정했다(2026-09-03). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 편집하지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=ROUTING_OPERATION_DEPENDENCY_TYPE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다.",
+             "example": "FINISH_TO_START",
+             "x-code-key": "CD-ROUTING-OPERATION-DEPENDENCY-TYPE"
             }
            }
           }
@@ -4195,7 +4198,9 @@
             "qualificationTypeCode": {
              "type": "string",
              "maxLength": 50,
-             "description": "공통코드 — 값 목록 미정 §8-5"
+             "description": "공통코드 — 값 = PROCESS_OPERATION·INSPECTOR·SAFETY·EQUIPMENT_OPERATION (2026-09-03 코드 사전 등재). ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31). 값 목록은 GET /mdm/code-values?codeGroupCode=QUALIFICATION_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다.",
+             "example": "PROCESS_OPERATION",
+             "x-code-key": "CD-QUALIFICATION-TYPE"
             },
             "processId": {
              "type": [
@@ -4723,7 +4728,14 @@
             "externalSystemCode": {
              "type": "string",
              "maxLength": 50,
-             "description": "공통코드"
+             "description": "어느 외부 체계의 코드인가 — EQUIPMENT_STANDARD_IF · TRACKING_SYSTEM · UNIERP. ⛔ 공통코드 그룹이 아니다 — 계약이 enum 으로 닫는다(고객이 늘리지 않는다 · 공유계약 A-16 「가」 참). ⭐ 읽는 쪽 ItemExternalCode.externalSystemCode 와 같은 값집합이다.",
+             "x-code-key": "CD-EXTERNAL-SYSTEM",
+             "enum": [
+              "EQUIPMENT_STANDARD_IF",
+              "TRACKING_SYSTEM",
+              "UNIERP"
+             ],
+             "example": "EQUIPMENT_STANDARD_IF"
             },
             "partnerId": {
              "type": [
@@ -4735,10 +4747,12 @@
             },
             "externalItemCode": {
              "type": "string",
-             "maxLength": 100
+             "maxLength": 100,
+             "x-no-code-key": "고객 바코드 체계의 «값»이다 — 공통코드 그룹이 아니다. 값집합을 우리가 정하지 않는다(W-06-05 · 형제 ItemExternalCode.externalItemCode 와 같은 판정)."
             }
            }
-          }
+          },
+          "x-no-code-key": "코드 값 자리가 아니다 — 외부 코드 «행»의 배열이다. 이 안의 externalSystemCode 가 코드 자리다."
          }
         }
        }

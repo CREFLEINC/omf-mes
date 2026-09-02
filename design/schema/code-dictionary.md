@@ -1,8 +1,8 @@
 # 코드 사전 (2026-09-02)
 
-> ⭐ **완성 — 174키 / 491자리.** 공유계약 `G-32` 등록부 **103그룹 전부**와 계약이
-> `enum` 으로 닫은 자리를 담는다. 2026-09-02 에 계약 `*Code(s)` 자리 **639 전건**이 판정을
-> 받았다(판정 없음 0). `check-code-dictionary.py` 가 ⓪ 규칙으로 «막는다» —
+> ⭐ **완성 — 175키 / 497자리.** 공유계약 `G-32` 등록부 **103그룹 전부**와 계약이
+> `enum` 으로 닫은 자리를 담는다. 계약 `*Code(s)` 자리 **647 전건**이 판정을
+> 받았다(판정 없음 0 · 2026-09-03). ⚠ 「639」로 적었던 앞선 수는 **경로 안에 «인라인»으로 정의된 스키마와 배열 `items` 안의 자리를 세지 않은 분모**였다 — 검사기 ㉨ 가 그 사각지대를 없앴다. `check-code-dictionary.py` 가 ⓪ 규칙으로 «막는다» —
 > 등록부에 이름이 오르면 여기에도 행이 있어야 한다.
 > «(정합주: 2026-09-03 — 1차 완성 시점의 「103키 / 257자리 · 62그룹 · 41종」을 지금 수치로
 > 갈았다. ⛔ 이 문단의 수를 손으로 고치지 않는다 — `check-code-dictionary.py` ⑦ 이 실물과
@@ -92,7 +92,7 @@ CD-<계열>-<축>
 
 ---
 
-## 사전 — **174키 / 491자리**
+## 사전 — **175키 / 497자리**
 
 | 소유 | 키 |
 | --- | :-: |
@@ -146,7 +146,7 @@ CD-<계열>-<축>
 | `CD-APPROVAL-TARGET-TYPE` | `GOODS_ISSUE` `GOODS_RECEIPT` `INBOUND_LOT` `INBOUND_RECEIPT` `INVENTORY_ADJUSTMENT` `PURCHASE_ORDER` `SHIPMENT` | — | `targetTypeCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `ApprovalTarget`(`app-공통`). ⭐ **2026-09-02 개명** — `CD-TARGET-TYPE` 은 이름에 자리가 없어 «범용»처럼 읽혔는데 실은 결재 전용이다. 같은 축의 형제 넷(첨부·문서발행·보전·감사)이 서면서 접두 규약을 통일했다(사용자 결정 결정 1 「가」) |
 | `CD-APPROVAL-TYPE` | `GOODS_ISSUE_DISPOSAL` `INVENTORY_ADJUSTMENT` `PURCHASE_ORDER` `INBOUND_RECEIPT_CANCEL` `GOODS_RECEIPT_CANCEL` `GOODS_ISSUE_CANCEL` `SHIPMENT_CANCEL` `IQC_SKIP` | — | `approvalTypeCode` | `enum` | 5 | 승인 유형 8값. `#336` · 사용자 확정 2026-09-01 |
 | `CD-APPROVER-TYPE` | `DEPARTMENT` `ROLE` `USER` | — | `approverTypeCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `ApprovalRouteStep` · `ApprovalRouteStepInput`(`app-공통`) |
-| `CD-ATTACHMENT-TARGET-TYPE` | `NOTICE` `WAREHOUSE` | — | `targetTypeCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `Attachment`(`app-공통`). ⭐ **두 화면이 이미 문자열을 스펙에 적어 두고 있었다** — `W-CO-08` §3 창고 도면 · `W-CO-04` §4 공지 첨부 |
+| `CD-ATTACHMENT-TARGET-TYPE` | `NOTICE` `WAREHOUSE` | — | `targetTypeCode` | `enum` | 3 | 계약이 `enum` 으로 닫은 값 — `Attachment`(`app-공통`). ⭐ **두 화면이 이미 문자열을 스펙에 적어 두고 있었다** — `W-CO-08` §3 창고 도면 · `W-CO-04` §4 공지 첨부 |
 | `CD-AUDIT-EVENT-TYPE` | `CREATE` `UPDATE` `DELETE` `GRANT` `REVOKE` ⬜ | `AUDIT_EVENT_TYPE` | `eventTypeCode` | `registry-system` | 2 | 감사 이벤트 유형. ⭐ `GRANT`·`REVOKE` 의 근거는 `W-CO-02` §8-8 — 「누가 언제 권한을 줬나」가 남는 곳이 그동안 하나도 없었다. ⛔ 무엇을 기록할지는 시스템이 정한다 |
 | `CD-AUDIT-TARGET-TYPE` | `APP_USER` `ROLE` `WORKER` `TERMINAL` `ITEM` `ROUTING` `INSPECTION_PLAN_VERSION` | — | `targetTypeCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `AuditEvent`(`mdm-기준정보`). ⭐ **값 일곱은 사용자와 협의해 확정했다**(2026-09-03) — 변경 이력이 «남아야 하는» 마스터만 든다. ⛔ **2026-09-03 정정** — 전에는 `registry-system` 으로 등록부에 올라 있었는데 `A-16` 위반이다(다형 참조 판별자는 `enum` 으로 닫고 `G-32` 에 «올리지 않는다»). ⚠ 개체 마스터는 안 든다 — 과거 판정이 소급해 달라지지 않는다. 버전 마스터도 안 든다 — `결정 07` 이 「Rev 이력 그 자체로 충족」이라 했다 |
 | `CD-BREAKDOWN-OCCURRENCE-STATE` | `STOPPED` `ABNORMAL` | `BREAKDOWN_OCCURRENCE_STATE` | `occurrenceStateCode` | `registry-system` | 2 | 고장 시점의 설비 상태. ⭐ 현장이 보고할 때 «고르는» 값이다(`M-05-02`). ⛔ **시스템 소유** — 비가동 집계에 드는가가 이 값으로 갈린다 |
@@ -169,7 +169,7 @@ CD-<계열>-<축>
 | `CD-DIRECTION` | `INBOUND` `OUTBOUND` | — | `directionCode` | `enum` | 6 | 계약이 `enum` 으로 닫은 값 — `IntegrationMessage` · `InterfaceDefinition`(`mdm-기준정보`) |
 | `CD-DISPOSITION-DECISION-DISPOSITION-TYPE` | `NORMAL` `REWORK` `SCRAP` | — | `dispositionTypeCode` | `enum` | 3 | 계약이 `enum` 으로 닫은 값 — `DispositionDecision` · `DispositionDecisionCreate`(`quality-03품질`) |
 | `CD-DISPOSITION-PROGRESS` | `COMPLETED` `NOT_STARTED` `PARTIAL` | — | `dispositionProgressCode` `followUpStatusCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `DispositionDecision` · `Nonconformance`(`quality-03품질`) |
-| `CD-DOCUMENT-ISSUE-TARGET-TYPE` | `GOODS_ISSUE_LINE` `HANDLING_UNIT` `INSPECTION_RESULT` `LOCATION` `LOT` `MOLD` `SERIAL_NUMBER` | — | `targetTypeCode` | `enum` | 4 | 계약이 `enum` 으로 닫은 값 — `DocumentTarget` · `DocumentIssueSummary`(`app-공통`). ⭐ **뜻 일곱은 §3-7 대응표가 이미 못박았고 문자열만 없었다** — 2026-09-02 §G 로 도출. 이 미결이 화면의 유형 선택칸을 비활성으로 묶고 있었다 |
+| `CD-DOCUMENT-ISSUE-TARGET-TYPE` | `GOODS_ISSUE_LINE` `HANDLING_UNIT` `INSPECTION_RESULT` `LOCATION` `LOT` `MOLD` `SERIAL_NUMBER` | — | `targetTypeCode` | `enum` | 5 | 계약이 `enum` 으로 닫은 값 — `DocumentTarget` · `DocumentIssueSummary`(`app-공통`). ⭐ **뜻 일곱은 §3-7 대응표가 이미 못박았고 문자열만 없었다** — 2026-09-02 §G 로 도출. 이 미결이 화면의 유형 선택칸을 비활성으로 묶고 있었다 |
 | `CD-DOCUMENT-SUCCESSOR-TYPE` | `GOODS_RECEIPT` `GOODS_ISSUE` `PICKING_ORDER` `INVENTORY_TRANSACTION` `MATERIAL_CONSUMPTION` | — | `successorTypeCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `DocumentSuccessor`(`logistics-01자재창고`). ⭐ `W-01-13` §5-3 이 「후속 판정이 두 갈래」로 이미 적어 두었다 — 앞 넷은 «문서 하류», 자재 투입은 «재고 사용»이다 |
 | `CD-DOWNTIME-REASON` | `EQUIPMENT_FAILURE` `MOLD_CHANGE` `MATERIAL_WAIT` `LABOR_WAIT` `PREVENTIVE_MAINTENANCE` `OTHER` | `DOWNTIME_REASON` | `reasonCode`(쿼리) | `registry` | 5 | 설비 비가동 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-EQUIPMENT-BREAKDOWN-STATUS` | `RECEIVED` `HANDLING` `DONE` | `EQUIPMENT_BREAKDOWN_STATUS` | `statusCode` | `registry-system` | 2 | 고장 접수. **값이 계약 산문에 이미 있었다**(2026-09-02 꺼냄) · `W-05-04` |
@@ -179,7 +179,7 @@ CD-<계열>-<축>
 | `CD-EQUIPMENT-STATUS` | `IN_SERVICE` `DISPOSED` | `EQUIPMENT_STATUS` | `statusCode` | `registry-system` | 4 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
 | `CD-EQUIPMENT-TYPE` | `INJECTION_MOLDING` `PRESS` `WATER_HEATER` | `EQUIPMENT_TYPE` | `equipmentTypeCode` | `registry` | 4 | 설비 계열. `#186` · 통지 `client#415` |
 | `CD-EVENT-TYPE` | `HELD` `RELEASED` | — | `eventTypeCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `LotHoldEvent`(`quality-03품질`) |
-| `CD-EXTERNAL-SYSTEM` | `EQUIPMENT_STANDARD_IF` `TRACKING_SYSTEM` `UNIERP` | — | `externalSystemCode` | `enum` | 7 | 계약이 `enum` 으로 닫은 값 — `InterfaceDefinition` · `InterfaceDefinitionCreate`(`mdm-기준정보`) |
+| `CD-EXTERNAL-SYSTEM` | `EQUIPMENT_STANDARD_IF` `TRACKING_SYSTEM` `UNIERP` | — | `externalSystemCode` | `enum` | 8 | 계약이 `enum` 으로 닫은 값 — `InterfaceDefinition` · `InterfaceDefinitionCreate`(`mdm-기준정보`) |
 | `CD-FIFO-POLICY` | `FIFO` `FEFO` | `FIFO_POLICY` | `fifoPolicyCode` | `registry-system` | 2 | CD-FIFO-POLICY 는 품목별 선입선출 정책. QA #28 |
 | `CD-FROM-INVENTORY-STATUS` | `AVAILABLE` `BLOCKED` `IN_TRANSIT` `ON_HOLD` | — | `fromInventoryStatusCode` `inventoryStatusCode` `toInventoryStatusCode` | `enum` | 6 | 계약이 `enum` 으로 닫은 값 — `GoodsReceiptLine` · `GoodsReceiptLineCreate`(`logistics-01자재창고`) |
 | `CD-GOODS-ISSUE-DESTINATION-TYPE` | `LOCATION` `PARTNER` `DISPOSAL_SITE` | — | `destinationTypeCode` | `enum` | 2 | 출고 도착지. ⚠ 계약 `enum` 에 `null` 이 함께 있다(nullable). `#337` |
@@ -268,7 +268,7 @@ CD-<계열>-<축>
 | `CD-PRODUCTION-RESULT-SOURCE` | `MANUAL` `IOT` | — | `resultSourceCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `ProductionResult`·`ProductionResultCreate`(`production-02생산실행`). ⭐ 서버가 안다 — 화면이 고르는 값이 아니다 |
 | `CD-PUTAWAY-TASK-STATUS` | `PENDING` `COMPLETED` `COMPLETED_TEMPORARY` | `PUTAWAY_TASK_STATUS` | `statusCode` | `registry-system` | 2 | 적치 작업. ⭐ **「완료」를 `COMPLETED` 로 정한 근거** — 실측하니 저장소가 도메인으로 갈려 있다: `COMPLETED` 는 실사(01)·작업지시(02)·검사의뢰(03)·처분진행(04) · `DONE` 은 설비 고장(05)·보전지시(05)·보전 항목(05)·연계 메시지. 적치는 물류(01)라 `COMPLETED` 다(사용자 위임 판단 2026-09-02) |
 | `CD-PUTAWAY-TASK-TEMPORARY-REASON` | `NO_SPACE` `INSPECTION_HOLD` `LOCATION_UNASSIGNED` `OTHER` | `PUTAWAY_TASK_TEMPORARY_REASON` | `reasonCode` | `registry` | 1 | 임시 위치 적재 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
-| `CD-QUALIFICATION-TYPE` | `PROCESS_OPERATION` `INSPECTOR` `SAFETY` `EQUIPMENT_OPERATION` | `QUALIFICATION_TYPE` | `qualificationTypeCode` | `registry` | 1 | 작업자 자격 유형. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
+| `CD-QUALIFICATION-TYPE` | `PROCESS_OPERATION` `INSPECTOR` `SAFETY` `EQUIPMENT_OPERATION` | `QUALIFICATION_TYPE` | `qualificationTypeCode` | `registry` | 2 | 작업자 자격 유형. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-QUALITY-INSPECTION-TYPE` | `IQC` `PQC` `OQC` | `QUALITY_INSPECTION_TYPE` | `inspectionTypeCode` | `registry-system` | 10 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
 | `CD-QUALITY-ZONE` | ⬜ | `QUALITY_ZONE` | `qualityZoneCode` | `registry` | 3 | 위치의 품질 구역. ⭐ 값을 계약이 닫지 않는다 — 창고 배치·품질관리 절차가 현장마다 다르다. ⛔ LOT 보류(Hold/Release)와의 «관계»가 아직 정의되지 않아(`W-06-07` §8-2) 이 값으로 출고 가부를 판정하지 않는다 — 판정의 정본은 LOT 보류다 |
 | `CD-RECEIPT-TYPE` | `MATERIAL` `PRODUCT` `RETURN` `TRANSFER` | `RECEIPT_TYPE` | `receiptTypeCode` | `registry` | 4 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
@@ -281,8 +281,9 @@ CD-<계열>-<축>
 | `CD-RESOURCE-TYPE` | `EQUIPMENT` `MOLD` `WORKER` | — | `resourceTypeCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `WorkOrderResourcePlan` · `WorkOrderResourcePlanCreate`(`production-02생산실행`) |
 | `CD-ROLE` | `RESULT` `SOURCE` | — | `roleCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `HandlingUnitRepackEventLine`(`logistics-01자재창고`) |
 | `CD-ROLE-TYPE` | `CUSTOMER` `DISPOSAL` `OTHER` `SUBCONTRACTOR` `SUPPLIER` | — | `roleTypeCode` `roleTypeCodes` | `enum` | 3 | 계약이 `enum` 으로 닫은 값 — `PartnerRole` · `PartnerRolesReplace`(`mdm-기준정보`) |
-| `CD-ROUTING-OPERATION-DEPENDENCY-TYPE` | `FINISH_TO_START` `START_TO_START` `FINISH_TO_FINISH` `START_TO_FINISH` | `ROUTING_OPERATION_DEPENDENCY_TYPE` | `dependencyTypeCode` | `registry-system` | 1 | 공정 선후관계. ⭐ 기본은 종료-시작(`FINISH_TO_START`) — 사용자와 협의해 확정했다(2026-09-03) |
+| `CD-ROUTING-OPERATION-DEPENDENCY-TYPE` | `FINISH_TO_START` `START_TO_START` `FINISH_TO_FINISH` `START_TO_FINISH` | `ROUTING_OPERATION_DEPENDENCY_TYPE` | `dependencyTypeCode` | `registry-system` | 2 | 공정 선후관계. ⭐ 기본은 종료-시작(`FINISH_TO_START`) — 사용자와 협의해 확정했다(2026-09-03) |
 | `CD-SCOPE` | `BUSINESS_UNIT` `COMPANY` `EQUIPMENT_GROUP` `WORK_ORDER` `WORK_SHIFT` | — | `scopeCode` | `enum` | 3 | 계약이 `enum` 으로 닫은 값 — `Notice` · `NoticeCreate`(`app-공통`) |
+| `CD-SHIPMENT-LOT-MATCH-FAIL-REASON` | `LABEL_ITEM_MISMATCH` `LOT_NOT_ALLOCATED` | — | `reasonCode` | `enum` | 1 | 출하 LOT 배분 대조가 «실패한 이유» — `GET /logistics/shipment-lot-allocations` 응답의 `match.reasonCode`. ⭐ 값이 계약 «산문에만» 있었다(2026-09-03 발굴) — 「정했는데 이름이 없었다」의 또 한 사례다. ⛔ 서버가 판정해 내리고 화면은 이 값으로 «문구»를 가른다 — 동작이 값에 걸리므로 설계가 닫는다(`G-31`). 고객이 늘리지 않아 등록부에 올리지 않는다(`A-16` 「가」 참) |
 | `CD-SHIPMENT-STATUS` | `UNCONFIRMED` `CONFIRMED` `CANCELLED` | `SHIPMENT_STATUS` | `statusCode` | `registry-system` | 2 | 출하 확정·취소 축 |
 | `CD-SHIPMENT-TIME-SLOT` | `MORNING` `AFTERNOON` `NIGHT` | `SHIPMENT_TIME_SLOT` | `timeSlotCode` | `registry` | 4 | 공유계약 `G-32` 등록부 표의 근거 칸에서 옮겼다 |
 | `CD-SHIPPING-INSPECTION-STATUS` | `HELD` `NOT_REQUIRED` `PASSED` `PENDING` `REJECTED` | — | `shippingInspectionStatusCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `ShipmentRequest`(`shipment-04제품출하`) |

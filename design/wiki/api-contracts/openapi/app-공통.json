@@ -3198,7 +3198,14 @@
         "properties": {
          "targetTypeCode": {
           "type": "string",
-          "maxLength": 40
+          "maxLength": 40,
+          "description": "무엇에 붙이는 첨부인가 — WAREHOUSE → 창고 도면(W-CO-08 §3) · NOTICE → 공지 첨부(W-CO-04 §4). ⛔ 다형 참조 판별자라 값이 «우리 계약의 대상 표 이름»이다 — 고객이 늘릴 수 없고, 붙일 곳이 늘면 계약을 고친다(공유계약 A-10 · A-16 「가」·「나」 참). ⭐ 읽는 쪽 Attachment.targetTypeCode 와 같은 값집합이다.",
+          "enum": [
+           "WAREHOUSE",
+           "NOTICE"
+          ],
+          "example": "WAREHOUSE",
+          "x-code-key": "CD-ATTACHMENT-TARGET-TYPE"
          },
          "targetId": {
           "type": "integer",
@@ -4521,7 +4528,19 @@
          "type": "string",
          "maxLength": 40,
          "minLength": 1,
-         "x-no-example": true
+         "x-no-example": true,
+         "description": "대상 유형. 이 값이 targetId 의 해석을 정한다 — LOT · SERIAL_NUMBER · HANDLING_UNIT · GOODS_ISSUE_LINE · MOLD · LOCATION · INSPECTION_RESULT. ⭐ 읽는 쪽 DocumentTarget.targetTypeCode 와 같은 값집합이다 — 대응표는 공유계약 A-10 이 갖는다. ⚠ 대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다.",
+         "enum": [
+          "LOT",
+          "SERIAL_NUMBER",
+          "HANDLING_UNIT",
+          "GOODS_ISSUE_LINE",
+          "MOLD",
+          "LOCATION",
+          "INSPECTION_RESULT"
+         ],
+         "example": "LOT",
+         "x-code-key": "CD-DOCUMENT-ISSUE-TARGET-TYPE"
         },
         "targetId": {
          "type": "integer",

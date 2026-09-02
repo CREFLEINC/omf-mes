@@ -304,8 +304,13 @@
               "string",
               "null"
              ],
-             "description": "matched 가 거짓일 때의 사유. LABEL_ITEM_MISMATCH=이 납품라벨은 다른 품목용이다 · LOT_NOT_ALLOCATED=이 출하에 배분되지 않은 LOT 이다",
-             "example": "LOT_NOT_ALLOCATED"
+             "description": "matched 가 거짓일 때의 사유 — LABEL_ITEM_MISMATCH(이 납품라벨은 다른 품목용이다) · LOT_NOT_ALLOCATED(이 출하에 배분되지 않은 LOT 이다). ⭐ 서버가 판정해 내리는 값이고 화면은 이 값으로 «문구»를 가른다 — 동작이 값에 걸리므로 설계가 닫는다(공유계약 G-31). ⛔ 공통코드 그룹이 아니다 — 고객이 늘리지 않는다(A-16 「가」 참). matched 가 참이면 null 이다.",
+             "example": "LOT_NOT_ALLOCATED",
+             "enum": [
+              "LABEL_ITEM_MISMATCH",
+              "LOT_NOT_ALLOCATED"
+             ],
+             "x-code-key": "CD-SHIPMENT-LOT-MATCH-FAIL-REASON"
             }
            },
            "required": [
