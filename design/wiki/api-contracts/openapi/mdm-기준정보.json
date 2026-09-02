@@ -15858,8 +15858,8 @@
       "x-source-column": "worker_no",
       "type": "string",
       "maxLength": 50,
-      "description": "POP·모바일 사번 경량 인증의 원천(P-CO-01·M-CO-01)",
-      "example": "문자열"
+      "description": "POP·모바일 사번 경량 인증의 원천(P-CO-01·M-CO-01). ⭐ 형식 — 실물은 «6자리 숫자»다(ERP 사원 마스터 대표값 900028 · 출문증 실물 903677 · ✓확정 2026-07-28 「POP 단말인증 설계검토」 §3.3). ⛔ 그러나 «강제하지 않는다» — 786건 중 표본 2건만 확인했고, 강제했다가 다른 형식의 사번이 하나라도 있으면 그 사람이 단말을 아예 못 쓴다. 그래서 pattern 을 두지 않는다(A-9 등급 ⓑ — 화면이 «경고»하고 «확인은 눌리게» 한다 · P-CO-01 §5-2). 근거: omf-mes#367",
+      "example": "900028"
      },
      "workerName": {
       "x-source-column": "worker_name",
