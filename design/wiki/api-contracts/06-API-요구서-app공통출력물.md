@@ -107,7 +107,7 @@
 | 재출력 대상 조회 | 목록 판정은 **`GET /app/document-issues/summary`**(대상 다건 한 번에) · 회차 상세는 `GET /app/document-issues?targetTypeCode=&targetId=` — **둘을 함께** 준다 | §5-3 · A-10 |
 | 무엇을 재출력할지 — 포장 구성이 정한다 | **없음 — 04 제품출하 계약 소관**(포장 구성 조회) | §5-2 · §7 |
 | 재출력 | `POST /app/document-issues` + `reissueReasonCode` **필수**. ⭐ **이 화면은 `documentTypeCode` 두 값을 다룬다** — `PACKING_LABEL`(포장 라벨) · `IDENTIFICATION_TAG`(인식표). `A-10` 규칙 4 「한 화면이 여러 대상 유형을 다루면 대상마다 판정한다」가 그대로 적용된다(§3-8) | §5-1 · K-2 · A-10 |
-| 재출력 사유 선택 | ⚠ **값 목록 미착지** — 공통코드다. **「인쇄 실패」 값 요청은 #64 코멘트로 올렸다** | K-7 · #64 |
+| ⭐ 재출력 사유 선택 | ✅ **열린다** — `GET /mdm/code-values?codeGroupCode=REISSUE_REASON`. 값 = `DAMAGED`·`LOST`·`PRINT_FAILURE`·`PACKAGING`·`QUANTITY_CHANGE`(2026-09-03 등재). ⭐ **「인쇄 실패」가 시드에 실재한다**(`K-7` 요구 충족) | K-7 · G-32 |
 | 대상 유형이 갈린다(LOT ↔ 개체) | `targetTypeCode` 로 판정 — 계약이 **FK 가 아니라 유형을 먼저** 보게 만든다 | §5-3 |
 | 단말 게이팅 | `POST` 403 | §6 · F-1 |
 | ⭐ **재발행 사유 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=REISSUE_REASON`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `DAMAGED`·`LOST`·`PRINT_FAILURE`·`PACKAGING`·`QUANTITY_CHANGE`(**2026-09-03 등재**) · ⭐ **고객이 늘린다** — 위 값은 초기 시드다 | G-32 |
@@ -134,7 +134,7 @@
 | 대기 목록 조회 | **없음 — 04 제품출하 계약 소관**(재구성 대기 상태) | §5-1 · §7 |
 | 대상 선택 | 동상 | §5-1 |
 | 인쇄 대상 선택(신규/잔량) | **없음 — API 불필요.** 화면 내 선택. 결과가 `targets` 배열이 된다 | §5-3 |
-| 재출력 사유 선택 | 활성 조건 = `summary`. ⚠ **값 목록 미착지**(#64) — 잔량 라벨이 재발행이라 필수 | §5-3 · K-2 |
+| ⭐ 재출력 사유 선택 | 활성 조건 = `summary`. ✅ **값 목록이 섰다** — `GET /mdm/code-values?codeGroupCode=REISSUE_REASON` 5값(2026-09-03 등재). 잔량 라벨이 재발행이라 필수 | §5-3 · K-2 · G-32 |
 | 프린터 선택 | ✅ **`GET /app/printers`** | §5-5 · K-4 |
 | 미리보기 | `GET /app/document-issues/{id}/rendition` | §5-5 · K-5 |
 | **발번·인쇄** | ⛔ **부분 미착지** — LOT 발번은 **02 계약**, 재구성 **이벤트 기록은 테이블이 없다**(**#117**). 이 계약은 **발행 기록만** — **`documentTypeCode = PACKING_LABEL`**(§3-8) | §5-5 · **§I-43** |

@@ -93,5 +93,54 @@ class IntegrationTest(unittest.TestCase):
         self.assertEqual(offending, [])
 
 
+# ── 절 «경계» — 꼬리 절이 직전 화면에 흡수되면 안 된다 ────────────────────
+#
+# ⛔ 2026-09-03 신설. `end = len(text)` 라 파일 «마지막» 화면 절이 꼬리 절
+# (「커버리지 집계」·「대상 유형 대응표」·「변경 이력」)을 통째로 삼켰다. 그 안의
+# 경로·그룹이 그 화면의 것으로 세어져, 실제로는 안 부르는 화면이 초록이 됐다.
+
+DOC = "\n".join([
+    "# 06 API 요구서",
+    "",
+    "### 3-1. `W-01-01` 첫 화면",
+    "| 액션 | API |",
+    "| 조회 | GET /a?codeGroupCode=ALPHA |",
+    "",
+    "### 3-2. `W-01-02` 마지막 화면",
+    "| 액션 | API |",
+    "| 조회 | GET /b?codeGroupCode=BETA |",
+    "",
+    "### 커버리지 집계",
+    "",
+    "| 경로 | 화면 |",
+    "| GET /c?codeGroupCode=GAMMA | 여러 화면 |",
+    "",
+    "## 변경 이력",
+    "",
+    "| v0.1 | codeGroupCode=DELTA 를 적었다 |",
+])
+
+
+class SectionBoundaryTest(unittest.TestCase):
+    def test_화면_절을_화면_코드로_가른다(self):
+        out = ccgr.sections_from_text(DOC)
+        self.assertEqual(set(out), {"W-01-01", "W-01-02"})
+
+    def test_첫_화면은_다음_화면_절에서_끊는다(self):
+        out = ccgr.sections_from_text(DOC)
+        self.assertIn("ALPHA", out["W-01-01"])
+        self.assertNotIn("BETA", out["W-01-01"])
+
+    def test_마지막_화면이_꼬리_절을_삼키지_않는다(self):
+        # ⛔ 이것이 2026-09-03 에 고친 결함이다.
+        out = ccgr.sections_from_text(DOC)
+        self.assertIn("BETA", out["W-01-02"])
+        self.assertNotIn("GAMMA", out["W-01-02"], "「커버리지 집계」를 삼켰다")
+        self.assertNotIn("DELTA", out["W-01-02"], "「변경 이력」을 삼켰다")
+
+    def test_화면_절이_없으면_빈다(self):
+        self.assertEqual(dict(ccgr.sections_from_text("## 아무 제목\n본문")), {})
+
+
 if __name__ == "__main__":
     unittest.main()

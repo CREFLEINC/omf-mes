@@ -220,6 +220,57 @@ class FieldRowsTest(unittest.TestCase):
         self.assertEqual(list(scd.field_rows(spec)), [])
 
 
+# ── ㉲ 「코드 아님」도 판정이다 ───────────────────────────────────────────
+#
+# ⛔ 2026-09-03 신설. `Asn.statusCode` 는 계약이 「코드 그룹을 세우지 않는다 …
+# 사용자 결정 2026-09-02」로 판정했는데 `W-01-09` 는 여전히 「값 목록 미확정 ·
+# §8-1 회신 대기」였다. **오지 않을 회신을 기다리고 있었다.**
+
+class NoCodeFromDocTest(unittest.TestCase):
+    def test_이유가_적힌_자리를_모은다(self):
+        doc = contract(Asn={
+            "x-source-table": "logistics.asn",
+            "properties": {"statusCode": {
+                "x-source-column": "status_code",
+                "x-no-code-key": "코드 그룹을 세우지 않는다 — 진행은 파생으로 나온다"}}})
+        out = scd.no_code_from_doc(doc)
+        self.assertEqual(list(out), [("logistics.asn", "status_code")])
+
+    def test_이유가_없으면_모으지_않는다(self):
+        doc = contract(Asn={"x-source-table": "t.a", "properties": {
+            "aCode": {"x-source-column": "a_code"}}})
+        self.assertEqual(scd.no_code_from_doc(doc), {})
+
+    def test_착지하지_않은_자리는_다리가_끊긴다(self):
+        # 화면 §4 는 «출처 컬럼»으로 잇는다 — 컬럼이 없으면 이을 수 없다.
+        doc = contract(Asn={"x-source-table": "t.a", "properties": {
+            "aCode": {"x-no-code-key": "식별자다"}}})
+        self.assertEqual(scd.no_code_from_doc(doc), {})
+
+    def test_테이블이_목록이면_전부_편다(self):
+        doc = contract(A={"x-source-table": ["t.a", "t.b"], "properties": {
+            "aCode": {"x-source-column": "a_code", "x-no-code-key": "이유"}}})
+        self.assertEqual(set(scd.no_code_from_doc(doc)),
+                         {("t.a", "a_code"), ("t.b", "a_code")})
+
+
+# ── 이력·회고 절은 세지 않는다 ──────────────────────────────────────────
+
+class HistorySectionTest(unittest.TestCase):
+    def test_이력_절_판정을_verify_stale_terms_와_같이_쓴다(self):
+        # ⭐ 같은 판정을 두 곳에 따로 두면 갈린다 — 그쪽 함수를 그대로 부른다.
+        self.assertTrue(scd._stale.in_history_section("변경 이력"))
+        self.assertTrue(scd._stale.in_history_section("### 상세 이력 (v3.0~v4.4)"))
+        self.assertTrue(scd._stale.in_history_section("회고"))
+        self.assertFalse(scd._stale.in_history_section("§8. 미결"))
+        self.assertFalse(scd._stale.in_history_section(None))
+
+    def test_제목_정규식이_본문을_제목으로_읽지_않는다(self):
+        self.assertIsNone(scd.HEADING.match("| 표 행 |"))
+        self.assertIsNone(scd.HEADING.match("본문 줄"))
+        self.assertEqual(scd.HEADING.match("## 변경 이력").group(1), "변경 이력")
+
+
 class NormTest(unittest.TestCase):
     def test_스칼라도_목록도_받는다(self):
         self.assertEqual(scd.norm("a"), ["a"])
