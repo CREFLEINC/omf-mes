@@ -40,6 +40,15 @@ RULES = [
      '괄호 안 요약을 x-internal-note 로 옮기고 식별자만 남긴다'),
     ('설계 진행 상태', re.compile(r'미결|미착지'),
      '진행 상태는 x-internal-note 로. 소비자에게 필요한 경고는 「확정되지 않았다」로 바꿔 남긴다'),
+    # ⭐ 2026-09-02 신설(omf-mes#367) — 고객 «실물» 식별자. uiux-client-handoff 의
+    #    check-issue.py 는 이 둘을 이미 막고 있었는데 «계약» 쪽에는 없었다. 같은 값이
+    #    이슈로 나가면 막히고 계약 example 로 나가면 통과하던 상태다(실측 — 실제로
+    #    통과했다). 규칙을 이쪽에도 둔다. 신설 시점 위반 0건.
+    ('실 사번 의심', re.compile(r'\b9\d{5}\b'),
+     '실 사번 형식(6자리·90****)이다. 합성값을 쓴다'),
+    ('실 LOT 번호 의심', re.compile(r'\b[A-Z]{1,3}-?20\d{6}-\d{3,4}\b'),
+     '실 LOT 번호 형식이다. 합성값을 쓴다'),
+
     ('사내 운영 용어', re.compile(r'\bWBS\b|통합 Agent|SQL \d+ 주석'),
      'x-internal-note 로 옮긴다'),
     # ⛔ 구현팀이 찾아 알려 왔다(client#102) — 그쪽 경계 검사기는 «경로 형태»만
@@ -62,8 +71,11 @@ def collect(node, path='$'):
     out = []
     if isinstance(node, dict):
         for k, v in node.items():
-            if k == 'description' and isinstance(v, str):
-                out.append((path, v))
+            # ⭐ example 도 본다(2026-09-02 · omf-mes#367) — 목 서버가 그 값을 그대로
+            #    내려주고 생성 타입에도 실린다. description 만 보던 동안 계약 example 로
+            #    나간 고객 실물 사번을 이 검사기가 통과시켰다.
+            if k in ('description', 'example') and isinstance(v, (str, int)):
+                out.append((path if k == 'description' else path + '.example', str(v)))
             elif k != 'x-internal-note':
                 out.extend(collect(v, '%s.%s' % (path, k)))
     elif isinstance(node, list):
@@ -84,7 +96,7 @@ def check(path):
                 s = max(0, m.start() - 40)
                 violations.append((name, loc, d[s:m.end() + 40].replace('\n', ' '), fix))
 
-    print('%s — description %d개 검사' % (os.path.basename(path), len(descs)))
+    print('%s — description·example %d개 검사' % (os.path.basename(path), len(descs)))
     if not violations:
         print('✅ 공개돼도 되는 상태입니다.')
         return 0
