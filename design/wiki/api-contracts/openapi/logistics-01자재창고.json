@@ -11481,9 +11481,9 @@
       "x-source-column": "source_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "원천 유형. ⭐ 확정된 값 «둘» — INBOUND_RECEIPT_LINE(입하 라인 · sourceId 는 그 «라인»을 가리킨다 · P-01-01 §3-6 이 「발번 단위는 건이 아니라 라인」으로 확정했고 InboundReceiptLine.lotId 가 그 짝이다) · RECYCLE_ENTRY(재생재 등록 건 · sourceId 는 등록 건 자체를 가리킨다 · M-01-12 §5-2). ⛔ 값은 언제나 sourceId 가 «가리키는 것»을 이름한다 — 건을 뜻하는 값에 라인 식별자를 넣지 않는다. 그 밖의 원천은 아직 확정 전이라 서버가 내려주는 선택지를 그대로 쓴다(공유계약 G-2). 근거: 공유계약 A-16 · omf-mes#326",
+      "description": "원천 유형. ⭐ 확정된 값 «둘» — INBOUND_RECEIPT_LINE(입하 라인 · sourceId 는 그 «라인»을 가리킨다 · P-01-01 §3-6 이 「발번 단위는 건이 아니라 라인」으로 확정했고 InboundReceiptLine.lotId 가 그 짝이다) · RECYCLE_ENTRY(재생재 등록 건 · sourceId 는 등록 건 자체를 가리킨다 · M-01-12 §5-2). ⛔ 값은 언제나 sourceId 가 «가리키는 것»을 이름한다 — 건을 뜻하는 값에 라인 식별자를 넣지 않는다. ⚠ 이 «응답» 자리는 enum 으로 닫지 않는다 — 서버가 만드는 원천이 더 있다(A-10 실측표가 「LOT 의 원천 (입하·생산 …)」으로 적었고 생산 LOT 을 만드는 계약 경로는 아직 0건이다). 화면은 서버가 내려주는 값을 그대로 표시하고 모르는 값에 깨지지 않게 만든다(공유계약 G-2). ⭐ «보내는» 자리인 LotCreate.sourceTypeCode 는 INBOUND_RECEIPT_LINE 하나로 닫혀 있다 — 자리마다 값 집합이 다르다. 근거: 공유계약 A-16 · omf-mes#326 · omf-mes#354",
       "example": "INBOUND_RECEIPT_LINE",
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "⛔ 응답이라 닫지 않았다(2026-09-02 · omf-mes#354). 응답 스키마에서 값 목록을 좁히면 «항상 오던 값이 목록 밖»이 될 수 있어 그 값을 그대로 그리던 화면이 깨진다 — uiux-client-handoff 의 「필수 여부는 방향이 아니라 누가 그 값을 읽는가로 가른다」와 같은 축이다. 요청 자리(LotCreate)는 A-16 판별자 판정으로 닫았다."
      },
      "sourceId": {
       "x-source-column": "source_id",
@@ -11705,9 +11705,12 @@
       "x-source-column": "source_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "원천 유형. ⭐ 확정된 값 «둘» — INBOUND_RECEIPT_LINE(입하 라인 · sourceId 는 그 «라인»을 가리킨다 · P-01-01 §3-6 이 「발번 단위는 건이 아니라 라인」으로 확정했고 InboundReceiptLine.lotId 가 그 짝이다) · RECYCLE_ENTRY(재생재 등록 건 · sourceId 는 등록 건 자체를 가리킨다 · M-01-12 §5-2). ⛔ 값은 언제나 sourceId 가 «가리키는 것»을 이름한다 — 건을 뜻하는 값에 라인 식별자를 넣지 않는다. 그 밖의 원천은 아직 확정 전이라 서버가 내려주는 선택지를 그대로 쓴다(공유계약 G-2). 근거: 공유계약 A-16 · omf-mes#326",
+      "enum": [
+       "INBOUND_RECEIPT_LINE"
+      ],
+      "description": "원천 유형. ⭐ 이 경로로 오는 값은 «하나»다 — INBOUND_RECEIPT_LINE(입하 라인 · sourceId 는 그 «라인» 식별자다 · P-01-01 §3-6 이 「발번 단위는 건이 아니라 라인」으로 확정했고 InboundReceiptLine.lotId 가 그 짝이다). ⛔ RECYCLE_ENTRY 는 이 경로로 오지 않는다 — 재생재 등록은 POST /logistics/recycle-entries 가 LOT 과 재고를 한 트랜잭션으로 만든다(M-01-12 §5-2 · 요구서 §3-24). ⛔ 값은 언제나 sourceId 가 «가리키는 것»을 이름한다 — 건을 뜻하는 값에 라인 식별자를 넣지 않는다. ⚠ «응답» Lot.sourceTypeCode 는 열려 있다 — 서버가 만드는 원천이 더 있기 때문이다. 자리마다 값 집합이 다르다(CancelResult 선례). 근거: 공유계약 A-16 · omf-mes#326 · omf-mes#354",
       "example": "INBOUND_RECEIPT_LINE",
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "⭐ 2026-09-02 enum 으로 닫았다(omf-mes#354). 공유계약 A-16 「판별자인가 업무 코드인가」 물음 넷 중 «가»(A-10 실측표에 source_type_code + source_id 짝으로 등재돼 있다)와 «나»(값이 우리 계약의 테이블 이름이라 고객이 새 값을 넣어도 가리킬 표가 없다)가 참이라 다형 참조 판별자다 → enum 으로 닫는다. ⛔ 자유문자열→enum 이라 변경 통지 대상이다. ⛔ 응답 Lot 은 닫지 않았다 — 자리마다 값 집합이 다르다."
      },
      "sourceId": {
       "x-source-column": "source_id",
