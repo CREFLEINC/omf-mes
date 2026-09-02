@@ -7473,7 +7473,9 @@
      },
      "statusCode": {
       "type": "string",
-      "example": "CANCELLED"
+      "example": "CANCELLED",
+      "x-code-key": "CD-LOGISTICS-DOCUMENT-STATUS",
+      "description": "취소 처리 뒤 그 전표가 놓인 상태. 값 목록은 GET /mdm/code-values?codeGroupCode=LOGISTICS_DOCUMENT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "reversed": {
       "type": "boolean",
@@ -7579,7 +7581,9 @@
      },
      "statusCode": {
       "type": "string",
-      "example": "POSTED"
+      "example": "POSTED",
+      "x-code-key": "CD-LOGISTICS-DOCUMENT-STATUS",
+      "description": "전표의 진행 상태. 값 목록은 GET /mdm/code-values?codeGroupCode=LOGISTICS_DOCUMENT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "plannedQty": {
       "type": "number",
@@ -10211,9 +10215,10 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "라인 사유. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
+      "description": "라인 사유. ⭐ 헤더(InventoryAdjustment.reasonCode)와 «같은 축»이다 — 조정 사유는 고객이 설정하는 마스터다(사용자 확정 2026-08-18 · G-31). 값 목록은 GET /mdm/code-values?codeGroupCode=INVENTORY_ADJUSTMENT_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-code-key": "CD-INVENTORY-ADJUSTMENT-REASON"
      }
     },
     "x-internal-note": "inventory_adjustment_line 은 물리 모델에 아직 없다. #88 회신으로 신설이 확정됐고 이 계약은 다른 전표의 라인과 같은 형태로 먼저 정의한 것이다 — 조정 대상. 라인 사유를 담을 자리도 함께 확정돼야 한다(W-01-12 §5-1)."
@@ -10289,9 +10294,10 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "라인 사유. 확정된 값 목록이 아직 없다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: 공유계약 G-2",
+      "description": "라인 사유. 헤더와 같은 축이다. 값 목록은 GET /mdm/code-values?codeGroupCode=INVENTORY_ADJUSTMENT_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다."
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-code-key": "CD-INVENTORY-ADJUSTMENT-REASON"
      }
     },
     "x-internal-note": "inventory_adjustment_line 은 물리 모델에 아직 없다. #88 회신으로 신설이 확정됐고 이 계약은 다른 전표의 라인과 같은 형태로 먼저 정의한 것이다 — 조정 대상."
@@ -10513,7 +10519,8 @@
       "maxLength": 50,
       "readOnly": true,
       "example": "ABC-123",
-      "description": "화면이 보이는 값. 식별자를 사람이 읽는 값으로 바꾸려 마스터를 다시 부르지 않게 한다. 근거: W-01-07 §3"
+      "description": "화면이 보이는 값. 식별자를 사람이 읽는 값으로 바꾸려 마스터를 다시 부르지 않게 한다. 근거: W-01-07 §3",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 품목 마스터의 행을 가리킨다 — Item.itemCode 가 같은 판정으로 이미 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "itemName": {
       "type": "string",
@@ -10540,7 +10547,8 @@
       "maxLength": 50,
       "readOnly": true,
       "example": "A-01-03",
-      "description": "화면이 보이는 값. 축이 접힌 줄에서는 비어 온다. 근거: W-01-07 §3"
+      "description": "화면이 보이는 값. 축이 접힌 줄에서는 비어 온다. 근거: W-01-07 §3",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 위치 마스터의 행을 가리킨다 — Location.locationCode 가 같은 판정으로 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "warehouseName": {
       "type": [
@@ -10869,7 +10877,8 @@
       "maxLength": 50,
       "readOnly": true,
       "example": "ABC-123",
-      "description": "화면이 보이는 값. 식별자를 사람이 읽는 값으로 바꾸려 마스터를 다시 부르지 않게 한다 — 모바일은 오프라인에서 그 마스터를 갱신할 수 없다. 근거: M-01-11 §3"
+      "description": "화면이 보이는 값. 식별자를 사람이 읽는 값으로 바꾸려 마스터를 다시 부르지 않게 한다 — 모바일은 오프라인에서 그 마스터를 갱신할 수 없다. 근거: M-01-11 §3",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 품목 마스터의 행을 가리킨다 — Item.itemCode 가 같은 판정으로 이미 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "itemName": {
       "type": "string",
@@ -10893,7 +10902,8 @@
       "maxLength": 50,
       "readOnly": true,
       "example": "A-01-03",
-      "description": "화면이 보이는 값. 근거: M-01-11 §3"
+      "description": "화면이 보이는 값. 근거: M-01-11 §3",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 위치 마스터의 행을 가리킨다 — Location.locationCode 가 같은 판정으로 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      }
     },
     "x-internal-note": "블라인드 실사에서 systemQty 를 내려보내지 않는 것은 W-01-04 §5-2. 계약은 필드를 두되 서버가 생략한다."
@@ -11724,7 +11734,8 @@
       ],
       "readOnly": true,
       "example": "값",
-      "description": "입고 확정 대기 큐의 판정 축 — IQC 합격 · 샘플링 미대상 · 긴급 IQC 생략 한도승인 세 갈래다. 목록 배지 「⚠ 한도승인」의 원천이다. ⚠ 값 집합은 확정이나 코드 문자열이 아직 정해지지 않아 enum 을 못 박지 않는다 — 서버가 내려주는 선택지를 그대로 쓴다. 근거: W-01-10 §5-1"
+      "description": "입고 확정 대기 큐의 판정 축 — IQC 합격 · 샘플링 미대상 · 긴급 IQC 생략 한도승인. 서버가 판정한다",
+      "x-code-key": "CD-GOODS-RECEIPT-DISPOSITION"
      }
     },
     "x-internal-note": "입하 시점의 LOT 은 Hold 로 생긴다 — 가용 재고가 아니다(M-01-01 §5-4 · ✓확정 §재정의 #5). 📨 「W/O 내 순번」(별도 속성 — 선발행 슬롯 구간 지정용)은 계약이 앞서 세울 자리이고 저장 컬럼은 통지 대상이다 — 기다리지 않는다. 근거: 02-SW설계사양서 §4.6 · omf-mes#46."
@@ -12942,7 +12953,8 @@
       "maxLength": 50,
       "readOnly": true,
       "example": "ABC-123",
-      "description": "화면이 보이는 값. 식별자를 사람이 읽는 값으로 바꾸려 마스터를 다시 부르지 않게 한다 — 모바일은 오프라인에서 그 마스터를 갱신할 수 없다. 근거: M-01-08 §3"
+      "description": "화면이 보이는 값. 식별자를 사람이 읽는 값으로 바꾸려 마스터를 다시 부르지 않게 한다 — 모바일은 오프라인에서 그 마스터를 갱신할 수 없다. 근거: M-01-08 §3",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 품목 마스터의 행을 가리킨다 — Item.itemCode 가 같은 판정으로 이미 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "itemName": {
       "type": "string",
@@ -12963,7 +12975,8 @@
       "maxLength": 50,
       "readOnly": true,
       "example": "A-01-03",
-      "description": "화면이 보이는 값. 근거: M-01-08 §3"
+      "description": "화면이 보이는 값. 근거: M-01-08 §3",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 위치 마스터의 행을 가리킨다 — Location.locationCode 가 같은 판정으로 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "expiryDate": {
       "type": [
@@ -14080,7 +14093,8 @@
       "maxLength": 50,
       "readOnly": true,
       "example": "ABC-123",
-      "description": "화면이 보이는 값. 식별자를 사람이 읽는 값으로 바꾸려 마스터를 다시 부르지 않게 한다 — POP 은 오프라인에서 그 마스터를 갱신할 수 없다. 근거: P-02-03 §3 · 공유계약 C-6"
+      "description": "화면이 보이는 값. 식별자를 사람이 읽는 값으로 바꾸려 마스터를 다시 부르지 않게 한다 — POP 은 오프라인에서 그 마스터를 갱신할 수 없다. 근거: P-02-03 §3 · 공유계약 C-6",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 품목 마스터의 행을 가리킨다 — Item.itemCode 가 같은 판정으로 이미 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "itemName": {
       "type": "string",

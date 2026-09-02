@@ -14540,7 +14540,8 @@
      "groupCode": {
       "type": "string",
       "description": "격자를 묶는 축(도메인). ⭐ 열이 화면 수만큼(2026-09-01 실측 **117** — 폐지된 W-06-13 제외)이라 묶지 않으면 관리자가 격자를 옆으로 끝없이 스크롤한다",
-      "example": "01"
+      "example": "01",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 그룹 마스터(설비그룹·권한그룹)의 행을 가리킨다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      }
     }
    },
@@ -15616,7 +15617,8 @@
        "null"
       ],
       "x-no-example": true,
-      "description": "판정유형 → 어떤 Lot Status로 전이하는가(결정 10 「상태 3축」)"
+      "description": "LOT 상태. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-LOT-STATUS"
      },
      "versionNo": {
       "type": "integer",
@@ -15662,7 +15664,9 @@
        "string",
        "null"
       ],
-      "x-no-example": true
+      "x-no-example": true,
+      "x-code-key": "CD-LOT-STATUS",
+      "description": "LOT 상태. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      }
     }
    },
@@ -18266,7 +18270,8 @@
     ],
     "properties": {
      "defectCode": {
-      "$ref": "#/components/schemas/DefectCode"
+      "$ref": "#/components/schemas/DefectCode",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 불량코드 마스터의 행을 가리킨다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "editability": {
       "$ref": "#/components/schemas/Editability"
@@ -18485,7 +18490,8 @@
     ],
     "properties": {
      "causeCode": {
-      "$ref": "#/components/schemas/CauseCode"
+      "$ref": "#/components/schemas/CauseCode",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 원인코드 마스터(mdm.cause_code)의 행을 가리킨다 — 선택 목록은 그 마스터가 준다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "editability": {
       "$ref": "#/components/schemas/Editability"
@@ -19681,7 +19687,8 @@
       ],
       "maxLength": 50,
       "example": "PRS-01",
-      "description": "설비 코드. 헤더가 「PRS-01 · 프레스 1호기」로 그리므로 함께 내린다 — 왕복 한 번을 없앤다."
+      "description": "설비 코드. 헤더가 「PRS-01 · 프레스 1호기」로 그리므로 함께 내린다 — 왕복 한 번을 없앤다.",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 설비 마스터의 행을 가리킨다 — Equipment.equipmentCode 가 같은 판정으로 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "equipmentName": {
       "type": [
@@ -19765,7 +19772,9 @@
      },
      "terminalTypeCode": {
       "type": "string",
-      "x-no-example": true
+      "x-no-example": true,
+      "x-code-key": "CD-TERMINAL-TYPE",
+      "description": "단말 유형 — 고정 스테이션(POP)과 손에 드는 기기(MOBILE). 값 목록은 GET /mdm/code-values?codeGroupCode=TERMINAL_TYPE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "statusCode": {
       "type": "string",
@@ -19805,7 +19814,9 @@
      },
      "terminalTypeCode": {
       "type": "string",
-      "x-no-example": true
+      "x-no-example": true,
+      "x-code-key": "CD-TERMINAL-TYPE",
+      "description": "단말 유형 — 고정 스테이션(POP)과 손에 드는 기기(MOBILE). 값 목록은 GET /mdm/code-values?codeGroupCode=TERMINAL_TYPE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "statusCode": {
       "type": "string",
@@ -20161,7 +20172,9 @@
      "groupTypeCode": {
       "type": "string",
       "example": "LINE",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-code-key": "CD-PRODUCTION-LINE-TYPE",
+      "description": "라인 계층 유형 — 라인과 작업구역을 가른다. ⚠ ProductionLine.lineTypeCode 와 «같은 물리 컬럼»이다"
      },
      "parentGroupId": {
       "type": [
@@ -20195,7 +20208,9 @@
      "groupTypeCode": {
       "type": "string",
       "example": "LINE",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-code-key": "CD-PRODUCTION-LINE-TYPE",
+      "description": "라인 계층 유형 — 라인과 작업구역을 가른다. ⚠ ProductionLine.lineTypeCode 와 «같은 물리 컬럼»이다"
      },
      "parentGroupId": {
       "type": [
@@ -20501,7 +20516,8 @@
      "itemCode": {
       "type": "string",
       "example": "DAILY-01",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 품목 마스터의 행을 가리킨다 — Item.itemCode 가 같은 판정으로 이미 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "itemName": {
       "type": "string",
@@ -20595,7 +20611,8 @@
      "itemCode": {
       "type": "string",
       "example": "DAILY-01",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 품목 마스터의 행을 가리킨다 — Item.itemCode 가 같은 판정으로 이미 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "itemName": {
       "type": "string",
@@ -20679,7 +20696,8 @@
      "itemCode": {
       "type": "string",
       "example": "DAILY-01",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 품목 마스터의 행을 가리킨다 — Item.itemCode 가 같은 판정으로 이미 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "itemName": {
       "type": "string",
@@ -20800,7 +20818,8 @@
      "itemCode": {
       "type": "string",
       "example": "DAILY-01",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 품목 마스터의 행을 가리킨다 — Item.itemCode 가 같은 판정으로 이미 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "itemName": {
       "type": "string",
@@ -21050,7 +21069,8 @@
       "type": "string",
       "example": "MOLD",
       "maxLength": 50,
-      "description": "도구 유형 — 금형 · 지그 · 그 밖의 도구"
+      "description": "도구 유형 — 금형 · 지그 · 그 밖의 도구(W-05-13 §3-3). 값 목록은 GET /mdm/code-values?codeGroupCode=TOOL_TYPE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-TOOL-TYPE"
      },
      "cavityCount": {
       "type": "integer",
@@ -21199,7 +21219,8 @@
       "type": "string",
       "example": "MOLD",
       "maxLength": 50,
-      "description": "도구 유형 — 금형 · 지그 · 그 밖의 도구. 요구가 「모든 도구」라 유형 축을 둔다"
+      "description": "도구 유형 — 금형 · 지그 · 그 밖의 도구(W-05-13 §3-3). 값 목록은 GET /mdm/code-values?codeGroupCode=TOOL_TYPE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-TOOL-TYPE"
      },
      "cavityCount": {
       "type": "integer",
@@ -21270,7 +21291,8 @@
       "type": "string",
       "example": "MOLD",
       "maxLength": 50,
-      "description": "도구 유형 — 금형 · 지그 · 그 밖의 도구. 요구가 「모든 도구」라 유형 축을 둔다"
+      "description": "도구 유형 — 금형 · 지그 · 그 밖의 도구(W-05-13 §3-3). 값 목록은 GET /mdm/code-values?codeGroupCode=TOOL_TYPE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-TOOL-TYPE"
      },
      "cavityCount": {
       "type": "integer",
@@ -21464,7 +21486,8 @@
      "equipmentCode": {
       "type": "string",
       "example": "PRS-01",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 설비 마스터의 행을 가리킨다 — Equipment.equipmentCode 가 같은 판정으로 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "equipmentName": {
       "type": "string",
@@ -21741,7 +21764,8 @@
      "calendarCode": {
       "type": "string",
       "example": "CAL-HCM-2026",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 작업 캘린더 마스터의 행을 가리킨다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      }
     }
    },
@@ -21852,7 +21876,8 @@
        "null"
       ],
       "example": "CAL-HCM-2026",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 작업 캘린더 마스터의 행을 가리킨다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "resolvedFromLevelCode": {
       "type": [
@@ -21860,7 +21885,8 @@
        "null"
       ],
       "example": "PLANT",
-      "description": "EQUIPMENT_GROUP 또는 PLANT. null 이면 어느 층에도 지정이 없어 따르는 캘린더가 없다 — 화면이 그 사실을 밝힌다"
+      "description": "어느 층의 지정을 따랐나 — EQUIPMENT_GROUP 또는 PLANT. null 이면 어느 층에도 지정이 없어 따르는 캘린더가 없다",
+      "x-code-key": "CD-RESOLVED-FROM-LEVEL"
      }
     }
    },
@@ -21916,7 +21942,8 @@
       "type": "string",
       "example": "IF-GR-SEND",
       "maxLength": 50,
-      "description": "전역에서 유일하다. 연계 메시지의 interfaceCode 가 이 값을 가리킨다"
+      "description": "전역에서 유일하다. 연계 메시지의 interfaceCode 가 이 값을 가리킨다",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 연계 정의 마스터의 행을 가리킨다 — 선택 목록은 GET /integration/interface-definitions 가 준다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "interfaceName": {
       "type": "string",
@@ -21938,7 +21965,8 @@
       "example": "ITEM",
       "maxLength": 50,
       "description": "연계 대상. 확정된 수신 대상은 품목 · 자재명세 · 조직 · 작업자 · 구매발주 다섯이며 그 밖의 값도 받는다 — 막지 않고 표식만 한다. 확정 목록 안인지는 withinConfirmedScope 가 말한다",
-      "x-internal-note": "공통코드는 2026-08-22 사용자 확정으로 수신 대상에서 제외(공유계약 B-4-3 · omf-mes#197). 거래처는 2026-07-08 에 넣었다가 2026-08-31 사용자 확정으로 뺐다(omf-mes#197) — 확정 목록은 QA §3.2 계보를 따른다. 따라서 수량은 「여섯」에서 「다섯」이 됐다."
+      "x-internal-note": "공통코드는 2026-08-22 사용자 확정으로 수신 대상에서 제외(공유계약 B-4-3 · omf-mes#197). 거래처는 2026-07-08 에 넣었다가 2026-08-31 사용자 확정으로 뺐다(omf-mes#197) — 확정 목록은 QA §3.2 계보를 따른다. 따라서 수량은 「여섯」에서 「다섯」이 됐다.",
+      "x-code-key": "CD-INTERFACE-TARGET"
      },
      "externalSystemCode": {
       "type": "string",
@@ -22016,7 +22044,8 @@
       "type": "string",
       "example": "IF-GR-SEND",
       "maxLength": 50,
-      "description": "전역에서 유일하다. 연계 메시지의 interfaceCode 가 이 값을 가리킨다"
+      "description": "전역에서 유일하다. 연계 메시지의 interfaceCode 가 이 값을 가리킨다",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 연계 정의 마스터의 행을 가리킨다 — 선택 목록은 GET /integration/interface-definitions 가 준다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "interfaceName": {
       "type": "string",
@@ -22038,7 +22067,8 @@
       "example": "ITEM",
       "maxLength": 50,
       "description": "연계 대상. 확정된 수신 대상은 품목 · 자재명세 · 조직 · 작업자 · 구매발주 다섯이며 그 밖의 값도 받는다 — 막지 않고 표식만 한다. 확정 목록 안인지는 withinConfirmedScope 가 말한다",
-      "x-internal-note": "공통코드는 2026-08-22 사용자 확정으로 수신 대상에서 제외(공유계약 B-4-3 · omf-mes#197). 거래처는 2026-07-08 에 넣었다가 2026-08-31 사용자 확정으로 뺐다(omf-mes#197) — 확정 목록은 QA §3.2 계보를 따른다. 따라서 수량은 「여섯」에서 「다섯」이 됐다."
+      "x-internal-note": "공통코드는 2026-08-22 사용자 확정으로 수신 대상에서 제외(공유계약 B-4-3 · omf-mes#197). 거래처는 2026-07-08 에 넣었다가 2026-08-31 사용자 확정으로 뺐다(omf-mes#197) — 확정 목록은 QA §3.2 계보를 따른다. 따라서 수량은 「여섯」에서 「다섯」이 됐다.",
+      "x-code-key": "CD-INTERFACE-TARGET"
      },
      "externalSystemCode": {
       "type": "string",
@@ -22111,7 +22141,8 @@
       "type": "string",
       "example": "IF-GR-SEND",
       "maxLength": 50,
-      "description": "전역에서 유일하다. 연계 메시지의 interfaceCode 가 이 값을 가리킨다"
+      "description": "전역에서 유일하다. 연계 메시지의 interfaceCode 가 이 값을 가리킨다",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 연계 정의 마스터의 행을 가리킨다 — 선택 목록은 GET /integration/interface-definitions 가 준다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "interfaceName": {
       "type": "string",
@@ -22133,7 +22164,8 @@
       "example": "ITEM",
       "maxLength": 50,
       "description": "연계 대상. 확정된 수신 대상은 품목 · 자재명세 · 조직 · 작업자 · 구매발주 다섯이며 그 밖의 값도 받는다 — 막지 않고 표식만 한다. 확정 목록 안인지는 withinConfirmedScope 가 말한다",
-      "x-internal-note": "공통코드는 2026-08-22 사용자 확정으로 수신 대상에서 제외(공유계약 B-4-3 · omf-mes#197). 거래처는 2026-07-08 에 넣었다가 2026-08-31 사용자 확정으로 뺐다(omf-mes#197) — 확정 목록은 QA §3.2 계보를 따른다. 따라서 수량은 「여섯」에서 「다섯」이 됐다."
+      "x-internal-note": "공통코드는 2026-08-22 사용자 확정으로 수신 대상에서 제외(공유계약 B-4-3 · omf-mes#197). 거래처는 2026-07-08 에 넣었다가 2026-08-31 사용자 확정으로 뺐다(omf-mes#197) — 확정 목록은 QA §3.2 계보를 따른다. 따라서 수량은 「여섯」에서 「다섯」이 됐다.",
+      "x-code-key": "CD-INTERFACE-TARGET"
      },
      "externalSystemCode": {
       "type": "string",

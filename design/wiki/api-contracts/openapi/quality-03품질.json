@@ -3108,7 +3108,8 @@
       "maxLength": 50,
       "readOnly": true,
       "description": "화면이 보이는 품목 코드. 식별자를 사람이 읽는 값으로 바꾸려 마스터를 다시 부르지 않게 한다",
-      "example": "값"
+      "example": "값",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 품목 마스터의 행을 가리킨다 — Item.itemCode 가 같은 판정으로 이미 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "itemName": {
       "type": "string",
@@ -4140,8 +4141,9 @@
        "string",
        "null"
       ],
-      "description": "보류 사유. ⚠ 해제 사건에는 없을 수 있다",
-      "example": "QUALITY_HOLD"
+      "description": "보류 사유. ⚠ 해제 사건에는 없을 수 있다. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "QUALITY_HOLD",
+      "x-code-key": "CD-LOT-HOLD-REASON"
      },
      "holdQty": {
       "type": [
@@ -4172,8 +4174,9 @@
        "string",
        "null"
       ],
-      "description": "해제 사건이 LOT 을 어느 상태로 보냈나. 값 목록은 LOT_STATUS",
-      "example": "NORMAL"
+      "description": "해제 사건이 LOT 을 어느 상태로 보냈나 — 값 목록은 LOT_STATUS 다. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "NORMAL",
+      "x-code-key": "CD-LOT-STATUS"
      }
     },
     "required": [
