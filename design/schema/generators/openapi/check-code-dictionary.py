@@ -50,6 +50,12 @@ import os
 import re
 import sys
 from collections import defaultdict
+import importlib
+
+# ⭐ 등록부는 **읽어 온다** — 여기에 그룹 이름 목록을 다시 적으면 그 순간 셋째 사본이 되고,
+#    그것이 정확히 이 사전이 고치려는 병이다(2026-09-02 이관). 파서는 저장소에 하나뿐이다.
+_ptr = importlib.import_module("check-code-group-pointer")
+load_registry = _ptr.load_registry
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, "..", "..", "..", ".."))
@@ -178,6 +184,19 @@ def main() -> int:
     print("코드 사전 검사 — 시험판")
     print("─" * 70)
     print("사전 %d 키 · 계약 *Code(s) 자리 %d" % (len(entries), total))
+    print()
+
+    # ⓪ 사전이 가리킨 «그룹» 이 등록부 안인가 — 사전이 셋째 사본이 되지 않게 대조한다.
+    registry = load_registry()
+    outside = sorted({g for e in entries for g in e["group"]} - registry)
+    if outside:
+        print("⛔ 사전의 «그룹» 열이 등록부 밖입니다 %d건 — 공유계약 G-32 표에 없습니다"
+              % len(outside))
+        for g in outside:
+            print("   %s" % g)
+    else:
+        print("⓪ 사전의 «그룹» 열 %d종 전부 등록부 안 (등록부 %d개)"
+              % (len({g for e in entries for g in e["group"]}), len(registry)))
     print()
 
     if not args.split:

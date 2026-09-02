@@ -117,5 +117,65 @@ class 빈_설명(unittest.TestCase):
         self.assertEqual(found(d), set())
 
 
+
+class 등록부를_조항_표에서_읽는다(unittest.TestCase):
+    """⛔ 2026-09-02 이관 — 이 목록의 사본은 저장소에 없다.
+
+    이관 전 실측: 조항 산문 **52** · 계수 괄호 고유 **4** · 검사기 상수 **56** — 세 벌이
+    갈려 있었다. `RECEIPT_TYPE` 등 넷은 「확정된 것 —」 문장에 아예 없었는데 계약 9자리가
+    그 넷을 가리켰다. 사본이 갈라지는 것을 막는 법은 사본을 없애는 것뿐이다.
+    """
+
+    HEAD = ("#### \u2b50 \ub4f1\ub85d\ubd80 \u2014 \uc774\ub984\uc774 \u00ab\uc788\ub294\u00bb "
+            "\uadf8\ub8f9 (**\uc815\ubcf8 \ud45c**)\n\n"
+            "| \uc5f4 | \ubb34\uc5c7 |\n| --- | --- |\n| **\uadf8\ub8f9** | \uc774\ub984 |\n\n"
+            "| \uadf8\ub8f9 | \uc18c\uc720 | \ub4f1\uc7ac | \uadfc\uac70 |\n"
+            "| --- | --- | --- | --- |\n")
+
+    @staticmethod
+    def write(text):
+        import tempfile
+        p = os.path.join(tempfile.mkdtemp(), "clause.md")
+        with open(p, "w", encoding="utf-8") as fh:
+            fh.write(text)
+        return p
+
+    def test_첫_칸만_읽는다(self):
+        # ⛔ 근거 칸의 «값»(RETEST_PASS)이나 다른 그룹 상호참조를 주우면 산문 시절로 되돌아간다.
+        md = self.HEAD + (
+            "| `LOT_HOLD_RELEASE_REASON` | `registry` | 2026-08-31 | "
+            "`RETEST_PASS`·`MANAGER_OVERRIDE` — `WAREHOUSE_TYPE` 과 같은 근거 |\n")
+        self.assertEqual(cg.load_registry(self.write(md)), {"LOT_HOLD_RELEASE_REASON"})
+
+    def test_열_설명표를_안_삼킨다(self):
+        # 바로 위 2열 표가 있어도 «4열» 행만 읽는다.
+        md = self.HEAD + "| `LOT_STATUS` | ⬜ | G-32 확정 | `omf-mes#176` |\n"
+        self.assertEqual(cg.load_registry(self.write(md)), {"LOT_STATUS"})
+
+    def test_다음_소제목에서_멈춘다(self):
+        md = (self.HEAD + "| `LOT_STATUS` | ⬜ | G-32 확정 | 근거 |\n"
+              "\n#### 다른 절\n\n| 그룹 | 소유 | 등재 | 근거 |\n| --- | --- | --- | --- |\n"
+              "| `NOT_A_GROUP` | ⬜ | — | — |\n")
+        self.assertEqual(cg.load_registry(self.write(md)), {"LOT_STATUS"})
+
+    def test_표가_없으면_죽는다(self):
+        # ⛔ 조용히 빈 등록부가 되면 계약의 «모든» 포인터가 빨강이 되고 원인이 오독된다.
+        with self.assertRaises(SystemExit):
+            cg.load_registry(self.write("## 아무 표도 없다\n"))
+
+    def test_행이_하나도_없어도_죽는다(self):
+        with self.assertRaises(SystemExit):
+            cg.load_registry(self.write(self.HEAD))
+
+    def test_실물_조항에서_56이_나온다(self):
+        self.assertEqual(len(cg.load_registry()), 56)
+
+    def test_계약이_가리키는_넷이_들어_있다(self):
+        # ⛔ 이관 전 「확정된 것 —」 문단에 없던 넷 — 사라지면 계약 9자리가 빨강이 된다.
+        got = cg.load_registry()
+        for n in ("RECEIPT_TYPE", "ISSUE_TYPE", "MANAGEMENT_LEVEL", "GOODS_RECEIPT_REASON"):
+            self.assertIn(n, got)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=1)

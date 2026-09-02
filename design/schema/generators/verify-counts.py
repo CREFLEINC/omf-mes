@@ -113,6 +113,13 @@ def m_decisions() -> int:
     return int(re.search(r"^\s+계\s+(\d+)", out, re.M).group(1))
 
 
+def m_code_groups() -> int:
+    """G-32 등록부 표의 행 수 — 표를 «읽는» 검사기에게 묻는다(파서는 저장소에 하나다)."""
+    out = run(sys.executable,
+              os.path.join(HERE, "openapi", "check-code-group-pointer.py"))
+    return int(re.search(r"등록부 (\d+)개", out).group(1))
+
+
 def m_dr() -> int:
     return len(glob.glob(os.path.join(ROOT, "design", "raw", "decision-requests", "DR-*.md")))
 
@@ -147,6 +154,9 @@ REGISTRY = [
     ("00-index.md", "결정 대장", r"결정 대장 \*\*(\d+)행\*\*", m_decisions),
     ("00-index.md", "의사결정 요청서", r"의사결정 요청서 \*\*(\d+)건\*\*", m_dr),
     ("00-index.md", "용어", r"용어 \*\*(\d+)항목\*\*", m_glossary),
+
+    ("decisions-policy/공유계약.md", "G-32 등록부",
+     r"위 표에 오른 것뿐이다 — 현재 (\d+)", m_code_groups),
 
     ("decisions-policy/00-index.md", "결정 대장", r"\| (\d+)행 \|", m_decisions),
     ("decisions-policy/00-index.md", "의사결정 요청서", r"DR-001~013 \| (\d+)건", m_dr),
