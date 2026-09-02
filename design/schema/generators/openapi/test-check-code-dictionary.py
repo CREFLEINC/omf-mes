@@ -41,7 +41,7 @@ class 자리_상태를_가른다(unittest.TestCase):
 
 
 class 사전_표를_읽는다(unittest.TestCase):
-    """⛔ 열이 «정확히 여섯»인 표만 본다 — 같은 문서의 결과 표를 삼켰다(10 → 13)."""
+    """⛔ 열이 «정확히 일곱»인 표만 본다 — 같은 문서의 결과 표를 삼켰다(10 → 13)."""
 
     @staticmethod
     def parse(text):
@@ -51,16 +51,28 @@ class 사전_표를_읽는다(unittest.TestCase):
             fh.write(text)
         return cd.read_dictionary(p)
 
-    def test_여섯_열_행을_읽는다(self):
+    def test_일곱_열_행을_읽는다(self):
         row = ("| `CD-PRINT-DOCUMENT-TYPE` | `MATERIAL_LOT_LABEL` `PACKING_LABEL` "
-               "| `documentTypeCode` | `enum` | 6 | 근거 |\n")
+               "| — | `documentTypeCode` | `enum` | 6 | 근거 |\n")
         got = self.parse(row)
         self.assertEqual(len(got), 1)
         self.assertEqual(got[0]["key"], "CD-PRINT-DOCUMENT-TYPE")
         self.assertEqual(got[0]["values"], ["MATERIAL_LOT_LABEL", "PACKING_LABEL"])
+        self.assertEqual(got[0]["group"], [])
         self.assertEqual(got[0]["names"], ["documentTypeCode"])
         self.assertEqual(got[0]["owner"], "enum")
         self.assertEqual(got[0]["places"], 6)
+
+    def test_registry_는_값과_그룹을_따로_갖는다(self):
+        # ⭐ 값 열은 «언제나» 코드 문자열이고 그룹은 따로다.
+        #    첫 판은 registry 갈래의 값 열에 그룹 이름을 적어 한 열에 두 종류가 섞였다.
+        row = ("| `CD-MAINTENANCE-ORDER-STATUS` | `ISSUED` `DONE` `CANCELLED` "
+               "| `MAINTENANCE_ORDER_STATUS` | `statusCode` | `registry-system` | 2 | 근거 |\n")
+        got = self.parse(row)
+        self.assertEqual(len(got), 1)
+        self.assertEqual(got[0]["values"], ["ISSUED", "DONE", "CANCELLED"])
+        self.assertEqual(got[0]["group"], ["MAINTENANCE_ORDER_STATUS"])
+        self.assertEqual(got[0]["owner"], "registry-system")
 
     def test_다섯_열_결과표는_안_읽는다(self):
         # ⛔ 실제로 삼켰던 형태 — 문서 아래쪽 「검증 결과」 표.
@@ -68,7 +80,7 @@ class 사전_표를_읽는다(unittest.TestCase):
         self.assertEqual(self.parse(row), [])
 
     def test_키가_아니면_안_읽는다(self):
-        row = "| 무엇 | 값 | 이름 | 소유 | 자리 | 근거 |\n"
+        row = "| 무엇 | 값 | 그룹 | 이름 | 소유 | 자리 | 근거 |\n"
         self.assertEqual(self.parse(row), [])
 
 

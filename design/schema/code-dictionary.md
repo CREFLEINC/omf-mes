@@ -79,25 +79,43 @@ CD-<계열>-<축>
 
 ## 사전 — 13키 / 41자리
 
-⛔ **열이 여섯이다 — 「키·값」 둘로는 서지 않는다.** 테스트베드가 그것을 실물로 증명했다(§ 아래 「형식이
-한 번 틀렸다」). **값**은 실제 코드 문자열이고(`enum` 갈래) 또는 그룹 이름이며(`registry` 갈래),
-**프로퍼티**는 계약이 부르는 이름이라 **중복한다.**
+⛔ **열이 일곱이다 — 「키·값」 둘로는 서지 않는다.** 테스트베드가 그것을 실물로 증명했다
+(§ 아래 「형식이 두 번 틀렸다」).
 
-| 키 | 값 | 프로퍼티 | 소유 | 자리 | 근거 |
-| --- | --- | --- | :-: | :-: | --- |
-| `CD-PRINT-DOCUMENT-TYPE` | `MATERIAL_LOT_LABEL` `GOODS_ISSUE_QR` `PRODUCTION_LOT_LABEL` `IDENTIFICATION_TAG` `PACKING_LABEL` `DELIVERY_LABEL` `CERTIFICATE_OF_ANALYSIS` `TOOL_LABEL` `LOCATION_LABEL` | `documentTypeCode` `supportedDocumentTypeCodes` | `enum` | 6 | 출력물 종류. `app-공통.json` — `omf-mes#145` · `22c08f5` · 요구서 `app공통출력물` §3-8 |
-| `CD-LOGISTICS-DOCUMENT-TYPE` | `PURCHASE_ORDER` `INBOUND_RECEIPT` `GOODS_RECEIPT` `MATERIAL_ISSUE_REQUEST` `PICKING_ORDER` `STOCK_TRANSFER` `SUBCONTRACT_ISSUE` `SUBCONTRACT_RECEIPT` `GOODS_ISSUE` | `documentTypeCode` | `enum` | 3 | 물류 문서 종류. `logistics-01자재창고.json` — `#351` · `06942be` |
-| `CD-CANCELABLE-DOCUMENT-TYPE` | `INBOUND_RECEIPT` `GOODS_RECEIPT` `GOODS_ISSUE` | `documentTypeCode` | `enum` | 1 | 취소할 수 있는 문서. 같은 계약 · 「자리마다 닫는다」 |
-| `CD-APPROVAL-TYPE` | `GOODS_ISSUE_DISPOSAL` `INVENTORY_ADJUSTMENT` `PURCHASE_ORDER` `INBOUND_RECEIPT_CANCEL` `GOODS_RECEIPT_CANCEL` `GOODS_ISSUE_CANCEL` `SHIPMENT_CANCEL` `IQC_SKIP` | `approvalTypeCode` | `enum` | 5 | 승인 유형 8값. `#336` · 사용자 확정 2026-09-01 |
-| `CD-GOODS-ISSUE-DESTINATION-TYPE` | `LOCATION` `PARTNER` `DISPOSAL_SITE` | `destinationTypeCode` | `enum` | 2 | 출고 도착지. ⚠ 계약 `enum` 에 `null` 이 함께 있다(nullable). `#337` |
-| `CD-INSPECTION-OVERALL-JUDGMENT` | `INSPECTION_RESULT_OVERALL_JUDGMENT` | `overallJudgmentCode` | `registry` | 7 | 합격·불합격·**보류** 3값. `#179` |
-| `CD-INSPECTION-MEASUREMENT-JUDGMENT` | `INSPECTION_MEASUREMENT_JUDGMENT` | `judgmentCode` | `registry` | 2 | 합격·불합격 **2값**. `#179` |
-| `CD-EQUIPMENT-TYPE` | `EQUIPMENT_TYPE` | `equipmentTypeCode` | `registry` | 4 | 설비 계열. `#186` · 통지 `client#415` |
-| `CD-INSTRUMENT-TYPE` | `INSTRUMENT_TYPE` | `equipmentTypeCode` | `registry` | 4 | 계측기 계열. **같은 컬럼에 두 계열**(`G-32` · `#219`) · 통지 `client#404` |
-| `CD-CYCLE-TYPE` | `CYCLE_TYPE` | `pmCycleUnitCode` `calibrationCycleTypeCode` | `registry` | 6 | 기간 단위. ⭐ **반례** — 아래 참조 |
-| `CD-EQUIPMENT-BREAKDOWN-STATUS` | `EQUIPMENT_BREAKDOWN_STATUS` | `statusCode` | `registry-system` | 2 | 고장 접수 — 접수·처리중·완료. **값이 계약 산문에 이미 있었다**(2026-09-02 꺼냄) · `W-05-04` |
-| `CD-MAINTENANCE-ORDER-STATUS` | `MAINTENANCE_ORDER_STATUS` | `statusCode` | `registry-system` | 2 | 보전 지시 — 발행·완료·취소. 같음 · `W-05-05` |
-| `CD-MAINTENANCE-ORDER-ITEM-STATUS` | `MAINTENANCE_ORDER_ITEM_STATUS` | `statusCode` | `registry-system` | 1 | 보전 지시 **항목** — 계획·완료·해당없음. ⚠ 지시 전체와 **다른 축**이다 |
+| 열 | 무엇 | 중복 |
+| --- | --- | :-: |
+| **키** | 이 코드를 가리키는 유일한 이름 | ⛔ **절대 불가** |
+| **값** | ⭐ **언제나 «실제 코드 문자열»**이다 — 그룹 이름이 아니다 | ✅ 가능 |
+| **그룹** | `codeGroupCode` — 서버 마스터에서 받을 때 쓰는 이름. `enum` 갈래는 `—` | ✅ |
+| **프로퍼티** | 계약이 부르는 이름 | ✅ **`statusCode` 는 97자리에서 중복한다** |
+| **소유** | 값을 누가 정하고 어디서 오나 — 아래 표 | |
+| **자리** | 계약에서 이 키가 걸리는 자리 수. 검사기가 실물과 대조한다 | |
+| **근거** | 어디서 나온 값인가 | |
+
+⭐ **「값이 완전한 목록인가 예시인가」는 «소유» 열이 말한다** — 값 열의 «모양»으로 가르지 않는다.
+
+| 소유 | 값 열의 뜻 |
+| --- | --- |
+| `enum` | **완전 목록** — 계약이 닫았다. 이 밖의 값은 400 이다 |
+| `registry` | **초기 시드** — 고객이 `W-06-06` 에서 늘리거나 바꾼다 |
+| `registry-system` | **완전 목록** — 우리가 정했고 마스터에 실린다. 고객은 편집 불가 |
+| `derived` | — 화면이 안 보낸다 |
+
+| 키 | 값 | 그룹 | 프로퍼티 | 소유 | 자리 | 근거 |
+| --- | --- | --- | --- | :-: | :-: | --- |
+| `CD-PRINT-DOCUMENT-TYPE` | `MATERIAL_LOT_LABEL` `GOODS_ISSUE_QR` `PRODUCTION_LOT_LABEL` `IDENTIFICATION_TAG` `PACKING_LABEL` `DELIVERY_LABEL` `CERTIFICATE_OF_ANALYSIS` `TOOL_LABEL` `LOCATION_LABEL` | — | `documentTypeCode` `supportedDocumentTypeCodes` | `enum` | 6 | 출력물 종류. `app-공통.json` — `omf-mes#145` · `22c08f5` · 요구서 `app공통출력물` §3-8 |
+| `CD-LOGISTICS-DOCUMENT-TYPE` | `PURCHASE_ORDER` `INBOUND_RECEIPT` `GOODS_RECEIPT` `MATERIAL_ISSUE_REQUEST` `PICKING_ORDER` `STOCK_TRANSFER` `SUBCONTRACT_ISSUE` `SUBCONTRACT_RECEIPT` `GOODS_ISSUE` | — | `documentTypeCode` | `enum` | 3 | 물류 문서 종류. `logistics-01자재창고.json` — `#351` · `06942be` |
+| `CD-CANCELABLE-DOCUMENT-TYPE` | `INBOUND_RECEIPT` `GOODS_RECEIPT` `GOODS_ISSUE` | — | `documentTypeCode` | `enum` | 1 | 취소할 수 있는 문서. 같은 계약 · 「자리마다 닫는다」 |
+| `CD-APPROVAL-TYPE` | `GOODS_ISSUE_DISPOSAL` `INVENTORY_ADJUSTMENT` `PURCHASE_ORDER` `INBOUND_RECEIPT_CANCEL` `GOODS_RECEIPT_CANCEL` `GOODS_ISSUE_CANCEL` `SHIPMENT_CANCEL` `IQC_SKIP` | — | `approvalTypeCode` | `enum` | 5 | 승인 유형 8값. `#336` · 사용자 확정 2026-09-01 |
+| `CD-GOODS-ISSUE-DESTINATION-TYPE` | `LOCATION` `PARTNER` `DISPOSAL_SITE` | — | `destinationTypeCode` | `enum` | 2 | 출고 도착지. ⚠ 계약 `enum` 에 `null` 이 함께 있다(nullable). `#337` |
+| `CD-INSPECTION-OVERALL-JUDGMENT` | `ACCEPTED` `REJECTED` `HELD` | `INSPECTION_RESULT_OVERALL_JUDGMENT` | `overallJudgmentCode` | `registry` | 7 | 검사 **종합** 판정 — 보류 수량(`held_qty`)이 있다. `#179`. ⚠ **소유 재판정 대상** — 판정 값에 화면 동작이 걸려 `registry-system` 일 수 있다 |
+| `CD-INSPECTION-MEASUREMENT-JUDGMENT` | `ACCEPTED` `REJECTED` | `INSPECTION_MEASUREMENT_JUDGMENT` | `judgmentCode` | `registry` | 2 | 검사 **항목** 판정 — 규격에 드는지 아닌지 둘뿐. `#179` · ⭐ 종합과 **값이 겹치는데 그룹이 다르다** |
+| `CD-EQUIPMENT-TYPE` | `INJECTION_MOLDING` `PRESS` `WATER_HEATER` | `EQUIPMENT_TYPE` | `equipmentTypeCode` | `registry` | 4 | 설비 계열. `#186` · 통지 `client#415` |
+| `CD-INSTRUMENT-TYPE` | `CALIPER` `MICROMETER` `GAUGE` | `INSTRUMENT_TYPE` | `equipmentTypeCode` | `registry` | 4 | 계측기 계열. **같은 컬럼에 두 계열**(`G-32` · `#219`) · 통지 `client#404` |
+| `CD-CYCLE-TYPE` | `DAY` `WEEK` `MONTH` `YEAR` | `CYCLE_TYPE` | `pmCycleUnitCode` `calibrationCycleTypeCode` | `registry` | 6 | 기간 단위. ⭐ **반례** — 아래 참조. ⛔ **값을 사전에 적자 결손이 드러났다**(2026-09-02) — `pmCycleUnitCode` 산문이 「일 또는 월」 **2값**으로 낡아 있었다. `#188` 이 4값으로 합쳐 확정했는데 형제 자리만 따라갔다 |
+| `CD-EQUIPMENT-BREAKDOWN-STATUS` | `RECEIVED` `HANDLING` `DONE` | `EQUIPMENT_BREAKDOWN_STATUS` | `statusCode` | `registry-system` | 2 | 고장 접수. **값이 계약 산문에 이미 있었다**(2026-09-02 꺼냄) · `W-05-04` |
+| `CD-MAINTENANCE-ORDER-STATUS` | `ISSUED` `DONE` `CANCELLED` | `MAINTENANCE_ORDER_STATUS` | `statusCode` | `registry-system` | 2 | 보전 지시. 같음 · `W-05-05` |
+| `CD-MAINTENANCE-ORDER-ITEM-STATUS` | `PLANNED` `DONE` `NA` | `MAINTENANCE_ORDER_ITEM_STATUS` | `statusCode` | `registry-system` | 1 | 보전 지시 **항목**. ⚠ 지시 전체와 **다른 축**이다 |
 
 ### ⭐ 이 표가 증명하려는 것 셋
 
