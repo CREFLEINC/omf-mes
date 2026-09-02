@@ -14220,7 +14220,7 @@
       "x-source-column": "status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "미지정 시 서버가 물리 모델 DEFAULT('ACTIVE')로 채운다. 공통코드 값 목록 미정 — §8-4",
+      "description": "사용자의 «인사» 상태. 미지정 시 서버가 물리 모델 DEFAULT('ACTIVE')로 채운다. ⛔ 계정을 쓸 수 있는가는 이 값이 아니라 isActive 가 정한다(사용자 결정 2026-09-01 · W-CO-02 §8-4 해소). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=APP_USER_STATUS 로 받는다(공유계약 G-31 마스터안전형 · G-32 · 2026-09-01 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "ACTIVE"
      }
     }
@@ -14262,6 +14262,7 @@
       "x-source-column": "status_code",
       "type": "string",
       "maxLength": 50,
+      "description": "사용자의 «인사» 상태. ⛔ 계정을 쓸 수 있는가는 이 값이 아니라 isActive 가 정한다 — isActive 는 이 본문으로 못 바꾼다(:deactivate / :activate 액션 전용). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=APP_USER_STATUS 로 받는다(공유계약 G-31 마스터안전형 · G-32 · 2026-09-01 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "ACTIVE"
      }
     }
