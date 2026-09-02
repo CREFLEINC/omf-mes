@@ -4159,7 +4159,7 @@
      "statusCode": {
       "x-source-column": "status_code",
       "type": "string",
-      "description": "값 목록은 공통코드 소관이다",
+      "description": "결재 요청의 진행 상태 — 대기(PENDING) · 승인(APPROVED) · 반려(REJECTED). ⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 값을 편집하면 안 된다. 내 차례 판정과 버튼 활성이 이 값에 걸린다(W-CO-09 §5). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=APPROVAL_REQUEST_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. 근거: W-CO-09 §3 목업(사용자 결정 2026-09-02).",
       "example": "IN_PROGRESS"
      },
      "reason": {
