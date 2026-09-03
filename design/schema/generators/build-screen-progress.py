@@ -64,6 +64,11 @@ SCREENS_ROOT = os.path.join(ROOT, "design", "wiki", "screens")
 
 sys.path.insert(0, HERE)
 _INV = importlib.import_module("verify-screen-inventory")
+# ⭐ 「폐지 확정 스펙인가」 판정은 **한 곳에만 둔다** — `collect-open-items.retired()`.
+#    같은 판정을 두 곳에 적으면 그 순간 갈린다. 실제로 갈려 있었다(2026-09-03):
+#    이 진도표는 정본 인벤토리로 117 을 세고, 미결·인계 대장은 스펙 «파일»로 118 을
+#    세어 **인도물 두 장이 다른 수를 말했다.** 지금은 둘 다 같은 함수를 쓴다.
+_OPEN = importlib.import_module("collect-open-items")
 
 SCREEN = re.compile(r"([WMP]-(?:CO|\d{2})-\d{2})")
 PROGRAM = {"W": "관리웹", "P": "POP", "M": "모바일"}
@@ -96,15 +101,26 @@ def screens_with_names() -> list[tuple[str, str]]:
     return out
 
 
-def spec_paths() -> dict[str, list[str]]:
-    """화면 ID → 상세 스펙 파일 경로(저장소 상대). 여럿이면 여럿 그대로."""
+def spec_paths() -> tuple[dict[str, list[str]], list[tuple[str, str]]]:
+    """화면 ID → 상세 스펙 파일 경로(저장소 상대). 여럿이면 여럿 그대로.
+
+    ⛔ **폐지 확정 스펙은 «스펙이 있다»로 세지 않는다** — 파일은 남아 있어도 서 있는
+       화면이 아니다. 판정은 `collect-open-items.retired()` 하나를 쓴다.
+       조용히 지우지 않고 «뺀 것»을 같이 돌려준다(생성물 문면에 적는다).
+    """
     out: dict[str, list[str]] = {}
+    gone: list[tuple[str, str]] = []
     for path in sorted(glob.glob(os.path.join(SCREENS_ROOT, "*", "[WMP]-*.md"))):
         base = os.path.basename(path)
         m = SCREEN.match(base)
-        if m:
-            out.setdefault(m.group(1), []).append(os.path.relpath(path, ROOT))
-    return out
+        if not m:
+            continue
+        rel = os.path.relpath(path, ROOT)
+        if _OPEN.retired(read(path)):
+            gone.append((m.group(1), rel))
+            continue
+        out.setdefault(m.group(1), []).append(rel)
+    return out, gone
 
 
 def doc_coverage() -> tuple[dict[str, str], dict[str, str]]:
@@ -124,7 +140,7 @@ def doc_coverage() -> tuple[dict[str, str], dict[str, str]]:
     return docs, contracts
 
 
-def render(rows, gaps) -> str:
+def render(rows, gaps, gone) -> str:
     counted = Counter(sid[0] for sid, *_ in rows)
     lines = [
         "# 화면 진도표 — 화면 하나를 스펙·요구서·계약으로 잇는다",
@@ -132,7 +148,8 @@ def render(rows, gaps) -> str:
         "> ⛔ **생성물이다. 손으로 고치지 마라.** `python3 design/schema/generators/build-screen-progress.py` 가 다시 만든다.",
         ">",
         "> 이 표가 답하는 질문 = **「이 화면의 상세 스펙은 어느 파일인가」** 와 **「어디가 비어 있나」**.",
-        "> 통합 정보구조 문서는 화면 번호만 적고 **파일 경로를 안 적어**, 스펙 118장이 흩어진 폴더 스무 곳을 뒤져야 했다.",
+        "> 통합 정보구조 문서는 화면 번호만 적고 **파일 경로를 안 적어**, 스펙 %d장이 흩어진 폴더 스무 곳을 뒤져야 했다."
+        % (len(rows) + len(gone)),
         ">",
         "> ⚠ **2026-09-03 개정 — 착수 통지 폐지로 「통지」 열을 걷었다.** 남은 세 열은 **설계팀 자신의 진행**이다.",
         "> 개발팀이 그 화면을 어디까지 만들었는지는 **우리가 갖는 정보가 아니다** — 개발팀이 이 자료를 직접 열람한다.",
@@ -146,10 +163,27 @@ def render(rows, gaps) -> str:
         "| --- | :-: |",
         "| 화면 | **%d** (%s) " % (
             len(rows), " · ".join("%s %d" % (PROGRAM[k], counted[k]) for k in "WPM")) + "|",
+        "| └ 폐지 확정으로 세지 않은 스펙 파일 | %d%s |" % (
+            len(gone),
+            (" — " + " · ".join("`%s`" % s for s, _ in gone)) if gone else ""),
         "| 상세 스펙이 있는 화면 | **%d** |" % (len(rows) - len(gaps["스펙"])),
         "| 요구서 §3 이 다룬 화면 | **%d** |" % (len(rows) - len(gaps["요구서"])),
         "",
     ]
+
+    if gone:
+        lines += [
+            "⛔ **폐지 확정 스펙은 「스펙이 있다」로 세지 않는다** — 파일은 남아 있어도 **서 있는 화면이 아니다.**",
+            "폐지가 확정돼도 문서를 지우지 않는 것은 **폐지 판단의 근거가 그 안에 있기** 때문이다.",
+            "그래서 스펙 파일은 **%d벌**이고 화면은 **%d**이다. 판정은 `collect-open-items.retired()` 하나를 쓰므로"
+            % (len(rows) + len(gone), len(rows)),
+            "**미결 대장·인계 대장도 같은 수를 말한다**(전에는 이 표가 %d, 두 대장이 %d 로 갈려 있었다)."
+            % (len(rows), len(rows) + len(gone)),
+            "",
+            "| 세지 않은 스펙 | 파일 |", "| --- | --- |",
+        ]
+        lines += ["| `%s` | `%s` |" % (sid, rel) for sid, rel in gone]
+        lines += [""]
 
     for label, ids in (("스펙", gaps["스펙"]), ("요구서", gaps["요구서"])):
         head = {"스펙": "⛔ 상세 스펙이 없는 화면",
@@ -178,7 +212,7 @@ def main() -> int:
     argparse.ArgumentParser(add_help=True).parse_args()
 
     names = screens_with_names()
-    specs = spec_paths()
+    specs, gone = spec_paths()
     docs, contracts = doc_coverage()
 
     rows = []
@@ -192,10 +226,10 @@ def main() -> int:
         if not d:
             gaps["요구서"].append(sid)
 
-    io.open(OUT, "w", encoding="utf-8").write(render(rows, gaps))
+    io.open(OUT, "w", encoding="utf-8").write(render(rows, gaps, gone))
     print("생성: %s" % os.path.relpath(OUT, ROOT))
-    print("화면 %d · 스펙 없음 %d · 요구서 없음 %d" % (
-        len(rows), len(gaps["스펙"]), len(gaps["요구서"])))
+    print("화면 %d (폐지 스펙 제외 %d) · 스펙 없음 %d · 요구서 없음 %d" % (
+        len(rows), len(gone), len(gaps["스펙"]), len(gaps["요구서"])))
     return 0
 
 

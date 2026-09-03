@@ -49,7 +49,7 @@
 | ㉦ | 그 자리의 `example` 이 **사전 값집합 밖**이다 | ⛔ 막는다 |
 | ㉧ | 산문이 「값 목록이 아직 없다」인데 **사전은 값을 갖는다** | ⛔ 막는다 |
 | ㉨ | `*Code(s)` 자리에 **판정이 «전혀» 없다**(키도 `x-no-code-key` 도) | ⛔ 막는다 |
-| ⑦ | 사전 머리말이 **자기 계수를 틀리게** 적었다 | ⛔ 막는다 |
+| ⑦ | 사전 머리말이 **자기 계수를 틀리게** 적었다 — 키·자리·등록부 그룹 + ⬜ 계수 둘 | ⛔ 막는다 |
 
 ⭐ **㉦㉧㉨⑦ 은 2026-09-03 신설.** ㉡ 는 `enum` 만 봤는데 값을 «나르는» 자리는 셋이다 —
 `enum` · `example` · 산문. 뒤 둘은 아무도 안 보고 있었다(실측 83자리가 낡아 있었다).
@@ -160,6 +160,10 @@ def read_dictionary(path: str) -> list[dict]:
                 "owner": cs[4].strip("`"),
                 "places": int(cs[5]) if cs[5].isdigit() else None,
                 "basis": cs[6],
+                # ⭐ 값 열에 ⬜ 가 있는가 — 「값이 아직 없다」의 «표지»다(2026-09-03).
+                #    values 가 비면 «전량» ⬜ 이고, values 가 있는데 ⬜ 가 붙어 있으면
+                #    «부분» ⬜(초기 시드 + 고객이 늘린다)다. ⑦ 이 이 둘을 센다.
+                "blank": "⬜" in cs[1],
             })
     return rows
 
@@ -511,6 +515,9 @@ def prose_example_gaps(doc: dict, values_by_key: dict) -> tuple[list, list]:
 SELF_COUNT = [
     (re.compile(r"\*\*[^*\n]*?(\d+)키 / (\d+)자리"), ("키", "자리")),
     (re.compile(r"등록부 \*\*(\d+)그룹 전부\*\*"), ("그룹",)),
+    # ⭐ ⬜ 계수도 본다(2026-09-03) — 이유는 self_count_gaps 독스트링의 「다섯째 사례」.
+    (re.compile(r"«전량» ⬜ 인 키는 \*\*(\d+)\*\*"), ("값 전량 ⬜",)),
+    (re.compile(r"«부분» ⬜ 인 키는 \*\*(\d+)\*\*"), ("값 부분 ⬜",)),
 ]
 
 
@@ -521,6 +528,10 @@ def self_count_gaps(text: str, facts: dict) -> list[str]:
        네 번 겪었다: `B-6`(부여·회수 9테이블) · `A-10`(16쌍) · `#198`(28그룹) ·
        그리고 이 사전 자신(2026-09-03 — 머리말이 「103키 / 257자리 · 등록부 62그룹」에
        고착돼 실물 174 / 491 / 103 과 갈려 있었다. 「62그룹이 전부다」로 읽혔다).
+
+    ⭐ **다섯째 사례가 ⬜ 계수다**(2026-09-03) — 머리말이 「⬜ 14키 · 그중 하나는
+       «진짜 결손»」이라 적었는데 그 하나(`CD-APP-USER-STATUS`)는 **같은 날 값이
+       채워졌다.** 세는 대상을 늘리지 않으면 같은 뿌리가 다시 자란다.
     """
     gaps: list[str] = []
     for pattern, names in SELF_COUNT:
@@ -791,6 +802,13 @@ def main() -> int:
         "키": len(entries),
         "자리": sum(e["places"] or 0 for e in entries),
         "그룹": len(registry),
+        # ⭐ **⬜ 계수를 더한 이유**(2026-09-03) — 머리말이 「⬜ 14키 · 그중 하나는
+        #    «진짜 결손»(`CD-APP-USER-STATUS`)」이라 적어 두었는데, 그 하나는
+        #    **같은 날 값이 채워졌다**(`#405` 가 문면을 쓰고 `#408` 이 값을 넣었다).
+        #    ⑦ 은 키·자리·그룹만 봐서 **문면이 실물과 갈린 것을 못 잡았다** —
+        #    사전이 자기 자신에 대해 「아직 결손이 하나 있다」고 거짓을 말했다.
+        "값 전량 ⬜": sum(1 for e in entries if not e["values"]),
+        "값 부분 ⬜": sum(1 for e in entries if e["blank"] and e["values"]),
     }
     with open(DICT, encoding="utf-8") as fh:
         head = fh.read()
@@ -846,8 +864,10 @@ def main() -> int:
             print("   %s" % s)
         print("   ⭐ 문면을 실물에 맞춘다 — 실측 결과를 손으로 박아 두면 다시 낡는다.")
     else:
-        print("⑦ ✅ 사전 머리말 계수가 실물과 같다 — %d키 / %d자리 / 등록부 %d그룹"
-              % (facts["키"], facts["자리"], facts["그룹"]))
+        print("⑦ ✅ 사전 머리말 계수가 실물과 같다 — %d키 / %d자리 / 등록부 %d그룹 · "
+              "⬜ 전량 %d · 부분 %d"
+              % (facts["키"], facts["자리"], facts["그룹"],
+                 facts["값 전량 ⬜"], facts["값 부분 ⬜"]))
     print()
 
     if gate:

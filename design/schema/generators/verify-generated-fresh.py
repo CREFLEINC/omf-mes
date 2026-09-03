@@ -150,7 +150,10 @@ def target_of(domain: str) -> str:
 
 
 def regenerate(domain: str) -> None:
-    cmd = [sys.executable, GENERATOR]
+    # ⛔ --write 는 반드시 준다 — 2026-09-03 부터 verify-ui-coverage.py 의 기본은
+    #    «검사»이고 인자 없이는 아무것도 쓰지 않는다. 빼면 이 검사가 «원본을 그대로
+    #    두고 비교»해 언제나 초록이 된다(거짓 초록).
+    cmd = [sys.executable, GENERATOR, "--write"]
     if domain != "mdm":  # mdm 은 생성기의 기본값이라 --domain 을 주지 않는다
         cmd += ["--domain", domain]
     try:

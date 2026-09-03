@@ -70,6 +70,16 @@ UIUX = os.path.join(ROOT, 'design', 'wiki', 'screens')
 #            문맥어(「회신 E-3」·「E-3 판정유형」)로 가르는 것이 근본 해결이나,
 #            지금은 **오탐 0** 을 우선해 통째로 제외한다.
 #   H-N   물리 모델 변경 번호([H-4] 등). §H 는 조항 절이 아니다
+# 기준선 — 2026-09-03 실측. ⛔ 늘리지 않는다. 줄었으면 이 수를 낮춘다.
+#
+# ⭐ 왜 게이트가 아니라 래칫인가 — 이 두 축은 «확인 권고»라 한 회차에 닫히는 수가
+#    아니다(글로스는 사람이 원문을 열어야 판정되고, 표기 충돌은 두 `G-N` 체계를
+#    갈라 적는 일이 화면마다 남아 있다). 게이트로 걸면 초록을 기준선으로 못 쓴다.
+#    그래서 **늘면 ⛔, 줄면 「기준선을 낮추라」**로 둔다 — 새로 쓰는 인용이 같은
+#    구멍을 반복하는 것만 막는다.
+BASELINE_WEAK = 15      # 글로스가 조항 제목과 한 낱말도 겹치지 않는 인용
+BASELINE_COLLIDE = 22   # 공유계약 `G-N` 과 ds-gap `G-N` 을 섞어 쓴 자리
+
 PREFIX_NOT_CLAUSE = ('I-',)
 AMBIGUOUS = {'E-%d' % i for i in range(3, 30)} | {'H-%d' % i for i in range(1, 10)}
 NOT_CLAUSE = re.compile(r'회신\s*$|고객\s*$|\[\s*$')
@@ -235,7 +245,21 @@ def check(target, strict, show_unused):
         return 1
     print('⚠ 확인 권고 — 글로스 불일치 %d건 · 표기 충돌 %d건'
           % (len(weak), len(collide)))
-    return 1 if strict else 0
+
+    grew = False
+    for label, got, base, name in (('글로스 불일치', len(weak), BASELINE_WEAK, 'BASELINE_WEAK'),
+                                   ('표기 충돌', len(collide), BASELINE_COLLIDE, 'BASELINE_COLLIDE')):
+        if got > base:
+            print('⛔ %s 기준선 %d 보다 %d 늘었다 — 새로 쓴 인용이 같은 구멍을 반복했다.'
+                  % (label, base, got - base))
+            grew = True
+        elif got < base:
+            print('⭐ %s 기준선 %d → %d 로 줄었다. 이 파일의 `%s` 를 %d 로 낮추세요.'
+                  % (label, base, got, name, got))
+        else:
+            print('✅ %s 기준선 %d 유지 — 늘지 않았다.' % (label, base))
+
+    return 1 if (grew or strict) else 0
 
 
 if __name__ == '__main__':

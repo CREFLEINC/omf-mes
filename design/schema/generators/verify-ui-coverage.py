@@ -8,6 +8,17 @@
 # 물리 모델과 OpenAPI 를 대조하지 않는다 — 그것은 데이터모델 담당 소관이다.
 # 표준 라이브러리만 쓴다(저장소 관행).
 #
+# ⛔ 기본은 «검사»다 — 인자 없이 돌리면 아무것도 쓰지 않는다(2026-09-03 개정).
+#     python3 verify-ui-coverage.py                    # 검사 — 커밋된 생성물과 대조 · 갈렸으면 종료 1
+#     python3 verify-ui-coverage.py --domain 04        # 검사 (한 도메인)
+#     python3 verify-ui-coverage.py --write            # ⭐ 생성 — 이때만 쓴다
+#     python3 verify-ui-coverage.py --write --domain 04
+#   왜 뒤집었나 — 이름은 `verify-` 인데 main() 이 조건 없이 덮어썼고, 하네스는
+#   「계약·화면을 고친 뒤 verify-*.py 를 전부 돌린다」고 지시한다. 그대로 따르면
+#   «검사한 줄 알았는데 생성물이 조용히 다시 쓰였다». 파일 이름을 바꾸는 쪽은
+#   `design/wiki/screens/**` 와 `design/raw/**`(둘 다 고칠 수 없다)에 죽은 인용을
+#   남기므로, 이름을 살리고 «행동»을 이름에 맞췄다.
+#
 # 도메인이 일곱이다 — `--domain 01`(자재창고 24장) · `--domain 02`(생산실행 20장) ·
 #   `--domain 03`(품질 7장 — ⭐ 도메인 배지 5 + 01·02 이월 2) ·
 #   `--domain 04`(제품출하 16장 — ⭐ 도메인 배지 18 − 출력물 계약 2) ·
@@ -295,7 +306,7 @@ def render(rows, domain="mdm", no_table=()):
     lines = [
         "# UI 요구 목록 — 화면이 API 에 요구하는 것",
         "",
-        "> 생성물이다. `python3 verify-ui-coverage.py%s` 로 다시 만든다." % arg,
+        "> 생성물이다. `python3 verify-ui-coverage.py --write%s` 로 다시 만든다." % arg,
         "> 이 목록의 모든 행이 `%s` §3 매핑표에서 다뤄져야 한다." % doc,
         "> 엔드포인트가 없는 액션은 「없음 + 이유」로 명시한다 — 빈칸은 누락이다.",
         "",
@@ -319,31 +330,67 @@ def render(rows, domain="mdm", no_table=()):
     return "\n".join(lines)
 
 
+def target_and_body(domain="mdm", here=None):
+    """(생성물 경로, 다시 만든 본문, 행, 액션 표 없는 화면) — ⛔ 쓰지 않는다.
+
+    검사 모드와 쓰기 모드가 «같은» 본문을 보게 하려고 한 자리에 모았다. 시험이
+    부작용 없이 검사 모드를 부를 수 있는 자리이기도 하다.
+    """
+    here = here or os.path.dirname(os.path.abspath(__file__))
+    screens_root = os.path.join(here, "..", "..", "wiki", "screens")
+    screens, filename, _ = DOMAINS[domain]
+    rows = extract_all(screens_root, screens)
+    no_table = screens_without_action_table(screens_root, screens)
+    return (os.path.join(here, "openapi", filename),
+            render(rows, domain, no_table), rows, no_table)
+
+
 def main():
+    # ⛔ 기본은 «검사»다 — 인자 없이 돌리면 아무것도 쓰지 않는다.
+    #    2026-09-03 개정. 이 스크립트는 이름이 `verify-` 인데 main() 이 «조건 없이»
+    #    openapi/ui-요구목록*.md 를 덮어썼다. 그런데 하네스(uiux-design SKILL §5)는
+    #    「계약·화면을 고친 뒤 verify-*.py 를 전부 돌린다」고 지시한다 — 그대로 따르면
+    #    검사기를 돌린 줄 알았는데 «생성물이 조용히 다시 쓰였다».
+    #    ⇒ 쓰기는 --write 를 명시할 때만. 검사 모드는 저장소를 건드리지 않는다.
     domain = "mdm"
     if "--domain" in sys.argv:
         domain = sys.argv[sys.argv.index("--domain") + 1]
     if domain not in DOMAINS:
         print("모르는 도메인: %s (%s 중 하나)" % (domain, " · ".join(DOMAINS)))
         return 1
+    write = "--write" in sys.argv
 
-    here = os.path.dirname(os.path.abspath(__file__))
-    screens_root = os.path.join(here, "..", "..", "wiki", "screens")
-    screens, filename, _ = DOMAINS[domain]
-    rows = extract_all(screens_root, screens)
-    no_table = screens_without_action_table(screens_root, screens)
-
-    dst = os.path.join(here, "openapi", filename)
-    d = os.path.dirname(dst)
-    if not os.path.isdir(d):
-        os.makedirs(d)
-    with io.open(dst, "w", encoding="utf-8") as f:
-        f.write(render(rows, domain, no_table))
-    print("생성: %s" % dst)
+    dst, body, rows, no_table = target_and_body(domain)
+    rc = 0
+    if write:
+        d = os.path.dirname(dst)
+        if not os.path.isdir(d):
+            os.makedirs(d)
+        with io.open(dst, "w", encoding="utf-8") as f:
+            f.write(body)
+        print("생성: %s" % dst)
+    else:
+        # 검사 — 다시 만든 것과 커밋된 것이 같은가. ⛔ 쓰지 않는다.
+        if not os.path.exists(dst):
+            print("⛔ 생성물이 없다 — %s" % dst)
+            print("   → python3 verify-ui-coverage.py --write%s"
+                  % ("" if domain == "mdm" else " --domain %s" % domain))
+            rc = 1
+        else:
+            with io.open(dst, encoding="utf-8") as f:
+                cur = f.read()
+            if cur == body:
+                print("✅ 검사(쓰지 않음): %s — 스펙과 같습니다" % dst)
+            else:
+                print("⛔ 낡았다 — %s" % dst)
+                print("   화면 스펙 §5 액션 표가 바뀌었는데 다시 만들지 않았다.")
+                print("   → python3 verify-ui-coverage.py --write%s"
+                      % ("" if domain == "mdm" else " --domain %s" % domain))
+                rc = 1
     print("화면 %d · 액션 %d" % (len({r["screen"] for r in rows}), len(rows)))
     if no_table:
         print("⚠ 액션 표 없는 화면 %d: %s" % (len(no_table), " ".join(no_table)))
-    return 0
+    return rc
 
 
 if __name__ == "__main__":

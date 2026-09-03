@@ -64,6 +64,19 @@ STANDARD_SHAPES = (
     frozenset({"items"}),
     frozenset({"items", "page", "summary"}),
 )
+# 기준선 — 2026-09-03 실측. ⛔ 늘리지 않는다. 줄었으면 그 수를 낮춘다.
+#
+# ⭐ 왜 게이트가 아니라 래칫인가 — ⑥ 무계 목록 47건처럼 한 회차에 닫히는 수가
+#    아닌 축이 섞여 있다(닫으려면 화면마다 「무엇으로 범위를 좁히나」를 정해야
+#    한다). 게이트로 걸면 초록을 기준선으로 못 쓴다. 그래서 **늘면 ⛔, 줄면
+#    「기준선을 낮추라」**로 둔다 — 새로 만드는 목록이 같은 구멍을 반복하는
+#    것만 막는다. 축을 «따로» 세는 이유는, 합계 하나로 두면 한 축이 줄고 다른
+#    축이 느는 것이 상쇄되어 안 보이기 때문이다.
+BASELINE_OFF_SHAPE = 13   # (1) 표준형 밖의 목록 응답
+BASELINE_NO_ASOF = 11     # (4) 집계인데 `asOf` 가 required 가 아니다
+BASELINE_SORT_FREE = 5    # (5) `sort` 에 enum 이 없다
+BASELINE_UNBOUNDED = 47   # (6) 무계 목록 후보
+
 SUMMARY_WORDS = ("summary", "distribution", "trend")
 PAGING_AXES = frozenset({"page", "size", "sort"})
 BANNED_ASOF = ("calculatedAt", "snapshotAt", "generatedAt")
@@ -367,10 +380,29 @@ def main() -> int:
             print("   %-26s %-6s %-46s %s" % (f, m, p[:46], pname))
         print("\n   ⭐ 「그날까지」는 «익일 00:00:00» 을 보낸다.\n")
 
+    grew = False
+    for label, got, base, name in (
+            ("① 표준형 밖", len(off_shape), BASELINE_OFF_SHAPE, "BASELINE_OFF_SHAPE"),
+            ("④ `asOf` 미필수", len(no_asof), BASELINE_NO_ASOF, "BASELINE_NO_ASOF"),
+            ("⑤ `sort` enum 없음", len(sort_free), BASELINE_SORT_FREE, "BASELINE_SORT_FREE"),
+            ("⑥ 무계 목록", len(unbounded), BASELINE_UNBOUNDED, "BASELINE_UNBOUNDED")):
+        if got > base:
+            print("⛔ %s 기준선 %d 보다 %d 늘었다 — 새로 만든 목록이 같은 구멍을 반복했다."
+                  % (label, base, got - base))
+            grew = True
+        elif got < base:
+            print("⭐ %s 기준선 %d → %d 로 줄었다. 이 파일의 `%s` 을 %d 로 낮추세요."
+                  % (label, base, got, name, got))
+        else:
+            print("✅ %s 기준선 %d 유지 — 늘지 않았다." % (label, base))
+    print()
+
     hard = len(query_gap) + len(banned) + len(boundary)
     if hard:
         print("⛔ 막는 항목 %d건 (③ %d · ④금지이름 %d · ⑥경계 %d)"
               % (hard, len(query_gap), len(banned), len(boundary)))
+        return 1
+    if grew:
         return 1
     print("✅ 막는 항목 0건 — 목록형 %d자리 검사" % list_total)
     return 0

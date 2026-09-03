@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # verify-ui-coverage.py 의 단위 테스트. 표준 라이브러리만 쓴다.
-import io, os, sys, unittest, importlib
+import io, os, subprocess, sys, unittest, importlib
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -254,6 +254,42 @@ class Domain04Test(unittest.TestCase):
 
     def test_액션_표가_전부_있다(self):
         self.assertEqual(cov.screens_without_action_table(SCREENS_ROOT, cov.SCREENS_04), [])
+
+
+# ── 쓰기 잠금 (2026-09-03) ──────────────────────────────────────────
+# ⛔ 이 스크립트는 이름이 `verify-` 인데 main() 이 «조건 없이» 생성물을 덮어썼다.
+#    하네스(uiux-design SKILL §5)는 「계약·화면을 고친 뒤 verify-*.py 를 전부
+#    돌린다」고 지시하므로, 그대로 따르면 검사한 줄 알았는데 생성물이 조용히
+#    다시 쓰였다. 아래 셋이 그 자리를 잠근다.
+class WriteLockTest(unittest.TestCase):
+    @staticmethod
+    def _bytes(path):
+        with open(path, "rb") as f:
+            return f.read()
+
+    def test_인자_없이_돌리면_아무것도_쓰지_않는다(self):
+        targets = [os.path.join(HERE, "openapi", fn)
+                   for (_s, fn, _d) in cov.DOMAINS.values()]
+        before = {p: self._bytes(p) for p in targets if os.path.exists(p)}
+        self.assertTrue(before, "생성물이 하나도 없다 — 시험 전제가 깨졌다")
+        subprocess.run([sys.executable, os.path.join(HERE, "verify-ui-coverage.py")],
+                       cwd=HERE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        for p, body in before.items():
+            self.assertEqual(self._bytes(p), body,
+                             "인자 없이 돌렸는데 %s 가 바뀌었다" % os.path.basename(p))
+
+    def test_머리말이_write_를_안내한다(self):
+        # 생성물을 읽은 사람이 «다시 만드는 법»을 찾는 유일한 자리다.
+        for d in cov.DOMAINS:
+            _dst, body, _rows, _nt = cov.target_and_body(d, HERE)
+            self.assertIn("verify-ui-coverage.py --write", body.split("\n")[2], d)
+
+    def test_생성물_최신성_검사기가_write_를_준다(self):
+        # ⛔ verify-generated-fresh.py 가 --write 를 빼면 «원본을 그대로 두고
+        #    비교»해 언제나 초록이 된다 — 이 저장소가 겪은 거짓 초록과 같은 형태다.
+        with io.open(os.path.join(HERE, "verify-generated-fresh.py"), encoding="utf-8") as f:
+            src = f.read()
+        self.assertIn('GENERATOR, "--write"', src)
 
 
 if __name__ == "__main__":
