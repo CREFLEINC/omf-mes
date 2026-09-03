@@ -4172,6 +4172,17 @@
       "description": "「수입검사 합격」 같은 문장",
       "example": "비고 문자열"
      },
+     "releaseReasonCode": {
+      "x-source-column": "release_reason_code",
+      "type": [
+       "string",
+       "null"
+      ],
+      "maxLength": 50,
+      "example": "RETEST_PASS",
+      "description": "보류를 «왜» 풀었는가. ⭐ eventTypeCode=RELEASED 인 사건에만 있다 — 등록(HELD) 사건에는 null 이다(등록 사유는 reasonCode 가 담는다). 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_RELEASE_REASON 로 받는다(공유계약 G-32). ⭐ 고객이 늘린다 — 값은 초기 시드다(공유계약 G-31). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-code-key": "CD-LOT-HOLD-RELEASE-REASON"
+     },
      "targetLotStatusCode": {
       "type": [
        "string",
@@ -4190,7 +4201,7 @@
      "lotNo",
      "actorId"
     ],
-    "x-internal-note": "⛔ 이것은 «전체 전이 이력이 아니다» — 보류 등록·해제만이다. ⛔ 되살리기 잔여 — 전이 9건 중 5건이 남지 않아(W-03-01 §5-1 실측) 경로 이름이 lot-status-events 가 아니라 lot-hold-events 이고, 화면은 「보류 이력만 보입니다」를 문구로 밝힌다. 이 축소의 근거였던 «변경이력 테이블이 물리 모델에 없다»는 A-11 v4.6 이 철회했다 — omf-mes#299(LOT 생명주기 전이 이력)가 계약 쪽 자리를 세우기 시작했다. ⭐ 새 테이블을 요구하지 않는다 — trace.lot_hold 한 행이 held_by/held_at 와 released_by/released_at 를 둘 다 가지므로 서버가 한 행을 최대 두 사건으로 편다(공유계약 L-2 파생은 서버 계산). 이슈 #176."
+    "x-internal-note": "⛔ 이것은 «전체 전이 이력이 아니다» — 보류 등록·해제만이다. ⛔ 되살리기 잔여 — 전이 9건 중 5건이 남지 않아(W-03-01 §5-1 실측) 경로 이름이 lot-status-events 가 아니라 lot-hold-events 이고, 화면은 「보류 이력만 보입니다」를 문구로 밝힌다. 이 축소의 근거였던 «변경이력 테이블이 물리 모델에 없다»는 A-11 v4.6 이 철회했다 — omf-mes#299(LOT 생명주기 전이 이력)가 계약 쪽 자리를 세우기 시작했다. ⭐ 새 테이블을 요구하지 않는다 — trace.lot_hold 한 행이 held_by/held_at 와 released_by/released_at 를 둘 다 가지므로 서버가 한 행을 최대 두 사건으로 편다(공유계약 L-2 파생은 서버 계산). 이슈 #176. 신설 2026-09-03 — `W-03-01` §3 이력 표의 「사유」 열이 **해제 행에서 «비어 있었다»**(목업 원문 `08-02 11:30 …0007 보류 → (해제) 박품질 —`). 같은 화면 §5-1 도 「C7 보류 → Release 재판정 합격 — ⚠ **해제 시각만** — 「합격이라서」가 안 남는다」로 그 결손을 적어 두었다. `W-03-02` §5-4 가 `releaseReasonCode` 를 되살린 이유가 「집계가 가능해졌다 — 「재판정으로 풀린 건이 몇 건인가」를 이 값으로 센다」인데, **세는 화면이 바로 이 이력 조회다** — 응답에 없으면 되살린 칸을 아무도 읽지 않는다. ⚠ 단건 조회(`LotHold`)에는 이미 있었고 사건 목록에만 빠져 있었다."
    },
    "LotHoldRelease": {
     "type": "object",
