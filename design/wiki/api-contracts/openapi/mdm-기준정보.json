@@ -3486,12 +3486,41 @@
      }
     }
    ],
+   "get": {
+    "tags": [
+     "mdm"
+    ],
+    "summary": "판정유형 통제 속성 상세",
+    "description": "편집 진입용. ⭐ 이 GET 의 ETag 가 뒤이을 PUT 의 If-Match 출처다 — 통제 속성은 «자기 판 번호»(versionNo)를 가지므로 자기 경로의 토큰을 쓴다(공유계약 B-1-1 ①ⓐ). ⛔ 부모인 코드값(GET /mdm/code-values/{codeValueId})의 토큰을 쓰지 않는다 — 판정유형 «이름»을 고쳤다고 통제 저장이 튕기면 안 되고, 잠그는 대상과 버전 축을 일치시킨다(B-1-1). 근거: W-06-04 §4-B·§5-1",
+    "responses": {
+     "200": {
+      "description": "상세",
+      "headers": {
+       "ETag": {
+        "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로는 내리지 않는다 — 표시하지 않되 전달한다",
+        "schema": {
+         "type": "string"
+        },
+        "x-internal-note": "본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다"
+       }
+      },
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/JudgmentTypeControl"
+        }
+       }
+      }
+     }
+    },
+    "x-internal-note": "신설 2026-09-03 — PUT 이 If-Match 를 «필수»로 요구하는데 토큰을 실을 GET 이 없었다(목록 GET 은 ETag 를 내지 않고, 낸다 해도 «어느 행의» 판인지 뜻이 서지 않는다). 같은 형태를 이미 푼 선례가 있다 — GET /planning/boms/{bomId}/components/{bomComponentId}(2026-08-03 사용자 결정 · 요구서 §3-6 「행 단위 GET 을 신설했다」)."
+   },
    "put": {
     "tags": [
      "mdm"
     ],
     "summary": "판정유형 통제 속성 편집",
-    "description": "전사 고정 축 — 편집하면 상태 전이도·물류 통제 규칙이 함께 바뀐다(W-06-04 §5-1). 근거: W-06-04 §4-B",
+    "description": "전사 고정 축 — 편집하면 상태 전이도·물류 통제 규칙이 함께 바뀐다(W-06-04 §5-1). ⭐ If-Match 에 담을 토큰은 이 경로의 상세 조회(GET /mdm/judgment-type-controls/{codeValueId}) 200 의 ETag 다 — 통제 속성이 자기 판 번호를 가지므로 자기 축을 쓴다(공유계약 B-1-1 ①ⓐ). 근거: W-06-04 §4-B",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -4033,6 +4062,15 @@
     "responses": {
      "200": {
       "description": "상세",
+      "headers": {
+       "ETag": {
+        "description": "낙관적 잠금 토큰 — 이 행의 version_no. 다음 쓰기의 If-Match 에 그대로 담는다. 본문 필드로는 내리지 않는다 — 표시하지 않되 전달한다",
+        "schema": {
+         "type": "string"
+        },
+        "x-internal-note": "본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다"
+       }
+      },
       "content": {
        "application/json": {
         "schema": {
@@ -4041,7 +4079,8 @@
        }
       }
      }
-    }
+    },
+    "x-internal-note": "⭐ ETag 신설 2026-09-03 — :update-name-translation 이 If-Match 를 요구하는데 토큰 원천이 선언돼 있지 않았다(공유계약 B-1-1 ②)."
    }
   },
   "/mdm/workers/{workerId}:update-name-translation": {
@@ -4061,7 +4100,7 @@
      "mdm"
     ],
     "summary": "작업자 다국어 명칭 편집",
-    "description": "작업자 기본 정보는 전부 ERP 수신본이라 쓰기 경로가 없지만(GET /mdm/workers/{workerId} 참조), 다국어 명칭(nameKo·nameVi)은 QA #33·#34가 「MES 확장 속성」으로 확정해 예외로 둔다 — 2026-08-30 되살림. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-06 §8-1",
+    "description": "작업자 기본 정보는 전부 ERP 수신본이라 쓰기 경로가 없지만(GET /mdm/workers/{workerId} 참조), 다국어 명칭(nameKo·nameVi)은 QA #33·#34가 「MES 확장 속성」으로 확정해 예외로 둔다 — 2026-08-30 되살림. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-06-06 §8-1 ⭐ If-Match 에 담을 토큰은 작업자 본체 조회(GET /mdm/workers/{workerId}) 200 의 ETag 다 — nameKo·nameVi 는 별도 자원이 아니라 mdm.worker «그 행»의 프로퍼티이므로 잠그는 대상과 버전 축이 본체에서 일치한다(공유계약 B-1-1 ①ⓐ · 선례 PUT /mdm/items/{itemId} — 품목도 ERP 수신본인데 MES 확장만 고치며 본체 축을 쓴다). ⚠ ERP 재동기화로 본체 판이 바뀌면 이름 번역을 고치지 않은 사용자도 충돌을 볼 수 있다 — 그 경우는 B-1 이 이미 예상해 ConflictResponse.conflictCause=erpSync 로 가르고 화면 문구도 따로 정해 두었다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
