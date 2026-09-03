@@ -3520,7 +3520,8 @@
        "type": "string",
        "example": "값"
       },
-      "x-code-key": "CD-WORK-SESSION-EVENT-TYPE"
+      "x-code-key": "CD-WORK-SESSION-EVENT-TYPE",
+      "description": "값 = `START`·`STOP`·`RESUME`·`END`·`CONTROL_OVERRIDE`. 값 목록은 `GET /mdm/code-values?codeGroupCode=WORK_SESSION_EVENT_TYPE` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      }
     ],
     "responses": {
@@ -4857,7 +4858,7 @@
       ],
       "maxLength": 50,
       "x-source-column": "override_reason_code",
-      "description": "⚠ decisionCode 가 OVERRIDDEN 일 때만 값이 있다",
+      "description": "⚠ decisionCode 가 OVERRIDDEN 일 때만 값이 있다 값 = `EMERGENCY_WORK_ORDER`·`OTHER`. 값 목록은 `GET /mdm/code-values?codeGroupCode=CONTROL_OVERRIDE_REASON` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31).",
       "example": "EMERGENCY_WORK_ORDER",
       "x-code-key": "CD-CONTROL-OVERRIDE-REASON"
      },
@@ -4936,7 +4937,7 @@
        "string",
        "null"
       ],
-      "description": "OVERRIDDEN 일 때만 보낸다. 자유 텍스트가 아니라 코드다",
+      "description": "OVERRIDDEN 일 때만 보낸다. 자유 텍스트가 아니라 코드다 값 = `EMERGENCY_WORK_ORDER`·`OTHER`. 값 목록은 `GET /mdm/code-values?codeGroupCode=CONTROL_OVERRIDE_REASON` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31).",
       "example": "EMERGENCY_WORK_ORDER",
       "x-code-key": "CD-CONTROL-OVERRIDE-REASON"
      }
@@ -6144,7 +6145,7 @@
      },
      "workOrderTypeCode": {
       "type": "string",
-      "description": "작업지시 유형. NORMAL(양산) 기본 · EMERGENCY(긴급) · REWORK(재작업) 셋이다. 공통코드 그룹 이름은 WORK_ORDER_TYPE 이다(공유계약 G-32). ⛔ 화면이 이 값을 로직에 흩어 박지 않는다 — 한 곳에 모아 두고 그 한 곳만 참조한다. ⭐ 이 값으로 갈리는 것이 셋이다 — 긴급 현장 투입 화면(P-02-12)의 진입 목록 · 확정·배포 화면(W-02-04)의 대기 목록 · 자재 출고요청 자동 발행의 긴급 제외(R29).",
+      "description": "작업지시 유형. NORMAL(양산) 기본 · EMERGENCY(긴급) · REWORK(재작업) 셋이다. 공통코드 그룹 이름은 WORK_ORDER_TYPE 이다(공유계약 G-32). ⛔ 화면이 이 값을 로직에 흩어 박지 않는다 — 한 곳에 모아 두고 그 한 곳만 참조한다. ⭐ 이 값으로 갈리는 것이 셋이다 — 긴급 현장 투입 화면(P-02-12)의 진입 목록 · 확정·배포 화면(W-02-04)의 대기 목록 · 자재 출고요청 자동 발행의 긴급 제외(R29). 값 = `NORMAL`·`EMERGENCY`·`REWORK`. 값 목록은 `GET /mdm/code-values?codeGroupCode=WORK_ORDER_TYPE` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "NORMAL",
       "x-internal-note": "값 셋을 함께 못박은 이유는 공유계약 A-21 이다 — 일부만 채워진 것이 빈 것보다 위험하다. 뜻 목록은 R15 가 「양산/긴급/개발품」으로 이름 지었으나 omf-mes#70 이 2026-08-24 에 「개발품 구분은 품목이다」로 닫아 유형 축에서 빠졌고(mdm.item.developmentItem · omf-mes#215), 그 자리를 이 계약이 이미 「긴급·재작업」으로 적고 있어 합이 셋이다. 문자열 EMERGENCY 는 새로 지은 것이 아니라 06-API-요구서-02생산실행.md §3-20 이 P-02-12 진입 쿼리로 이미 쓰고 있던 것을 스키마에 앉힌 것이다(omf-mes#259). ⚠ 같은 계약의 PrecheckDecision.overrideReasonCode 예시 EMERGENCY_WORK_ORDER 는 통제 우회 «사유» 코드라 다른 그룹이다 — 충돌하지 않는다. 공통코드 마스터 등록은 W-06-06 소관이고 우리를 막지 않는다(공유계약 G-31 표기 — 작업 통지).",
       "x-code-key": "CD-WORK-ORDER-TYPE"
@@ -6456,7 +6457,7 @@
      "workOrderTypeCode": {
       "type": "string",
       "maxLength": 50,
-      "description": "작업지시 유형. 보내지 않으면 서버가 NORMAL(양산)로 채운다. ⛔ 긴급 발행 화면(W-02-07)은 이 칸을 반드시 EMERGENCY 로 채워 보낸다 — 비우면 화면이 「유형: 긴급」이라 적어 놓고 양산 작업지시가 만들어지고, 오류가 나지 않아 아무 데서도 드러나지 않는다. 값 집합은 셋이다 — NORMAL(양산) · EMERGENCY(긴급) · REWORK(재작업). 공통코드 그룹 이름은 WORK_ORDER_TYPE 이다(공유계약 G-32).",
+      "description": "작업지시 유형. 보내지 않으면 서버가 NORMAL(양산)로 채운다. ⛔ 긴급 발행 화면(W-02-07)은 이 칸을 반드시 EMERGENCY 로 채워 보낸다 — 비우면 화면이 「유형: 긴급」이라 적어 놓고 양산 작업지시가 만들어지고, 오류가 나지 않아 아무 데서도 드러나지 않는다. 값 집합은 셋이다 — NORMAL(양산) · EMERGENCY(긴급) · REWORK(재작업). 공통코드 그룹 이름은 WORK_ORDER_TYPE 이다(공유계약 G-32). 값 = `NORMAL`·`EMERGENCY`·`REWORK`. 값 목록은 `GET /mdm/code-values?codeGroupCode=WORK_ORDER_TYPE` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "EMERGENCY",
       "x-code-key": "CD-WORK-ORDER-TYPE"
      },

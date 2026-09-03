@@ -422,13 +422,22 @@ def matches(e: dict, place: tuple) -> bool:
 def split_siblings(found: dict[str, list[tuple]]) -> list[tuple]:
     """같은 계약 안에서 같은 이름이 「값 있음」과 「맨몸」으로 갈린 자리.
 
-    ⚠ 자리 튜플을 «앞 네 칸만» 읽는다 — 뒤에 칸이 붙어도(키·착지) 그대로 돈다.
+    ⛔ **「코드가 아니다」로 이미 판정한 자리는 맨몸으로 세지 않는다**(2026-09-03).
+       `x-no-code-key` 가 붙은 자리는 값 목록이 없는 것이 «정상»이다 — 그것을 갈린
+       형제로 세면 ④ 가 「고칠 것」을 말하는 수인지 「판정된 것」을 말하는 수인지
+       뜻을 잃는다. 실측 — 57자리 중 **27이 그런 자리**였고 전부 `statusCode` 였다
+       (`HandlingUnit` 「전표가 아니라 물건이다」 · `InventoryReservation` 「수량 축이
+       담고 이 칸을 움직이는 오퍼레이션이 없다(A-21)」 · `Asn` 「ERP 수신본이라 이 칸을
+       올릴 주체가 없다」 — **이유까지 계약에 적혀 있었다**).
+    ⚠ 자리 튜플을 «앞 네 칸»과 «맨 끝 칸»(x-no-code-key)만 읽는다.
     """
     out = []
     for name, places in found.items():
         by_file = defaultdict(list)
         for p in places:
             f, kind, path, st = p[0], p[1], p[2], p[3]
+            if len(p) > 8 and p[8]:          # ⛔ 「코드 아님」 판정이 붙은 자리
+                continue
             by_file[f].append((kind, path, st))
         for f, ps in by_file.items():
             sts = {s for _, _, s in ps}

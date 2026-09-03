@@ -59,7 +59,8 @@
       "schema": {
        "type": "string"
       },
-      "x-code-key": "CD-INVENTORY-ADJUSTMENT-REASON"
+      "x-code-key": "CD-INVENTORY-ADJUSTMENT-REASON",
+      "description": "값 = `COUNT_VARIANCE`·`TRANSPORT_DAMAGE`·`HOPPER_MEASUREMENT`·`SYSTEM_ERROR_CORRECTION`·`OTHER`. 값 목록은 `GET /mdm/code-values?codeGroupCode=INVENTORY_ADJUSTMENT_REASON` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31)."
      },
      {
       "name": "adjustedAtFrom",
@@ -779,7 +780,8 @@
       "schema": {
        "type": "string"
       },
-      "x-code-key": "CD-INVENTORY-COUNT-TYPE"
+      "x-code-key": "CD-INVENTORY-COUNT-TYPE",
+      "description": "값 = `PERIODIC`·`ADHOC`·`CYCLE`. 값 목록은 `GET /mdm/code-values?codeGroupCode=INVENTORY_COUNT_TYPE` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31)."
      },
      {
       "name": "statusCode",
@@ -1225,7 +1227,8 @@
       "schema": {
        "type": "string"
       },
-      "x-code-key": "CD-HANDLING-UNIT-TYPE"
+      "x-code-key": "CD-HANDLING-UNIT-TYPE",
+      "description": "값 = `BOX`·`CART`·`PALLET`. 값 목록은 `GET /mdm/code-values?codeGroupCode=HANDLING_UNIT_TYPE` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31)."
      },
      {
       "name": "statusCode",
@@ -2389,7 +2392,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "출고 유형",
+      "description": "출고 유형 값 = `PRODUCTION`·`SUPPLIER_RETURN`·`OTHER`·`SHIPMENT`. 값 목록은 `GET /mdm/code-values?codeGroupCode=ISSUE_TYPE` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31).",
       "x-code-key": "CD-ISSUE-TYPE"
      },
      {
@@ -2415,7 +2418,8 @@
       "schema": {
        "type": "string"
       },
-      "x-code-key": "CD-GOODS-ISSUE-REASON"
+      "x-code-key": "CD-GOODS-ISSUE-REASON",
+      "description": "값 = `IQC_FAIL`·`OVER_RECEIPT`·`DEFECT_AFTER_RECEIPT`·`WRONG_SHIPMENT`·`OTHER`. 값 목록은 `GET /mdm/code-values?codeGroupCode=GOODS_ISSUE_REASON` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31)."
      },
      {
       "name": "supplierId",
@@ -3109,7 +3113,8 @@
       "schema": {
        "type": "string"
       },
-      "x-code-key": "CD-RECEIPT-TYPE"
+      "x-code-key": "CD-RECEIPT-TYPE",
+      "description": "값 = `MATERIAL`·`PRODUCT`·`RETURN`·`TRANSFER`. 값 목록은 `GET /mdm/code-values?codeGroupCode=RECEIPT_TYPE` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31)."
      },
      {
       "name": "statusCode",
@@ -11630,7 +11635,7 @@
       "x-source-column": "lot_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "LOT 유형. 값 = MATERIAL·PRODUCTION·PRODUCT (2026-09-03 코드 사전 등재) — ⛔ 고객이 편집할 수 없다 — 우리가 정한 값이다",
+      "description": "LOT 유형. 값 = MATERIAL·PRODUCTION·PRODUCT (2026-09-03 코드 사전 등재) — ⛔ 고객이 편집할 수 없다 — 우리가 정한 값이다 값 = `MATERIAL`·`PRODUCTION`·`PRODUCT`. 값 목록은 `GET /mdm/code-values?codeGroupCode=LOT_TYPE` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "MATERIAL",
       "x-internal-note": "⛔ PRODUCTION → PRODUCT 전이 쓰기가 계약 7벌에 0건이다(실측). 갈래가 둘이다 — ⓐ 동일 행 유지(제품LOT 은 완제품 창고에 선 PRODUCTION LOT 을 부르는 이름) ⓑ 제품 LOT 별도 발번(발번 화면·POST 경로·W-03-01 유형별 분리 집계를 함께 세워야 한다). 사람 결정 대기 — 경계 B6-01. CLOSED 영향: W-01-07·W-01-04·W-02-04·W-02-05·W-03-01·W-03-02·W-03-03·M-01-04.",
       "x-code-key": "CD-LOT-TYPE"
@@ -11866,7 +11871,7 @@
       "x-source-column": "lot_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "LOT 유형. 값 = MATERIAL·PRODUCTION·PRODUCT (2026-09-03 코드 사전 등재) — ⛔ 고객이 편집할 수 없다 — 우리가 정한 값이다",
+      "description": "LOT 유형. 값 = MATERIAL·PRODUCTION·PRODUCT (2026-09-03 코드 사전 등재) — ⛔ 고객이 편집할 수 없다 — 우리가 정한 값이다 값 = `MATERIAL`·`PRODUCTION`·`PRODUCT`. 값 목록은 `GET /mdm/code-values?codeGroupCode=LOT_TYPE` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "MATERIAL",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-LOT-TYPE"

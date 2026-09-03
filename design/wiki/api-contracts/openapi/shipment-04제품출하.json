@@ -541,7 +541,7 @@
        "type": "string",
        "example": "MORNING"
       },
-      "description": "출하 희망 시간대 필터 — 공통코드 그룹 `SHIPMENT_TIME_SLOT`(`MORNING`·`AFTERNOON`·`NIGHT`). W-04-02 시간대 필터 축. 근거: W-04-02 §5-2, 2026-08-31 결정(omf-mes-server#41)",
+      "description": "출하 희망 시간대 필터 — 공통코드 그룹 `SHIPMENT_TIME_SLOT`(`MORNING`·`AFTERNOON`·`NIGHT`). W-04-02 시간대 필터 축. 근거: W-04-02 §5-2, 2026-08-31 결정(omf-mes-server#41) 값 = `MORNING`·`AFTERNOON`·`NIGHT`. 값 목록은 `GET /mdm/code-values?codeGroupCode=SHIPMENT_TIME_SLOT` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31).",
       "x-code-key": "CD-SHIPMENT-TIME-SLOT"
      },
      {
@@ -753,7 +753,7 @@
        "type": "string",
        "example": "MORNING"
       },
-      "description": "출하 희망 시간대 필터 — 목록(GET /logistics/shipment-requests)과 같은 축. 공통코드 그룹 `SHIPMENT_TIME_SLOT`(`MORNING`·`AFTERNOON`·`NIGHT`). 근거: W-04-02 §5-2, 2026-08-31 결정(omf-mes-server#41)",
+      "description": "출하 희망 시간대 필터 — 목록(GET /logistics/shipment-requests)과 같은 축. 공통코드 그룹 `SHIPMENT_TIME_SLOT`(`MORNING`·`AFTERNOON`·`NIGHT`). 근거: W-04-02 §5-2, 2026-08-31 결정(omf-mes-server#41) 값 = `MORNING`·`AFTERNOON`·`NIGHT`. 값 목록은 `GET /mdm/code-values?codeGroupCode=SHIPMENT_TIME_SLOT` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31).",
       "x-code-key": "CD-SHIPMENT-TIME-SLOT"
      },
      {
@@ -2242,7 +2242,7 @@
        "null"
       ],
       "example": "PENDING_DECISION",
-      "description": "이미 만든 부적합의 진행 상태 — 의뢰 전(NOT_REQUESTED)·판정 대기(PENDING_DECISION)·판정 완료(DECIDED). nonconformanceId 가 null 이면 이 값도 null 이다.",
+      "description": "이미 만든 부적합의 진행 상태 — 의뢰 전(NOT_REQUESTED)·판정 대기(PENDING_DECISION)·판정 완료(DECIDED). nonconformanceId 가 null 이면 이 값도 null 이다. 값 = `NOT_REQUESTED`·`PENDING_DECISION`·`DECIDED`. 값 목록은 `GET /mdm/code-values?codeGroupCode=NONCONFORMANCE_STATUS` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-NONCONFORMANCE-STATUS"
      }
     }
