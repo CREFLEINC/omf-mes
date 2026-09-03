@@ -29,9 +29,16 @@ class PairedTest(unittest.TestCase):
         both, solo = m.paired("공정 유형은 `MACHINING` 이다.", "MACHINING")
         self.assertEqual((both, solo), (0, 1))
 
-    def test_backtick_이_없어도_본다(self):
-        both, _ = m.paired("값 = MACHINING(가공)", "MACHINING")
-        self.assertEqual(both, 1)
+    def test_backtick_이_없으면_보지_않는다(self):
+        """⛔ 맨몸 토큰은 «업무 낱말»일 수 있다 — 실측에서 `LOT`(「LOT 라벨」)이
+        한 파일 30자리씩 걸렸다. 코드 값으로 «적은» 표시가 backtick 이다."""
+        both, solo = m.paired("값 = MACHINING(가공)", "MACHINING")
+        self.assertEqual((both, solo), (0, 0))
+
+    def test_업무_낱말은_세지_않는다(self):
+        """`LOT` 은 사전의 값이지만 「LOT 라벨」은 코드로 쓴 것이 아니다."""
+        both, solo = m.paired("LOT 라벨을 출력한다. LOT 스캔 후 LOT 을 확인한다.", "LOT")
+        self.assertEqual((both, solo), (0, 0))
 
     def test_영문_괄호는_병기가_아니다(self):
         """⛔ `DAY`(daily) 는 뜻풀이가 아니다 — 한국어가 있어야 병기다."""
