@@ -325,7 +325,7 @@ def main(argv=None) -> int:
     print("✅ 통과%s" % (" (⚠ 확인 %d건 — 사람이 본다)" % len(warns) if warns else ""))
     if a.title:
         print("")
-        print("─ 발행 명령 — 사람 게이트(초안 전문 승인) 뒤에 사람이 실행한다. 출력만 한다 ─")
+        print("─ 발행 명령 — 사람 게이트(초안 전문 승인) 뒤에 SKILL ⑤ 대로 실행한다. 이 검사기는 출력만 한다 ─")
         for cmd in publish_commands(a.title, a.path):
             print(cmd)
         print("⚠ 라벨 「%s」 가 저장소에 없으면 먼저 `gh label create` — 이것도 승인 게이트다." % NOTICE_LABEL)
