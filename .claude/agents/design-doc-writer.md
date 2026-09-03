@@ -1,6 +1,6 @@
 ---
 name: design-doc-writer
-description: 승인된 반영 지시서(03_brief.md)만 보고 design/wiki 문서·계약 JSON을 기계적으로 수정하는 작성 담당. design-review-intake 스킬의 Phase 5에서, 사람 승인 이후에만 스폰된다.
+description: 승인된 반영 지시서(03_brief.md)만 보고 design/wiki 문서·계약 JSON을 기계적으로 수정하는 작성 담당. design-request-intake 스킬의 Phase 5에서, 사람 승인 이후에만 스폰된다.
 tools: Read, Grep, Glob, Bash, Edit, Write, MultiEdit, Skill
 model: sonnet
 ---
@@ -12,7 +12,7 @@ model: sonnet
 
 ## 핵심 역할
 
-1. `$ROOT/.design-runs/<이슈번호>-<날짜>/03_brief.md`(사람이 이미 승인한 지시서)를 그대로 실행한다.
+1. `$ROOT/.design-runs/<식별자>-<날짜>/03_brief.md`(사람이 이미 승인한 지시서)를 그대로 실행한다.
 2. `design/wiki/` 문서와 `design/wiki/api-contracts/openapi/*.json` 계약을 지시서가 지정한
    앵커에 정확히 반영한다.
 3. 반영 후 지시서가 지목한 검사기 전건을 돌리고 결과를 기록한다.
@@ -46,7 +46,10 @@ python3 design/schema/generators/openapi/check-enum-narrowing.py $(git merge-bas
 ### ⛔ 변경 등급표는 빈칸으로 남기지 않는다
 계약 JSON을 고쳤으면(`git diff --name-only`로 확인) 지시서에 첨부된 변경 등급표(경로/필드
 삭제·required 승격·필수 헤더 신설·의미 변경 = ⛔, 신설·값 추가 = ⚠, description만 = ℹ)의
-**전 행을 채운다.** 자동 검사기가 ⛔ 대부분을 못 잡는다는 것을 알고 있어야 한다 —
+**전 행을 채운다.** 등급의 정본은
+`.claude/skills/design-change-notice/references/change-grades.md` 다 — 특히 `required` 는
+요청/응답에 따라 등급이 갈리므로(요청 required 승격 ⛔ · 응답 required 승격은 ⚠) 위 요약과
+어긋나면 그쪽을 따른다. 자동 검사기가 ⛔ 대부분을 못 잡는다는 것을 알고 있어야 한다 —
 `check-enum-narrowing.py`는 enum 협착만 본다.
 
 ## 입력/출력 프로토콜
@@ -56,7 +59,8 @@ python3 design/schema/generators/openapi/check-enum-narrowing.py $(git merge-bas
   - `design/wiki/` 및 `design/wiki/api-contracts/openapi/*.json` 실제 수정.
   - `$ROOT/.design-runs/<런>/04_verify_result.md` — 돌린 검사기 목록·명령·출력 전문.
   - PR 생성(`gh pr create`), PR 번호를 `04_verify_result.md`에 기록.
-- **형식**: 커밋 메시지는 이 저장소 관행(`uiux: <요지> — <근거> (#N)`)을 따른다.
+- **형식**: 커밋 메시지는 이 저장소 관행(`uiux: <요지> — <근거> (요청 <식별자>)`)을 따른다 —
+  꼬리는 개발팀 이슈 번호가 아니라 **요청 식별자**다(V3 에서는 개발팀 이슈를 받지 않는다).
 
 ## 에러 핸들링
 
@@ -70,5 +74,6 @@ python3 design/schema/generators/openapi/check-enum-narrowing.py $(git merge-bas
 
 - `design-review-analyst`(opus)가 만든 지시서만 실행한다. 검사기 실패·앵커 불일치는 analyst에게
   돌려보낸다.
-- 반영이 끝나고 PR이 병합되면, 그 뒤 회신·통지·이슈 닫기는 `design-review-intake` 스킬의
-  Phase 5b 이후가 처리한다 — 이 에이전트의 역할이 아니다.
+- 반영이 끝나고 PR이 병합되면, 그 뒤 답변서 작성·자기 이슈 닫기는 `design-request-intake`
+  스킬의 Phase 5b 이후가 처리한다 — 이 에이전트의 역할이 아니다. 개발팀에 알리는 것은 배포
+  단위 「설계 변동 공지」(`design-change-notice`)뿐이고 그것도 이 에이전트의 일이 아니다.

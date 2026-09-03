@@ -168,7 +168,7 @@ description: omf-mes 화면 설계·계약 작업을 할 때 — 설계 소관 �
 | — | ⛔ **계약은 JSON 이 정본이다**(2026-08-18 확정) — 생성기를 두지 않는다. 고치는 방법은 `design/wiki/api-contracts/00-계약-작성-규약.md` |
 | `design/schema/generators/collect-open-items.py --check` | ⭐ **화면 스펙을 고친 뒤** — 미결 대장이 스펙과 갈렸는지 본다 |
 | `design/schema/generators/verify-generated-fresh.py` | ⭐⭐ **화면 스펙 §5 액션 표를 고친 뒤**(요구목록 축 9건 — 커버리지 스냅숏이 낡았는지 본다) · ⭐⭐ **편람 마크다운을 고친 뒤**(HTML 배포본 축 9건 — 용어사전·요구사항명세서·SW설계사양서·HW구성안·태스크플로우·API요구서·웹프론트착수안내·통합 IA 둘). 한 축만 보려면 `--kind md\|html`. **저장소를 안 바꾸고 되돌린다** |
-| `.claude/skills/uiux-client-handoff/scripts/check-issue.py` | 구현팀 통지 **발행 전** |
+| `.claude/skills/design-change-notice/scripts/check-notice.py` | 설계 변동 공지 **발행 전** |
 
 ### ⛔ 커버리지 게이트가 **거짓 초록을 낸 적이 있다**
 

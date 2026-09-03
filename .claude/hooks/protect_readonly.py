@@ -3,7 +3,7 @@
 
 - design/raw/  : 설계 과정 부산물·고객 원자료·확정기록 원문. 생성·수정·삭제·이동을 전부
   차단한다(읽기는 허용). 정본: design/README.md·design/schema/00-authoring-rules.md.
-- 생성물(GENERATED_FILES) : design/wiki/handover/*.md 3종 + design/schema/generators/openapi/
+- 생성물(GENERATED_FILES) : design/wiki/handover/*.md 4종 + design/schema/generators/openapi/
   ui-요구목록*.md — 손으로 고치면 다음 재생성 때 덮여 사라지고, 그 사이엔 "손으로 고친 값"이
   정본처럼 읽힌다(2026-08-18 커버리지 게이트 거짓 초록 사고). Write/Edit/NotebookEdit·Bash로
   직접 건드리는 것을 막는다 — 항상 해당 생성 스크립트를 다시 돌려서 만든다.
@@ -29,11 +29,14 @@ from pathlib import Path
 PROJECT = Path(__file__).resolve().parents[2]
 RAW_DIR = PROJECT / "design" / "raw"
 
-# 생성물 — design/wiki/handover/*.md 3종
+# 생성물 — design/wiki/handover/*.md 4종
+# ⚠ settings.json 의 deny 는 Write/Edit 만 막는다 — Bash 리다이렉션은 이 목록이 막는다.
+#   변경-요약.md 가 빠져 있던 동안(2026-09-03) 그 경로로 실제 오염이 났다.
 GENERATED_RELS = {
     Path("design/wiki/handover/화면-진도표.md"),
     Path("design/wiki/handover/미결-대장.md"),
     Path("design/wiki/handover/99-인계대장.md"),
+    Path("design/wiki/handover/변경-요약.md"),
 }
 # 생성물 — design/schema/generators/openapi/ui-요구목록*.md (도메인별 파생 파일 + 총괄본)
 GENERATED_GLOB_DIR = Path("design/schema/generators/openapi")

@@ -92,7 +92,7 @@ class ShapeTest(unittest.TestCase):
 
 
 class GradeTableTest(unittest.TestCase):
-    """판정표 네 칸 — 등급 정본은 uiux-client-handoff/SKILL.md 「변경 통지 ⛔/⚠」."""
+    """판정표 네 칸 — 등급 정본은 design-change-notice/references/change-grades.md."""
 
     CASES = [
         # (방향, 변화,            ⛔ 인가)

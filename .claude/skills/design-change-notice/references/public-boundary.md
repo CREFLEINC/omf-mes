@@ -4,6 +4,10 @@
 
 **되돌릴 수 없다** — 지워도 인덱싱된 사본과 포크는 회수되지 않는다.
 
+⭐ V3(2026-09-03) — 「설계 변동 공지」(`[설계 변동 공지] <날짜> · <해시7>`)는 `omf-mes-client`(공개)와
+`omf-mes-server`(비공개, 실측 2026-09-03)에 **같은 본문**으로 나간다. 그래서 이 문서의 기준을 **한 번**,
+공개 기준으로 적용한다 — 「서버 쪽은 비공개니까」라는 완화는 없다.
+
 ---
 
 ## 표
@@ -38,7 +42,7 @@
 
 ### 2. 확정 기록 마커 (`✓확정 QA #4` · `✓설계확정 결정 10`)
 
-**우리 내부 문서 체계의 이름**이다. 프론트가 그 문서에 접근할 수 없으므로 **적어도 도움이 안 된다.**
+**우리 내부 문서 체계의 이름**이다 — 확정기록 원문(`design/raw/decisions/`)의 자리표시다. 개발팀은 설계 저장소를 격리 클론해 읽을 수는 있지만(CLAUDE.md 2026-09-02 행), 그 마커를 **공개 저장소에 옮겨 적으면** 고객 확정 사항의 존재와 순번이 공개된다. 공지에서는 **적어도 도움이 안 되고** 유출 경로만 하나 는다.
 
 - 필요하면 **일반 표현으로** — 「PQC 생략은 품목·공정 단위 설정이다」
 - 추적이 필요하면 **이슈 번호로** — `omf-mes#64`
@@ -83,8 +87,12 @@
 **발행 후 검사가 아니다.** 2026-08-04 에 DS 저장소(`design-system-v2-webui`)에서 발행 후 검사하다 제품 용어 2건을 흘렸고(#43·#45), 즉시 수정했으나 **수정 이력에는 원문이 남았다.**
 
 ```bash
-python3 .claude/skills/uiux-client-handoff/scripts/check-issue.py <초안.md>
+python3 .claude/skills/design-change-notice/scripts/check-notice.py <초안.md> --title "[설계 변동 공지] <YYYY-MM-DD> · <해시7>"
 ```
+
+(이 문서의 표와 「경계선에 있는 것 넷」은 `check-notice.py` 의 규칙 P — 옛 `check-issue.py` 의
+BLOCKING 10 · ADVISORY 5 를 그대로 이식한 것 — 가 검사한다. 2026-09-03 V3 에서 `check-issue.py` 는
+삭제됐다.)
 
 ---
 
@@ -97,4 +105,4 @@ python3 .claude/skills/uiux-client-handoff/scripts/check-issue.py <초안.md>
 | `omf-mes-client` | ✅ **허용** — 제품 자신이라 있는 게 정상 | ⛔ 금지 |
 | `design-system-v2-webui` | ⛔ **금지** — **컴포넌트의 언어로만** | ⛔ 금지 |
 
-**이 스킬은 `omf-mes-client` 전용이다.** DS 이슈를 낼 때 이 기준을 쓰면 화면 ID 가 새어 나간다.
+**이 스킬(`design-change-notice`)의 기준은 `omf-mes-client` 줄이다** — 같은 본문이 가는 `omf-mes-server` 도 이 줄로 본다. DS 이슈를 낼 때 이 기준을 쓰면 화면 ID 가 새어 나간다.

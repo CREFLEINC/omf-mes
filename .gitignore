@@ -1,8 +1,12 @@
 # OS
 .DS_Store
 
-# design-review-intake 등 하네스 런타임 스크래치 — 감사 추적의 정본은 이슈 코멘트·커밋 SHA·통지 이슈다
+# design-request-intake 등 하네스 런타임 스크래치 — 감사 추적의 정본은 자기 이슈 코멘트·커밋 SHA·공지 이슈다
 /.design-runs/
+
+# V3(2026-09-03) — 사용자와 주고받는 파일: 개발팀 요청 자료·답변서(tmp/requests/) · 설계 변동 공지 초안(tmp/notices/).
+# 정본은 git 이력(커밋 SHA·notice/* 태그)과 omf-mes 자기 이슈 코멘트다 — 여기 남는 것은 사본이다
+/tmp/
 
 # 백엔드는 CREFLEINC/omf-mes-server로 분리 — 로컬에 남은 apps/는 추적하지 않는다
 /apps/
