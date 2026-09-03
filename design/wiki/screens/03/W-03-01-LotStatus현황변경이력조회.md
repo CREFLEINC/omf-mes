@@ -106,6 +106,7 @@
 | **해제 조건** | `release_condition` | **text** — 「IQC 합격」 같은 문장 |
 | 상태 | `status_code` | ⚠ **`lot.status_code`와 다른 축**이다 §5-3 |
 | 등록 | `held_by` · `held_at` | `app_user` FK — **행위자 축이 여기만 있다** |
+| **해제 사유** | `release_reason_code` | ⭐ **왜 풀었는가** — `RETEST_PASS`(재검사 합격)·`RETEST_FAIL`(재검사 불합격)·`INVESTIGATION_CLEARED`(조사 종결)·`MANAGER_OVERRIDE`(관리자 판단) **4값**. 값 목록은 `GET /mdm/code-values?codeGroupCode=LOT_HOLD_RELEASE_REASON` 로 받는다(`G-32`) · ⭐ 고객이 늘린다(`registry`). ⚠ **§3 이력 표의 「사유」 열이 해제 행에서 비어 있던 자리다** — §5-1 C7·C8 이 「합격이라서가 안 남는다」로 적은 결손이고, `W-03-02` §5-4 가 되살린 칸을 «세는» 화면이 여기다. 계약 `LotHoldEvent.releaseReasonCode` 2026-09-03 신설 |
 | 해제 | `released_by` · `released_at` | `ck_lot_hold_release`(해제 ≥ 등록) |
 
 ## §5. 액션·상태
