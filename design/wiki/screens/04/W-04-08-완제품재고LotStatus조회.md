@@ -70,6 +70,7 @@
 
 | 라벨(한/베) | 출처 컬럼 | 타입 | 비고 |
 | --- | --- | --- | --- |
+| **품질 상태** | `quality_status_code` | `code_t` | ⭐ **목록 「상태」 열이 이 칸이다** — 잔고 행이 «위치별»이라 이 축이 행을 나눈다(`M-01-04` §5-1 이 세운 노출 기준). 값 = `NORMAL`(정상)·`DEFECTIVE`(불량)·`INSPECTION_PENDING`(검사 대기)·`SCRAPPED`(폐기) **4값** — `GET /mdm/code-values?codeGroupCode=LOT_STATUS`(`G-32`). ⛔ 고객이 편집할 수 없다(`registry-system`). ⚠ 목업의 `Release`/`Hold` 는 **`§I-32` 종결 이전의 옛 어휘**다 «(구표기 보존)» — 확정 4값이 정본이고 「보류」는 `trace.lot_hold` 가 담는다(§4-C). ⭐ `trace.lot.status_code` 도 «같은 값 집합»이라(코드 사전 `CD-LOT-STATUS` 가 두 프로퍼티를 한 키로 묶었다) 호출은 한 번이면 된다 · 2026-09-03 신설 |
 | 보유 | `on_hand_qty` | `signed_qty_t` | ⚠ **음수 가능** — `item.negative_stock_allowed` 기준 트리거 |
 | 예약 | `reserved_qty` | `qty_t` | 출하 배정분 |
 | 피킹 | `picked_qty` | `qty_t` | 집었으나 아직 안 나간 것 |
