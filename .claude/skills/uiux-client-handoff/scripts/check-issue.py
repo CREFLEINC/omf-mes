@@ -1,5 +1,21 @@
 # -*- coding: utf-8 -*-
-"""착수 가능 통지 초안을 발행 전에 검사한다.
+"""공개 저장소로 나가는 글을 발행 전에 검사한다.
+
+⛔ 부분 폐지 — 착수 통지 폐지(2026-09-03)
+  이 검사기는 원래 「착수 가능 통지」 초안 검사기였다. 2026-09-03 개정으로 설계팀은 개발팀의
+  업무 배정·진행에 관여하지 않게 되어 **착수 통지가 폐지**됐다.
+
+  ⛔ 폐지된 것 — 인자 없이 도는 «기본 모드»(폼 6항목 구조 검증 · 중복/금지 화면 조회 ·
+     팀 라벨 병기 --team). 새 착수 이슈를 발행하지 않으므로 이 경로를 쓸 자리가 없다.
+     ⚠ --status 는 이미 발행된 착수 이슈를 되짚는 «유산 조회»로만 남긴다 — 개발팀의 진행
+     상태를 우리 판단의 입력으로 삼지 않는다.
+
+  ⭐ 살아 있는 것 — --change-notice(⛔/⚠ 변경 요약 통지, 이제 유일한 아웃바운드) ·
+     --reply(회신 규약 검사, design-review-intake 가 쓴다) · 공개 안전 스캔 · 미기입
+     자리표시 검사. **이 셋은 개정과 무관하게 그대로다.**
+
+  ⛔ 코드를 지우지 않았다 — 이미 발행된 착수 이슈 107건이 이 규칙으로 쓰여 있고, 테스트
+     37건이 «무엇을 안 잡느냐»까지 잠그고 있다. 지우면 회신 검사의 회귀 방어가 함께 무너진다.
 
 왜 필요한가
   omf-mes-client 는 **공개 저장소**다. 이슈의 제목·본문·첨부·라벨·수정 이력이
@@ -40,19 +56,24 @@
      없으므로(공개 저장소) 검사기가 매번 조회한다.
 
 사용법
-  python3 check-issue.py <초안.md>                  # 착수 가능 통지
-  python3 check-issue.py <초안.md> --change-notice  # ⛔/⚠ 변경 통지 (구조 검증 생략)
-  python3 check-issue.py <초안.md> --title "..."    # 통과 시 gh 명령까지 출력
-  python3 check-issue.py <초안.md> --team T4        # 통과 시 gh 명령의 라벨에 Agent : T4 를 병기
-  python3 check-issue.py --status                   # 발행 현황만 조회
-  python3 check-issue.py <초안.md> --no-remote      # 원격 조회 생략 (오프라인)
+  ⭐ 지금 쓰는 것
+  python3 check-issue.py <통지문.md> --change-notice            # ⛔/⚠ 변경 요약 통지
+  python3 check-issue.py <통지문.md> --change-notice --title "..."  # 통과 시 gh 명령까지 출력
+  python3 check-issue.py <회신.md> --reply [--private]          # 검토 요청 회신 규약
 
-팀 라벨 병기 (team-issue-protocol §2)
-  omf-mes-client 는 uiux→client·ready 두 라벨만 써 왔지만, multi-agent-team-workflow-v2.md
-  체계에서는 어느 개발팀이 담당인지 Agent : T{n} 라벨로도 식별한다. --team 을 주면 그 값을
-  --label 병기에 반영하고, 주지 않으면 같은 화면·같은 도메인의 기존 이슈에서 이미 쓰인
-  Agent : T{n} 라벨을 조회해 「이런 값이 보인다」로만 제안한다(자동 부착하지 않는다 — 팀
-  배정은 design-work-assignment 의 승인을 거친 결정이어야 한다).
+  ⛔ 폐지 — 착수 통지 전용(2026-09-03). 새로 쓰지 않는다
+  python3 check-issue.py <초안.md>                  # 착수 가능 통지 (폼 6항목 구조 검증)
+  python3 check-issue.py <초안.md> --team T4        # 라벨에 Agent : T4 병기 — 배정 폐지로 무효
+  python3 check-issue.py --status                   # 발행 현황 — 유산 조회로만
+  python3 check-issue.py <초안.md> --no-remote      # 중복 조회 생략 (착수 전용 경로)
+
+팀 라벨 병기 (team-issue-protocol §2) — ⛔ 폐지 (2026-09-03)
+  --team 은 Agent : T{n} 라벨을 --label 에 병기하는 옵션이었다. 그 라벨은 **업무 배정**을
+  표시하는 것이고, 개정으로 배정은 설계팀이 하는 일이 아니게 됐다(design-work-assignment
+  스킬도 함께 폐지됐다). **변경 통지에 팀 라벨을 붙이지 않는다.**
+
+  옵션 자체는 남겨 두었다 — 이미 그 라벨이 붙은 이슈들이 있고, 코드를 지우면 그 이슈를
+  읽을 때 라벨의 출처를 알 수 없게 된다. 쓰지 않을 뿐이다.
 """
 import io
 import json
@@ -239,8 +260,9 @@ TEAM_LABEL = re.compile(r'^Agent\s*:\s*T\d+$')
 def suggest_team(screen_id, issues):
     """같은 화면·같은 도메인 이슈에서 이미 쓰인 Agent : T{n} 라벨을 세어 제안한다.
 
-    자동 부착이 아니라 제안이다 — 팀 배정은 design-work-assignment 의 승인을 거친
-    결정이어야 하고, 이 스크립트는 그 결정을 대신하지 않는다.
+    ⛔ 폐지 — 착수 통지 폐지(2026-09-03). 팀 배정은 설계팀 소관이 아니게 됐고, 우리가
+    Agent : T{n} 을 새로 부착하지 않는다. 이 함수는 착수 전용 경로(기본 모드)에서만
+    불리므로 지금은 도달하지 않는다 — 이미 그 라벨이 붙은 이슈를 읽을 때의 참고로만 남긴다.
     """
     if not issues or not screen_id:
         return []
@@ -454,6 +476,9 @@ def main():
         i = sys.argv.index('--title')
         if i + 1 < len(sys.argv):
             title = sys.argv[i + 1]
+    # ⛔ --team 은 폐지 옵션이다(2026-09-03) — Agent : T{n} 은 업무 배정 라벨이고 배정은
+    # 더 이상 설계팀이 하는 일이 아니다. 이미 그 라벨이 붙은 이슈를 읽을 수 있도록 코드만
+    # 남겨 두었다. 새 통지에는 쓰지 않는다.
     team = None
     if '--team' in sys.argv:
         i = sys.argv.index('--team')
@@ -553,8 +578,8 @@ def main():
         top = team_suggestions[0]
         print('\n💡 팀 라벨 제안 — %s 기존 이슈에 Agent : %s 가 %d건 보입니다.'
               % (top[2], top[0].split(':')[-1].strip(), top[1]))
-        print('   자동 부착하지 않았습니다 — --team T{n} 을 직접 주거나, 배정이 아직이면')
-        print('   design-work-assignment 로 먼저 확정하세요.')
+        print('   ⛔ 2026-09-03 개정 — 업무 배정은 설계팀 소관이 아닙니다.')
+        print('   팀 라벨을 새로 붙이지 마세요(--team 은 폐지 옵션입니다).')
 
     labels = CHANGE_NOTICE_LABELS if change_notice else LABELS
     if team:
