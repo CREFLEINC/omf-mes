@@ -127,9 +127,9 @@ def main() -> int:
     for f in findings:
         print("  " + f)
     print(
-        "\n⛔ 좁아지는 것은 «이미 만든 것이 틀린다» 라 ⛔ 변경 통지 대상입니다.\n"
-        "   통지를 냈으면 그대로 진행하고, 안 냈으면 내고 진행하세요.\n"
-        "   → .claude/skills/uiux-client-handoff/")
+        "\n⛔ 좁아지는 것은 «이미 만든 것이 틀린다» 라 등급 ⛔ 입니다(설계팀 내부 판단).\n"
+        "   답변서·PR 에 등급을 채우고 진행하세요 — 개발팀에는 다음 설계 변동 공지로 «지점»만 나갑니다.\n"
+        "   → .claude/skills/design-change-notice/references/change-grades.md")
     return 1
 
 

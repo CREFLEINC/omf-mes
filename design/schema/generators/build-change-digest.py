@@ -29,6 +29,14 @@
 - **왜 바뀌었는지** — 커밋 본문에 있다. 이 표는 «어디를 볼지»까지만 안내한다.
 - **바뀐 내용이 맞는지** — 이력을 옮길 뿐 판정하지 않는다.
 - `design/raw/`·`.claude/` — 설계 산출물이 아니다(전자는 시점 고착 자료, 후자는 하네스).
+- `design/wiki/handover/` 만 건드린 커밋 — 생성물 갱신이라 «설계»가 바뀐 회차가 아니다.
+  ⭐ 이 표 자신도 거기 있어, 빼지 않으면 「표를 갱신한 커밋」이 다음 회차에 또 한 행이 된다.
+
+⭐ V3(2026-09-03) — 이 표는 설계팀 «내부» 이력이다
+--------------------------------------------------
+개발팀에 「무엇이 바뀌었나」를 알리는 창구는 **설계 변동 공지**(`.claude/skills/design-change-notice/`)
+하나다 — 직전 공지(git tag `notice/*`)와 HEAD 사이의 «달라진 지점»을 개발팀 저장소에 이슈로 낸다.
+이 표는 그 공지를 만들 때 `where()` 를 빌려 주고, 설계팀이 자기 이력을 되짚을 때 읽는다.
 
 쓰기
 ----
@@ -48,6 +56,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, "..", "..", "..")
 OUT = os.path.join(ROOT, "design", "wiki", "handover", "변경-요약.md")
 WATCH = ["design/wiki", "design/schema"]
+SELF_DIR = "design/wiki/handover/"   # 생성물 자리 — 이 표 자신을 포함한다
 
 SCREEN = re.compile(r"([WMP]-(?:CO|\d{2})-\d{2})")
 PR = re.compile(r"\(#(\d+)\)\s*$")
@@ -126,6 +135,11 @@ def commits(limit: int | None) -> list[dict]:
         sha, date, subject = line.split(sep, 2)
         files = [f for f in run(["show", "--name-only", "--format=", sha,
                                  "--"] + WATCH).splitlines() if f.strip()]
+        # ⛔ 자기 출력을 세지 않는다 — handover/ 는 생성물이라 「이 표를 갱신한 커밋」이
+        # 다음 회차에 또 한 행이 되어 표가 영원히 수렴하지 않았다(2026-09-03 실측 93→94).
+        files = [f for f in files if not f.startswith(SELF_DIR)]
+        if not files:
+            continue
         m = PR.search(subject)
         rows.append({
             "sha": sha[:7],
@@ -157,6 +171,9 @@ def render(rows: list[dict]) -> str:
         "2026-09-03 업무 방식 개정(사용자 확정) — 설계팀은 개발팀의 업무에 관여하지 않는다.",
         "설계팀이 하는 것은 **「무엇이 언제 바뀌었는지」를 전하는 것**이고, 개발팀은 설계",
         "자료를 **직접 열람**해 내용을 확인하고 처리 방식도 스스로 정한다.",
+        "",
+        "⭐ V3(2026-09-03) — 개발팀에 알리는 창구는 **설계 변동 공지** 하나다(직전 공지 태그",
+        "`notice/*` → HEAD 의 «달라진 지점»을 개발팀 저장소 이슈로). 이 표는 설계팀 **내부** 이력이다.",
         "",
         "| 무엇 | 값 |",
         "| --- | :-: |",

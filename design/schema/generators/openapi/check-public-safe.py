@@ -40,8 +40,8 @@ RULES = [
      '괄호 안 요약을 x-internal-note 로 옮기고 식별자만 남긴다'),
     ('설계 진행 상태', re.compile(r'미결|미착지'),
      '진행 상태는 x-internal-note 로. 소비자에게 필요한 경고는 「확정되지 않았다」로 바꿔 남긴다'),
-    # ⭐ 2026-09-02 신설(omf-mes#367) — 고객 «실물» 식별자. uiux-client-handoff 의
-    #    check-issue.py 는 이 둘을 이미 막고 있었는데 «계약» 쪽에는 없었다. 같은 값이
+    # ⭐ 2026-09-02 신설(omf-mes#367) — 고객 «실물» 식별자. design-change-notice 의
+    #    check-notice.py(옛 check-issue.py) 는 이 둘을 이미 막고 있었는데 «계약» 쪽에는 없었다. 같은 값이
     #    이슈로 나가면 막히고 계약 example 로 나가면 통과하던 상태다(실측 — 실제로
     #    통과했다). 규칙을 이쪽에도 둔다. 신설 시점 위반 0건.
     ('실 사번 의심', re.compile(r'\b9\d{5}\b'),

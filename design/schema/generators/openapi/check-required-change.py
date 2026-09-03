@@ -183,12 +183,12 @@ def main() -> int:
     print()
 
     if blocking:
-        print(f"⛔ 변경 통지 «즉시 1건» 대상 {len(blocking)}건 — 이미 만든 것이 틀린다")
+        print(f"⛔ 등급 ⛔ {len(blocking)}건 — 이미 만든 것이 틀린다")
         for line in blocking:
             print("   " + line)
         print()
     if notice:
-        print(f"⚠ 변경 통지 «차수 마감 묶음» 대상 {len(notice)}건 — 기존은 깨지지 않는다")
+        print(f"⚠ 등급 ⚠ {len(notice)}건 — 기존은 깨지지 않는다")
         for line in notice:
             print("   " + line)
         print()
@@ -197,8 +197,9 @@ def main() -> int:
         print("✅ 필수 여부·널 허용이 바뀐 자리가 없습니다.")
         return 0
 
-    print("⛔ 이 검사기는 «통지를 냈는지»를 보지 않는다 — 사람이 판단한다.")
-    print("   등급 정본: .claude/skills/uiux-client-handoff/SKILL.md 「변경 통지 ⛔/⚠」")
+    print("⛔ 이 검사기는 «등급을 채웠는지»를 보지 않는다 — 사람이 판단한다(설계팀 내부).")
+    print("   개발팀에는 다음 설계 변동 공지로 «지점»만 나간다 — 등급·내용은 싣지 않는다.")
+    print("   등급 정본: .claude/skills/design-change-notice/references/change-grades.md")
     return 1 if blocking else 0
 
 
