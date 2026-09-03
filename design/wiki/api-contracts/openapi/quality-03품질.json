@@ -583,7 +583,7 @@
        "type": "string",
        "example": "값"
       },
-      "description": "IQC · PQC · OQC",
+      "description": "IQC · PQC · OQC 값 = `IQC`·`PQC`·`OQC`. 값 목록은 `GET /mdm/code-values?codeGroupCode=QUALITY_INSPECTION_TYPE` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
      },
      {
@@ -768,7 +768,8 @@
        "type": "string",
        "example": "값"
       },
-      "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
+      "x-code-key": "CD-QUALITY-INSPECTION-TYPE",
+      "description": "값 = `IQC`·`PQC`·`OQC`. 값 목록은 `GET /mdm/code-values?codeGroupCode=QUALITY_INSPECTION_TYPE` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "overallJudgmentCode",
@@ -1003,7 +1004,8 @@
        "type": "string",
        "example": "값"
       },
-      "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
+      "x-code-key": "CD-QUALITY-INSPECTION-TYPE",
+      "description": "값 = `IQC`·`PQC`·`OQC`. 값 목록은 `GET /mdm/code-values?codeGroupCode=QUALITY_INSPECTION_TYPE` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "itemId",
@@ -1113,7 +1115,7 @@
        "type": "string",
        "example": "값"
       },
-      "description": "⚠ IQC·PQC·OQC 를 합치지 않는다 — 자재 불량률과 제품 불량률을 더하면 뜻이 없다(L-7)",
+      "description": "⚠ IQC·PQC·OQC 를 합치지 않는다 — 자재 불량률과 제품 불량률을 더하면 뜻이 없다(L-7) 값 = `IQC`·`PQC`·`OQC`. 값 목록은 `GET /mdm/code-values?codeGroupCode=QUALITY_INSPECTION_TYPE` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
      },
      {
@@ -1624,7 +1626,8 @@
       "schema": {
        "type": "string"
       },
-      "x-code-key": "CD-LOT-HOLD-REASON"
+      "x-code-key": "CD-LOT-HOLD-REASON",
+      "description": "값 = `INCOMING_INSPECTION_WAIT`·`FOREIGN_MATTER_SUSPECTED`·`DIMENSION_ABNORMAL`·`APPEARANCE_ABNORMAL`·`CLAIM_RECALL`·`OTHER`. 값 목록은 `GET /mdm/code-values?codeGroupCode=LOT_HOLD_REASON` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31)."
      },
      {
       "name": "lotTypeCode",
@@ -1746,7 +1749,8 @@
        "type": "string",
        "example": "값"
       },
-      "x-code-key": "CD-LOT-HOLD-REASON"
+      "x-code-key": "CD-LOT-HOLD-REASON",
+      "description": "값 = `INCOMING_INSPECTION_WAIT`·`FOREIGN_MATTER_SUSPECTED`·`DIMENSION_ABNORMAL`·`APPEARANCE_ABNORMAL`·`CLAIM_RECALL`·`OTHER`. 값 목록은 `GET /mdm/code-values?codeGroupCode=LOT_HOLD_REASON` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31)."
      },
      {
       "name": "heldBy",
@@ -4058,7 +4062,8 @@
      "reasonCode": {
       "type": "string",
       "example": "INCOMING_INSPECTION_WAIT",
-      "x-code-key": "CD-LOT-HOLD-REASON"
+      "x-code-key": "CD-LOT-HOLD-REASON",
+      "description": "값 = `INCOMING_INSPECTION_WAIT`·`FOREIGN_MATTER_SUSPECTED`·`DIMENSION_ABNORMAL`·`APPEARANCE_ABNORMAL`·`CLAIM_RECALL`·`OTHER`. 값 목록은 `GET /mdm/code-values?codeGroupCode=LOT_HOLD_REASON` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31)."
      },
      "releaseCondition": {
       "type": "string",

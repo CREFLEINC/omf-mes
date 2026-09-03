@@ -43,7 +43,8 @@
        "type": "string",
        "example": "DAILY"
       },
-      "x-code-key": "CD-EQUIPMENT-INSPECTION-TYPE"
+      "x-code-key": "CD-EQUIPMENT-INSPECTION-TYPE",
+      "description": "값 = `DAILY`·`MONTHLY`·`MAINTENANCE`. 값 목록은 `GET /mdm/code-values?codeGroupCode=EQUIPMENT_INSPECTION_TYPE` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31)."
      },
      {
       "name": "inspectedFrom",
@@ -4440,7 +4441,8 @@
       "type": "string",
       "example": "MOLD_CHANGE",
       "x-internal-note": "✅ 평면 «1단»으로 확정(2026-09-03 · P-05-02 §8-2). 계약이 처음부터 1단이었고 2단이던 것은 그 화면 §3 입력 셀렉트 하나였다 — 2단으로 가려면 대분류 값을 새로 지어내야 하는데 그 값을 정한 문서가 없었다(A-21). 선례 LOCATION_TYPE 이 같은 판단이다 — 「축은 하나다 — 계층 깊이는 별도 그룹이 갖는다」. 그룹 이름의 출처는 omf-mes#198 시드(2026-08-22 작업 통지).",
-      "x-code-key": "CD-DOWNTIME-REASON"
+      "x-code-key": "CD-DOWNTIME-REASON",
+      "description": "값 = `EQUIPMENT_FAILURE`·`MOLD_CHANGE`·`MATERIAL_WAIT`·`LABOR_WAIT`·`PREVENTIVE_MAINTENANCE`·`OTHER`. 값 목록은 `GET /mdm/code-values?codeGroupCode=DOWNTIME_REASON` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31)."
      },
      "reasonName": {
       "type": "string",
