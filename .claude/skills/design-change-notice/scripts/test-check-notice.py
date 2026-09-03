@@ -11,7 +11,8 @@
   남은 것은 「같은 본문이 공개 저장소로 나간다」 하나라 스캔 함수만 잠근다.
 - 모양(N1~N6·T) — 규칙마다 통과 1 · 위반 ≥1. `use_git=False` 로 해시 실재는 형식만 본다.
 - 통합 — 임시 git 저장소에 화면·계약·코드 사전을 두 커밋으로 만들고 build-notice.py 를 돌려
-  «지점만 나오고 값은 안 나온다»를 잠근 뒤, 그 결과가 check-notice.py 를 통과하는지 본다.
+  «파일만 나오고 파일 안의 무엇(절·경로·스키마·키·값)은 안 나온다»를 잠근 뒤, 그 결과가
+  check-notice.py 를 통과하는지 본다. 입자 = 파일(2026-09-03 사용자 확정).
 """
 from __future__ import annotations
 
@@ -46,8 +47,9 @@ GOOD = (
     "| 자료 | 경로 | 버전 |\n| --- | --- | --- |\n"
     "| 화면설계서 | `design/wiki/screens/` | `b96f470` |\n\n"
     "4. **이전 버전(`de4203a`)과 달라진 지점**\n\n"
-    "- 화면설계서 `W-04-03` — §3 · §5-1\n"
-    "- API 계약서 03품질 — `POST /quality/lot-holds/{lotHoldId}:release` · 스키마 `LotHold`(신설)\n"
+    "- 화면설계서 `design/wiki/screens/04/W-04-03-테스트화면.md`\n"
+    "- API 계약서 `design/wiki/api-contracts/openapi/quality-03품질.json`\n"
+    "- 코드 사전 `design/schema/code-dictionary.md` (신설)\n"
 ) % (FULL, FULL[:7])
 TITLE = "[설계 변동 공지] 2026-09-03 · " + FULL[:7]
 
@@ -196,7 +198,7 @@ class N3TeamWords(unittest.TestCase):
 
     def test_백틱_안은_안_본다(self):
         """경로·파일명에 들어간 낱말은 지점이지 팀 구분이 아니다."""
-        errs, _ = codes(GOOD + "- 사양서·요구사항 `클라이언트-구성` — §1\n")
+        errs, _ = codes(GOOD + "- 사양서·요구사항 `design/wiki/project-spec/클라이언트-구성.md`\n")
         self.assertNotIn("N3", errs)
 
 
@@ -335,6 +337,7 @@ class BuildNotice(unittest.TestCase):
         _write(r, "design/wiki/api-contracts/openapi/quality-03품질.json", CONTRACT_V1)
         _write(r, "design/schema/code-dictionary.md", DICT_V1)
         _write(r, "design/wiki/screens/W-01-01-테스트화면.html", "<p>배포본</p>")
+        _write(r, "design/wiki/screens/W-01-02-옛이름.md", "# W-01-02 옛이름\n\n## §1. 개요\n\n본문\n")
         _git(r, "add", "-A")
         _git(r, "commit", "-q", "-m", "첫 커밋")
         cls.first = _git(r, "rev-parse", "HEAD")
@@ -342,6 +345,7 @@ class BuildNotice(unittest.TestCase):
         _write(r, "design/wiki/api-contracts/openapi/quality-03품질.json", CONTRACT_V2)
         _write(r, "design/schema/code-dictionary.md", DICT_V2)
         _write(r, "design/wiki/screens/W-01-01-테스트화면.html", "<p>배포본 2</p>")
+        _git(r, "mv", "design/wiki/screens/W-01-02-옛이름.md", "design/wiki/screens/W-01-02-새이름.md")
         _git(r, "add", "-A")
         _git(r, "commit", "-q", "-m", "둘째 커밋")
         cls.second = _git(r, "rev-parse", "HEAD")
@@ -353,7 +357,7 @@ class BuildNotice(unittest.TestCase):
                            capture_output=True, text=True)
         return p, out
 
-    def test_지점만_나오고_값은_안_나온다(self):
+    def test_파일만_나오고_파일_안의_것은_안_나온다(self):
         p, out = self._build("--since", self.first)
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
         self.assertIn("지점", p.stdout)
@@ -362,19 +366,23 @@ class BuildNotice(unittest.TestCase):
         self.assertIn("1. **공지 발행 날짜**: 2026-09-03", text)
         self.assertIn("2. **배포 버전**: `%s` (`%s`)" % (self.second, self.second[:7]), text)
         self.assertIn("4. **이전 버전(`%s`)과 달라진 지점**" % self.first[:7], text)
-        self.assertIn("- 화면설계서 `W-01-01` — §3", text)
-        self.assertIn("API 계약서 03품질 — ", text)
-        self.assertIn("`GET /quality/lot-holds`", text)
-        self.assertIn("스키마 `LotHold`", text)
-        self.assertIn("스키마 `LotHoldCreate`(신설)", text)
-        self.assertIn("- 코드 사전 — `CD-X`", text)
+        self.assertIn("- 화면설계서 `design/wiki/screens/W-01-01-테스트화면.md`\n", text)
+        self.assertIn("- 화면설계서 `design/wiki/screens/W-01-02-새이름.md` "
+                      "(경로 변경 · 이전 `design/wiki/screens/W-01-02-옛이름.md`)\n", text)
+        self.assertIn("- API 계약서 `design/wiki/api-contracts/openapi/quality-03품질.json`\n", text)
+        self.assertIn("- 코드 사전 `design/schema/code-dictionary.md`\n", text)
+        # 파일 «안»의 것은 어느 갈래에서도 나오지 않는다 — 절·경로·메서드·스키마·키. 항목은 「갈래 `경로` (표지)」뿐
+        items = [l for l in text.splitlines() if l.startswith("- ")]
+        self.assertEqual(len(items), 4, items)
+        for line in items:
+            for inner in ("§", "/quality/lot-holds", "GET", "스키마", "LotHold", "CD-X", " — "):
+                self.assertNotIn(inner, line, line)
         self.assertIn("| 화면설계서 | `design/wiki/screens/` | `%s` |" % self.second[:7], text)
         self.assertIn("| 공유계약 | `design/wiki/decisions-policy/공유계약.md` | — |", text)
         for s in SECRETS:
             self.assertNotIn(s, text, s)
-        self.assertNotIn("§1", text)   # 안 바뀐 절은 안 나온다
-        self.assertNotIn("§5", text)
         self.assertNotIn(".html", text)
+        self.assertEqual(p.stdout.count("지점(파일) 4건"), 1, p.stdout)
 
     def test_생성물이_검사기를_통과한다(self):
         p, out = self._build("--since", self.first)

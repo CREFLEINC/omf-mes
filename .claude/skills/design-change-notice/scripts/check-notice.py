@@ -245,7 +245,7 @@ def check(text: str, title: str | None = None, use_git: bool = True,
     # N4 — 내용 유출
     for n, line in enumerate(lines, 1):
         if line.lstrip().startswith("```"):
-            errs.append(("N4", n, "코드 펜스 — 본문·값을 옮긴 징후. 지점(이름·키·절)만 적는다"))
+            errs.append(("N4", n, "코드 펜스 — 본문·값을 옮긴 징후. 지점(파일)만 적는다"))
         if ARROWS.search(line):
             errs.append(("N4", n, "화살표(→ · -> · =>) — 「무엇이 어떻게 바뀌었나」를 적은 징후"))
         if line.startswith(">"):
