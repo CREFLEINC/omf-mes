@@ -21,8 +21,8 @@
 
 | 무엇 | 정본 | 규모 | 세는 명령 |
 | --- | --- | :-: | --- |
-| **계약** | `wiki/api-contracts/openapi/*.json` **7파일** | **경로 353 · 오퍼레이션 489 · 스키마 506** | `python3 design/schema/generators/openapi/check-structure.py` |
-| **근거** — 화면 액션이 어느 경로에 대응하나 | `design/wiki/api-contracts/06-API-요구서*.md` **9장** | 인용 **914** 전건 계약에 실재 | `python3 design/schema/generators/verify-doc-citations.py` |
+| **계약** | `wiki/api-contracts/openapi/*.json` **7파일** | **경로 354 · 오퍼레이션 490 · 스키마 507** | `python3 design/schema/generators/openapi/check-structure.py` |
+| **근거** — 화면 액션이 어느 경로에 대응하나 | `design/wiki/api-contracts/06-API-요구서*.md` **9장** | 인용 **916** 전건 계약에 실재 | `python3 design/schema/generators/verify-doc-citations.py` |
 | **덮은 화면** | 요구서 §3 소절 | **117 / 117** | `python3 design/schema/generators/build-screen-progress.py` |
 
 **실측일: 2026-08-25**(design 이관 시 verify-counts.py 재측정으로 정정 — 아래 변경 이력 참조).
@@ -152,6 +152,7 @@ python3 design/schema/generators/openapi/check-lock-token-source.py
 
 | 판 | 날짜 | 요지 |
 | :-: | --- | --- |
+| v0.8 | 2026-09-03 | **처분 판정 대상 목록 신설 — 경로 353→354 · 오퍼레이션 489→490 · 스키마 506→507 · 인용 914→916.** `W-04-07` 의 **유일한 차단 미결**(진입 목록의 출처)을 닫았다. §5-7 이 진입을 `GET /quality/nonconformances`(이미 만들어진 부적합)로 매핑해 두어 **자기 자신을 입력으로 요구**하고 있었다 — 부적합을 만드는 화면이 이 화면 하나로 확정된 뒤(2026-09-01) 아직 부적합이 없는 대상은 목록에 뜰 수 없었다. ⇒ **`GET /quality/disposition-candidates`**(`DispositionCandidate` — LOT 단위)를 04 에 신설했다. ⭐ 축을 04 에 둔 이유 — 원천이 01(반품 입고)과 03(OQC 불합격)으로 갈려 있어 어느 한쪽에 「부적합 미생성」 축을 달면 그 계약이 `quality.nonconformance` 를 알아야 한다. ⭐ 부적합 «유무를 가리지 않고» 내려 화면 배지 넷(부적합 없음/의뢰 전/판정 대기/판정 완료)이 한 목록에서 나온다. 함께 정정 — `POST /quality/nonconformances` 산문이 아직 「`W-04-06` 반품 입고가 만든다」였다(2026-09-01 확정과 어긋남). |
 | v0.7 | 2026-09-03 | **인용 913 → 914.** 05 설비툴 요구서 §3-3(`W-05-13` 툴 마스터)에 `GET /mdm/code-values?codeGroupCode=CYCLE_TYPE` 행을 신설했다 — 화면 §4-A 가 「PM 날짜 주기」를 **한 행에 「간격 + 단위」로 담고 출처 컬럼을 안 적어** 계약↔사전 다리가 이어지지 않았고, 그 사각지대에서 단위 값이 **「일/월」 2값으로 낡은 채** 남아 있었다(확정은 `CYCLE_TYPE` 4값 · 계약은 2026-09-02 에 이미 고쳤다). 행을 둘로 가르고 컬럼명을 적어 다리를 이었다. 계약 자체는 늘지 않았다 — 경로·오퍼레이션·스키마 수는 v0.6 과 같다. ⇒ 코드 그룹 도달성 **화면 축 21 → 20**. |
 | v0.6 | 2026-09-03 | **공정 마스터 CRUD 신설 — 경로 350→353 · 오퍼레이션 483→488 · 스키마 503→506 · 인용 900→913.** `mdm.process` 는 `REQ-PR-0026` 이 「ERP 에 공정 정보가 없는 경우가 전제」로 확정한 **MES 정본**인데 **만드는 경로가 없었다**(`GET /mdm/processes` 조회 하나뿐). `W-06-01` 이 공정 마스터를 흡수하기로 확정되면서(2026-09-03 사용자 · 최상위 탭 2개) `POST /mdm/processes` · `GET|PUT /mdm/processes/{processId}` · `:deactivate` · `:activate` **5오퍼레이션**과 `ProcessCreate`·`ProcessUpdate`·`ProcessDetailResponse` **3스키마**가 섰다. 인용 13건은 요구서 §3-2 액션표 5행 · 근거 표 갱신 · §9 이력 문면에서 왔다. ⭐ 이로써 코드 그룹 도달성 검사의 **그룹 축이 1 → 0** 이 됐다 — 남아 있던 `PROCESS_TYPE` 하나는 요구서의 결손이 아니라 **«화면의 부재»**였다. |
 | v0.5 | 2026-09-01 | **인용 수 정정 — 710 → 714.** 개발팀 검토 요청 `omf-mes#336` 반영으로 04 제품출하 요구서 §3-9(`W-04-10`)에 `code-values` 신설 행 1건, app 공통승인 요구서 §1-2 「긴급 IQC 생략」 행의 생성 경로 정정 1건이 인용으로 잡혔다(계약 자체는 늘지 않았다 — 경로·오퍼레이션·스키마 수는 v0.4 이후 동일). ⚠ **710 은 이번 회차 시작 시점의 실측이지 v0.4 가 남긴 560 의 다음 판이 아니다** — 그 사이 여러 회차가 인용을 늘렸는데 이 표를 매번 따라가지 않았다. 이 행의 「적힘」은 이번 반영 직전 `verify-counts.py` 실측값을 기준으로 삼았다. |
