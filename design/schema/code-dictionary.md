@@ -1,7 +1,7 @@
 # 코드 사전 (2026-09-02)
 
-> ⭐ **완성 — 175키 / 499자리.** 공유계약 `G-32` 등록부 **103그룹 전부**와 계약이
-> `enum` 으로 닫은 자리를 담는다. 계약 `*Code(s)` 자리 **651 전건**이 판정을
+> ⭐ **완성 — 175키 / 502자리.** 공유계약 `G-32` 등록부 **103그룹 전부**와 계약이
+> `enum` 으로 닫은 자리를 담는다. 계약 `*Code(s)` 자리 **655 전건**이 판정을
 > 받았다(판정 없음 0 · 2026-09-03). ⚠ 「639」로 적었던 앞선 수는 **경로 안에 «인라인»으로 정의된 스키마와 배열 `items` 안의 자리를 세지 않은 분모**였다 — 검사기 ㉨ 가 그 사각지대를 없앴다. `check-code-dictionary.py` 가 ⓪ 규칙으로 «막는다» —
 > 등록부에 이름이 오르면 여기에도 행이 있어야 한다.
 > «(정합주: 2026-09-03 — 1차 완성 시점의 「103키 / 257자리 · 62그룹 · 41종」을 지금 수치로
@@ -92,7 +92,7 @@ CD-<계열>-<축>
 
 ---
 
-## 사전 — **175키 / 499자리**
+## 사전 — **175키 / 502자리**
 
 | 소유 | 키 |
 | --- | :-: |
@@ -246,8 +246,8 @@ CD-<계열>-<축>
 | `CD-MES-CATEGORY` | `NEW` `RECYCLED` | `MES_CATEGORY` | `mesCategoryCode` | `registry-system` | 2 | CD-MES-CATEGORY 는 품목의 신재/재생재 구분. M-01-12 §5-B · DR-006 6-A |
 | `CD-MOLD-PM-TRIGGER-TYPE` | `SHOT` `DATE` `BOTH` `NONE` | `MOLD_PM_TRIGGER_TYPE` | `pmTriggerTypeCode` | `registry-system` | 3 | 툴 예방보전을 무엇으로 판정하는가. ⭐ 확정이 「겸용 설정형」이라 이 칸이 그 «설정»이다 — 툴마다 사용자가 고른다. ⛔ **시스템 소유** — 값이 늘면 PM 도래 판정 규칙이 함께 늘어야 한다. ⚠ `W-05-13` §8-11 이 「`PM_TRIGGER_TYPE` 이 저장소 전수 0건」으로 보류해 둔 자리다 |
 | `CD-NONCONFORMANCE-SEVERITY` | `CRITICAL` `MAJOR` `MINOR` ⬜ | `NONCONFORMANCE_SEVERITY` | `severityCode` | `registry` | 3 | 부적합 심각도. ⭐ 화면 목업이 「심각도 중대」(`W-03-10`)·「심각도 중」(`W-04-07`)을 그려 3단계 축이 이미 서 있었다. ⚠ `#198` 시드 28그룹 목록 «밖»이라 그동안 아무도 세지 않았다 |
-| `CD-NONCONFORMANCE-SOURCE` | `PRODUCT` `RETURN` | — | `sourceCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `/quality/nonconformances`(`shipment-04제품출하`). ⭐ 서버가 대상 LOT 의 입고 유형으로 «파생»한다. ⛔ `CD-DEFECT-RECORD-SOURCE` 와 축이 다르다 — 저쪽은 「어디서 발견했나」, 여기는 「어디서 들어온 물건인가」 |
-| `CD-NONCONFORMANCE-STATUS` | `NOT_REQUESTED` `PENDING_DECISION` `DECIDED` | `NONCONFORMANCE_STATUS` | `statusCode` | `registry-system` | 2 | 부적합 의뢰·판정 축 |
+| `CD-NONCONFORMANCE-SOURCE` | `PRODUCT` `RETURN` | — | `sourceCode` | `enum` | 4 | 계약이 `enum` 으로 닫은 값 — `/quality/nonconformances`(`shipment-04제품출하`). ⭐ 서버가 대상 LOT 의 입고 유형으로 «파생»한다. ⛔ `CD-DEFECT-RECORD-SOURCE` 와 축이 다르다 — 저쪽은 「어디서 발견했나」, 여기는 「어디서 들어온 물건인가」 |
+| `CD-NONCONFORMANCE-STATUS` | `NOT_REQUESTED` `PENDING_DECISION` `DECIDED` | `NONCONFORMANCE_STATUS` | `statusCode` | `registry-system` | 3 | 부적합 의뢰·판정 축 |
 | `CD-NOTIFICATION-RECIPIENT-TYPE` | `ROLE` `USER` | — | `recipientTypeCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `NotificationRecipient`(`app-공통`). ⛔ 값이 «어느 짝 필드를 채우는지»를 가른다 — `ROLE` 이면 `businessUnitId`+`roleId`, `USER` 면 `userId` 다 |
 | `CD-NOTIFICATION-TARGET-TYPE` | `EQUIPMENT` `MOLD` `INSTRUMENT` `PURCHASE_ORDER` `INTEGRATION_SYNC` `APPROVAL_REQUEST` `LOT` `WORK_ORDER` `NONCONFORMANCE` | — | `targetTypeCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `Notification`(`app-공통`). ⛔ **2026-09-03 정정** — 전에는 `registry-system` 으로 등록부에 올라 있었는데 `A-16` 위반이다. ⚠ `LOT`·`WORK_ORDER`·`NONCONFORMANCE` 는 대응 이벤트가 알림센터 목록에 아직 없다 |
 | `CD-NUMBER-SOURCE` | `MES` `SUPPLIER` | — | `numberSourceCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `LotCreate`(`logistics-01자재창고`) |
