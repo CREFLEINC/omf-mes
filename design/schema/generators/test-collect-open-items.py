@@ -147,5 +147,206 @@ class 표를_읽어서도_같은가(unittest.TestCase):
         self.assertEqual([r["done"] for r in 결과["rows"]], [True, False, False])
 
 
+# ── omf-mes#357 — 미결 절 안의 «다른 표»를 미결 행으로 삼켰다 ────────────────
+#
+# 파서가 표 경계를 «열 수»로만 판정해서(`len(cs) < len(header)-1`), 같은 절 안에
+# 4열 표가 또 나오면 그 행까지 미결로 셌다. 실물 — `W-05-03` §8-2 공유계약 후보
+# 표 둘이 §8-1 뒤에 붙어 있어 규칙 표 7행이 통째로 미결이 됐다:
+#     「타발수 입력(P-05-01) · 증분 +1,250」 · 「자기참조 체인」 · 「이력 · 체인이 곧 이력」
+# 그중 3행은 ✅ 가 붙어 «해소»로까지 세어졌다.
+#
+# ⛔ 「번호가 숫자인 행만 센다」는 답이 아니다 — 정당한 비숫자 번호가 실재한다.
+#    아래 «비숫자 번호» 표본이 그 반증을 박아 둔 자리다.
+class 표_경계(unittest.TestCase):
+    """미결 표는 «머리»에서 시작해 «표가 끝나는 자리»에서 끝난다."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def parse(self, 본문: str, 이름: str = "W-99-02-시험용화면.md") -> dict:
+        경로 = os.path.join(self.tmp, 이름)
+        with open(경로, "w", encoding="utf-8") as f:
+            f.write(본문)
+        return coi.parse(경로)
+
+    # ⓐ 미결 절에 표가 둘 — 둘째 표를 안 센다 (`W-05-03` §8-1 + §8-2 의 축소판)
+    표가_둘 = """# W-99-02 시험용 화면
+
+## §8. 미결 · 계약 후보
+
+### §8-1. 미결
+
+| # | 항목 | 성격 | 처리 |
+| :-: | --- | --- | --- |
+| **1** | **PM 실적 테이블 없음** | **설계 결정** | ✅ **정의했다**(§5-A) |
+| **2** | **보전부위 마스터** | **설계 결정** | ⚠ 자유 입력 유지 |
+
+### §8-2. 이 장에서 나온 공유 계약 후보
+
+#### **한 컬럼에 증분과 치환이 함께 붙는다** — B-18 단서
+
+| 행위 | 방식 | 낙관적 잠금 | 왜 |
+| --- | --- | :-: | --- |
+| 타발수 입력(`P-05-01`) | **증분** `+1,250` | ⛔ **안 건다** | 여러 POP 이 동시에 기여 |
+| **PM 리셋**(이 화면) | **치환** `→ 0` | ✅ **건다** | 덮어쓰는 행위라 충돌 감지가 필요 |
+
+#### **자기참조 체인 대신 마스터의 현재 값을 갱신한다**
+
+| | 자기참조 체인 | **마스터 현재 값** |
+| --- | --- | --- |
+| 중간 한 건 취소 | ⛔ 뒤가 전부 어긋난다 | ✅ 영향 없다 |
+| 이력 | 체인이 곧 이력 | 실적이 각자 남는다 |
+"""
+
+    def test_둘째_표는_미결이_아니다(self):
+        결과 = self.parse(self.표가_둘)
+        self.assertEqual([r["no"] for r in 결과["rows"]], ["1", "2"])
+        self.assertEqual([r["done"] for r in 결과["rows"]], [True, False])
+
+    def test_둘째_표의_행이_한_줄도_안_섞인다(self):
+        결과 = self.parse(self.표가_둘)
+        문면 = " ".join(r["item"] + r["handling"] for r in 결과["rows"])
+        for 섞이면_안_되는_말 in ("증분", "치환", "자기참조", "체인이 곧 이력", "행위"):
+            with self.subTest(말=섞이면_안_되는_말):
+                self.assertNotIn(섞이면_안_되는_말, 문면)
+
+    # ⛔ 미결 표가 «첫 표»가 아닌 스펙이 실재한다 — 2026-09-03 전수 실측에서
+    #    미결 절에 표가 둘 이상인 4벌 중 `W-05-02`·`W-05-05` 는 앞에 DS 매핑 표가
+    #    온다. 「첫 표만 센다」로 고쳤으면 그 둘이 통째로 사라진다.
+    미결표가_뒤에 = """# W-99-03 시험용 화면
+
+## §8. 미결
+
+| 요소 | 유형 | 컴포넌트 |
+| --- | --- | --- |
+| 오더 목록 | 표 | DataGrid |
+
+### §8-1. 미결
+
+| # | 항목 | 성격 | 처리 |
+| :-: | --- | --- | --- |
+| **1** | **값 목록 미정** | **공통코드** | `W-06-06` |
+"""
+
+    def test_미결_표가_첫_표가_아니어도_찾는다(self):
+        결과 = self.parse(self.미결표가_뒤에, "W-99-03-시험용화면.md")
+        self.assertTrue(결과["table"])
+        self.assertEqual([r["no"] for r in 결과["rows"]], ["1"])
+        self.assertEqual(결과["rows"][0]["item"], "**값 목록 미정**")
+
+    # ⓑ 정당한 비숫자 번호는 살아남는다 — 실물 3형태.
+    #     `7(신설)`  P-01-01     `신설 6`  W-02-06     `~~5~~`  W-06-05
+    #    (`~~5~~` 는 «취소선으로 해소를 적은» 형태라 행은 남되 done=True 다)
+    비숫자_번호 = """# W-99-04 시험용 화면
+
+## §8. 미결
+
+| # | 항목 | 성격 | 처리 |
+| :-: | --- | --- | --- |
+| **7(신설)** | 채번 도출·검증 상세 미정 | 데이터 | 서버 몫 |
+| **신설 6** | 모바일 반품 경로 | 프로세스 | 확인 |
+| ~~5~~ | ~~BOM 확장 열도 작성중에만 편집 가능한가~~ | 설계 결정 | ✅ **종결(2026-08-29)** |
+| **4-a** | 재고 상태 값 목록 | 공통코드 | `W-06-06` |
+"""
+
+    def test_비숫자_번호는_사라지지_않는다(self):
+        결과 = self.parse(self.비숫자_번호, "W-99-04-시험용화면.md")
+        self.assertEqual([r["no"] for r in 결과["rows"]],
+                         ["7(신설)", "신설 6", "~~5~~", "4-a"])
+
+    def test_취소선_번호는_행은_남고_해소로_센다(self):
+        결과 = self.parse(self.비숫자_번호, "W-99-04-시험용화면.md")
+        self.assertEqual([r["done"] for r in 결과["rows"]],
+                         [False, False, True, False])
+
+
+# ── C2 — 진도표 117 ↔ 미결·인계 대장 118 이 갈렸다 ──────────────────────────
+#
+# 폐지가 확정돼도 문서는 지우지 않는다(폐지 «판단의 근거»가 그 안에 있다).
+# 그래서 스펙 «파일»을 세면 118, 정본 인벤토리는 117 이 되어 인도물 두 장이
+# 다른 수를 말했다. 판정을 한 곳(`retired()`)에 두고 셋이 함께 쓴다.
+class 폐지_확정_스펙(unittest.TestCase):
+
+    폐지 = "# ~~W-06-13 · 검사정책 설정~~ → **`W-06-02`로 통합·폐지**\n\n## §8. 미결\n"
+
+    def test_취소선과_폐지가_함께_있으면_폐지다(self):
+        self.assertTrue(coi.retired(self.폐지))
+
+    def test_낱말_하나로는_안_가른다(self):
+        """⛔ 살아 있는 화면의 «이름»에 취소·통합·중단이 들어간다 — 실물 3벌."""
+        for h1 in ("# W-01-13 · 물류 문서 진행현황·취소",
+                   "# W-04-12 · 출하 확정·취소",
+                   "# P-02-10 · 작업 중단(홀드) 등록",
+                   "# W-06-02 · 검사기준 등록 — `W-06-13` 을 통합했다"):
+            with self.subTest(h1=h1):
+                self.assertFalse(coi.retired(h1 + "\n\n## §8. 미결\n"))
+
+    def test_취소선만_있고_폐지가_없으면_아니다(self):
+        # 제목의 «옛 이름»을 지우고 새 이름을 붙인 표기 — 폐지가 아니다.
+        self.assertFalse(coi.retired("# ~~W-06-03 · 불량코드~~ 불량·원인코드 2계층 마스터\n"))
+
+    def test_폐지_스펙도_행은_읽는다_세지_않을_뿐이다(self):
+        """⭐ 안 읽으면 그 문서에 살아 있던 미결이 «소리 없이» 사라진다.
+
+        `W-06-13` 에 실제로 2행이 있었다. 읽어 두어야 대장이 「몇 행이 딸려
+        나갔나」를 적을 수 있고, 다음 사람이 통합처를 볼 수 있다.
+        """
+        tmp = tempfile.mkdtemp()
+        try:
+            경로 = os.path.join(tmp, "W-99-05-폐지화면.md")
+            with open(경로, "w", encoding="utf-8") as f:
+                f.write(self.폐지 + """
+| # | 항목 | 성격 | 처리 |
+| :-: | --- | --- | --- |
+| **1** | 통합안이 부결되면 쓸 미결 | 설계 결정 | 보류 |
+""")
+            결과 = coi.parse(경로)
+            self.assertTrue(결과["retired"])
+            self.assertEqual([r["no"] for r in 결과["rows"]], ["1"])
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+
+class 정본_실측(unittest.TestCase):
+    """표본이 아니라 «지금 저장소»를 한 번 태운다 — 회귀가 여기서 먼저 보인다."""
+
+    def test_폐지_스펙은_정확히_한_벌이고_그것이_W_06_13_이다(self):
+        specs, gone = coi.collect()
+        self.assertEqual([s["screen"] for s in gone], ["W-06-13"])
+        self.assertNotIn("W-06-13", [s["screen"] for s in specs])
+
+    def test_폐지_스펙에_딸린_미결은_계수에서만_빠진다(self):
+        """세지 않는 것과 «없는 것»은 다르다 — 행은 읽혀 있어야 대장이 그 사실을 적는다."""
+        _, gone = coi.collect()
+        살아있는 = [r for s in gone for r in s["rows"] if not r["done"]]
+        self.assertTrue(살아있는, "폐지 스펙의 미결 행을 아예 안 읽으면 대장이 그 사실을 못 적는다")
+
+    def test_대장_문면이_폐지_제외를_말한다(self):
+        """⛔ 조용히 빼면 다음 사람이 스펙 «파일»을 세고 「또 갈렸다」로 읽는다."""
+        specs, gone = coi.collect()
+        본문 = coi.render(specs, gone)
+        self.assertIn("폐지 확정으로 제외한 스펙", 본문)
+        self.assertIn("W-06-13", 본문)
+        self.assertIn("| 화면 스펙 | **%d** |" % len(specs), 본문)
+
+    def test_W_05_03_은_8_1_다섯_행만_낸다(self):
+        specs, _ = coi.collect()
+        w = next(s for s in specs if s["screen"] == "W-05-03")
+        self.assertEqual(len(w["rows"]), 5)          # §8-1 미결 5행
+        self.assertEqual([r["no"] for r in w["rows"]], ["1", "2", "3", "4", "5"])
+
+    def test_정당한_비숫자_번호가_대장에_남아_있다(self):
+        specs, _ = coi.collect()
+        살아있는 = {(s["screen"], r["no"]) for s in specs for r in s["rows"]
+                    if not r["done"]}
+        for 표본 in (("P-01-01", "7(신설)"), ("W-02-06", "신설 6"),
+                     ("M-01-12", "4-a"), ("W-CO-08", "1-a")):
+            with self.subTest(표본=표본):
+                self.assertIn(표본, 살아있는)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

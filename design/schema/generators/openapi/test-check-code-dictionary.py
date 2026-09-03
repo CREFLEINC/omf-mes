@@ -129,10 +129,12 @@ class 형제_갈림을_찾는다(unittest.TestCase):
 
 
 
-def 사전행(key, values=(), group=(), names=(), owner="enum", places=None):
+def 사전행(key, values=(), group=(), names=(), owner="enum", places=None,
+        blank=False):
     """사전 한 행을 지어낸다 — read_dictionary 가 내는 모양 그대로."""
     return {"key": key, "values": list(values), "group": list(group),
-            "names": list(names), "owner": owner, "places": places, "basis": "테스트"}
+            "names": list(names), "owner": owner, "places": places,
+            "basis": "테스트", "blank": blank}
 
 
 def 자리(f="logi", kind="스키마", path="/a", st="enum", enum=(), ptr=(),
@@ -489,7 +491,8 @@ class UndecidedTest(unittest.TestCase):
 
 
 class SelfCountGapsTest(unittest.TestCase):
-    FACTS = {"키": 174, "자리": 491, "그룹": 103}
+    FACTS = {"키": 174, "자리": 491, "그룹": 103,
+             "값 전량 ⬜": 13, "값 부분 ⬜": 9}
 
     def test_문면이_실물과_같으면_통과한다(self):
         text = "⭐ **174키 / 491자리.** 등록부 **103그룹 전부**와 …"
@@ -526,13 +529,56 @@ class SelfCountGapsTest(unittest.TestCase):
     def test_수를_안_적으면_잡을_것이_없다(self):
         self.assertEqual(cd.self_count_gaps("계수를 적지 않았다", self.FACTS), [])
 
+    # ── ⬜ 계수 — 2026-09-03 신설 ────────────────────────────────────────
+    # ⛔ 이 사고의 실물 — 머리말이 「⬜ 14키 · 그중 하나는 «진짜 결손»」이라 적었는데
+    #    그 하나(`CD-APP-USER-STATUS`)는 **같은 날 `#408` 이 값을 채웠다.** ⑦ 이
+    #    키·자리·그룹만 봐서 못 잡았고, 사전이 자기 자신에 대해 거짓을 말했다.
+
+    def test_전량_빈값_수가_어긋나면_잡는다(self):
+        gaps = cd.self_count_gaps("값이 «전량» ⬜ 인 키는 **14** 이고", self.FACTS)
+        self.assertEqual(len(gaps), 1)
+        self.assertIn("문면 14", gaps[0])
+        self.assertIn("실물 13", gaps[0])
+
+    def test_부분_빈값_수가_어긋나면_잡는다(self):
+        gaps = cd.self_count_gaps("«부분» ⬜ 인 키는 **8** — 결손이 아니다", self.FACTS)
+        self.assertEqual(len(gaps), 1)
+        self.assertIn("값 부분 ⬜", gaps[0])
+
+    def test_빈값_수가_맞으면_통과한다(self):
+        text = ("값이 «전량» ⬜ 인 키는 **13** 이고 … "
+                "«부분» ⬜ 인 키는 **9** — 결손이 아니다")
+        self.assertEqual(cd.self_count_gaps(text, self.FACTS), [])
+
+    def test_전량과_부분을_따로_센다(self):
+        # ⭐ 두 수가 «다른 것»을 세므로 한쪽만 맞아도 다른 쪽은 걸린다.
+        text = "값이 «전량» ⬜ 인 키는 **13** … «부분» ⬜ 인 키는 **14**"
+        gaps = cd.self_count_gaps(text, self.FACTS)
+        self.assertEqual(len(gaps), 1)
+        self.assertIn("값 부분 ⬜", gaps[0])
+
+    def test_실물_사전의_빈값_계수를_직접_센다(self):
+        # ⭐ 「전량 ⬜」 = 값 열에 코드 문자열이 0 · 「부분 ⬜」 = 값이 있는데 ⬜ 가 붙었다.
+        entries = cd.read_dictionary(cd.DICT)
+        전량 = [e["key"] for e in entries if not e["values"]]
+        부분 = [e["key"] for e in entries if e["blank"] and e["values"]]
+        self.assertEqual(len(전량), 13, 전량)
+        self.assertEqual(len(부분), 9, 부분)
+        # ⛔ 「전량 ⬜」 는 전부 고객이 채우는 갈래여야 한다 — 우리 몫이 남아 있으면
+        #    머리말의 「전부 없는 것이 정상」이 거짓이 된다.
+        self.assertEqual({e["owner"] for e in entries if not e["values"]},
+                         {"registry"})
+
     def test_실물_사전이_자기_계수와_맞는다(self):
         import importlib
         ptr = importlib.import_module("check-code-group-pointer")
         entries = cd.read_dictionary(cd.DICT)
         facts = {"키": len(entries),
                  "자리": sum(e["places"] or 0 for e in entries),
-                 "그룹": len(ptr.load_registry())}
+                 "그룹": len(ptr.load_registry()),
+                 "값 전량 ⬜": sum(1 for e in entries if not e["values"]),
+                 "값 부분 ⬜": sum(1 for e in entries
+                               if e["blank"] and e["values"])}
         with open(cd.DICT, encoding="utf-8") as fh:
             self.assertEqual(cd.self_count_gaps(fh.read(), facts), [])
 

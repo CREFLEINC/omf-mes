@@ -86,20 +86,30 @@ def collect() -> "tuple[list, list, list]":
 # ⛔ `raw/…/screen-inventory-ia.md`(129)·`04-통합-IA.md`(131)를 쓰지 않는다 —
 #    통합·폐지 전 원본이라 지금 서 있는 화면보다 많다.
 INVENTORY = os.path.join(HERE, "..", "..", "wiki", "handover", "화면-진도표.md")
-SCREEN_CODE = re.compile(r"([WMP]-(?:CO|\d{2})-\d{2})")
+
+
+SUMMARY_SCREENS = re.compile(r"^\|\s*화면\s*\|\s*\*\*(\d+)\*\*", re.M)
 
 
 def screen_inventory_count() -> "int | None":
-    """정본 화면 수.
+    """정본 화면 수 — 진도표 요약 표의 「화면」 값을 읽는다.
 
     ⭐ 대조 상대를 «생성기 자신»이 아니라 인벤토리 정본으로 둔다 — 자기가 센 수를
     자기가 검증하면 화면 스펙 서식이 바뀐 순간 둘 다 같이 틀린다.
     ⛔ 정본을 못 읽으면 `None` 을 내고 «건너뛰지 않고» 호출부가 실패로 다룬다.
+
+    ⛔ **파일 전체에서 화면 코드를 «긁어» 세지 않는다**(2026-09-03 정정).
+       그 방식은 「진도표가 화면 코드를 표 안에서만 말한다」를 가정했는데, 폐지 확정
+       스펙을 «조용히 빼지 않으려고» 「세지 않은 스펙 | `W-06-13`」 표를 실은 순간
+       그 가정이 깨졌다 — 서 있는 화면 117 에 폐지 1 이 더해져 118 로 세고,
+       자기 계수(폐지를 이미 제외한 117)와 어긋나 ⛔ 를 냈다. 세는 수를 문면에
+       드러낼수록 긁기는 더 틀린다. ⇒ 진도표가 «세어서 적어 둔 값»을 읽는다.
     """
     if not os.path.exists(INVENTORY):
         return None
     with io.open(INVENTORY, encoding="utf-8") as fh:
-        return len(set(SCREEN_CODE.findall(fh.read())))
+        m = SUMMARY_SCREENS.search(fh.read())
+    return int(m.group(1)) if m else None
 
 
 def main() -> int:
@@ -131,8 +141,10 @@ def main() -> int:
         out.append("")
 
     out.append("## 시드 — 개발용\n")
-    out.append("⛔ **반영은 데이터모델 소관이다 — 작업 통지이고 기다리지 않는다**"
-               "(`design/schema/data-model-boundary.md`).\n")
+    out.append("⛔ **반영은 데이터모델 소관이다 — 우리는 여기 적는 데까지이고 "
+               "기다리지 않는다**(`design/schema/data-model-boundary.md`). 이 목록은 "
+               "업무 「사실」이지 **반영 지시가 아니다**. 개발팀에 알리는 별도의 통지는 "
+               "없다 — 개발팀이 이 저장소를 직접 열람한다(V3 규칙 2).\n")
     out.append("### 역할 `app.role` — 4\n")
     out.append("고객이 운영 중 늘리고 고치고 지운다(사용자 결정 2026-09-01). "
                "⭐ 화면 동작은 역할 «이름»이 아니라 **권한**에 걸리므로 이 넷은 출발점일 뿐이다.\n")
