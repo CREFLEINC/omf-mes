@@ -119,6 +119,45 @@ class 좁힘은_살아있다(unittest.TestCase):
         self.assertTrue(coi.resolved(문면))
 
 
+class 살아있다고_적은_행(unittest.TestCase):
+    """⛔ 표지를 갈아 끼울 때 «옛 표지의 결말»을 적으면 그 행 자신이 닫혔다.
+
+    2026-09-04 · `omf-mes#378` 3회차에서 실제로 일곱 행이 대장에서 사라졌다 —
+    `W-03-10` 3 · `W-06-06` 9 · `W-04-10` 4 · `W-01-04` 2 · `W-06-14` 6 ·
+    `W-06-15` 6 · `W-CO-09` 1. 그중 둘은 계약·등록부가 그 미결 번호를 인용하며
+    자리를 비워 둔 곳이라 사라지면 계약 주석이 죽는다.
+    """
+
+    def test_표지_교체는_열림이다(self):
+        문면 = "3 ⭐ 표지 교체 — 옛 표지 #64 는 2026-08-25 에 회신 없이 종결됐다"
+        self.assertFalse(coi.resolved(문면))
+
+    def test_닫지_않는다는_열림이다(self):
+        문면 = "9 ⛔ 그래도 이 행은 닫지 않는다 — 등록부가 이 미결을 이름으로 인용한다"
+        self.assertFalse(coi.resolved(문면))
+
+    def test_열어_둔다는_열림이다(self):
+        문면 = "4 ⚠ 답이 없다 — 열어 둔다. #44 는 종결됐고 그 결말이 이것을 닫지 않는다"
+        self.assertFalse(coi.resolved(문면))
+
+    def test_표기가_없으면_옛_표지의_종결이_이_행을_닫는다(self):
+        """⛔ 반례 — 이것이 규약을 «필요»하게 만든 자리다.
+
+        같은 뜻인데 표기가 빠지면 닫힌다. 그래서 머리말이 「함께 적는다」로 못박는다.
+        """
+        문면 = "3 옛 표지 #64 는 2026-08-25 에 회신 없이 종결됐다"
+        self.assertTrue(coi.resolved(문면))
+
+    def test_답이_없다도_열림이다(self):
+        """판정 3 의 어휘 그대로다 — 판정을 적으면 표기가 저절로 붙는다."""
+        문면 = ("4 ⚠ 2026-09-04 — 답이 없다. 표지가 죽었고 갈아 끼울 곳도 없다. "
+              "#44 는 2026-07-29 에 코멘트 0건으로 종결됐다")
+        self.assertFalse(coi.resolved(문면))
+
+    def test_진짜_해소는_여전히_해소다(self):
+        self.assertTrue(coi.resolved("2 ✅ 해소 2026-09-04 — 계약에 자리가 섰다"))
+
+
 class 표를_읽어서도_같은가(unittest.TestCase):
     """단위 판정이 맞아도 표를 거쳐 오면 달라질 수 있다 — 끝까지 한 번 태운다."""
 
@@ -338,14 +377,122 @@ class 정본_실측(unittest.TestCase):
         self.assertEqual(len(w["rows"]), 5)          # §8-1 미결 5행
         self.assertEqual([r["no"] for r in w["rows"]], ["1", "2", "3", "4", "5"])
 
-    def test_정당한_비숫자_번호가_대장에_남아_있다(self):
+    def test_정당한_비숫자_번호를_읽는다(self):
+        """숫자가 아닌 미결 번호(`7(신설)`·`신설 6`·`4-a`)도 «행»으로 읽혀야 한다.
+
+        ⛔ **표본을 「살아 있는 행」으로 잡지 않는다.** 그렇게 두었더니 2026-09-04
+           하루에 두 번 빨개졌다 — 3회차가 `W-02-06` 신설 6 을, 이어서
+           `P-01-01` 7(신설)을 **정당하게** 닫았기 때문이다. 미결이 닫히는 것은
+           이 저장소가 «일을 한» 결과인데 그때마다 시험이 깨지면, 다음 사람은
+           시험을 고치는 대신 «닫지 않는» 쪽으로 기울게 된다.
+        ⇒ 읽히는가는 **해소 여부와 무관한 성질**이라 닫힌 행까지 전건에서 본다.
+        """
         specs, _ = coi.collect()
-        살아있는 = {(s["screen"], r["no"]) for s in specs for r in s["rows"]
-                    if not r["done"]}
+        번호 = {(s["screen"], r["no"]) for s in specs for r in s["rows"]}
         for 표본 in (("P-01-01", "7(신설)"), ("W-02-06", "신설 6"),
                      ("M-01-12", "4-a"), ("W-CO-08", "1-a")):
             with self.subTest(표본=표본):
-                self.assertIn(표본, 살아있는)
+                self.assertIn(표본, 번호)
+        꼴 = {n for _, n in 번호 if not n.isdigit()}
+        self.assertTrue(any("(신설)" in n for n in 꼴), "`N(신설)` 꼴이 사라졌다")
+        self.assertTrue(any(n.startswith("신설") for n in 꼴), "`신설 N` 꼴이 사라졌다")
+        self.assertTrue(any(n.endswith("-a") for n in 꼴), "`N-a` 꼴이 사라졌다")
+
+
+# ── `#N` 을 네 가지가 쓴다 — 우리 이슈만 표지다 (2026-09-04 · omf-mes#378) ──────
+# ⭐ 문면은 전부 «실물»에서 따왔다 — 지어내면 시험이 실물을 안 지킨다.
+우리이슈_맨몸 = "3 값 목록 미정 공통코드 W-06-06 · #145"
+우리이슈_접두 = "1 문서 유형 값 집합 — **`omf-mes#347` 으로 판정된다** 확인 필요"
+QA_띄움 = "6 알림 발송 대상 — 보류 등록이 알림 대상인가(QA #24)"
+QA_붙임 = "2 재입하 이벤트(REQ-PR-0024·QA#23) — 자리표시"
+타저장소_server = ("3 `mes_category_code` 값 목록 — ⛔ `enum` 을 만들지 않는다 · "
+                "시드 삽입 확인은 `omf-mes-server#45`·`#46`")
+타저장소_client = "1 「갭 없음」으로 읽고 client#85 로 넘긴 자리"
+MLOT항목 = ("2 채번 상세 설계 부재 — 34자리 자릿수만 확정이고 도출·검증·유일성 "
+           "규칙은 별도 후속 과제(MLOT #16)")
+확정날짜 = "4 사출 조건은 설비가 갖는다 (✓확정 2026-07-14 #4)"
+PR번호 = "1 2차 리뷰 반영(`PR #211`) — 문면만"
+자기미결 = "5 「그렇게 처리한다」로 정정. **§8 미결 #3** 과 같은 자리"
+
+
+class 표지_네갈래(unittest.TestCase):
+    """⛔ 우리 이슈가 아닌 `#N` 을 표지로 세면 «엉뚱한 이슈»에 걸린다."""
+
+    def test_맨몸_번호는_우리_이슈다(self):
+        self.assertEqual(coi.tag_issues(우리이슈_맨몸), ["#145"])
+
+    def test_우리_저장소_접두는_벗겨서_남긴다(self):
+        """`omf-mes#347` 은 우리 것이다 — 접두가 붙었다고 버리면 안 된다."""
+        self.assertEqual(coi.tag_issues(우리이슈_접두), ["#347"])
+
+    def test_QA_는_띄우든_붙이든_버린다(self):
+        self.assertEqual(coi.tag_issues(QA_띄움), [])
+        self.assertEqual(coi.tag_issues(QA_붙임), [])
+
+    def test_다른_저장소_이슈는_표지가_아니다(self):
+        """⛔ V3 아래서 개발팀 저장소 이슈는 우리가 추적할 수 없다.
+
+        `omf-mes-server#45` 를 `#45` 로 읽어 「닫힌 표지」 45행 안에 넣고 있었다.
+        ⚠ 뒤따르는 `·#46` 은 «맨몸»이라 남는다 — 원문이 같은 저장소를 이어 쓴
+           줄임꼴이지만, 그것까지 가르려면 문맥을 봐야 한다. 지금은 안 가른다.
+        """
+        self.assertNotIn("#45", coi.tag_issues(타저장소_server))
+        self.assertEqual(coi.tag_issues(타저장소_client), [])
+
+    def test_다른_번호_체계는_버린다(self):
+        """MLOT(확정기록 항목) · 확정 날짜 · PR · 자기 미결 번호."""
+        self.assertEqual(coi.tag_issues(MLOT항목), [])
+        self.assertEqual(coi.tag_issues(확정날짜), [])
+        self.assertEqual(coi.tag_issues(PR번호), [])
+        self.assertEqual(coi.tag_issues(자기미결), [])
+
+    def test_네자리_번호도_읽는다(self):
+        """⛔ 옛 정규식은 `\d{1,3}` 이라 `#1024` 를 `#102` 로 읽었다."""
+        self.assertEqual(coi.tag_issues("1 후속 — #1024 참조"), ["#1024"])
+
+    def test_같은_번호는_한_번만_센다(self):
+        self.assertEqual(coi.tag_issues("#61 과 omf-mes#61 은 같다"), ["#61"])
+
+    def test_버린_번호에_이어진_목록도_버린다(self):
+        """⛔ `QA #7·#10` 의 `#10` 은 앞 낱말이 구분점이라 낱말만 보면 샌다.
+
+        2026-09-04 실측 8건 — `QA #12·#13`(`P-02-04`) · `QA #4·#6·#35`(`W-02-05`) ·
+        `QA #33·#34`(`W-06-06`) · `QA #7·#10`(`W-06-08`) · `QA #1·#4·#6·#35`(`W-06-12`).
+        """
+        for 문면 in ("판정 근거(QA #7·#10)", "✓확정 QA #12 · #13",
+                   "QA #1·#4·#6·#35 로 종결"):
+            with self.subTest(문면=문면):
+                self.assertEqual(coi.tag_issues(문면), [])
+
+    def test_이어짐은_구분점뿐일_때만이다(self):
+        """⚠ 반대로 막으면 안 된다 — 사이에 «말»이 있으면 이어진 목록이 아니다."""
+        self.assertEqual(coi.tag_issues("QA #7 이 정했고 #145 가 남았다"), ["#145"])
+
+
+class 조항과_절번호(unittest.TestCase):
+    """⛔ `§4-B-1` 의 꼬리가 공유계약 조항 `B-1` 로 읽히면
+
+    그 화면 «자신의 절»이 「답을 줄 상대」로 둔갑한다 — `E-n` 예외 번호와 같은 병이다.
+    2026-09-04 실측 — 화면 스펙 전건 22회 · 이름 4종(`C-1` 13 · `C-2` 4 · `B-1` 4 · `B-2` 1).
+    """
+
+    @staticmethod
+    def _조항(text):
+        for kind, pat in coi.TRACKS:
+            if kind == "조항":
+                return pat.findall(text)
+        raise AssertionError("조항 규칙이 TRACKS 에 없다")
+
+    def test_절_번호의_꼬리는_조항이_아니다(self):
+        for 문면 in ("이름 정합화만 데이터 모델 통지(§4-B-1)", "§4-B-1-a 참조",
+                   "§4-C-1 표"):
+            with self.subTest(문면=문면):
+                self.assertEqual(self._조항(문면), [])
+
+    def test_진짜_조항은_그대로_남는다(self):
+        self.assertEqual(self._조항("공유계약 B-1 을 본다"), ["B-1"])
+        self.assertEqual(self._조항("(A-11) 을 적용"), ["A-11"])
+        self.assertEqual(self._조항("A-10·B-3 둘 다"), ["A-10", "B-3"])
 
 
 if __name__ == "__main__":
