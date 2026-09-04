@@ -129,8 +129,12 @@ READERS: list[tuple[str, list[str], str]] = [
 #    (저장소 기준 경로, 대상 글롭들, 무엇이 대상인가)
 TARGETED: list[tuple[str, list[str], str]] = [
     (".claude/skills/uiux-design/scripts/check-report-language.py",
-     ["tmp/requests/*/*.md", "tmp/replies/*.md"],
-     "요청서·완료보고·답변서 초안. 정본은 `tmp/` 아래(gitignore)라 평소에는 0건이다"),
+     # ⛔ `tmp/requests/*/*.md` 로 넓히지 않는다 — 같은 폴더의 `요청.md` 는 «개발팀이 쓴 글»이고
+     #    Phase 1 이 그대로 저장하라고 정한 시점 고착본이다. 우리 서술 규약(화면 번호 전개)으로
+     #    검사하면 «고칠 수 없는 ⛔» 가 남는다. 2026-09-04 실측 — omf-mes#427 요청서를 저장하자
+     #    runall 이 그 자리에서 빨개졌고, 고치려면 개발팀의 문장을 우리가 바꿔야 했다.
+     ["tmp/requests/*/답변서.md", "tmp/replies/*.md"],
+     "완료보고·답변서 초안 — «우리가 쓴 글»만. 정본은 `tmp/` 아래(gitignore)라 평소에는 0건이다"),
     (".claude/skills/design-change-notice/scripts/check-notice.py",
      ["tmp/notices/*.md"],
      "설계 변동 공지 초안. `build-notice.py` 가 만든 뒤에만 있다"),
