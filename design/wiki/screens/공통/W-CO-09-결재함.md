@@ -83,7 +83,7 @@
 | 라벨(한/베) | 출처 컬럼 | 타입 | 표시 | 비고 |
 | --- | --- | --- | :-: | --- |
 | 요청번호 | `approval_request_no` | `business_no_t` | ✅ | UNIQUE — 목록 검색 대상 |
-| 승인 유형 | `approval_type_code` | `code_t` | ✅ | `GOODS_ISSUE_DISPOSAL`(기타출고 품의=폐기) · `INVENTORY_ADJUSTMENT`(재고조정) · `PURCHASE_ORDER`(신규 P/O) · `INBOUND_RECEIPT_CANCEL`(입하 취소) · `GOODS_RECEIPT_CANCEL`(입고 취소) · `GOODS_ISSUE_CANCEL`(출고 취소) · `SHIPMENT_CANCEL`(출하 취소) · `IQC_SKIP`(긴급 IQC 생략) **8값** — ⭐ **계약이 `enum` 으로 닫았다 — 생성 타입(`api.d.ts`)이 값을 갖는다**(코드 사전 `CD-APPROVAL-TYPE` · `omf-mes#336` · 사용자 확정 2026-09-01). **`W-06-15` §8-2 와 같은 뿌리이고 그쪽도 함께 해소됐다.** ⛔ **공통코드 그룹으로 받지 않는다** — `codeGroupCode=` 호출이 «없다». ⛔ 화면이 «고르는» 값이 아니다 — 서버가 상신 오퍼레이션에서 채운다. 이 화면은 **필터·표시**로만 쓴다 |
+| 승인 유형 | `approval_type_code` | `code_t` | ✅ | `GOODS_ISSUE_DISPOSAL`(기타출고 품의=폐기) · `PRODUCTION_RESULT_CORRECT`(작업실적 A급 정정) · `INVENTORY_ADJUSTMENT`(재고조정) · `PURCHASE_ORDER`(신규 P/O) · `INBOUND_RECEIPT_CANCEL`(입하 취소) · `GOODS_RECEIPT_CANCEL`(입고 취소) · `GOODS_ISSUE_CANCEL`(출고 취소) · `SHIPMENT_CANCEL`(출하 취소) · `IQC_SKIP`(긴급 IQC 생략) **8값** — ⭐ **계약이 `enum` 으로 닫았다 — 생성 타입(`api.d.ts`)이 값을 갖는다**(코드 사전 `CD-APPROVAL-TYPE` · `omf-mes#336` · 사용자 확정 2026-09-01). **`W-06-15` §8-2 와 같은 뿌리이고 그쪽도 함께 해소됐다.** ⛔ **공통코드 그룹으로 받지 않는다** — `codeGroupCode=` 호출이 «없다». ⛔ 화면이 «고르는» 값이 아니다 — 서버가 상신 오퍼레이션에서 채운다. 이 화면은 **필터·표시**로만 쓴다 |
 | 대상 유형 | `target_type_code` | `code_t` | ✅ | **다형 참조** — ⚠ 유형↔테이블 규약 부재(#68) §5-2 |
 | 대상 | `target_id` | bigint | ✅ | 위와 짝 |
 | 상신자 | `requested_by` | bigint FK → `app_user` | ✅ | |

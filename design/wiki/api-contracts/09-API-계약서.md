@@ -21,8 +21,8 @@
 
 | 무엇 | 정본 | 규모 | 세는 명령 |
 | --- | --- | :-: | --- |
-| **계약** | `wiki/api-contracts/openapi/*.json` **7파일** | **경로 354 · 오퍼레이션 490 · 스키마 507** | `python3 design/schema/generators/openapi/check-structure.py` |
-| **근거** — 화면 액션이 어느 경로에 대응하나 | `design/wiki/api-contracts/06-API-요구서*.md` **9장** | 인용 **922** 전건 계약에 실재 | `python3 design/schema/generators/verify-doc-citations.py` |
+| **계약** | `wiki/api-contracts/openapi/*.json` **7파일** | **경로 355 · 오퍼레이션 491 · 스키마 509** | `python3 design/schema/generators/openapi/check-structure.py` |
+| **근거** — 화면 액션이 어느 경로에 대응하나 | `design/wiki/api-contracts/06-API-요구서*.md` **9장** | 인용 **929** 전건 계약에 실재 | `python3 design/schema/generators/verify-doc-citations.py` |
 | **덮은 화면** | 요구서 §3 소절 | **117 / 117** | `python3 design/schema/generators/build-screen-progress.py` |
 
 **실측일: 2026-08-25**(design 이관 시 verify-counts.py 재측정으로 정정 — 아래 변경 이력 참조).

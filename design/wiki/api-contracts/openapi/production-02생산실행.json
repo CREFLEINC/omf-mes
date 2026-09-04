@@ -1845,9 +1845,6 @@
      },
      {
       "$ref": "#/components/parameters/IdempotencyKey"
-     },
-     {
-      "$ref": "#/components/parameters/WorkerNo"
      }
     ],
     "requestBody": {
@@ -1911,7 +1908,95 @@
        }
       }
      }
-    }
+    },
+    "x-internal-note": "⛔ X-Worker-No 를 걷었다(2026-09-04) — 이 오퍼레이션을 부르는 화면이 관리웹 W-02-05 하나로 확정되면서(omf-mes#61) 사번을 보낼 주체가 없어졌다. 공유계약 D-5 의 귀속 헤더는 «현장 단말·모바일» 조항이고 관리웹은 지어낼 사번이 없다 — 형제인 :request-approval 도 같은 이유로 두지 않는다. 정정한 사람은 인증 주체로 남는다. ⚠ 뒤에 현장 단말이 이 경로를 부르게 되면 그때 선택판을 얹는다."
+   }
+  },
+  "/production/production-results/{productionResultId}:request-approval": {
+   "post": {
+    "tags": [
+     "production"
+    ],
+    "summary": "실적 정정 상신",
+    "description": "A급 보정(수불·기간업무시스템에 영향을 주는 정정)을 승인에 올린다. **등급은 서버가 정정 내용으로 판정한다** — 화면이 등급을 보내지 않는다. 결재선이 없으면 400(code=ROUTE_NOT_FOUND)이다 — 상신할 곳이 없는 요청을 만들지 않는다. 진행 중인 승인 요청이 이미 있으면 400 이다 — 한 실적에 살아 있는 요청은 하나다. 반려된 요청은 진행 중이 아니므로 다시 상신할 수 있고 그때는 새 요청이 만들어진다(공유계약 J-6). 승인이 끝나면 정정은 `POST /production/production-results/{productionResultId}:correct` 로 기록한다 — 이 오퍼레이션은 «승인 요청»만 만든다. 근거: W-02-05 §5-4 · 공유계약 J-4 · G-18 · 2026-08-31 사용자 확정(A급 보정부터 승인)",
+    "parameters": [
+     {
+      "name": "productionResultId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ApprovalRequestCreate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "202": {
+      "description": "상신됨",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApprovalRequestRef"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "검증 실패. 고쳐야 풀린다 — 결재선 부재·진행 중 요청 존재·B급이라 승인이 필요 없는 정정",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "권한 없음",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다 — 원본 실적이 없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "저장 충돌. 다시 읽어 오면 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProductionConflictResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-internal-note": "⛔ If-Match 를 받지 않는다 — 원본 실적을 고치지 않으므로 잠글 것이 없다(:correct 와 같은 이유). ⛔ X-Worker-No 를 받지 않는다 — 이 오퍼레이션을 부르는 것은 관리웹 W-02-05 다(2026-09-04 사용자 결정). 서버가 approval_type_code=PRODUCTION_RESULT_CORRECT · target_type_code=PRODUCTION_RESULT 를 채운다. 누가 승인하는지는 결재선 정의(W-06-15)가 정한다 — 계약은 요청 생성까지만 덮는다."
    }
   },
   "/production/repair-executions": {
@@ -7181,6 +7266,36 @@
      "withResultCount",
      "withoutResultCount"
     ]
+   },
+   "ApprovalRequestCreate": {
+    "type": "object",
+    "required": [
+     "reason"
+    ],
+    "description": "승인 요청. 사유는 비울 수 없다 — 데이터가 NOT NULL 로 강제하고, 결재함 목록에서 이 문장이 요약을 겸한다(approval_request 에 업무 값이 reason 하나뿐이다). 승인 진행 상태를 읽고 결재하는 경로는 app-공통 파일이 갖는다. 근거: W-02-05 §5-4 · 공유계약 J-4 · A-12 보강",
+    "properties": {
+     "reason": {
+      "type": "string",
+      "description": "이 정정을 왜 하는가. 결재함(W-CO-09)에 보이는 «유일한 업무 값»이라 승인자가 이 문장만으로 판단한다. 화면이 필수로 만든다(공유계약 A-12)",
+      "example": "교대 종료 후 집계에서 양품 150 EA 누락이 확인됨",
+      "minLength": 1
+     }
+    },
+    "x-internal-note": "app.approval_request 계약은 app-공통 파일 소관(01-리소스도출 §1-1). 이 오퍼레이션은 요청 생성만 하고 요청 식별자를 돌려준다."
+   },
+   "ApprovalRequestRef": {
+    "type": "object",
+    "required": [
+     "approvalRequestId"
+    ],
+    "properties": {
+     "approvalRequestId": {
+      "x-source-column": "approval_request_id",
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     }
+    }
    }
   }
  }
