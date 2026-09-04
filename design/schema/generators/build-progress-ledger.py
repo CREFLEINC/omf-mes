@@ -19,7 +19,7 @@
 겁먹거나, 숫자를 감추고 다 됐다고 말하게 된다.
 
 ⚠ **「인계」라는 낱말이 더는 안 맞는다** — 개발팀에 넘겨주는 문서가 아니라 우리
-   진도표다. 폴더 이름(`design/wiki/handover/`)과 파일 이름 변경은 이번 범위 밖이라
+   진도표다. 폴더 이름(`design/wiki/progress/`)과 파일 이름 변경은 이번 범위 밖이라
    **적어만 둔다.**
 
 ⛔ 복사하지 않는다 — «합류» 시킨다
@@ -61,7 +61,7 @@
 
 쓰기
 ----
-    python3 design/schema/generators/build-handover-ledger.py
+    python3 design/schema/generators/build-progress-ledger.py
 """
 from __future__ import annotations
 
@@ -76,8 +76,8 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 OPENAPI = os.path.join(HERE, "openapi")
 ROOT = os.path.normpath(os.path.join(HERE, "..", "..", ".."))
-HANDOVER = os.path.join(ROOT, "design", "wiki", "handover")
-OUT = os.path.join(HANDOVER, "99-인계대장.md")
+PROGRESS = os.path.join(ROOT, "design", "wiki", "progress")
+OUT = os.path.join(PROGRESS, "99-설계진도대장.md")
 
 # 갈래 이름 — 표와 코드가 같은 말을 쓰도록 한자리에 둔다.
 HAS_VALUE = "사전이 값을 갖는다"
@@ -208,7 +208,7 @@ def screen_gaps() -> dict[str, str]:
     """화면 축의 구멍. ⛔ 「착수 통지가 아직 안 나간 화면」 행은 없앴다(2026-09-03) —
     착수 통지가 폐지돼 셀 대상이 아니다."""
     run("build-screen-progress.py")
-    text = read(os.path.join(HANDOVER, "화면-진도표.md"))
+    text = read(os.path.join(PROGRESS, "화면-진도표.md"))
     out: dict[str, str] = {}
     for head in ("상세 스펙이 없는 화면", "요구서 §3 이 다루지 않은 화면"):
         m = re.search(r"^### [⛔⚠] %s — (\d+)건\n\n(.*)$" % re.escape(head),
@@ -223,7 +223,7 @@ def main() -> int:
     argparse.ArgumentParser(add_help=True).parse_args()
 
     run("collect-open-items.py")
-    ledger = read(os.path.join(HANDOVER, "미결-대장.md"))
+    ledger = read(os.path.join(PROGRESS, "미결-대장.md"))
     TRACKLESS = "살아 있는 행 중 추적 표지가 없는 것"
     # ⭐ 「폐지 확정으로 제외한 스펙」도 함께 집는다 — 조용히 빼면 다음 사람이 스펙
     #    «파일»을 세고 「대장이 또 갈렸다」로 읽는다. 실제로 그 어긋남이 있었다
@@ -244,7 +244,7 @@ def main() -> int:
     lines = [
         "# 99 설계 진도 대장 — 우리 설계에서 아직 안 정해진 것",
         "",
-        "> ⛔ **생성물이다. 손으로 고치지 마라.** `python3 design/schema/generators/build-handover-ledger.py` 가 다시 만든다.",
+        "> ⛔ **생성물이다. 손으로 고치지 마라.** `python3 design/schema/generators/build-progress-ledger.py` 가 다시 만든다.",
         ">",
         "> ⭐ **이 대장은 «설계팀 자신»을 위한 것이다** — 우리 설계의 미결이 화면 스펙 %s장에 흩어져 있어,"
         % s.get("화면 스펙", "여러"),
@@ -255,7 +255,7 @@ def main() -> int:
         "> 그래서 이 대장이 말하는 것은 **「우리 설계가 어디까지 됐나」** 하나다.",
         ">",
         "> ⚠ **「인계」라는 낱말이 더는 안 맞는다** — 넘겨주는 문서가 아니라 우리 진도표다.",
-        "> 폴더·파일 이름 변경은 이번 범위 밖이라 **적어만 둔다**(`design/wiki/handover/`).",
+        "> 폴더·파일 이름 변경은 이번 범위 밖이라 **적어만 둔다**(`design/wiki/progress/`).",
         "",
         "## ⭐ 한 줄 판정",
         "",

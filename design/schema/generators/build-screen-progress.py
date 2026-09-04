@@ -57,7 +57,7 @@ from collections import Counter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, "..", "..", ".."))
-OUT = os.path.join(ROOT, "design", "wiki", "handover", "화면-진도표.md")
+OUT = os.path.join(ROOT, "design", "wiki", "progress", "화면-진도표.md")
 PROJECT_SPEC = os.path.join(ROOT, "design", "wiki", "project-spec")
 API_CONTRACTS = os.path.join(ROOT, "design", "wiki", "api-contracts")
 SCREENS_ROOT = os.path.join(ROOT, "design", "wiki", "screens")

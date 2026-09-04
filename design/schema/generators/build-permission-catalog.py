@@ -85,7 +85,7 @@ def collect() -> "tuple[list, list, list]":
 # `verify-screen-inventory.py` 출력과 같다).
 # ⛔ `raw/…/screen-inventory-ia.md`(129)·`04-통합-IA.md`(131)를 쓰지 않는다 —
 #    통합·폐지 전 원본이라 지금 서 있는 화면보다 많다.
-INVENTORY = os.path.join(HERE, "..", "..", "wiki", "handover", "화면-진도표.md")
+INVENTORY = os.path.join(HERE, "..", "..", "wiki", "progress", "화면-진도표.md")
 
 
 SUMMARY_SCREENS = re.compile(r"^\|\s*화면\s*\|\s*\*\*(\d+)\*\*", re.M)

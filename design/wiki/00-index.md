@@ -35,7 +35,7 @@ python3 design/schema/generators/verify-counts.py     ← 이 문서의 숫자�
 | :-: | --- | --- |
 | **00** | [용어 사전](glossary/00-용어사전.md) | **읽다 막히면 여기부터.** 이 프로젝트의 조어와 좁은 뜻으로 쓰는 말 — 용어 **24항목** |
 | — | [도메인 워크플로우](domain-workflow/00-index.md) | 요구사항이 도메인 업무 흐름에 어떻게 반영됐는가(WF 6·도식스펙 6·개념모델 1) |
-| **99** | ⭐ [**설계 진도 대장**](handover/99-인계대장.md) *(생성물)* | 우리 설계에서 **아직 안 정해진 것**을 한자리에 모은다 — 미결이 스펙 118장에 흩어져 있어 모아 두지 않으면 **설계팀이 자기 진행을 놓친다**. **동시에 「차단 0 — 설계 골격은 서 있다」도 같은 대장이 말한다** ⚠ 2026-09-03 개정 — 「인계」라는 낱말은 더는 안 맞는다(파일 이름은 그대로) |
+| **99** | ⭐ [**설계 진도 대장**](progress/99-설계진도대장.md) *(생성물)* | 우리 설계에서 **아직 안 정해진 것**을 한자리에 모은다 — 미결이 스펙 118장에 흩어져 있어 모아 두지 않으면 **설계팀이 자기 진행을 놓친다**. **동시에 「차단 0 — 설계 골격은 서 있다」도 같은 대장이 말한다** ⚠ 2026-09-03 개정 — 「인계」라는 낱말은 더는 안 맞는다(파일 이름은 그대로) |
 
 ---
 
@@ -43,7 +43,7 @@ python3 design/schema/generators/verify-counts.py     ← 이 문서의 숫자�
 
 개발은 대개 **화면 하나**를 맡아 시작한다. 그 화면의 모든 것을 한 줄로 잇는 표가 있다.
 
-> ### 👉 [**화면 진도표**](handover/화면-진도표.md) — 화면 ↔ 상세 스펙 경로 ↔ 요구서 ↔ 계약
+> ### 👉 [**화면 진도표**](progress/화면-진도표.md) — 화면 ↔ 상세 스펙 경로 ↔ 요구서 ↔ 계약
 >
 > ⚠ **2026-09-03 — 「착수 통지」 열은 걷었다.** 착수 가능 통지가 폐지됐고, 설계팀은 개발팀의 업무 진행에 직접 정보를 보유하지 않는다.
 
@@ -81,9 +81,9 @@ python3 design/schema/generators/verify-counts.py     ← 이 문서의 숫자�
 
 | 파일 | 다시 만드는 명령 |
 | --- | --- |
-| `handover/화면-진도표.md` | `python3 design/schema/generators/build-screen-progress.py` |
-| `handover/99-인계대장.md` | `python3 design/schema/generators/build-handover-ledger.py` |
-| `handover/미결-대장.md` | `python3 design/schema/generators/collect-open-items.py` |
+| `progress/화면-진도표.md` | `python3 design/schema/generators/build-screen-progress.py` |
+| `progress/99-설계진도대장.md` | `python3 design/schema/generators/build-progress-ledger.py` |
+| `progress/미결-대장.md` | `python3 design/schema/generators/collect-open-items.py` |
 | `schema/generators/openapi/ui-요구목록*.md` | `python3 design/schema/generators/verify-ui-coverage.py --write --domain <도메인>` |
 | `*.html` | `python3 design/schema/generators/build-doc-html.py [00\|01\|02\|03\|05\|06\|07\|all]` · `build-04-ia-html.py` · `build-04-ia-도식본.py` |
 

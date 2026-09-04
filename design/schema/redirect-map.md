@@ -395,7 +395,7 @@ uiux/2026-08-11-화면상세스펙-확대16차/W-CO-11-알람수신자설정.md 
 deliverables/build-04-ia-html.py  →  design/schema/generators/build-04-ia-html.py
 deliverables/build-04-ia-도식본.py  →  design/schema/generators/build-04-ia-도식본.py
 deliverables/build-doc-html.py  →  design/schema/generators/build-doc-html.py
-deliverables/build-handover-ledger.py  →  design/schema/generators/build-handover-ledger.py
+deliverables/build-handover-ledger.py  →  design/schema/generators/build-progress-ledger.py
 deliverables/build-screen-progress.py  →  design/schema/generators/build-screen-progress.py
 deliverables/collect-open-items.py  →  design/schema/generators/collect-open-items.py
 deliverables/count-decisions.py  →  design/schema/generators/count-decisions.py
@@ -429,9 +429,9 @@ deliverables/test-verify-polymorphic-mapping.py  →  design/raw/process/deliver
 
 ### 생성물 출력 위치 이동
 ```
-deliverables/화면-진도표.md  →  design/wiki/handover/화면-진도표.md
-deliverables/미결-대장.md  →  design/wiki/handover/미결-대장.md
-deliverables/99-인계대장.md  →  design/wiki/handover/99-인계대장.md
+deliverables/화면-진도표.md  →  design/wiki/progress/화면-진도표.md
+deliverables/미결-대장.md  →  design/wiki/progress/미결-대장.md
+deliverables/99-인계대장.md  →  design/wiki/progress/99-설계진도대장.md
 deliverables/openapi/ui-요구목록*.md  →  design/schema/generators/openapi/ui-요구목록*.md
 deliverables/README.md  →  design/wiki/00-index.md
 uiux/2026-07-25-화면목록-IA/crefle-doc/  →  design/raw/process/uiux/2026-07-25-화면목록-IA/crefle-doc/ (Phase 2 누락분 보강)
