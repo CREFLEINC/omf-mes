@@ -79,7 +79,7 @@
 | 플래그 토글 | 공정 행이 있을 때 |
 | 저장 | 변경이 있을 때만. 단말 단위 한 트랜잭션(§5-3) |
 | 사용 중지 | ⚠ 경고 필요 §6 |
-| 변경 이력 | ⛔ 없다 — §I-5(audit_event 키 규약 부재) |
+| 변경 이력 | ⛔ 없다 — §I-5(audit_event 키 규약 부재) ✅ 되살렸다 2026-09-04 — 「키 규약 부재」가 사실이 아니게 됐다(B-5 규칙 5 · §I-5 ✅ 2026-09-03). 이 화면은 GET /audit/events?targetTypeCode=TERMINAL&targetId={terminalId} 로 읽는다 — CD-AUDIT-TARGET-TYPE 7값에 TERMINAL(단말기) 이 있고, mdm.terminal_process 는 B-6 의 부여·회수 테이블이라 GRANT(권한 부여)·REVOKE(권한 회수) 이벤트로 남는다. 화면은 「변경 이력」 액션을 정상 활성으로 그린다. |
 
 ## M-CO-01
 

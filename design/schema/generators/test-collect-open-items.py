@@ -119,6 +119,45 @@ class 좁힘은_살아있다(unittest.TestCase):
         self.assertTrue(coi.resolved(문면))
 
 
+class 살아있다고_적은_행(unittest.TestCase):
+    """⛔ 표지를 갈아 끼울 때 «옛 표지의 결말»을 적으면 그 행 자신이 닫혔다.
+
+    2026-09-04 · `omf-mes#378` 3회차에서 실제로 일곱 행이 대장에서 사라졌다 —
+    `W-03-10` 3 · `W-06-06` 9 · `W-04-10` 4 · `W-01-04` 2 · `W-06-14` 6 ·
+    `W-06-15` 6 · `W-CO-09` 1. 그중 둘은 계약·등록부가 그 미결 번호를 인용하며
+    자리를 비워 둔 곳이라 사라지면 계약 주석이 죽는다.
+    """
+
+    def test_표지_교체는_열림이다(self):
+        문면 = "3 ⭐ 표지 교체 — 옛 표지 #64 는 2026-08-25 에 회신 없이 종결됐다"
+        self.assertFalse(coi.resolved(문면))
+
+    def test_닫지_않는다는_열림이다(self):
+        문면 = "9 ⛔ 그래도 이 행은 닫지 않는다 — 등록부가 이 미결을 이름으로 인용한다"
+        self.assertFalse(coi.resolved(문면))
+
+    def test_열어_둔다는_열림이다(self):
+        문면 = "4 ⚠ 답이 없다 — 열어 둔다. #44 는 종결됐고 그 결말이 이것을 닫지 않는다"
+        self.assertFalse(coi.resolved(문면))
+
+    def test_표기가_없으면_옛_표지의_종결이_이_행을_닫는다(self):
+        """⛔ 반례 — 이것이 규약을 «필요»하게 만든 자리다.
+
+        같은 뜻인데 표기가 빠지면 닫힌다. 그래서 머리말이 「함께 적는다」로 못박는다.
+        """
+        문면 = "3 옛 표지 #64 는 2026-08-25 에 회신 없이 종결됐다"
+        self.assertTrue(coi.resolved(문면))
+
+    def test_답이_없다도_열림이다(self):
+        """판정 3 의 어휘 그대로다 — 판정을 적으면 표기가 저절로 붙는다."""
+        문면 = ("4 ⚠ 2026-09-04 — 답이 없다. 표지가 죽었고 갈아 끼울 곳도 없다. "
+              "#44 는 2026-07-29 에 코멘트 0건으로 종결됐다")
+        self.assertFalse(coi.resolved(문면))
+
+    def test_진짜_해소는_여전히_해소다(self):
+        self.assertTrue(coi.resolved("2 ✅ 해소 2026-09-04 — 계약에 자리가 섰다"))
+
+
 class 표를_읽어서도_같은가(unittest.TestCase):
     """단위 판정이 맞아도 표를 거쳐 오면 달라질 수 있다 — 끝까지 한 번 태운다."""
 
@@ -338,14 +377,26 @@ class 정본_실측(unittest.TestCase):
         self.assertEqual(len(w["rows"]), 5)          # §8-1 미결 5행
         self.assertEqual([r["no"] for r in w["rows"]], ["1", "2", "3", "4", "5"])
 
-    def test_정당한_비숫자_번호가_대장에_남아_있다(self):
+    def test_정당한_비숫자_번호를_읽는다(self):
+        """숫자가 아닌 미결 번호(`7(신설)`·`신설 6`·`4-a`)도 «행»으로 읽혀야 한다.
+
+        ⛔ **표본을 「살아 있는 행」으로 잡지 않는다.** 그렇게 두었더니 2026-09-04
+           하루에 두 번 빨개졌다 — 3회차가 `W-02-06` 신설 6 을, 이어서
+           `P-01-01` 7(신설)을 **정당하게** 닫았기 때문이다. 미결이 닫히는 것은
+           이 저장소가 «일을 한» 결과인데 그때마다 시험이 깨지면, 다음 사람은
+           시험을 고치는 대신 «닫지 않는» 쪽으로 기울게 된다.
+        ⇒ 읽히는가는 **해소 여부와 무관한 성질**이라 닫힌 행까지 전건에서 본다.
+        """
         specs, _ = coi.collect()
-        살아있는 = {(s["screen"], r["no"]) for s in specs for r in s["rows"]
-                    if not r["done"]}
+        번호 = {(s["screen"], r["no"]) for s in specs for r in s["rows"]}
         for 표본 in (("P-01-01", "7(신설)"), ("W-02-06", "신설 6"),
                      ("M-01-12", "4-a"), ("W-CO-08", "1-a")):
             with self.subTest(표본=표본):
-                self.assertIn(표본, 살아있는)
+                self.assertIn(표본, 번호)
+        꼴 = {n for _, n in 번호 if not n.isdigit()}
+        self.assertTrue(any("(신설)" in n for n in 꼴), "`N(신설)` 꼴이 사라졌다")
+        self.assertTrue(any(n.startswith("신설") for n in 꼴), "`신설 N` 꼴이 사라졌다")
+        self.assertTrue(any(n.endswith("-a") for n in 꼴), "`N-a` 꼴이 사라졌다")
 
 
 # ── `#N` 을 네 가지가 쓴다 — 우리 이슈만 표지다 (2026-09-04 · omf-mes#378) ──────
