@@ -134,9 +134,14 @@ ANY_HEAD = re.compile(r"^#{1,4}\s", re.M)
 # ⛔ 「이슈」도 따로 두지 않는다 — `#N` 을 «고객 질의응답 번호»가 같은 모양으로 쓴다.
 #    「보류 등록이 알림 대상인가(QA #24)」의 `#24` 를 이슈 #24(도식스펙-04 정합)로
 #    잡고 있었다. 갈라 내는 일은 tag_issues() 가 한다.
+# ⛔ 조항 이름은 «절 번호의 꼬리»와 글자가 겹친다 — `§4-B-1` 의 뒤쪽이 조항 `B-1` 로
+#    읽혔다. 그러면 그 화면 «자신의 절»이 「답을 줄 상대」로 둔갑한다(`E-n` 예외 번호와
+#    같은 병이다). 2026-09-04 실측 — 화면 스펙 전건에서 22회 · 이름 4종
+#    (`C-1` 13 · `C-2` 4 · `B-1` 4 · `B-2` 1).
+#    ⇒ 바로 앞이 낱말 글자나 `-` 이면 조항이 아니다. `공유계약 B-1`·`(A-11)` 은 남는다.
 TRACKS = (
     ("DR", re.compile(r"\bDR-(\d{3})\b")),
-    ("조항", re.compile(r"\b([A-DF-J]-\d{1,2})\b")),
+    ("조항", re.compile(r"(?<![\w\-])([A-DF-J]-\d{1,2})\b")),
 )
 
 # ⛔ `E-n` 은 «세 가지»가 쓴다 — 문자열만 보면 갈 수 없다(2026-09-02 실측).
@@ -204,17 +209,32 @@ DATE_WORD = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
 def tag_issues(text: str) -> list[str]:
-    """`#N` 중 «우리 저장소 이슈»만 표지로 남긴다. 나머지 세 갈래는 버린다."""
+    """`#N` 중 «우리 저장소 이슈»만 표지로 남긴다. 나머지 세 갈래는 버린다.
+
+    ⛔ 버린 번호에 «목록»이 이어지면 그것도 버린다 — `QA #7·#10` 의 `#10` 은
+       앞 낱말이 `QA` 가 아니라 구분점이라 낱말만 보면 샌다. 2026-09-04 실측
+       8건(`QA #12·#13`·`QA #1·#4·#6·#35` 등). 이어짐의 표시는 «구분점뿐인 사이»다.
+    """
     out = []
+    prev_end = -1
+    prev_dropped = False
     for m in ISSUE_NO.finditer(text):
         pre = m.group("pre")
+        drop = False
         if pre and pre != OUR_REPO:
-            continue                      # ③ 다른 저장소(·②의 `QA#23` 같은 붙임꼴)
-        if not pre:
-            w = PREV_WORD.search(text[max(0, m.start() - 24):m.start()])
-            word = w.group(1) if w else ""
-            if word in NOT_ISSUE_WORDS or DATE_WORD.match(word):
-                continue                  # ②④ 다른 번호 체계
+            drop = True                   # ③ 다른 저장소(·②의 `QA#23` 같은 붙임꼴)
+        elif not pre:
+            gap = text[prev_end:m.start()] if prev_end >= 0 else None
+            if prev_dropped and gap is not None and gap.strip(" ·,、\u00a0") == "":
+                drop = True               # ② 버린 번호에 이어진 목록
+            else:
+                w = PREV_WORD.search(text[max(0, m.start() - 24):m.start()])
+                word = w.group(1) if w else ""
+                if word in NOT_ISSUE_WORDS or DATE_WORD.match(word):
+                    drop = True           # ②④ 다른 번호 체계
+        prev_end, prev_dropped = m.end(), drop
+        if drop:
+            continue
         tag = f"#{m.group('n')}"
         if tag not in out:
             out.append(tag)

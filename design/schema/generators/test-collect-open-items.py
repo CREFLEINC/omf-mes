@@ -402,6 +402,47 @@ class 표지_네갈래(unittest.TestCase):
     def test_같은_번호는_한_번만_센다(self):
         self.assertEqual(coi.tag_issues("#61 과 omf-mes#61 은 같다"), ["#61"])
 
+    def test_버린_번호에_이어진_목록도_버린다(self):
+        """⛔ `QA #7·#10` 의 `#10` 은 앞 낱말이 구분점이라 낱말만 보면 샌다.
+
+        2026-09-04 실측 8건 — `QA #12·#13`(`P-02-04`) · `QA #4·#6·#35`(`W-02-05`) ·
+        `QA #33·#34`(`W-06-06`) · `QA #7·#10`(`W-06-08`) · `QA #1·#4·#6·#35`(`W-06-12`).
+        """
+        for 문면 in ("판정 근거(QA #7·#10)", "✓확정 QA #12 · #13",
+                   "QA #1·#4·#6·#35 로 종결"):
+            with self.subTest(문면=문면):
+                self.assertEqual(coi.tag_issues(문면), [])
+
+    def test_이어짐은_구분점뿐일_때만이다(self):
+        """⚠ 반대로 막으면 안 된다 — 사이에 «말»이 있으면 이어진 목록이 아니다."""
+        self.assertEqual(coi.tag_issues("QA #7 이 정했고 #145 가 남았다"), ["#145"])
+
+
+class 조항과_절번호(unittest.TestCase):
+    """⛔ `§4-B-1` 의 꼬리가 공유계약 조항 `B-1` 로 읽히면
+
+    그 화면 «자신의 절»이 「답을 줄 상대」로 둔갑한다 — `E-n` 예외 번호와 같은 병이다.
+    2026-09-04 실측 — 화면 스펙 전건 22회 · 이름 4종(`C-1` 13 · `C-2` 4 · `B-1` 4 · `B-2` 1).
+    """
+
+    @staticmethod
+    def _조항(text):
+        for kind, pat in coi.TRACKS:
+            if kind == "조항":
+                return pat.findall(text)
+        raise AssertionError("조항 규칙이 TRACKS 에 없다")
+
+    def test_절_번호의_꼬리는_조항이_아니다(self):
+        for 문면 in ("이름 정합화만 데이터 모델 통지(§4-B-1)", "§4-B-1-a 참조",
+                   "§4-C-1 표"):
+            with self.subTest(문면=문면):
+                self.assertEqual(self._조항(문면), [])
+
+    def test_진짜_조항은_그대로_남는다(self):
+        self.assertEqual(self._조항("공유계약 B-1 을 본다"), ["B-1"])
+        self.assertEqual(self._조항("(A-11) 을 적용"), ["A-11"])
+        self.assertEqual(self._조항("A-10·B-3 둘 다"), ["A-10", "B-3"])
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
