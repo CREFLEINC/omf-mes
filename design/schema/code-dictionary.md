@@ -1,6 +1,6 @@
 # 코드 사전 (2026-09-02)
 
-> ⭐ **완성 — 175키 / 502자리.** 공유계약 `G-32` 등록부 **103그룹 전부**와 계약이
+> ⭐ **완성 — 176키 / 507자리.** 공유계약 `G-32` 등록부 **103그룹 전부**와 계약이
 > `enum` 으로 닫은 자리를 담는다. 계약 `*Code(s)` 자리 **655 전건**이 판정을
 > 받았다(판정 없음 0 · 2026-09-03). ⚠ 「639」로 적었던 앞선 수는 **경로 안에 «인라인»으로 정의된 스키마와 배열 `items` 안의 자리를 세지 않은 분모**였다 — 검사기 ㉨ 가 그 사각지대를 없앴다. `check-code-dictionary.py` 가 ⓪ 규칙으로 «막는다» —
 > 등록부에 이름이 오르면 여기에도 행이 있어야 한다.
@@ -92,7 +92,7 @@ CD-<계열>-<축>
 
 ---
 
-## 사전 — **175키 / 502자리**
+## 사전 — **176키 / 507자리**
 
 | 소유 | 키 |
 | --- | :-: |
@@ -160,8 +160,8 @@ CD-<계열>-<축>
 | `CD-CALIBRATION-AGENCY-TYPE` | `INTERNAL` `EXTERNAL` | `CALIBRATION_AGENCY_TYPE` | `agencyTypeCode` | `registry-system` | 2 | 교정 기관 구분. ⭐ 뜻 둘은 `W-05-10` §3-2·§5-4 가 확정했고 문자열만 없었다. ⚠ 외부 기관이면 `agencyName` 이 필수이고 `performedByUserId` 를 비운다(`A-2` 짝 제약) |
 | `CD-CALIBRATION-HISTORY-TYPE` | `CALIBRATION` `CHECK` ⬜ | `CALIBRATION_HISTORY_TYPE` | `historyTypeCode` | `registry` | 3 | 계측기 이력 유형. ⭐ **2026-09-02 사용자 결정으로 시스템이 «이름으로 지목하는» 값이 `CALIBRATION` 하나가 됐다** — 사용 가부 판정이 「열린 «수리» 이력」 대신 `blocksUse`+`clearedAt` 를 읽는다(`W-05-11` §5-2). 그래서 「수리」·「폐기」의 문자열을 우리가 정할 필요가 없고, 계약이 원래 적은 「관리자 설정형」이 그제서야 성립한다 |
 | `CD-CALIBRATION-RESULT` | ⬜ | `CALIBRATION_RESULT` | `resultCode` | `registry` | 2 | 계측기 이력의 결과. ⚠ 값 집합이 «이력 유형마다 다르다». ⛔ 설비 점검의 `resultCode`(`CD-MAINTENANCE-INSPECTION-RESULT`)와 이름만 같고 값집합이 다르다 — 한 그룹으로 묶으면 화면이 남의 선택지를 본다(`B-28`) |
-| `CD-CANCEL-BLOCKED-REASON` | `SUCCESSOR_EXISTS` `ALREADY_CANCELLED` `CANCEL_IN_PROGRESS` `STATE_LOCKED` | — | `cancelBlockedReasonCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `DocumentProgress`(`logistics-01자재창고`). ⭐ 서버가 판정한다 — 화면이 조건을 따로 조합하면 화면마다 갈린다. 화면은 이 값으로 안내 문구와 다음 경로를 가른다(`G-3`) |
-| `CD-CANCELABLE-DOCUMENT-TYPE` | `INBOUND_RECEIPT` `GOODS_RECEIPT` `GOODS_ISSUE` | — | `documentTypeCode` | `enum` | 1 | 취소할 수 있는 문서. 같은 계약 · 「자리마다 닫는다」 |
+| `CD-CANCEL-BLOCKED-REASON` | `SUCCESSOR_EXISTS` `ALREADY_CANCELLED` `CANCEL_IN_PROGRESS` `STATE_LOCKED` `TYPE_NOT_CANCELABLE` | — | `cancelBlockedReasonCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `DocumentProgress`(`logistics-01자재창고`). ⭐ 서버가 판정한다 — 화면이 조건을 따로 조합하면 화면마다 갈린다. 화면은 이 값으로 안내 문구와 다음 경로를 가른다(`G-3`). ⭐ **`TYPE_NOT_CANCELABLE` 2026-09-04 신설**(`omf-mes#352`) — 취소 경로가 없는 6종을 말할 값이 없었다 |
+| `CD-CANCELABLE-DOCUMENT-TYPE` | `INBOUND_RECEIPT` `GOODS_RECEIPT` `GOODS_ISSUE` | — | `documentTypeCode` | `enum` | 3 | 취소할 수 있는 문서. 같은 계약 · 「자리마다 닫는다」. ⭐ **2026-09-04 자리 1 → 3**(`omf-mes#352`) — 취소 주소가 유형 축 한 경로로 모이면서 이 값 목록이 **경로 파라미터**로 올라섰다(`:request-cancel`·`:cancel` 둘). 「어느 유형이 취소를 받는가」를 산문이 아니라 **경로가 스스로 말한다** |
 | `CD-COMPLETION-JUDGMENT` | `NORMAL` `OVER` `UNDER` | — | `completionJudgmentCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `LotProgress` · `WorkOrderProgress`(`logistics-01자재창고`) |
 | `CD-CONTROL-LEVEL` | `BLOCK` `OFF` `WARN` | — | `controlLevelCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `PrecheckDecision` · `PrecheckDecisionCreate`(`production-02생산실행`) |
 | `CD-CONTROL-OVERRIDE-REASON` | `EMERGENCY_WORK_ORDER` `OTHER` | `CONTROL_OVERRIDE_REASON` | `reasonCode` | `registry` | 3 | 통제 우회 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
@@ -291,6 +291,7 @@ CD-<계열>-<축>
 | `CD-ROUTING-OPERATION-DEPENDENCY-TYPE` | `FINISH_TO_START` `START_TO_START` `FINISH_TO_FINISH` `START_TO_FINISH` | `ROUTING_OPERATION_DEPENDENCY_TYPE` | `dependencyTypeCode` | `registry-system` | 2 | 공정 선후관계. ⭐ 기본은 종료-시작(`FINISH_TO_START`) — 사용자와 협의해 확정했다(2026-09-03) |
 | `CD-SCOPE` | `BUSINESS_UNIT` `COMPANY` `EQUIPMENT_GROUP` `WORK_ORDER` `WORK_SHIFT` | — | `scopeCode` | `enum` | 3 | 계약이 `enum` 으로 닫은 값 — `Notice` · `NoticeCreate`(`app-공통`) |
 | `CD-SHIPMENT-LOT-MATCH-FAIL-REASON` | `LABEL_ITEM_MISMATCH` `LOT_NOT_ALLOCATED` | — | `reasonCode` | `enum` | 1 | 출하 LOT 배분 대조가 «실패한 이유» — `GET /logistics/shipment-lot-allocations` 응답의 `match.reasonCode`. ⭐ 값이 계약 «산문에만» 있었다(2026-09-03 발굴) — 「정했는데 이름이 없었다」의 또 한 사례다. ⛔ 서버가 판정해 내리고 화면은 이 값으로 «문구»를 가른다 — 동작이 값에 걸리므로 설계가 닫는다(`G-31`). 고객이 늘리지 않아 등록부에 올리지 않는다(`A-16` 「가」 참) |
+| `CD-SHIPMENT-PROGRESS` | `NOT_ALLOCATED` `PARTIALLY_ALLOCATED` `PICKING` `PICKED` `PARTIALLY_SHIPPED` `SHIPPED` | — | `shipmentProgressCode` | `enum` | 3 | 출하작업지시의 진행 축 — 라인 4수량(요청·배정·피킹·출하)의 서버 롤업이다. ⛔ 저장하지 않는다(`A-17` 두 질문이 둘 다 「아니오」 · `L-2`). ⭐ 고객이 늘리지 않아 등록부에 올리지 않는다 — 서버가 «내는» 값이라 늘려도 낼 경로가 없다(`A-16` 「가르는 물음 넷」 — 가 거짓 · 라 거짓 · 다 참). 같은 계약 파일의 형제 셋(`CD-DISPOSITION-PROGRESS`·`CD-SHIPPING-INSPECTION-STATUS`·`CD-SHIPMENT-LOT-MATCH-FAIL-REASON`)과 같은 모양 · `omf-mes#402` |
 | `CD-SHIPMENT-STATUS` | `UNCONFIRMED` `CONFIRMED` `CANCELLED` | `SHIPMENT_STATUS` | `statusCode` | `registry-system` | 2 | 출하 확정·취소 축 |
 | `CD-SHIPMENT-TIME-SLOT` | `MORNING` `AFTERNOON` `NIGHT` | `SHIPMENT_TIME_SLOT` | `timeSlotCode` | `registry` | 4 | 공유계약 `G-32` 등록부 표의 근거 칸에서 옮겼다 |
 | `CD-SHIPPING-INSPECTION-STATUS` | `HELD` `NOT_REQUIRED` `PASSED` `PENDING` `REJECTED` | — | `shippingInspectionStatusCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `ShipmentRequest`(`shipment-04제품출하`) |
