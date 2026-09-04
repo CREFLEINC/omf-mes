@@ -26,7 +26,7 @@ V3 규칙 2 — 「설계팀과 개발팀의 직접 소통은 설계팀이 개�
 | 종류 | 어디에 | 누가 만들고 닫나 | 접두 | 라벨 | 만드는 스킬 |
 | --- | --- | --- | --- | --- | --- |
 | **설계 변동 공지** (규칙 2·5) | 개발팀 저장소 2곳 — `omf-mes-client` · `omf-mes-server` 에 **같은 본문 1건씩** | 설계팀이 만든다. **닫지 않는다**(시점 기록) | `[설계 변동 공지] <YYYY-MM-DD> · <해시7>` | `설계 변동 공지` (+ 클라이언트 저장소는 `uiux→client` 도) | `design-change-notice` |
-| **설계팀 자기 이슈** (규칙 4 — 「하는 일·처리할 일」 공개, 규칙 2(2) 회신 대기) | `omf-mes` | 설계팀이 만들고 설계팀이 닫는다 | `[요청 처리]` · `[설계]` · `[확인 요청]` | `Agent : Architect` + `status:in-progress` / `help wanted` | `design-request-intake`(요청 처리) · 자체 과제는 직접 |
+| **설계팀 자기 이슈** (규칙 4 — 「하는 일·처리할 일」 공개, 규칙 2(2) 회신 대기) | `omf-mes` | 설계팀이 만들고 설계팀이 닫는다 | `[요청 처리]` · `[설계]` · `[확인 요청]` | `Agent : Consultant`/`Architect`/`Caster`(3역할 핸드오프에 따라 스왑, §6) + `status:in-progress` / `help wanted` | `design-request-intake`(Consultant) · `design-issue-resolution`(Architect) · `design-change-notice`(Caster) · 자체 과제는 직접 |
 
 그 외의 이슈·코멘트는 **어느 저장소에도 만들지 않는다.** 개발팀의 요청은 이슈로 오지 않는다 —
 **사용자가 자료로 건네고**, 우리 답도 **답변서 파일로 사용자가 전한다**(§4·§7).
@@ -59,17 +59,23 @@ gh repo view CREFLEINC/omf-mes-server --json visibility,isPrivate
 검토 요청이 와서 회신이 공개로 나간 사례)은 V3 로 **인바운드 자체가 없어져** 절로 남기지 않는다.
 남는 교훈은 하나 — **가시성은 저장소 이름으로 판단하지 말고 매번 실측한다.**
 
-## 2. 라벨 — V2 양식, 실측(2026-09-03)과 대조
+## 2. 라벨 — V2 양식, 실측(2026-09-04)과 대조
 
 V2 라벨 양식: 팀 유형 `Agent : {type}` · 팀 번호 `Agent : T{number}` · 진행 `in progress` · 중단
 `help wanted`. V3 규칙 4 — 「처리하려는 이슈에 팀 라벨을 부착하고 실제로 하고 있는 일은 시작할 때
 진행 중 라벨을 붙여야 한다」 — 를 설계팀 자신에게도 적용한다(2026-09-03 사용자 판정 Q5).
 
-### `omf-mes` — 자기 이슈용
+⭐ **2026-09-04 — 3역할 구성안 도입으로 `Agent : {type}` 이 「설계팀」 하나가 아니라 역할 셋으로
+갈라졌다.** 자기 이슈는 이제 **어느 라벨이 붙어 있는가가 곧 지금 누구 차례인가**다(§6 핸드오프
+참조) — 예전처럼 전건에 `Agent : Architect` 하나만 붙이지 않는다.
+
+### `omf-mes` — 자기 이슈용, 역할 라벨 3종
 
 | 라벨 | 뜻 | 실측 |
 | --- | --- | --- |
-| `Agent : Architect` | 설계팀 팀 유형 라벨(V2 `Agent : {type}` 양식) — 자기 이슈 전건에 붙인다 | ⭐ **신설 예정 — 아직 없다.** 처음 쓰는 회차에 §8 승인 뒤 `gh label create "Agent : Architect" --repo CREFLEINC/omf-mes --description "설계팀 자기 이슈(V3 규칙 4)"` |
+| `Agent : Consultant` | 자기 이슈는 **이 라벨로 시작**한다(Phase 0'). 즉시 답변으로 끝나면 계속 이 라벨인 채 닫힌다 | ⭐ **2026-09-04 신설·실재**(색상 `c5def5`) |
+| `Agent : Architect` | Consultant가 재실측·반영이 필요하다고 판정하면 스왑해 넘긴다 — "지금 Architect 차례" | 이미 있음(선례 `#425`. V2 시절엔 「자기 이슈 전건에 붙인다」였으나 2026-09-04 3역할 도입으로 뜻이 좁혀졌다 — 설명도 그에 맞춰 정정) |
+| `Agent : Caster` | 설계 변동 공지의 검증→배포 자기 이슈(`[설계]`)에 붙인다 | ⭐ **2026-09-04 신설·실재**(색상 `f9d0c4`) |
 | `status:in-progress` | 진행 중 | 있음(설명 「진행 중」, 부착 8건). ⛔ **V2 의 `in progress` 는 이 저장소에 없고 새로 만들지 않는다**(2026-08-25 확정) — 뜻이 같은 라벨을 둘 두면 이 파일의 존재 이유(어휘 분열 방지)에 스스로 걸린다 |
 | `help wanted` | **사용자 회신 대기** — `[확인 요청]` 이슈, 또는 요청 처리가 사용자 확인 없이는 끝나지 않을 때 | GitHub 기본 라벨(부착 2건) |
 | `Agent : T1`~`T4` · `Agent : Client` | V3 이전 유산 — 개발팀이 「누가 물었나」로 붙여 온 표기 | 있음(`T2`·`T3` 는 설명 비어 있음). **새로 붙이지 않는다 · 떼지 않는다** |
@@ -88,7 +94,7 @@ V2 라벨 양식: 팀 유형 `Agent : {type}` · 팀 번호 `Agent : T{number}` 
 | --- | --- | --- | --- |
 | `[설계 변동 공지] <YYYY-MM-DD> · <해시7>` | 개발팀 저장소 2곳 | 배포 선언 시 직전 공지(git tag `notice/*`) → HEAD 를 묶은 공지 1건 | `design-change-notice` |
 | `[요청 처리] <자료 제목>` | `omf-mes` | 개발팀 요청 자료(정보 요청·설계 개선 — 규칙 2(1)) 접수 — 「지금 하는 일」 | `design-request-intake` Phase 0' |
-| `[설계] <제목>` | `omf-mes` | 자체 설계 과제 — 「처리할 일」 | 직접 |
+| `[설계] <제목>` | `omf-mes` | 자체 설계 과제 — 「처리할 일」(Architect 자체 과제 · Caster 검증→배포 추적) | 직접(Architect) · `design-change-notice`(Caster) |
 | `[확인 요청] <제목>` | `omf-mes` | 설계팀 → 사용자 확인 대기(규칙 2(2)) | 직접 · `design-request-intake` 가 사용자 확인이 필요할 때 |
 
 ### V3 이전 유산 — 새로 만들지 않는다
@@ -129,8 +135,10 @@ gitignore). 이슈 목록을 훑어 요청을 «찾는» 절차는 **없다** �
 
 ## 5. 적합성 8유형 — 요청 자료의 물음 단위 판정
 
-`design-review-analyst` 가 `design-request-intake` Phase 3 에서 요청 자료의 **물음(문장) 하나하나**에
-적용한다. 자료 전체를 한 번에 승인/기각하지 않는다 — 한 자료에 여러 유형이 섞여 있을 수 있다.
+`design-request-intake`(Consultant) Phase 2가 요청 자료의 **물음(문장) 하나하나**에 이 표를
+적용해 판정한다(재실측이 필요한 유형이 있으면 Architect에게 인계 — `design-issue-resolution`이
+그 판정을 이어받아 `design-review-analyst`로 재실측한다). 자료 전체를 한 번에 승인/기각하지
+않는다 — 한 자료에 여러 유형이 섞여 있을 수 있다.
 
 | 유형 | 근거 | 처리 |
 | --- | --- | --- |
@@ -146,10 +154,19 @@ gitignore). 이슈 목록을 훑어 요청을 «찾는» 절차는 **없다** �
 ## 6. 상태 전이 — 자기 이슈만
 
 ```
-만든다(Agent : Architect + status:in-progress)
+만든다(Agent : Consultant + status:in-progress)                          [design-request-intake Phase 0']
+   →  즉시 답변이면 그대로 닫는다로
+   →  재실측·반영이 필요하면 인계 — 코멘트(01_scope.md) + Agent : Consultant → Agent : Architect
+          → Architect가 재실측·게이트·반영·병합                           [design-issue-resolution]
+          → 인계 코멘트(병합 해시) + Agent : Architect → Agent : Consultant 로 되돌림
    →  사용자 확인 대기 : status:in-progress → help wanted   ([확인 요청] 이거나 F·G 유형이 남았을 때)
-   →  닫는다 : 답변서/결과 «전문»을 닫는 코멘트로 남기고 닫는다
+   →  닫는다 : 답변서/결과 «전문»을 닫는 코멘트로 남기고 닫는다             [design-request-intake Phase 6b]
 ```
+
+Consultant↔Architect 라벨 스왑은 **같은 자기 이슈** 위에서 일어난다 — 이슈를 새로 만들거나
+닫지 않는다. 두 스킬이 서로 다른 워크트리(세션)에서 돌기 때문에 로컬 스크래치(`.design-runs/`·
+`tmp/`)는 공유되지 않는다 — 인계는 **반드시 이 자기 이슈의 코멘트**를 거친다(§4의 정본 원칙과
+같다).
 
 - **닫는 조건** — `[요청 처리]` 는 `design-request-intake` 의 3중 잠금(PR 병합이 `origin/main` 조상 ·
   계약 diff 등급 판정 · 답변서에 병합 해시·근거 경로 실재)을 통과했을 때. `[설계]` 는 PR 병합.
@@ -236,7 +253,7 @@ git tag notice/20260903 <전체 해시> && git push origin notice/20260903
 | 행위 | 가역성 | 승인 |
 | --- | --- | :-: |
 | 공지 발행 — `omf-mes-client`(**공개**)·`omf-mes-server` `gh issue create` | ⛔ 불가 — 인덱싱·포크는 회수 안 됨 | **필수** — 초안 전문을 보이고 받는다 |
-| 라벨 생성 — `설계 변동 공지`(개발팀 저장소 2곳) · `Agent : Architect`(`omf-mes`) | 준-불가역(지우면 부착 이력이 함께 사라진다) | **필수** — 처음 쓰는 회차에 한 번 |
+| 라벨 생성 — `설계 변동 공지`(개발팀 저장소 2곳, 아직 안 함) · `Agent : Consultant`·`Agent : Caster`(`omf-mes`, ✅ 2026-09-04 생성 완료) | 준-불가역(지우면 부착 이력이 함께 사라진다) | **필수** — 처음 쓰는 회차에 한 번 |
 | git tag `notice/*` push | 준-불가역(지우면 「직전 공지」 기준점이 사라진다) | **필수** — 공지 발행 승인에 흡수 |
 | PR 병합(`origin/main`) | 준-불가역 | **필수** |
 | 자기 이슈 닫기 + 답변서 코멘트 | 준-불가역(코멘트 삭제 불가) | 답변서 승인에 흡수 |
@@ -248,6 +265,10 @@ git tag notice/20260903 <전체 해시> && git push origin notice/20260903
 `Agent : Architect` 라벨·자기 이슈·공지 라벨은 **문면만** 세워 둔 것이다. 실제 라벨 생성과 첫
 발행은 처음 쓰는 회차에 위 승인 뒤 한다.
 
+⭐ **2026-09-04 갱신** — 3역할 구성안 도입에 맞춰 `Agent : Consultant`·`Agent : Caster` 라벨은
+사용자 승인 뒤 실제로 만들었다(위 표). `설계 변동 공지` 라벨과 개발팀 저장소 이슈는 여전히
+손대지 않았다 — 그 승인은 실제 첫 공지 발행 때 따로 받는다.
+
 ## 9. 운영 피드백 — V3 에서도 유효한 것
 
 | 날짜 | 교훈 | 지금 자리 |
@@ -258,3 +279,4 @@ git tag notice/20260903 <전체 해시> && git push origin notice/20260903
 | 2026-08-26 | 가시성은 저장소 이름으로 판단하지 않고 매번 실측한다 | §1 |
 | 2026-08-27 | 머리 표기는 관행이 아니라 V2 원문(line 62) — `개발팀에 전달사항` | §7-1 |
 | 2026-09-03 | 개발팀 저장소에 우리가 세운 이슈(`omf-mes-server` 접두 있는 17건 — 2026-08-25 실측 때는 0건이었다)가 V3 로 한꺼번에 유산이 됐다 — 「직접 소통」이 열흘 사이 얼마나 샜는지의 실측이다 | §1·§3 |
+| 2026-09-04 | 3역할(Consultant/Architect/Caster) 구성안 도입 — 자기 이슈 라벨이 고정 소유가 아니라 역할 핸드오프 상태를 표시하게 됨. `design-request-intake`가 Consultant 전용으로 좁혀지고 옛 재실측·반영 단계는 신설 `design-issue-resolution`(Architect)으로 옮겨졌다 | §0·§2·§5·§6 |

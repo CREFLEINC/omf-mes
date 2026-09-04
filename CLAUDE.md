@@ -4,6 +4,8 @@
 저장소**다 — 이슈 라벨 종류·형식만 V2(`multi-agent-team-workflow-v2.md`)를 그대로 쓴다. 산출물
 정본은 `design/`(raw/wiki/schema 3층 — `design/README.md` 참조)이고, 이 파일은 하네스 존재를
 알리는 포인터만 담는다. 에이전트·스킬 목록은 `.claude/agents/`·`.claude/skills/`에서 직접 확인한다.
+설계팀 내부 팀 구성(3역할·워크트리)은 `multi-agent-team-workflow-v3-design-team-structure.md`
+(2026-09-04 사용자 확정, 원문 그대로 보존)가 정의한다 — 아래 「설계팀 3역할」 절 참조.
 
 ⭐ **설계 내용은 전부 `design/` 안에 있다.** 2026-08-25 재구성(`a8f46f2`)으로 `uiux/`·
 `deliverables/`·`docs/research/`가 사라졌다 — 옛 이슈·문서가 그 경로를 가리키면 죽은 인용이고,
@@ -17,8 +19,10 @@
 
 - **설계 변동 공지 발행**("공지해", "배포 공지", "개발팀에 변경 알려줘" 등 — 직전 공지 태그
   `notice/*` → HEAD 를 묶어 개발팀 저장소 2곳에 이슈 1건씩) → `design-change-notice` 스킬을 사용하라.
-- **개발팀 요청 자료 처리**(사용자가 건넨 파일·붙여넣기 — "이 자료 처리해줘", "개선 제안서 검토",
-  "답변서 만들어줘" 등) → `design-request-intake` 스킬을 사용하라.
+- **개발팀 요청 자료 접수·판정**(사용자가 건넨 파일·붙여넣기 — "이 자료 처리해줘", "개선 제안서
+  검토", "답변서 만들어줘" 등, Consultant 전용) → `design-request-intake` 스킬을 사용하라.
+- **자기 이슈 재실측·반영**("Architect 역할 시작하자", "이 이슈 해결해줘", `Agent : Architect`
+  라벨 이슈 처리 등, Architect 전용) → `design-issue-resolution` 스킬을 사용하라.
 - 화면 설계·계약 작업 자체는 `uiux-design` 스킬을 사용하라.
 - 이슈 규약·라벨·제목 접두·승인 지점을 물으면 `team-issue-protocol` 스킬을 사용하라.
 - 단순 질문·조회는 스킬 없이 직접 응답 가능.
@@ -35,6 +39,36 @@
 ⇒ 개발팀에 「무엇이 언제 바뀌었나」를 알리는 정본은 **설계 변동 공지 이슈**(개발팀 저장소,
 git tag `notice/*`)다. [`design/wiki/handover/변경-요약.md`](design/wiki/handover/변경-요약.md) 는
 설계팀 «내부» 이력이다(생성물 — `build-change-digest.py` 가 git 이력에서 만든다).
+
+## 설계팀 3역할 — Consultant · Architect · Caster
+
+설계팀은 `multi-agent-team-workflow-v3-design-team-structure.md`(2026-09-04 사용자 확정, 원문
+그대로 보존)가 정의하는 3역할로 나뉜다. 각 역할은 완전히 격리된 자기 워크트리에서만 실행한다 —
+`.claude/scripts/setup-team-worktrees.sh [consultant|architect|caster|all]`가 이 저장소를 새로
+클론받아 처음 개발환경을 설정할 때(또는 그 이후 갱신할 때) 워크트리를 만든다.
+
+| 역할 | 워크트리 | 보는 자료 상태 | 스킬 |
+| --- | --- | --- | --- |
+| Consultant(상담원) | `.claude/worktrees/consultant` | 가장 마지막 배포 버전(최신 `notice/*` 태그, 디태치드) | `design-request-intake` |
+| Architect(설계자) | `.claude/worktrees/architect` | 현재 진행 중인 작업(브랜치 `architect-work`, 자유롭게 수정) | `design-issue-resolution` |
+| Caster(캐스터) | `.claude/worktrees/caster` | 검증 완료된 배포 브랜치 최신(`origin/main`, 디태치드) | `design-change-notice` |
+
+⛔ **담당 역할이 아닌 다른 역할의 작업을 하지 않는다**(구성안 원문 「주의 사항」 — 상담원이
+캐스터 역할을 해서 공지를 보내면 안 된다). 이 경계는 **문서로만** 강제한다 — 세 스킬이 서로의
+몫(반영 PR·공지 발행·답변서 작성)에 손대지 않도록 각자 description 과 절차문에 명시했다. 코드
+훅으로 강제하지 않는다 — 이 저장소에서 다른 큰 규칙(V3 규칙 2 등)도 줄곧 문서 강제였고,
+`protect_readonly.py`는 비가역적 손상(`design/raw/` 원자료 훼손) 방지라는 예외적 목적으로만
+쓰는 훅이다.
+
+⭐ **역할 지시 없이 일을 시키면 반드시 사용자에게 지금 세션의 역할이 무엇인지 먼저 물어본다**
+(구성안 원문 「설계팀 시작하기」 4번 그대로) — 지금 작업 디렉토리가 어느 워크트리인지만으로
+역할을 스스로 단정하지 않는다.
+
+⚠ **`design/raw/` 보호 훅은 세션 자신의 작업 디렉토리가 실제로 그 워크트리일 때만 유효하다**
+(2026-09-04 실측 — `.claude/hooks/protect_readonly.py`는 `$CLAUDE_PROJECT_DIR` 기준으로 보호
+범위를 계산한다). 각 워크트리는 훅·`settings.json`을 git 이 자동으로 동반해 자기 안에서는
+정상 작동하지만, 메인 체크아웃에서 절대경로로 다른 워크트리 파일을 건드리면 보호 밖이다 — 각
+역할 세션은 반드시 자기 워크트리를 작업 디렉토리로 삼아 새로 실행한다.
 
 ## 변경 이력
 
@@ -53,3 +87,4 @@ git tag `notice/*`)다. [`design/wiki/handover/변경-요약.md`](design/wiki/ha
 | 2026-09-02 | **2026-09-01 행이 근거로 든 두 문장을 정정** — ① 「프론트는 계약 정본(비공개)을 못 보고 … 「이 화면 몫」을 알 길이 없다」는 **거짓이다.** 프론트는 설계 저장소를 격리 클론(`.claude/_designref/omf-mes/`)해 계약·요구서·화면 스펙을 **직접 읽는다**(`design-reference.md` 가 `gh repo clone` 을 지시하고 `resolve-spec.mjs` 가 계약 7벌을 병합한다). 프론트가 못 하는 것은 **읽기가 아니라 내용을 공개 저장소로 옮기기**다. ② 다섯 화면의 단말 게이팅 누락(`#69`·`#73`·`#74`·`#75`·`#78`)은 **이 결손의 사례가 아니다** — 착수 통지 5건은 2026-08-11 발행이고 요구서 §3 에 게이팅 행을 «처음» 신설한 것은 2026-08-29 `e38c5d9`(#288) 다. 08-11 에 경로 목록을 성실히 실었어도 **게이팅은 실리지 않았다.** 그 자리를 막은 것은 목록이 아니라 **변경 통지**다. 규칙 자체(§3 목록 의무화)는 유지 — 근거를 「검증할 수 없는 주장을 없앤다」로 바꿔 적었다 | `CLAUDE.md` · `uiux-client-handoff/references/field-sources.md` | 사용자가 직접 반증했다 — 「프론트 개발 팀은 '프론트가 계약 JSON을 안 읽기 때문' 가 아니야. API 설계서를 참고하고 있어.」 **틀린 근거는 규칙을 틀린 방향으로 키운다** — 「프론트는 못 본다」를 전제로 두면 다음 규칙은 계약 내용을 공개 저장소로 옮기는 쪽으로 간다(그것이야말로 금지된 일이다). 인과 ②도 같다 — 막지 못한 사고를 「이 규칙이 막았을 것」으로 적어 두면 실제로 막은 수단(변경 통지)이 안 보인다 |
 | 2026-09-03 | ⭐⭐ **하네스 V3 개정 — 「사용자 경유 소통 · 설계 변동 공지 단일 창구」**(`multi-agent-team-workflow-v3.md` 도입 — 이슈 라벨 종류·형식만 V2 를 그대로 쓴다). ① **스킬 개명 2건** — `uiux-client-handoff` → **`design-change-notice`**(화면 단위 «변경 요약 통지» → **배포 선언 시** 직전 태그 `notice/*` → HEAD 를 묶은 **「설계 변동 공지」** 1건을 개발팀 저장소 2곳(`omf-mes-client`·`omf-mes-server`)에 **같은 본문**으로 발행 · 본문은 `build-notice.py` 가 4항(공지 날짜 · 배포 해시 · 설계 자료 목록 표 · 이전 버전과 달라진 «지점»)으로 만들고 `check-notice.py` 가 공개 안전·내용 유출·팀 구분어를 검사 · 발행 뒤 git tag `notice/<YYYYMMDD>` push · ⛔/⚠ 등급표는 `references/change-grades.md` 로 옮겨 «내부» 판단 도구로 남긴다) · `design-review-intake` → **`design-request-intake`**(입력이 「이슈 번호」에서 **「사용자가 건넨 자료」**로 — `gh issue view` 호출 0 · `omf-mes` 에 `[요청 처리]` 자기 이슈를 세우고 · 회신 코멘트 대신 **답변서** `tmp/requests/<날짜>-<식별자>/답변서.md` 를 만들어 **사용자가 전한다** · 자기 이슈 닫기 3중 잠금) ② **`team-issue-protocol` 재편** — §0 「V3 에서 이슈는 두 종류뿐(공지 · 자기 이슈)」 신설 · §1 `omf-mes-server` 를 공지 발행처로 승격 · §2 `Agent : Architect` 신설 예정(문면만) · §3 정본 접두 4종(`[설계 변동 공지]`·`[요청 처리]`·`[설계]`·`[확인 요청]`) + 「V3 이전 유산 — 새로 만들지 않는다」 표 · §4 인바운드 수집(2축 합집합) **삭제** · §5 8유형을 자료 기준으로 · §6 상태 전이를 자기 이슈용으로 · §7 「회신 코멘트」 → **「답변서 서식」+「공지 게시 수단」** · §8 승인 지점에 라벨 생성·tag push 추가 ③ `.gitignore` 에 `/tmp/`(요청 자료·답변서·공지 초안 — 정본은 자기 이슈 코멘트·커밋·공지 이슈) ④ `protect_readonly.py` `GENERATED_RELS` 에 `변경-요약.md` 추가(settings deny 는 Write/Edit 만 막고 **Bash 리다이렉션이 열려 있어** 실제로 오염됐다) ⑤ `build-change-digest.py` 비수렴 수정 — `handover/` 만 건드린 커밋을 세지 않는다(표를 갱신한 커밋이 다음 회차에 또 한 행이 되어 93→94 로 영원히 늘었다) + 머리말에 「개발팀에 알리는 창구는 공지 · 이 표는 내부 이력」 ⑥ V3 원문 `multi-agent-team-workflow-v3.md` 저장(오탈자 포함 그대로 — 고치지 않는다) ⑦ **삭제** — `check-issue.py`·`test-check-issue.py`(38건)·`templates/`·`references/field-sources.md`(착수 통지·회신 코멘트의 폼·검사기라 V3 에 남을 자리가 없다 — 공개 안전 스캔만 `check-notice.py` 로 이식) · `CLAUDE.md` 머리말·트리거 절 재작성 · `uiux-design` 검사기 참조 표 1행 | `CLAUDE.md` · `multi-agent-team-workflow-v3.md`(신설) · 스킬 3종(`design-change-notice`·`design-request-intake`·`team-issue-protocol`) · 에이전트 2종 · `.gitignore` · `.claude/hooks/protect_readonly.py` · `design/schema/generators/build-change-digest.py` · `uiux-design` §검사기 표 | **V3 원문(사용자 확정)** — 규칙 2 「설계팀과 개발팀의 직접 소통은 설계팀이 개발팀에 이슈를 발행하는 "설계 변동 공지"를 제외하면 원칙적으로 모두 금지한다. 필요한 게 있으면 무엇이든 자료를 만들어 사용자에게 전달 요청을하고 자신의 깃헙 저장소에 이슈를 발행하고 요청에 대한 회신을 대기 한다.」 · 규칙 5 「이 공지에는 자세한 내용이 적히는 것을 금지한다. 이 공지의 목적은 "변동 사항이 있다는 사실"을 알리는 것이다.」 ⛔ 하네스와의 **정면 충돌** 자리 — `design-review-intake` Phase 1 이 `gh issue view` 로 개발팀 이슈를 직접 받고 Phase 6a 가 `gh issue comment` 로 직접 회신했다(둘 다 규칙 2 가 금지한 직접 소통이고, 우리도 `omf-mes-server` 에 `[uiux→데이터모델]` 류 이슈를 직접 세우고 있었다). **사용자 판정 4건**(2026-09-03) — Q1 공지 발행처는 **개발팀 저장소 각각**(같은 본문 1건씩) · Q2 발행 단위는 **배포 선언 시 묶음**(직전 `notice/*` 태그 → HEAD) · Q4 답변서는 **루트 `tmp/`** 에 두고 **gitignore**(권고였던 `design/wiki/replies/` 커밋은 버렸다) · Q5 규칙 4 「하는 일·처리할 일」 공개를 **설계팀에도 세운다**(`omf-mes` 자기 이슈). 사용자 추가 지시 「지금 개발팀/설계팀의 이슈를 건드리지는 마」 — 그래서 `Agent : Architect`·`설계 변동 공지` 라벨과 자기 이슈는 **문면만** 세웠고, 이 회차가 GitHub 에 쓴 것은 **PR 하나**뿐이다. ⭐ 실측이 브리핑의 전제 둘을 뒤집었다 — `omf-mes-server` 는 「이슈 0·라벨 0」이 아니라 이슈 21건(접두 있는 17건 전부 설계팀이 낸 `[uiux→데이터모델]`·`[docs→데이터모델]`·`[uiux→server]` — 2026-08-25 실측 0건 뒤 아흐레 사이 V2 가 허용하던 직접 발행이 그만큼 쌓였다. V3 아래서는 새로 만들지 않는 유산이다)·라벨 11종(기본 9 + `Agent : Backend`·`status:in-progress`)이었고, `status:in-progress` 부착은 229건이 아니라 **8건**이다(계획서의 229 는 어디서 온 수인지 확인하지 못했다). 결정 자체(`in progress` 를 만들지 않고 `status:in-progress` 유지)는 그대로다 — 라벨이 실재하고 사용 중이라는 근거는 8건으로도 선다 |
 | 2026-09-03 | ⭐ **공지 「달라진 지점」의 입자를 파일로 내린다** — `build-notice.py` 가 절(`§`)·계약 경로·메서드·스키마·`CD-*` 키를 뽑던 코드를 걷고 `git diff --name-status` 만 읽어 **한 파일이 한 줄**(「- 갈래 `경로`」 + 신설·삭제·경로 변경 표지)로 낸다. SKILL §4 표·원칙 표·`check-notice.py` N4 문구·시험 통합 6건(이름 바꿈 사례 추가)을 같이 맞췄다 | `design-change-notice` (`build-notice.py`·`check-notice.py`·`test-check-notice.py`·`SKILL.md`) | 1차 공지 초안(`22c08f5`→`065e5fb`, 642지점·171행)을 사람 게이트에 올리자 사용자가 반려했다 — 「변경 점은 파일단위로, API 계약서 내에 어떤게 바뀌었는지 나열하지말 것」. 절·경로·스키마까지 고르는 것은 개발팀이 열어 볼 자리를 «미리» 골라 주는 일이라 규칙 5 가 금지한 「자세한 내용」의 초입이다. ⛔ 초안은 손으로 못 고치므로(SKILL 금지 표) 생성기를 고쳤다 — 그래야 다음 공지도 같은 입자다 |
+| 2026-09-04 | ⭐⭐ **설계팀 멀티 에이전트 3역할(Consultant/Architect/Caster) 체계 도입**(사용자 확정 — `multi-agent-team-workflow-v3-design-team-structure.md` 신설, 원문 그대로 보존). ① **워크트리 3개 신설** — `.claude/scripts/setup-team-worktrees.sh`(재사용 가능한 절차, 클론마다 다시 실행) 신설 + 지금 이 머신에서 실행해 `.claude/worktrees/{consultant,architect,caster}` 실제 생성(각각 최신 `notice/*` 태그·`architect-work` 브랜치·`origin/main`) + `.gitignore`에 `/.claude/worktrees/` 추가 ② **GitHub 라벨 신설** — `omf-mes`에 `Agent : Consultant`(`c5def5`)·`Agent : Caster`(`f9d0c4`) 생성, `Agent : Architect` 설명 정정(3역할 도입 반영) ③ **`design-request-intake` 를 Consultant 전용으로 재편** — 옛 Phase 3(재실측)~5b(PR 병합 확인)를 걷어내고, Phase 2가 판정 결과에 따라 그대로 답변(즉시 답변 유형)하거나 라벨 스왑(`Agent : Consultant`→`Agent : Architect`) + 자기 이슈 코멘트로 **인계**하도록 재편. Phase 6a는 인계 코멘트(병합 해시)를 받아야만 진행 — 옛 #206·#196 순서 불변식을 두 스킬에 걸쳐 유지 ④ **`design-issue-resolution` 신설**(Architect 전용) — 옛 Phase 3~5b를 그대로 계승해 재실측·사람 게이트·반영 PR·병합 확인을 수행하고, 완료하면 답변서를 쓰지 않고 인계 코멘트 + 라벨을 `Agent : Consultant`로 되돌린 뒤 정지(자기 이슈를 닫지 않는다) ⑤ **`design-change-notice` 에 Caster 검증 단계 신설** — 기존 ①(기준 태그) 뒤에 「①-1 검증」을 넣어 `uiux-design` §5 검사기 표 전건을 `origin/main` tip 기준으로 재실행(이 저장소엔 `.github/workflows/`가 없어 CI가 전무하므로 이게 마지막 그물이다), 실패하면 Architect에게 코멘트로 돌려보내고 발행 정지. 태그 형식도 `notice/<YYYYMMDD>` → `notice/<YYYYMMDDHHmmss>-<누적순번>`로 갱신(코드는 `creatordate` 정렬만 써서 무수정, SKILL.md 예시만 갱신) ⑥ **`team-issue-protocol` 갱신** — 라벨 3종 표·§6 상태 전이에 Consultant↔Architect 핸드오프(라벨 스왑 + 자기 이슈 코멘트) 명문화 | `CLAUDE.md` · `multi-agent-team-workflow-v3-design-team-structure.md`(신설) · `.claude/scripts/setup-team-worktrees.sh`(신설) · `.gitignore` · GitHub 라벨(`omf-mes`) · 스킬 4종(`design-request-intake`·`design-issue-resolution`(신설)·`design-change-notice`·`team-issue-protocol`) | **구성안 원문(사용자 확정)** — 「설계팀은 Consultant(상담원)·Architect(설계자)·Caster(캐스터) 3역할을 하며, 이 3역할은 바라보는 설계 자료의 상태가 모두 다르다 … 완전히 격리된 개별 워크트리를 가지고 작업해야 한다 … 절대 담당하는 역할이 아닌 다른 역할의 작업을 하는 것을 금지한다」. 실행 중 사용자가 계획을 한 차례 정정했다 — 워크트리는 "미리 폴더를 만들어두고 사용하는" 것이 아니라 "이 프로젝트를 클론 받은 로컬 환경에서 처음 개발환경 설정 시" 반복되는 절차여야 한다는 지적으로, 그래서 산출물이 1회성 폴더가 아니라 재사용 가능한 스크립트(`setup-team-worktrees.sh`) + 그 스크립트의 첫 실행이 됐다. ⭐ 검증 중 새 사실도 나왔다 — `design/raw/` 보호 훅(`protect_readonly.py`)은 세션의 `$CLAUDE_PROJECT_DIR`가 실제로 그 워크트리일 때만 유효하고, 메인 체크아웃에서 절대경로로 다른 워크트리 파일을 건드리면 보호 밖이다(실측 — 테스트 편집이 막히지 않고 실제로 반영됐다가 즉시 원복함) — 그래서 "각 역할 세션은 반드시 자기 워크트리를 작업 디렉토리로 삼아 새로 실행해야 한다"는 운영 규칙을 위 절에 명문화했다 |

@@ -1,17 +1,27 @@
 ---
 name: design-change-notice
 description: >-
-  설계 변동 공지 — 배포를 선언할 때 직전 공지(git tag `notice/*`) 이후 바뀐 설계 자료의
-  «지점»을 개발팀 저장소 둘(CREFLEINC/omf-mes-client · CREFLEINC/omf-mes-server)에 같은 본문의
-  이슈로 발행한다. V3(2026-09-03) 규칙 2 가 허용한 설계팀→개발팀의 **유일한 직접 채널**이다.
-  "공지해", "설계 변동 공지 발행", "배포 공지 내줘", "개발팀에 변경 알려줘" 같은 요청에 쓴다.
-  초안은 손으로 쓰지 않고 `scripts/build-notice.py` 가 git 이력에서 만들고, `scripts/check-notice.py`
-  를 통과한 뒤 사람 게이트를 거쳐 발행한다. ⛔ 「변경 요약 통지」·「착수 가능 통지」·「⛔/⚠ 화면
-  단위 통지」는 2026-09-03 V3 로 폐지됐다 — 새로 발행하지 않는다. 개발팀이 보내는 정보 요청·
-  설계 개선 요청의 처리는 `design-request-intake` 스킬 소관이다(방향이 반대다).
+  Caster(캐스터) 전용 스킬 — 설계 변동 공지. 배포를 선언할 때 직전 공지(git tag `notice/*`)
+  이후 main에 merge된 설계 자료 변경을 검증하고, 바뀐 «지점»을 개발팀 저장소 둘
+  (CREFLEINC/omf-mes-client · CREFLEINC/omf-mes-server)에 같은 본문의 이슈로 발행한다.
+  V3(2026-09-03) 규칙 2 가 허용한 설계팀→개발팀의 **유일한 직접 채널**이다. "공지해", "설계
+  변동 공지 발행", "배포 공지 내줘", "개발팀에 변경 알려줘", "Caster 역할 시작하자" 같은 요청에
+  쓴다. `.claude/worktrees/caster` 워크트리 안에서만 실행한다. 검증은 `uiux-design` §5 검사기
+  표를 main 최신 tip 기준으로 재실행하는 것이고, 실패하면 Caster가 직접 고치지 않고 Architect의
+  자기 이슈에 코멘트로 돌려보낸다(역할 경계). 초안은 손으로 쓰지 않고 `scripts/build-notice.py`
+  가 git 이력에서 만들고, `scripts/check-notice.py` 를 통과한 뒤 사람 게이트를 거쳐 발행한다.
+  ⛔ 「변경 요약 통지」·「착수 가능 통지」·「⛔/⚠ 화면 단위 통지」는 2026-09-03 V3 로 폐지됐다 —
+  새로 발행하지 않는다. 개발팀이 보내는 정보 요청·설계 개선 요청의 처리는
+  `design-request-intake`(Consultant)·`design-issue-resolution`(Architect) 스킬 소관이다
+  (방향이 반대다).
 ---
 
 # 설계 변동 공지 — 설계팀에서 개발팀으로
+
+이 스킬은 `multi-agent-team-workflow-v3-design-team-structure.md`가 정의하는 **Caster(캐스터)**
+역할의 작업 스킬이다. Caster는 "현재 작업 중인 상태를 제외한 검증이 완료된 변경 사항"만 보는
+`.claude/worktrees/caster`(`origin/main` 최신 추적)에서만 실행한다 — 다른 워크트리에서 이 스킬을
+돌리지 않는다.
 
 ## 1. 왜 이 모양인가
 
@@ -39,7 +49,7 @@ description: >-
 **PUBLIC** 이다. 같은 본문이 둘에 나가므로 **공개 기준 하나로** 검사한다(`check-notice.py` P) —
 「서버 쪽은 비공개니까」라는 완화는 없다. 두 저장소 모두 「설계 변동 공지」 라벨이 아직 없다.
 
-## 2. 절차 ①~⑦
+## 2. 절차 ①~⑦ (+①-1 검증)
 
 ### ① 기준을 정한다 — 직전 공지 태그
 
@@ -50,6 +60,19 @@ git tag -l 'notice/*' --sort=-creatordate
 맨 위가 직전 공지다. **태그가 하나도 없으면 첫 공지다** — 생성기가 기준을 추측하지 않는다(종료 2).
 사용자에게 기준 해시를 묻고 `--since <해시>` 로 준다. ⚠ 기준 해시는 «개발팀이 지금 붙들고 있는
 버전»이어야 한다 — 마지막 착수 통지·마지막 배포 커밋 등 사용자가 안다.
+
+### ①-1 검증한다 — main tip 기준 재실행
+
+이 저장소엔 `.github/workflows/`가 없다 — PR 하나하나는 Architect(`design-issue-resolution`)가
+검사기를 돌리고 병합하지만, 여러 PR이 쌓인 뒤 상호작용으로 깨지는 경우를 잡아줄 CI가 없다. 이
+단계가 그 마지막 그물이다.
+
+`uiux-design/SKILL.md` §5의 검사기 표(전건)를 현재 `origin/main` tip에 대해 다시 돌린다 — PR
+단위가 아니라 **직전 공지 이후 쌓인 전체 변경**을 대상으로 한다. 빨간불이 나오면 Caster가 직접
+고치지 않는다 — 원인이 된 변경을 낸 자기 이슈(최근에 `Agent : Architect` 라벨이 붙어 있었던
+것)를 찾아 `gh issue comment`로 실패 내용을 남기고 라벨을 `Agent : Architect`로 되돌린 뒤 발행을
+정지한다(역할 경계 — 상담원이 캐스터 역할을 하면 안 되는 것의 대칭, 여기서는 캐스터가 설계자
+역할을 하면 안 된다). 전건 초록이면 ②로 진행한다.
 
 ### ② 초안을 만든다 — 손으로 쓰지 않는다
 
@@ -100,16 +123,24 @@ gh label create "설계 변동 공지" --repo CREFLEINC/omf-mes-server --color 1
 ### ⑥ 태그를 찍는다 — 다음 공지의 기준
 
 ```bash
-git tag notice/<YYYYMMDD> <head>          # 같은 날 두 번째면 notice/<YYYYMMDD>-2
-git push origin notice/<YYYYMMDD>
+N=$(( $(git tag -l 'notice/*' | wc -l) + 1 ))
+TAG="notice/$(date +%Y%m%d%H%M%S)-${N}"
+git tag "$TAG" <head>
+git push origin "$TAG"
 ```
 
-태그가 없으면 다음 공지가 이번 지점을 또 싣는다. 발행 직후 찍는다 — 다른 커밋이 끼기 전에.
+태그 명칭 양식은 `notice/<날짜시간>-<누적순번>`이다(구성안 원문) — 누적순번은 지금까지 발행한
+공지 총 개수 + 1이며, 날짜시간까지 붙으므로 같은 날 두 번째 발행이라도 옛 `-2` 접미사 규칙은
+쓰지 않는다. 태그가 없으면 다음 공지가 이번 지점을 또 싣는다. 발행 직후 찍는다 — 다른 커밋이
+끼기 전에. `build-notice.py`의 태그 조회(`latest_notice_tag()`)는 `creatordate` 정렬만 쓰므로
+이 형식 변경에 영향받지 않는다 — 코드는 그대로 두고 이 절차문만 갱신했다.
 
 ### ⑦ 자기 저장소에 남긴다
 
-`omf-mes` 의 해당 작업 이슈(배포 선언 이슈·회차 이슈)에 한 줄 코멘트 —
-「공지 발행 client#n · server#m · 태그 `notice/<YYYYMMDD>`」. 개발팀 이슈는 건드리지 않는다.
+Caster의 검증→배포 작업도 `[설계] <제목>` 접두 자기 이슈로 추적한다(`Agent : Caster` 라벨 —
+`omf-mes#425` 선례와 같은 형태). 그 이슈에 한 줄 코멘트 —
+「공지 발행 client#n · server#m · 태그 `notice/<태그>`」를 남기고 닫는다. 개발팀 이슈는
+건드리지 않는다.
 
 ## 3. ⛔ 하지 않는 것
 
@@ -121,6 +152,7 @@ git push origin notice/<YYYYMMDD>
 | 초안을 **손으로 쓰거나 고친다** | 손끝에 「왜 바꿨는지」가 남아 내용이 섞인다. 생성기가 못 뽑으면 생성기를 고친다 — 그래야 다음 공지도 맞는다 |
 | 발행한 공지를 **사후 편집**한다 | 공개 이슈의 편집 이력은 남고, 개발팀은 편집 사실을 못 본다. 틀렸으면 새 공지를 낸다(같은 날이면 `notice/<YYYYMMDD>-2`) |
 | `--since` 를 **추측**한다 | 태그가 없으면 사용자에게 묻는다. 잘못된 기준은 지점을 빠뜨리거나 두 번 싣는다 |
+| 검증(①-1)에서 빨간불 난 원인을 Caster가 **직접 고친다** | 역할 경계 위반 — 설계 자료를 자유롭게 고치는 것은 Architect의 워크트리·권한이다. Caster는 자기 이슈 코멘트로 돌려보내고 발행을 멈춘다 |
 
 ## 4. 「달라진 지점」의 입자 — 파일
 
@@ -153,7 +185,9 @@ git push origin notice/<YYYYMMDD>
 | `scripts/check-notice.py` | ⭐ | 검사기 — N1 4항 머리 · N2 해시 실재 · N3 팀 구분어 · N4 내용 유출 · N5 항목 길이(⚠) · N6 자리표시 · P 공개 안전(BLOCKING 10 · ADVISORY 5) · T 제목 |
 | `scripts/test-check-notice.py` | ⭐ | 48건 — 공개 안전 이식 · 규칙별 통과/위반 · 임시 git 저장소 통합 |
 | `../team-issue-protocol/SKILL.md` | ⭐ | 라벨·제목 접두·저장소 경계의 정본 |
-| `../design-request-intake/SKILL.md` | ⭐ | 반대 방향 — 개발팀의 정보 요청·설계 개선 요청 처리 |
+| `../design-request-intake/SKILL.md` | ⭐ | 반대 방향(Consultant) — 개발팀의 정보 요청·설계 개선 요청 접수·판정 |
+| `../design-issue-resolution/SKILL.md` | ⭐ | 검증(①-1)에서 빨간불이 나면 돌려보내는 곳(Architect) |
+| `../uiux-design/SKILL.md` §5 | ⭐ | 검증(①-1)이 재실행하는 검사기 표의 정본 |
 
 **2026-09-03 V3 로 삭제한 것** — `scripts/check-issue.py` · `scripts/test-check-issue.py`(38건) ·
 `templates/`(착수가능-초안·예시) · `references/field-sources.md`. `--reply`·`--change-notice` 모드가
