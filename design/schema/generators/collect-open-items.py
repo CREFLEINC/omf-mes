@@ -169,25 +169,53 @@ def tag_e_codes(text: str) -> list[str]:
     return out
 
 
-# ⛔ `#N` 도 «두 가지»가 쓴다 — `E-n` 과 같은 형태의 오독이다(2026-09-02 실측).
+# ⛔ `#N` 을 «네 가지»가 쓴다 — `E-n` 과 같은 형태의 오독이고, 고칠 때마다 하나씩
+#    더 나왔다(2026-09-02 ② · 2026-09-04 ③④).
 #
-#    ① 이슈 번호        #145 「공통코드 값 목록」 — 답이 오면 그 이슈가 움직인다
-#    ② 고객 질의응답     QA #24 「보류 등록이 알림 대상인가」 — 답이 «이미» 온 근거다
+#    ① 우리 이슈        #145 · omf-mes#347      ← 표지다. 답이 오면 그 이슈가 움직인다
+#    ② 고객 질의응답     QA #24 · QA#23          ← 답이 «이미» 온 근거다
+#    ③ 다른 저장소       omf-mes-server#45 · omf-mes-client#442 · client#85
+#    ④ 다른 번호 체계    MLOT #16(확정기록 항목) · §재정의 #4 · 2026-07-24 #8(확정 날짜)
+#                       PR #211 · DS #74 · 구현팀 질의 #179 · §8 미결 #3 · 세션 #2(예시)
 #
-# ⚠ ② 를 이슈로 세면 «엉뚱한 이슈»에 걸린다. `W-03-03` 미결 6 의 「QA #24」가
-#    이슈 #24(도식스펙-04 정합 4건)로 잡혀 있었다 — 그 이슈가 닫혀도 이 행은 안 움직인다.
-#    실측 — 미결 표의 `#N` 227 개 중 10 개가 QA 번호였다.
-ISSUE_NO = re.compile(r"#(\d{1,3})\b")
-QA_MARK = re.compile(r"(QA|질의응답)\s*$")
+# ⚠ ②③④ 를 이슈로 세면 «엉뚱한 이슈»에 걸린다.
+#    · ② `W-03-03` 미결 6 의 「QA #24」가 이슈 #24(도식스펙-04 정합)로 잡혀 있었다.
+#    · ③ `W-01-07` 3 의 「`omf-mes-server#45`·`#46`」이 우리 `#45`·`#46` 으로 잡혀
+#      **닫힌 표지 45행** 안에 들어가 있었다(2026-09-04 `omf-mes#378` 실측). V3 아래서
+#      개발팀 저장소 이슈는 우리가 추적할 수 없다 — 추적 가능한 척 보이게 하면 안 된다.
+#    · ④ `M-01-02` 2 의 「MLOT #16」은 `design/raw/decisions/2026-07-20-자재LOT관리-
+#      재정의-확정기록.md` 의 16번 항목이지 이슈가 아니다.
+#
+# ⭐ 목록은 «세어서» 만들었다 — 화면 스펙 전건에서 `#N` 앞 24자를 관찰한 실측이다
+#    (2026-09-04 · `omf-mes` 접두 256 · `omf-mes-server` 33 · `client` 18 ·
+#    `omf-mes-client` 9 · `QA` 246 · `재정의` 23 · 날짜 19 · `PR` 14 · `DS` 13 ·
+#    `MLOT` 10 · `질의` 6 · `미결` 6 · `세션` 6 · `라인` 2 · `구` 2).
+#    ⛔ 추측으로 늘리지 마라 — 늘릴 일이 생기면 다시 세고 이 수를 갱신한다.
+OUR_REPO = "omf-mes"
+# 접두가 «붙은» 것까지 함께 잡는다(공백 없음) — 안 잡으면 뒷부분만 우리 이슈로 읽힌다.
+ISSUE_NO = re.compile(r"(?P<pre>[0-9A-Za-z_.\-]*)#(?P<n>\d{1,4})\b")
+# 앞 «낱말»(공백으로 떨어진 것)이 다른 번호 체계를 가리키는 것들.
+NOT_ISSUE_WORDS = frozenset((
+    "QA", "질의응답", "질의", "MLOT", "재정의", "PR", "DS",
+    "미결", "세션", "라인", "구", "확정",
+))
+PREV_WORD = re.compile(r"([0-9A-Za-z가-힣_\-]+)\s+$")
+DATE_WORD = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
 def tag_issues(text: str) -> list[str]:
-    """`#N` 을 앞 낱말로 갈라 이슈 표지만 남긴다. QA 번호는 «버린다»."""
+    """`#N` 중 «우리 저장소 이슈»만 표지로 남긴다. 나머지 세 갈래는 버린다."""
     out = []
     for m in ISSUE_NO.finditer(text):
-        if QA_MARK.search(text[max(0, m.start() - 12):m.start()]):
-            continue                      # ② 고객 질의응답 번호 — 이슈가 아니다
-        tag = f"#{m.group(1)}"
+        pre = m.group("pre")
+        if pre and pre != OUR_REPO:
+            continue                      # ③ 다른 저장소(·②의 `QA#23` 같은 붙임꼴)
+        if not pre:
+            w = PREV_WORD.search(text[max(0, m.start() - 24):m.start()])
+            word = w.group(1) if w else ""
+            if word in NOT_ISSUE_WORDS or DATE_WORD.match(word):
+                continue                  # ②④ 다른 번호 체계
+        tag = f"#{m.group('n')}"
         if tag not in out:
             out.append(tag)
     return out

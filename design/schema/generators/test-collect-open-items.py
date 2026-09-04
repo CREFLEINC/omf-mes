@@ -348,5 +348,60 @@ class 정본_실측(unittest.TestCase):
                 self.assertIn(표본, 살아있는)
 
 
+# ── `#N` 을 네 가지가 쓴다 — 우리 이슈만 표지다 (2026-09-04 · omf-mes#378) ──────
+# ⭐ 문면은 전부 «실물»에서 따왔다 — 지어내면 시험이 실물을 안 지킨다.
+우리이슈_맨몸 = "3 값 목록 미정 공통코드 W-06-06 · #145"
+우리이슈_접두 = "1 문서 유형 값 집합 — **`omf-mes#347` 으로 판정된다** 확인 필요"
+QA_띄움 = "6 알림 발송 대상 — 보류 등록이 알림 대상인가(QA #24)"
+QA_붙임 = "2 재입하 이벤트(REQ-PR-0024·QA#23) — 자리표시"
+타저장소_server = ("3 `mes_category_code` 값 목록 — ⛔ `enum` 을 만들지 않는다 · "
+                "시드 삽입 확인은 `omf-mes-server#45`·`#46`")
+타저장소_client = "1 「갭 없음」으로 읽고 client#85 로 넘긴 자리"
+MLOT항목 = ("2 채번 상세 설계 부재 — 34자리 자릿수만 확정이고 도출·검증·유일성 "
+           "규칙은 별도 후속 과제(MLOT #16)")
+확정날짜 = "4 사출 조건은 설비가 갖는다 (✓확정 2026-07-14 #4)"
+PR번호 = "1 2차 리뷰 반영(`PR #211`) — 문면만"
+자기미결 = "5 「그렇게 처리한다」로 정정. **§8 미결 #3** 과 같은 자리"
+
+
+class 표지_네갈래(unittest.TestCase):
+    """⛔ 우리 이슈가 아닌 `#N` 을 표지로 세면 «엉뚱한 이슈»에 걸린다."""
+
+    def test_맨몸_번호는_우리_이슈다(self):
+        self.assertEqual(coi.tag_issues(우리이슈_맨몸), ["#145"])
+
+    def test_우리_저장소_접두는_벗겨서_남긴다(self):
+        """`omf-mes#347` 은 우리 것이다 — 접두가 붙었다고 버리면 안 된다."""
+        self.assertEqual(coi.tag_issues(우리이슈_접두), ["#347"])
+
+    def test_QA_는_띄우든_붙이든_버린다(self):
+        self.assertEqual(coi.tag_issues(QA_띄움), [])
+        self.assertEqual(coi.tag_issues(QA_붙임), [])
+
+    def test_다른_저장소_이슈는_표지가_아니다(self):
+        """⛔ V3 아래서 개발팀 저장소 이슈는 우리가 추적할 수 없다.
+
+        `omf-mes-server#45` 를 `#45` 로 읽어 「닫힌 표지」 45행 안에 넣고 있었다.
+        ⚠ 뒤따르는 `·#46` 은 «맨몸»이라 남는다 — 원문이 같은 저장소를 이어 쓴
+           줄임꼴이지만, 그것까지 가르려면 문맥을 봐야 한다. 지금은 안 가른다.
+        """
+        self.assertNotIn("#45", coi.tag_issues(타저장소_server))
+        self.assertEqual(coi.tag_issues(타저장소_client), [])
+
+    def test_다른_번호_체계는_버린다(self):
+        """MLOT(확정기록 항목) · 확정 날짜 · PR · 자기 미결 번호."""
+        self.assertEqual(coi.tag_issues(MLOT항목), [])
+        self.assertEqual(coi.tag_issues(확정날짜), [])
+        self.assertEqual(coi.tag_issues(PR번호), [])
+        self.assertEqual(coi.tag_issues(자기미결), [])
+
+    def test_네자리_번호도_읽는다(self):
+        """⛔ 옛 정규식은 `\d{1,3}` 이라 `#1024` 를 `#102` 로 읽었다."""
+        self.assertEqual(coi.tag_issues("1 후속 — #1024 참조"), ["#1024"])
+
+    def test_같은_번호는_한_번만_센다(self):
+        self.assertEqual(coi.tag_issues("#61 과 omf-mes#61 은 같다"), ["#61"])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
