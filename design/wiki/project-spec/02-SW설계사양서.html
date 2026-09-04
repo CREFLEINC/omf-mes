@@ -2167,7 +2167,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th class="nw">C4</th><td>백업·보존 최소 5년·최대 10년(요구 47건 중 유일한 '중요' 분류)</td><td>✅REQ-PR-0018, ✅REQ-OA-0006</td></tr>
 <tr><th class="nw">C5</th><td>다국어 전범위(UI·마스터·라벨 출력물, 한/베)</td><td>✅REQ-PR-0012, ✓확정 QA #33</td></tr>
 <tr><th class="nw">C6</th><td>POP 로컬 버퍼링+복구 시 자동 동기화</td><td>✓확정 QA #32</td></tr>
-<tr><th class="nw">C7</th><td>라벨 프린터 TSC TTP-247=USB/시리얼. 현장 단말=모듈 D 산업용 패널 PC(N100, Win11 IoT Entry·터치)</td><td>【HW스펙 §2.4】, 🔹CTO</td></tr>
+<tr><th class="nw">C7</th><td>라벨 프린터 TSC TTP-247=USB/시리얼. 현장 단말=모듈 D 산업용 패널 PC(N100, Win11 IoT Entry·터치) «(정합주: 2026-09-04 — <strong>실물 단말은 Windows 10 Enterprise LTSC 1809</strong>(빌드 17763.107 · 설치 2026-08-06)다. 클라이언트 개발 2팀 현황 전달(<code>omf-mes#278</code>). 빌드 타깃·산출물 형태는 바뀌지 않는다(<code>electron-builder --win</code>·NSIS·x64) — 달라지는 것은 <strong>실기 확인의 대상 OS</strong> 뿐이다. ⚠ 라벨 프린터 드라이버가 이 OS 에서 도는지는 실기 확인 대상이고, 빌드 17763.107 은 누적 업데이트 미적용 상태다)»</td><td>【HW스펙 §2.4】, 🔹CTO</td></tr>
 <tr><th class="nw">C8</th><td>폼팩터 3종 — 관리 Desktop / POP 패널 PC(터치·사번 경량 인증) / 모바일 스캐너(Android·문서 촬영). 모듈 D=현장 단말기(관리자 데스크탑 아님)</td><td>✅REQ-PR-0023·0006·0017</td></tr>
 <tr><th class="nw">C9</th><td>개발 7주(07-13~08-28), Agent coding 병렬, 계약 우선</td><td>【WBS §2·§4.1】</td></tr>
 <tr><th class="nw">C10</th><td>수불 원장이 정본, 잔량은 파생, 상태 캐시 없음</td><td>✓설계확정 결정 08·10</td></tr>
@@ -2232,7 +2232,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <thead><tr><th>폼팩터</th><th>형태</th><th>대상 장비</th><th>요점</th></tr></thead>
 <tbody>
 <tr><th>관리 Desktop</th><td>React + TS 웹(브라우저)</td><td>사무 PC</td><td>마스터 CRUD·대시보드·데이터 그리드. <strong>계정 로그인(JWT)</strong>. 온라인 전제(오프라인 금지 작업 대부분)</td></tr>
-<tr><th>POP(현장)</th><td><strong>Electron 설치형 앱</strong></td><td>모듈 D 산업용 패널 PC(N100 올인원 터치, Win11 IoT Entry — C7)</td><td>키오스크 전용 창(자동 시작·전체 화면)·터치 중심·<strong>사번 경량 인증</strong>(✅REQ-PR-0023)·한/베 토글·<strong>로컬 SQLite</strong>(선배포 캐시+outbox)·<strong>라벨 인쇄 내장</strong>(결정 18)·제한적 오프라인(결정 17 시나리오 1)·오프라인/미동기 상시 표시</td></tr>
+<tr><th>POP(현장)</th><td><strong>Electron 설치형 앱</strong></td><td>모듈 D 산업용 패널 PC(N100 올인원 터치, Win11 IoT Entry — C7) «(정합주: 2026-09-04 — 실물은 Windows 10 Enterprise LTSC 1809 · C7 참조)»</td><td>키오스크 전용 창(자동 시작·전체 화면)·터치 중심·<strong>사번 경량 인증</strong>(✅REQ-PR-0023)·한/베 토글·<strong>로컬 SQLite</strong>(선배포 캐시+outbox)·<strong>라벨 인쇄 내장</strong>(결정 18)·제한적 오프라인(결정 17 시나리오 1)·오프라인/미동기 상시 표시</td></tr>
 <tr><th>모바일 스캐너</th><td><strong>Capacitor Android 앱</strong></td><td>모바일/PDA(기종 미정 — 베트남 현지 구매, OS=Android 확정 🔹) — <strong>바코드 스캐너 일체형</strong>(모듈 A) «(정정 2026-08-26 — omf-mes-client#442)»</td><td>스캔 퍼스트 플로우·카메라(거래명세서 촬영→OCR, ✅REQ-PR-0006)·로컬 저장소·제한적 오프라인(결정 17 시나리오 2)</td></tr>
 </tbody></table>
 <ul><li>코드 1벌: 동일 React 코드베이스에서 셸 3종 빌드. 공유물·분기 원칙은 §2.3 FE 행 참조.</li><li><strong>폐기 기록</strong>: v0.1의 POP=PWA(웹) 계획 폐기 — 🔹CTO: "오프라인 원활+프린터 제어 필요, 웹 브라우저 부적합" <code>[확정 2026-07-10 질의]</code> 【결정서 §2.3】.</li></ul>
