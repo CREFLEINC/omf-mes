@@ -15,6 +15,10 @@
 .omc/
 **/settings.local.json
 
+# 설계팀 3역할(Consultant/Architect/Caster) 워크트리 — .claude/scripts/setup-team-worktrees.sh 가
+# 클론마다 다시 만든다. 로컬 작업 디렉토리라 커밋 대상이 아니다.
+/.claude/worktrees/
+
 # 파이썬 바이트코드 — 검사기·생성기가 서로를 불러오면 생긴다
 __pycache__/
 *.pyc
