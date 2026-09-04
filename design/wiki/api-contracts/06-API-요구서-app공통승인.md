@@ -26,7 +26,7 @@
 | 기타출고 품의(폐기) | `W-01-06`·`W-04-10` | `POST /logistics/goods-issues/{goodsIssueId}:request-approval` | ✅ |
 | 재고조정 | `W-01-12` | `POST /inventory/adjustments/{inventoryAdjustmentId}:request-approval` | ✅ |
 | 신규 P/O | `W-01-11` | `POST /logistics/purchase-orders/{purchaseOrderId}:request-approval` | ✅ |
-| 물류문서 취소 3종 | `W-01-13` | `POST /logistics/{문서}/{id}:request-cancel`(입하·입고·출고) | ✅ |
+| 물류문서 취소 3종 | `W-01-13` | ⭐ `POST /logistics/document-progress/{documentTypeCode}/{documentId}:request-cancel`(입하·입고·출고 — 2026-09-04 유형 축 통합 · `omf-mes#352`) | ✅ |
 | 출하 취소 | `W-04-12` | `POST /logistics/shipments/{shipmentId}:request-cancel` | ✅ |
 | **긴급 IQC 생략**(한도승인) | **`M-01-13`** | `POST /trace/lots/{lotId}:request-iqc-skip` | ✅ ⭐ **2026-09-01 정정** — 경로는 `#288`(`e38c5d9`)이 신설했는데 **같은 커밋의 이 표가 「0건」으로 남았다.** 서버가 `approval_type_code=IQC_SKIP`·`target_type_code=INBOUND_LOT` 을 채운다(그 오퍼레이션의 내부 주석) |
 | ⭐ **실적 정정**(A급 보정) | **`W-02-05`** | `POST /production/production-results/{productionResultId}:request-approval` | ✅ **2026-09-04 신설** — 승인 부착이 2026-08-31 확정(`#61` · A급 보정부터)되고 **부르는 화면이 2026-09-04 확정**(사용자 — 전용 화면 신설 없이 W/O 마감 화면에 얹는다)돼 경로가 섰다. 서버가 `approval_type_code=PRODUCTION_RESULT_CORRECT`·`target_type_code=PRODUCTION_RESULT` 를 채운다(그 오퍼레이션의 내부 주석). ⛔ `If-Match` 없음(원본을 안 고친다) · ⛔ `X-Worker-No` 없음(**관리웹**이 부른다) |
@@ -125,6 +125,7 @@
 | 대리 지정 | **없음 — 범위 밖**(2026-08-07 사용자 결정) | §5-8 |
 | 상신 철회 | **없음 — 범위 밖.** 승인자 반려로 대신한다 | §5-8 · **J-6·G-24** |
 | ⭐ **선택지·표시명 — `APPROVAL_REQUEST_STATUS`** | **`GET /mdm/code-values?codeGroupCode=APPROVAL_REQUEST_STATUS`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = PENDING·APPROVED·REJECTED · ⛔ 고객이 편집할 수 없다 | G-32 |
+| ⛔ **유형 선택칸의 표시명 — 원천 없음**(2026-09-04) | `approvalTypeCode` 9값은 계약이 닫은 값이라 표시명이 안 온다. `omf-mes#352` 가 같은 형태를 판정 중이다 | `A-16`·`G-32` |
 
 **계약이 정본으로 갖는 것 셋**
 
