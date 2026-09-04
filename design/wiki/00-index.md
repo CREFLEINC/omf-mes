@@ -27,15 +27,15 @@ python3 design/schema/generators/verify-counts.py     ← 이 문서의 숫자�
 | :-: | --- | --- | --- |
 | **Ⅰ** | **이 기능이 왜 있나** — 고객이 무엇을 요구했나 | [요구사항명세서](requirements/00-요구사항명세서.md) | 요구 47건 · 추적성 47행 |
 | **Ⅱ** | **어떤 구조 위에 만드나** — 어느 단말에서 도나 | [SW 설계사양서](project-spec/02-SW설계사양서.md) · [HW 구성안](project-spec/03-HW구성안.md) | 제약 C1~C11 · 프로그램 3종 · ⛔ HW 는 미확정 |
-| **Ⅲ** | **왜 그렇게 정해졌나** — 만들 때 무슨 규약을 지키나 | ⭐ [**의사결정·정책**](decisions-policy/00-index.md) *(표지)* | 결정 대장 **143행** · 의사결정 요청서 **13건** · 조항 **155** |
+| **Ⅲ** | **왜 그렇게 정해졌나** — 만들 때 무슨 규약을 지키나 | ⭐ [**의사결정·정책**](decisions-policy/00-index.md) *(표지)* | 결정 대장 **143행** · 의사결정 요청서 **13건** · 조항 **156** |
 | **Ⅳ** | **이 화면이 무엇을 보이고 무엇을 저장하나** | [통합 정보구조](project-spec/04-통합-IA.md) · [사용자 프로세스](project-spec/05-사용자-프로세스-태스크플로우.md) · [화면 상세 스펙](screens/) | 화면 **117** · 상세 스펙 **118장**(폐지본 `W-06-13` 1장 포함 — `W-06-02` 로 통합됐고 폐지 근거로 남겼다) |
-| **Ⅴ** | **서버와 무슨 말을 주고받나** | ⭐ [**API 계약서**](api-contracts/09-API-계약서.md) *(표지)* | 계약 **7파일** · 경로 **355** · 오퍼레이션 **491** · 스키마 **509** · 요구서 **9장** |
+| **Ⅴ** | **서버와 무슨 말을 주고받나** | ⭐ [**API 계약서**](api-contracts/09-API-계약서.md) *(표지)* | 계약 **7파일** · 경로 **351** · 오퍼레이션 **487** · 스키마 **509** · 요구서 **9장** |
 
 | | 무엇 | 왜 |
 | :-: | --- | --- |
 | **00** | [용어 사전](glossary/00-용어사전.md) | **읽다 막히면 여기부터.** 이 프로젝트의 조어와 좁은 뜻으로 쓰는 말 — 용어 **24항목** |
 | — | [도메인 워크플로우](domain-workflow/00-index.md) | 요구사항이 도메인 업무 흐름에 어떻게 반영됐는가(WF 6·도식스펙 6·개념모델 1) |
-| **99** | ⭐ [**설계 진도 대장**](handover/99-인계대장.md) *(생성물)* | 우리 설계에서 **아직 안 정해진 것**을 한자리에 모은다 — 미결이 스펙 118장에 흩어져 있어 모아 두지 않으면 **설계팀이 자기 진행을 놓친다**. **동시에 「차단 0 — 설계 골격은 서 있다」도 같은 대장이 말한다** ⚠ 2026-09-03 개정 — 「인계」라는 낱말은 더는 안 맞는다(파일 이름은 그대로) |
+| **99** | ⭐ [**설계 진도 대장**](progress/99-설계진도대장.md) *(생성물)* | 우리 설계에서 **아직 안 정해진 것**을 한자리에 모은다 — 미결이 스펙 118장에 흩어져 있어 모아 두지 않으면 **설계팀이 자기 진행을 놓친다**. **동시에 「차단 0 — 설계 골격은 서 있다」도 같은 대장이 말한다** ⚠ 2026-09-03 개정 — 「인계」라는 낱말은 더는 안 맞는다(파일 이름은 그대로) |
 
 ---
 
@@ -43,7 +43,7 @@ python3 design/schema/generators/verify-counts.py     ← 이 문서의 숫자�
 
 개발은 대개 **화면 하나**를 맡아 시작한다. 그 화면의 모든 것을 한 줄로 잇는 표가 있다.
 
-> ### 👉 [**화면 진도표**](handover/화면-진도표.md) — 화면 ↔ 상세 스펙 경로 ↔ 요구서 ↔ 계약
+> ### 👉 [**화면 진도표**](progress/화면-진도표.md) — 화면 ↔ 상세 스펙 경로 ↔ 요구서 ↔ 계약
 >
 > ⚠ **2026-09-03 — 「착수 통지」 열은 걷었다.** 착수 가능 통지가 폐지됐고, 설계팀은 개발팀의 업무 진행에 직접 정보를 보유하지 않는다.
 
@@ -81,9 +81,9 @@ python3 design/schema/generators/verify-counts.py     ← 이 문서의 숫자�
 
 | 파일 | 다시 만드는 명령 |
 | --- | --- |
-| `handover/화면-진도표.md` | `python3 design/schema/generators/build-screen-progress.py` |
-| `handover/99-인계대장.md` | `python3 design/schema/generators/build-handover-ledger.py` |
-| `handover/미결-대장.md` | `python3 design/schema/generators/collect-open-items.py` |
+| `progress/화면-진도표.md` | `python3 design/schema/generators/build-screen-progress.py` |
+| `progress/99-설계진도대장.md` | `python3 design/schema/generators/build-progress-ledger.py` |
+| `progress/미결-대장.md` | `python3 design/schema/generators/collect-open-items.py` |
 | `schema/generators/openapi/ui-요구목록*.md` | `python3 design/schema/generators/verify-ui-coverage.py --write --domain <도메인>` |
 | `*.html` | `python3 design/schema/generators/build-doc-html.py [00\|01\|02\|03\|05\|06\|07\|all]` · `build-04-ia-html.py` · `build-04-ia-도식본.py` |
 

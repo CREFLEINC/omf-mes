@@ -80,6 +80,23 @@ def has_etag(op: dict | None) -> bool:
                       .get("headers") or {})
 
 
+def named_sources(desc: str, merged: dict) -> list[str]:
+    """description 이 «이름으로 지목한» 조회 경로 중 실제로 ETag 를 내는 것.
+
+    ⛔ 자동 추론이 아니다 — 설계가 **문장으로 적은 것만** 인정한다. 이 검사기의
+       ⛔ 안내(「원천이 부모 자원인가 자식 집합인가는 판단입니다」)를 그대로 지킨다.
+    ⭐ 왜 필요한가 — 토큰 원천이 «판별자로 갈리는» 경로가 생겼다(2026-09-04 ·
+       `omf-mes#352`). `POST /logistics/document-progress/{documentTypeCode}/{documentId}:cancel`
+       의 원천은 `documentTypeCode` 값에 따라 **세 리소스**로 갈린다. `sources()` 는
+       「자기 경로 · 한 단계 부모」 둘만 보므로 그런 자리를 «선언할 방법이 없었다» —
+       설계가 description 에 원천을 또박또박 적어도 검사기가 못 읽고 ⛔ 를 냈다.
+    ⚠ 느슨해지지 않는다 — 지목한 경로가 **실재하고 그 GET 이 ETag 를 내야** 인정한다.
+       존재하지 않는 경로를 적으면 여전히 걸린다.
+    """
+    return [p for p in merged
+            if p in desc and has_etag((merged.get(p) or {}).get("get"))]
+
+
 def sources(path: str) -> list[str]:
     """이 경로의 토큰을 받을 만한 조회 후보. [0]=자기 경로 · [1:]=부모."""
     base = path.split(":")[0]
@@ -132,6 +149,7 @@ def main() -> int:
     unnamed: list[tuple[str, str, str, str]] = []
     offline_locked: list[tuple[str, str, str]] = []
     borrowed = 0
+    declared = 0
     total = 0
 
     for name, path, method, op, item in ops:
@@ -153,21 +171,28 @@ def main() -> int:
         cands = sources(path)
         if has_etag((merged.get(cands[0]) or {}).get("get")):
             continue
+        desc = op.get("description") or ""
         parent = next((c for c in cands[1:]
                        if has_etag((merged.get(c) or {}).get("get"))), None)
         if parent is None:
+            # ④ 판별자로 «갈리는» 원천 — 부모가 하나가 아니라 sources() 로는 못 찾는다.
+            #    설계가 description 에 이름으로 지목했고 그 경로가 실제로 ETag 를 내면
+            #    그것을 원천 선언으로 인정한다(named_sources 주석 참조).
+            if named_sources(desc, merged) and "ETag" in desc:
+                declared += 1
+                continue
             missing.append((name, method.upper(), path))
             continue
 
         # ② 부모의 토큰을 «빌리는» 자리 — 어느 축인지 description 이 적었나
         borrowed += 1
-        desc = op.get("description") or ""
         if parent not in desc or "ETag" not in desc:
             unnamed.append((name, method.upper(), path, parent))
 
     if not (missing or unnamed or offline_locked):
         print(f"✅ 저장 충돌 토큰을 받을 곳이 전부 선언돼 있습니다 — {total}곳 검사"
-              f" (부모 빌림 {borrowed}곳 · 축 전건 명시)")
+              f" (부모 빌림 {borrowed}곳 · 판별자로 갈려 «이름으로 지목» {declared}곳"
+              f" · 축 전건 명시)")
         return 0
 
     if missing:

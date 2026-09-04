@@ -29,7 +29,7 @@
 - **왜 바뀌었는지** — 커밋 본문에 있다. 이 표는 «어디를 볼지»까지만 안내한다.
 - **바뀐 내용이 맞는지** — 이력을 옮길 뿐 판정하지 않는다.
 - `design/raw/`·`.claude/` — 설계 산출물이 아니다(전자는 시점 고착 자료, 후자는 하네스).
-- `design/wiki/handover/` 만 건드린 커밋 — 생성물 갱신이라 «설계»가 바뀐 회차가 아니다.
+- `design/wiki/progress/` 만 건드린 커밋 — 생성물 갱신이라 «설계»가 바뀐 회차가 아니다.
   ⭐ 이 표 자신도 거기 있어, 빼지 않으면 「표를 갱신한 커밋」이 다음 회차에 또 한 행이 된다.
 
 ⭐ V3(2026-09-03) — 이 표는 설계팀 «내부» 이력이다
@@ -54,9 +54,9 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, "..", "..", "..")
-OUT = os.path.join(ROOT, "design", "wiki", "handover", "변경-요약.md")
+OUT = os.path.join(ROOT, "design", "wiki", "progress", "변경-요약.md")
 WATCH = ["design/wiki", "design/schema"]
-SELF_DIR = "design/wiki/handover/"   # 생성물 자리 — 이 표 자신을 포함한다
+SELF_DIR = "design/wiki/progress/"   # 생성물 자리 — 이 표 자신을 포함한다
 
 SCREEN = re.compile(r"([WMP]-(?:CO|\d{2})-\d{2})")
 PR = re.compile(r"\(#(\d+)\)\s*$")
@@ -135,7 +135,7 @@ def commits(limit: int | None) -> list[dict]:
         sha, date, subject = line.split(sep, 2)
         files = [f for f in run(["show", "--name-only", "--format=", sha,
                                  "--"] + WATCH).splitlines() if f.strip()]
-        # ⛔ 자기 출력을 세지 않는다 — handover/ 는 생성물이라 「이 표를 갱신한 커밋」이
+        # ⛔ 자기 출력을 세지 않는다 — progress/ 는 생성물이라 「이 표를 갱신한 커밋」이
         # 다음 회차에 또 한 행이 되어 표가 영원히 수렴하지 않았다(2026-09-03 실측 93→94).
         files = [f for f in files if not f.startswith(SELF_DIR)]
         if not files:

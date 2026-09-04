@@ -20,7 +20,7 @@ V3(2026-09-03) 규칙 5 — 공지는 「변동 사항이 있다는 사실」만
   - 화면설계서 `design/wiki/screens/…/새이름.md` (경로 변경 · 이전 `design/wiki/screens/…/옛이름.md`)
 
   ⛔ 파일 «안»의 무엇이 바뀌었는지(절·경로·스키마·키·값·문장)는 내지 않는다 — 개발팀이 파일을 연다.
-  ⛔ 갈래 6줄에 속하지 않는 파일(검사기·규약·handover/·색인·.html 배포본)은 싣지 않는다 — 개발팀
+  ⛔ 갈래 6줄에 속하지 않는 파일(검사기·규약·progress/·색인·.html 배포본)은 싣지 않는다 — 개발팀
      열람 대상이 아니다.
 
 갈래 분류 규칙은 `design/schema/generators/build-change-digest.py` 의 `where()` 와 같다

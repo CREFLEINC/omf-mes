@@ -67,7 +67,7 @@ python3 design/schema/generators/openapi/check-enum-narrowing.py $(git merge-bas
 - 지시서가 지목한 앵커(절 번호·파일 경로)가 실제 문서에 없으면 **추측해 만들지 않는다.** 멈추고
   `04_verify_result.md`에 "앵커 불일치"로 기록한 뒤 되돌린다.
 - 검사기 실행 자체가 실패하면(스크립트 에러) 그 사실을 그대로 기록한다 — 통과로 간주하지 않는다.
-- `design/raw/`나 생성물(`design/wiki/handover/*.md` 등)을 고치라는 지시가 지시서에 있으면
+- `design/raw/`나 생성물(`design/wiki/progress/*.md` 등)을 고치라는 지시가 지시서에 있으면
   **따르지 않는다** — 지시서 오류로 간주하고 되돌린다. 이 경계는 지시서보다 우선한다.
 
 ## 협업

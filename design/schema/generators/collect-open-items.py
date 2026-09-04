@@ -40,7 +40,7 @@
 4. **해소 표시**(✅ · 해소 · 종결 · 취소선)가 붙은 행을 갈라 센다.
    ⛔ 단 「좁힘」이 적힌 행은 **살아 있는 것으로 센다** — 부분 해소 표기라 문면에
    「해소」가 같이 나온다. `resolved()` 주석 ③ 참조.
-5. `design/wiki/handover/미결-대장.md` 로 쓴다.
+5. `design/wiki/progress/미결-대장.md` 로 쓴다.
 
 ⚠ 이 생성기가 못 보는 것
 ------------------------
@@ -79,7 +79,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, "..", "..", ".."))
-OUT = os.path.join(ROOT, "design", "wiki", "handover", "미결-대장.md")
+OUT = os.path.join(ROOT, "design", "wiki", "progress", "미결-대장.md")
 
 SPEC_GLOB = os.path.join(ROOT, "design", "wiki", "screens", "*", "[WPM]-*.md")
 SCREEN_ID = re.compile(r"^([WPM]-(?:CO|\d{2})-\d{2})")
@@ -101,7 +101,7 @@ SCREEN_ID = re.compile(r"^([WPM]-(?:CO|\d{2})-\d{2})")
 #    지우고 새 이름을 붙이는 표기가 언제든 나올 수 있다. 그래서 «둘을 함께» 요구한다.
 #
 # ⭐ 이 판정을 쓰는 곳은 여기와 `build-screen-progress.py` 다(같은 함수를 import 한다).
-#    `build-handover-ledger.py` 는 이 대장의 «요약 표»를 그대로 인용하므로 셋이 같은
+#    `build-progress-ledger.py` 는 이 대장의 «요약 표»를 그대로 인용하므로 셋이 같은
 #    수를 말한다 — 판정을 세 곳에 적으면 그 순간 갈린다.
 H1 = re.compile(r"^#\s+.*$", re.M)
 

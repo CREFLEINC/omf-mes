@@ -35,7 +35,7 @@
     보고 썼나」의 이력이라 그대로 둔다. 목록으로만 낸다
   - `## 변경 이력` 표 안의 행 — 시점 기록이라 다시 쓰지 않는다(저장소 관행)
   - `design/raw/` 아래 전부 — 읽지 않는다
-  - **생성물**(`design/wiki/handover/*.md` — 진도표·인계대장·미결-대장) — 손으로
+  - **생성물**(`design/wiki/progress/*.md` — 진도표·설계진도대장·미결-대장) — 손으로
     고치지 않는다. 값을 바꾸려면 원천(화면 스펙 §8 등)을 고치고 «재생성»한다.
     이 검사기도 읽기만 하고 `--fix` 대상에서 뺀다
   - 와일드카드가 든 경로(`uiux/2026-08-1*-API스펙-*/…`) — `--fix` 대상 밖.
@@ -68,7 +68,7 @@ MAP = os.path.join(ROOT, "design", "schema", "redirect-map.md")
 DEAD_PREFIXES = ("docs/research/", "research/", "uiux/", "deliverables/")
 
 # ⛔ 생성물 — 손으로 고치지 않는다(재생성으로만 갱신). 읽되 --fix 하지 않는다.
-GENERATED_DIRS = (os.path.join("design", "wiki", "handover") + os.sep,)
+GENERATED_DIRS = (os.path.join("design", "wiki", "progress") + os.sep,)
 
 # ⛔ 앞 글자가 경로 조각이면 잡지 않는다 — `design/raw/process/uiux/…` 안의
 #    `uiux/` 를 잡으면 «이미 옮긴» 경로를 다시 옮기려 든다.
