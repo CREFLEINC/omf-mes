@@ -36,6 +36,8 @@
   - 관리웹 전용 오퍼레이션의 헤더 선언 — **막지 않고 알리기만** 한다
   - 요구서가 **한글 자리표시**로 여러 리소스를 접어 적은 줄(`/logistics/{문서}/…`) — 경로가 잘린 채 잡힌다
   - **`…` 로 앞을 줄인 경로**(`POST …:report-print`) — 못 본다. ⛔ #178 이 `:report-print` 를 놓친 자리가 여기다
+  - ✅ **`~~취소선~~` 으로 폐기된 인용은 2026-09-04 부터 «걷는다»** — 그 전에는 폐기본을
+    살아 있는 호출로 읽어 «관리웹 전용»인 오퍼레이션에 귀속 헤더를 요구했다(omf-mes#61)
 
 ⇒ 그래서 이 수치는 **하한**이다. 「전부 덮었다」가 아니라 「여기까지는 덮었다」.
 
@@ -64,6 +66,13 @@ OPTIONAL_REF = "#/components/parameters/WorkerNoOptional"
 HEAD = re.compile(r"^###\s+§?3-\d+[.\s]")
 SID = re.compile(r"\b([PMW]-\d{2}-\d{2})\b")
 CALL = re.compile(r"\b(POST|PUT|PATCH|DELETE)\s+(/[A-Za-z0-9_{}/:.\-]+)")
+# ⛔ 폐기된 인용은 «살아 있는 호출»이 아니다.
+#    작성 규칙 5 는 폐기된 표기를 `~~취소선~~` 으로 남기라고 정한다 — 그래서 요구서에
+#    「이 화면이 이 경로를 부른다」의 «폐기본»이 그대로 남아 있다. 걷지 않으면 검사기가
+#    그것을 현재 호출로 읽는다. 2026-09-04 실측 — 06-API-요구서-04제품출하.md §3 의
+#    폐기된 `P-04-03` 인용 하나 때문에 `:correct` 가 「현장 단말이 부른다」로 잡혀,
+#    관리웹 전용으로 확정된 오퍼레이션에 귀속 헤더를 요구하는 ⛔ 가 났다(omf-mes#61).
+STRIKE = re.compile(r"~~.+?~~")
 HTTP_METHODS = ("get", "post", "put", "patch", "delete", "head", "options")
 
 
@@ -125,6 +134,7 @@ def scope(real: dict) -> tuple[dict, dict]:
         buf: list[str] = []
         with open(f, encoding="utf-8") as fh:
             for line in fh:
+                line = STRIKE.sub("", line)
                 if HEAD.match(line):
                     absorb(ids, buf)
                     ids, buf = SID.findall(line), []
