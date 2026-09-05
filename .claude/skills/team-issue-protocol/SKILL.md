@@ -26,7 +26,7 @@ V3 규칙 2 — 「설계팀과 개발팀의 직접 소통은 설계팀이 개�
 | 종류 | 어디에 | 누가 만들고 닫나 | 접두 | 라벨 | 만드는 스킬 |
 | --- | --- | --- | --- | --- | --- |
 | **설계 변동 공지** (규칙 2·5) | 개발팀 저장소 2곳 — `omf-mes-client` · `omf-mes-server` 에 **같은 본문 1건씩** | 설계팀이 만든다. **닫지 않는다**(시점 기록) | `[설계 변동 공지] <YYYY-MM-DD> · <해시7>` | `설계 변동 공지` (+ 클라이언트 저장소는 `uiux→client` 도) | `design-change-notice` |
-| **설계팀 자기 이슈** (규칙 4 — 「하는 일·처리할 일」 공개, 규칙 2(2) 회신 대기) | `omf-mes` | 설계팀이 만들고 설계팀이 닫는다 | `[요청 처리]` · `[설계]` · `[확인 요청]` | `Agent : Consultant`/`Architect`/`Caster`(3역할 핸드오프에 따라 스왑, §6) + `status:in-progress` / `help wanted` | `design-request-intake`(Consultant) · `design-issue-resolution`(Architect) · `design-change-notice`(Caster) · 자체 과제는 직접 |
+| **설계팀 자기 이슈** (규칙 4 — 「하는 일·처리할 일」 공개, 규칙 2(2) 회신 대기) | `omf-mes` | 설계팀이 만들고 설계팀이 닫는다 | `[요청 처리]` · `[설계]` · `[확인 요청]` | `Agent : Consultant`/`Architect`/`Caster`(3역할 핸드오프에 따라 스왑, §6) + `status:in-progress`(**착수 시**) / `help wanted` | `design-request-intake`(Consultant) · `design-issue-resolution`(Architect) · `design-change-notice`(Caster) · 자체 과제는 직접 |
 
 그 외의 이슈·코멘트는 **어느 저장소에도 만들지 않는다.** 개발팀의 요청은 이슈로 오지 않는다 —
 **사용자가 자료로 건네고**, 우리 답도 **답변서 파일로 사용자가 전한다**(§4·§7).
@@ -76,7 +76,7 @@ V2 라벨 양식: 팀 유형 `Agent : {type}` · 팀 번호 `Agent : T{number}` 
 | `Agent : Consultant` | 자기 이슈는 **이 라벨로 시작**한다(Phase 0'). 즉시 답변으로 끝나면 계속 이 라벨인 채 닫힌다 | ⭐ **2026-09-04 신설·실재**(색상 `c5def5`) |
 | `Agent : Architect` | Consultant가 재실측·반영이 필요하다고 판정하면 스왑해 넘긴다 — "지금 Architect 차례" | 이미 있음(선례 `#425`. V2 시절엔 「자기 이슈 전건에 붙인다」였으나 2026-09-04 3역할 도입으로 뜻이 좁혀졌다 — 설명도 그에 맞춰 정정) |
 | `Agent : Caster` | 설계 변동 공지의 검증→배포 자기 이슈(`[설계]`)에 붙인다 | ⭐ **2026-09-04 신설·실재**(색상 `f9d0c4`) |
-| `status:in-progress` | 진행 중 | 있음(설명 「진행 중」, 부착 8건). ⛔ **V2 의 `in progress` 는 이 저장소에 없고 새로 만들지 않는다**(2026-08-25 확정) — 뜻이 같은 라벨을 둘 두면 이 파일의 존재 이유(어휘 분열 방지)에 스스로 걸린다 |
+| `status:in-progress` | ⭐ **설계 담당자가 실제로 착수했다**(2026-09-05 사용자 확정) — 접수·인계 대기는 «착수»가 아니다. 붙이는 자리는 **Architect 가 이어받아 재실측을 시작할 때 하나뿐**이고(`design-issue-resolution` Phase 0), 떼는 자리는 이슈를 닫을 때다(`design-request-intake` Phase 6b). ⛔ Consultant 는 이슈를 만들 때 붙이지 않는다 — 즉시 답변 회차는 이 라벨 없이 열렸다 닫힌다 | 있음(설명 「진행 중」). ⛔ **V2 의 `in progress` 는 이 저장소에 없고 새로 만들지 않는다**(2026-08-25 확정) — 뜻이 같은 라벨을 둘 두면 이 파일의 존재 이유(어휘 분열 방지)에 스스로 걸린다 |
 | `help wanted` | **사용자 회신 대기** — `[확인 요청]` 이슈, 또는 요청 처리가 사용자 확인 없이는 끝나지 않을 때 | GitHub 기본 라벨(부착 2건) |
 | `Agent : T1`~`T4` · `Agent : Client` | V3 이전 유산 — 개발팀이 「누가 물었나」로 붙여 온 표기 | 있음(`T2`·`T3` 는 설명 비어 있음). **새로 붙이지 않는다 · 떼지 않는다** |
 
@@ -154,12 +154,13 @@ gitignore). 이슈 목록을 훑어 요청을 «찾는» 절차는 **없다** �
 ## 6. 상태 전이 — 자기 이슈만
 
 ```
-만든다(Agent : Consultant + status:in-progress)                          [design-request-intake Phase 0']
-   →  즉시 답변이면 그대로 닫는다로
+만든다(Agent : Consultant 만 — ⛔ status:in-progress 는 아직 붙이지 않는다)  [design-request-intake Phase 0']
+   →  즉시 답변이면 그대로 닫는다로 (이 회차는 status:in-progress 가 한 번도 붙지 않는다)
    →  재실측·반영이 필요하면 인계 — 코멘트(01_scope.md) + Agent : Consultant → Agent : Architect
-          → Architect가 재실측·게이트·반영·병합                           [design-issue-resolution]
+          → Architect가 «착수할 때» + status:in-progress                  [design-issue-resolution Phase 0]
+          → 재실측·게이트·반영·병합
           → 인계 코멘트(병합 해시) + Agent : Architect → Agent : Consultant 로 되돌림
-   →  사용자 확인 대기 : status:in-progress → help wanted   ([확인 요청] 이거나 F·G 유형이 남았을 때)
+   →  사용자 확인 대기 : help wanted 부착(status:in-progress 가 붙어 있으면 뗀다)  ([확인 요청] 이거나 F·G 유형이 남았을 때)
    →  닫는다 : 답변서/결과 «전문»을 닫는 코멘트로 남기고 닫는다             [design-request-intake Phase 6b]
 ```
 
@@ -280,3 +281,4 @@ git tag notice/20260903 <전체 해시> && git push origin notice/20260903
 | 2026-08-27 | 머리 표기는 관행이 아니라 V2 원문(line 62) — `개발팀에 전달사항` | §7-1 |
 | 2026-09-03 | 개발팀 저장소에 우리가 세운 이슈(`omf-mes-server` 접두 있는 17건 — 2026-08-25 실측 때는 0건이었다)가 V3 로 한꺼번에 유산이 됐다 — 「직접 소통」이 열흘 사이 얼마나 샜는지의 실측이다 | §1·§3 |
 | 2026-09-04 | 3역할(Consultant/Architect/Caster) 구성안 도입 — 자기 이슈 라벨이 고정 소유가 아니라 역할 핸드오프 상태를 표시하게 됨. `design-request-intake`가 Consultant 전용으로 좁혀지고 옛 재실측·반영 단계는 신설 `design-issue-resolution`(Architect)으로 옮겨졌다 | §0·§2·§5·§6 |
+| 2026-09-05 | ⭐ **`status:in-progress` 는 접수가 아니라 «착수»에 붙인다**(사용자 확정). 접수 시점 부착은 3역할 도입 전 관행이 남은 것이고, 인계만 받아 둔 이슈까지 「진행 중」으로 보이게 해 **라벨이 거짓을 말했다**. 붙이는 자리를 Architect 착수 한 곳으로 좁혔다 | §0·§2·§6 |

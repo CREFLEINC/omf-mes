@@ -39,7 +39,19 @@ gh issue view <이슈번호> --repo CREFLEINC/omf-mes --json title,body,comments
 ```
 
 이슈에 `Agent : Architect` 라벨이 없으면 받지 않는다 — Consultant가 아직 판정 중이거나 이미
-Consultant에게 돌아간 이슈다. 이슈 코멘트 중 Consultant가 남긴 `01_scope.md` 요지(물음별 판정표)
+Consultant에게 돌아간 이슈다.
+
+⭐ **착수하기로 했으면 여기서 `status:in-progress` 를 붙인다**(2026-09-05 사용자 확정 — 그 라벨은
+「**설계 담당자가 실제로 착수했다**」는 뜻이라 접수 시점에는 붙지 않는다. 인계만 받아 둔 이슈와
+지금 손대고 있는 이슈를 라벨 하나로 가르는 것이 이 규칙의 목적이다):
+```
+gh issue edit <이슈번호> --repo CREFLEINC/omf-mes --add-label "status:in-progress"
+```
+⛔ **읽어만 보고 착수하지 않을 것이면 붙이지 않는다** — 붙여 놓고 멈추면 그 라벨이 다시 거짓이 된다.
+떼는 것은 Consultant가 이슈를 닫을 때다(`design-request-intake` Phase 6b) · 사용자 확인 대기로
+멈추면 `help wanted` 로 교체한다(Phase 2).
+
+이슈 코멘트 중 Consultant가 남긴 `01_scope.md` 요지(물음별 판정표)
 를 찾아 `$ROOT/.design-runs/<식별자>-*/`에 `00_request.md`·`01_scope.md`로 복원한다 —
 `.design-runs/`는 워크트리마다 독립된 gitignore 스크래치이므로, Consultant 워크트리가 만든 파일이
 여기 자동으로 있지 않다. 자기 이슈 코멘트가 유일한 정본 전달 경로다.
