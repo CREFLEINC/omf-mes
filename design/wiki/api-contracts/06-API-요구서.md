@@ -101,13 +101,13 @@ python3 -c "import json,io; d=json.load(io.open('openapi/mdm-기준정보.json',
 print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['paths'])))"
 ```
 
-**대조 규칙**: `openapi/ui-요구목록.md`의 액션 **100건**이 §3 매핑표에 하나도 빠짐없이 있어야 한다. 엔드포인트가 없는 액션도 **「없음 + 이유」로 한 행을 차지**하며, 그것을 다룬 것으로 친다. **빈칸은 누락이다.**
+**대조 규칙**: `openapi/ui-요구목록.md`의 액션 **105건**이 §3 매핑표에 하나도 빠짐없이 있어야 한다. 엔드포인트가 없는 액션도 **「없음 + 이유」로 한 행을 차지**하며, 그것을 다룬 것으로 친다. **빈칸은 누락이다.**
 
 ---
 
 ## §3. 화면 → API 매핑
 
-`openapi/ui-요구목록.md`의 **화면 14 · 액션 100**을 전건 소화한다. 액션 이름과 활성 조건은 화면 스펙 §5-1 원문 그대로다.
+`openapi/ui-요구목록.md`의 **화면 14 · 액션 105**을 전건 소화한다. 액션 이름과 활성 조건은 화면 스펙 §5-1 원문 그대로다.
 
 ### 3-0. 「없음」의 다섯 가지 — 이유가 다르면 대응이 다르다
 
@@ -256,11 +256,14 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 정렬 재배치 | `PUT /mdm/code-values/{id}` — 행마다(유일 제약 없음 → A-5 대상 아님) | §5-1 |
 | 저장 / 취소 | `PUT /mdm/code-groups/{id}` · `PUT /mdm/code-values/{id}` · `PUT /mdm/departments/{id}` — 탭·대상별 | §4-A~§4-C · B-1 |
 | 사용 중지 | `POST …:deactivate` 3종(코드그룹·코드값·부서) | §5-1 · B-4 |
-| 자격 추가 / 삭제 | `PUT /mdm/workers/{id}/qualifications` — 전체 치환 | §4-E · B-6 · A-7 |
+| 자격 추가 / 삭제 | `PUT /mdm/workers/{id}/qualifications` — 전체 치환, 기존 인증자 참조 보존과 새 참조의 활성 검증 구분 | §4-E · B-6 · A-7 |
+| 인증자 선택 | `GET /app/users?includeInactive=false` — 활성 사용자 계정(`AppUser.appUserId`), 선택·null 허용 | §4-E · §8-2 |
 | 변경 이력 | `GET /audit/events` | §5-1 · B-5 |
 | 수신 동기화 상태 보기 | **없음 — 소관 이동.** `W-06-10`의 `GET /integration/messages?targetTypeCode=…`로 이동한다(중복 구현 금지). ⚠ `targetTypeCode` 에 넣을 문자열이 아직 없다(다형 참조 대응표 미정) — 그때까지 `GET /integration/interface-definitions?directionCode=INBOUND` 로 정의를 받아 그 `interfaceCode` 로 거른다. §3-13 이 같은 경로를 이미 쓴다 | §5-1 원문 · B-4-1 ④ |
 | ⭐ **작업자 자격유형 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=QUALIFICATION_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `PROCESS_OPERATION`·`INSPECTOR`·`SAFETY`·`EQUIPMENT_OPERATION`(**2026-09-03 등재**) · ⭐ **고객이 늘린다** — 위 값은 초기 시드다 | G-32 |
 
+- **인증자 목록 조회 실패**는 새 선택만 불가로 안내한다. 기존 참조·빈값을 유지하며 W-06-06 진입이나 자격 저장 권한을 대신 판정하지 않는다.
+- **인증자**는 자격을 인정한 사용자 계정이며 실제 입력자 감사정보와 별개다. 외부기관 식별자·사원번호를 넣거나 기존 정수를 자동 변환하지 않는다. 새로 지정한 ID의 계정이 존재하지 않거나 비활성이면 400(생략·null 허용), 기존 비활성 참조 보존은 허용한다. 인증자 선택으로 권한을 얻지 않으며 자격 대상자의 계정 연결은 필요 없다(§8-3 독립 미결).
 - **작업자 기본 정보는 쓰기 경로 자체가 없다.** 테이블 **전체**가 ERP 수신본이라 행 단위 식별 플래그(#65) 없이도 판정에 모호함이 없다 → `editability.reason`을 `RECEIVED_FROM_ERP`로 고정했다. 편집 가능한 것은 **MES 확장인 자격·인증**뿐이다.
 - ⚠ **`department`가 그 판정을 할 수 없다** — §5 미착지 8. 지금 API는 부서의 **쓰기를 열어 두고 있다.** `code_group`·`code_value`는 2026-08-22 확정으로 수신 대상에서 빠져 이 시스템이 정본이라 쓰기가 열려 있는 것이 옳다.
 
@@ -394,7 +397,7 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | 무엇 | 값 | 명령 |
 | --- | :-: | --- |
 | **화면** | **14** | `python3 design/schema/generators/verify-ui-coverage.py` |
-| **액션**(화면 스펙에서 실측) | **100** | 동상 |
+| **액션**(화면 스펙에서 실측) | **105** | 동상 |
 | **§3 매핑 행** | **114** | 아래 주 (2026-09-02 `W-06-10` 선택지 행 +1 · **2026-09-03 `W-06-01` 《공정 마스터》 탭 흡수로 +5** — 공정 등록·상세·수정·중지/재개 4행 + `PROCESS_TYPE` 선택지 1행) |
 | **「없음 + 이유」로 명시한 행** | **22** | 동상 |
 | **전건 대조** | ✅ 통과 | `python3 design/schema/generators/verify-mapping-coverage.py` |
