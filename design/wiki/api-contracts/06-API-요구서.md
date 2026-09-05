@@ -398,9 +398,20 @@ print('스키마 %d · 경로 %d' % (len(d['components']['schemas']), len(d['pat
 | --- | :-: | --- |
 | **화면** | **14** | `python3 design/schema/generators/verify-ui-coverage.py` |
 | **액션**(화면 스펙에서 실측) | **105** | 동상 |
-| **§3 매핑 행** | **114** | 아래 주 (2026-09-02 `W-06-10` 선택지 행 +1 · **2026-09-03 `W-06-01` 《공정 마스터》 탭 흡수로 +5** — 공정 등록·상세·수정·중지/재개 4행 + `PROCESS_TYPE` 선택지 1행) |
+| **§3 매핑 행** | **126** | §3-1~§3-14의 「화면 액션」 매핑 표 14개에서 머리글·구분선과 별도 보조 표를 제외한 데이터 행. 아래 재현 명령 참조. #445 인증자 선택 1행 추가 전 동일 기준은 125행이며, 기존 114는 낡은 계수다 |
 | **「없음 + 이유」로 명시한 행** | **22** | 동상 |
 | **전건 대조** | ✅ 통과 | `python3 design/schema/generators/verify-mapping-coverage.py` |
+
+매핑 행 집계 재현(중복 액션도 별도 매핑 행이면 각각 센다):
+
+```python
+import re
+from pathlib import Path
+text = Path("design/wiki/api-contracts/06-API-요구서.md").read_text()
+section = text.split("### 3-1.", 1)[1].split("### 3-15.", 1)[0]
+tables = re.findall(r"^\| 화면 액션[^\n]*\n\|[- :|]+\n((?:\|[^\n]*\n)+)", section, re.M)
+print(sum(len(table.splitlines()) for table in tables))  # 126
+```
 
 ⚠ **행이 액션보다 많다** — 요구서가 한 액션을 **대상별로 나눠** 적는 자리가 있어서다(「저장 / 취소」를 코드그룹·코드값·부서 셋으로 쪼갠 곳). **덜 적어서 생긴 차이가 아니다**, 대조는 검사기가 전건 확인한다.
 
