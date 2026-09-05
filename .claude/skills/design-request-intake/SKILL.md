@@ -104,7 +104,7 @@ REQ="$ROOT/tmp/requests/<YYYY-MM-DD>-<식별자>"; mkdir -p "$REQ"
 ```
 gh issue create --repo CREFLEINC/omf-mes \
   --title "[요청 처리] <자료 제목>" \
-  --label "Agent : Consultant" --label "status:in-progress" \
+  --label "Agent : Consultant" \
   --body-file $RUN/00_issue_body.md
 ```
 
@@ -115,7 +115,12 @@ gh issue create --repo CREFLEINC/omf-mes \
 그때 `Agent : Architect`로 스왑해 넘긴다(3역할 도입 전에는 처음부터 `Agent : Architect`를 붙여
 왔지만, 그 라벨은 이제 "지금 Architect 차례"라는 뜻으로 좁혀졌다). `Agent : Consultant`·
 `Agent : Architect`·`Agent : Caster` 세 라벨은 모두 이미 저장소에 있다(`team-issue-protocol` §2).
-⛔ `in progress` 를 새로 만들지 않는다 — `status:in-progress` 가 정본이다.
+
+⛔ **`status:in-progress` 를 접수 시점에 붙이지 않는다**(2026-09-05 사용자 확정). 그 라벨은
+「**설계 담당자가 실제로 착수했다**」는 뜻이고 **접수는 착수가 아니다** — 붙이는 것은 Architect 가
+이어받아 재실측을 시작할 때다(`design-issue-resolution` Phase 0). 즉시 답변 회차(Phase 2 에서
+E/F/H 만)는 이 라벨이 **한 번도 붙지 않은 채** 닫힌다. ⛔ `in progress` 를 새로 만들지 않는다 —
+붙일 때 쓰는 정본은 `status:in-progress` 다.
 
 부분 재실행(Phase 0 의 둘째·셋째 경우)이면 이미 있는 자기 이슈를 그대로 쓴다 — 새로 세우지
 않는다. 재개정 자료가 오면 그 이슈에 「개정본 접수 <날짜>」 코멘트 한 줄만 남긴다.
@@ -246,14 +251,16 @@ gh issue edit    <자기 이슈> --repo CREFLEINC/omf-mes \
 통과하면 **답변서 전문을 닫는 코멘트로** 남기고 닫는다 — 자기 저장소라 공개 비용이 0 이고,
 `tmp/` 는 gitignore 라 이 코멘트가 답변서의 **유일한 영구 사본**(감사 추적)이다:
 ```
+# 이 줄은 라벨이 «붙어 있을 때만» — Architect 가 착수했던 회차다. 즉시 답변 회차는 애초에
+# 붙지 않으므로 건너뛴다(없는 라벨을 떼려 하면 gh 가 실패한다).
 gh issue edit  <자기 이슈> --repo CREFLEINC/omf-mes --remove-label "status:in-progress"
 gh issue close <자기 이슈> --repo CREFLEINC/omf-mes --comment "$(cat $REQ/답변서.md)"
 ```
 (`team-issue-protocol` §7-1 과 같은 형태 — 코멘트와 닫기를 한 명령으로 묶어 «코멘트만 남고
 안 닫힘»·«닫혔는데 코멘트 없음»을 막는다.)
 
-닫을 수 없는 경우(사용자 확인 대기 · 반영 PR 미병합)는 `status:in-progress` → `help wanted` 로
-교체하고 사유 코멘트를 남긴 채 열어 둔다. 사용자에게 물을 것이 있으면 `[확인 요청] <제목>`
+닫을 수 없는 경우(사용자 확인 대기 · 반영 PR 미병합)는 `help wanted` 를 붙이고(`status:in-progress`
+가 붙어 있으면 함께 뗀다) 사유 코멘트를 남긴 채 열어 둔다. 사용자에게 물을 것이 있으면 `[확인 요청] <제목>`
 이슈(같은 저장소)로 세운다 — 그것도 자기 저장소라 규칙 2 위반이 아니다.
 
 ⛔ **옛 잠금 ④(「표지로 찾은 화면 0건」)는 2026-09-03 에 걷어냈다 — 되살리지 않는다.** 안 지켜진
