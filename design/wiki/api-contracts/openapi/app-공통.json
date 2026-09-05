@@ -1665,7 +1665,7 @@
       }
      }
     },
-    "x-internal-note": "관리웹 계정 세션의 운반 수단(쿠키 / Bearer)이 미확정이다 — 공유계약 F-2 · §I-3. 확정 전까지 securitySchemes 에 스킴을 두지 않는다."
+    "x-internal-note": "관리웹 계정 세션의 운반 수단(쿠키 / Bearer)이 미확정이다 — 공유계약 F-2 · §I-3. 확정 전까지 securitySchemes 에 스킴을 두지 않는다. ⛔ 같은 이유로 오퍼레이션에 security 를 배선하지도 «않는다» — 관리웹과 현장 셸이 같은 오퍼레이션을 공유하는 자리가 있어(예: 공지 확인 — 서버가 토큰의 종류로 주체를 가른다) 단말 토큰만 배선하면 「단말 토큰만 받는다」는 거짓 선언이 된다. 배선 0건은 누락이 아니라 이 보류의 범위다 — 계정 토큰 스킴이 확정되면 두 축을 함께 배선한다."
    }
   },
   "/app/sessions/current": {
@@ -1732,7 +1732,7 @@
       "description": "바뀌었다"
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "검증 실패. 고쳐야 풀린다. ⛔ 새 비밀번호가 현재 비밀번호와 «같으면» 여기로 온다 — code=SAME_AS_CURRENT. 근거: W-CO-10 §6",
       "content": {
        "application/json": {
         "schema": {
@@ -2309,7 +2309,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "검증 실패. 고쳐야 풀린다. ⛔ 종료일이 시작일보다 앞이면 여기로 온다 — code=RANGE. 근거: W-CO-04 §6",
       "content": {
        "application/json": {
         "schema": {
@@ -2427,7 +2427,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "검증 실패. 고쳐야 풀린다. ⛔ 종료일이 시작일보다 앞이면 여기로 온다 — code=RANGE. 근거: W-CO-04 §6",
       "content": {
        "application/json": {
         "schema": {
@@ -2544,7 +2544,7 @@
      "app"
     ],
     "summary": "공지 종료",
-    "description": "종료일을 앞으로 당긴다. 지우지 않는다 — 확인 이력이 남아야 한다. 근거: W-CO-04 §5",
+    "description": "«지금» 내린다 — 종료일을 오늘로 당기고 내린 시각(closedAt)을 찍는다. ⭐ 그 즉시 statusCode 가 CLOSED 이고 현장 셸의 미확인 질의(unacknowledgedByMe)에서도 빠진다 — 기간 안이라도 즉시 내리고 싶을 때가 있고, 확인 요구가 켜진 공지는 현장에서 닫을 수 없어 하루를 기다리면 그날 내내 남는다. 지우지 않는다 — 확인 이력이 남아야 한다. 근거: W-CO-04 §5-1·§5-3",
     "parameters": [
      {
       "name": "noticeId",
@@ -3645,7 +3645,7 @@
      },
      "code": {
       "type": "string",
-      "description": "REQUIRED · RANGE · PAIR · PERMISSION_DENIED · STATE_LOCKED · NOT_YOUR_TURN · ROUTE_NOT_FOUND · ROUTE_AMBIGUOUS · APPROVER_TYPE_NOT_SUPPORTED 등. STATE_LOCKED 계열은 재로드해도 풀리지 않는다 — 재로드로 풀리는 저장 충돌(409)과 구분한다(공유계약 G-1)",
+      "description": "REQUIRED · RANGE · PAIR · PERMISSION_DENIED · STATE_LOCKED · NOT_YOUR_TURN · ROUTE_NOT_FOUND · ROUTE_AMBIGUOUS · APPROVER_TYPE_NOT_SUPPORTED · SAME_AS_CURRENT 등. STATE_LOCKED 계열은 재로드해도 풀리지 않는다 — 재로드로 풀리는 저장 충돌(409)과 구분한다(공유계약 G-1)",
       "example": "NOT_YOUR_TURN"
      },
      "uniqueScope": {
@@ -4963,7 +4963,7 @@
       "writeOnly": true,
       "minLength": 8,
       "x-no-example": "비밀번호에 예시를 두지 않는다",
-      "description": "최소 길이만 둔다 — 조합 규칙은 두지 않는다"
+      "description": "최소 길이만 둔다 — 조합 규칙은 두지 않는다. ⛔ 현재 비밀번호와 «같은 값»은 받지 않는다 — 400(code=SAME_AS_CURRENT). 화면이 제출 전에 먼저 막지만(W-CO-10 §6) 계약도 같은 조건을 둔다 — 두 값이 다 이 본문에 오므로 서버가 판정할 수 있고, 선검사만으로 확정하지 않는 것이 공유계약 A-1 이 확정한 방식이다. ⛔ 「직전 N개 재사용 금지」가 아니다 — DR-002 2-B 가 뺀 것은 이력 표가 필요한 쪽이고 이것은 그 자리에서 안다(W-CO-10 §9-2). ⚠ 조건이 없다 — 강제 변경 한정이 아니라 이 경로 전건이다. 우리 설계에 강제 변경 흐름이 없다(W-CO-10 §3)."
      }
     }
    },
@@ -5159,6 +5159,7 @@
      "title",
      "statusCode",
      "startDate",
+     "endDate",
      "scopeCode"
     ],
     "properties": {
@@ -5184,7 +5185,7 @@
        "PUBLISHED",
        "CLOSED"
       ],
-      "description": "서버가 «파생»한다. 저장 컬럼이 아니다. DRAFT = 아직 게시하지 않았다(publishedAt 이 비어 있다) · SCHEDULED = 게시됐고 오늘 < 시작일 · PUBLISHED = 시작일 ≤ 오늘 ≤ 종료일 · CLOSED = 종료일 < 오늘. 「내려버리기」는 상태를 바꾸는 것이 아니라 종료일을 오늘로 당기는 것이다",
+      "description": "서버가 «파생»한다. 저장 컬럼이 아니다. ⭐ 판정에 순서가 있다 — ① closedAt 이 있으면 CLOSED 다(내려버린 공지는 종료일이 오늘이어도 그 즉시 CLOSED) ② 없으면 날짜가 가른다: DRAFT = 아직 게시하지 않았다(publishedAt 이 비어 있다) · SCHEDULED = 게시됐고 오늘 < 시작일 · PUBLISHED = 시작일 ≤ 오늘 ≤ 종료일 · CLOSED = 종료일 < 오늘. ⛔ 「내려버리기」는 상태 컬럼을 만드는 것이 아니다 — 종료일을 오늘로 당기고 closedAt 을 찍을 뿐이며, 달력이 만드는 전이는 그대로 날짜가 정한다(공유계약 A-15). 행위 시각으로 파생 상태를 가르는 방식은 DRAFT 판정(publishedAt)과 같은 형태다",
       "example": "PUBLISHED",
       "x-code-key": "CD-STATUS"
      },
@@ -5196,7 +5197,8 @@
      "endDate": {
       "type": "string",
       "format": "date",
-      "example": "2026-08-13"
+      "example": "2026-08-13",
+      "description": "게시 종료일. 「내려버리기」를 누르면 오늘로 당겨진다(:close). 상태 파생이 이 값에 걸린다 — 근거: W-CO-04 §5-1"
      },
      "acknowledgeRequired": {
       "type": "boolean",
@@ -5219,6 +5221,12 @@
       "type": "string",
       "format": "date-time",
       "example": "2026-08-13T09:12:00+09:00"
+     },
+     "closedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-08-13T14:30:00+09:00",
+      "description": "«내려버리기»를 누른 시각. ⭐ 이 값이 있으면 종료일이 오늘이어도 statusCode 는 CLOSED 다 — publishedAt 이 DRAFT 를 가르는 것과 같은 방식이다. 비어 있으면 사람이 내린 적이 없다는 뜻이고 그때는 날짜만으로 상태를 가른다. ⛔ 요청으로 받지 않는다 — :close 가 서버에서 찍는다. 근거: W-CO-04 §5-1"
      },
      "createdBy": {
       "type": "integer",
@@ -5261,7 +5269,7 @@
       "example": "W/O-2026-0812"
      }
     },
-    "x-internal-note": "공지 표가 물리 모델에 없다(W-CO-04 §2 — notice·announce·bulletin 검색 0건). 첨부는 app.attachment 의 다형 참조를 그대로 쓴다."
+    "x-internal-note": "공지 표가 물리 모델에 없다(W-CO-04 §2 — notice·announce·bulletin 검색 0건). 첨부는 app.attachment 의 다형 참조를 그대로 쓴다. ⛔ 사람이 읽는 «공지 번호»는 두지 않는다 — 2026-09-05 판정(요구서 §3-7). 개념데이터모델의 공지 행 «식별자(키)» 열에 Notice No 가 있으나 그 칸은 엔티티의 키를 적는 자리이고 표기만으로는 사람이 읽는 번호인지 알 수 없다 — 그것이 번호를 두라는 근거가 되지 못한다. 번호를 요구한 자리는 어디에도 없다: 결정 02(2026-07-06)의 속성 목록에 없고, W-CO-04 가 번호를 보여 주지도 받지도 않으며(§4 목록·§5-A 작성 폼), 공지 스키마 3종에 프로퍼티가 없고, 출력물 계약의 대상도 아니다. ⇒ noticeId 밖에 별도 번호 프로퍼티를 두지 않는다 — 키의 형식·길이는 데이터 모델·구현 소관이다."
    },
    "NoticeCreate": {
     "type": "object",
@@ -5269,6 +5277,7 @@
      "title",
      "body",
      "startDate",
+     "endDate",
      "scopeCode"
     ],
     "properties": {
@@ -5289,7 +5298,8 @@
      "endDate": {
       "type": "string",
       "format": "date",
-      "example": "2026-08-13"
+      "example": "2026-08-13",
+      "description": "게시 종료일. ⛔ 시작일보다 앞일 수 없다 — 어기면 400(code=RANGE). ⚠ 비울 수 없다 — 상태 파생이 이 값에 걸려 있어 비면 PUBLISHED 와 CLOSED 를 가를 수 없다. 화면도 필수로 받는다. 근거: W-CO-04 §5-A·§6"
      },
      "acknowledgeRequired": {
       "type": "boolean",
