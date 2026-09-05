@@ -839,7 +839,7 @@
      "app"
     ],
     "summary": "사용자 목록",
-    "description": "근거: W-CO-02 §3 좌측 목록 · 공유계약 G-8. W-06-06의 인증자 선택에도 기존 조회를 사용한다. 권한 범위를 넓히지 않으며 조회 403·실패이면 새 인증자 선택만 불가로 안내한다. W-06-06 전체 진입을 차단하지 않고 기존 참조 보존·선택 입력 빈값을 유지한다. 자격 저장 권한은 기존 자격 PUT에서 별도로 검증한다.",
+    "description": "근거: W-CO-02 §3 좌측 목록 · 공유계약 G-8. W-06-06의 인증자 선택에도 기존 조회를 사용한다. 권한 범위를 넓히지 않으며 W-06-06의 인증자 선택에서 조회 403·실패이면 새 인증자 선택만 불가로 안내한다. W-06-06 전체 진입을 차단하지 않고 기존 참조 보존·선택 입력 빈값을 유지한다. 자격 저장 권한은 기존 자격 PUT에서 별도로 검증한다.",
     "parameters": [
      {
       "name": "q",
@@ -11339,7 +11339,7 @@
           },
           "summary": {
            "type": "object",
-           "description": "⭐ 필터 «전체» 기준 요약이다 — 페이지가 아니다. 툴 보전오더 생성 화면의 요약 구획이 그대로 보인다. ⚠ pmDueOnly 는 이 집계에 적용하지 않는다 — q·plantId·toolTypeCode·includeInactive 만 걸고 센다. 적용하면 「임박」이 항상 0 이 된다",
+           "description": "⭐ 필터 «전체» 기준 요약이다 — 페이지가 아니다. 툴 보전오더 생성 화면의 요약 구획이 그대로 보인다. ⚠ pmDueOnly 는 이 집계에 적용하지 않는다 — q·plantId·toolTypeCode·includeInactive 만 걸고 센다. 적용하면 「임박」이 항상 0 이 된다 요약 집계에는 q·plantId·toolTypeCode·includeInactive만 적용한다. statusCode·withOpenMaintenanceOrder·guaranteedShotCountMissing·pmDueOnly 및 페이지·정렬은 적용하지 않는다.",
            "required": [
             "pmDueCount",
             "pmNearCount",
@@ -11355,7 +11355,7 @@
             "pmNearCount": {
              "type": "integer",
              "example": 5,
-             "description": "타발수 축을 사용하고 적정타수(guaranteedShotCount)>0으로 비율을 산출할 수 있는 툴 중 사용률이 pmNearThresholdPercent(서버 고정 90) 이상 100 미만이며 실제 PM이 아직 도래하지 않은 툴 수. 날짜 축으로 이미 도래했으면 pmDueCount에만 포함한다. 날짜 전용·NONE 및 적정타수 null/0은 타발수 임박 집계에서 제외한다. 기존 pmDue 안전판정과 criteriaMissingCount 정의는 변경하지 않으며 날짜 임박 백분율은 두지 않는다."
+             "description": "타발수 축을 사용하고 적정타수(guaranteedShotCount)>0으로 비율을 산출할 수 있는 툴 중 사용률이 pmNearThresholdPercent(서버 고정 90) 이상 100 미만이며 실제 PM이 아직 도래하지 않은 툴 수. 날짜 축으로 이미 도래했으면 pmDueCount에만 포함한다. 날짜 전용·NONE 및 적정타수 null/0은 타발수 임박 집계에서 제외한다. 기존 pmDue 안전판정과 criteriaMissingCount 정의는 변경하지 않으며 날짜 임박 백분율은 두지 않는다. 요약 집계에는 q·plantId·toolTypeCode·includeInactive만 적용한다. statusCode·withOpenMaintenanceOrder·guaranteedShotCountMissing·pmDueOnly 및 페이지·정렬은 적용하지 않는다."
             },
             "criteriaMissingCount": {
              "type": "integer",
@@ -14652,8 +14652,7 @@
     "x-source-table": "app.app_user",
     "type": "object",
     "required": [
-     "userName",
-     "statusCode"
+     "userName"
     ],
     "description": "사용자 수정 요청. loginId 는 항상 잠김(NOT_COUNTABLE)이라 요청에 포함하지 않는다. isActive 는 별도 액션(:deactivate / :activate)으로만 바꾼다. 낙관적 잠금은 공유계약 B-1. 근거: W-CO-02 §5-2 ⛔ **loginId 는 이 본문에 없다 — 한 번 만들면 고치지 않는다**(사용자 결정 2026-09-01 · W-CO-02 §8-5 해소). B-4 의 「참조 건수 0 일 때만 코드 수정」 규칙을 loginId 에는 적용할 수 없다 — 작성자 기록류에 흩어져 있고 FK 를 의도적으로 걸지 않아 **참조를 셀 수 없기 때문**이다. 셀 수 없는 조건은 규칙이 될 수 없다. 바꿔야 하면 새 계정을 만든다. ⚠ roleCode 는 참조를 셀 수 있어 기존 B-4 규칙을 그대로 쓴다.",
     "properties": {
