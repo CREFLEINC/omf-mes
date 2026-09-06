@@ -214,7 +214,7 @@ def main() -> int:
             print(f"  {'':<24} {'':<6}   ↳ 원천 = GET {parent}")
         print("\n   ⭐ 오퍼레이션 description 에 «부모 경로»와 «ETag» 를 한 문장으로 적는다.\n"
               "   ⛔ x-internal-note 에만 적지 않는다 — 구현팀은 pnpm gen:api 가 옮기는\n"
-              "      description 을 읽고 내부 주석은 공개되지 않는다.\n")
+              "      description 을 읽고 내부 주석은 그 생성물에 실리지 않는다.\n")
 
     if offline_locked:
         print("⛔ 현장 단말·모바일 전용 오퍼레이션에 잠금 토큰이 «필수»로 걸려 있습니다 "
