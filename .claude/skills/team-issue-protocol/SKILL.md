@@ -31,23 +31,51 @@ V3 규칙 2 — 「설계팀과 개발팀의 직접 소통은 설계팀이 개�
 그 외의 이슈·코멘트는 **어느 저장소에도 만들지 않는다.** 개발팀의 요청은 이슈로 오지 않는다 —
 **사용자가 자료로 건네고**, 우리 답도 **답변서 파일로 사용자가 전한다**(§4·§7).
 
-## 1. 저장소 3종 — 역할과 공개 경계 (2026-09-03 실측)
+## 1. 저장소 3종 — 역할과 가시성
 
-| 저장소 | 가시성 | V3 역할 | 실태 |
-| --- | --- | --- | --- |
-| `CREFLEINC/omf-mes` | **PRIVATE** | 이 저장소 자신 — 설계팀 **자기 이슈**·PR | 이슈 192건·OPEN 39 · 라벨 19종 |
-| `CREFLEINC/omf-mes-client` | **PUBLIC** | **공지 발행처** ① — 공개 안전 스캔 필수 | 이슈 246건·OPEN 89 · `uiux→client` 부착 170건(유산 통지) |
-| `CREFLEINC/omf-mes-server` | **PRIVATE** | **공지 발행처** ② | 이슈 21건·OPEN 18 — 접두 있는 17건은 전부 V3 이전에 설계팀이 낸 `[uiux→데이터모델]`·`[docs→데이터모델]`·`[uiux→server]` 유산 · 라벨은 GitHub 기본 9종 + `Agent : Backend`·`status:in-progress` 11종 — **`설계 변동 공지` 라벨은 첫 발행 때 만든다**(§8 승인) |
+| 저장소 | 가시성 | V3 역할 |
+| --- | --- | --- |
+| `CREFLEINC/omf-mes` | ⭐ **PUBLIC** | 이 저장소 자신 — 설계팀 **자기 이슈**·PR |
+| `CREFLEINC/omf-mes-client` | **PUBLIC** | **공지 발행처** ① |
+| `CREFLEINC/omf-mes-server` | **PRIVATE** | **공지 발행처** ② — 접두 있는 열린 이슈는 V3 이전에 설계팀이 낸 `[uiux→데이터모델]`·`[docs→데이터모델]`·`[uiux→server]` 유산이다 |
 
-가시성 실측 명령(문서를 믿지 말고 발행 직전에 다시 본다 — 공개로 바뀌면 되돌릴 수 없다):
+⛔ **볼륨 수치(이슈 수·OPEN·라벨 수·부착 건수)를 이 표에 적지 않는다.** 세 번 낡았다 —
+적는 순간 낡고, 낡은 수가 다음 회차의 계획을 틀리게 만든다. 필요하면 **그때 센다**:
+
 ```
-gh repo view CREFLEINC/omf-mes-server --json visibility,isPrivate
+gh api repos/CREFLEINC/omf-mes --jq '{private:.private, visibility:.visibility}'
+gh api repos/CREFLEINC/omf-mes-server --jq '{private:.private, visibility:.visibility}'
+gh issue list --repo CREFLEINC/omf-mes --state open --limit 200 --json number --jq 'length'
+gh label list --repo CREFLEINC/omf-mes --limit 100
 ```
 
-**공개 안전 스캔** — 공지는 **한 본문**을 두 저장소에 내므로 `omf-mes-client` 가 공개인 이상 그 본문은
-언제나 `check-notice.py`(`design-change-notice/scripts/`)의 스캔을 통과해야 한다. 스캔은 본문
-한 번이면 두 저장소를 다 덮는다 — `omf-mes-server` 가 뒤에 공개로 바뀌어도 규칙은 달라지지
-않는다. 경계 자체는 `design-change-notice/references/public-boundary.md`.
+### ⛔ 2026-09-06 정정 — `omf-mes` 는 «처음부터» 공개다
+
+```
+$ gh api repos/CREFLEINC/omf-mes --jq '{created:.created_at, private:.private}'
+{"created": "2026-06-27T11:39:46Z", "private": false}
+```
+
+⚠ **가시성이 «바뀐» 것이 아니다.** 이 표가 「PRIVATE」로 적고 있었을 뿐이고, 그 기재는
+**측정된 적이 없다** — 2026-09-03 「실측」이라 적힌 명령이
+`gh repo view CREFLEINC/omf-mes-server` 하나였다. **`omf-mes` 는 조회 대상에 없었다.**
+
+⭐ **뿌리는 「측정 안 하고 단정」이다** — 표에 「실측」이라 적혀 있다고 실측인 것이 아니다.
+**가시성처럼 뒤집히면 비싼 값은 쓰기 직전에 명령으로 다시 본다.**
+
+### ⭐ 보안 제약 — 이 프로젝트에는 없다 (2026-09-06 사용자 확정)
+
+> 「공개가 의도된 것이다. 자료들에 보안성이 높은 것이 없고 프로젝트 자체가 보안성을 크게
+> 필요로 하지 않는다. 지금은 **개발 편의성이 가장 중요**하다. 앞으로도 보안성은 고려하지
+> 않아도 좋다.」
+
+⇒ **설계 자료가 공개되는 것을 결손으로 보지 않는다.** 「비공개니까 괜찮다」도, 「공개니까
+가려야 한다」도 이 저장소의 판단 기준이 아니다. ⛔ **가리는 쪽으로 설계를 비틀지 않는다** —
+내용을 `x-internal-note` 로 옮기거나 근거를 번호로만 적는 식의 «감추기»는 개발 편의를 깎는다.
+
+⚠ **남는 것은 워크플로 규칙이다** — 「설계 변동 공지」에 자세한 내용을 적지 않는 것(V3 규칙 5)은
+보안이 아니라 **개발팀이 열어 볼 자리를 미리 골라 주지 않기 위해서**다. 그 규칙은 그대로다.
+공지 본문은 계속 `check-notice.py` 를 통과시킨다 — 규칙 5 를 지키는지 보는 검사다.
 
 **사용자에게 물을 것** — 우리가 정할 수 없는 것(고객·팀 리더 확정 필요, 요청 자료가 모호함,
 데이터 모델 소관 질의)은 개발팀 저장소에 이슈를 세우는 것이 아니라 **`omf-mes` 에 `[확인 요청]`
