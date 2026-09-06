@@ -1462,7 +1462,7 @@
      "quality"
     ],
     "summary": "검사 판정 확정",
-    "description": "작성중 → 확정. ⭐ 이 순간 Lot Status 가 전이한다 — 합격이면 정상, 불합격이면 불량, 보류면 검사 대기다. 독립된 상태 전이 경로를 두지 않는다(결정 10 「상태 이중 보유 없음」 · 공유계약 B-8). ⛔ accepted + rejected + held = inspected 가 아니면 400 이다(A-3). 근거: W-01-01 §5-2 · P-02-13 §5-3 ⭐ PQC 샘플 검사에서 불합격 수가 공정별 합격판정개수를 넘으면 서버가 «같은 W/O 의 생산LOT 전체»를 INSPECTION_PENDING(검사 대기)으로 일괄 전이하고 관리자 알람을 낸다 — 화면이 부르는 추가 액션은 없다(도식 C14 · 05 §5 S2 태스크 4 ✓확정 2026-07-15). 기준값은 06 계약 GET /quality/inspection-plan-versions/{inspectionPlanVersionId} 가 갖는다.",
+    "description": "작성중 → 확정. ⭐ 이 순간 Lot Status 가 전이한다 — 합격이면 정상, 불합격이면 불량, 보류면 검사 대기다. 독립된 상태 전이 경로를 두지 않는다(결정 10 「상태 이중 보유 없음」 · 공유계약 B-8). ⛔ accepted + rejected + held = inspected 가 아니면 400 이다(A-3). 근거: W-01-01 §5-2 · P-02-13 §5-3 ⭐ PQC 샘플 검사에서 불합격 수가 공정별 합격판정개수를 넘으면 서버가 «같은 W/O 의 생산LOT 전체»를 INSPECTION_PENDING(검사 대기)으로 일괄 전이하고 관리자 알람을 낸다 — 화면이 부르는 추가 액션은 없다(도식 C14 · 05 §5 S2 태스크 4 ✓확정 2026-07-15). 기준값은 06 계약 GET /quality/inspection-plan-versions/{inspectionPlanVersionId} 가 갖는다. ⭐ 종합 판정이 합격이면 서버가 «등록 시 스스로 건 입하 보류»를 이 확정 한 번에 함께 푼다 — 보류 행의 해제자·해제 시각을 채운다. 화면이 부르는 추가 액션은 없다(공유계약 B-8). ⛔ 이 해제에는 해제 사유 코드를 요구하지 않는다 — 왜 풀렸는지는 검사 결과 자신이 말한다. 사유 코드를 받는 것은 사람이 건 보류를 푸는 POST /quality/lot-holds/{lotHoldId}:release 다. ⛔ 불합격·보류 판정은 보류를 풀지 않는다. 근거: W-01-01 §5 · 요구서 03 §3",
     "parameters": [
      {
       "name": "inspectionResultId",
