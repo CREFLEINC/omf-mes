@@ -6582,7 +6582,7 @@
     "properties": {
      "reasonCode": {
       "type": "string",
-      "example": "값",
+      "example": "EQUIPMENT_FAILURE",
       "x-code-key": "CD-WORK-SESSION-EVENT-REASON",
       "description": "작업지시 보류 사유. 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_SESSION_EVENT_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-internal-note": "«(정합주: 2026-09-06 — 구표기는 전용 그룹 CD-WORK-ORDER-HOLD-REASON 이었다. 사전 값이 비어 있는 채로 방치돼 있어 세션 사건 사유 그룹(WORK_SESSION_EVENT_REASON · 7값)으로 통일한다)» 등급 ⛔ — 필드 의미 변경."
