@@ -104,7 +104,7 @@
        "type": "string",
        "example": "값"
       },
-      "description": "P/O 번호 검색"
+      "description": "P/O 번호 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "includeChildren",
@@ -2385,7 +2385,7 @@
        "type": "string",
        "example": "값"
       },
-      "description": "W/O 번호 검색. ⚠ P/O 번호는 이 축으로 검색되지 않는다 — P/O 는 productionOrderId 로 좁힌다"
+      "description": "W/O 번호 검색. ⚠ P/O 번호는 이 축으로 검색되지 않는다 — P/O 는 productionOrderId 로 좁힌다 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "sort",
@@ -4096,7 +4096,7 @@
        "type": "string",
        "example": "값"
       },
-      "description": "일련번호 검색"
+      "description": "일련번호 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "page",
@@ -5888,7 +5888,7 @@
      },
      "resultSourceCode": {
       "type": "string",
-      "description": "실적을 «무엇이» 만들었는가 — 수기 입력(MANUAL) · IoT 자동수집(IOT). ⭐ 서버가 안다 — 화면이 고르는 값이 아니다. ⛔ 두 갈래뿐이라 계약이 닫는다",
+      "description": "실적을 «무엇이» 만들었는가 — 수기 입력(MANUAL) · IoT 자동수집(IOT). ⛔ 화면이 보내지 않는다 — 서버가 채운다(수기 입력이면 MANUAL). ⛔ 두 갈래뿐이라 계약이 닫는다",
       "x-code-key": "CD-PRODUCTION-RESULT-SOURCE",
       "enum": [
        "MANUAL",
@@ -5932,7 +5932,6 @@
     "required": [
      "workOrderId",
      "uomId",
-     "resultSourceCode",
      "occurredAt"
     ],
     "description": "다섯 수량의 합이 0 이면 400 이다 — ck_production_result_qty 가 물리적으로도 막는다."
@@ -6584,8 +6583,9 @@
      "reasonCode": {
       "type": "string",
       "example": "값",
-      "x-code-key": "CD-WORK-ORDER-HOLD-REASON",
-      "description": "작업지시 보류 사유. ⭐ 사유 코드의 선례를 따른다 — 스키마별 전용 그룹 + 고객이 늘림. 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_ORDER_HOLD_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "x-code-key": "CD-WORK-SESSION-EVENT-REASON",
+      "description": "작업지시 보류 사유. 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_SESSION_EVENT_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-internal-note": "«(정합주: 2026-09-06 — 구표기는 전용 그룹 CD-WORK-ORDER-HOLD-REASON 이었다. 사전 값이 비어 있는 채로 방치돼 있어 세션 사건 사유 그룹(WORK_SESSION_EVENT_REASON · 7값)으로 통일한다)» 등급 ⛔ — 필드 의미 변경."
      },
      "occurredAt": {
       "type": "string",

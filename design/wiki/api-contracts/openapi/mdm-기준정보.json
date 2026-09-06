@@ -61,7 +61,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "코드·명칭 검색"
+      "description": "코드·명칭 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "warehouseTypeCode",
@@ -466,7 +466,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "코드·명칭 검색"
+      "description": "코드·명칭 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "locationCode",
@@ -847,7 +847,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "로그인ID·이름 검색"
+      "description": "로그인ID·이름 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "departmentId",
@@ -1549,7 +1549,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "역할코드·역할명 검색"
+      "description": "역할코드·역할명 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "includeInactive",
@@ -2690,7 +2690,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "그룹코드·그룹명 검색"
+      "description": "그룹코드·그룹명 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "includeInactive",
@@ -3081,7 +3081,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "코드·코드명 검색"
+      "description": "코드·코드명 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "includeInactive",
@@ -3578,7 +3578,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "부서코드·부서명 검색"
+      "description": "부서코드·부서명 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "businessUnitId",
@@ -3952,7 +3952,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "사번·성명 검색"
+      "description": "사번·성명 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "workerNo",
@@ -4344,7 +4344,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "품목코드·품목명 검색"
+      "description": "품목코드·품목명 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "itemTypeCode",
@@ -5311,7 +5311,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "기준코드·기준명 검색"
+      "description": "기준코드·기준명 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "inspectionTypeCode",
@@ -6223,7 +6223,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "불량코드·불량명 검색"
+      "description": "불량코드·불량명 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "parentDefectCodeId",
@@ -6740,7 +6740,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "원인코드·원인명 검색"
+      "description": "원인코드·원인명 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "parentCauseCodeId",
@@ -7566,7 +7566,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "코드·명칭 검색"
+      "description": "코드·명칭 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "includeInactive",
@@ -7637,7 +7637,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "코드·명칭 검색"
+      "description": "코드·명칭 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "roleTypeCode",
@@ -7726,7 +7726,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "코드·명칭 검색"
+      "description": "코드·명칭 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "includeInactive",
@@ -7798,7 +7798,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "코드·명칭 검색"
+      "description": "코드·명칭 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "legalEntityId",
@@ -7877,7 +7877,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "코드·명칭 검색"
+      "description": "코드·명칭 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "legalEntityId",
@@ -7964,7 +7964,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "코드·명칭 검색"
+      "description": "코드·명칭 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "plantId",
@@ -8044,7 +8044,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "코드·명칭 검색"
+      "description": "코드·명칭 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "includeInactive",
@@ -8408,7 +8408,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "코드·명칭 검색"
+      "description": "코드·명칭 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "plantId",
@@ -9212,7 +9212,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "단말 코드 검색"
+      "description": "단말 코드 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "page",
@@ -9956,7 +9956,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "코드·명칭 검색"
+      "description": "코드·명칭 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "plantId",
@@ -10728,7 +10728,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "코드·명칭 검색"
+      "description": "코드·명칭 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "plantId",
@@ -11224,7 +11224,16 @@
       "schema": {
        "type": "string"
       },
-      "description": "코드·명칭 검색"
+      "description": "코드·명칭 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
+     },
+     {
+      "name": "moldCode",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "maxLength": 50
+      },
+      "description": "금형·지그 코드 정확 일치. 스캔 화면이 쓴다 — 스캔값 하나로 한 건을 집어야 하므로 부분 검색(q)으로는 성립하지 않는다(여러 건이 온다). 근거: P-02-04 §3 · P-02-11 §3"
      },
      {
       "name": "plantId",
@@ -11872,7 +11881,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "코드·명칭 검색"
+      "description": "코드·명칭 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "plantId",
@@ -12472,7 +12481,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "코드·명칭 검색"
+      "description": "코드·명칭 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "includeInactive",
@@ -13070,7 +13079,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "코드·명칭 검색"
+      "description": "코드·명칭 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "directionCode",
@@ -13628,7 +13637,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "코드·이름 검색"
+      "description": "코드·이름 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "plantId",

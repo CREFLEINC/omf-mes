@@ -21,8 +21,8 @@
 
 | 무엇 | 정본 | 규모 | 세는 명령 |
 | --- | --- | :-: | --- |
-| **계약** | `wiki/api-contracts/openapi/*.json` **7파일** | **경로 351 · 오퍼레이션 487 · 스키마 509** | `python3 design/schema/generators/openapi/check-structure.py` |
-| **근거** — 화면 액션이 어느 경로에 대응하나 | `design/wiki/api-contracts/06-API-요구서*.md` **9장** | 인용 **931** 전건 계약에 실재 | `python3 design/schema/generators/verify-doc-citations.py` |
+| **계약** | `wiki/api-contracts/openapi/*.json` **7파일** | **경로 352 · 오퍼레이션 488 · 스키마 509** | `python3 design/schema/generators/openapi/check-structure.py` |
+| **근거** — 화면 액션이 어느 경로에 대응하나 | `design/wiki/api-contracts/06-API-요구서*.md` **9장** | 인용 **943** 전건 계약에 실재 | `python3 design/schema/generators/verify-doc-citations.py` |
 | **덮은 화면** | 요구서 §3 소절 | **117 / 117** | `python3 design/schema/generators/build-screen-progress.py` |
 
 **실측일: 2026-08-25**(design 이관 시 verify-counts.py 재측정으로 정정 — 아래 변경 이력 참조).
@@ -156,6 +156,7 @@ python3 design/schema/generators/openapi/check-lock-token-source.py
 
 | 판 | 날짜 | 요지 |
 | :-: | --- | --- |
+| v1.2 | 2026-09-06 | **POP 계약 미착지 12건 반영 — 경로 351→352 · 오퍼레이션 487→488 · 인용 → 943(재실측).** 취급 단위 취소(확정 전) 오퍼레이션 1건 신설(`POST /inventory/handling-units/{handlingUnitId}:cancel`)로 경로·오퍼레이션이 늘었다. 스키마 수는 그대로다 — 신설 필드는 기존 스키마에 속성으로 붙었다(`HandlingUnit.labelIssued`·`ShipmentLotAllocation.shipmentRequestNo`·`customerName` 등). 함께 — `q` 50자리에 「부분 일치·대소문자 무시」 명문화, `GET /trace/lots`·`GET /inventory/handling-units`·`GET /mdm/molds` 에 질의 축 신설, `ProductionResultCreate.resultSourceCode` 를 `required` 에서 제거, `WorkOrderHold.reasonCode` 의 `x-code-key` 를 `WORK_SESSION_EVENT_REASON` 그룹으로 통일(⛔ 등급 — 필드 의미 변경). 요청 `pop-계약-미착지-12건`. |
 | v1.1 | 2026-09-03 | **보류 «해제 사유»를 이력 응답에 세웠다 — 인용 921→922.** `W-03-01` §3 이력 표의 「사유」 열이 **해제 행에서 비어 있었다**(목업 원문 `보류 → (해제)  박품질  —`). 같은 화면 §5-1 도 「C7 재판정 합격 — ⚠ **해제 시각만** — 「합격이라서」가 안 남는다」로 결손을 적었고, `W-03-02` §5-4 가 `releaseReasonCode` 를 되살린 이유가 「집계가 가능해졌다」인데 **세는 화면이 바로 이 이력 조회**였다. ⇒ `LotHoldEvent.releaseReasonCode` 신설(단건 `LotHold` 에는 이미 있었고 «사건 목록»에만 빠져 있었다) + §4-B·요구서 §3 반영. ⭐ 함께 — `OWNERSHIP_TYPE` 2건은 **「두지 않는다」로 판정**했다(사용자 2026-09-03 — 사급·수탁을 다루기는 하나 중요하지 않고, `W-01-10` §4-C 는 「갱신 대상」 표이며 `W-04-08` 목록은 이미 8열이라 설계 변동이 얻는 것보다 크다). 다시 여는 조건을 `W-04-08` §4-A 에 적었다. 경로·오퍼레이션·스키마 수는 v1.0 과 같다 — 프로퍼티 하나만 늘었다. |
 | v1.0 | 2026-09-03 | **화면 축 전건 판정 — 인용 918→921.** 코드 그룹 도달성의 화면 축 **26건을 화면마다 §3 목업·§4·§5·§8 과 형제 요구서까지 대조**해 「그 칸을 이 화면이 보여야 하는가」를 가렸다. **닫은 6** — `M-01-04`·`W-04-08` × `LOT_STATUS`(잔고 행이 «위치별»이라 품질 상태가 행을 나눈다) · `W-05-12` × `CYCLE_TYPE`(⚠ 검사기가 짚은 «이유»는 헛짚었고 진짜 결손은 §4-C-2 점검 부여 주기였다) · `P-01-01`·`W-02-04` × `LOT_TYPE`. **헛짚음 19** 는 근거를 검사기 주석에 박아 두었다 — 「⛔ 계약이 해제분을 안 내린다」·「§4-A 가 명문으로 배제했다」·「단일 유형만 다룬다」 등. **⏸ 보류 3** — `OWNERSHIP_TYPE` 2(업무 사실이라 스펙으로 못 가른다) · `W-03-01` 해제 사유 1(`LotHoldEvent` 에 칸이 없어 계약 선행). 함께 — `W-05-11` §4-A 검교정 주기를 «간격·단위» 2행으로 갈랐고(`W-05-13` 선례) `M-01-02` §4 의 §I-32 종결 이전 문면(「기본 `ACTIVE`」·「≠ Lot Status」)을 정정했다. 계약 자체는 늘지 않았다. |
 | v0.9 | 2026-09-03 | **④ 형제 갈림 축을 닫았다 — 인용 916→918.** 계약의 「맨몸」 자리 **33곳**(`x-code-key` 로 어느 그룹인지는 판정했는데 `enum` 도 산문 포인터도 없어 **개발자가 값 목록으로 갈 길이 없던** 자리)에 `GET /mdm/code-values?codeGroupCode=…` 를 적었다. `registry` 갈래에는 「고객이 늘린다 — 초기 시드다」를 함께 달았다. ⭐ 그러자 형제 갈림이 **21종 57자리 → 0** 이 됐다. ⚠ 그 대가로 코드 그룹 도달성의 **화면 축이 20 → 26** 이 됐는데 «같은 구멍의 반복»이 아니다 — 계약이 그룹을 밝히자 그 테이블을 쓰는 형제 화면이 처음 보이게 된 것이고, 그중 **진짜 결손 2건**(`P-01-01`·`W-02-04` 의 `LOT_TYPE`)은 요구서에 행을 넣어 닫았다. 계약 자체는 늘지 않았다 — 경로·오퍼레이션·스키마 수는 v0.8 과 같다. |

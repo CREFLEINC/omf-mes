@@ -131,7 +131,7 @@
 
 | 화면 액션 | 엔드포인트 | 근거 |
 | --- | --- | --- |
-| 대기 목록 조회 | **없음 — 04 제품출하 계약 소관**(재구성 대기 상태) | §5-1 · §7 |
+| 대기 목록 조회 | ✅ **해소 2026-09-06** — **01 자재창고 계약** `GET /inventory/handling-units?labelIssued=false` — `HandlingUnit.labelIssued` boolean 축(`InboundReceiptLine.labelIssued` 선례)이 대기(미발행)를 가른다 «(정합주: 2026-09-06 — 구표기는 「없음 — 04 제품출하 계약 소관」→「미착지」를 거쳤다)» | §5-1 · §7 |
 | 대상 선택 | 동상 | §5-1 |
 | 인쇄 대상 선택(신규/잔량) | **없음 — API 불필요.** 화면 내 선택. 결과가 `targets` 배열이 된다 | §5-3 |
 | ⭐ 재출력 사유 선택 | 활성 조건 = `summary`. ✅ **값 목록이 섰다** — `GET /mdm/code-values?codeGroupCode=REISSUE_REASON` 5값(2026-09-03 등재). 잔량 라벨이 재발행이라 필수 | §5-3 · K-2 · G-32 |

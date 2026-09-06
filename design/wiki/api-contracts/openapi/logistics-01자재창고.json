@@ -1239,12 +1239,30 @@
       "x-no-code-key": "코드 그룹을 세우지 않는다 — 이 리소스는 «전표»가 아니라 «물건»(팔레트·박스 같은 담는 그릇)이다. ⛔ 2026-09-02 이전에는 이 자리에 「전표의 진행 상태」라는 «남의 설명»이 복사돼 있었다. 담긴 것의 진행은 :pack · /contents · /repack-events 가 이미 담고, 라벨 발행 여부는 boolean 축이면 충분하다(InboundReceiptLine.labelIssued 선례). ⚠ P-02-08 §8-4 가 「포장 해체 화면이 없다」고 적어 뒤쪽 값이 업무에 없다 — 해체 업무가 서면 그때 세운다(A-21 · 사용자 결정 2026-09-02)."
      },
      {
+      "name": "labelIssued",
+      "in": "query",
+      "schema": {
+       "type": "boolean"
+      },
+      "description": "라벨이 발행된 건을 뺄지. 근거: P-04-04 §5-1"
+     },
+     {
+      "name": "goodsIssueId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64"
+      },
+      "description": "이 출고 전표(logistics.goods_issue)가 만든 취급 단위만. 출고 시 취급 단위는 이 화면이 아니라 M-01-08 이 만든다 — P-01-02 는 이 축으로 대상을 좁혀 조회만 한다. 근거: P-01-02 §5-2·§8",
+      "x-internal-note": "P-01-02 §8 미결 6(「출고 시 파렛트(HU)를 누가 만드나」) 확정 — M-01-08. 확정 전에는 이 축이 성립하지 않는다."
+     },
+     {
       "name": "q",
       "in": "query",
       "schema": {
        "type": "string"
       },
-      "description": "취급 단위 번호 검색"
+      "description": "취급 단위 번호 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "page",
@@ -2022,7 +2040,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "입하예정번호·거래명세서번호 검색"
+      "description": "입하예정번호·거래명세서번호 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "page",
@@ -2239,7 +2257,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "문서번호 검색"
+      "description": "문서번호 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "page",
@@ -2445,7 +2463,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "출고번호 검색. ⛔ 발행된 출고 QR 은 라인을 가리키므로 이 축으로는 풀리지 않는다 — goodsIssueLineId 를 쓴다(P-01-02 §5-2)"
+      "description": "출고번호 검색. ⛔ 발행된 출고 QR 은 라인을 가리키므로 이 축으로는 풀리지 않는다 — goodsIssueLineId 를 쓴다(P-01-02 §5-2) ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "page",
@@ -2961,7 +2979,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "입고번호 검색"
+      "description": "입고번호 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "page",
@@ -3312,7 +3330,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "입하번호·거래명세서번호 검색"
+      "description": "입하번호·거래명세서번호 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "page",
@@ -3802,7 +3820,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "요청번호 검색"
+      "description": "요청번호 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "page",
@@ -4303,7 +4321,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "발주번호 검색"
+      "description": "발주번호 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "page",
@@ -5817,6 +5835,15 @@
       "x-code-key": "CD-LOT-STATUS"
      },
      {
+      "name": "withProgress",
+      "in": "query",
+      "schema": {
+       "type": "boolean",
+       "default": false
+      },
+      "description": "생산 진척을 함께 받는다. 목록에서는 LOT 마다 세게 되므로 기본은 끈다"
+     },
+     {
       "name": "heldOnly",
       "in": "query",
       "schema": {
@@ -5857,7 +5884,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "LOT 번호·외부 식별자 검색"
+      "description": "LOT 번호·외부 식별자 검색 ⭐ 부분 일치 — 대소문자를 가리지 않는다(2026-09-06 확정)."
      },
      {
       "name": "page",
@@ -6856,6 +6883,70 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/inventory/handling-units/{handlingUnitId}:cancel": {
+   "parameters": [
+    {
+     "name": "handlingUnitId",
+     "in": "path",
+     "required": true,
+     "schema": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     }
+    }
+   ],
+   "post": {
+    "tags": [
+     "inventory"
+    ],
+    "summary": "포장 단위 취소(확정 전)",
+    "description": "`:pack` 이전 — 아직 내용물이 확정되지 않은 포장 단위를 지운다. 담다 그만두거나(P-04-01 §6) 만들기가 성공하고 확정이 실패해 남은 빈 포장 단위를 치우는 경로다. ⛔ 이미 `:pack` 을 거친 포장 단위는 취소할 수 없다 — 확정 전은 아직 이력이 아니다(공유계약 B-3 은 «확정된 기록»의 조항이다). 근거: P-04-01 §5-6·§6",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/WorkerNo"
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "취소됨 — 본문 없음"
+     },
+     "403": {
+      "description": "권한 없음",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "이미 확정된 포장 단위 — 취소할 수 없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
         }
        }
       }
@@ -8545,6 +8636,11 @@
       "x-no-example": true,
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-no-code-key": "코드 그룹을 세우지 않는다 — 이 리소스는 «전표»가 아니라 «물건»(팔레트·박스 같은 담는 그릇)이다. ⛔ 2026-09-02 이전에는 이 자리에 「전표의 진행 상태」라는 «남의 설명»이 복사돼 있었다. 담긴 것의 진행은 :pack · /contents · /repack-events 가 이미 담고, 라벨 발행 여부는 boolean 축이면 충분하다(InboundReceiptLine.labelIssued 선례). ⚠ P-02-08 §8-4 가 「포장 해체 화면이 없다」고 적어 뒤쪽 값이 업무에 없다 — 해체 업무가 서면 그때 세운다(A-21 · 사용자 결정 2026-09-02)."
+     },
+     "labelIssued": {
+      "type": "boolean",
+      "description": "라벨이 발행됐는가 — POST /app/document-issues 로 발행 기록이 생기면 true. 재구성 신규 라벨 발행(P-04-04)의 발행 대기 목록이 이 축을 쓴다. 근거: P-04-04 §5-1",
+      "example": false
      }
     }
    },
