@@ -1424,6 +1424,60 @@
       }
      }
     }
+   },
+   "delete": {
+    "tags": [
+     "inventory"
+    ],
+    "summary": "포장 단위 취소",
+    "description": "확정 전에만 지운다 — 내용물이 0일 때만 허용한다. 내용물이 있으면 409, 이미 확정된 포장 단위면 409 다. 근거: P-02-08 §5-x · P-04-01 §5-x",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/IfMatchVersionOptional"
+     },
+     {
+      "$ref": "#/components/parameters/WorkerNo"
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "삭제됨"
+     },
+     "403": {
+      "description": "권한 없음",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "내용물이 있거나 이미 확정됐다. 저장 충돌이면 다시 읽어 오면 풀린다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-internal-note": "공유계약 B-8-1③(부분 성공 되찾을 경로 신설) — 담기 시작에 취급 단위를 만들되(POST /inventory/handling-units) 확정 전 그만두면 이 경로로 거둔다. ⛔ PUT …/contents 를 재사용하지 않는다 — 그 경로는 수량 합 보존 제약이 걸려 해체가 아니다(P-02-08 §6). 오프라인 표기는 붙이지 않는다 — 이 조작이 온라인 전용이라 볼 근거가 없어 사람 게이트에서 보류했다(2026-09-06 요청 p-02-08-오프라인-큐잉-성립조건). 확정 후 해체 경로는 여전히 없다(별건 미결)."
    }
   },
   "/inventory/handling-units/{handlingUnitId}/contents": {
