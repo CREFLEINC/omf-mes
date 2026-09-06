@@ -23,9 +23,11 @@
 __pycache__/
 *.pyc
 
-# 대외비 외부 원본 — git 미포함 (현황은 docs/research/raw-자료-목록.md)
+# 고객 소유 원본 — git 미포함. 보안이 아니라 «소유권»이다(2026-09-06 — 이 프로젝트에 보안
+# 제약은 없다). 우리 자료가 아니라 가시성을 정할 권한이 우리에게 없다.
+# ⚠ docs/ 는 구 하네스이고 이 경로는 지금 존재하지 않는다 — 규칙만 남겨 둔다.
 docs/raw/
-# design/ 이관 대상 — 위 docs/raw/와 동일한 대외비 원자료 사본 자리 (현황은 design/raw/customer/00-목록.md)
+# 위와 같은 갈래의 고객 원자료 사본 자리 (목록만 추적한다 — design/raw/customer/00-목록.md)
 design/raw/customer/*
 !design/raw/customer/00-목록.md
 

@@ -2082,7 +2082,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       <tr><th>작성 주체</th><td>CREFLE OMF 팀</td></tr>
       <tr><th>작성일</th><td>2026-07-30</td></tr>
       <tr><th>버전</th><td>v0.2 (deliverables/06-API-요구서.md 와 동일 내용의 HTML 판 — 사용자 확정 4건 반영판)</td></tr>
-      <tr><th>대상</th><td>CREFLE OMF 팀 내부 (내부 대외비)</td></tr>
+      <tr><th>대상</th><td>CREFLE OMF 팀 · 개발팀 (공개 저장소)</td></tr>
       <tr><th>정본 관계</th><td>원본(docs/·uiux/)이 정본 — 편람은 추종, 어긋나면 원본 우선</td></tr>
     </tbody>
   </table>
@@ -2565,7 +2565,7 @@ print(sum(len(table.splitlines()) for table in tables))  # 126</code></pre><figc
 </tbody></table>
 <hr>
 <h2>§5. 미착지가 무엇을 막는가</h2>
-<p><strong>원칙: 계약은 화면 요구대로 쓴다.</strong> 물리 모델이 못 담아도 필드를 빼지 않는다(<code>data-model-boundary.md</code>) — 대신 두 곳에 흔적을 남긴다: OpenAPI <code>x-internal-note</code>(비공개)와 이 표. 데이터 모델 담당에게 통지하고 기다리지 않는다.</p>
+<p><strong>원칙: 계약은 화면 요구대로 쓴다.</strong> 물리 모델이 못 담아도 필드를 빼지 않는다(<code>data-model-boundary.md</code>) — 대신 두 곳에 흔적을 남긴다: OpenAPI <code>x-internal-note</code>(생성 타입에 실리지 않는다 — <strong>API 표면 분리</strong>다 «(정합주: 2026-09-06 — 구표기 「(비공개)」. 이 저장소는 공개이고 보안 제약도 없다)»)와 이 표. 데이터 모델 담당에게 통지하고 기다리지 않는다.</p>
 <table>
 <thead><tr><th class="nw">#</th><th>미착지</th><th>무엇을 막는가</th><th>이슈</th></tr></thead>
 <tbody>

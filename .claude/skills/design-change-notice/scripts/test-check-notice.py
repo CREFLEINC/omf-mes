@@ -6,7 +6,7 @@
 
 무엇을 잠그나
 -------------
-- 공개 안전(P) — 옛 check-issue.py 시험(PublicSafetySplit·DraftResidue)을 **함수 직접 호출**로 옮겼다.
+- 본문 경계(P) — 옛 check-issue.py 시험(PublicSafetySplit·DraftResidue)을 **함수 직접 호출**로 옮겼다.
   옛 시험은 `--reply`·`--private`·`--change-notice` 모드를 돌렸는데 그 모드들은 V3 로 사라졌다.
   남은 것은 「같은 본문이 공개 저장소로 나간다」 하나라 스캔 함수만 잠근다.
 - 모양(N1~N6·T) — 규칙마다 통과 1 · 위반 ≥1. `use_git=False` 로 해시 실재는 형식만 본다.
@@ -85,7 +85,7 @@ def run_main(text: str, *flags: str):
         os.unlink(path)
 
 
-# ─────────────────────────────────────────── P — 공개 안전(옛 check-issue.py 이식)
+# ─────────────────────────────────────────── P — 본문 경계(옛 check-issue.py 이식)
 
 class PublicSafety(unittest.TestCase):
     """omf-mes-client 는 공개 저장소다 — 옛 PublicSafetySplit 의 RISKY 본문을 그대로 쓴다."""

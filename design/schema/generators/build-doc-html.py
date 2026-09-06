@@ -327,7 +327,7 @@ def build(key, kit):
       <tr><th>작성 주체</th><td>CREFLE OMF 팀</td></tr>
       <tr><th>작성일</th><td>2026-07-30</td></tr>
       <tr><th>버전</th><td>%s</td></tr>
-      <tr><th>대상</th><td>CREFLE OMF 팀 내부 (내부 대외비)</td></tr>
+      <tr><th>대상</th><td>CREFLE OMF 팀 · 개발팀 (공개 저장소)</td></tr>
       <tr><th>정본 관계</th><td>원본(docs/·uiux/)이 정본 — 편람은 추종, 어긋나면 원본 우선</td></tr>
     </tbody>
   </table>

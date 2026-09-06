@@ -1,17 +1,24 @@
 # -*- coding: utf-8 -*-
-"""OpenAPI 정본의 description 이 공개돼도 되는지 검사한다. (이슈 #92)
+"""OpenAPI 정본의 description 이 «API 표면»으로 성립하는지 검사한다. (이슈 #92)
 
 왜 필요한가
-  omf-mes-client 는 **공개 저장소**다. 그 저장소의 `pnpm gen:api` 가 이 정본을 읽어
-  타입을 생성하는데, openapi-typescript 가 `description` 을 JSDoc 주석으로 그대로 옮긴다.
-  생성물(packages/api-client/src/generated/api.d.ts)은 공개 저장소에 커밋된다.
-  즉 **description 에 적은 것은 공개된다.**
+  `pnpm gen:api` 가 이 정본을 읽어 타입을 생성하는데, openapi-typescript 가
+  `description` 을 JSDoc 주석으로 그대로 옮긴다. 생성물
+  (packages/api-client/src/generated/api.d.ts)은 소비자 저장소에 커밋되어 **구현팀의
+  에디터에 뜬다.** 즉 **description 에 적은 것은 계약의 «표면»이 된다** — 우리 설계
+  부기를 거기 두면 계약이 API 를 설명하지 않게 된다.
 
   `x-internal-note` 는 생성물에 실리지 않는다(openapi-typescript 7.13.0 실측).
   내부용 서술은 그쪽에 둔다.
 
+⚠ 2026-09-06 — 이 검사기의 «이유»가 바뀌었다. 이 저장소는 공개이고 보안 제약도 없다
+  (사용자 확정). 그래도 규칙은 그대로 둔다 — 뿌리가 «비밀»이 아니라 **API 표면 분리**이기
+  때문이다. `description` 은 생성 타입 주석으로 복사되어 소비자의 코드에 남는다. 거기에
+  설계 부기(문서 경로·미결 상태·사내 용어)가 섞이면 계약이 API 를 설명하지 않게 된다.
+  ⇒ 규칙 이름에서 「비공개」를 걷었다 — 막는 이유는 감추기가 아니라 «계약은 API 를 말한다»다.
+
 무엇을 막나
-  ① 비공개 문서 경로 — design/… · docs/…
+  ① 설계 문서 경로 — design/… · docs/…
   ② 설계 규칙 요약 — 「공유계약 X-N(요약문)」의 괄호. 식별자만 남긴다
   ③ 설계 진행 상태 — 미결 · 미착지
   ④ 사내 운영 용어 — WBS · 통합 Agent · SQL NNN 주석
@@ -33,7 +40,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 CONTRACTS_DIR = os.path.join(HERE, "..", "..", "..", "wiki", "api-contracts", "openapi")
 
 RULES = [
-    ('비공개 문서 경로', re.compile(r'\b(?:design|docs|deliverables|uiux)/'),
+    ('설계 문서 경로', re.compile(r'\b(?:design|docs|deliverables|uiux)/'),
      'x-internal-note 로 옮기거나 이슈 번호로 대체한다'),
     # 절 기호는 공유계약이 늘면 함께 늘린다 — 2026-08-06 현재 §A~§L
     ('설계 규칙 요약', re.compile(r'공유계약\s+[A-L]-\d+\s*\('),
@@ -56,8 +63,10 @@ RULES = [
     #    ⭐ 화면 ID(`W-06-02 §4-A`)와 조항 번호(`공유계약 B-1`)는 «잡지 않는다» —
     #       이 저장소는 제품 자신이라 화면 ID 가 정상이고(실측 554곳), 조항은
     #       번호만 부르고 내용을 안 옮긴다. 가르는 기준은 «공개된 계약 안에서
-    #       뜻이 통하는가»다. 문서 파일명은 소비자가 열 수 없는 곳을 가리킨다.
-    ('비공개 문서 이름',
+    #       뜻이 통하는가»다. 문서 파일명은 «계약 밖»을 가리킨다 — 생성 타입 주석에
+    #       그것이 남으면 소비자 코드가 이 저장소의 파일 구조를 인용하게 된다.
+    #       ⚠ 열람 가능 여부의 문제가 아니다(이 저장소는 공개다 · 2026-09-06).
+    ('설계 문서 이름',
      re.compile(r'(?:\d\d[\s\-]?)?API[\s\-]?요구서[\w가-힣\-]*\s*§'
                 r'|\d\d\s요구서\s*§'
                 r'|\d\d\s계약\s\d단계\s*§'
@@ -98,7 +107,7 @@ def check(path):
 
     print('%s — description·example %d개 검사' % (os.path.basename(path), len(descs)))
     if not violations:
-        print('✅ 공개돼도 되는 상태입니다.')
+        print('✅ description 이 API 표면으로 성립합니다.')
         return 0
 
     print('⛔ 위반 %d건\n' % len(violations))
@@ -106,7 +115,8 @@ def check(path):
         print('  [%s] %s' % (name, loc))
         print('    …%s…' % snippet)
         print('    → %s' % fix)
-    print('\n생성물(api.d.ts)은 공개 저장소에 커밋됩니다. 고치고 다시 검사하세요.')
+    print('\n생성물(api.d.ts)은 구현팀 에디터에 그대로 뜹니다 — 설계 부기는'
+          ' x-internal-note 로 옮기세요.')
     return 1
 
 

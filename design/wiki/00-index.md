@@ -115,7 +115,7 @@ python3 design/schema/generators/verify-counts.py     ← 이 문서의 숫자�
 | 결정 대장이 몇 행인가 | `count-decisions.py --check` |
 | 미결이 스펙과 갈렸나 | `collect-open-items.py --check` |
 | **계약이 계약으로 성립하나** | `openapi/check-structure.py` |
-| **계약 설명이 공개돼도 되나** | `openapi/check-public-safe.py` |
+| **계약 설명이 API 표면으로 성립하나** | `openapi/check-public-safe.py` |
 | 저장 충돌 토큰을 받을 곳이 있나 | `openapi/check-lock-token-source.py` |
 | 값 목록이 좁아졌나 | `openapi/check-enum-narrowing.py` |
 | 확정되지 않은 업무 코드 | `openapi/count-undecided-codes.py` |

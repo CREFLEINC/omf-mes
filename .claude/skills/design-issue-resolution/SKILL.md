@@ -173,7 +173,7 @@ analyst 산출물이 다음을 만족하는지 확인한다(미달이면 재작�
 | 대상 | 명령 | 무엇을 막나 |
 |---|---|---|
 | 계약 구조 | `openapi/check-structure.py` | 계약으로 성립하는가 |
-| 공개 안전 | `openapi/check-public-safe.py` | 단가·내부 주소 유출 |
+| 계약 표면 분리 | `openapi/check-public-safe.py` | 설계 부기(문서 경로·문서 이름·규칙 요약·진행 상태·사내 용어)가 `description` 에 섞였는가 — `description` 은 생성 타입 주석으로 복사된다. 실 사번·실 LOT 형식 예시도 본다 «(정합주: 2026-09-06 — 구표기 「공개 안전 ‖ 단가·내부 주소 유출」. 이 검사기의 7규칙 어디에도 단가·주소가 없다 — 그 둘은 `check-notice.py` 의 P 규칙 몫이라 **두 검사기가 뒤바뀌어** 적혀 있었다)» |
 | enum 협착 | `openapi/check-enum-narrowing.py $(git merge-base origin/main HEAD)` | 자유문자열→enum · 값 삭제. ⛔ 인자 없이 돌리면 기본 `HEAD` 비교라 커밋 후 항상 초록 |
 | ⭐ 필수 변경 | `openapi/check-required-change.py $(git merge-base origin/main HEAD)` | optional→required. **`check-enum-narrowing` 이 못 보는 파괴 변경**. ⛔ 인자 없이 돌리면 기본 `HEAD` 비교라 커밋 후 항상 초록 |
 | ⭐ 조회 표준형 | `openapi/check-query-envelope.py` | 목록·요약 응답이 §L 게이트를 지키는가. **목록에 질의를 더하고 `/summary` 짝을 안 고치면 여기서 터진다**(`L-1-1 ⑶`) |
@@ -187,9 +187,13 @@ analyst 산출물이 다음을 만족하는지 확인한다(미달이면 재작�
 ⛔ **초록을 「내가 안 깼다」로, 빨강을 「내가 깼다」로 읽지 마라.** ③ 중 일부는 **손대기 전부터
 비초록**이다. ⭐ **고치기 전에 먼저 돌려 기준선을 잡고**, 반영 뒤 값과 대조해 «내가 낸 것»만 가른다.
 기준선 표는 `design-request-intake`(Consultant)가 아니라 이 스킬이 최신으로 유지한다 — 반영이
-일어나는 자리이므로. 현재 기준선(2026-09-02 `055557d`): `check-lock-token-source` ⚠ 2건·종료 1
-(의도된 보류). `check-worker-no` 는 초록(2026-09-02 · `omf-mes#350`, ⚠ 3건은 남아 있으나 검사기
-자신이 막지 않는다로 둔 것). `check-required-change` 는 헤더·질의 파라미터의 `required` 뒤집힘을
+일어나는 자리이므로. 현재 기준선(**2026-09-06** `3a20be0`): `check-lock-token-source` **✅ 125곳
+검사·종료 0** «(정합주: 구표기 「⚠ 2건·종료 1 (의도된 보류)」 — 2026-09-02 `055557d` 시점 값이고
+그 뒤 해소됐는데 이 표가 안 따라왔다. ⛔ **낡은 기준선은 회귀를 숨긴다** — 「원래 빨강이랬지」로
+넘어가면 내가 낸 빨강을 못 가른다. 이 표가 「떠 있는 값」인 이유가 그것이다)».
+`check-worker-no` 는 초록(2026-09-02 · `omf-mes#350`, ⚠ 3건은 남아 있으나 검사기
+자신이 막지 않는다로 둔 것). `check-example-placeholder` 는 **⚠ 97건·종료 0**(게이트 아님 ·
+`omf-mes#191` 트랙 — 늘지만 않으면 된다). `check-required-change` 는 헤더·질의 파라미터의 `required` 뒤집힘을
 초록으로 통과시킨다(스키마 필드만 본다) — 그 자리의 등급은 사람이 매긴다.
 
 ⚠ 이 표는 **떠 있는 값이다.** 기준선이 바뀌면 여기 날짜와 커밋을 함께 갱신한다.
