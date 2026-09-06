@@ -182,10 +182,10 @@ Caster의 검증→배포 작업도 `[설계] <제목>` 접두 자기 이슈로 
 
 | 파일 | 상태 | 내용 |
 | --- | :-: | --- |
-| `references/public-boundary.md` | ⭐ 살아 있음 | **핵심** — 공개 저장소에 적어도 되는 것과 안 되는 것 · 실수했을 때 |
+| `references/public-boundary.md` | ⭐ 살아 있음 | **공지 본문**에 적어도 되는 것과 안 되는 것 «(정합주: 2026-09-06 — 구표기 「공개 저장소에 적어도 되는 것…」. 그 표는 이제 **공지 본문에만** 적용한다 — 보안 제약이 폐지됐다)» |
 | `references/change-grades.md` | 내부용 | ⛔/⚠/ℹ 등급표 — `check-required-change.py`·`check-enum-narrowing.py` 의 등급 정본, `design-request-intake` 답변서 잠금 ②. **공지에는 싣지 않는다** |
 | `scripts/build-notice.py` | ⭐ | 초안 생성기 — `--since`(기본 최신 `notice/*`) · `--head` · `--out` · `--date` · `--repo-root` |
-| `scripts/check-notice.py` | ⭐ | 검사기 — N1 4항 머리 · N2 해시 실재 · N3 팀 구분어 · N4 내용 유출 · N5 항목 길이(⚠) · N6 자리표시 · P 공개 안전(BLOCKING 10 · ADVISORY 5) · T 제목 |
+| `scripts/check-notice.py` | ⭐ | 검사기 — N1 4항 머리 · N2 해시 실재 · N3 팀 구분어 · N4 내용 유출 · N5 항목 길이(⚠) · N6 자리표시 · **P 본문 경계**(BLOCKING 10 · ADVISORY 5) · T 제목. ⚠ **P 는 보안 검사가 아니라 규칙 5 검사다** — 공지에 자세한 내용을 적지 않았는가 |
 | `scripts/test-check-notice.py` | ⭐ | 48건 — 공개 안전 이식 · 규칙별 통과/위반 · 임시 git 저장소 통합 |
 | `../team-issue-protocol/SKILL.md` | ⭐ | 라벨·제목 접두·저장소 경계의 정본 |
 | `../design-request-intake/SKILL.md` | ⭐ | 반대 방향(Consultant) — 개발팀의 정보 요청·설계 개선 요청 접수·판정 |

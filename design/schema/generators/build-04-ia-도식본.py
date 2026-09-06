@@ -977,7 +977,7 @@ out.write('''<!doctype html><html lang="ko"><head><meta charset="utf-8">
       <tr><th>작성 주체</th><td>CREFLE OMF 팀</td></tr>
       <tr><th>작성일</th><td>2026-07-30</td></tr>
       <tr><th>버전</th><td>v2.0 — crefle-doc 기반 재작성 (v1.0 은 독자 CSS)</td></tr>
-      <tr><th>대상</th><td>CREFLE OMF 팀 내부 (내부 대외비)</td></tr>
+      <tr><th>대상</th><td>CREFLE OMF 팀 · 개발팀 (공개 저장소)</td></tr>
       <tr><th>미결 스냅샷</th><td>%s</td></tr>
     </tbody>
   </table>

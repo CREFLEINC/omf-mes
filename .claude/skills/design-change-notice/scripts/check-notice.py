@@ -49,8 +49,11 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_ROOT = os.path.normpath(os.path.join(HERE, "..", "..", "..", ".."))
 
-CLIENT_REPO = "CREFLEINC/omf-mes-client"     # PUBLIC  (실측 2026-09-03)
-SERVER_REPO = "CREFLEINC/omf-mes-server"     # PRIVATE (실측 2026-09-03) — 같은 본문이 나가므로 공개 기준 하나로 검사한다
+CLIENT_REPO = "CREFLEINC/omf-mes-client"     # PUBLIC
+SERVER_REPO = "CREFLEINC/omf-mes-server"     # PRIVATE — 같은 본문이 나가므로 기준 하나로 검사한다
+# ⚠ 이 검사기의 P 규칙은 «보안» 검사가 아니다(2026-09-06 사용자 확정 — 이 프로젝트에 보안
+#    제약은 없다). 보는 것은 V3 규칙 5 다: 공지에 자세한 내용을 적지 않았는가 — 개발팀이
+#    열어 볼 자리를 우리가 미리 골라 주지 않기 위해서다. 경계는 references/public-boundary.md.
 NOTICE_LABEL = "설계 변동 공지"
 CLIENT_FILTER_LABEL = "uiux→client"          # 클라이언트 저장소의 기존 필터 라벨 — 함께 붙인다
 
