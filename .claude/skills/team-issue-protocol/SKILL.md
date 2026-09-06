@@ -40,10 +40,17 @@ V3 규칙 2 — 「설계팀과 개발팀의 직접 소통은 설계팀이 개�
 | `CREFLEINC/omf-mes-server` | **PRIVATE** | **공지 발행처** ② — 접두 있는 열린 이슈는 V3 이전에 설계팀이 낸 `[uiux→데이터모델]`·`[docs→데이터모델]`·`[uiux→server]` 유산이다 |
 
 ⛔ **볼륨 수치(이슈 수·OPEN·라벨 수·부착 건수)를 이 표에 적지 않는다.** 세 번 낡았다 —
-적는 순간 낡고, 낡은 수가 다음 회차의 계획을 틀리게 만든다. 필요하면 **그때 센다**:
+적는 순간 낡고, 낡은 수가 다음 회차의 계획을 틀리게 만든다. 필요하면 **그때 센다**.
+
+⚠ **명령이 표의 «전 행»을 덮는지 세어 보고 쓴다** — 저장소가 셋이면 가시성 명령도 셋이다
+«(정합주: 2026-09-06 — 구표기는 `omf-mes`·`omf-mes-server` 둘만 잤다. 바로 아래 절이
+「2026-09-03 「실측」이라 적힌 명령이 한 저장소만 조회했다」를 뿌리로 지목해 놓고, 같은 모양을
+이 블록에서 반복했다)». 실측 2026-09-06 — `omf-mes` public · `omf-mes-client` public ·
+`omf-mes-server` private.
 
 ```
-gh api repos/CREFLEINC/omf-mes --jq '{private:.private, visibility:.visibility}'
+gh api repos/CREFLEINC/omf-mes        --jq '{private:.private, visibility:.visibility}'
+gh api repos/CREFLEINC/omf-mes-client --jq '{private:.private, visibility:.visibility}'
 gh api repos/CREFLEINC/omf-mes-server --jq '{private:.private, visibility:.visibility}'
 gh issue list --repo CREFLEINC/omf-mes --state open --limit 200 --json number --jq 'length'
 gh label list --repo CREFLEINC/omf-mes --limit 100
@@ -73,7 +80,7 @@ $ gh api repos/CREFLEINC/omf-mes --jq '{created:.created_at, private:.private}'
 가려야 한다」도 이 저장소의 판단 기준이 아니다. ⛔ **«저장소가 공개라는 이유로» 내용을 감추지
 않는다** — 「누가 볼지 모르니 빼자」는 판단을 하지 않는다.
 
-⚠ **범위 — 이 결정이 «삼키지 않는» 것 넷.** 아래는 감추기가 아니라 각자 다른 이유로 서 있다.
+⚠ **범위 — 이 결정이 «삼키지 않는» 것 다섯.** 아래는 감추기가 아니라 각자 다른 이유로 서 있다.
 
 | 그대로인 것 | 왜 |
 | --- | --- |
@@ -81,6 +88,7 @@ $ gh api repos/CREFLEINC/omf-mes --jq '{created:.created_at, private:.private}'
 | **V3 규칙 5**(공지에 자세한 내용 금지) | **워크플로** — 개발팀이 열어 볼 자리를 우리가 미리 골라 주지 않는다. 공지 본문은 계속 `check-notice.py` 를 통과시킨다 |
 | **`design/raw/` 읽기 전용** | **시점 고착본 보호** |
 | **제품 자신의 접근 설계** — 권한·역할·응답 노출 범위 | 「우리 문서의 가시성」이 아니라 **설계 결정**이다. 화면·계약이 정하던 대로 정한다 |
+| **고객 소유 자료** — `design/raw/customer/` 원자료 · 실물 식별자(실 사번·실 LOT) | **소유권**이다 — 우리 자료가 아니라 가시성을 정할 권한이 없다. `.gitignore` 의 `design/raw/customer/*` 규칙과 `check-public-safe.py` 의 「실 사번 의심」·「실 LOT 번호 의심」이 이미 집행한다 |
 
 **사용자에게 물을 것** — 우리가 정할 수 없는 것(고객·팀 리더 확정 필요, 요청 자료가 모호함,
 데이터 모델 소관 질의)은 개발팀 저장소에 이슈를 세우는 것이 아니라 **`omf-mes` 에 `[확인 요청]`

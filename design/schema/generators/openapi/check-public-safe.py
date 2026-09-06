@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-"""OpenAPI 정본의 description 이 공개돼도 되는지 검사한다. (이슈 #92)
+"""OpenAPI 정본의 description 이 «API 표면»으로 성립하는지 검사한다. (이슈 #92)
 
 왜 필요한가
-  omf-mes-client 는 **공개 저장소**다. 그 저장소의 `pnpm gen:api` 가 이 정본을 읽어
-  타입을 생성하는데, openapi-typescript 가 `description` 을 JSDoc 주석으로 그대로 옮긴다.
-  생성물(packages/api-client/src/generated/api.d.ts)은 공개 저장소에 커밋된다.
-  즉 **description 에 적은 것은 공개된다.**
+  `pnpm gen:api` 가 이 정본을 읽어 타입을 생성하는데, openapi-typescript 가
+  `description` 을 JSDoc 주석으로 그대로 옮긴다. 생성물
+  (packages/api-client/src/generated/api.d.ts)은 소비자 저장소에 커밋되어 **구현팀의
+  에디터에 뜬다.** 즉 **description 에 적은 것은 계약의 «표면»이 된다** — 우리 설계
+  부기를 거기 두면 계약이 API 를 설명하지 않게 된다.
 
   `x-internal-note` 는 생성물에 실리지 않는다(openapi-typescript 7.13.0 실측).
   내부용 서술은 그쪽에 둔다.
@@ -106,7 +107,7 @@ def check(path):
 
     print('%s — description·example %d개 검사' % (os.path.basename(path), len(descs)))
     if not violations:
-        print('✅ 공개돼도 되는 상태입니다.')
+        print('✅ description 이 API 표면으로 성립합니다.')
         return 0
 
     print('⛔ 위반 %d건\n' % len(violations))
@@ -114,7 +115,8 @@ def check(path):
         print('  [%s] %s' % (name, loc))
         print('    …%s…' % snippet)
         print('    → %s' % fix)
-    print('\n생성물(api.d.ts)은 공개 저장소에 커밋됩니다. 고치고 다시 검사하세요.')
+    print('\n생성물(api.d.ts)은 구현팀 에디터에 그대로 뜹니다 — 설계 부기는'
+          ' x-internal-note 로 옮기세요.')
     return 1
 
 
