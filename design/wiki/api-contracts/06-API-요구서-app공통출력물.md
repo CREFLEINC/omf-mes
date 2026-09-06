@@ -95,8 +95,6 @@
 | 2단 출력 — 두 화면이 나눠 가진다 | 계약은 **한 경로**다. 「누가 어느 단을 찍는가」는 화면이 정한다 | §5-3 |
 | ⭐ **LOT 발생 원천 표시명** | **`GET /mdm/code-values?codeGroupCode=LOT_SOURCE_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `INBOUND_RECEIPT_LINE`·`RECYCLE_ENTRY`(**2026-09-02 등재**) | G-32 |
 | ⭐ **LOT 생명주기 표시명** | **`GET /mdm/code-values?codeGroupCode=LOT_LIFECYCLE_STATUS`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `WAITING`·`ACTIVE`·`VOIDED`(**2026-09-02 등재**) | G-32 |
-| ⭐ **선택지·표시명 — `LOT_STATUS`** | **`GET /mdm/code-values?codeGroupCode=LOT_STATUS`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED · ⛔ 고객이 편집할 수 없다 | G-32 |
-| ⭐ **선택지·표시명 — `LOT_TYPE`** | **`GET /mdm/code-values?codeGroupCode=LOT_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `MATERIAL`·`PRODUCTION`·`PRODUCT` **3값**(뜻풀이는 코드 사전 `CD-LOT-TYPE` 이 갖는다 — 작성 규칙 6) · ⛔ **고객이 편집할 수 없다** — 우리가 정한 값이다(`registry-system`) | §4 · G-32 |
 
 ⭐ **A-10 규칙 3(FK 우선)이 여기서 갈린다.** LOT 라벨은 `targetId` 와 `lotId` 가 같은 값이고 인식표는 다르다 → **`targetTypeCode` 로 먼저 판정한다.** 계약의 `DocumentTarget.targetTypeCode` 가 그 판정 입력이다.
 
@@ -142,7 +140,6 @@
 | **발번·인쇄** | ⛔ **부분 미착지** — LOT 발번은 **02 계약**, 재구성 **이벤트 기록은 테이블이 없다**(**#117**). 이 계약은 **발행 기록만** — **`documentTypeCode = PACKING_LABEL`**(§3-8) | §5-5 · **§I-43** |
 | 발행 이력 보기 | 활성 조건 = `summary` · 상세는 `GET /app/document-issues?…` | K-1 |
 | 발번 취소 | **없음 — 두지 않는다.** 번호는 회수하지 않는다 | §5-5 · K-1 |
-| ⭐ **선택지·표시명 — `HANDLING_UNIT_TYPE`** | **`GET /mdm/code-values?codeGroupCode=HANDLING_UNIT_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = BOX·CART·PALLET · ⭐ 고객이 늘린다 — 위 값은 초기 시드다 | G-32 |
 
 ### 3-6. 커버리지 집계
 
