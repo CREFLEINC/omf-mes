@@ -119,9 +119,15 @@ gh label create "설계 변동 공지" --repo CREFLEINC/omf-mes-client --color 1
 gh label create "설계 변동 공지" --repo CREFLEINC/omf-mes-server --color 1D76DB --description "설계팀 설계 변동 공지(V3 규칙 5)"
 ```
 
-⚠ **첫 발행 주의** — 실측(2026-09-03) 두 저장소 모두 「설계 변동 공지」 라벨이 없다. `omf-mes-server`
-에는 GitHub 기본 라벨과 `Agent : Backend`·`status:in-progress` 만 있다. 라벨 없이 `--label` 을 주면
-`gh` 가 실패한다.
+✅ **라벨은 양쪽 다 이미 있다**(색상 `1D76DB`) — 첫 발행이 끝났고 공지도 발행돼 있다
+«(정합주: 2026-09-06 — 구표기 「⚠ **첫 발행 주의** — 실측(2026-09-03) 두 저장소 모두 「설계
+변동 공지」 라벨이 없다 …」)». ⚠ 그래도 **쓰기 직전에 다시 본다** — 라벨이 지워졌으면
+`--label` 이 실패한다:
+
+```bash
+gh label list --repo CREFLEINC/omf-mes-client --search "설계 변동 공지"
+gh label list --repo CREFLEINC/omf-mes-server --search "설계 변동 공지"
+```
 
 ### ⑥ 태그를 찍는다 — 다음 공지의 기준
 
