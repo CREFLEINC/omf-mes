@@ -2565,7 +2565,7 @@ print(sum(len(table.splitlines()) for table in tables))  # 126</code></pre><figc
 </tbody></table>
 <hr>
 <h2>§5. 미착지가 무엇을 막는가</h2>
-<p><strong>원칙: 계약은 화면 요구대로 쓴다.</strong> 물리 모델이 못 담아도 필드를 빼지 않는다(<code>data-model-boundary.md</code>) — 대신 두 곳에 흔적을 남긴다: OpenAPI <code>x-internal-note</code>(비공개)와 이 표. 데이터 모델 담당에게 통지하고 기다리지 않는다.</p>
+<p><strong>원칙: 계약은 화면 요구대로 쓴다.</strong> 물리 모델이 못 담아도 필드를 빼지 않는다(<code>data-model-boundary.md</code>) — 대신 두 곳에 흔적을 남긴다: OpenAPI <code>x-internal-note</code>(생성 타입에 실리지 않는다 — <strong>API 표면 분리</strong>다 «(정합주: 2026-09-06 — 구표기 「(비공개)」. 이 저장소는 공개이고 보안 제약도 없다)»)와 이 표. 데이터 모델 담당에게 통지하고 기다리지 않는다.</p>
 <table>
 <thead><tr><th class="nw">#</th><th>미착지</th><th>무엇을 막는가</th><th>이슈</th></tr></thead>
 <tbody>
