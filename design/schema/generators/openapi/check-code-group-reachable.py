@@ -188,7 +188,7 @@ BASELINE = 0
 #      축이라 완제품 창고에 서는 일이 드물며, `W-01-10` §4-C 는 「갱신 대상」 표라
 #      화면이 «보이는» 자리가 아니고, `W-04-08` §3 목록은 이미 8열로 차 있다.
 #      ⇒ **설계 변동이 얻는 것보다 크다.** 다시 여는 조건을 `W-04-08` §4-A 에 적었다.
-BASELINE_SCREEN = 19
+BASELINE_SCREEN = 0
 
 
 def table_groups_from_doc(doc: dict) -> dict[str, set[str]]:
