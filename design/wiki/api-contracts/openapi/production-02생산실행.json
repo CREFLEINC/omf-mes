@@ -6583,9 +6583,9 @@
     "properties": {
      "reasonCode": {
       "type": "string",
-      "example": "값",
-      "x-code-key": "CD-WORK-ORDER-HOLD-REASON",
-      "description": "작업지시 보류 사유. ⭐ 사유 코드의 선례를 따른다 — 스키마별 전용 그룹 + 고객이 늘림. 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_ORDER_HOLD_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "example": "MATERIAL_SHORTAGE",
+      "x-code-key": "CD-WORK-SESSION-EVENT-REASON",
+      "description": "작업지시 보류 사유. ⛔ 2026-09-06 게이트 승인 — 전용 코드 그룹(CD-WORK-ORDER-HOLD-REASON)을 따로 세우지 않는다(값 집합이 비어 있었고 요구 원천도 채울 화면도 없었다 — A-21). 세션 이벤트 중단 사유(WORK_SESSION_EVENT_REASON)와 통일한다 — 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_SESSION_EVENT_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      "occurredAt": {
       "type": "string",

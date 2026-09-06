@@ -1239,6 +1239,23 @@
       "x-no-code-key": "코드 그룹을 세우지 않는다 — 이 리소스는 «전표»가 아니라 «물건»(팔레트·박스 같은 담는 그릇)이다. ⛔ 2026-09-02 이전에는 이 자리에 「전표의 진행 상태」라는 «남의 설명»이 복사돼 있었다. 담긴 것의 진행은 :pack · /contents · /repack-events 가 이미 담고, 라벨 발행 여부는 boolean 축이면 충분하다(InboundReceiptLine.labelIssued 선례). ⚠ P-02-08 §8-4 가 「포장 해체 화면이 없다」고 적어 뒤쪽 값이 업무에 없다 — 해체 업무가 서면 그때 세운다(A-21 · 사용자 결정 2026-09-02)."
      },
      {
+      "name": "labelIssued",
+      "in": "query",
+      "schema": {
+       "type": "boolean"
+      },
+      "description": "라벨 발행 여부로 거른다. false = 발행 대기 목록(재구성 신규 라벨 발행 대상). 근거: P-04-04 §5-1(2026-09-06 게이트 승인)"
+     },
+     {
+      "name": "lotId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64"
+      },
+      "description": "이 LOT 을 담은 취급 단위만(handling_unit_content 경유). 출고 시 파렛트를 좁히는 축 — 창고 전체가 아니라 이 출고 라인의 LOT 이 실제로 실린 파렛트만 낸다. 근거: P-01-02 §5-2(2026-09-06 게이트 승인 · M-01-08 이 만든 취급 단위를 조회만 한다)"
+     },
+     {
       "name": "q",
       "in": "query",
       "schema": {
@@ -5852,6 +5869,15 @@
       "description": "LOT 번호 정확 일치. 스캔 화면이 쓴다 — 스캔값 하나로 한 건을 집어야 하므로 부분 검색(q)으로는 성립하지 않는다(여러 건이 온다). 공장 안에서 유일하다. 근거: P-02-03 §5-1 · P-02-08 §5-2 · 공유계약 D-2"
      },
      {
+      "name": "withProgress",
+      "in": "query",
+      "schema": {
+       "type": "boolean",
+       "default": false
+      },
+      "description": "생산 진척을 함께 받는다. 목록에서는 LOT 마다 세게 되므로 기본은 끈다"
+     },
+     {
       "name": "q",
       "in": "query",
       "schema": {
@@ -8545,6 +8571,13 @@
       "x-no-example": true,
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-no-code-key": "코드 그룹을 세우지 않는다 — 이 리소스는 «전표»가 아니라 «물건»(팔레트·박스 같은 담는 그릇)이다. ⛔ 2026-09-02 이전에는 이 자리에 「전표의 진행 상태」라는 «남의 설명»이 복사돼 있었다. 담긴 것의 진행은 :pack · /contents · /repack-events 가 이미 담고, 라벨 발행 여부는 boolean 축이면 충분하다(InboundReceiptLine.labelIssued 선례). ⚠ P-02-08 §8-4 가 「포장 해체 화면이 없다」고 적어 뒤쪽 값이 업무에 없다 — 해체 업무가 서면 그때 세운다(A-21 · 사용자 결정 2026-09-02)."
+     },
+     "labelIssued": {
+      "x-source-column": "label_issued",
+      "type": "boolean",
+      "default": false,
+      "description": "라벨 발행 여부. boolean 축으로 「발행 대기」를 가른다 — 담긴 것의 진행은 :pack·/contents·/repack-events 가 이미 담는다(InboundReceiptLine 자리의 같은 형태 선례). 근거: P-04-04 §5-1(2026-09-06 게이트 승인)",
+      "example": false
      }
     }
    },
