@@ -1322,11 +1322,12 @@
        "type": "string",
        "enum": [
         "png",
-        "pdf"
+        "pdf",
+        "tspl"
        ],
        "default": "png"
       },
-      "description": "라벨은 이미지이고 성적서·보고서는 문서다. 발행 종류가 지원하지 않는 형식이면 422 다."
+      "description": "라벨은 이미지 또는 TSPL 명령문이고 성적서·보고서는 문서다. 미리보기는 항상 `png` 다. 라벨 8종(MATERIAL_LOT_LABEL·GOODS_ISSUE_QR·PRODUCTION_LOT_LABEL·IDENTIFICATION_TAG·PACKING_LABEL·DELIVERY_LABEL·TOOL_LABEL·LOCATION_LABEL)은 `tspl` 을 지원한다. CERTIFICATE_OF_ANALYSIS(검사성적서)는 `tspl` 을 지원하지 않는다. 발행 종류가 지원하지 않는 형식이면 422 다."
      }
     ],
     "responses": {
@@ -1340,6 +1341,12 @@
         }
        },
        "application/pdf": {
+        "schema": {
+         "type": "string",
+         "format": "binary"
+        }
+       },
+       "application/octet-stream": {
         "schema": {
          "type": "string",
          "format": "binary"
@@ -1367,7 +1374,8 @@
        }
       }
      }
-    }
+    },
+    "x-internal-note": "`tspl` 값은 §3.4 2026-09-06 확정(라벨 기본 경로를 TSPL 명령형 한 갈래로 확정) 근거로 선다 — Windows 스풀러 경유가 대상 기종에서 서지 않는다는 것은 개발팀 실측이다(클라이언트 개발 2팀 · `omf-mes-client#798` 세 회차). 미리보기는 계속 `png` 를 쓴다 — 화면 다섯이 미리보기를 `<img>` 로 확정했다: 출고 QR 발행 화면(P-01-02) · 납품 포장 라벨 출력 화면(P-04-02) · 재구성 신규 라벨 발행 화면(P-04-04) · 툴·금형·지그 마스터 화면(W-05-13) · 창고·Location 마스터 화면(W-06-07). 발행 종류 9값 중 TOOL_LABEL·LOCATION_LABEL 은 라벨이라 계약상 `tspl` 을 지원하지만 실제로는 관리웹(브라우저) 화면이 소유해 원시 바이트를 포트로 흘려보낼 전송 수단이 없다 — 그 두 종류는 실무에서 계속 `png` 를 쓴다. `printerName` 은 이름일 뿐이고 물리 포트 대응은 이 계약이 갖지 않는다(셸 설정값 — 개발팀 소관). 규격(라벨 치수)은 질의 파라미터로 받지 않는다 — `documentTypeCode` 와 대상에서 서버가 정한다(요구서 조항 K-5 「클라이언트는 레이아웃을 그리지 않는다」)."
    }
   },
   "/app/document-issues/{documentIssueLogId}:report-print": {
