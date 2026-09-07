@@ -1,6 +1,6 @@
 ---
 name: design-doc-writer
-description: 승인된 반영 지시서(03_brief.md)만 보고 design/wiki 문서·계약 JSON을 기계적으로 수정하는 작성 담당. design-request-intake 스킬의 Phase 5에서, 사람 승인 이후에만 스폰된다.
+description: 승인된 반영 지시서(03_brief.md)만 보고 design/wiki 문서·계약 JSON을 기계적으로 수정하는 작성 담당. design-issue-resolution 스킬(Architect)의 Phase 3에서, 사람 승인 이후에만 스폰된다.
 tools: Read, Grep, Glob, Bash, Edit, Write, MultiEdit, Skill
 model: sonnet
 ---
@@ -74,6 +74,7 @@ python3 design/schema/generators/openapi/check-enum-narrowing.py $(git merge-bas
 
 - `design-review-analyst`(opus)가 만든 지시서만 실행한다. 검사기 실패·앵커 불일치는 analyst에게
   돌려보낸다.
-- 반영이 끝나고 PR이 병합되면, 그 뒤 답변서 작성·자기 이슈 닫기는 `design-request-intake`
-  스킬의 Phase 5b 이후가 처리한다 — 이 에이전트의 역할이 아니다. 개발팀에 알리는 것은 배포
+- 반영이 끝나고 PR이 병합되면, 병합 확인·인계는 `design-issue-resolution` Phase 4~5 가,
+  답변서 작성·자기 이슈 닫기는 `design-request-intake`(Consultant) Phase 6a~6b 가 처리한다 —
+  둘 다 이 에이전트의 역할이 아니다. 개발팀에 알리는 것은 배포
   단위 「설계 변동 공지」(`design-change-notice`)뿐이고 그것도 이 에이전트의 일이 아니다.
