@@ -120,6 +120,8 @@
 | --- | --- | --- |
 | 배분 | `shipment_lot_allocation.handling_unit_id` | ⚠ **nullable** — 포장하지 않는 출하도 있다 |
 
+✅ **헤더 「SR-2026-0456 · B사」의 출처(2026-09-06 게이트 승인)** — `ShipmentLotAllocation.shipmentRequestNo`(출하작업지시 번호 · `SR-` 접두)·`.customerName`(거래처명). 둘 다 ① 스캔 응답이 값으로 준다(§5-1) — 화면이 따로 조회하지 않는다(서버가 `shipment.shipmentRequestId` 를 거슬러 풀어 준다 · 공유계약 L-2). ⚠ **`Shipment.shipmentNo`(`SH-` 접두)와는 다른 번호다** — 도면이 그리는 것은 출하(`SH-`)가 아니라 출하작업지시(`SR-`)다.
+
 **감사 컬럼·`version_no` 제외**(A-4). `handling_unit` 에 `version_no` 가 있으므로 **B-1 적용** · `handling_unit_content` 는 **부여 형**(B-6 — `version_no` 없음).
 
 ## §5. 액션·상태

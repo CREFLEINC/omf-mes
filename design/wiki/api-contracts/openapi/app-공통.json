@@ -73,7 +73,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "승인 유형 검색"
+      "description": "승인 유형 검색 ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
      },
      {
       "name": "page",
@@ -728,7 +728,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "요청번호 검색"
+      "description": "요청번호 검색 ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
      },
      {
       "name": "page",
@@ -2206,7 +2206,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "제목 검색"
+      "description": "제목 검색 ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
      },
      {
       "name": "overlapFrom",
