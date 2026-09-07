@@ -102,6 +102,8 @@ READERS: list[tuple[str, list[str], str]] = [
     # ── design/schema/generators/openapi/ — 17종. 전부 인자 없이 돈다.
     ("design/schema/generators/openapi/check-code-dictionary.py", [],
      "인자 없음(`--split` 은 형제 갈림만 낸다)"),
+    ("design/schema/generators/openapi/check-status-inventory.py", [],
+     "상태 속성·파라미터의 설명과 분류. enum 부재를 미정으로 세지 않는다"),
     ("design/schema/generators/openapi/check-code-group-pointer.py", [], "인자 없음"),
     ("design/schema/generators/openapi/check-code-group-reachable.py", [], "인자 없음"),
     ("design/schema/generators/openapi/check-code-notation.py", [],

@@ -47,7 +47,8 @@
        "type": "string",
        "x-no-example": "코드 그룹을 세우지 않는다 — 편성 여부는 계약이 이미 unassignedOnly(boolean)로 받고 있고 이 칸의 쿼리를 부르는 화면이 0건이다. ⛔ 이 리소스는 수신본이라 등록·수정 경로가 없다 — 상태를 «올릴» 주체가 MES 안에 없다(A-21 · 사용자 결정 2026-09-02)."
       },
-      "x-no-code-key": "코드 그룹을 세우지 않는다 — 편성 여부는 계약이 이미 unassignedOnly(boolean)로 받고 있고 이 칸의 쿼리를 부르는 화면이 0건이다. ⛔ 이 리소스는 수신본이라 등록·수정 경로가 없다 — 상태를 «올릴» 주체가 MES 안에 없다(A-21 · 사용자 결정 2026-09-02)."
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 편성 여부는 계약이 이미 unassignedOnly(boolean)로 받고 있고 이 칸의 쿼리를 부르는 화면이 0건이다. ⛔ 이 리소스는 수신본이라 등록·수정 경로가 없다 — 상태를 «올릴» 주체가 MES 안에 없다(A-21 · 사용자 결정 2026-09-02).",
+      "description": "독립 상태 코드를 사용하는 조회 조건이 아니다. 독립 상태 코드를 사용하지 않는 수주 수신본이다. 미편성 대상 조회는 unassignedOnly를 사용한다."
      },
      {
       "name": "orderDateFrom",
@@ -2623,7 +2624,8 @@
      "statusCode": {
       "type": "string",
       "x-no-code-key": "코드 그룹을 세우지 않는다 — 편성 여부는 계약이 이미 unassignedOnly(boolean)로 받고 있고 이 칸의 쿼리를 부르는 화면이 0건이다. ⛔ 이 리소스는 수신본이라 등록·수정 경로가 없다 — 상태를 «올릴» 주체가 MES 안에 없다(A-21 · 사용자 결정 2026-09-02).",
-      "x-no-example": "「칸 불필요」로 닫힌 칸이라 값이 없다(A-21 · 사용자 결정 2026-09-02) — omf-mes#402"
+      "x-no-example": "「칸 불필요」로 닫힌 칸이라 값이 없다(A-21 · 사용자 결정 2026-09-02) — omf-mes#402",
+      "description": "독립 상태 코드를 사용하지 않는 수주 수신본이다. 미편성 대상 조회는 unassignedOnly를 사용한다."
      },
      "lines": {
       "type": "array",
@@ -3221,7 +3223,8 @@
      "statusCode": {
       "type": "string",
       "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 화면이 그리는 「미편성·피킹중·검사대기·출하완료」는 «파생 진행» 축이지 이 칸이 아니다. 한 칸에 두 축을 담으면 어느 쪽도 못 읽는다. ⭐ 선례가 같은 계약 파일에 있다 — Nonconformance 가 statusCode 옆에 dispositionProgressCode(enum)를 «따로» 두고 「statusCode 와 축이 다르다 — 「판정 대기」 한 값이 NOT_STARTED 와 PARTIAL 을 함께 담아 이 열을 대신할 수 없다」로 못박았다. ⚠ 진행 축 필드 신설은 별건이다. 이 칸을 «움직이는» 액션도 계약에 0건이다(A-21 · 사용자 결정 2026-09-02).",
-      "x-no-example": "「칸 불필요」로 닫힌 칸이라 값이 없다(A-21 · 사용자 결정 2026-09-02) — omf-mes#402"
+      "x-no-example": "「칸 불필요」로 닫힌 칸이라 값이 없다(A-21 · 사용자 결정 2026-09-02) — omf-mes#402",
+      "description": "독립 상태 코드를 사용하지 않는다. 출하 진행은 shipmentProgressCode로 확인한다."
      },
      "shippingInspectionStatusCode": {
       "type": "string",

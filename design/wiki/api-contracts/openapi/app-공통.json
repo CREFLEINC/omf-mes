@@ -2165,7 +2165,8 @@
        ],
        "x-no-example": true
       },
-      "x-code-key": "CD-STATUS"
+      "x-code-key": "CD-STATUS",
+      "description": "공지 상태로 조회한다 — DRAFT(작성중), SCHEDULED(예약), PUBLISHED(게시), CLOSED(종료)."
      },
      {
       "name": "scopeCode",
