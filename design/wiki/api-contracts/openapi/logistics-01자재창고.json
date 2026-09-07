@@ -3929,7 +3929,7 @@
      "logistics"
     ],
     "summary": "추가 자재 출고 요청 발행",
-    "description": "현장이 BOM 소요량 밖의 자재를 수동으로 요청한다. 라인 1건 이상이고 각 수량이 0 보다 커야 한다. BOM 밖 품목도 담을 수 있다. ⛔ 오프라인 대상이 아니다 — 이 오퍼레이션을 부르는 추가 자재 출고 요청(W-02-10)은 관리웹이고, 관리웹 셸에는 오프라인이 없다(공유계약 C-5 · W-02-10 §1). Idempotency-Key 는 필수이나 오프라인 큐 때문이 아니라 재시도 중복을 막기 위해서다(C-8) — Idempotency-Key 는 필수이고 If-Match 는 선택이다(공유계약 C-9). 근거: W-02-10 §5-6",
+    "description": "Manually requests additional materials, including items outside the BOM. At least one line is required, and each requested quantity must be greater than zero. A reason code or non-blank remarks must be provided. If neither a reason code nor non-blank remarks is provided, the request cannot be issued. This operation is not available offline. Idempotency-Key is required to prevent duplicate retries, not for offline queuing. If-Match is optional.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -3990,7 +3990,7 @@
       }
      }
     },
-    "x-internal-note": "02 요구서 §3-9 가 이 오퍼레이션을 「01 계약」이라 적었는데 01 에 GET 만 있었다. 역방향 ② 검사기가 찾아 2026-08-12 에 더했다(client #72). ⛔ 요청 사유 코드 컬럼이 아직 없어 reasonCode 가 remarks 로 저장된다(omf-mes#87)."
+    "x-internal-note": "02 요구서 §3-9 가 이 오퍼레이션을 「01 계약」이라 적었는데 01 에 GET 만 있었다. 역방향 ② 검사기가 찾아 2026-08-12 에 더했다(client #72). «(정합주: 2026-09-07 — 구표기 「요청 사유 코드 컬럼이 아직 없어 reasonCode 가 remarks 로 저장된다(omf-mes#87)」는 과거 임시방안 기록이다. 현행 요청 계약은 reasonCode와 remarks를 구분하며 실제 서버의 물리 저장을 확인했다는 뜻은 아니다)» 근거: W-02-10 §5-6 · 공유계약 C-5·C-8·C-9. 사용자 승인 2026-09-07: 사유 코드 또는 내용 있는 비고. 둘 다 미입력 시 발행 불가를 명시하는 의미 변경(⛔)이다."
    }
   },
   "/logistics/material-issue-requests/shortage": {
@@ -8157,8 +8157,7 @@
       ],
       "maxLength": 50,
       "description": "원천 문서 유형. **A-10 다형 참조 판별자**이고 값은 «대상 테이블 이름»이다 — sourceDocumentId 는 그 표의 식별자다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다. 넷이다 — 입하(INBOUND_RECEIPT → logistics.inbound_receipt · W-01-10 정상품 입하 · W-01-13 「입하 → 입고」) · 출하(SHIPMENT → logistics.shipment · W-04-06 반품 클레임 입고) · 생산 실적(PRODUCTION_RESULT → production.production_result · M-04-04 제품 입고 적치) · 외주 출고(SUBCONTRACT_ISSUE · M-04-04 외주 회수 — 나갔던 외주분이 돌아온다). ⭐ **비울 수 있다**(2026-08-31 사용자 확정) — 「반품인 것은 확실한데 어느 출하인지 모르는」 갈래가 성립한다. sourceDocumentId 와 «함께» 비운다. ⛔ 「없음(NONE)」을 값으로 두지 않는다 — 가리킬 대상이 없는 값을 판별자에 섞지 않는다.",
-      "x-internal-note": "2026-08-31 사용자 확정 — 「없음(NONE)」을 값으로 두지 않고 칸을 비울 수 있게 한다. 저장 컬럼의 NOT NULL 해제는 데이터 모델 담당에게 통지한다 — 기다리지 않는다(schema/data-model-boundary.md). 근거: W-04-06 §5-3 · omf-mes#302.",
-      "x-no-example": "값 목록이 아직 확정 전이다(omf-mes#145) — 확정 전에는 예시를 지어내지 않는다.",
+      "x-internal-note": "2026-08-31 사용자 확정 — 「없음(NONE)」을 값으로 두지 않고 칸을 비울 수 있게 한다. 저장 컬럼의 NOT NULL 해제는 데이터 모델 담당에게 통지한다 — 기다리지 않는다(schema/data-model-boundary.md). 근거: W-04-06 §5-3 · omf-mes#302. «(정합주: 2026-09-07 — 구 x-no-example 「값 목록이 아직 확정 전이다(omf-mes#145) — 확정 전에는 예시를 지어내지 않는다」는 과거 면제 사유다. 현재 이 속성의 enum이 이미 있고 example INBOUND_RECEIPT가 그 안에 있어 해당 면제 메타만 제거한다. 값 목록과 예시는 그대로 보존하며, 긴급직행출하의 실제 원천 ID 선택·연결을 확정하지 않는다. 근거: CD-GOODS-RECEIPT-SOURCE-DOCUMENT-TYPE 및 W-04-05 §8-4)»",
       "x-code-key": "CD-GOODS-RECEIPT-SOURCE-DOCUMENT-TYPE",
       "enum": [
        "INBOUND_RECEIPT",
@@ -12412,7 +12411,7 @@
      "businessDate",
      "occurredAt"
     ],
-    "description": "추가 자재 출고 요청 발행. 라인이 1건 이상이고 수량이 0 보다 커야 한다. 근거: W-02-10 §5-6",
+    "description": "Issues an additional material request. At least one line is required, and each requested quantity must be greater than zero. A reason code or non-blank remarks must be provided. If neither a reason code nor non-blank remarks is provided, the request cannot be issued. Empty or whitespace-only remarks do not qualify as a substitute for a reason code.",
     "properties": {
      "workOrderId": {
       "x-source-column": "work_order_id",
@@ -12444,7 +12443,8 @@
        "string",
        "null"
       ],
-      "description": "요청 사유(코드형) — 확정이 형태까지 지정했다(✓확정 2026-07-14 #4·#5·#7·#8 「사유 필드(코드형 — '긴급 W/O 대응' 포함) 신설」). 2026-08-30 되살림. 값 목록은 GET /mdm/code-values?codeGroupCode=MATERIAL_ISSUE_REQUEST_REASON 로 받는다 — 「긴급 W/O 대응」 포함(공유계약 G-32). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-02-10 §5-1 · omf-mes#87",
+      "description": "Request reason code. Retrieve available values from GET /mdm/code-values?codeGroupCode=MATERIAL_ISSUE_REQUEST_REASON. May be omitted when non-blank remarks are provided.",
+      "x-internal-note": "과거 코드형 복구 근거 기록: 요청 사유(코드형) — 확정이 형태까지 지정했다(✓확정 2026-07-14 #4·#5·#7·#8 「사유 필드(코드형 — '긴급 W/O 대응' 포함) 신설」). 2026-08-30 되살림. 값 목록은 GET /mdm/code-values?codeGroupCode=MATERIAL_ISSUE_REQUEST_REASON 로 받는다 — 「긴급 W/O 대응」 포함(공유계약 G-32). 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-02-10 §5-1 · omf-mes#87",
       "example": "URGENT_WO_RESPONSE",
       "x-code-key": "CD-MATERIAL-ISSUE-REQUEST-REASON"
      },
@@ -12454,7 +12454,7 @@
        "string",
        "null"
       ],
-      "description": "비고. 사유 코드 자리가 생기기 전까지 사유가 여기 담긴다",
+      "description": "Remarks that may be provided instead of a reason code. If no reason code is selected, remarks are required and must not be empty or contain only whitespace.",
       "example": "라인 정지로 추가 소요"
      },
      "lines": {
