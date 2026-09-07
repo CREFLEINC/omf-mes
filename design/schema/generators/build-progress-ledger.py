@@ -73,6 +73,8 @@ import re
 import subprocess
 import sys
 
+from generated_output import emit
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 OPENAPI = os.path.join(HERE, "openapi")
 ROOT = os.path.normpath(os.path.join(HERE, "..", "..", ".."))
@@ -207,8 +209,7 @@ def code_verdicts(names: list[str]) -> dict[str, list[tuple[str, str]]]:
 def screen_gaps() -> dict[str, str]:
     """화면 축의 구멍. ⛔ 「착수 통지가 아직 안 나간 화면」 행은 없앴다(2026-09-03) —
     착수 통지가 폐지돼 셀 대상이 아니다."""
-    run("build-screen-progress.py")
-    text = read(os.path.join(PROGRESS, "화면-진도표.md"))
+    text = importlib.import_module("build-screen-progress").generate()
     out: dict[str, str] = {}
     for head in ("상세 스펙이 없는 화면", "요구서 §3 이 다루지 않은 화면"):
         m = re.search(r"^### [⛔⚠] %s — (\d+)건\n\n(.*)$" % re.escape(head),
@@ -220,10 +221,12 @@ def screen_gaps() -> dict[str, str]:
 def main() -> int:
     # ⛔ `--no-remote` 는 없앴다(2026-09-03) — 착수 통지 폐지로 상대 저장소를
     #    조회하는 자리가 이 계보 전체에서 사라졌다.
-    argparse.ArgumentParser(add_help=True).parse_args()
+    ap = argparse.ArgumentParser(add_help=True)
+    ap.add_argument("--check", action="store_true")
+    args = ap.parse_args()
 
-    run("collect-open-items.py")
-    ledger = read(os.path.join(PROGRESS, "미결-대장.md"))
+    collector = importlib.import_module("collect-open-items")
+    ledger = collector.render(*collector.collect())
     TRACKLESS = "살아 있는 행 중 추적 표지가 없는 것"
     # ⭐ 「폐지 확정으로 제외한 스펙」도 함께 집는다 — 조용히 빼면 다음 사람이 스펙
     #    «파일»을 세고 「대장이 또 갈렸다」로 읽는다. 실제로 그 어긋남이 있었다
@@ -384,11 +387,12 @@ def main() -> int:
         "| **개발팀의 진행** | 2026-09-03 개정 — 설계팀이 갖는 정보가 아니다 |",
         "",
     ]
-    io.open(OUT, "w", encoding="utf-8").write("\n".join(lines))
-    print("생성: %s" % os.path.relpath(OUT, ROOT))
+    result = emit(OUT, "\n".join(lines), args.check)
+    if not args.check:
+        print("생성: %s" % os.path.relpath(OUT, ROOT))
     print("차단 %s · 살아 있는 미결 %s · 값이 비어 있는 코드 그룹 %d (기계적 후보 %s종 중)"
           % (blocking, s.get("살아 있는 행", "?"), len(open_codes), code_count))
-    return 0
+    return result
 
 
 if __name__ == "__main__":

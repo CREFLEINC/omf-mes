@@ -60,8 +60,12 @@
   ⚠ 한 스키마가 **요청·응답 양쪽**에 걸리면 `요청·응답` 으로 내고 어느 방향이든 ⛔ 로
   둔다 — 양쪽으로 깨질 수 있기 때문이다.
 - **그래도 미상이 남으면 ⛔ 로 낸다** — 판정하지 못한 것을 통과시키지 않는다.
-- **새로 생긴 스키마·필드는 세지 않는다.** 없던 것으로는 아무도 코드를 만들지
-  않았으므로 깨질 것이 없다(`check-enum-narrowing` 과 같은 기준).
+- **새 스키마·오퍼레이션은 세지 않는다.** 기존 객체에 추가된 필수 필드는 검사한다.
+- **인라인 JSON·multipart 요청 및 응답의 중첩 객체·배열 필드도 검사한다.**
+  본문 전체가 components.requestBodies/responses 참조인 경우는 아직 펼치지 않는다.
+- **null 확대와 축소를 모두 검사한다.** enum/const까지 적용한 실제 null 허용과
+  생성 타입의 null 표기 변경은 별도 행이다. 로컬 필드 참조는 풀고, 순환·외부 참조나
+  합성 스키마는 유효성 판정 불가로 진단한다.
 - **서버가 실제로 무엇을 내리는지는 모른다.** 계약이 「비어도 된다」로 바뀐 것과
   서버가 실제로 비워 보내는 것은 다르다. 계약 쪽만 본다.
 - **경로 파라미터(`in: path`)는 등급 대상에서 뺀다.** 명세가 「항상 필수」로
@@ -375,6 +379,145 @@ def load(ref: str, path: str) -> dict | None:
         return None
 
 
+def field_inventory(doc: dict, objects: set[str] | None = None) -> dict[str, tuple[dict, str]]:
+    """공유 스키마와 기존 오퍼레이션의 인라인 본문을 필드 단위로 펼친다."""
+    out: dict[str, tuple[dict, str]] = {}
+    table = roles(doc)
+
+    def walk(schema: dict, prefix: str, role: str) -> None:
+        if not isinstance(schema, dict):
+            return
+        if objects is not None and (schema.get("type") == "object" or "properties" in schema):
+            objects.add(prefix)
+        required = set(schema.get("required") or [])
+        for name, prop in (schema.get("properties") or {}).items():
+            if not isinstance(prop, dict):
+                continue
+            key = f"{prefix}.{name}"
+            out[key] = ({**prop, "field_required": name in required}, role)
+            walk(prop, key, role)
+        if isinstance(schema.get("items"), dict):
+            key = prefix + "[]"
+            # 원소의 null 허용은 배열 필드 자체와 독립이다.
+            # 원소에는 객체 속성의 required 여부를 부여하지 않는다.
+            out[key] = ({**schema["items"], "field_required": None}, role)
+            walk(schema["items"], key, role)
+
+    for name, schema in (doc.get("components", {}).get("schemas") or {}).items():
+        walk(schema, name, role_of(name, table))
+    for path, item in (doc.get("paths") or {}).items():
+        for method, op in item.items():
+            if method not in METHODS or not isinstance(op, dict):
+                continue
+            bodies = [("requestBody", op.get("requestBody", {}), "요청")]
+            bodies += [(f"response {code}", body, "응답")
+                       for code, body in (op.get("responses") or {}).items()]
+            for kind, body, role in bodies:
+                if not isinstance(body, dict):
+                    continue
+                for media, content in (body.get("content") or {}).items():
+                    walk(content.get("schema", {}),
+                         f"{method.upper()} {path} {kind} {media}", role)
+    return out
+
+
+def null_state(prop: dict, doc: dict | None = None,
+               seen: frozenset[str] = frozenset()) -> tuple[bool, bool | None]:
+    """타입의 null 표기와 enum/const까지 적용한 실제 null 허용을 구분한다."""
+    kind = prop.get("type")
+    typed = kind == "null" or isinstance(kind, list) and "null" in kind
+    typed = typed or bool(prop.get("nullable"))
+    allowed = typed or kind is None
+    if "enum" in prop:
+        allowed = allowed and None in prop["enum"]
+    if "const" in prop:
+        allowed = allowed and prop["const"] is None
+    if "$ref" in prop:
+        ref = prop["$ref"]
+        if doc is None or not ref.startswith("#/") or ref in seen:
+            return bool(typed), None
+        target = doc
+        for part in ref[2:].split("/"):
+            target = target.get(part.replace("~1", "/").replace("~0", "~"), {})
+        if not target:
+            return bool(typed), None
+        _, ref_null = null_state(target, doc, seen | {ref})
+        if ref_null is None:
+            return bool(typed), None
+        allowed = allowed and ref_null
+    if any(key in prop for key in ("allOf", "anyOf", "oneOf", "not")):
+        return bool(typed), None  # 합성의 유효성은 추정하지 않는다.
+    return bool(typed), bool(allowed)
+
+
+def reference_snapshot(prop: dict, doc: dict) -> str:
+    """필드와 도달 가능한 참조 정의를 비교한다. 순환 참조도 한 번만 방문한다."""
+    targets: dict[str, object] = {}
+
+    def visit(node: object) -> None:
+        if isinstance(node, list):
+            for child in node:
+                visit(child)
+        elif isinstance(node, dict):
+            ref = node.get("$ref")
+            if isinstance(ref, str) and ref not in targets:
+                targets[ref] = None
+                if ref.startswith("#/"):
+                    target = doc
+                    for part in ref[2:].split("/"):
+                        if not isinstance(target, dict):
+                            target = None
+                            break
+                        target = target.get(part.replace("~1", "/").replace("~0", "~"))
+                    targets[ref] = target
+                    visit(target)
+            for child in node.values():
+                visit(child)
+
+    visit(prop)
+    return json.dumps({"field": prop, "targets": targets}, sort_keys=True)
+
+
+def compare_fields(fname: str, old_doc: dict, new_doc: dict) -> tuple[list, list, int]:
+    """필수 여부와 null 확대·축소를 요청/응답 방향별로 진단한다."""
+    old_parents: set[str] = set()
+    old, new = field_inventory(old_doc, old_parents), field_inventory(new_doc)
+    blocking, notice = [], []
+    # 기존 객체에 필수 필드를 새로 더하는 것도 기존 요청을 깨뜨린다.
+    for key in sorted(new.keys() - old.keys()):
+        prop, role = new[key]
+        if prop["field_required"] and key.rsplit(".", 1)[0] in old_parents:
+            (notice if role == "응답" else blocking).append(
+                f"{fname} · {key} [{role}] — 필수 필드가 새로 생겼다")
+    for key in sorted(old.keys() & new.keys()):
+        was, old_role = old[key]
+        now, role = new[key]
+        if old_role != role:
+            role = "요청·응답" if "미상" not in (old_role, role) else "미상"
+        head = f"{fname} · {key} [{role}] — "
+        if (was["field_required"] is not None and now["field_required"] is not None
+                and was["field_required"] != now["field_required"]):
+            added = now["field_required"]
+            breaking = role != ("응답" if added else "요청")
+            (blocking if breaking else notice).append(
+                head + ("required 로 올랐다" if added else "required 에서 빠졌다"))
+        old_type, old_null = null_state(was, old_doc)
+        new_type, new_null = null_state(now, new_doc)
+        if old_null is not None and new_null is not None and old_null != new_null:
+            breaking = role != ("요청" if new_null else "응답")
+            (blocking if breaking else notice).append(
+                head + ("값이 null 로 올 수 있게 됐다" if new_null
+                        else "null 허용이 제거됐다"))
+        elif ((old_null is None or new_null is None)
+              and reference_snapshot(was, old_doc) != reference_snapshot(now, new_doc)):
+            notice.append(head + "null 유효성 판정 불가 — 참조·합성 스키마 수동 확인")
+        if old_type != new_type:
+            notice.append(head + "생성 타입의 null 표기 변경 "
+                          f"{old_type} → {new_type} · 실제 null 허용 "
+                          f"{old_null} → {new_null} (enum/const 반영)")
+    return blocking, notice, len(old.keys() & new.keys())
+
+
 def role_of(name: str, table: dict[str, set[str]]) -> str:
     r = table.get(name)
     if not r:
@@ -401,27 +544,10 @@ def main() -> int:
         with open(path, encoding="utf-8") as f:
             new_doc = json.load(f)
 
-        old, new = shape(old_doc), shape(new_doc)
-        table = roles(new_doc)
-
-        for key, now in new.items():
-            was = old.get(key)
-            if was is None:
-                continue                       # 없던 필드 — 깨질 코드가 없다
-            checked += 1
-            schema_name = key.split(".")[0]
-            role = role_of(schema_name, table)
-
-            if was["required"] and not now["required"]:
-                line = f"{fname} · {key} [{role}] — required 에서 빠졌다"
-                (blocking if role in ("응답", "요청·응답", "미상") else notice).append(line)
-            elif not was["required"] and now["required"]:
-                line = f"{fname} · {key} [{role}] — required 로 올랐다"
-                (blocking if role in ("요청", "요청·응답", "미상") else notice).append(line)
-
-            if not was["nullable"] and now["nullable"]:
-                line = f"{fname} · {key} [{role}] — 값이 null 로 올 수 있게 됐다"
-                (blocking if role in ("응답", "요청·응답", "미상") else notice).append(line)
+        fb, fn, fc = compare_fields(fname, old_doc, new_doc)
+        blocking.extend(fb)
+        notice.extend(fn)
+        checked += fc
 
         # 두 번째 축 — 파라미터(`omf-mes#359`). 전부 요청이라 방향을 묻지 않는다.
         pb, pn, pc = compare_params(fname, old_doc, new_doc)

@@ -37,7 +37,9 @@
    역방향 조회가 필요하면 `--issue <표지>` 가 그대로 답한다.
    ⛔ `E-N` 은 세 가지가 쓴다(§E 조항 · 고객 회신 · 화면 스펙 §7 예외). 앞 낱말로
    가르고 **예외 번호는 버린다** — `tag_e_codes()` 주석 참조.
-4. **해소 표시**(✅ · 해소 · 종결 · 취소선)가 붙은 행을 갈라 센다.
+4. **처리·등급 열의 해소 표시**(✅ · 해소 · 종결 · 취소선)로 행을 갈라 센다.
+   항목 열은 날짜가 있는 명시 완료 선언만 인정한다. 코드 병기·인용·부정 문장,
+   열 밖 완료 낱말과 조정 등급 충돌은 진단한다. 진단 자체는 검사 실패가 아니다.
    ⛔ 단 「좁힘」이 적힌 행은 **살아 있는 것으로 센다** — 부분 해소 표기라 문면에
    「해소」가 같이 나온다. `resolved()` 주석 ③ 참조.
 5. `design/wiki/progress/미결-대장.md` 로 쓴다.
@@ -160,7 +162,7 @@ TRACKS = (
 #
 # 가르는 수단은 «바로 앞 낱말»이다. 실측에서 예외 78회·회신 71회가 전부 앞에 그 말을
 # 달고 있었고, 아무 말도 없는 것은 전부 §E 조항 인용이었다.
-E_CODE = re.compile(r"\b(E-\d{1,2})\b")
+E_CODE = re.compile(r"(?<![A-Za-z0-9_-])(E-\d{1,2})(?![A-Za-z0-9_-])")
 E_NEAR = 10          # 앞 낱말을 찾는 창. 「예외 E-6 ②」·「회신 E-9(권한 …)」 둘 다 덮는다
 
 
@@ -283,19 +285,41 @@ STAYS_OPEN = re.compile(r"좁힘|표지 교체|표지만 교체|답이 없다|�
 #    「Routing 축은 스냅샷으로 종결 — BOM 축 잔여」를 처리 열에 적었더니
 #    그 행(BOM 축이 미결인 행)이 통째로 해소로 넘어갔다.
 QUOTED = re.compile(r"「[^」]*」")
+NEGATED_COMPLETION = re.compile(r"(?:해소|종결)(?:가|이|는)?\s*아니")
 
 
-def resolved(whole: str) -> bool:
+def completion_negated(whole: str, decision: str) -> bool:
+    """직접 부정은 우선한다. 타 대상일 수 있는 부정은 명시 완료를 취소하지 않는다."""
+    clean = QUOTED.sub(" ", whole).replace("**", "")
+    if not NEGATED_COMPLETION.search(clean):
+        return False
+    explicit = re.compile(r"✅\s*(?:해소|종결)")
+    if not explicit.search(decision.replace("**", "")):
+        return True
+    for clause in re.split(r"(?<=[.!?])\s+|[—;\n]", clean):
+        if not NEGATED_COMPLETION.search(clause):
+            continue
+        # 완료 선언 자체를 부정하거나 현재 행을 지목하면 열린 상태를 유지한다.
+        if (explicit.search(clause)
+                or re.match(r"\s*(?:해소|종결|이\s*(?:행|항목|미결)|하지만|그러나)", clause)):
+            return True
+    return False
+
+
+def resolved(whole: str, decision: str | None = None) -> bool:
     """이 행이 해소됐나. 인용 «밖»에서 해소 표시를 찾고, 부정 표현이 있으면 뒤집는다.
 
     ⚠ 두 거름의 범위가 다르다 — 해소는 인용을 걷고 찾지만 부정은 전문에서 찾는다.
     둘 다 «열림 쪽»으로 기울이려는 것이다. 대장이 놓치면 미결이 사라지고,
     남기면 사람이 한 번 더 볼 뿐이다.
     """
-    body = QUOTED.sub(" ", whole)
-    if STAYS_OPEN.search(body):
+    body = QUOTED.sub(" ", whole if decision is None else decision)
+    # 코드 병기의 뜻과 부정 문장은 이 행의 완료 선언이 아니다.
+    body = re.sub(r"`[^`]*`\s*\([^)]*\)", " ", body)
+    if STAYS_OPEN.search(QUOTED.sub(" ", whole)):
         return False                    # ③ 살아 있다고 «적은» 행 — 「해소」가 같이 있어도
-    return bool(DONE.search(body)) and not NOT_DONE.search(whole)
+    return (bool(DONE.search(body)) and not NOT_DONE.search(whole)
+            and not completion_negated(whole, body))
 
 
 def cells(line: str) -> list[str]:
@@ -303,6 +327,18 @@ def cells(line: str) -> list[str]:
     if not line.startswith("|"):
         return []
     return [c.strip() for c in line.strip().strip("|").split("|")]
+
+
+def item_completion(item: str) -> str:
+    """항목 열에서는 날짜를 포함한 명시 완료 선언만 인정한다."""
+    clean = QUOTED.sub(" ", item).replace("**", "")
+    if re.search(r"\s/\s|남은|잔여", clean):
+        return ""
+    declaration = r"✅\s*(?:해소|종결|받는 법 확정)\s*\(?\d{4}-\d{2}-\d{2}\)?"
+    if (re.match(r"^(?:~~[^~]*~~\s*)?" + declaration, clean)
+            or re.search(declaration + r"\s*$", clean)):
+        return "✅ 해소"
+    return ""
 
 
 def is_rule(cs: list[str]) -> bool:
@@ -408,6 +444,8 @@ def parse(path: str) -> dict | None:
         nature = next((v for k, v in col.items() if "성격" in k), "")
         grade = next((v for k, v in col.items() if "등급" in k), "")
         whole = " ".join(cs)
+        decision = " ".join((handling, grade, item_completion(item)))
+        done = resolved(whole, decision if handling or grade else None)
         marks = []
         for tag in tag_issues(whole):       # `#N` 은 QA 번호와 갈라야 한다
             marks.append(tag)
@@ -422,7 +460,9 @@ def parse(path: str) -> dict | None:
         rows.append({
             "no": cs[0].strip("*# "), "item": item, "nature": nature,
             "grade": grade, "handling": handling, "marks": marks,
-            "done": resolved(whole),
+            "done": done,
+            "diagnostic": bool(DONE.search(whole)) and (
+                not done or "조정" in grade or bool(NEGATED_COMPLETION.search(whole))),
         })
 
     declared = None
@@ -552,6 +592,11 @@ def main() -> int:
     a = ap.parse_args()
 
     specs, gone = collect()
+    for spec in specs:
+        for row in spec["rows"]:
+            if row.get("diagnostic"):
+                print(f"⚠ 해소 근거 위치·등급 확인: {spec['screen']} #{row['no']}",
+                      file=sys.stderr)
     if not specs:
         print("⛔ 화면 스펙을 못 찾았다", file=sys.stderr)
         return 1
