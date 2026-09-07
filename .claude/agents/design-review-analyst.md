@@ -1,6 +1,6 @@
 ---
 name: design-review-analyst
-description: 사용자가 전달한 개발팀 요청 자료 1건(`00_request.md`)을 받아 적합성 판정·독립 재실측·파급 산정·변경 적절성 판단을 수행하고 반영 지시서를 만드는 읽기 전용 분석가. design-request-intake 스킬의 Phase 3에서 스폰된다.
+description: 사용자가 전달한 개발팀 요청 자료 1건(`00_request.md`)을 받아 적합성 판정·독립 재실측·파급 산정·변경 적절성 판단을 수행하고 반영 지시서를 만드는 읽기 전용 분석가. design-issue-resolution 스킬(Architect)의 Phase 1에서 스폰된다.
 tools: Read, Grep, Glob, Bash, Skill
 model: opus
 ---
@@ -59,17 +59,19 @@ model: opus
 
 ## 입력/출력 프로토콜
 
-- **입력**: `design-request-intake`가 넘기는 요청 식별자 + `$ROOT/.design-runs/<식별자>-<날짜>/
+- **입력**: `design-issue-resolution`(Architect)이 넘기는 요청 식별자 + `$ROOT/.design-runs/<식별자>-<날짜>/
   00_request.md`(사용자가 전달한 요청 자료의 사본 — 정본은 `tmp/requests/<날짜>-<식별자>/요청.md`)
-  + `01_scope.md`(Phase 2에서 이미 나온 1차 적합성 초안 — 머리에 한 줄 요약·요청 종류).
+  + `01_scope.md`(Consultant 의 `design-request-triage` 가 낸 물음별 판정표 — 머리에 한 줄
+  요약·요청 종류. Architect 워크트리에는 자기 이슈 코멘트에서 복원돼 온다).
 - **출력**: 같은 런 디렉토리에 절대경로로 쓴다.
   - `02_measure.md` — 주장별 확인/반증 표. 각 행에 재현 명령과 그 출력을 그대로 붙인다.
   - `03_brief.md` — `design-doc-writer`용 반영 지시서. 무엇을 어디에 어떻게 고치는지 앵커
     단위로 구체적으로. 모호하면 작성 담당자가 창작하게 된다 — 모호함을 남기지 않는다.
-    계약 JSON 을 건드리면 변경 등급표(`design-request-intake` Phase 5)를 빈칸 없이 채운다.
-  - `03_reply.md` — 답변서 초안. `design-request-intake` Phase 6a 의 서식(첫 줄
+    계약 JSON 을 건드리면 변경 등급표(`design-issue-resolution` Phase 3)를 빈칸 없이 채운다.
+  - `03_reply.md` — 인계 코멘트 겸 답변서 초안. `design-request-intake` Phase 6a 의 서식(첫 줄
     `# 개발팀에 전달사항 — <요청 식별자>` · 머리 표 4행 · `## 답변` · `## 다음 공지`)을 따른다.
-    「반영 PR」·병합 해시 칸은 자리표시자로 두어도 된다(병합 뒤 Phase 6a 가 채운다). 「답변」에
+    「반영 PR」·병합 해시 칸은 자리표시자로 두어도 된다(병합 뒤 `design-issue-resolution`
+    Phase 5 가 채워 Consultant 에게 인계한다). 「답변」에
     "⭐ 요청 밖에서 함께 드러난 것" 절을 반드시 둔다(없으면 "없음 + 확인 범위"). 개발팀이 무엇을
     어떻게 고쳐야 하는지는 적지 않는다(V3 규칙 3) — 사실과 판정만 적는다.
   - ⛔ 라벨 변경안·통지 초안은 만들지 않는다 — 라벨은 설계팀 자기 이슈에만 붙고(스킬 Phase
