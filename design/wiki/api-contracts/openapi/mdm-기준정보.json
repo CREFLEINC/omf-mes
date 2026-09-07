@@ -15073,7 +15073,7 @@
       "maxLength": 50,
       "description": "마스터 버전의 편집 잠금 상태 — 작성중(DRAFT · 편집 가능) · 확정(CONFIRMED · 편집 잠김) · 폐기(OBSOLETE). ⛔ 확정본은 in-place 수정하지 않고 새 Rev 를 발행한다(결정 07). ⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 값을 편집하면 안 된다. 편집 가부가 이 값에 걸려 있어 값을 지우면 잠금이 «조용히» 안 걸리고, 이미 그 Rev 로 전개된 W/O 와 어긋난다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=MASTER_VERSION_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. 근거: 결정 07(W-06-01 §4) — Routing 이 정한 세 값을 BOM·검사기준 버전이 준용한다(사용자 결정 2026-09-02). ⭐ Routing 은 결정 07 이 값을 «직접» 확정한 자리다.",
       "example": "DRAFT",
-      "x-internal-note": "example 이 'ACTIVE' 였다 — 결정 07 이 확정한 뜻은 작성중·확정·폐기 셋이고 그중 어느 것도 아니다. 공유계약 G-32 가 설비 자산 상태에서 같은 결함을 잡아 「사용 여부(is_active)와 수명주기에 같은 낱말을 쓰지 않는다」로 고쳤다(ACTIVE → IN_SERVICE·DISPOSED). 여기도 코드 문자열이 정해질 때까지 자리표시로 되돌린다 — 등록은 W-06-06 소관이고 폐기 전이 액션 이름 :obsolete 와 짝을 맞추는 것이 후보다. omf-mes#259 요청 밖 확인에서 드러났다.",
+      "x-internal-note": "example 이 'ACTIVE' 였다 — 결정 07 이 확정한 뜻은 작성중·확정·폐기 셋이고 그중 어느 것도 아니다. 공유계약 G-32 가 설비 자산 상태에서 같은 결함을 잡아 「사용 여부(is_active)와 수명주기에 같은 낱말을 쓰지 않는다」로 고쳤다(ACTIVE → IN_SERVICE·DISPOSED). 당시에는 코드 문자열 확정 전이라 자리표시로 되돌렸고 W-06-06 등록 및 :obsolete와의 대응을 후보로 기록했다. 이후 사용자 결정 2026-09-02로 CD-MASTER-VERSION-STATUS의 DRAFT·CONFIRMED·OBSOLETE가 확정됐고, 현재 example은 DRAFT다. 앞의 대기·후보 설명은 당시 경위이며 현재 값 목록 미정을 뜻하지 않는다. omf-mes#259 요청 밖 확인에서 드러났다.",
       "x-code-key": "CD-MASTER-VERSION-STATUS"
      },
      "effectiveFrom": {
@@ -17087,7 +17087,7 @@
       "maxLength": 50,
       "description": "마스터 버전의 편집 잠금 상태 — 작성중(DRAFT · 편집 가능) · 확정(CONFIRMED · 편집 잠김) · 폐기(OBSOLETE). ⛔ 확정본은 in-place 수정하지 않고 새 Rev 를 발행한다(결정 07). ⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 값을 편집하면 안 된다. 편집 가부가 이 값에 걸려 있어 값을 지우면 잠금이 «조용히» 안 걸리고, 이미 그 Rev 로 전개된 W/O 와 어긋난다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=MASTER_VERSION_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. 근거: 결정 07(W-06-01 §4) — Routing 이 정한 세 값을 BOM·검사기준 버전이 준용한다(사용자 결정 2026-09-02). ⭐ W-06-11 「작성중만 편집」 규칙의 판정 컬럼이다.",
       "example": "DRAFT",
-      "x-internal-note": "example 이 'ACTIVE' 였다 — 공유계약 G-32 가 설비 자산 상태에서 같은 결함을 잡아 「사용 여부(is_active)와 수명주기에 같은 낱말을 쓰지 않는다」로 고쳤다(ACTIVE → IN_SERVICE·DISPOSED). 여기도 코드 문자열이 정해질 때까지 자리표시로 되돌린다 — 등록은 W-06-06 소관이고 폐기 전이 액션 이름 :obsolete 와 짝을 맞추는 것이 후보다. omf-mes#259 요청 밖 확인에서 드러났다.",
+      "x-internal-note": "example 이 'ACTIVE' 였다 — 공유계약 G-32 가 설비 자산 상태에서 같은 결함을 잡아 「사용 여부(is_active)와 수명주기에 같은 낱말을 쓰지 않는다」로 고쳤다(ACTIVE → IN_SERVICE·DISPOSED). 당시에는 코드 문자열 확정 전이라 자리표시로 되돌렸고 W-06-06 등록 및 :obsolete와의 대응을 후보로 기록했다. 이후 사용자 결정 2026-09-02로 CD-MASTER-VERSION-STATUS의 DRAFT·CONFIRMED·OBSOLETE가 확정됐고, 현재 example은 DRAFT다. 앞의 대기·후보 설명은 당시 경위이며 현재 값 목록 미정을 뜻하지 않는다. omf-mes#259 요청 밖 확인에서 드러났다.",
       "x-code-key": "CD-MASTER-VERSION-STATUS"
      },
      "isDefault": {
