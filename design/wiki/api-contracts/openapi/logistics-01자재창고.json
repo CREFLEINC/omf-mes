@@ -1430,7 +1430,7 @@
      "inventory"
     ],
     "summary": "포장 단위 취소",
-    "description": "확정 전에만 지운다 — 내용물이 0일 때만 허용한다. 내용물이 있으면 409, 이미 확정된 포장 단위면 409 다. 근거: P-02-08 §5-x · P-04-01 §5-x",
+    "description": "확정 전에만 지운다 — 내용물이 0일 때만 허용한다. 내용물이 있으면 409, 이미 확정된 포장 단위면 409 다. 근거: P-02-08 §5-7 · P-04-01 §5-6",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -8627,11 +8627,10 @@
       "x-no-code-key": "코드 그룹을 세우지 않는다 — 이 리소스는 «전표»가 아니라 «물건»(팔레트·박스 같은 담는 그릇)이다. ⛔ 2026-09-02 이전에는 이 자리에 「전표의 진행 상태」라는 «남의 설명»이 복사돼 있었다. 담긴 것의 진행은 :pack · /contents · /repack-events 가 이미 담고, 라벨 발행 여부는 boolean 축이면 충분하다(InboundReceiptLine.labelIssued 선례). ⚠ P-02-08 §8-4 가 「포장 해체 화면이 없다」고 적어 뒤쪽 값이 업무에 없다 — 해체 업무가 서면 그때 세운다(A-21 · 사용자 결정 2026-09-02)."
      },
      "labelIssued": {
-      "x-source-column": "label_issued",
       "type": "boolean",
-      "default": false,
-      "description": "라벨 발행 여부. boolean 축으로 「발행 대기」를 가른다 — 담긴 것의 진행은 :pack·/contents·/repack-events 가 이미 담는다(InboundReceiptLine 자리의 같은 형태 선례). 근거: P-04-04 §5-1(2026-09-06 게이트 승인)",
-      "example": false
+      "description": "라벨 발행 여부. ⭐ **저장하는 칸이 아니라 파생값이다** — 이 취급 단위를 대상으로 한 발행 기록(POST /app/document-issues, 대상 유형 = 취급 단위)이 하나라도 있으면 true 다. 그러므로 이 값을 true 로 «옮기는» 요청이 따로 없다 — 발행 기록이 생기면 함께 참이 된다. 입하 계열의 같은 이름 질의(GET /logistics/inbound-receipts/{inboundReceiptId}/lines?labelIssued=)가 「발행 기록이 없는」 상태를 가리키는 것과 같은 형태다. 근거: P-04-04 §5-1(2026-09-06 게이트 승인)",
+      "example": false,
+      "x-internal-note": "«(정합주: 2026-09-07 — 구표기는 x-source-column: label_issued · default: false 였다. PR #466 리뷰 [Major] 가 「true 로 바꾸는 요청·서버 규칙이 없어 발행한 취급 단위도 대기 목록에 남는다」를 짚었다. 선례로 든 입하 계열은 실제로는 «저장 칸이 아니라 발행 기록 유무»라 인용이 틀렸다 — 파생으로 바로잡는다)»"
      }
     }
    },
