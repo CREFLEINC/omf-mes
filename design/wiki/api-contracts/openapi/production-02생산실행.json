@@ -104,7 +104,7 @@
        "type": "string",
        "example": "값"
       },
-      "description": "P/O 번호 검색"
+      "description": "P/O 번호 검색 ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
      },
      {
       "name": "includeChildren",
@@ -2387,7 +2387,7 @@
        "type": "string",
        "example": "값"
       },
-      "description": "W/O 번호 검색. ⚠ P/O 번호는 이 축으로 검색되지 않는다 — P/O 는 productionOrderId 로 좁힌다"
+      "description": "W/O 번호 검색. ⚠ P/O 번호는 이 축으로 검색되지 않는다 — P/O 는 productionOrderId 로 좁힌다 ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
      },
      {
       "name": "sort",
@@ -4099,7 +4099,7 @@
        "type": "string",
        "example": "값"
       },
-      "description": "일련번호 검색"
+      "description": "일련번호 검색 ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
      },
      {
       "name": "page",
@@ -5895,7 +5895,7 @@
      },
      "resultSourceCode": {
       "type": "string",
-      "description": "실적을 «무엇이» 만들었는가 — 수기 입력(MANUAL) · IoT 자동수집(IOT). ⭐ 서버가 안다 — 화면이 고르는 값이 아니다. ⛔ 두 갈래뿐이라 계약이 닫는다",
+      "description": "실적을 «무엇이» 만들었는가 — 수기 입력(MANUAL) · IoT 자동수집(IOT). ⛔ 화면이 보내지 않는다 — 서버가 채운다(수기 입력이면 MANUAL). ⭐ 서버가 안다 — 화면이 고르는 값이 아니다. ⛔ 두 갈래뿐이라 계약이 닫는다",
       "x-code-key": "CD-PRODUCTION-RESULT-SOURCE",
       "enum": [
        "MANUAL",
@@ -5939,7 +5939,6 @@
     "required": [
      "workOrderId",
      "uomId",
-     "resultSourceCode",
      "occurredAt"
     ],
     "description": "다섯 수량의 합이 0 이면 400 이다 — ck_production_result_qty 가 물리적으로도 막는다."

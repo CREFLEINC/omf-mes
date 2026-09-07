@@ -651,7 +651,7 @@
        "type": "string",
        "example": "값"
       },
-      "description": "의뢰번호 검색. ⛔ 범위는 inspection_request_no «하나»다 — 공급사·품목은 훑지 않는다(넓히면 인덱스 없는 다형 조인이 검색어마다 돈다). 공급사로 좁히려면 supplierId 를, 품목은 itemId 를 쓴다. 근거: omf-mes#170 질문 2"
+      "description": "의뢰번호 검색. ⛔ 범위는 inspection_request_no «하나»다 — 공급사·품목은 훑지 않는다(넓히면 인덱스 없는 다형 조인이 검색어마다 돈다). 공급사로 좁히려면 supplierId 를, 품목은 itemId 를 쓴다. 근거: omf-mes#170 질문 2 ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
      },
      {
       "name": "page",
@@ -2143,7 +2143,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "LOT 번호 검색"
+      "description": "LOT 번호 검색 ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
      },
      {
       "name": "transitionFrom",
@@ -2325,7 +2325,7 @@
        "type": "string",
        "example": "값"
       },
-      "description": "LOT 번호 검색"
+      "description": "LOT 번호 검색 ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
      },
      {
       "name": "page",

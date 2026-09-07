@@ -1263,7 +1263,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "취급 단위 번호 검색"
+      "description": "취급 단위 번호 검색 ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
      },
      {
       "name": "page",
@@ -2097,7 +2097,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "입하예정번호·거래명세서번호 검색"
+      "description": "입하예정번호·거래명세서번호 검색 ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
      },
      {
       "name": "page",
@@ -2314,7 +2314,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "문서번호 검색"
+      "description": "문서번호 검색 ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
      },
      {
       "name": "page",
@@ -2520,7 +2520,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "출고번호 검색. ⛔ 발행된 출고 QR 은 라인을 가리키므로 이 축으로는 풀리지 않는다 — goodsIssueLineId 를 쓴다(P-01-02 §5-2)"
+      "description": "출고번호 검색. ⛔ 발행된 출고 QR 은 라인을 가리키므로 이 축으로는 풀리지 않는다 — goodsIssueLineId 를 쓴다(P-01-02 §5-2) ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
      },
      {
       "name": "page",
@@ -3036,7 +3036,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "입고번호 검색"
+      "description": "입고번호 검색 ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
      },
      {
       "name": "page",
@@ -3387,7 +3387,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "입하번호·거래명세서번호 검색"
+      "description": "입하번호·거래명세서번호 검색 ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
      },
      {
       "name": "page",
@@ -3877,7 +3877,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "요청번호 검색"
+      "description": "요청번호 검색 ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
      },
      {
       "name": "page",
@@ -4378,7 +4378,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "발주번호 검색"
+      "description": "발주번호 검색 ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
      },
      {
       "name": "page",
@@ -5941,7 +5941,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "LOT 번호·외부 식별자 검색"
+      "description": "LOT 번호·외부 식별자 검색 ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
      },
      {
       "name": "page",
