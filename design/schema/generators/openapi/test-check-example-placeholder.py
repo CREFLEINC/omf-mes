@@ -172,5 +172,63 @@ class 단수는_그대로_본다(unittest.TestCase):
         self.assertFalse(ep.in_enum({"type": "string"}, "무엇이든"))
 
 
+class GateTest(unittest.TestCase):
+    def test_multiple_dictionary_keys_and_array_examples(self):
+        prop = {"x-code-key": ["CD-EQUIPMENT-TYPE", "CD-INSTRUMENT-TYPE"]}
+        expected = set(ep.dictionary_values()["CD-EQUIPMENT-TYPE"]) | set(ep.dictionary_values()["CD-INSTRUMENT-TYPE"])
+        self.assertEqual(set(ep.known_values(prop)), expected)
+        document = param_doc("statusCodes", ["CONFIRMED"], {
+            "type": "array", "items": {"type": "string"}, "x-code-key": "CD-SHIPMENT-STATUS"})
+        self.assertEqual(ep.check_parameters(document, "fixture.json"), [])
+        document["paths"]["/app/document-issues/summary"]["get"]["parameters"][0]["example"] = ["WRONG"]
+        self.assertTrue(ep.check_parameters(document, "fixture.json"))
+
+    def test_confirmed_state_label_is_not_an_undecided_value(self):
+        prop = {"type": "string", "x-code-key": "CD-SHIPMENT-STATUS",
+                "description": "미확정(UNCONFIRMED)·확정·취소", "example": "UNCONFIRMED"}
+        self.assertIn(prop["example"], ep.known_values(prop))
+
+    def test_real_contracts_have_no_example_violations(self):
+        import glob
+        files = glob.glob(os.path.join(ep.CONTRACTS_DIR, "*.json"))
+        self.assertEqual(len(files), 7)
+        for path in files:
+            with self.subTest(path=path):
+                self.assertEqual(ep.check_one(path), [])
+
+    def test_lot_example_is_preserved_despite_other_numbering_pattern_being_undecided(self):
+        import json
+        path = os.path.join(ep.CONTRACTS_DIR, "logistics-01자재창고.json")
+        with open(path, encoding="utf-8") as stream:
+            prop = json.load(stream)["components"]["schemas"]["LotCreate"]["properties"]["lotNo"]
+        self.assertEqual(len(prop["example"]), 34)
+        self.assertTrue(prop["example"].isdigit())
+        self.assertNotIn("x-no-example", prop)
+        self.assertFalse(any("LotCreate.lotNo" in line for line in ep.check_one(path)))
+
+    def test_cli_rejects_invalid_example_and_accepts_valid_example(self):
+        import json
+        import subprocess
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "contract.json"
+            for example, expected in (("값", 1), ("READY", 0)):
+                with self.subTest(example=example):
+                    doc = {"components": {"schemas": {"Entry": {"properties": {
+                        "statusCode": {"type": "string", "enum": ["READY"], "example": example}
+                    }}}}}
+                    path.write_text(json.dumps(doc), encoding="utf-8")
+                    result = subprocess.run([sys.executable, ep.__file__, str(path)],
+                                            capture_output=True, text=True)
+                    self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
+
+    def test_missing_default_contracts_fails(self):
+        from unittest.mock import patch
+        with patch.object(sys, "argv", [ep.__file__]), patch.object(ep.glob, "glob", return_value=[]):
+            self.assertEqual(ep.main(), 1)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

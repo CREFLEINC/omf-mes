@@ -393,7 +393,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "example": "DRAFT"
       },
       "x-code-key": "CD-PRODUCTION-PLAN-STATUS",
       "description": "생산계획 상태로 거른다 — 작성중(DRAFT) · 확정(CONFIRMED). ⛔ 확정 뒤에는 수정·삭제가 막힌다(400 STATE_LOCKED) — :confirm 이 그 전이를 만든다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PRODUCTION_PLAN_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
@@ -845,7 +845,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "x-no-example": "코드 그룹을 세우지 않는다 — 잠정 뜻 3종 중 둘이 다른 축으로 빠져 남는 것이 하나뿐이다(A-21 · 2026-09-02 판정)."
       },
       "x-no-code-key": "코드 그룹을 세우지 않는다 — 잠정 뜻 3종 중 둘이 다른 축으로 빠져 남는 것이 하나뿐이다(A-21 · 2026-09-02 판정)."
      },
@@ -1049,7 +1049,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "x-no-example": "코드 그룹을 세우지 않는다 — ⛔ 부르는 화면이 0건이고(02 요구서 §5 미착지 5 — 경로가 고아다) 전이 액션도 없다. 구간 형 리소스라 진행은 requestedAt ↔ receivedAt 의 유무로 판정한다 — 작업 세션·LOT 보류가 쓴 그 방식이다(A-21)."
       },
       "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 부르는 화면이 0건이고(02 요구서 §5 미착지 5 — 경로가 고아다) 전이 액션도 없다. 구간 형 리소스라 진행은 requestedAt ↔ receivedAt 의 유무로 판정한다 — 작업 세션·LOT 보류가 쓴 그 방식이다(A-21)."
      },
@@ -1261,7 +1261,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "x-no-example": "코드 그룹을 세우지 않는다 — 계약이 인계·인수를 «한 행위»로 접어 (receivedAt 을 같은 시각에 찍는다) 전이가 0개다. 구간 형 리소스로 handedOverAt ↔ receivedAt 의 유무로 판정한다. ⚠ M-02-01 §8 미결 2 는 그 접기 자체를 열어 두었다 — 축이 갈리면 그때 다시 본다."
       },
       "x-no-code-key": "코드 그룹을 세우지 않는다 — 계약이 인계·인수를 «한 행위»로 접어 (receivedAt 을 같은 시각에 찍는다) 전이가 0개다. 구간 형 리소스로 handedOverAt ↔ receivedAt 의 유무로 판정한다. ⚠ M-02-01 §8 미결 2 는 그 접기 자체를 열어 두었다 — 축이 갈리면 그때 다시 본다."
      },
@@ -2266,7 +2266,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "example": "PLANNED"
       },
       "x-code-key": "CD-WORK-ORDER-STATUS",
       "description": "작업지시 상태로 거른다 — 편성(PLANNED) · 확정(CONFIRMED) · 배포(RELEASED) · 진행(IN_PROGRESS) · 완료(COMPLETED) · 마감(CLOSED) · 중단(SUSPENDED) · 취소(CANCELLED) «8종»(결정 14 · 사용자 확정 2026-09-02). ⛔ 「진행불가」는 상태가 «아니다» — 자원 Validation NG 는 확정 버튼을 막는 게이트이고 W/O 는 편성에 머문다(W-02-04 §5 · W-02-03 §5-3 A-9 3등급). 「재시작」을 상태에서 뺀 것과 같은 논리다(중단→진행 전이 이벤트). ⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 값을 편집하면 안 된다. 상태 전이와 버튼 활성이 이 값에 걸린다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_ORDER_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
@@ -2353,7 +2353,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "example": "NORMAL"
       },
       "x-code-key": "CD-WORK-ORDER-TYPE",
       "description": "작업지시 유형으로 거른다 — NORMAL(양산) · EMERGENCY(긴급) · REWORK(재작업). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_ORDER_TYPE 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⛔ 시스템 소유다 — 고객이 W-06-06 공통코드 마스터에서 이 값을 편집하면 안 된다. 계약 자신이 「이 값으로 갈리는 것이 셋」이라 적어 두었다."
@@ -3603,7 +3603,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "example": "START"
       },
       "x-code-key": "CD-WORK-SESSION-EVENT-TYPE",
       "description": "값 = `START`·`STOP`·`RESUME`·`END`·`CONTROL_OVERRIDE`. 값 목록은 `GET /mdm/code-values?codeGroupCode=WORK_SESSION_EVENT_TYPE` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
@@ -4067,7 +4067,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "x-no-example": "코드 그룹을 세우지 않는다 — 전이 액션이 계약 7벌에 0건이고 축이 품질(⇒ LOT_STATUS 파생)인지 생애인지 안 정해졌다. R69 「불량품 미부착」이라 「불량」 값의 생산자도 없다(A-21)."
       },
       "x-no-code-key": "코드 그룹을 세우지 않는다 — 전이 액션이 계약 7벌에 0건이고 축이 품질(⇒ LOT_STATUS 파생)인지 생애인지 안 정해졌다. R69 「불량품 미부착」이라 「불량」 값의 생산자도 없다(A-21)."
      },
@@ -4346,7 +4346,7 @@
      },
      "consumptionNo": {
       "type": "string",
-      "example": "값"
+      "example": "MC-DEMO-001"
      },
      "workOrderId": {
       "type": "integer",
@@ -4447,9 +4447,9 @@
      },
      "lateEntryReasonCode": {
       "type": "string",
-      "example": "값",
       "x-code-key": "CD-LATE-ENTRY-REASON",
-      "description": "지연 입력 사유 — 실적·투입을 «나중에» 적을 때 왜 늦었는지. ⭐ 「지연 입력이 몇 건이고 왜인가」를 세려면 자유 텍스트가 아니라 코드 축이어야 한다. ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=LATE_ENTRY_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "지연 입력 사유 — 실적·투입을 «나중에» 적을 때 왜 늦었는지. ⭐ 「지연 입력이 몇 건이고 왜인가」를 세려면 자유 텍스트가 아니라 코드 축이어야 한다. ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=LATE_ENTRY_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-no-example": "고객이 운영 중 등록하는 값이며 설계가 정한 예시값은 없다 — 코드 사전 CD-LATE-ENTRY-REASON"
      },
      "workerId": {
       "type": "integer",
@@ -4463,8 +4463,8 @@
      },
      "statusCode": {
       "type": "string",
-      "example": "값",
-      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 이 리소스는 «기록 전용»이다. 이 칸을 움직이는 전이 액션이 계약에 0건이고(GET·POST 뿐), 정정은 상태를 바꾸는 것이 아니라 «새 행»으로 남긴다(corrects…Id 가 원본을 가리킨다). 원본인지 정정본인지는 그 칼럼으로 판정한다(A-21 · L-2-1 · 2026-09-02 판정)."
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 이 리소스는 «기록 전용»이다. 이 칸을 움직이는 전이 액션이 계약에 0건이고(GET·POST 뿐), 정정은 상태를 바꾸는 것이 아니라 «새 행»으로 남긴다(corrects…Id 가 원본을 가리킨다). 원본인지 정정본인지는 그 칼럼으로 판정한다(A-21 · L-2-1 · 2026-09-02 판정).",
+      "x-no-example": "코드 그룹을 세우지 않는다 — ⛔ 이 리소스는 «기록 전용»이다. 이 칸을 움직이는 전이 액션이 계약에 0건이고(GET·POST 뿐), 정정은 상태를 바꾸는 것이 아니라 «새 행»으로 남긴다(corrects…Id 가 원본을 가리킨다). 원본인지 정정본인지는 그 칼럼으로 판정한다(A-21 · L-2-1 · 2026-09-02 판정)."
      },
      "remarks": {
       "type": "string",
@@ -4525,9 +4525,9 @@
       "x-source-column": "consumption_type_code",
       "type": "string",
       "description": "투입 유형이며 물리 컬럼은 production.material_consumption.consumption_type_code 다. 보내지 않으면 서버가 기본 투입 유형으로 기록한다 — 화면이 값을 지어내지 않는다. 값 목록은 아직 확정 전이고, 확정 전에는 이 칸을 보내지 않는다.",
-      "example": "값",
       "x-internal-note": "뜻 목록 세 값 중 「재생재」는 품목 축(mdm.item.mes_category_code = NEW/RECYCLED · 확정 기록 DR-006 2026-08-10 · 재생재 등록 화면 M-01-12)에, 「대체·교체」는 구조 축(replacedConsumptionId + changeReasonCode · 러닝체인지 화면 P-02-11 §5-2)에 이미 자리가 있어 한 칸이 두 축을 겸하려는 상태다. 축을 정합화한 뒤에 문자열을 정한다(공유계약 A-21 — 일부만 채워진 것이 빈 것보다 위험하다). 추적은 P-02-03 §8 미결 8 이 갖는다(공유계약 A-21 — 2026-09-04 omf-mes#378 3회차 표지 교체. 미결 1 은 이미 닫힌 행이다).",
-      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 계약이 스스로 「뜻 목록 3종은 축 정합화 전의 잠정 서술이라 코드값이 아니다」로 무효화했고, 셋 중 둘이 이미 다른 축으로 빠져 남는 것이 「정상」 하나다. 값이 하나뿐인 축은 축이 아니다(A-21 · 2026-09-02 판정)."
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 계약이 스스로 「뜻 목록 3종은 축 정합화 전의 잠정 서술이라 코드값이 아니다」로 무효화했고, 셋 중 둘이 이미 다른 축으로 빠져 남는 것이 「정상」 하나다. 값이 하나뿐인 축은 축이 아니다(A-21 · 2026-09-02 판정).",
+      "x-no-example": "코드 그룹을 세우지 않는다 — ⛔ 계약이 스스로 「뜻 목록 3종은 축 정합화 전의 잠정 서술이라 코드값이 아니다」로 무효화했고, 셋 중 둘이 이미 다른 축으로 빠져 남는 것이 「정상」 하나다. 값이 하나뿐인 축은 축이 아니다(A-21 · 2026-09-02 판정)."
      },
      "actualUseProcessId": {
       "type": "integer",
@@ -4537,9 +4537,9 @@
      },
      "changeReasonCode": {
       "type": "string",
-      "example": "값",
       "x-code-key": "CD-MATERIAL-CHANGE-REASON",
-      "description": "러닝체인지 교체 사유 — 왜 자재를 바꿔 넣었는가. 근거: P-02-11 §5-2. ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=MATERIAL_CHANGE_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "러닝체인지 교체 사유 — 왜 자재를 바꿔 넣었는가. 근거: P-02-11 §5-2. ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=MATERIAL_CHANGE_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-no-example": "고객이 운영 중 등록하는 값이며 설계가 정한 예시값은 없다 — 코드 사전 CD-MATERIAL-CHANGE-REASON"
      },
      "replacedConsumptionId": {
       "type": "integer",
@@ -4574,9 +4574,9 @@
      },
      "lateEntryReasonCode": {
       "type": "string",
-      "example": "값",
       "x-code-key": "CD-LATE-ENTRY-REASON",
-      "description": "지연 입력 사유 — 실적·투입을 «나중에» 적을 때 왜 늦었는지. ⭐ 「지연 입력이 몇 건이고 왜인가」를 세려면 자유 텍스트가 아니라 코드 축이어야 한다. ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=LATE_ENTRY_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "지연 입력 사유 — 실적·투입을 «나중에» 적을 때 왜 늦었는지. ⭐ 「지연 입력이 몇 건이고 왜인가」를 세려면 자유 텍스트가 아니라 코드 축이어야 한다. ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=LATE_ENTRY_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-no-example": "고객이 운영 중 등록하는 값이며 설계가 정한 예시값은 없다 — 코드 사전 CD-LATE-ENTRY-REASON"
      },
      "remarks": {
       "type": "string",
@@ -4603,7 +4603,7 @@
      },
      "materialReturnNo": {
       "type": "string",
-      "example": "값"
+      "example": "MR-DEMO-001"
      },
      "workOrderId": {
       "type": "integer",
@@ -4622,8 +4622,8 @@
      },
      "statusCode": {
       "type": "string",
-      "example": "값",
-      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 부르는 화면이 0건이고(02 요구서 §5 미착지 5 — 경로가 고아다) 전이 액션도 없다. 구간 형 리소스라 진행은 requestedAt ↔ receivedAt 의 유무로 판정한다 — 작업 세션·LOT 보류가 쓴 그 방식이다(A-21)."
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 부르는 화면이 0건이고(02 요구서 §5 미착지 5 — 경로가 고아다) 전이 액션도 없다. 구간 형 리소스라 진행은 requestedAt ↔ receivedAt 의 유무로 판정한다 — 작업 세션·LOT 보류가 쓴 그 방식이다(A-21).",
+      "x-no-example": "코드 그룹을 세우지 않는다 — ⛔ 부르는 화면이 0건이고(02 요구서 §5 미착지 5 — 경로가 고아다) 전이 액션도 없다. 구간 형 리소스라 진행은 requestedAt ↔ receivedAt 의 유무로 판정한다 — 작업 세션·LOT 보류가 쓴 그 방식이다(A-21)."
      },
      "requestedAt": {
       "type": "string",
@@ -4732,7 +4732,7 @@
      },
      "handoverNo": {
       "type": "string",
-      "example": "값"
+      "example": "HO-DEMO-001"
      },
      "fromWorkOrderId": {
       "type": "integer",
@@ -4746,8 +4746,8 @@
      },
      "statusCode": {
       "type": "string",
-      "example": "값",
-      "x-no-code-key": "코드 그룹을 세우지 않는다 — 계약이 인계·인수를 «한 행위»로 접어 (receivedAt 을 같은 시각에 찍는다) 전이가 0개다. 구간 형 리소스로 handedOverAt ↔ receivedAt 의 유무로 판정한다. ⚠ M-02-01 §8 미결 2 는 그 접기 자체를 열어 두었다 — 축이 갈리면 그때 다시 본다."
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 계약이 인계·인수를 «한 행위»로 접어 (receivedAt 을 같은 시각에 찍는다) 전이가 0개다. 구간 형 리소스로 handedOverAt ↔ receivedAt 의 유무로 판정한다. ⚠ M-02-01 §8 미결 2 는 그 접기 자체를 열어 두었다 — 축이 갈리면 그때 다시 본다.",
+      "x-no-example": "코드 그룹을 세우지 않는다 — 계약이 인계·인수를 «한 행위»로 접어 (receivedAt 을 같은 시각에 찍는다) 전이가 0개다. 구간 형 리소스로 handedOverAt ↔ receivedAt 의 유무로 판정한다. ⚠ M-02-01 §8 미결 2 는 그 접기 자체를 열어 두었다 — 축이 갈리면 그때 다시 본다."
      },
      "handedOverAt": {
       "type": "string",
@@ -5250,7 +5250,7 @@
      },
      "productionOrderNo": {
       "type": "string",
-      "example": "값"
+      "example": "PO-DEMO-001"
      },
      "erpOrderNo": {
       "type": "string",
@@ -5472,7 +5472,7 @@
      },
      "planNo": {
       "type": "string",
-      "example": "값"
+      "example": "PLAN-DEMO-001"
      },
      "planDate": {
       "type": "string",
@@ -5668,7 +5668,7 @@
      },
      "productionResultNo": {
       "type": "string",
-      "example": "값"
+      "example": "RESULT-DEMO-001"
      },
      "workOrderId": {
       "type": "integer",
@@ -5742,9 +5742,9 @@
      },
      "lateEntryReasonCode": {
       "type": "string",
-      "example": "값",
       "x-code-key": "CD-LATE-ENTRY-REASON",
-      "description": "지연 입력 사유 — 실적·투입을 «나중에» 적을 때 왜 늦었는지. ⭐ 「지연 입력이 몇 건이고 왜인가」를 세려면 자유 텍스트가 아니라 코드 축이어야 한다. ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=LATE_ENTRY_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "지연 입력 사유 — 실적·투입을 «나중에» 적을 때 왜 늦었는지. ⭐ 「지연 입력이 몇 건이고 왜인가」를 세려면 자유 텍스트가 아니라 코드 축이어야 한다. ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=LATE_ENTRY_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-no-example": "고객이 운영 중 등록하는 값이며 설계가 정한 예시값은 없다 — 코드 사전 CD-LATE-ENTRY-REASON"
      },
      "workerId": {
       "type": "integer",
@@ -5774,8 +5774,8 @@
      },
      "statusCode": {
       "type": "string",
-      "example": "값",
-      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 이 리소스는 «기록 전용»이다. 이 칸을 움직이는 전이 액션이 계약에 0건이고(GET·POST 뿐), 정정은 상태를 바꾸는 것이 아니라 «새 행»으로 남긴다(corrects…Id 가 원본을 가리킨다). 원본인지 정정본인지는 그 칼럼으로 판정한다(A-21 · L-2-1 · 2026-09-02 판정)."
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 이 리소스는 «기록 전용»이다. 이 칸을 움직이는 전이 액션이 계약에 0건이고(GET·POST 뿐), 정정은 상태를 바꾸는 것이 아니라 «새 행»으로 남긴다(corrects…Id 가 원본을 가리킨다). 원본인지 정정본인지는 그 칼럼으로 판정한다(A-21 · L-2-1 · 2026-09-02 판정).",
+      "x-no-example": "코드 그룹을 세우지 않는다 — ⛔ 이 리소스는 «기록 전용»이다. 이 칸을 움직이는 전이 액션이 계약에 0건이고(GET·POST 뿐), 정정은 상태를 바꾸는 것이 아니라 «새 행»으로 남긴다(corrects…Id 가 원본을 가리킨다). 원본인지 정정본인지는 그 칼럼으로 판정한다(A-21 · L-2-1 · 2026-09-02 판정)."
      },
      "remarks": {
       "type": "string",
@@ -5805,9 +5805,9 @@
     "properties": {
      "reasonCode": {
       "type": "string",
-      "example": "값",
       "x-code-key": "CD-PRODUCTION-RESULT-CORRECT-REASON",
-      "description": "실적 정정 사유. ⭐ 「정정이 몇 건이고 왜인가」를 세려면 자유 텍스트가 아니라 코드 축이어야 한다 — 사유 코드 17자리가 이미 같은 형태다(스키마별 전용 그룹 + 고객이 늘림). 값 목록은 GET /mdm/code-values?codeGroupCode=PRODUCTION_RESULT_CORRECT_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "실적 정정 사유. ⭐ 「정정이 몇 건이고 왜인가」를 세려면 자유 텍스트가 아니라 코드 축이어야 한다 — 사유 코드 17자리가 이미 같은 형태다(스키마별 전용 그룹 + 고객이 늘림). 값 목록은 GET /mdm/code-values?codeGroupCode=PRODUCTION_RESULT_CORRECT_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-no-example": "고객이 운영 중 등록하는 값이며 설계가 정한 예시값은 없다 — 코드 사전 CD-PRODUCTION-RESULT-CORRECT-REASON"
      },
      "note": {
       "type": "string",
@@ -5903,9 +5903,9 @@
      },
      "lateEntryReasonCode": {
       "type": "string",
-      "example": "값",
       "x-code-key": "CD-LATE-ENTRY-REASON",
-      "description": "지연 입력 사유 — 실적·투입을 «나중에» 적을 때 왜 늦었는지. ⭐ 「지연 입력이 몇 건이고 왜인가」를 세려면 자유 텍스트가 아니라 코드 축이어야 한다. ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=LATE_ENTRY_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "지연 입력 사유 — 실적·투입을 «나중에» 적을 때 왜 늦었는지. ⭐ 「지연 입력이 몇 건이고 왜인가」를 세려면 자유 텍스트가 아니라 코드 축이어야 한다. ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=LATE_ENTRY_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-no-example": "고객이 운영 중 등록하는 값이며 설계가 정한 예시값은 없다 — 코드 사전 CD-LATE-ENTRY-REASON"
      },
      "equipmentId": {
       "type": "integer",
@@ -6200,7 +6200,7 @@
      },
      "workOrderNo": {
       "type": "string",
-      "example": "값"
+      "example": "WO-DEMO-001"
      },
      "productionPlanId": {
       "type": "integer",
@@ -6583,9 +6583,9 @@
     "properties": {
      "reasonCode": {
       "type": "string",
-      "example": "값",
       "x-code-key": "CD-WORK-ORDER-HOLD-REASON",
-      "description": "작업지시 보류 사유. ⭐ 사유 코드의 선례를 따른다 — 스키마별 전용 그룹 + 고객이 늘림. 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_ORDER_HOLD_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "작업지시 보류 사유. ⭐ 사유 코드의 선례를 따른다 — 스키마별 전용 그룹 + 고객이 늘림. 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_ORDER_HOLD_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-no-example": "고객이 운영 중 등록하는 값이며 설계가 정한 예시값은 없다 — 코드 사전 CD-WORK-ORDER-HOLD-REASON"
      },
      "occurredAt": {
       "type": "string",
@@ -6868,10 +6868,10 @@
      },
      "stopReasonCode": {
       "type": "string",
-      "example": "값",
       "description": "⛔ 쓰지 않는다 — 비운다. 값 목록을 못 정한 것이 아니라 «비우기로 정했다». 근거: 공유계약 A-21 · A-25",
       "x-internal-note": "세션 종료 사유를 요구한 문서가 없다. 요구 원천은 「비가동 및 작업중단 사유 기록」 한 줄인데 그 뜻은 work_session_event.reason_code 가 받는다(논리 모델 §9.7 만 설명이 붙어 있다). 데이터모델 CHANGELOG 144행도 「작업 세션 기반 중지는 work_session_event 로 커버」라 적었다. 세션 종료 화면도 인벤토리에 없어 채울 사람이 없다. 다시 여는 조건 — 세션 종료 화면이 생기고 「왜 닫는가」를 사람에게 묻기로 하면 그때 연다.",
-      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 이 칸을 «쓰지 않는다». 계약 산문이 이미 「값 목록을 못 정한 것이 아니라 «비우기로 정했다»」로 판정했다(공유계약 A-21 · A-25). 중단 사유는 비가동 실적(P-05-02)이 받는다."
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 이 칸을 «쓰지 않는다». 계약 산문이 이미 「값 목록을 못 정한 것이 아니라 «비우기로 정했다»」로 판정했다(공유계약 A-21 · A-25). 중단 사유는 비가동 실적(P-05-02)이 받는다.",
+      "x-no-example": "코드 그룹을 세우지 않는다 — ⛔ 이 칸을 «쓰지 않는다». 계약 산문이 이미 「값 목록을 못 정한 것이 아니라 «비우기로 정했다»」로 판정했다(공유계약 A-21 · A-25). 중단 사유는 비가동 실적(P-05-02)이 받는다."
      },
      "remarks": {
       "type": "string",
@@ -6952,10 +6952,10 @@
      },
      "stopReasonCode": {
       "type": "string",
-      "example": "값",
       "description": "⛔ 쓰지 않는다 — 비운다. 값 목록을 못 정한 것이 아니라 «비우기로 정했다». 근거: 공유계약 A-21 · A-25",
       "x-internal-note": "세션 종료 사유를 요구한 문서가 없다. 요구 원천은 「비가동 및 작업중단 사유 기록」 한 줄인데 그 뜻은 work_session_event.reason_code 가 받는다(논리 모델 §9.7 만 설명이 붙어 있다). 데이터모델 CHANGELOG 144행도 「작업 세션 기반 중지는 work_session_event 로 커버」라 적었다. 세션 종료 화면도 인벤토리에 없어 채울 사람이 없다. 다시 여는 조건 — 세션 종료 화면이 생기고 「왜 닫는가」를 사람에게 묻기로 하면 그때 연다.",
-      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 이 칸을 «쓰지 않는다». 계약 산문이 이미 「값 목록을 못 정한 것이 아니라 «비우기로 정했다»」로 판정했다(공유계약 A-21 · A-25). 중단 사유는 비가동 실적(P-05-02)이 받는다."
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 이 칸을 «쓰지 않는다». 계약 산문이 이미 「값 목록을 못 정한 것이 아니라 «비우기로 정했다»」로 판정했다(공유계약 A-21 · A-25). 중단 사유는 비가동 실적(P-05-02)이 받는다.",
+      "x-no-example": "코드 그룹을 세우지 않는다 — ⛔ 이 칸을 «쓰지 않는다». 계약 산문이 이미 「값 목록을 못 정한 것이 아니라 «비우기로 정했다»」로 판정했다(공유계약 A-21 · A-25). 중단 사유는 비가동 실적(P-05-02)이 받는다."
      }
     },
     "required": [

@@ -11840,7 +11840,7 @@
      },
      "lotNo": {
       "type": "string",
-      "example": "값"
+      "example": "LOT-SAMPLE-0001"
      },
      "itemId": {
       "type": "integer",
@@ -11994,7 +11994,7 @@
      },
      "lotNo": {
       "type": "string",
-      "example": "값"
+      "example": "LOT-SAMPLE-0001"
      },
      "fromStatusCode": {
       "type": [
@@ -12092,7 +12092,7 @@
      },
      "lotNo": {
       "type": "string",
-      "example": "값"
+      "example": "LOT-SAMPLE-0001"
      },
      "fromLifecycleStatusCode": {
       "type": [
