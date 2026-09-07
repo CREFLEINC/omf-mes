@@ -109,7 +109,7 @@ READERS: list[tuple[str, list[str], str]] = [
     ("design/schema/generators/openapi/check-enum-narrowing.py", [],
      "첫 인자는 대조 기준 git ref — 기본 `HEAD`"),
     ("design/schema/generators/openapi/check-example-placeholder.py", [],
-     "⭐ 인자 = 검사할 계약 파일. 없으면 **계약 7벌 전건**(기본 글롭)"),
+     "⭐ 예시값 실패 게이트. 인자 없으면 계약 7벌 전건(기본 글롭)"),
     ("design/schema/generators/openapi/check-lock-token-source.py", [], "인자 없음"),
     ("design/schema/generators/openapi/check-offline-consistency.py", [], "인자 없음"),
     ("design/schema/generators/openapi/check-operation-inventory-drift.py", [], "인자 없음"),

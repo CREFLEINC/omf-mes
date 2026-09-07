@@ -25,8 +25,8 @@
                       G 의 확정값 목록 밖이다
     ④ 자기 스키마 위반 example 이 자기 maxLength·minLength 를 어긴다 ·
                       type 이 string 인데 문자열이 아니다
-    ⑤ 자기모순        description 이 「확정되지 않았다」·「미확정」·「미정」을 적으면서
-                      구체 example 을 든다
+    ⑤ 자기모순        Code/Codes의 description이 미확정 값을 말하면서 구체 example을 든다.
+                      No는 값 목록이 아닌 합성 식별자라 이 규칙을 적용하지 않는다.
 
 통과 조건
 ---------
@@ -47,16 +47,14 @@
   값이다(`omf-mes#191` 코멘트 제안 2번). ③ 으로만 걸린다.
 - **하이픈을 무조건 오류로 보지 않는다** — 하이픈 example 상위는 코드값이 아니라
   식별자다(실측: `PRS-01` 9 · `SL-2026-0001` 5 · `WH-01` 3).
-- **값 목록이 «옳은지»는 안 본다.** 확정 그룹 값표는 아래 상수이고, 그 출처는
-  공유계약 `G-32` 다. 조항이 바뀌면 이 표도 손으로 따라가야 한다.
+- **값 목록이 «옳은지»는 안 본다.** x-code-key가 있으면 코드 사전의 값을 읽는다.
+  키가 없는 기존 자리만 아래 공유계약 G-32 상수표로 대조한다.
 - **그룹 이름이 등록부에 있는지는 안 본다** — `check-code-group-pointer.py` 몫이다.
 
-⛔ 지금은 게이트가 «아니다» — 종료 코드는 언제나 0
---------------------------------------------------
-기준선이 빨갛다. `omf-mes#191` 【A】【B】【C】 반영이 끝나기 전에 게이트로 걸면
-사람이 매번 손으로 넘기게 되고, 그러면 검사기가 신뢰를 잃는다(`omf-mes#212` §4 가
-같은 이유로 짝 스크립트를 미뤘다). **막지 않고 알린다.** 0건이 되면 그때
-`raise SystemExit(1)` 로 올린다.
+게이트 — 위반이 있으면 종료 코드 1
+---------------------------------
+`omf-mes#191`의 잔여 예시 정리와 함께 실패 게이트로 전환했다.
+예시가 다시 잘못 추가되면 통합 검사에서도 실패한다. 정본이 없을 때도 실패한다.
 
 쓰기
 ----
@@ -66,10 +64,12 @@
 from __future__ import annotations
 
 import glob
+import importlib
 import json
 import os
 import re
 import sys
+from functools import lru_cache
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 # Tier 0 — OpenAPI JSON 정본. Phase 5 컷오버(2026-08-25)로 design/wiki/api-contracts/openapi/가 정본 위치다.
@@ -150,6 +150,34 @@ def pointed_group(prop: dict) -> str | None:
     return match.group(1) if match else None
 
 
+@lru_cache(maxsize=1)
+def dictionary_values() -> dict[str, list[str]]:
+    """확정값은 코드 사전 정본의 기존 파서로 읽는다."""
+    dictionary = importlib.import_module("check-code-dictionary")
+    return {entry["key"]: entry["values"]
+            for entry in dictionary.read_dictionary(dictionary.DICT)}
+
+
+def known_values(prop: dict) -> list[str] | tuple[str, ...] | None:
+    """키가 있으면 그 사전을 우선한다. 빈 그룹을 다른 값으로 대체하지 않는다."""
+    key = prop.get("x-code-key")
+    if isinstance(key, str):
+        return dictionary_values().get(key) or None
+    if isinstance(key, list):
+        groups = [dictionary_values().get(value) for value in key]
+        if not groups or any(not group for group in groups):
+            return None
+        return sorted({value for group in groups for value in group})
+    return CONFIRMED_GROUPS.get(pointed_group(prop))
+
+
+def in_known_values(prop: dict, example: object, values: list | tuple) -> bool:
+    """배열 예시는 원소별로, 단수 예시는 값 하나로 비교한다."""
+    if prop.get("type") == "array":
+        return isinstance(example, list) and all(value in values for value in example)
+    return example in values
+
+
 def enum_of(prop: dict) -> list | None:
     """이 자리의 확정 값 목록. 배열이면 items 쪽에 있다.
 
@@ -172,6 +200,61 @@ def in_enum(prop: dict, example: object) -> bool:
         return all(x in values for x in example)
     values = prop.get("enum")
     return isinstance(values, list) and example in values
+
+
+def parameter_examples(parameter: dict) -> list[tuple[str, dict]]:
+    """예시 위치와 적용 스키마를 함께 보존한다. 원소 예시는 배열이 아니다."""
+    schema = parameter.get("schema") or {}
+    items = schema.get("items") or {}
+    examples = []
+    for location, owner, target in (
+        ("example", parameter, schema),
+        ("schema.example", schema, schema),
+        ("schema.items.example", items, items),
+    ):
+        if "example" not in owner:
+            continue
+        merged = dict(target)
+        # 코드 사전 키는 저장소 규약상 파라미터 객체에 있다.
+        for key in ("description", "x-code-key"):
+            if key in parameter:
+                merged[key] = parameter[key]
+            elif key not in merged and key in schema:
+                merged[key] = schema[key]
+        merged["example"] = owner["example"]
+        examples.append((location, merged))
+    return examples
+
+
+def check_parameter_example(prop: dict, where: str) -> list[str]:
+    """자기 enum을 먼저 검사하고, 없을 때만 사전 값으로 비교한다."""
+    if is_exempt(prop):
+        return []
+    example = prop["example"]
+    values = enum_of(prop)
+    if values is not None:
+        if in_enum(prop, example):
+            return []
+        return [
+            "⑥ 자기 enum 밖 — %s : example %r · enum = %s"
+            % (where, example, "·".join(map(str, values)))
+        ]
+    confirmed = known_values(prop)
+    if confirmed:
+        if in_known_values(prop, example, confirmed):
+            return []
+        return [
+            "③ 확정 그룹 밖 — %s : example %r · %s = %s"
+            % (
+                where,
+                example,
+                prop.get("x-code-key") or pointed_group(prop),
+                "·".join(confirmed),
+            )
+        ]
+    if isinstance(example, str) and example in PLACEHOLDER:
+        return ["① 자리채움 상수 — %s : example %r" % (where, example)]
+    return []
 
 
 def check_parameters(doc: dict, name: str) -> list[str]:
@@ -199,42 +282,9 @@ def check_parameters(doc: dict, name: str) -> list[str]:
                 pname = p.get("name") or ""
                 if not pname.endswith(("Code", "Codes", "No")):
                     continue
-                schema = p.get("schema") or {}
-                # ⛔ example 은 «두 자리» 에 올 수 있다 — 파라미터 객체와 그 schema.
-                #    2026-09-02 이전에는 객체쪽만 봤고, 실측하니 객체 3 · schema 43 이었다.
-                #    43자리가 통째로 안 걸렸고 그중 30이 자리채움이었다.
-                #    배열이면 schema.items.example 도 본다.
-                if "example" in p:
-                    example = p["example"]
-                elif "example" in schema:
-                    example = schema["example"]
-                elif "example" in (schema.get("items") or {}):
-                    example = schema["items"]["example"]
-                else:
-                    continue
-                merged = dict(schema)
-                merged["example"] = example
-                if p.get("description"):
-                    merged["description"] = p["description"]
-                if is_exempt(merged):
-                    continue
                 where = "%s · %s %s ?%s" % (name, method.upper(), route, pname)
-                if in_enum(merged, example):
-                    continue
-                group = pointed_group(merged)
-                if group in CONFIRMED_GROUPS:
-                    if example in CONFIRMED_GROUPS[group]:
-                        continue
-                    out.append("③ 확정 그룹 밖 — %s : example %r · %s = %s"
-                               % (where, example, group, "·".join(CONFIRMED_GROUPS[group])))
-                    continue
-                if isinstance(example, str) and example in PLACEHOLDER:
-                    out.append("① 자리채움 상수 — %s : example %r" % (where, example))
-                    continue
-                values = enum_of(merged)
-                if values is not None:
-                    out.append("⑥ 자기 enum 밖 — %s : example %r · enum = %s"
-                               % (where, example, "·".join(map(str, values))))
+                for location, prop in parameter_examples(p):
+                    out.extend(check_parameter_example(prop, where + " · " + location))
     return out
 
 
@@ -311,12 +361,13 @@ def check_one(path: str) -> list[str]:
                 continue
 
             group = pointed_group(prop)
-            if group in CONFIRMED_GROUPS:
-                if example in CONFIRMED_GROUPS[group]:
+            confirmed = known_values(prop)
+            if confirmed:
+                if in_known_values(prop, example, confirmed):
                     continue                   # 가리킨 확정 그룹 안 — 통과
                 findings.append(
                     "③ 확정 그룹 밖 — %s : example %r · %s = %s"
-                    % (where, example, group, "·".join(CONFIRMED_GROUPS[group])))
+                    % (where, example, prop.get("x-code-key") or group, "·".join(confirmed)))
                 continue
 
             # ① 자리채움 상수
@@ -325,7 +376,7 @@ def check_one(path: str) -> list[str]:
                 continue
 
             # ⑤ 자기모순 — 「확정되지 않았다」면서 구체 example 을 든다
-            if any(word in desc for word in UNDECIDED):
+            if prop_name.endswith(("Code", "Codes")) and any(word in desc for word in UNDECIDED):
                 findings.append(
                     "⑤ 자기모순 — %s : description 이 「미확정」을 적는데 example %r"
                     % (where, example))
@@ -359,7 +410,7 @@ def main() -> int:
     targets = sys.argv[1:] or sorted(glob.glob(os.path.join(CONTRACTS_DIR, "*.json")))
     if not targets:
         print("검사할 정본이 없습니다.")
-        return 0
+        return 1
 
     total = 0
     for target in targets:
@@ -378,11 +429,10 @@ def main() -> int:
         print("⚠ 확인이 필요한 자리 %d건 — 확정값이 있으면 그 값으로, 없으면 example 을"
               " 지우고 x-no-example 에 사유를 적습니다(계약 작성 규약 「예시도 계약의"
               " 일부다」)." % total)
-        print("⛔ 이 검사기는 «막지 않는다» — omf-mes#191 반영이 끝나 0건이 되면"
-              " 게이트로 올립니다.")
+        print("⛔ 예시값 위반 — 정정 후 다시 검사하십시오.")
     else:
-        print("✅ 전건 통과 — 게이트로 올릴 수 있습니다(종료 코드 1 로 바꾼다).")
-    return 0          # ⛔ 언제나 0 — 위 「게이트가 아니다」 절을 보라
+        print("✅ 전건 통과.")
+    return 1 if total else 0
 
 
 if __name__ == "__main__":
