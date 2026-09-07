@@ -2899,9 +2899,9 @@
      "expedited": {
       "type": "boolean",
       "default": false,
-      "description": "⭐ 긴급 직행 출하인가(W-04-05) — 창고 경유·피킹·Packing 을 건너뛴다. ⛔ 품질 게이트는 건너뛰지 않는다 — 배분 LOT 이 Release 가 아니면 400 이다(결정 10 · W-04-05 §5-3). ⭐ 참이면 서버가 제품 입고 전표와 입고 전기를 같은 트랜잭션에서 함께 만든다 — 화면이 01 계약을 따로 부르지 않는다. 입고 유형·원천 문서 유형은 서버가 정한다(01 계약 receiptTypeCode·sourceDocumentTypeCode). 입고 유형은 제품입고(PRODUCT)로 확정됐고(2026-08-31 · 공유계약 G-32 등록부 RECEIPT_TYPE), 원천 문서 유형의 값 목록만 아직 확정 전이다(omf-mes#145). 장부상 입고 창고는 본문의 warehouseId 다 — 화면이 고른다(W-04-05 §5-1·§5-4)",
+      "description": "When true, bypasses warehouse routing, picking and packing without bypassing quality checks. Returns HTTP 400 if an allocated lot is not released. The server creates a product goods receipt and posts the receipt in the same transaction; the client does not create a separate goods receipt. The receipt type is PRODUCT, and the server determines the source document type. The receipt warehouse is the client-selected warehouseId in this request.",
       "example": true,
-      "x-internal-note": "receiptTypeCode·sourceDocumentTypeCode 의 값 목록 미확정 — 추적 omf-mes#145·#213. 서버가 정하므로 이 화면은 막히지 않는다."
+      "x-internal-note": "근거: W-04-05 §5-1·§5-3·§5-4 및 §8-4, 결정 10, G-32 RECEIPT_TYPE(2026-08-31 확정). 2026-09-07 정합화 — GoodsReceipt.sourceDocumentTypeCode 및 GoodsReceiptCreate.sourceDocumentTypeCode의 enum 목록(INBOUND_RECEIPT·SHIPMENT·PRODUCTION_RESULT·SUBCONTRACT_ISSUE)은 이미 존재한다. InventoryTransaction.sourceDocumentTypeCode는 수불 원장용의 다른 목록이므로 입고 원천 목록과 혼용하지 않는다. 목록 존재와 긴급직행출하의 실제 원천 ID 선택·연결은 별개이며 후자는 W-04-05 §8-4에서 열어 둔다. 서버가 입고를 생성하는 기존 책임을 유지하며 특정 원천 ID의 자동선택 규칙을 확정하지 않는다. «(정합주: 2026-09-07 — 구 description의 「입고 유형은 제품입고(PRODUCT)로 확정됐고 … 원천 문서 유형의 값 목록만 아직 확정 전이다(omf-mes#145)」 및 구 x-internal-note의 「receiptTypeCode·sourceDocumentTypeCode 의 값 목록 미확정 — 추적 omf-mes#145·#213. 서버가 정하므로 이 화면은 막히지 않는다」는 당시 대기 기록으로 보존한다. 현재 목록 부재 전제만 철회하며 #145·#213 전체 종료를 뜻하지 않는다)»"
      },
      "expediteReason": {
       "type": [
