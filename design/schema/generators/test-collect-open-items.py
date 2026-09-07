@@ -158,6 +158,84 @@ class 살아있다고_적은_행(unittest.TestCase):
         self.assertTrue(coi.resolved("2 ✅ 해소 2026-09-04 — 계약에 자리가 섰다"))
 
 
+class CurrentOpenDeclaration(unittest.TestCase):
+    """현재 행의 미결 선언과 과거·타 대상의 기록을 구별한다."""
+
+    def test_current_declaration_overrides_old_issue_completion(self) -> None:
+        for text in (
+            "옛 표지 #87 은 일괄 종결됐다. ⛔ **미결은 살아 있다** — 계약이 비었다",
+            "⛔ **미결은 살아 있다** — 옛 표지 #87 은 일괄 종결됐다",
+            "미결은 살아 있다. 현재는 ✅ 해소 예정이며 아직 반영하지 않았다.",
+        ):
+            with self.subTest(text=text):
+                self.assertFalse(coi.resolved(text))
+
+    def test_other_contexts_preserve_completion(self) -> None:
+        for text in (
+            "✅ 해소 — 「미결은 살아 있다」는 이전 기록이다",
+            "과거에는 미결은 살아 있다고 기록했다. 현재는 ✅ 해소",
+            "미결은 살아 있다가 아니다. ✅ 해소",
+            "미결은 살아 있지 않다. ✅ 해소",
+            "✅ 해소 — 다른 화면의 미결은 살아 있다",
+            "✅ 해소 — 그 항목은 미결은 살아 있다로 기록했던 과거 건이다",
+            "미결은 살아 있다. 현재는 ✅ 해소 — 계약 반영",
+            "미결은 살아 있다. ✅ 해소 2026-09-07 — 계약에 반영했다.",
+            "미결은 살아 있다. 현재 ✅ 해소됐다 — 계약 반영.",
+            "✅ 해소 — 과거 기록: ⛔ 미결은 살아 있다 — 이 문구는 당시 기록이다.",
+            "✅ 해소 — 다른 화면 상태: ⛔ 미결은 살아 있다 — 그쪽은 별도 추적한다.",
+        ):
+            with self.subTest(text=text):
+                self.assertTrue(coi.resolved(text))
+
+    def test_real_table_rows_from_20260907_stay_open(self) -> None:
+        rows = (
+            "| 1 | ⛔ **긴급 사유를 담을 전용 컬럼이 없다** — 자유 텍스트로 물러난다(§5-5) | 상류↔하류 불일치 | **조정** | **`[docs→데이터모델]` 이슈** — 「기록하라는데 자리가 없다」 · #87 계열 ⭐ **2026-09-04 재판정 — 표지를 `I-41`·`A-11` 로 간다.** ⚠ 옛 표지 `#87` 은 2026-08-25 **닫는 코멘트 없이 일괄 종결**됐고 이 항목(2026-08-07 코멘트 7번)에 대한 회신은 **0건**이다. ⛔ **미결은 살아 있다** — 공유계약 §I 대장 **41** 이 「⛔ 되살리기 잔여 … **남은 것은 `W-04-05` 긴급 직행 출하의 `expediteReason` 하나다**」로 이 자리를 이름으로 지목해 열어 두었다. 계약 실측(2026-09-04): `Shipment.expediteReason`·`ShipmentCreate.expediteReason` 둘 다 `[\"string\",\"null\"]` 자유 텍스트 그대로다. ⭐ **근거가 바뀌었다** — 「전용 컬럼이 없어서 물러났다」는 `A-11` v4.6 이 철회했다. 업무가 「긴급 출하가 몇 건인가」를 세라고 요구하므로 **사유는 코드 축이어야 한다** |",
+            "| 1 | ⛔ **제품 입고의 수량 차이·사유를 담을 자리가 없다** — 반대 방향(`shopfloor_receipt`)에는 있다(§5-4) | 상류↔하류 불일치 | **조정** | **`[docs→데이터모델]` 이슈** — 「기록하라는데 자리가 없다」 패턴 · #87 계열 ⭐ **2026-09-04 재판정 — 표지를 `I-40`·`A-11` 로 간다.** ⚠ 옛 표지 `#87` 은 2026-08-25 에 **닫는 코멘트 없이 일괄 종결**됐고, 이 항목(2026-08-07 코멘트의 6번)에 대한 회신은 **0건**이다 — 그 표지로는 아무도 오지 않는다. ⛔ **미결은 살아 있다** — 공유계약 §I 대장 **40** 이 이 자리를 이름으로 인용하며 열어 두었고, 계약 실측(2026-09-04)도 그대로다: `ShopfloorReceiptLine` 에는 `varianceQty`·`varianceReasonCode` 가 있는데 `GoodsReceiptLine`·`GoodsReceiptLineCreate` 에는 **0건**. ⭐ **근거의 성격이 바뀌었다** — 「저장 자리가 없어서 `remarks` 로 물러났다」는 `A-11` v4.6(2026-08-30 사용자 원칙)이 철회한 물러남이다. 업무가 「수량 차이가 몇 건인가」를 세라고 요구하므로 **사유는 코드 축이어야 한다** — `W-04-05` §8-1 과 같은 **되살리기 잔여**다 |",
+        )
+        for row_text in rows:
+            with self.subTest(row_text=row_text), tempfile.TemporaryDirectory() as directory:
+                path = os.path.join(directory, "W-99-01-시험.md")
+                with open(path, "w", encoding="utf-8") as source:
+                    source.write(
+                        "# W-99-01 시험\n\n## §8. 미결\n\n"
+                        "| # | 항목 | 성격 | 등급 | 처리 |\n"
+                        "| --- | --- | --- | --- | --- |\n" + row_text + "\n"
+                    )
+                row = coi.parse(path)["rows"][0]
+                self.assertFalse(row["done"])
+                self.assertTrue(row["diagnostic"])
+
+    def test_later_completion_at_column_end_takes_precedence(self) -> None:
+        fixture = (
+            "# W-99-01 시험\n\n## §8. 미결\n\n"
+            "| # | 항목 | 성격 | 등급 | 처리 |\n"
+            "| --- | --- | --- | --- | --- |\n"
+            "| 1 | 사유 코드 | 계약 | 조정 | 미결은 살아 있다. 현재 ✅ 해소 |\n"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = os.path.join(directory, "W-99-01-시험.md")
+            with open(path, "w", encoding="utf-8") as source:
+                source.write(fixture)
+            self.assertTrue(coi.parse(path)["rows"][0]["done"])
+
+    def test_fixed_table_fixture_stays_open(self) -> None:
+        fixture = (
+            "# W-99-01 시험용 화면\n\n## §8. 미결\n\n"
+            "| # | 항목 | 성격 | 등급 | 처리 |\n"
+            "| --- | --- | --- | --- | --- |\n"
+            "| 1 | 긴급 사유의 코드 축 | 상류↔하류 불일치 | 조정 | "
+            "옛 표지 #87 은 닫는 코멘트 없이 일괄 종결됐다. "
+            "⛔ **미결은 살아 있다** — 공유계약이 이 자리를 열어 두었다 |\n"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = os.path.join(directory, "W-99-01-시험.md")
+            with open(path, "w", encoding="utf-8") as source:
+                source.write(fixture)
+            row = coi.parse(path)["rows"][0]
+        self.assertFalse(row["done"])
+        self.assertTrue(row["diagnostic"])
+
+
 class 표를_읽어서도_같은가(unittest.TestCase):
     """단위 판정이 맞아도 표를 거쳐 오면 달라질 수 있다 — 끝까지 한 번 태운다."""
 
