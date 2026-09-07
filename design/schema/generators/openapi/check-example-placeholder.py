@@ -202,6 +202,61 @@ def in_enum(prop: dict, example: object) -> bool:
     return isinstance(values, list) and example in values
 
 
+def parameter_examples(parameter: dict) -> list[tuple[str, dict]]:
+    """예시 위치와 적용 스키마를 함께 보존한다. 원소 예시는 배열이 아니다."""
+    schema = parameter.get("schema") or {}
+    items = schema.get("items") or {}
+    examples = []
+    for location, owner, target in (
+        ("example", parameter, schema),
+        ("schema.example", schema, schema),
+        ("schema.items.example", items, items),
+    ):
+        if "example" not in owner:
+            continue
+        merged = dict(target)
+        # 코드 사전 키는 저장소 규약상 파라미터 객체에 있다.
+        for key in ("description", "x-code-key"):
+            if key in parameter:
+                merged[key] = parameter[key]
+            elif key not in merged and key in schema:
+                merged[key] = schema[key]
+        merged["example"] = owner["example"]
+        examples.append((location, merged))
+    return examples
+
+
+def check_parameter_example(prop: dict, where: str) -> list[str]:
+    """자기 enum을 먼저 검사하고, 없을 때만 사전 값으로 비교한다."""
+    if is_exempt(prop):
+        return []
+    example = prop["example"]
+    values = enum_of(prop)
+    if values is not None:
+        if in_enum(prop, example):
+            return []
+        return [
+            "⑥ 자기 enum 밖 — %s : example %r · enum = %s"
+            % (where, example, "·".join(map(str, values)))
+        ]
+    confirmed = known_values(prop)
+    if confirmed:
+        if in_known_values(prop, example, confirmed):
+            return []
+        return [
+            "③ 확정 그룹 밖 — %s : example %r · %s = %s"
+            % (
+                where,
+                example,
+                prop.get("x-code-key") or pointed_group(prop),
+                "·".join(confirmed),
+            )
+        ]
+    if isinstance(example, str) and example in PLACEHOLDER:
+        return ["① 자리채움 상수 — %s : example %r" % (where, example)]
+    return []
+
+
 def check_parameters(doc: dict, name: str) -> list[str]:
     """paths 아래 쿼리·경로 파라미터의 example 을 본다.
 
@@ -227,45 +282,9 @@ def check_parameters(doc: dict, name: str) -> list[str]:
                 pname = p.get("name") or ""
                 if not pname.endswith(("Code", "Codes", "No")):
                     continue
-                schema = p.get("schema") or {}
-                # ⛔ example 은 «두 자리» 에 올 수 있다 — 파라미터 객체와 그 schema.
-                #    2026-09-02 이전에는 객체쪽만 봤고, 실측하니 객체 3 · schema 43 이었다.
-                #    43자리가 통째로 안 걸렸고 그중 30이 자리채움이었다.
-                #    배열이면 schema.items.example 도 본다.
-                if "example" in p:
-                    example = p["example"]
-                elif "example" in schema:
-                    example = schema["example"]
-                elif "example" in (schema.get("items") or {}):
-                    example = schema["items"]["example"]
-                else:
-                    continue
-                merged = dict(schema)
-                merged["example"] = example
-                if p.get("description"):
-                    merged["description"] = p["description"]
-                if "x-code-key" in p:
-                    merged["x-code-key"] = p["x-code-key"]
-                if is_exempt(merged):
-                    continue
                 where = "%s · %s %s ?%s" % (name, method.upper(), route, pname)
-                if in_enum(merged, example):
-                    continue
-                group = pointed_group(merged)
-                confirmed = known_values(merged)
-                if confirmed:
-                    if in_known_values(merged, example, confirmed):
-                        continue
-                    out.append("③ 확정 그룹 밖 — %s : example %r · %s = %s"
-                               % (where, example, merged.get("x-code-key") or group, "·".join(confirmed)))
-                    continue
-                if isinstance(example, str) and example in PLACEHOLDER:
-                    out.append("① 자리채움 상수 — %s : example %r" % (where, example))
-                    continue
-                values = enum_of(merged)
-                if values is not None:
-                    out.append("⑥ 자기 enum 밖 — %s : example %r · enum = %s"
-                               % (where, example, "·".join(map(str, values))))
+                for location, prop in parameter_examples(p):
+                    out.extend(check_parameter_example(prop, where + " · " + location))
     return out
 
 

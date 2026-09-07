@@ -78,6 +78,99 @@ class 쿼리_파라미터를_본다(unittest.TestCase):
         self.assertIn("자리채움 상수", out[0])
 
 
+class ParameterExampleReviewTest(unittest.TestCase):
+    """#471 리뷰: 명시 enum 우선 및 예시 위치별 스키마 적용."""
+
+    def check(self, parameter):
+        doc = {"paths": {"/test": {"get": {"parameters": [parameter]}}}}
+        return ep.check_parameters(doc, "test.json")
+
+    def parameter(self):
+        return {
+            "name": "statusCodes",
+            "in": "query",
+            "x-code-key": "CD-SHIPMENT-STATUS",
+            "schema": {"type": "array", "items": {"type": "string"}},
+        }
+
+    def test_partial_enum_rejects_dictionary_value(self):
+        for location in ("parameter", "schema", "items"):
+            with self.subTest(location=location):
+                parameter = self.parameter()
+                parameter["schema"]["items"]["enum"] = ["CONFIRMED"]
+                owner = {
+                    "parameter": parameter,
+                    "schema": parameter["schema"],
+                    "items": parameter["schema"]["items"],
+                }[location]
+                owner["example"] = (
+                    "UNCONFIRMED" if location == "items" else ["UNCONFIRMED"]
+                )
+                findings = self.check(parameter)
+                self.assertEqual(len(findings), 1)
+                self.assertIn("⑥ 자기 enum 밖", findings[0])
+
+    def test_scalar_partial_enum_rejects_dictionary_value(self):
+        parameter = {
+            "name": "statusCode",
+            "in": "query",
+            "x-code-key": "CD-SHIPMENT-STATUS",
+            "example": "UNCONFIRMED",
+            "schema": {"type": "string", "enum": ["CONFIRMED"]},
+        }
+        self.assertIn("⑥ 자기 enum 밖", self.check(parameter)[0])
+
+    def test_valid_examples_in_all_three_locations(self):
+        for with_enum in (False, True):
+            for location in ("parameter", "schema", "items"):
+                with self.subTest(with_enum=with_enum, location=location):
+                    parameter = self.parameter()
+                    if with_enum:
+                        parameter["schema"]["items"]["enum"] = ["CONFIRMED"]
+                    owner = {
+                        "parameter": parameter,
+                        "schema": parameter["schema"],
+                        "items": parameter["schema"]["items"],
+                    }[location]
+                    owner["example"] = (
+                        "CONFIRMED" if location == "items" else ["CONFIRMED"]
+                    )
+                    self.assertEqual(self.check(parameter), [])
+
+    def test_invalid_dictionary_examples_in_all_three_locations(self):
+        for location in ("parameter", "schema", "items"):
+            parameter = self.parameter()
+            owner = {
+                "parameter": parameter,
+                "schema": parameter["schema"],
+                "items": parameter["schema"]["items"],
+            }[location]
+            owner["example"] = "BAD" if location == "items" else ["BAD"]
+            self.assertIn("③ 확정 그룹 밖", self.check(parameter)[0])
+
+    def test_valid_parent_does_not_hide_invalid_item(self):
+        parameter = self.parameter()
+        parameter["example"] = ["CONFIRMED"]
+        parameter["schema"]["example"] = ["CONFIRMED"]
+        parameter["schema"]["items"]["example"] = "BAD"
+        findings = self.check(parameter)
+        self.assertEqual(len(findings), 1)
+        self.assertIn("schema.items.example", findings[0])
+
+    def test_array_examples_must_be_arrays(self):
+        parameter = self.parameter()
+        parameter["example"] = "CONFIRMED"
+        self.assertIn("③ 확정 그룹 밖", self.check(parameter)[0])
+
+    def test_item_exemption_does_not_exempt_invalid_parent(self):
+        parameter = self.parameter()
+        parameter["example"] = ["BAD"]
+        parameter["schema"]["items"].update({"example": "BAD", "x-no-example": True})
+        findings = self.check(parameter)
+        self.assertEqual(len(findings), 1)
+        self.assertIn("③ 확정 그룹 밖", findings[0])
+
+
 class 복수형_배열을_본다(unittest.TestCase):
     """② 사각지대 — endswith("Code") 가 «Codes» 를 놓쳤다."""
 
