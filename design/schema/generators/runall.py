@@ -48,7 +48,7 @@
 ---------------------------
 - **검사기가 옳은지** — 검사기가 못 보는 자리는 여기서도 안 보인다
 - **시험(`test-*.py`)** — 이것은 검사기 실행기다. 시험은 `test-*.py` 를 직접 돌린다
-- **생성기(`build-*.py`)** — 만드는 것이지 보는 것이 아니다
+- **생성기(`build-*.py`)** — 쓰기 모드는 제외하고 등록된 `--check`만 실행한다
 """
 from __future__ import annotations
 
@@ -75,6 +75,9 @@ READERS: list[tuple[str, list[str], str]] = [
      "인자 없음 = 검사. `--fix` 를 주면 치환하므로 «주지 않는다»"),
     ("design/schema/generators/collect-open-items.py", ["--check"],
      "⭐ `--check` 필수 — 인자 없이 돌리면 미결 대장을 «덮어쓴다»"),
+    ("design/schema/generators/build-progress-ledger.py", ["--check"], "진도대장 최신성"),
+    ("design/schema/generators/build-screen-progress.py", ["--check"], "화면 진도표 최신성"),
+    ("design/schema/generators/build-change-digest.py", ["--check"], "변경 요약 최신성"),
     ("design/schema/generators/count-decisions.py", ["--check"],
      "`--check` 는 문서 머리의 「N행」 표기와 대조한다(없으면 세기만 하고 늘 0)"),
     ("design/schema/generators/verify-contract-citation.py", [], "인자 없음"),
@@ -99,6 +102,8 @@ READERS: list[tuple[str, list[str], str]] = [
     # ── design/schema/generators/openapi/ — 17종. 전부 인자 없이 돈다.
     ("design/schema/generators/openapi/check-code-dictionary.py", [],
      "인자 없음(`--split` 은 형제 갈림만 낸다)"),
+    ("design/schema/generators/openapi/check-status-inventory.py", [],
+     "상태 속성·파라미터의 설명과 분류. enum 부재를 미정으로 세지 않는다"),
     ("design/schema/generators/openapi/check-code-group-pointer.py", [], "인자 없음"),
     ("design/schema/generators/openapi/check-code-group-reachable.py", [], "인자 없음"),
     ("design/schema/generators/openapi/check-code-notation.py", [],
@@ -106,7 +111,7 @@ READERS: list[tuple[str, list[str], str]] = [
     ("design/schema/generators/openapi/check-enum-narrowing.py", [],
      "첫 인자는 대조 기준 git ref — 기본 `HEAD`"),
     ("design/schema/generators/openapi/check-example-placeholder.py", [],
-     "⭐ 인자 = 검사할 계약 파일. 없으면 **계약 7벌 전건**(기본 글롭)"),
+     "⭐ 예시값 실패 게이트. 인자 없으면 계약 7벌 전건(기본 글롭)"),
     ("design/schema/generators/openapi/check-lock-token-source.py", [], "인자 없음"),
     ("design/schema/generators/openapi/check-offline-consistency.py", [], "인자 없음"),
     ("design/schema/generators/openapi/check-operation-inventory-drift.py", [], "인자 없음"),
@@ -153,7 +158,7 @@ EXCLUDED: list[tuple[str, str]] = [
      "⛔ 시점 고착본이라 돌리지 않는다(`design/README.md`). patch-*.py 38개는 계약 정본을 "
      "덮어쓰고, verify-polymorphic-mapping.py 는 사라진 물리 모델 SQL 을 열어 깨져 있다"),
     ("design/schema/generators/build-*.py",
-     "생성기다 — 보는 것이 아니라 만드는 것이라 검사 대상이 아니다"),
+     "쓰기 모드는 제외한다. 진도대장·화면 진도표·변경 요약의 --check는 등록한다"),
     ("**/test-*.py",
      "시험이다 — 검사기를 고친 뒤 직접 돌린다"),
 ]
@@ -173,7 +178,7 @@ def unregistered() -> list[str]:
         for p in sorted(glob.glob(os.path.join(ROOT, pat))):
             rel = os.path.relpath(p, ROOT)
             base = os.path.basename(rel)
-            if base.startswith(("test-", "build-", "runall")):
+            if base.startswith(("test-", "build-", "runall")) or base == "generated_output.py":
                 continue
             if rel not in known:
                 found.append(rel)

@@ -52,6 +52,8 @@ import re
 import subprocess
 import sys
 
+from generated_output import emit
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, "..", "..", "..")
 OUT = os.path.join(ROOT, "design", "wiki", "progress", "변경-요약.md")
@@ -199,17 +201,18 @@ def render(rows: list[dict]) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=None, help="최근 N 회차만")
+    ap.add_argument("--check", action="store_true")
     args = ap.parse_args()
 
     rows = commits(args.limit)
     if not rows:
         print("⛔ 변경 회차가 없다 — git 이력을 못 읽었다")
         return 1
-    with open(OUT, "w", encoding="utf-8") as fh:
-        fh.write(render(rows))
-    print("생성: %s" % os.path.relpath(OUT, os.path.join(HERE, "..", "..", "..")))
+    result = emit(OUT, render(rows), args.check)
+    if not args.check:
+        print("생성: %s" % os.path.relpath(OUT, os.path.join(HERE, "..", "..", "..")))
     print("변경 회차 %d · %s ~ %s" % (len(rows), rows[-1]["date"], rows[0]["date"]))
-    return 0
+    return result
 
 
 if __name__ == "__main__":

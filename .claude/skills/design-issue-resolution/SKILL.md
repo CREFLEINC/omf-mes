@@ -179,7 +179,7 @@ analyst 산출물이 다음을 만족하는지 확인한다(미달이면 재작�
 | ⭐ 조회 표준형 | `openapi/check-query-envelope.py` | 목록·요약 응답이 §L 게이트를 지키는가. **목록에 질의를 더하고 `/summary` 짝을 안 고치면 여기서 터진다**(`L-1-1 ⑶`) |
 | ⭐ 코드그룹 이름 | `openapi/check-code-group-pointer.py` | 등록부에 없는 그룹 이름을 계약이 가리키면 화면이 **빈 목록**을 받는다 |
 | ⭐ 코드그룹 도달 | `openapi/check-code-group-reachable.py` | 계약엔 있는데 요구서 §3 에 없어 **화면이 부를 줄 모르는** 그룹(래칫 — 늘면 ⛔) |
-| 예시값 | `openapi/check-example-placeholder.py` | `example` 이 확정값 밖 — 구현팀이 그 값으로 만든다(`#191`). ⛔ 아직 **막지 않는다**(종료 0) — `#191` 반영이 끝나 0건이 되면 게이트로 올린다 |
+| 예시값 | `openapi/check-example-placeholder.py` | 예시가 확정값 밖이거나 자리채움이면 실패한다(`#191` 정리 후 게이트 전환). |
 | 저장 충돌 토큰 | `openapi/check-lock-token-source.py` | `If-Match` 를 쓰라면서 `ETag` 받을 곳이 없는 자리 |
 | 귀속 사번 | `openapi/check-worker-no.py` | 사번을 받을 곳이 계약에 있는가 |
 | 오프라인 표기 | `openapi/check-offline-consistency.py` | 계약의 오프라인 표기 ↔ 그 오퍼레이션을 부르는 화면의 판정 |
@@ -192,8 +192,8 @@ analyst 산출물이 다음을 만족하는지 확인한다(미달이면 재작�
 그 뒤 해소됐는데 이 표가 안 따라왔다. ⛔ **낡은 기준선은 회귀를 숨긴다** — 「원래 빨강이랬지」로
 넘어가면 내가 낸 빨강을 못 가른다. 이 표가 「떠 있는 값」인 이유가 그것이다)».
 `check-worker-no` 는 초록(2026-09-02 · `omf-mes#350`, ⚠ 3건은 남아 있으나 검사기
-자신이 막지 않는다로 둔 것). `check-example-placeholder` 는 **⚠ 97건·종료 0**(게이트 아님 ·
-`omf-mes#191` 트랙 — 늘지만 않으면 된다). `check-required-change` 는 헤더·질의 파라미터의 `required` 뒤집힘을
+자신이 막지 않는다로 둔 것). `check-example-placeholder`는 `#191` 정리 후 **위반 0건**을 요구한다.
+종전 97건은 과거 기준선이며 더 이상 허용하지 않는다. `check-required-change` 는 헤더·질의 파라미터의 `required` 뒤집힘을
 초록으로 통과시킨다(스키마 필드만 본다) — 그 자리의 등급은 사람이 매긴다.
 
 ⚠ 이 표는 **떠 있는 값이다.** 기준선이 바뀌면 여기 날짜와 커밋을 함께 갱신한다.

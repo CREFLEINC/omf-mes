@@ -533,5 +533,111 @@ class RealArtifactTest(unittest.TestCase):
             self.assertEqual((b, n), ([], []), os.path.basename(f))
 
 
+class Issue452Regression(unittest.TestCase):
+    @staticmethod
+    def body_doc(media, required, prop, role="요청"):
+        schema = {"type": "object", "required": required, "properties": {"plantId": prop}}
+        body = {"content": {media: {"schema": schema}}}
+        operation = {"requestBody": body} if role == "요청" else {"responses": {"200": body}}
+        return {"paths": {"/upload": {"post": operation}}}
+
+    def test_inline_required_both_directions(self):
+        for media in ("application/json", "multipart/form-data"):
+            for role in ("요청", "응답"):
+                with self.subTest(media=media, role=role):
+                    old = self.body_doc(media, [], {"type": "string"}, role)
+                    new = self.body_doc(media, ["plantId"], {"type": "string"}, role)
+                    self.assertEqual(bool(crc.compare_fields("x", old, new)[0]), role == "요청")
+                    self.assertEqual(bool(crc.compare_fields("x", new, old)[0]), role == "응답")
+
+    def test_nullable_both_directions(self):
+        for role in ("요청", "응답"):
+            old = self.body_doc("application/json", [], {"type": "string"}, role)
+            new = self.body_doc("application/json", [], {"type": ["string", "null"]}, role)
+            self.assertEqual(bool(crc.compare_fields("x", old, new)[0]), role == "응답")
+            self.assertEqual(bool(crc.compare_fields("x", new, old)[0]), role == "요청")
+
+    def test_enum_excludes_null_but_generated_type_changes(self):
+        old = self.body_doc("application/json", [], {"type": ["string", "null"], "enum": ["A"]})
+        new = self.body_doc("application/json", [], {"type": "string", "enum": ["A"]})
+        blocking, notice, _ = crc.compare_fields("x", old, new)
+        self.assertEqual(blocking, [])
+        self.assertEqual(len(notice), 1)
+        self.assertIn("생성 타입", notice[0])
+
+    def test_shared_request_response_narrowing(self):
+        paths = {"/x": op("requestBody", "A"), "/y": op("responses", "A")}
+        old = doc(paths, A={"properties": {"x": {"type": ["string", "null"]}}})
+        new = doc(paths, A={"properties": {"x": {"type": "string"}}})
+        self.assertIn("요청·응답", crc.compare_fields("x", old, new)[0][0])
+
+    def test_new_operation_is_not_a_breaking_change(self):
+        new = self.body_doc("application/json", ["plantId"], {"type": "string"})
+        self.assertEqual(crc.compare_fields("x", {"paths": {}}, new)[0], [])
+
+    def test_ref_to_equivalent_inline_is_not_nullable_narrowing(self):
+        paths = {"/x": op("requestBody", "A")}
+        old = doc(paths, A={"properties": {"x": {"$ref": "#/components/schemas/Code"}}},
+                  Code={"type": "string"})
+        new = doc(paths, A={"properties": {"x": {"type": "string"}}},
+                  Code={"type": "string"})
+        self.assertEqual(crc.compare_fields("x", old, new)[:2], ([], []))
+
+    def test_required_field_added_to_existing_empty_body(self):
+        old = self.body_doc("multipart/form-data", [], {"type": "string"})
+        old["paths"]["/upload"]["post"]["requestBody"]["content"]["multipart/form-data"]["schema"]["properties"] = {}
+        new = self.body_doc("multipart/form-data", ["plantId"], {"type": "string"})
+        self.assertTrue(crc.compare_fields("x", old, new)[0])
+
+    def test_array_element_null_changes_in_both_directions(self):
+        for kind in ("string", "object"):
+            for role in ("요청", "응답"):
+                with self.subTest(kind=kind, role=role):
+                    old = self.body_doc("application/json", [], {
+                        "type": "array", "items": {"type": kind}}, role)
+                    new = self.body_doc("application/json", [], {
+                        "type": "array", "items": {"type": [kind, "null"]}}, role)
+                    expanded = crc.compare_fields("x", old, new)
+                    narrowed = crc.compare_fields("x", new, old)
+                    self.assertEqual(bool(expanded[0]), role == "응답")
+                    self.assertEqual(bool(narrowed[0]), role == "요청")
+                    self.assertTrue(any("[]" in line for line in expanded[0] + expanded[1]))
+                    self.assertFalse(any("required" in line for line in expanded[0] + expanded[1]))
+
+    def test_unchanged_ref_to_changed_composition_is_diagnosed(self):
+        for chain in (False, True):
+            with self.subTest(chain=chain):
+                paths = {"/x": op("requestBody", "A")}
+                shared = {"A": {"properties": {"x": {"$ref": "#/components/schemas/Value"}}}}
+                target = "Value"
+                if chain:
+                    shared["Value"] = {"$ref": "#/components/schemas/Inner"}
+                    target = "Inner"
+                old = doc(paths, **shared, **{target: {"anyOf": [{"type": "string"}, {"type": "null"}]}})
+                new = doc(paths, **shared, **{target: {"anyOf": [{"type": "string"}]}})
+                self.assertTrue(any("수동 확인" in line for line in crc.compare_fields("x", old, new)[1]))
+                self.assertEqual(crc.compare_fields("x", old, old)[:2], ([], []))
+
+    def test_recursive_ref_snapshot_terminates_and_ignores_unrelated_changes(self):
+        paths = {"/x": op("requestBody", "A")}
+        shared = {"A": {"properties": {"x": {"$ref": "#/components/schemas/Value"}}},
+                  "Value": {"anyOf": [{"$ref": "#/components/schemas/Value"}, {"type": "null"}]}}
+        old = doc(paths, **shared, Unused={"type": "string"})
+        new = doc(paths, **shared, Unused={"type": "integer"})
+        self.assertEqual(crc.compare_fields("x", old, new)[:2], ([], []))
+        new["components"]["schemas"]["Value"] = {"anyOf": [{"$ref": "#/components/schemas/Value"}]}
+        self.assertTrue(crc.compare_fields("x", old, new)[1])
+
+    def test_array_object_property_required_is_still_compared(self):
+        old = self.body_doc("application/json", [], {"type": "array", "items": {
+            "type": "object", "properties": {"name": {"type": "string"}}}})
+        new = self.body_doc("application/json", [], {"type": "array", "items": {
+            "type": "object", "required": ["name"], "properties": {"name": {"type": "string"}}}})
+        blocking, _, _ = crc.compare_fields("x", old, new)
+        self.assertEqual(len(blocking), 1)
+        self.assertIn("[].name", blocking[0])
+
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
