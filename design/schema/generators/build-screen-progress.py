@@ -55,6 +55,8 @@ import re
 import sys
 from collections import Counter
 
+from generated_output import emit
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, "..", "..", ".."))
 OUT = os.path.join(ROOT, "design", "wiki", "progress", "화면-진도표.md")
@@ -206,10 +208,9 @@ def render(rows, gaps, gone) -> str:
     return "\n".join(lines)
 
 
-def main() -> int:
+def generate() -> str:
     # ⛔ `--no-remote`·`--stamp` 는 없앴다(2026-09-03) — 상대 저장소를 조회하던 통지
     #    열이 사라져 「조회 시점」이라는 것이 없다. 이 표는 로컬 정본만 읽는다.
-    argparse.ArgumentParser(add_help=True).parse_args()
 
     names = screens_with_names()
     specs, gone = spec_paths()
@@ -226,11 +227,13 @@ def main() -> int:
         if not d:
             gaps["요구서"].append(sid)
 
-    io.open(OUT, "w", encoding="utf-8").write(render(rows, gaps, gone))
-    print("생성: %s" % os.path.relpath(OUT, ROOT))
-    print("화면 %d (폐지 스펙 제외 %d) · 스펙 없음 %d · 요구서 없음 %d" % (
-        len(rows), len(gone), len(gaps["스펙"]), len(gaps["요구서"])))
-    return 0
+    return render(rows, gaps, gone)
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--check", action="store_true")
+    return emit(OUT, generate(), ap.parse_args().check)
 
 
 if __name__ == "__main__":

@@ -495,5 +495,33 @@ class 조항과_절번호(unittest.TestCase):
         self.assertEqual(self._조항("A-10·B-3 둘 다"), ["A-10", "B-3"])
 
 
+class Issue452Regression(unittest.TestCase):
+    def test_negation_and_code_gloss_stay_open(self):
+        for text in ("조정 — 해소가 아니다", "종결이 아니다",
+                     "`INVESTIGATION_CLEARED`(조사 종결) 조정",
+                     "조정 — 「✅ 해소」는 다른 화면의 판정"):
+            with self.subTest(text=text):
+                self.assertFalse(coi.resolved(text))
+
+    def test_decision_column_controls_resolution(self):
+        self.assertFalse(coi.resolved("항목의 자동 종결 규칙 미정", "조정"))
+        self.assertTrue(coi.resolved("조정 ✅ 해소 — 계약 반영", "조정 ✅ 해소 — 계약 반영"))
+
+    def test_korean_particles_preserve_marker_types(self):
+        self.assertEqual(coi.tag_e_codes("추적 기준은 D-4·E-3·E-4다"), ["E-3", "E-4"])
+        self.assertEqual(coi.tag_e_codes("예외 E-4는 남는다"), [])
+        self.assertEqual(coi.tag_e_codes("회신 E-4가 답한다"), ["회신 E-4"])
+        self.assertEqual(coi.tag_e_codes("E-400 X-E-4 E-4suffix"), [])
+
+    def test_explicit_item_completion_and_partial_completion(self):
+        for text in ("✅ **해소(2026-09-02)** — 경로 확정",
+                     "부품 구분 ✅ **해소 2026-08-28**",
+                     "~~미확정~~ ✅ **받는 법 확정 2026-09-01**"):
+            self.assertTrue(coi.item_completion(text))
+        for text in ("~~판정~~ ✅ 해소 2026-08-07 / 불량코드 값 목록",
+                     "다른 화면 §8 해소 — 잔여 있음", "자동 종결 규칙 미정"):
+            self.assertFalse(coi.item_completion(text))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
