@@ -124,6 +124,7 @@ BLOCKING = [
     #    발행 전 자기검토 문구를 단 채 공개 저장소로 나갔다.
     ('내부 에이전트·스킬 이름',
      re.compile(r'design-review-analyst|design-doc-writer|design-review-intake'
+                r'|design-request-triage'
                 r'|uiux-client-handoff|team-issue-protocol'
                 r'|design-change-notice|design-request-intake'),
      '우리 하네스의 내부 이름이다. 받는 쪽에게 뜻이 없고 내부 절차를 드러낸다 — 지운다'),
