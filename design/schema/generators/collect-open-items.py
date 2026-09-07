@@ -285,6 +285,25 @@ STAYS_OPEN = re.compile(r"좁힘|표지 교체|표지만 교체|답이 없다|�
 #    「Routing 축은 스냅샷으로 종결 — BOM 축 잔여」를 처리 열에 적었더니
 #    그 행(BOM 축이 미결인 행)이 통째로 해소로 넘어갔다.
 QUOTED = re.compile(r"「[^」]*」")
+NEGATED_COMPLETION = re.compile(r"(?:해소|종결)(?:가|이|는)?\s*아니")
+
+
+def completion_negated(whole: str, decision: str) -> bool:
+    """직접 부정은 우선한다. 타 대상일 수 있는 부정은 명시 완료를 취소하지 않는다."""
+    clean = QUOTED.sub(" ", whole).replace("**", "")
+    if not NEGATED_COMPLETION.search(clean):
+        return False
+    explicit = re.compile(r"✅\s*(?:해소|종결)")
+    if not explicit.search(decision.replace("**", "")):
+        return True
+    for clause in re.split(r"(?<=[.!?])\s+|[—;\n]", clean):
+        if not NEGATED_COMPLETION.search(clause):
+            continue
+        # 완료 선언 자체를 부정하거나 현재 행을 지목하면 열린 상태를 유지한다.
+        if (explicit.search(clause)
+                or re.match(r"\s*(?:해소|종결|이\s*(?:행|항목|미결)|하지만|그러나)", clause)):
+            return True
+    return False
 
 
 def resolved(whole: str, decision: str | None = None) -> bool:
@@ -300,7 +319,7 @@ def resolved(whole: str, decision: str | None = None) -> bool:
     if STAYS_OPEN.search(QUOTED.sub(" ", whole)):
         return False                    # ③ 살아 있다고 «적은» 행 — 「해소」가 같이 있어도
     return (bool(DONE.search(body)) and not NOT_DONE.search(whole)
-            and not re.search(r"(?:해소|종결)(?:가|이|는)?\s*아니", whole))
+            and not completion_negated(whole, body))
 
 
 def cells(line: str) -> list[str]:
@@ -443,7 +462,7 @@ def parse(path: str) -> dict | None:
             "grade": grade, "handling": handling, "marks": marks,
             "done": done,
             "diagnostic": bool(DONE.search(whole)) and (
-                not done or "조정" in grade),
+                not done or "조정" in grade or bool(NEGATED_COMPLETION.search(whole))),
         })
 
     declared = None

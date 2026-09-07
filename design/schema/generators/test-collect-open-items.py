@@ -496,6 +496,17 @@ class 조항과_절번호(unittest.TestCase):
 
 
 class Issue452Regression(unittest.TestCase):
+    def test_completed_row_with_other_issue_negation(self):
+        import glob
+        path = glob.glob(os.path.join(coi.ROOT, "design/wiki/screens/02/W-02-06-*.md"))[0]
+        row = next(row for row in coi.parse(path)["rows"] if row["no"] == "신설 6")
+        self.assertTrue(row["done"])
+        self.assertTrue(row["diagnostic"])
+
+    def test_direct_negation_still_overrides_completion(self):
+        self.assertFalse(coi.resolved("✅ 해소 — 해소가 아니다"))
+        self.assertFalse(coi.resolved("✅ 해소. 하지만 이 행의 해소가 아니다"))
+
     def test_negation_and_code_gloss_stay_open(self):
         for text in ("조정 — 해소가 아니다", "종결이 아니다",
                      "`INVESTIGATION_CLEARED`(조사 종결) 조정",

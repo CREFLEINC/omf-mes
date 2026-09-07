@@ -397,7 +397,11 @@ def field_inventory(doc: dict, objects: set[str] | None = None) -> dict[str, tup
             out[key] = ({**prop, "field_required": name in required}, role)
             walk(prop, key, role)
         if isinstance(schema.get("items"), dict):
-            walk(schema["items"], prefix + "[]", role)
+            key = prefix + "[]"
+            # 원소의 null 허용은 배열 필드 자체와 독립이다.
+            # 원소에는 객체 속성의 required 여부를 부여하지 않는다.
+            out[key] = ({**schema["items"], "field_required": None}, role)
+            walk(schema["items"], key, role)
 
     for name, schema in (doc.get("components", {}).get("schemas") or {}).items():
         walk(schema, name, role_of(name, table))
@@ -446,6 +450,34 @@ def null_state(prop: dict, doc: dict | None = None,
     return bool(typed), bool(allowed)
 
 
+def reference_snapshot(prop: dict, doc: dict) -> str:
+    """필드와 도달 가능한 참조 정의를 비교한다. 순환 참조도 한 번만 방문한다."""
+    targets: dict[str, object] = {}
+
+    def visit(node: object) -> None:
+        if isinstance(node, list):
+            for child in node:
+                visit(child)
+        elif isinstance(node, dict):
+            ref = node.get("$ref")
+            if isinstance(ref, str) and ref not in targets:
+                targets[ref] = None
+                if ref.startswith("#/"):
+                    target = doc
+                    for part in ref[2:].split("/"):
+                        if not isinstance(target, dict):
+                            target = None
+                            break
+                        target = target.get(part.replace("~1", "/").replace("~0", "~"))
+                    targets[ref] = target
+                    visit(target)
+            for child in node.values():
+                visit(child)
+
+    visit(prop)
+    return json.dumps({"field": prop, "targets": targets}, sort_keys=True)
+
+
 def compare_fields(fname: str, old_doc: dict, new_doc: dict) -> tuple[list, list, int]:
     """필수 여부와 null 확대·축소를 요청/응답 방향별로 진단한다."""
     old_parents: set[str] = set()
@@ -463,7 +495,8 @@ def compare_fields(fname: str, old_doc: dict, new_doc: dict) -> tuple[list, list
         if old_role != role:
             role = "요청·응답" if "미상" not in (old_role, role) else "미상"
         head = f"{fname} · {key} [{role}] — "
-        if was["field_required"] != now["field_required"]:
+        if (was["field_required"] is not None and now["field_required"] is not None
+                and was["field_required"] != now["field_required"]):
             added = now["field_required"]
             breaking = role != ("응답" if added else "요청")
             (blocking if breaking else notice).append(
@@ -475,7 +508,8 @@ def compare_fields(fname: str, old_doc: dict, new_doc: dict) -> tuple[list, list
             (blocking if breaking else notice).append(
                 head + ("값이 null 로 올 수 있게 됐다" if new_null
                         else "null 허용이 제거됐다"))
-        elif (old_null is None or new_null is None) and was != now:
+        elif ((old_null is None or new_null is None)
+              and reference_snapshot(was, old_doc) != reference_snapshot(now, new_doc)):
             notice.append(head + "null 유효성 판정 불가 — 참조·합성 스키마 수동 확인")
         if old_type != new_type:
             notice.append(head + "생성 타입의 null 표기 변경 "
