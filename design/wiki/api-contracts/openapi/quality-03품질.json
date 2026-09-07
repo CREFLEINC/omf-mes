@@ -1462,7 +1462,7 @@
      "quality"
     ],
     "summary": "검사 판정 확정",
-    "description": "작성중 → 확정. ⭐ 이 순간 Lot Status 가 전이한다 — 합격이면 정상, 불합격이면 불량, 보류면 검사 대기다. 독립된 상태 전이 경로를 두지 않는다(결정 10 「상태 이중 보유 없음」 · 공유계약 B-8). ⛔ accepted + rejected + held = inspected 가 아니면 400 이다(A-3). 근거: W-01-01 §5-2 · P-02-13 §5-3 ⭐ PQC 샘플 검사에서 불합격 수가 공정별 합격판정개수를 넘으면 서버가 «같은 W/O 의 생산LOT 전체»를 INSPECTION_PENDING(검사 대기)으로 일괄 전이하고 관리자 알람을 낸다 — 화면이 부르는 추가 액션은 없다(도식 C14 · 05 §5 S2 태스크 4 ✓확정 2026-07-15). 기준값은 06 계약 GET /quality/inspection-plan-versions/{inspectionPlanVersionId} 가 갖는다.",
+    "description": "작성중 → 확정. ⭐ 이 순간 Lot Status 가 전이한다 — 합격이면 정상, 불합격이면 불량, 보류면 검사 대기다. 독립된 상태 전이 경로를 두지 않는다(결정 10 「상태 이중 보유 없음」 · 공유계약 B-8). ⛔ accepted + rejected + held = inspected 가 아니면 400 이다(A-3). 근거: W-01-01 §5-2 · P-02-13 §5-3 ⭐ PQC 샘플 검사에서 불합격 수가 공정별 합격판정개수를 넘으면 서버가 «같은 W/O 의 생산LOT 전체»를 INSPECTION_PENDING(검사 대기)으로 일괄 전이하고 관리자 알람을 낸다 — 화면이 부르는 추가 액션은 없다(도식 C14 · 05 §5 S2 태스크 4 ✓확정 2026-07-15). 기준값은 06 계약 GET /quality/inspection-plan-versions/{inspectionPlanVersionId} 가 갖는다. ⭐ 종합 판정이 합격이면 서버가 «등록 시 스스로 건 입하 보류»를 이 확정 한 번에 함께 푼다 — 보류 행의 해제자·해제 시각을 채운다. 화면이 부르는 추가 액션은 없다(공유계약 B-8-1 — 후속을 한 요청에 넣을지를 정하는 조항이다). 이 오퍼레이션의 요청 본문(InspectionResultConfirm)에는 해제 사유 칸이 없다 — 화면은 사유를 보내지 않는다. ⚠ 그러면 해제 «사건»(LotHoldEvent.releaseReasonCode)에 무엇이 실리는지는 **확정되지 않았다** — 값을 지어내지 마라. 사람이 건 보류를 푸는 POST /quality/lot-holds/{lotHoldId}:release 는 releaseReasonCode 를 필수로 받고, 같은 모양의 POST /logistics/stock-reinstatements 도 그렇다 — 이 자리만 사유 없이 푸는 것이 옳은지가 함께 확정되지 않았다. ⛔ 불합격은 보류를 풀지 않는다 — Hold 를 유지하고 반품으로 간다(W-01-01 §2). 보류(HELD) 판정일 때의 처리는 화면 스펙이 아직 말하지 않는다. 근거: W-01-01 §5 · §2 · 요구서 03 §3 · 공유계약 B-8-1",
     "parameters": [
      {
       "name": "inspectionResultId",
@@ -1543,7 +1543,7 @@
       }
      }
     },
-    "x-internal-note": "관리웹·온라인 전용이다 — 오프라인 큐는 서버가 만든 inspectionResultId 를 모르므로 이 경로를 부를 수 없다. 큐는 POST /quality/inspection-results 에 statusCode=확정 으로 보낸다(03 계약 3단계 §3)."
+    "x-internal-note": "관리웹·온라인 전용이다 — 오프라인 큐는 서버가 만든 inspectionResultId 를 모르므로 이 경로를 부를 수 없다. 큐는 POST /quality/inspection-results 에 statusCode=확정 으로 보낸다(03 계약 3단계 §3). ⚠ 자동 해제의 사유 값이 미결이다 — LOT_HOLD_RELEASE_REASON 초기 시드 네 값(RETEST_PASS·RETEST_FAIL·INVESTIGATION_CLEARED·MANAGER_OVERRIDE) 중 「IQC 최초 합격」에 해당하는 것이 없다. 형제 선례 둘은 사유를 required 로 받는다(LotHoldRelease · StockReinstatementCreate). 판정은 W-01-01 §8 미결 8 이 갖는다 — omf-mes#451 재실측에서 드러났다. ⛔ 초안은 「이 해제에는 사유 코드를 요구하지 않는다」로 규범을 지어냈고 리뷰가 반증했다 — 인용한 근거(W-01-01 §5 · 요구서 03 §3) 어디에도 없는 말이었다."
    }
   },
   "/quality/lot-hold-events": {
