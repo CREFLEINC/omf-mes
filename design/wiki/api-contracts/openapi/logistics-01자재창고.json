@@ -599,7 +599,8 @@
        ],
        "example": "AVAILABLE"
       },
-      "x-code-key": "CD-FROM-INVENTORY-STATUS"
+      "x-code-key": "CD-FROM-INVENTORY-STATUS",
+      "description": "재고 상태로 조회한다 — AVAILABLE(가용), BLOCKED(차단), IN_TRANSIT(이동중), ON_HOLD(보류)."
      },
      {
       "name": "ownershipTypeCode",
@@ -1236,7 +1237,8 @@
       "schema": {
        "type": "string"
       },
-      "x-no-code-key": "코드 그룹을 세우지 않는다 — 이 리소스는 «전표»가 아니라 «물건»(팔레트·박스 같은 담는 그릇)이다. ⛔ 2026-09-02 이전에는 이 자리에 「전표의 진행 상태」라는 «남의 설명»이 복사돼 있었다. 담긴 것의 진행은 :pack · /contents · /repack-events 가 이미 담고, 라벨 발행 여부는 boolean 축이면 충분하다(InboundReceiptLine.labelIssued 선례). ⚠ P-02-08 §8-4 가 「포장 해체 화면이 없다」고 적어 뒤쪽 값이 업무에 없다 — 해체 업무가 서면 그때 세운다(A-21 · 사용자 결정 2026-09-02)."
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 이 리소스는 «전표»가 아니라 «물건»(팔레트·박스 같은 담는 그릇)이다. ⛔ 2026-09-02 이전에는 이 자리에 「전표의 진행 상태」라는 «남의 설명»이 복사돼 있었다. 담긴 것의 진행은 :pack · /contents · /repack-events 가 이미 담고, 라벨 발행 여부는 boolean 축이면 충분하다(InboundReceiptLine.labelIssued 선례). ⚠ P-02-08 §8-4 가 「포장 해체 화면이 없다」고 적어 뒤쪽 값이 업무에 없다 — 해체 업무가 서면 그때 세운다(A-21 · 사용자 결정 2026-09-02).",
+      "description": "독립 상태 코드를 사용하는 조회 조건이 아니다. 포장 단위의 독립 상태 코드는 사용하지 않는다. 포장 내용과 재구성 이력으로 진행을 확인한다."
      },
      {
       "name": "q",
@@ -1705,7 +1707,8 @@
       "schema": {
        "type": "string"
       },
-      "x-no-code-key": "코드 그룹을 세우지 않는다 — 예약의 유효·소진은 수량 축이 담고 이 칸을 움직이는 오퍼레이션이 없다(A-21)."
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 예약의 유효·소진은 수량 축이 담고 이 칸을 움직이는 오퍼레이션이 없다(A-21).",
+      "description": "독립 상태 코드를 사용하는 조회 조건이 아니다. 독립 상태 코드를 사용하지 않는다. 예약의 유효·소진은 예약 수량으로 판단한다."
      },
      {
       "name": "openOnly",
@@ -2005,7 +2008,8 @@
       "schema": {
        "type": "string"
       },
-      "x-no-code-key": "코드 그룹을 세우지 않는다 — 진행은 파생으로 나오고 이 칸을 «올릴» 주체가 없다. ASN 은 ERP 수신본이라 경로가 GET 셋뿐이고(등록·수정·삭제 없음) 소비 화면은 W-01-09 조회 하나다. 예정 대비 실입하는 AsnLine.expectedQty ↔ receivedQty 로 서버가 계산한다 — InventoryCountLine 이 라인 진행을 counted 로 두고 「이 필드로 하지 않는다」고 한 것과 같은 형태다(사용자 결정 2026-09-02). ⚠ ERP 가 ASN 을 안 보내면 W-01-09 는 빈다 — 입하는 P/O 기준으로 그대로 돈다."
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 진행은 파생으로 나오고 이 칸을 «올릴» 주체가 없다. ASN 은 ERP 수신본이라 경로가 GET 셋뿐이고(등록·수정·삭제 없음) 소비 화면은 W-01-09 조회 하나다. 예정 대비 실입하는 AsnLine.expectedQty ↔ receivedQty 로 서버가 계산한다 — InventoryCountLine 이 라인 진행을 counted 로 두고 「이 필드로 하지 않는다」고 한 것과 같은 형태다(사용자 결정 2026-09-02). ⚠ ERP 가 ASN 을 안 보내면 W-01-09 는 빈다 — 입하는 P/O 기준으로 그대로 돈다.",
+      "description": "독립 상태 코드를 사용하는 조회 조건이 아니다. 독립 상태 코드를 사용하지 않는 입하 예정 수신본이다. 예정 대비 실입하 진행은 라인의 expectedQty와 receivedQty로 확인한다."
      },
      {
       "name": "itemId",
@@ -7010,7 +7014,7 @@
       "x-source-column": "status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "전표의 진행 상태. 확정된 값 목록이 아직 없으므로 화면은 서버가 내려주는 값을 그대로 표시하고 값 자체로 분기하지 않는다. 근거: 공유계약 G-2",
+      "description": "독립 상태 코드를 사용하지 않는 입하 예정 수신본이다. 예정 대비 실입하 진행은 라인의 expectedQty와 receivedQty로 확인한다.",
       "x-no-example": true,
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-no-code-key": "코드 그룹을 세우지 않는다 — 진행은 파생으로 나오고 이 칸을 «올릴» 주체가 없다. ASN 은 ERP 수신본이라 경로가 GET 셋뿐이고(등록·수정·삭제 없음) 소비 화면은 W-01-09 조회 하나다. 예정 대비 실입하는 AsnLine.expectedQty ↔ receivedQty 로 서버가 계산한다 — InventoryCountLine 이 라인 진행을 counted 로 두고 「이 필드로 하지 않는다」고 한 것과 같은 형태다(사용자 결정 2026-09-02). ⚠ ERP 가 ASN 을 안 보내면 W-01-09 는 빈다 — 입하는 P/O 기준으로 그대로 돈다."
@@ -8316,7 +8320,7 @@
       "x-source-column": "quality_status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "품질 상태. 정상 · 불량 · 검사 대기 · 폐기 네 가지다. ⚠ 값 집합은 확정이나 코드 문자열이 아직 정해지지 않아 enum 을 못 박지 않는다 — 서버가 내려주는 선택지를 그대로 쓴다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). 근거: 공유계약 G-32",
+      "description": "품질 상태 — NORMAL(정상), DEFECTIVE(불량), INSPECTION_PENDING(검사 대기), SCRAPPED(폐기). 값과 표시명은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 조회한다. 시스템 소유 값으로 고객이 값 집합을 추가하지 않는다.",
       "example": "NORMAL",
       "x-internal-note": "값 집합 출처 = 회신 E-3 확정(정상·불량·검사 대기·폐기). E-3 는 이 축이 재고의 차원임을 확인했다 — uq_inventory_balance_dim 에 quality_status_code 가 들어 있어 같은 LOT 이 같은 위치에 있어도 품질 상태가 다르면 재고 행이 갈린다. ⚠ example 'RELEASED' 는 확정 4값 어디에도 없는 잠정값이었다 — 2026-08-29 교체 완료. 구 서술 「확정된 값 목록이 아직 없다(G-2)」는 오기였다.",
       "x-code-key": "CD-LOT-STATUS"
@@ -8427,7 +8431,7 @@
       "x-source-column": "quality_status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "품질 상태. 정상 · 불량 · 검사 대기 · 폐기 네 가지다. ⚠ 값 집합은 확정이나 코드 문자열이 아직 정해지지 않아 enum 을 못 박지 않는다 — 서버가 내려주는 선택지를 그대로 쓴다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). 근거: 공유계약 G-32",
+      "description": "품질 상태 — NORMAL(정상), DEFECTIVE(불량), INSPECTION_PENDING(검사 대기), SCRAPPED(폐기). 값과 표시명은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 조회한다. 시스템 소유 값으로 고객이 값 집합을 추가하지 않는다.",
       "example": "NORMAL",
       "x-internal-note": "값 집합 출처 = 회신 E-3 확정(정상·불량·검사 대기·폐기). E-3 는 이 축이 재고의 차원임을 확인했다 — uq_inventory_balance_dim 에 quality_status_code 가 들어 있어 같은 LOT 이 같은 위치에 있어도 품질 상태가 다르면 재고 행이 갈린다. ⚠ example 'RELEASED' 는 확정 4값 어디에도 없는 잠정값이었다 — 2026-08-29 교체 완료. 구 서술 「확정된 값 목록이 아직 없다(G-2)」는 오기였다.",
       "x-code-key": "CD-LOT-STATUS"
@@ -8546,7 +8550,8 @@
       "maxLength": 50,
       "x-no-example": true,
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
-      "x-no-code-key": "코드 그룹을 세우지 않는다 — 이 리소스는 «전표»가 아니라 «물건»(팔레트·박스 같은 담는 그릇)이다. ⛔ 2026-09-02 이전에는 이 자리에 「전표의 진행 상태」라는 «남의 설명»이 복사돼 있었다. 담긴 것의 진행은 :pack · /contents · /repack-events 가 이미 담고, 라벨 발행 여부는 boolean 축이면 충분하다(InboundReceiptLine.labelIssued 선례). ⚠ P-02-08 §8-4 가 「포장 해체 화면이 없다」고 적어 뒤쪽 값이 업무에 없다 — 해체 업무가 서면 그때 세운다(A-21 · 사용자 결정 2026-09-02)."
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 이 리소스는 «전표»가 아니라 «물건»(팔레트·박스 같은 담는 그릇)이다. ⛔ 2026-09-02 이전에는 이 자리에 「전표의 진행 상태」라는 «남의 설명»이 복사돼 있었다. 담긴 것의 진행은 :pack · /contents · /repack-events 가 이미 담고, 라벨 발행 여부는 boolean 축이면 충분하다(InboundReceiptLine.labelIssued 선례). ⚠ P-02-08 §8-4 가 「포장 해체 화면이 없다」고 적어 뒤쪽 값이 업무에 없다 — 해체 업무가 서면 그때 세운다(A-21 · 사용자 결정 2026-09-02).",
+      "description": "포장 단위의 독립 상태 코드는 사용하지 않는다. 포장 내용과 재구성 이력으로 진행을 확인한다."
      }
     }
    },
@@ -9267,7 +9272,7 @@
       "x-source-column": "status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "전표의 진행 상태. 확정된 값 목록이 아직 없으므로 화면은 서버가 내려주는 값을 그대로 표시하고 값 자체로 분기하지 않는다. 근거: 공유계약 G-2",
+      "description": "독립 상태 코드를 사용하지 않는다. 라인 진행은 supplierLotMissing, labelIssued, inspectionRequired, lotId로 확인한다.",
       "x-no-example": true,
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-no-code-key": "코드 그룹을 세우지 않는다 — 라인 진행은 supplierLotMissing · labelIssued · inspectionRequired · lotId 네 축이 이미 담는다(A-21)."
@@ -10933,7 +10938,7 @@
       "x-source-column": "status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "전표의 진행 상태. 확정된 값 목록이 아직 없으므로 화면은 서버가 내려주는 값을 그대로 표시하고 값 자체로 분기하지 않는다. 근거: 공유계약 G-2",
+      "description": "독립 상태 코드를 사용하지 않는다. 예약의 유효·소진은 예약 수량으로 판단한다.",
       "x-no-example": true,
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-no-code-key": "코드 그룹을 세우지 않는다 — 예약의 유효·소진은 수량 축이 담고 이 칸을 움직이는 오퍼레이션이 없다(A-21)."
@@ -11031,7 +11036,7 @@
       "x-source-column": "status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "전표의 진행 상태. 확정된 값 목록이 아직 없으므로 화면은 서버가 내려주는 값을 그대로 표시하고 값 자체로 분기하지 않는다. 근거: 공유계약 G-2",
+      "description": "독립 상태 코드를 사용하지 않는다. 미확정 재고 조정은 원장 행이 아니라 재고 조정 라인에서 관리한다.",
       "x-no-example": true,
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-no-code-key": "코드 그룹을 세우지 않는다 — 이 칸을 쓰자던 유일한 근거가 W-01-12 §5-2 ②안(미확정 원장 행)인데, 그것은 ③안이 없어서 쓰던 임시책이었다. ③(조정 라인)이 2026-09-02 에 계약에 들어와(/inventory/adjustments/{id}/lines · InventoryAdjustmentLine) 근거가 소멸했다."
@@ -12686,7 +12691,7 @@
       "x-source-column": "status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "전표의 진행 상태. 확정된 값 목록이 아직 없으므로 화면은 서버가 내려주는 값을 그대로 표시하고 값 자체로 분기하지 않는다. 근거: 공유계약 G-2",
+      "description": "독립 상태 코드를 사용하지 않는다. 피킹 진행은 plannedQty, pickedQty와 held로 확인한다.",
       "x-no-example": true,
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-no-code-key": "코드 그룹을 세우지 않는다 — 라인 진행은 plannedQty ↔ pickedQty 와 held 가 이미 담는다. InventoryCountLine 의 counted 선례와 같다(A-21)."
