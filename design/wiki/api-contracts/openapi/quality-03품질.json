@@ -59,7 +59,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "x-no-example": "코드 그룹을 세우지 않는다 — 특채의 승인 상태는 approval_request 가 갖는다(approval_request_id 가 NOT NULL). 값 후보 셋이 APPROVAL_REQUEST_STATUS 와 정확히 겹치고, 이 리소스를 움직이는 오퍼레이션이 0건이다. ⭐ usable 은 「상태 유효 ∧ validTo ∧ 잔여>0」 3항 논리곱이라 만료·소진은 이 축이 아니다."
       },
       "x-no-code-key": "코드 그룹을 세우지 않는다 — 특채의 승인 상태는 approval_request 가 갖는다(approval_request_id 가 NOT NULL). 값 후보 셋이 APPROVAL_REQUEST_STATUS 와 정확히 겹치고, 이 리소스를 움직이는 오퍼레이션이 0건이다. ⭐ usable 은 「상태 유효 ∧ validTo ∧ 잔여>0」 3항 논리곱이라 만료·소진은 이 축이 아니다.",
       "description": "독립 상태 코드를 사용하는 조회 조건이 아니다. 독립 승인 상태 코드를 사용하지 않는다. 승인 상태는 연결된 결재 요청에서 확인하며, 사용 가능 여부는 usable로 확인한다."
@@ -394,7 +394,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값",
+       "example": "REWORK",
        "enum": [
         "REWORK",
         "SCRAP",
@@ -582,7 +582,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "example": "IQC"
       },
       "description": "IQC · PQC · OQC 값 = `IQC`·`PQC`·`OQC`. 값 목록은 `GET /mdm/code-values?codeGroupCode=QUALITY_INSPECTION_TYPE` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
@@ -767,7 +767,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "example": "IQC"
       },
       "x-code-key": "CD-QUALITY-INSPECTION-TYPE",
       "description": "값 = `IQC`·`PQC`·`OQC`. 값 목록은 `GET /mdm/code-values?codeGroupCode=QUALITY_INSPECTION_TYPE` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
@@ -777,7 +777,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "example": "ACCEPTED"
       },
       "description": "검사 종합 판정으로 거른다 — 합격(ACCEPTED) · 불합격(REJECTED) · 보류(HELD). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_OVERALL_JUDGMENT 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-INSPECTION-OVERALL-JUDGMENT"
@@ -787,7 +787,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "example": "DRAFT"
       },
       "x-code-key": "CD-INSPECTION-RESULT-STATUS",
       "description": "검사 성적서 상태로 거른다 — 임시저장(DRAFT) · 확정(CONFIRMED). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
@@ -1003,7 +1003,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "example": "IQC"
       },
       "x-code-key": "CD-QUALITY-INSPECTION-TYPE",
       "description": "값 = `IQC`·`PQC`·`OQC`. 값 목록은 `GET /mdm/code-values?codeGroupCode=QUALITY_INSPECTION_TYPE` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
@@ -1114,7 +1114,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "example": "IQC"
       },
       "description": "⚠ IQC·PQC·OQC 를 합치지 않는다 — 자재 불량률과 제품 불량률을 더하면 뜻이 없다(L-7) 값 = `IQC`·`PQC`·`OQC`. 값 목록은 `GET /mdm/code-values?codeGroupCode=QUALITY_INSPECTION_TYPE` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-QUALITY-INSPECTION-TYPE"
@@ -1142,7 +1142,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "example": "ACCEPTED"
       },
       "description": "검사 종합 판정으로 거른다 — 목록과 같은 축. 합격(ACCEPTED) · 불합격(REJECTED) · 보류(HELD). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_OVERALL_JUDGMENT 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-INSPECTION-OVERALL-JUDGMENT"
@@ -1201,7 +1201,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "example": "DRAFT"
       },
       "x-code-key": "CD-INSPECTION-RESULT-STATUS",
       "description": "검사 성적서 상태로 거른다 — 목록과 같은 축. 임시저장(DRAFT) · 확정(CONFIRMED). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
@@ -1748,7 +1748,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "example": "INCOMING_INSPECTION_WAIT"
       },
       "x-code-key": "CD-LOT-HOLD-REASON",
       "description": "값 = `INCOMING_INSPECTION_WAIT`·`FOREIGN_MATTER_SUSPECTED`·`DIMENSION_ABNORMAL`·`APPEARANCE_ABNORMAL`·`CLAIM_RECALL`·`OTHER`. 값 목록은 `GET /mdm/code-values?codeGroupCode=LOT_HOLD_REASON` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31)."
@@ -2072,7 +2072,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "example": "MATERIAL"
       },
       "description": "자재·생산·제품 3종(결정 10). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_TYPE 로 받는다(MATERIAL·PRODUCTION·PRODUCT). ⚠ 셋을 합쳐 집계하지 않는다(공유계약 L-7) — 같은 「보류 38건」이라도 자재와 제품은 대응이 다르다. 근거: omf-mes#176",
       "x-code-key": "CD-LOT-TYPE"
@@ -2237,7 +2237,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "example": "NORMAL"
       },
       "description": "품질 판정 축 — 정상·불량·검사 대기·폐기. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(NORMAL·DEFECTIVE·INSPECTION_PENDING·SCRAPPED). ⚠ 보류 건의 진행 상태와 다른 축이다(W-03-01 §5-3). 근거: 회신 E-3 종결 2026-08-07 · omf-mes#176",
       "x-code-key": "CD-LOT-STATUS"
@@ -2247,7 +2247,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "example": "MATERIAL"
       },
       "description": "자재·생산·제품 3종(결정 10). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_TYPE 로 받는다(MATERIAL·PRODUCTION·PRODUCT). ⚠ 셋을 합쳐 집계하지 않는다(공유계약 L-7) — 같은 「보류 38건」이라도 자재와 제품은 대응이 다르다. 근거: omf-mes#176",
       "x-code-key": "CD-LOT-TYPE"
@@ -2677,7 +2677,7 @@
      },
      "lotNo": {
       "type": "string",
-      "example": "값"
+      "example": "LOT-SAMPLE-0001"
      },
      "approvedQty": {
       "type": "number",
@@ -2735,8 +2735,8 @@
      },
      "statusCode": {
       "type": "string",
-      "example": "값",
       "x-no-code-key": "코드 그룹을 세우지 않는다 — 특채의 승인 상태는 approval_request 가 갖는다(approval_request_id 가 NOT NULL). 값 후보 셋이 APPROVAL_REQUEST_STATUS 와 정확히 겹치고, 이 리소스를 움직이는 오퍼레이션이 0건이다. ⭐ usable 은 「상태 유효 ∧ validTo ∧ 잔여>0」 3항 논리곱이라 만료·소진은 이 축이 아니다.",
+      "x-no-example": "코드 그룹을 세우지 않는다 — 특채의 승인 상태는 approval_request 가 갖는다(approval_request_id 가 NOT NULL). 값 후보 셋이 APPROVAL_REQUEST_STATUS 와 정확히 겹치고, 이 리소스를 움직이는 오퍼레이션이 0건이다. ⭐ usable 은 「상태 유효 ∧ validTo ∧ 잔여>0」 3항 논리곱이라 만료·소진은 이 축이 아니다.",
       "description": "독립 승인 상태 코드를 사용하지 않는다. 승인 상태는 연결된 결재 요청에서 확인하며, 사용 가능 여부는 usable로 확인한다."
      },
      "usable": {
@@ -2949,9 +2949,9 @@
      },
      "responsibilityTypeCode": {
       "type": "string",
-      "example": "값",
       "x-code-key": "CD-DEFECT-RESPONSIBILITY-TYPE",
-      "description": "귀책 구분 — 이 불량의 책임이 어디에 있는가. responsibleDepartmentId 와 짝이다. ⚠ «원천 축이 아니다» — 어디서 «발견»했나(sourceCode)와 다르다(W-03-05 §5-2). ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=DEFECT_RESPONSIBILITY_TYPE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "귀책 구분 — 이 불량의 책임이 어디에 있는가. responsibleDepartmentId 와 짝이다. ⚠ «원천 축이 아니다» — 어디서 «발견»했나(sourceCode)와 다르다(W-03-05 §5-2). ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=DEFECT_RESPONSIBILITY_TYPE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-no-example": "고객이 운영 중 등록하는 값이며 설계가 정한 예시값은 없다 — 코드 사전 CD-DEFECT-RESPONSIBILITY-TYPE"
      },
      "responsibleDepartmentId": {
       "type": "integer",
@@ -3036,7 +3036,7 @@
      },
      "nonconformanceNo": {
       "type": "string",
-      "example": "값"
+      "example": "NC-DEMO-001"
      },
      "dispositionTypeCode": {
       "type": "string",
@@ -3090,7 +3090,7 @@
      },
      "lotNo": {
       "type": "string",
-      "example": "값"
+      "example": "LOT-SAMPLE-0001"
      },
      "itemId": {
       "type": "integer",
@@ -3102,7 +3102,7 @@
       "maxLength": 50,
       "readOnly": true,
       "description": "화면이 보이는 품목 코드. 식별자를 사람이 읽는 값으로 바꾸려 마스터를 다시 부르지 않게 한다",
-      "example": "값",
+      "example": "ITEM-DEMO-001",
       "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 품목 마스터의 행을 가리킨다 — Item.itemCode 가 같은 판정으로 이미 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "itemName": {
@@ -3631,9 +3631,9 @@
      },
      "reinspectionReasonCode": {
       "type": "string",
-      "example": "값",
       "x-code-key": "CD-REINSPECTION-REASON",
-      "description": "재검사 사유 — 왜 회차를 더 돌리는가. ⭐ 번복은 「수정」이 아니라 «재검사 회차»라 이 사유가 그 회차의 근거다(W-04-03 §5). ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=REINSPECTION_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "재검사 사유 — 왜 회차를 더 돌리는가. ⭐ 번복은 「수정」이 아니라 «재검사 회차»라 이 사유가 그 회차의 근거다(W-04-03 §5). ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=REINSPECTION_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-no-example": "고객이 운영 중 등록하는 값이며 설계가 정한 예시값은 없다 — 코드 사전 CD-REINSPECTION-REASON"
      },
      "remarks": {
       "type": "string",
@@ -3761,9 +3761,9 @@
      },
      "reinspectionReasonCode": {
       "type": "string",
-      "example": "값",
       "x-code-key": "CD-REINSPECTION-REASON",
-      "description": "재검사 사유 — 왜 회차를 더 돌리는가. ⭐ 번복은 「수정」이 아니라 «재검사 회차»라 이 사유가 그 회차의 근거다(W-04-03 §5). ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=REINSPECTION_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "재검사 사유 — 왜 회차를 더 돌리는가. ⭐ 번복은 「수정」이 아니라 «재검사 회차»라 이 사유가 그 회차의 근거다(W-04-03 §5). ⭐ 고객이 늘릴 수 있다 — 계약이 값을 닫지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=REINSPECTION_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "x-no-example": "고객이 운영 중 등록하는 값이며 설계가 정한 예시값은 없다 — 코드 사전 CD-REINSPECTION-REASON"
      },
      "measurements": {
       "type": "array",
@@ -3925,7 +3925,7 @@
      },
      "lotNo": {
       "type": "string",
-      "example": "값"
+      "example": "LOT-SAMPLE-0001"
      },
      "itemId": {
       "type": "integer",
@@ -4123,7 +4123,7 @@
      },
      "lotNo": {
       "type": "string",
-      "example": "값"
+      "example": "LOT-SAMPLE-0001"
      },
      "itemId": {
       "type": "integer",
@@ -4250,7 +4250,7 @@
      },
      "lotNo": {
       "type": "string",
-      "example": "값"
+      "example": "LOT-SAMPLE-0001"
      },
      "itemId": {
       "type": "integer",

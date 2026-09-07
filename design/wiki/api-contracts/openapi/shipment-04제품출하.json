@@ -45,7 +45,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "x-no-example": "코드 그룹을 세우지 않는다 — 편성 여부는 계약이 이미 unassignedOnly(boolean)로 받고 있고 이 칸의 쿼리를 부르는 화면이 0건이다. ⛔ 이 리소스는 수신본이라 등록·수정 경로가 없다 — 상태를 «올릴» 주체가 MES 안에 없다(A-21 · 사용자 결정 2026-09-02)."
       },
       "x-no-code-key": "코드 그룹을 세우지 않는다 — 편성 여부는 계약이 이미 unassignedOnly(boolean)로 받고 있고 이 칸의 쿼리를 부르는 화면이 0건이다. ⛔ 이 리소스는 수신본이라 등록·수정 경로가 없다 — 상태를 «올릴» 주체가 MES 안에 없다(A-21 · 사용자 결정 2026-09-02).",
       "description": "독립 상태 코드를 사용하는 조회 조건이 아니다. 독립 상태 코드를 사용하지 않는 수주 수신본이다. 미편성 대상 조회는 unassignedOnly를 사용한다."
@@ -1041,7 +1041,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "example": "UNCONFIRMED"
       },
       "x-code-key": "CD-SHIPMENT-STATUS",
       "description": "출하의 진행 상태 — 미확정(UNCONFIRMED) · 확정(CONFIRMED) · 취소(CANCELLED). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 확정이 PGI 송신을 부르고 취소가 그것을 되돌린다(W-04-04 §5-1 · W-04-12 §5-2). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=SHIPMENT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
@@ -1688,7 +1688,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "example": "NOT_REQUESTED"
       },
       "description": "부적합 건의 진행 상태 — 의뢰 전(NOT_REQUESTED) · 판정 대기(PENDING_DECISION) · 판정 완료(DECIDED). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 이 값이 처분 판정 화면의 진입 목록을 가른다(W-04-07 §3 · W-03-10 §5-5). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=NONCONFORMANCE_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-NONCONFORMANCE-STATUS"
@@ -1739,7 +1739,7 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "example": "MAJOR"
       },
       "x-code-key": "CD-NONCONFORMANCE-SEVERITY",
       "description": "부적합 심각도 — 중대(CRITICAL) · 중(MAJOR) · 경(MINOR). ⭐ 화면 목업이 「심각도 중대」(W-03-10 §3)·「심각도 중」(W-04-07 §3)을 그려 3단계 축이 이미 서 있다. ⭐ 고객이 늘릴 수 있다 — 아래는 초기값(기본값)이지 닫힌 목록이 아니다. 값 목록은 GET /mdm/code-values?codeGroupCode=NONCONFORMANCE_SEVERITY 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
@@ -2508,7 +2508,7 @@
      },
      "lotNo": {
       "type": "string",
-      "example": "값"
+      "example": "LOT-SAMPLE-0001"
      },
      "affectedQty": {
       "type": "number",
@@ -2720,7 +2720,7 @@
      },
      "vehicleNo": {
       "type": "string",
-      "example": "값"
+      "example": "VEHICLE-DEMO-001"
      },
      "driverName": {
       "type": "string",
@@ -2728,11 +2728,11 @@
      },
      "sealNo": {
       "type": "string",
-      "example": "값"
+      "example": "SEAL-DEMO-001"
      },
      "transportDocumentNo": {
       "type": "string",
-      "example": "값"
+      "example": "TD-DEMO-001"
      },
      "loadingWorkerId": {
       "type": "integer",
@@ -2872,7 +2872,7 @@
      },
      "vehicleNo": {
       "type": "string",
-      "example": "값"
+      "example": "VEHICLE-DEMO-001"
      },
      "driverName": {
       "type": "string",
@@ -2880,11 +2880,11 @@
      },
      "sealNo": {
       "type": "string",
-      "example": "값"
+      "example": "SEAL-DEMO-001"
      },
      "transportDocumentNo": {
       "type": "string",
-      "example": "값"
+      "example": "TD-DEMO-001"
      },
      "loadingWorkerId": {
       "type": "integer",
@@ -3073,7 +3073,7 @@
      },
      "lotNo": {
       "type": "string",
-      "example": "값"
+      "example": "LOT-SAMPLE-0001"
      },
      "handlingUnitId": {
       "type": [
@@ -3618,7 +3618,7 @@
      },
      "lotNo": {
       "type": "string",
-      "example": "값"
+      "example": "LOT-SAMPLE-0001"
      },
      "pickedQty": {
       "type": "number",
