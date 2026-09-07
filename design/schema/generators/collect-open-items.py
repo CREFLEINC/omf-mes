@@ -306,6 +306,23 @@ def completion_negated(whole: str, decision: str) -> bool:
     return False
 
 
+def current_open_declaration(decision: str) -> bool:
+    """독립적인 현재 미결 선언만 읽고, 이후 명시한 현재 해소는 우선한다."""
+    clean = QUOTED.sub(" ", decision).replace("**", "")
+    declaration = re.compile(r"\s*(?:⛔\s*)?미결은 살아 있다\s*")
+    current_completion = re.compile(
+        r"\s*(?:현재(?:는)?\s+)?✅\s*(?:해소|종결)(?:됐다|되었다)?"
+        r"(?:\s*\(?\d{4}-\d{2}-\d{2}\)?)?\s*"
+    )
+    is_open = False
+    for clause in re.split(r"[.!?;—\n]", clean):
+        if declaration.fullmatch(clause):
+            is_open = True
+        elif current_completion.fullmatch(clause):
+            is_open = False
+    return is_open
+
+
 def resolved(whole: str, decision: str | None = None) -> bool:
     """이 행이 해소됐나. 인용 «밖»에서 해소 표시를 찾고, 부정 표현이 있으면 뒤집는다.
 
@@ -318,6 +335,8 @@ def resolved(whole: str, decision: str | None = None) -> bool:
     body = re.sub(r"`[^`]*`\s*\([^)]*\)", " ", body)
     if STAYS_OPEN.search(QUOTED.sub(" ", whole)):
         return False                    # ③ 살아 있다고 «적은» 행 — 「해소」가 같이 있어도
+    if current_open_declaration(body):
+        return False
     return (bool(DONE.search(body)) and not NOT_DONE.search(whole)
             and not completion_negated(whole, body))
 
@@ -444,7 +463,8 @@ def parse(path: str) -> dict | None:
         nature = next((v for k, v in col.items() if "성격" in k), "")
         grade = next((v for k, v in col.items() if "등급" in k), "")
         whole = " ".join(cs)
-        decision = " ".join((handling, grade, item_completion(item)))
+        # 각 열의 마지막 선언에 다음 열의 등급이 붙지 않도록 경계를 보존한다.
+        decision = "\n".join((handling, grade, item_completion(item)))
         done = resolved(whole, decision if handling or grade else None)
         marks = []
         for tag in tag_issues(whole):       # `#N` 은 QA 번호와 갈라야 한다
