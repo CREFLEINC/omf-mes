@@ -5304,7 +5304,7 @@
      },
      "statusCode": {
       "type": "string",
-      "x-no-example": "값 목록이 미확정이라 코드 문자열을 못 박지 않는다",
+      "x-no-example": "예시는 생략한다. 값 목록은 사용자 결정 2026-09-02에 따라 CD-PRODUCTION-ORDER-STATUS의 RECEIVED·UPDATED·CANCELLED로 확정돼 있다. 종전 「값 목록이 미확정」은 확정 전의 예시 생략 사유이며 현재 미결을 뜻하지 않는다. 이번 정정은 example을 추가하거나 기본 상태를 지정하지 않는다.",
       "description": "P/O(생산오더)의 상태 — 수신(RECEIVED) · 수정됨(UPDATED) · 취소(CANCELLED). ⭐ ERP 가 발행하고 MES 는 수신본을 갖지만 **코드는 우리 어휘로 저장한다** — ERP 코드를 그대로 담거나 매핑 테이블을 두지 않는다(사용자 결정 2026-09-02). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PRODUCTION_ORDER_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-PRODUCTION-ORDER-STATUS"
      },
