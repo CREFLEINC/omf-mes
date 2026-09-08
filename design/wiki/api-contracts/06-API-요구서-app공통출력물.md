@@ -160,6 +160,7 @@
 | LOT | `GET /trace/lots/{lotId}` | `P-02-04` |
 | 개체 | `GET /trace/serial-numbers` | `P-02-04` |
 | 포장 | `GET /inventory/handling-units/{handlingUnitId}` · 내용물은 `…/contents` | `P-02-09` |
+| 출하 배분 | `GET /logistics/shipment-lot-allocations/{shipmentLotAllocationId}` | `P-04-01` |
 | 출고 라인 | ⛔ **없다 — 신설 대기.** 발행 QR 을 스캔해 출고 전표를 찾을 축이 `GET /logistics/goods-issues` 에 없다 | `P-01-02` |
 | 툴·금형 | `GET /mdm/molds/{moldId}` | `W-05-13` |
 | 위치(Location) | `GET /mdm/locations/{locationId}` | `W-06-07` |
@@ -186,7 +187,7 @@
 | `PRODUCTION_LOT_LABEL` | 생산 LOT 라벨 | `P-02-04` | LOT |
 | `IDENTIFICATION_TAG` | 인식표 | `P-02-04` · `P-02-09`(재출력) | 개체 |
 | `PACKING_LABEL` | 포장 라벨 | `P-02-09` · `P-04-01` · `P-04-04` | 포장 |
-| `DELIVERY_LABEL` | 납품 라벨 | `P-04-01` | 출하 배분 |
+| `DELIVERY_LABEL` | 납품 라벨 | `P-04-01` | 출하 배분(`SHIPMENT_LOT_ALLOCATION`) |
 | `CERTIFICATE_OF_ANALYSIS` | 검사성적서(CoA) | `W-04-03` ⚠ **양식 미정이라 아직 안 부른다** | 검사 결과 |
 | `TOOL_LABEL` | 툴 QR 라벨 | **`W-05-13`** ⛔ **구현 완료** | 툴·금형 |
 | `LOCATION_LABEL` | Location 코드 라벨 | **`W-06-07`** | 위치(Location) |

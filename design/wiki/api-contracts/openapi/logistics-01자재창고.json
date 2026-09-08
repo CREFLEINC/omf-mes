@@ -5969,7 +5969,16 @@
        "type": "integer",
        "format": "int64"
       },
-      "description": "이 W/O 를 원천으로 발행된 LOT 만. 선발행 슬롯을 빠짐없이 훑는 경로다 — 마감(W-02-05 §3)과 POP 의 실적 대상 LOT 선택(P-02-04 §5)·생산LOT 완료(P-02-04 §3 좌단 LOT 목록)가 같은 축을 쓴다. ⭐ 저장된 형태는 다형 참조 짝(sourceTypeCode + sourceId)이지만 판별자 값 목록이 아직 미확정이라 짝 필터를 열지 않았다 — 값을 모르는 채 열면 눌러도 아무것도 안 걸린다(공유계약 G-23). 서버가 W/O 원천으로 풀어 준다"
+     "description": "이 W/O 를 원천으로 발행된 LOT 만. 선발행 슬롯을 빠짐없이 훑는 경로다 — 마감(W-02-05 §3)과 POP 의 실적 대상 LOT 선택(P-02-04 §5)·생산LOT 완료(P-02-04 §3 좌단 LOT 목록)가 같은 축을 쓴다. ⭐ 저장된 형태는 다형 참조 짝(sourceTypeCode + sourceId)이지만 판별자 값 목록이 아직 미확정이라 짝 필터를 열지 않았다 — 값을 모르는 채 열면 눌러도 아무것도 안 걸린다(공유계약 G-23). 서버가 W/O 원천으로 풀어 준다"
+     },
+     {
+      "name": "currentOnly",
+      "in": "query",
+      "schema": {
+       "type": "boolean",
+       "default": false
+      },
+      "description": "현재 작업 대상 생산 LOT 한 건만. true 이면 workOrderId 가 필수다. 서버는 해당 W/O의 completedAt 이 비어 있고 lifecycleStatusCode 가 WAITING 또는 ACTIVE 인 슬롯 중 workOrderSequenceNo 가 가장 작은 건을 최대 1건 반환한다. VOIDED 는 제외한다. ⛔ 화면이 페이지 첫 행을 현재 LOT으로 추측하지 않는다. 근거: P-02-04 §3·§5"
      },
      {
       "name": "receiptDispositionCode",
@@ -6036,6 +6045,16 @@
            "$ref": "#/components/schemas/PageMeta"
           }
          }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "질의 조합 오류. currentOnly=true인데 workOrderId가 없으면 400",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
         }
        }
       }
@@ -7447,6 +7466,25 @@
      "successors"
     ],
     "properties": {
+     "workOrderSequenceNo": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "minimum": 1,
+      "description": "W/O 전개 시 확정된 생산 LOT 순번. W/O 원천 생산 LOT에는 항상 내리고 그 외 LOT은 null이다. 현재 LOT 결정과 ‘현재/전체’ 표시에 쓴다. 화면이 lotNo 또는 생성시각으로 순서를 추측하지 않는다.",
+      "example": 2,
+      "x-internal-note": "📨 물리 저장 컬럼 신설 또는 확인 대상 — W/O 전개 시 함께 고정한다. 계약이 앞서 세우고 데이터 모델 담당에게 통지한다. 근거: 02-SW설계사양서 §4.6 · P-02-04"
+     },
+     "workOrderLotCount": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "minimum": 1,
+      "description": "같은 W/O에서 선발행된 생산 LOT 슬롯 전체 수. W/O 원천 생산 LOT에는 서버가 계산해 내리고 그 외 LOT은 null이다. P-02-04의 ‘현재 LOT 번호(순서대로)’ 표시용이며 폐번 슬롯도 전체 수에는 포함한다.",
+      "example": 8
+     },
      "progress": {
       "$ref": "#/components/schemas/DocumentProgress"
      },
@@ -9592,7 +9630,7 @@
      "businessDate",
      "occurredAt"
     ],
-    "description": "초과 입하 분리. 정량분과 초과분을 한 트랜잭션으로 등록한다. mode 로 어느 쪽을 저장할지 고른다 — 세 갈래가 모두 화면의 버튼이다. 근거: W-01-03 §5-1 · §5-4",
+    "description": "초과 입하 분리. 정량분과 초과분을 한 트랜잭션으로 등록한다. mode 로 어느 쪽을 저장할지 고른다 — 세 갈래가 모두 W-01-03과 M-01-01 화면의 버튼이다. 초과분을 포함하면 예외 유형과 사유가 필수다. 근거: W-01-03 §5-1 · §5-4 · M-01-01 §5-2-2",
     "properties": {
      "mode": {
       "type": "string",
@@ -9625,7 +9663,62 @@
       "example": "2026-08-06T09:12:00+09:00"
      }
     },
-    "x-internal-note": "businessDate·occurredAt 은 바깥에서 한 번만 받는다 — 두 건이 같은 순간의 한 트랜잭션이기 때문이다. ⚠ mode 에 따른 normal·excess 의 조건부 필수를 oneOf 로 표현하지 않았다 — 초안 단계라 description 으로 둔다. 목 서버·검증기는 mode 와 어긋나는 조합을 통과시킨다."
+    "oneOf": [
+     {
+      "properties": {
+       "mode": {
+        "const": "BOTH"
+       },
+       "excess": {
+        "required": [
+         "exceptionTypeCode",
+         "exceptionReason"
+        ]
+       }
+      },
+      "required": [
+       "normal",
+       "excess"
+      ]
+     },
+     {
+      "properties": {
+       "mode": {
+        "const": "NORMAL_ONLY"
+       }
+      },
+      "required": [
+       "normal"
+      ],
+      "not": {
+       "required": [
+        "excess"
+       ]
+      }
+     },
+     {
+      "properties": {
+       "mode": {
+        "const": "EXCESS_ONLY"
+       },
+       "excess": {
+        "required": [
+         "exceptionTypeCode",
+         "exceptionReason"
+        ]
+       }
+      },
+      "required": [
+       "excess"
+      ],
+      "not": {
+       "required": [
+        "normal"
+       ]
+      }
+     }
+    ],
+    "x-internal-note": "businessDate·occurredAt 은 바깥에서 한 번만 받는다 — 두 건이 같은 순간의 한 트랜잭션이기 때문이다. mode 별 본문 모양과 초과 예외 유형·사유 필수를 oneOf 로 강제한다."
    },
    "InboundReceiptSplitResponse": {
     "type": "object",
@@ -11570,7 +11663,7 @@
       ]
      }
     },
-    "x-internal-note": "입하 시점의 LOT 은 Hold 로 생긴다 — 가용 재고가 아니다(M-01-01 §5-4 · ✓확정 §재정의 #5). 📨 「W/O 내 순번」(별도 속성 — 선발행 슬롯 구간 지정용)은 계약이 앞서 세울 자리이고 저장 컬럼은 통지 대상이다 — 기다리지 않는다. 근거: 02-SW설계사양서 §4.6 · omf-mes#46."
+    "x-internal-note": "입하 시점의 LOT 은 Hold 로 생긴다 — 가용 재고가 아니다(M-01-01 §5-4 · ✓확정 §재정의 #5). 생산 LOT의 W/O 내 순번은 workOrderSequenceNo 로 계약을 세웠고 저장 컬럼은 데이터 모델 통지 대상이다. workOrderLotCount 는 같은 W/O 슬롯 수의 서버 파생값이다. 근거: 02-SW설계사양서 §4.6 · P-02-04 · omf-mes#46."
    },
    "LotComplete": {
     "type": "object",

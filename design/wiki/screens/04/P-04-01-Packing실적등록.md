@@ -28,7 +28,7 @@
 
 ```text
 ┌ 출하 실적 등록 ─ ERP W/O/W/O · 작업자 · 연결상태 · 화면 이동 · 사용자 전환 ┐
-│ 출하/납품 대상 [현재 선택값] [선택]                                      │
+│ 출하 대상 [현재 선택값] [선택]                                           │
 │ 출하 대상 확인 ─ 생산 LOT 스캔 ─ 배분 매칭 판정                         │
 │ 포장 구성: 유형 [값] [선택] · 상위 포장 [값] [선택] · 내용물/수량 목록   │
 │ OQC 상태: 비대상 / 대기 / 합격 / 불합격                                 │
@@ -43,7 +43,7 @@
 
 ### §3-1. 매칭 스캔
 
-1. 출하 대상을 스캔/선택해 출하·품목을 확정한다. 납품 라벨은 포장 확정 뒤 발행되므로 최초 포장의 선행 입력으로 요구하지 않는다.
+1. 출하번호를 스캔하거나 출하 목록에서 대상을 선택해 `shipmentId`를 정하고, 그 출하의 미포장 배분에서 품목을 확정한다. 출하번호 스캔은 정확 일치 `shipmentNo`로 조회한다. 목록 팝업은 현재 영업일의 피킹 완료 출하를 페이지로 읽고, 팝업 검색은 현재 표시된 항목만 로컬에서 거른다. 납품 라벨은 포장 확정 뒤 발행되므로 최초 포장의 선행 입력으로 요구하지 않는다. 이미 납품 라벨이 발행된 건의 재진입·재출력은 납품 라벨 스캔도 허용한다.
 2. 생산 LOT을 스캔한다.
 3. 서버가 출하 배분(`shipment_lot_allocation`)과 대조한다.
 4. 일치한 LOT만 포장 내용물에 추가한다. 같은 포장에 같은 LOT을 다시 넣으면 새 행이 아니라 기존 수량에 합산하고 변경 전후 수량을 안내한다.
@@ -76,7 +76,7 @@
 
 ### §4-1. OQC 대기 후 납품 라벨
 
-OQC가 필요한 제품이 포장 시점에 미합격이면 포장 라벨만 자동 출력한다. 이후 OQC 합격 상태로 같은 화면에 진입하면 납품 라벨 미발행 상태를 표시하고 [납품 라벨 출력]을 활성화한다. 이미 발행됐다면 신규 출력이 아니라 재출력 흐름을 사용한다.
+OQC가 필요한 제품이 포장 시점에 미합격이면 포장 라벨만 자동 출력한다. 출하 배분 응답의 `shippingInspectionStatusCode`로 비대상·대기·합격·불합격/보류를 구분하며, 납품 라벨 발행 가능 여부는 같은 응답의 `oqcPassed`를 사용한다. 이후 OQC 합격 상태로 같은 화면에 진입하면 납품 라벨 미발행 상태를 표시하고 [납품 라벨 출력]을 활성화한다. 이미 발행됐다면 신규 출력이 아니라 재출력 흐름을 사용한다.
 
 ## §5. 재출력
 
@@ -116,7 +116,10 @@ OQC가 필요한 제품이 포장 시점에 미합격이면 포장 라벨만 자
 
 | 목적 | 계약 |
 | --- | --- |
-| 출하 배분/매칭 | `/logistics/shipment-lot-allocations` 계열 |
+| 최초 출하번호 스캔 | `GET /logistics/shipments?pickedOnly=true&shipmentNo=` → `GET /logistics/shipment-lot-allocations?shipmentId=&unpackedOnly=true` |
+| 최초 출하 목록 선택 | `GET /logistics/shipments?pickedOnly=true&shipDateFrom={businessDate}&shipDateTo={businessDate}&page=&size=` — 팝업 검색은 수신한 현재 표시 목록만 로컬 필터 → 선택 후 배분 조회 |
+| 기존 납품 라벨 재진입 | `GET /logistics/shipment-lot-allocations?q=` |
+| 출하 배분/LOT 매칭 | `GET /logistics/shipment-lot-allocations?shipmentId=&lotQ=` |
 | 포장 단위 생성/조회 | `POST /inventory/handling-units` · `GET /inventory/handling-units/{handlingUnitId}` |
 | 포장 확정/취소 | `POST /inventory/handling-units/{handlingUnitId}:pack` · `DELETE /inventory/handling-units/{handlingUnitId}` |
 | 라벨 발행 | `POST /app/document-issues` (`PACKING_LABEL`·`DELIVERY_LABEL`) |

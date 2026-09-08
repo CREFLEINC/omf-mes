@@ -1089,6 +1089,7 @@
         "LOT",
         "SERIAL_NUMBER",
         "HANDLING_UNIT",
+        "SHIPMENT_LOT_ALLOCATION",
         "GOODS_ISSUE_LINE",
         "MOLD",
         "LOCATION",
@@ -1096,7 +1097,7 @@
        ],
        "example": "LOT"
       },
-      "description": "targetId 와 함께 준다. 하나만 주면 400 이다. 대상 유형. 이 값이 targetId 의 해석을 정한다 — LOT → 자재·생산·제품 로트 · SERIAL_NUMBER → 개체 일련번호 · HANDLING_UNIT → 취급 단위(포장) · GOODS_ISSUE_LINE → 출고 전표 라인 · MOLD → 툴·금형 마스터 · LOCATION → 위치 마스터 · INSPECTION_RESULT → 검사 결과. ⭐ 값 문자열을 확정했다(2026-09-02) — 뜻 일곱은 §3-7 대응표가 이미 못박았고 남은 것은 문자열뿐이었다(공유계약 §G — 확정된 뜻을 영문 SNAKE 로). ⚠ 대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다 — 어디로 갈지 모른다",
+      "description": "targetId 와 함께 준다. 하나만 주면 400 이다. 대상 유형. 이 값이 targetId 의 해석을 정한다 — LOT → 자재·생산·제품 로트 · SERIAL_NUMBER → 개체 일련번호 · HANDLING_UNIT → 취급 단위(포장) · SHIPMENT_LOT_ALLOCATION → 출하 LOT 배분 · GOODS_ISSUE_LINE → 출고 전표 라인 · MOLD → 툴·금형 마스터 · LOCATION → 위치 마스터 · INSPECTION_RESULT → 검사 결과. ⭐ 납품 라벨은 출하 LOT 배분을 대상으로 발행한다(P-04-01). ⚠ 대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다 — 어디로 갈지 모른다",
       "x-code-key": "CD-DOCUMENT-ISSUE-TARGET-TYPE"
      },
      {
@@ -1527,6 +1528,7 @@
         "LOT",
         "SERIAL_NUMBER",
         "HANDLING_UNIT",
+        "SHIPMENT_LOT_ALLOCATION",
         "GOODS_ISSUE_LINE",
         "MOLD",
         "LOCATION",
@@ -1535,7 +1537,7 @@
        "example": "LOT"
       },
       "example": "HANDLING_UNIT",
-      "description": "대상 유형. 한 번에 한 유형만 묻는다 — 유형이 섞이면 targetId 의 뜻이 갈린다. 대상 유형. 이 값이 targetId 의 해석을 정한다 — LOT → 자재·생산·제품 로트 · SERIAL_NUMBER → 개체 일련번호 · HANDLING_UNIT → 취급 단위(포장) · GOODS_ISSUE_LINE → 출고 전표 라인 · MOLD → 툴·금형 마스터 · LOCATION → 위치 마스터 · INSPECTION_RESULT → 검사 결과. ⭐ 값 문자열을 확정했다(2026-09-02) — 뜻 일곱은 §3-7 대응표가 이미 못박았고 남은 것은 문자열뿐이었다(공유계약 §G — 확정된 뜻을 영문 SNAKE 로). ⚠ 대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다 — 어디로 갈지 모른다",
+      "description": "대상 유형. 한 번에 한 유형만 묻는다 — 유형이 섞이면 targetId 의 뜻이 갈린다. 이 값이 targetId 의 해석을 정한다 — LOT → 자재·생산·제품 로트 · SERIAL_NUMBER → 개체 일련번호 · HANDLING_UNIT → 취급 단위(포장) · SHIPMENT_LOT_ALLOCATION → 출하 LOT 배분 · GOODS_ISSUE_LINE → 출고 전표 라인 · MOLD → 툴·금형 마스터 · LOCATION → 위치 마스터 · INSPECTION_RESULT → 검사 결과. ⭐ 납품 라벨은 출하 LOT 배분을 대상으로 발행한다(P-04-01). ⚠ 대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다 — 어디로 갈지 모른다",
       "x-code-key": "CD-DOCUMENT-ISSUE-TARGET-TYPE"
      },
      {
@@ -4329,13 +4331,14 @@
      "targetTypeCode": {
       "type": "string",
       "maxLength": 40,
-      "description": "대상 유형. 이 값이 targetId 의 해석을 정한다 — LOT → 자재·생산·제품 로트 · SERIAL_NUMBER → 개체 일련번호 · HANDLING_UNIT → 취급 단위(포장) · GOODS_ISSUE_LINE → 출고 전표 라인 · MOLD → 툴·금형 마스터 · LOCATION → 위치 마스터 · INSPECTION_RESULT → 검사 결과. ⭐ 값 문자열을 확정했다(2026-09-02) — 뜻 일곱은 §3-7 대응표가 이미 못박았고 남은 것은 문자열뿐이었다(공유계약 §G — 확정된 뜻을 영문 SNAKE 로). ⚠ 대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다 — 어디로 갈지 모른다",
+      "description": "대상 유형. 이 값이 targetId 의 해석을 정한다 — LOT → 자재·생산·제품 로트 · SERIAL_NUMBER → 개체 일련번호 · HANDLING_UNIT → 취급 단위(포장) · SHIPMENT_LOT_ALLOCATION → 출하 LOT 배분 · GOODS_ISSUE_LINE → 출고 전표 라인 · MOLD → 툴·금형 마스터 · LOCATION → 위치 마스터 · INSPECTION_RESULT → 검사 결과. ⭐ 납품 라벨은 출하 LOT 배분을 대상으로 발행한다(P-04-01). ⚠ 대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다 — 어디로 갈지 모른다",
       "x-no-example": true,
       "x-code-key": "CD-DOCUMENT-ISSUE-TARGET-TYPE",
       "enum": [
        "LOT",
        "SERIAL_NUMBER",
        "HANDLING_UNIT",
+       "SHIPMENT_LOT_ALLOCATION",
        "GOODS_ISSUE_LINE",
        "MOLD",
        "LOCATION",
@@ -4545,11 +4548,12 @@
          "maxLength": 40,
          "minLength": 1,
          "x-no-example": true,
-         "description": "대상 유형. 이 값이 targetId 의 해석을 정한다 — LOT · SERIAL_NUMBER · HANDLING_UNIT · GOODS_ISSUE_LINE · MOLD · LOCATION · INSPECTION_RESULT. ⭐ 읽는 쪽 DocumentTarget.targetTypeCode 와 같은 값집합이다 — 대응표는 공유계약 A-10 이 갖는다. ⚠ 대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다.",
+         "description": "대상 유형. 이 값이 targetId 의 해석을 정한다 — LOT · SERIAL_NUMBER · HANDLING_UNIT · SHIPMENT_LOT_ALLOCATION · GOODS_ISSUE_LINE · MOLD · LOCATION · INSPECTION_RESULT. ⭐ 읽는 쪽 DocumentTarget.targetTypeCode 와 같은 값집합이다 — 대응표는 공유계약 A-10 이 갖는다. 납품 라벨은 출하 LOT 배분을 대상으로 발행한다(P-04-01). ⚠ 대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다.",
          "enum": [
           "LOT",
           "SERIAL_NUMBER",
           "HANDLING_UNIT",
+          "SHIPMENT_LOT_ALLOCATION",
           "GOODS_ISSUE_LINE",
           "MOLD",
           "LOCATION",
@@ -4764,11 +4768,12 @@
       "maxLength": 40,
       "x-no-example": true,
       "x-code-key": "CD-DOCUMENT-ISSUE-TARGET-TYPE",
-      "description": "대상 유형. 이 값이 targetId 의 해석을 정한다 — LOT → 자재·생산·제품 로트 · SERIAL_NUMBER → 개체 일련번호 · HANDLING_UNIT → 취급 단위(포장) · GOODS_ISSUE_LINE → 출고 전표 라인 · MOLD → 툴·금형 마스터 · LOCATION → 위치 마스터 · INSPECTION_RESULT → 검사 결과. ⭐ 값 문자열을 확정했다(2026-09-02) — 뜻 일곱은 §3-7 대응표가 이미 못박았고 남은 것은 문자열뿐이었다(공유계약 §G — 확정된 뜻을 영문 SNAKE 로). ⚠ 대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다 — 어디로 갈지 모른다",
+      "description": "대상 유형. 이 값이 targetId 의 해석을 정한다 — LOT → 자재·생산·제품 로트 · SERIAL_NUMBER → 개체 일련번호 · HANDLING_UNIT → 취급 단위(포장) · SHIPMENT_LOT_ALLOCATION → 출하 LOT 배분 · GOODS_ISSUE_LINE → 출고 전표 라인 · MOLD → 툴·금형 마스터 · LOCATION → 위치 마스터 · INSPECTION_RESULT → 검사 결과. ⭐ 납품 라벨은 출하 LOT 배분을 대상으로 발행한다(P-04-01). ⚠ 대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다 — 어디로 갈지 모른다",
       "enum": [
        "LOT",
        "SERIAL_NUMBER",
        "HANDLING_UNIT",
+       "SHIPMENT_LOT_ALLOCATION",
        "GOODS_ISSUE_LINE",
        "MOLD",
        "LOCATION",

@@ -1717,7 +1717,7 @@
      "production"
     ],
     "summary": "생산 실적 등록",
-    "description": "다섯 수량을 그대로 받는다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다. 미확정 표식은 셸이 붙인다(공유계약 C-7 — 화면 조항). 근거: P-02-04 §5",
+    "description": "다섯 수량을 그대로 받는다. P-02-04 생산 LOT 출력에서 저장할 때는 goodQty와 함께 현재 LOT 한 건의 lotAllocations를 필수로 보내며 allocatedQty는 goodQty와 같아야 한다 — W/O 합계가 아니라 해당 LOT 최종 실적으로 귀속하기 위해서다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다. 미확정 표식은 셸이 붙인다(공유계약 C-7 — 화면 조항). 근거: P-02-04 §5",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -4044,7 +4044,7 @@
      "production"
     ],
     "summary": "제품 개체 목록",
-    "description": "이미 발번된 개체를 센다. 화면이 「미발행 양품」을 계산하는 근거다 — 양품 누계에서 이 목록의 건수를 뺀다. 근거: P-02-04 §5-3·§6",
+    "description": "LOT 중간 실적으로 이미 등록된 개체를 조회·계수한다. 생산 LOT 출력 전 실제 생산수량과 이 목록의 전체 건수를 대조한다. 아직 production_result가 없는 LOT도 조회할 수 있으며 양품 누계에서 개체 수를 빼지 않는다. 근거: P-02-04 §5-3·§6",
     "parameters": [
      {
       "name": "lotId",
@@ -4151,7 +4151,7 @@
      "production"
     ],
     "summary": "제품 개체 대량 발번",
-    "description": "양품 N개에 개체 N행을 만든다 — 인식표가 개체별 1:1 이기 때문이다(R69). 번호는 서버가 매긴다. ⛔ 한 트랜잭션이고 부분 발번이 없다 — 하나라도 실패하면 전량 되돌린다. 부분 발번은 번호에 구멍을 만들고 그것을 메울 화면이 없다. 근거: P-02-04 §5-3·§6 · 공유계약 B-8. ⭐ 발행 기록은 이 경로가 만들지 않는다 — 공통 계약의 POST /app/document-issues 가 이어서 만든다. 개체가 먼저 있어야 그쪽 targets 에 담을 수 있다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다. 미확정 표식은 셸이 붙인다(공유계약 C-7 — 화면 조항).",
+    "description": "LOT 중간 실적으로 개체 N행을 만든다 — 인식표가 개체별 1:1 이기 때문이다(R69). 번호는 서버가 매긴다. ⛔ 기존 production_result 또는 goodQty는 선행조건이 아니다. 최종 생산 LOT 출력 시 실제 생산수량과 이 LOT의 전체 개체 수가 같은지 검증한다. ⛔ 한 트랜잭션이고 부분 발번이 없다 — 하나라도 실패하면 전량 되돌린다. 부분 발번은 번호에 구멍을 만들고 그것을 메울 화면이 없다. 근거: P-02-04 §5-3·§6 · 공유계약 B-8. ⭐ 발행 기록은 이 경로가 만들지 않는다 — 공통 계약의 POST /app/document-issues 가 이어서 만든다. 개체가 먼저 있어야 그쪽 targets 에 담을 수 있다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다. 미확정 표식은 셸이 붙인다(공유계약 C-7 — 화면 조항).",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -5929,7 +5929,7 @@
       "items": {
        "$ref": "#/components/schemas/ResultLotAllocation"
       },
-      "description": "실적↔LOT 배분은 본문에 싣는다 — 독립 경로를 두지 않는다"
+      "description": "실적↔LOT 배분은 본문에 싣는다 — 독립 경로를 두지 않는다. P-02-04 생산 LOT 출력 저장은 현재 LOT 한 건을 반드시 보내며 allocatedQty는 goodQty와 같아야 한다."
      },
      "remarks": {
       "type": "string",
@@ -6024,7 +6024,7 @@
       "minimum": 1,
       "maximum": 1000,
       "example": 480,
-      "description": "발번할 개체 수. 미발행 양품 수를 넘으면 400 이다. 근거: P-02-04 §6"
+      "description": "이번에 등록할 인식표 개체 수(1~1000). 기존 production_result 또는 goodQty를 요구하지 않는다. 최종 생산 LOT 출력 때 화면 입력 수량과 LOT 전체 개체 수를 대조한다. 근거: P-02-04 §5-3·§6"
      },
      "producedAt": {
       "type": "string",
