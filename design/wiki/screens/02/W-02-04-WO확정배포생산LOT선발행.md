@@ -78,7 +78,7 @@
 | 상태 | `status_code` | `code_t` | ✅ | | 자동 |
 | **배포 시각** | `released_at` | timestamptz | — | **확정·배포의 흔적** | 자동 |
 | 완료·마감 시각 | `completed_at` · `closed_at` | timestamptz | — | 이 화면 밖 | — |
-| **미달 사유** | `completion_variance_reason_code` | `code_t` | — | ⚠ `P-02-06` 소관 — 여기선 안 쓴다 | — |
+| **미달 사유** | `completion_variance_reason_code` | `code_t` | — | ⚠ 관리웹 `W-02-05` W/O 마감 소관 — 여기선 안 쓴다 | — |
 
 ### §4-B. 생산LOT 선발행 `trace.lot` (슬롯 N개 생성)
 

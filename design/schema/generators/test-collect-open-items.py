@@ -430,9 +430,12 @@ class 폐지_확정_스펙(unittest.TestCase):
 class 정본_실측(unittest.TestCase):
     """표본이 아니라 «지금 저장소»를 한 번 태운다 — 회귀가 여기서 먼저 보인다."""
 
-    def test_폐지_스펙은_정확히_한_벌이고_그것이_W_06_13_이다(self):
+    def test_폐지_스펙_목록은_현재_정본과_일치한다(self):
         specs, gone = coi.collect()
-        self.assertEqual([s["screen"] for s in gone], ["W-06-13"])
+        self.assertEqual(
+            [s["screen"] for s in gone],
+            ["P-02-05", "P-02-06", "P-02-07", "P-04-02", "W-06-13"],
+        )
         self.assertNotIn("W-06-13", [s["screen"] for s in specs])
 
     def test_폐지_스펙에_딸린_미결은_계수에서만_빠진다(self):

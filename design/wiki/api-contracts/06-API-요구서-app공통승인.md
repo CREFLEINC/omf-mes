@@ -25,7 +25,7 @@
 | --- | --- | --- | :-: |
 | 기타출고 품의(폐기) | `W-01-06`·`W-04-10` | `POST /logistics/goods-issues/{goodsIssueId}:request-approval` | ✅ |
 | 재고조정 | `W-01-12` | `POST /inventory/adjustments/{inventoryAdjustmentId}:request-approval` | ✅ |
-| 신규 P/O | `W-01-11` | `POST /logistics/purchase-orders/{purchaseOrderId}:request-approval` | ✅ |
+| 신규 ERP W/O | `W-01-11` | `POST /logistics/purchase-orders/{purchaseOrderId}:request-approval` | ✅ |
 | 물류문서 취소 3종 | `W-01-13` | ⭐ `POST /logistics/document-progress/{documentTypeCode}/{documentId}:request-cancel`(입하·입고·출고 — 2026-09-04 유형 축 통합 · `omf-mes#352`) | ✅ |
 | 출하 취소 | `W-04-12` | `POST /logistics/shipments/{shipmentId}:request-cancel` | ✅ |
 | **긴급 IQC 생략**(한도승인) | **`M-01-13`** | `POST /trace/lots/{lotId}:request-iqc-skip` | ✅ ⭐ **2026-09-01 정정** — 경로는 `#288`(`e38c5d9`)이 신설했는데 **같은 커밋의 이 표가 「0건」으로 남았다.** 서버가 `approval_type_code=IQC_SKIP`·`target_type_code=INBOUND_LOT` 을 채운다(그 오퍼레이션의 내부 주석) |
@@ -239,7 +239,7 @@
 `type: string` 을 유지한다(G-2 — 값이 미확정이면 비활성 + 사유).
 
 ⭐ **`approval_type_code` 후보는 상신 경로에서 기계적으로 나온다**(2026-09-04 재실측 · §1-2 전수표) —
-기타출고 품의(폐기) · 재고조정 · 신규 P/O · 입하 취소 · 입고 취소 · 출고 취소 · 출하 취소 ·
+기타출고 품의(폐기) · 재고조정 · 신규 ERP W/O · 입하 취소 · 입고 취소 · 출고 취소 · 출하 취소 ·
 **긴급 IQC 생략**(`M-01-13` §5-A 가 고정값으로 못박았다) · ⭐ **실적 정정**(`W-02-05` · 2026-09-04 신설) ·
 특채(발의 화면 미특정).
 ⚠ **「한도승인」은 두 뜻이 병존한다** — ① 의심자재 판정 유형(`W-03-09`) ② 긴급 IQC 생략 한도

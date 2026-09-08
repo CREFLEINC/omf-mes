@@ -4,7 +4,7 @@
   "title": "omf-mes 04 제품출하 도메인 API (초안)",
   "version": "0.1.0",
   "description": "04 제품출하 도메인 API 계약. 출하 3층(고객사 지시서 수신본 - MES 출하작업지시 - 실물 출하)과 출하 LOT 배분, 부적합, 처분 결정 조회를 덮는다. 출하지시서는 연계 수신이 기본이라 등록 경로를 두지 않고, 상위 지시가 없는 단독 편성이 상시 구조다. 출하는 2단 확정이다 — 출하 처리가 «재고 차감»과 미확정 출하 생성을 한 트랜잭션으로 하고, 확정이 연계 송신 적재를 건다. 확정 취소 경로는 없다. 이 계약은 남의 계약을 많이 쓴다 — 검사는 품질, 입고·출고·재고·취급 단위는 자재창고, 실적은 생산실행, 승인과 출력물은 공통, 품목과 연계는 기준정보가 소유한다. ⛔ 오프라인 대상 오퍼레이션이 없다 — 이 계약의 테이블에 쓰는 현장 화면 하나가 판정값을 캐시할 수 없어 오프라인 진입을 차단하기 때문이다.",
-  "x-internal-note": "설계·도출 근거는 uiux/2026-08-13-API스펙-04제품출하/ 의 00~03 단계 문서다. 대상 화면 16 — 도메인 배지 18 에서 출력물 계약이 덮는 P-04-02·P-04-04 를 뺀 것이다. 리소스 5 · 라인 4 · 읽기만 1 · 액션 근거 147건(화면 액션 표 · 본문 도출 0). 미해소를 계약이 드러낸다 — ⛔⛔ 처분 결정을 만드는 화면이 인벤토리 116 전체에 0건이라 세 화면(W-04-10·W-04-11·P-04-03)의 진입 목록이 빈다 «(정합주: 2026-09-01 — ⭐ 2026-08-13 DR-008 확정 3-A 로 처분 판정 화면 W-03-10 이 신설돼 해소됐다)». ⛔ 01 계약에 POST /inventory/reservations 가 없어 M-04-01 제품 피킹이 걸린다. omf-mes#117(재구성 이벤트 기록 테이블 부재)로 M-04-03 되돌리기 경로를 두지 않았다. omf-mes#118 로 선별 실행 경로를 두지 않았다."
+  "x-internal-note": "설계·도출 근거는 uiux/2026-08-13-API스펙-04제품출하/ 의 00~03 단계 문서다. 대상 화면 16 — 도메인 배지 18 에서 출력물 계약이 덮는 P-04-01·P-04-04 를 뺀 것이다. 리소스 5 · 라인 4 · 읽기만 1 · 액션 근거 147건(화면 액션 표 · 본문 도출 0). 미해소를 계약이 드러낸다 — ⛔⛔ 처분 결정을 만드는 화면이 인벤토리 116 전체에 0건이라 세 화면(W-04-10·W-04-11·P-04-03)의 진입 목록이 빈다 «(정합주: 2026-09-01 — ⭐ 2026-08-13 DR-008 확정 3-A 로 처분 판정 화면 W-03-10 이 신설돼 해소됐다)». ⛔ 01 계약에 POST /inventory/reservations 가 없어 M-04-01 제품 피킹이 걸린다. omf-mes#117(재구성 이벤트 기록 테이블 부재)로 M-04-03 되돌리기 경로를 두지 않았다. omf-mes#118 로 선별 실행 경로를 두지 않았다."
  },
  "servers": [
   {
@@ -184,7 +184,7 @@
      "shipment"
     ],
     "summary": "출하 LOT 배분 목록",
-    "description": "P-04-01 이 납품라벨↔생산LOT 매칭을 판정받고, P-04-02 가 납품라벨 대상을 고른다. ⭐ 매칭 판정을 화면이 하지 않는다 — 서버가 배분을 보고 판정한다(P-04-01 §5-1 · 공유계약 C-6). 근거: P-04-01 · P-04-02 §5",
+    "description": "P-04-01이 선택한 출하의 생산 LOT 배분을 읽고, LOT 스캔 매칭과 납품 라벨 발행 가능 여부를 판정받는다. 최초 진입의 출하 검색은 GET /logistics/shipments 가 맡고 이 목록은 shipmentId 를 받은 뒤 호출한다. ⭐ 매칭·OQC 판정을 화면이 하지 않는다 — 서버가 배분과 검사 결과를 보고 판정한다(P-04-01 §5-1 · 공유계약 C-6). 근거: P-04-01 §5",
     "parameters": [
      {
       "name": "shipmentId",
@@ -238,7 +238,7 @@
        "type": "boolean",
        "example": true
       },
-      "description": "⭐ 출하검사 합격분만. 납품라벨 대상 목록이 「합격」만 활성하는 데 쓴다(P-04-02 §5)"
+      "description": "⭐ 출하검사 합격분만. 납품라벨 대상 목록이 「합격」만 활성하는 데 쓴다(P-04-01 §5)"
      },
      {
       "name": "q",
@@ -246,7 +246,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "스캔한 납품라벨 값으로 배분을 찾는다. ⛔ 범위는 납품라벨 번호 하나다 — LOT 번호는 lotId 를, 포장은 handlingUnitId 를 쓴다. ⭐ P-04-01 매칭 스캔의 진입이다(P-04-01 §5-1 · 공유계약 D-2). 일치하는 배분이 없으면 «빈 목록»이다 — 화면은 items 가 비었는지로 「없는 납품라벨」을 판정한다. ⛔ 404 를 내지 않는다 — 같은 오퍼레이션의 lotQ 가 이미 200 + match 로 판정을 내리므로, 파라미터에 따라 상태 코드가 갈리면 예외가 는다 ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
+      "description": "기존 납품 라벨 번호로 배분을 찾는다. ⛔ 최초 출하 선택에는 쓰지 않는다 — 그때는 GET /logistics/shipments 의 q 로 출하 번호를 검색한다. 이 질의는 통합 화면 재진입·재출력 때만 쓴다. 범위는 납품 라벨 번호 하나다 — LOT 번호는 lotId 를, 포장은 handlingUnitId 를 쓴다. 일치하는 배분이 없으면 «빈 목록»이다. ⛔ 404 를 내지 않는다. ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
      },
      {
       "name": "lotQ",
@@ -254,7 +254,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "스캔한 생산 LOT 값. shipmentId(납품라벨 스캔으로 정해진 출하)와 함께 주면 서버가 「이 출하의 배분에 이 LOT 이 있는가」를 판정한다 — 화면이 목록을 받아 비교하지 않는다(P-04-01 §5-1 · 공유계약 C-6) ⭐ 이 shipmentId 는 첫 스캔(q) 응답의 ShipmentLotAllocation.shipmentId 에서 그대로 얻는다 — 화면이 출하를 다시 조회하지 않는다(omf-mes#330 A)."
+      "description": "스캔한 생산 LOT 값. shipmentId 와 함께 주면 서버가 「이 출하의 배분에 이 LOT 이 있는가」를 판정한다 — 화면이 목록을 받아 비교하지 않는다(P-04-01 §5-1 · 공유계약 C-6). ⭐ shipmentId 는 최초 진입이면 GET /logistics/shipments 의 출하 선택 결과에서, 재진입이면 기존 납품 라벨 q 응답에서 얻는다."
      },
      {
       "name": "page",
@@ -342,8 +342,37 @@
       "format": "int64",
       "example": 1001
      }
-    }
+   }
    ],
+   "get": {
+    "tags": [
+     "shipment"
+    ],
+    "summary": "출하 LOT 배분 상세",
+    "description": "납품 라벨 발행 기록의 SHIPMENT_LOT_ALLOCATION 대상과 P-04-01 재진입 대상 한 건을 식별자로 읽는다. 근거: P-04-01 §4·§5 · 출력물 요구서 §3-7",
+    "responses": {
+     "200": {
+      "description": "상세",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ShipmentLotAllocation"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    }
+   },
    "put": {
     "tags": [
      "shipment"
@@ -1016,8 +1045,18 @@
      "shipment"
     ],
     "summary": "출하 목록",
-    "description": "W-04-02·W-04-04·W-04-12 가 함께 쓴다. 기간 필수(L-3)",
+    "description": "W-04-02·W-04-04·W-04-12·P-04-01이 함께 쓴다. 목록 조회는 기간 필수(L-3)다. P-04-01의 출하번호 스캔처럼 shipmentNo를 정확 일치로 주는 단건 식별 조회는 기간을 생략할 수 있다.",
     "parameters": [
+     {
+      "name": "shipmentNo",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "maxLength": 100
+      },
+      "description": "출하 번호 정확 일치. POP 스캔 진입이 사용하며 이 값을 주면 기간을 생략할 수 있다. 일치하지 않으면 200 빈 목록을 반환한다. 부분 검색은 q를 쓴다. 근거: P-04-01 §3-1 · 공유계약 D-2",
+      "example": "SH-2026-0813-0031"
+     },
      {
       "name": "shipmentRequestId",
       "in": "query",
@@ -1081,7 +1120,7 @@
        "format": "date",
        "example": "2026-08-13"
       },
-      "description": "필수"
+      "description": "목록 조회에서는 필수. shipmentNo 정확 일치 조회에서는 생략 가능"
      },
      {
       "name": "shipDateTo",
@@ -1090,7 +1129,8 @@
        "type": "string",
        "format": "date",
        "example": "2026-08-13"
-      }
+      },
+      "description": "목록 조회에서는 필수. shipmentNo 정확 일치 조회에서는 생략 가능"
      },
      {
       "name": "q",
@@ -3110,9 +3150,22 @@
       "format": "int64",
       "example": 1001
      },
+     "shippingInspectionStatusCode": {
+      "type": "string",
+      "enum": [
+       "NOT_REQUIRED",
+       "PENDING",
+       "PASSED",
+       "REJECTED",
+       "HELD"
+      ],
+      "description": "이 배분의 출하검사 상태. NOT_REQUIRED=검사 절차 없음 · PENDING=결과 대기 · PASSED=합격 · REJECTED=불합격 · HELD=보류. 03 품질 결과를 서버가 배분 단위로 판정한다. 화면은 이 값을 그대로 표시하고 자체 조합하지 않는다(P-04-01 §5-1).",
+      "example": "NOT_REQUIRED",
+      "x-code-key": "CD-SHIPPING-INSPECTION-STATUS"
+     },
      "oqcPassed": {
       "type": "boolean",
-      "description": "⭐ 서버가 판정한 값 — 이 배분의 LOT 이 출하검사에 합격했는가. 납품라벨 대상 목록이 「합격」만 활성하는 데 쓴다(P-04-02 §5). 검사 결과는 03 품질 계약이 소유한다 ⛔ 없으면 납품라벨 대상을 가릴 수 없다 — 항상 내린다(P-04-02 §5-1). ⛔ 검사 대상이 아닌 배분(해당 라인의 shippingInspectionRequired=false)은 true 로 내린다 — 「검사를 안 거쳤다」가 「발행하면 안 된다」가 아니다.",
+      "description": "⭐ 서버가 판정한 납품 라벨 발행 게이트. shippingInspectionStatusCode 가 PASSED 또는 NOT_REQUIRED 이면 true, 나머지는 false 다. 검사 결과는 03 품질 계약이 소유한다. ⛔ 화면이 상태 문자열로 다시 계산하지 않는다 — 이 값을 활성 조건으로 쓴다(P-04-01 §5-1).",
       "example": true
      },
      "packedQty": {
@@ -3133,6 +3186,7 @@
      "allocatedQty",
      "uomId",
      "packedQty",
+     "shippingInspectionStatusCode",
      "oqcPassed"
     ],
     "description": "출하 LOT 배분 — genealogy 종결점이다. ⛔ 등록 경로를 두지 않는다 — 출하 처리가 shipment·shipment_line 과 한 트랜잭션으로 만든다(W-04-04 §5 · 공유계약 B-8). shipment_line_id 가 NOT NULL 이라 출하보다 먼저 생길 수 없다"

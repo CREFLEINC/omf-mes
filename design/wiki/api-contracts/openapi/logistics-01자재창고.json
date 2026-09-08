@@ -2079,7 +2079,7 @@
       "schema": {
        "type": "string"
       },
-      "x-no-code-key": "코드 그룹을 세우지 않는다 — 진행은 파생으로 나오고 이 칸을 «올릴» 주체가 없다. ASN 은 ERP 수신본이라 경로가 GET 셋뿐이고(등록·수정·삭제 없음) 소비 화면은 W-01-09 조회 하나다. 예정 대비 실입하는 AsnLine.expectedQty ↔ receivedQty 로 서버가 계산한다 — InventoryCountLine 이 라인 진행을 counted 로 두고 「이 필드로 하지 않는다」고 한 것과 같은 형태다(사용자 결정 2026-09-02). ⚠ ERP 가 ASN 을 안 보내면 W-01-09 는 빈다 — 입하는 P/O 기준으로 그대로 돈다.",
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 진행은 파생으로 나오고 이 칸을 «올릴» 주체가 없다. ASN 은 ERP 수신본이라 경로가 GET 셋뿐이고(등록·수정·삭제 없음) 소비 화면은 W-01-09 조회 하나다. 예정 대비 실입하는 AsnLine.expectedQty ↔ receivedQty 로 서버가 계산한다 — InventoryCountLine 이 라인 진행을 counted 로 두고 「이 필드로 하지 않는다」고 한 것과 같은 형태다(사용자 결정 2026-09-02). ⚠ ERP 가 ASN 을 안 보내면 W-01-09 는 빈다 — 입하는 ERP W/O 기준으로 그대로 돈다.",
       "description": "독립 상태 코드를 사용하는 조회 조건이 아니다. 독립 상태 코드를 사용하지 않는 입하 예정 수신본이다. 예정 대비 실입하 진행은 라인의 expectedQty와 receivedQty로 확인한다."
      },
      {
@@ -3777,10 +3777,13 @@
      "logistics"
     ],
     "summary": "초과 입하 분리 등록",
-    "description": "정량분과 초과분을 한 트랜잭션으로 등록한다. 근거: W-01-03 §5-1 · §5-4",
+    "description": "정량분과 초과분을 한 트랜잭션으로 등록한다. 관리웹 W-01-03과 모바일 M-01-01의 초과 입하 단계가 함께 사용한다. 단말 토큰 요청은 X-Worker-No가 필수다. 근거: W-01-03 §5-1 · §5-4 · M-01-01 §5-2-2",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/WorkerNoOptional"
      }
     ],
     "requestBody": {
@@ -3825,7 +3828,7 @@
       }
      }
     },
-    "x-internal-note": "세 갈래(BOTH·NORMAL_ONLY·EXCESS_ONLY)가 모두 화면의 버튼이다. 부분 실패를 허용하지 않는다 — 화면이 「한 트랜잭션」이라고 못박았다(W-01-03 §5-4)."
+    "x-internal-note": "세 갈래(BOTH·NORMAL_ONLY·EXCESS_ONLY)가 모두 화면의 버튼이다. 부분 실패를 허용하지 않는다 — 화면이 「한 트랜잭션」이라고 못박았다(W-01-03 §5-4). 관리웹과 모바일이 같은 경로를 사용하므로 WorkerNoOptional을 선언한다. 계정 토큰은 인증 주체에서 행위자를 풀고, 단말 토큰은 X-Worker-No가 없으면 거부한다(공유계약 D-5)."
    }
   },
   "/logistics/material-issue-requests": {
@@ -4306,7 +4309,7 @@
     "tags": [
      "logistics"
     ],
-    "summary": "P/O 목록",
+    "summary": "ERP W/O 목록",
     "description": "근거: W-01-09 §5-1 · W-01-11",
     "parameters": [
      {
@@ -4343,7 +4346,7 @@
        "type": "integer",
        "format": "int64"
       },
-      "description": "이 품목이 라인에 있는 P/O 만"
+      "description": "이 품목이 라인에 있는 ERP W/O 만"
      },
      {
       "name": "orderDateFrom",
@@ -4429,7 +4432,7 @@
     "tags": [
      "logistics"
     ],
-    "summary": "P/O 등록",
+    "summary": "ERP W/O 등록",
     "description": "헤더와 라인을 한 트랜잭션으로 저장한다. 근거: W-01-11 §5-1",
     "parameters": [
      {
@@ -4506,7 +4509,7 @@
     "tags": [
      "logistics"
     ],
-    "summary": "P/O 상세",
+    "summary": "ERP W/O 상세",
     "description": "헤더와 라인을 함께 내린다. 근거: W-01-09 §5-1 · W-01-03",
     "responses": {
      "200": {
@@ -4544,7 +4547,7 @@
     "tags": [
      "logistics"
     ],
-    "summary": "P/O 헤더 수정",
+    "summary": "ERP W/O 헤더 수정",
     "description": "작성중 상태에서만 허용한다. 근거: 공유계약 B-1 · G-1",
     "parameters": [
      {
@@ -4634,7 +4637,7 @@
     "tags": [
      "logistics"
     ],
-    "summary": "P/O 라인 목록",
+    "summary": "ERP W/O 라인 목록",
     "description": "근거: W-01-11 §4-B",
     "responses": {
      "200": {
@@ -4653,7 +4656,7 @@
     "tags": [
      "logistics"
     ],
-    "summary": "P/O 라인 치환",
+    "summary": "ERP W/O 라인 치환",
     "description": "라인 배열을 통째로 치환한다. 이미 입하가 붙은 라인은 지울 수 없다. 근거: W-01-11 §5-1 · 공유계약 A-5 ⭐ 이 경로의 조회는 ETag 를 내리지 않는다 — If-Match 에 담을 토큰은 부모 자원 GET /logistics/purchase-orders/{purchaseOrderId} 200 의 ETag 다. 잠그는 단위가 부모이기 때문이다. 근거: 공유계약 B-1-1",
     "parameters": [
      {
@@ -4753,8 +4756,8 @@
     "tags": [
      "logistics"
     ],
-    "summary": "P/O 승인 요청",
-    "description": "등록이 끝난 P/O 에 승인을 건다. 결재선이 없으면 400(code=ROUTE_NOT_FOUND)이다 — 상신할 곳이 없는 요청을 만들지 않는다. 진행 중인 승인 요청이 이미 있으면 400 이다 — 한 전표에 살아 있는 요청은 하나다. 반려된 요청은 진행 중이 아니므로 다시 상신할 수 있고 그때는 새 요청이 만들어진다(공유계약 J-6). 근거: W-01-11 §5-1 · 공유계약 J-4",
+    "summary": "ERP W/O 승인 요청",
+    "description": "등록이 끝난 ERP W/O 에 승인을 건다. 결재선이 없으면 400(code=ROUTE_NOT_FOUND)이다 — 상신할 곳이 없는 요청을 만들지 않는다. 진행 중인 승인 요청이 이미 있으면 400 이다 — 한 전표에 살아 있는 요청은 하나다. 반려된 요청은 진행 중이 아니므로 다시 상신할 수 있고 그때는 새 요청이 만들어진다(공유계약 J-6). 근거: W-01-11 §5-1 · 공유계약 J-4",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -5966,7 +5969,16 @@
        "type": "integer",
        "format": "int64"
       },
-      "description": "이 W/O 를 원천으로 발행된 LOT 만. 선발행 슬롯을 빠짐없이 훑는 경로다 — 마감(W-02-05 §3)과 POP 의 실적 대상 LOT 선택(P-02-04 §5)·생산LOT 완료(P-02-06 §3 좌단 LOT 목록)가 같은 축을 쓴다. ⭐ 저장된 형태는 다형 참조 짝(sourceTypeCode + sourceId)이지만 판별자 값 목록이 아직 미확정이라 짝 필터를 열지 않았다 — 값을 모르는 채 열면 눌러도 아무것도 안 걸린다(공유계약 G-23). 서버가 W/O 원천으로 풀어 준다"
+     "description": "이 W/O 를 원천으로 발행된 LOT 만. 선발행 슬롯을 빠짐없이 훑는 경로다 — 마감(W-02-05 §3)과 POP 의 실적 대상 LOT 선택(P-02-04 §5)·생산LOT 완료(P-02-04 §3 좌단 LOT 목록)가 같은 축을 쓴다. ⭐ 저장된 형태는 다형 참조 짝(sourceTypeCode + sourceId)이지만 판별자 값 목록이 아직 미확정이라 짝 필터를 열지 않았다 — 값을 모르는 채 열면 눌러도 아무것도 안 걸린다(공유계약 G-23). 서버가 W/O 원천으로 풀어 준다"
+     },
+     {
+      "name": "currentOnly",
+      "in": "query",
+      "schema": {
+       "type": "boolean",
+       "default": false
+      },
+      "description": "현재 작업 대상 생산 LOT 한 건만. true 이면 workOrderId 가 필수다. 서버는 해당 W/O의 completedAt 이 비어 있고 lifecycleStatusCode 가 WAITING 또는 ACTIVE 인 슬롯 중 workOrderSequenceNo 가 가장 작은 건을 최대 1건 반환한다. VOIDED 는 제외한다. ⛔ 화면이 페이지 첫 행을 현재 LOT으로 추측하지 않는다. 근거: P-02-04 §3·§5"
      },
      {
       "name": "receiptDispositionCode",
@@ -5999,7 +6011,7 @@
       "schema": {
        "type": "boolean"
       },
-      "description": "완료 처리됐는가로 거른다 — false 면 completedAt 이 비어 있는 것만, true 면 값이 있는 것만 낸다. LOT 라벨 출력(P-02-07 §4-B)의 완료 LOT 목록과 긴급 직행 출하(W-04-05 §3)의 생산 완료분 선택이 이 축으로 선다. ⭐ 상태 코드 문자열을 몰라도 판정된다. ⛔ statusCode(품질 판정 축)로는 완료를 고를 수 없다. ⛔ 응답을 화면이 거르는 것으로는 성립하지 않는다 — 목록이 쪽 단위다(공유계약 L-11). 근거: P-02-07 §4-B·§5-4 · omf-mes#269"
+      "description": "완료 처리됐는가로 거른다 — false 면 completedAt 이 비어 있는 것만, true 면 값이 있는 것만 낸다. LOT 라벨 출력(P-02-04 §4-B)의 완료 LOT 목록과 긴급 직행 출하(W-04-05 §3)의 생산 완료분 선택이 이 축으로 선다. ⭐ 상태 코드 문자열을 몰라도 판정된다. ⛔ statusCode(품질 판정 축)로는 완료를 고를 수 없다. ⛔ 응답을 화면이 거르는 것으로는 성립하지 않는다 — 목록이 쪽 단위다(공유계약 L-11). 근거: P-02-04 §4-B·§5-4 · omf-mes#269"
      },
      {
       "name": "unreceivedOnly",
@@ -6033,6 +6045,16 @@
            "$ref": "#/components/schemas/PageMeta"
           }
          }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "질의 조합 오류. currentOnly=true인데 workOrderId가 없으면 400",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
         }
        }
       }
@@ -6670,7 +6692,7 @@
      "trace"
     ],
     "summary": "생산 LOT 완료",
-    "description": "생산 LOT 을 완료로 옮긴다. 계획 수량에 미달하면 사유 코드가 필수이고, 서버가 LOT 상태와 작업지시 사유를 한 트랜잭션으로 기록한다(공유계약 B-8). ⛔ 라벨 출력은 이 오퍼레이션 밖이다 — 공통 출력물 계약이 소유한다. 오프라인 대상이다(공유계약 C-9). 근거: P-02-06 §5-5",
+    "description": "생산 LOT 라벨을 부착한 뒤 스캔한 현재 LOT을 완료로 옮긴다. 이 동작은 LOT 생산 등록 확정이며 W/O 마감이 아니다. 계획 수량 미달 사유와 잔량 처리는 받지 않고 관리웹 W-02-05의 W/O 마감에서 처리한다. 라벨 발행은 이 오퍼레이션 밖이며 공통 출력물 계약이 소유한다. 오프라인 대상이다(공유계약 C-9). 근거: P-02-04 §3-3",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -7097,7 +7119,7 @@
       "description": "독립 상태 코드를 사용하지 않는 입하 예정 수신본이다. 예정 대비 실입하 진행은 라인의 expectedQty와 receivedQty로 확인한다.",
       "x-no-example": true,
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
-      "x-no-code-key": "코드 그룹을 세우지 않는다 — 진행은 파생으로 나오고 이 칸을 «올릴» 주체가 없다. ASN 은 ERP 수신본이라 경로가 GET 셋뿐이고(등록·수정·삭제 없음) 소비 화면은 W-01-09 조회 하나다. 예정 대비 실입하는 AsnLine.expectedQty ↔ receivedQty 로 서버가 계산한다 — InventoryCountLine 이 라인 진행을 counted 로 두고 「이 필드로 하지 않는다」고 한 것과 같은 형태다(사용자 결정 2026-09-02). ⚠ ERP 가 ASN 을 안 보내면 W-01-09 는 빈다 — 입하는 P/O 기준으로 그대로 돈다."
+      "x-no-code-key": "코드 그룹을 세우지 않는다 — 진행은 파생으로 나오고 이 칸을 «올릴» 주체가 없다. ASN 은 ERP 수신본이라 경로가 GET 셋뿐이고(등록·수정·삭제 없음) 소비 화면은 W-01-09 조회 하나다. 예정 대비 실입하는 AsnLine.expectedQty ↔ receivedQty 로 서버가 계산한다 — InventoryCountLine 이 라인 진행을 counted 로 두고 「이 필드로 하지 않는다」고 한 것과 같은 형태다(사용자 결정 2026-09-02). ⚠ ERP 가 ASN 을 안 보내면 W-01-09 는 빈다 — 입하는 ERP W/O 기준으로 그대로 돈다."
      },
      "remarks": {
       "x-source-column": "remarks",
@@ -7203,7 +7225,7 @@
       ],
       "readOnly": true,
       "example": 500.0,
-      "description": "이 라인이 가리키는 P/O 라인의 발주 수량. purchaseOrderLineId 가 비면(무발주) 널이다"
+      "description": "이 라인이 가리키는 ERP W/O 라인의 발주 수량. purchaseOrderLineId 가 비면(무발주) 널이다"
      },
      "receivedQty": {
       "type": [
@@ -7212,7 +7234,7 @@
       ],
       "readOnly": true,
       "example": 0.0,
-      "description": "그 P/O 라인의 누적 입하 수량. 화면의 「진행」 열은 receivedQty ÷ orderedQty 다 — 화면이 라인마다 P/O 를 따로 부르지 않는다(공유계약 L-2). 무발주 행은 널이고 화면은 「—」로 그린다(W-01-09 §5-2)"
+      "description": "그 ERP W/O 라인의 누적 입하 수량. 화면의 「진행」 열은 receivedQty ÷ orderedQty 다 — 화면이 라인마다 ERP W/O 를 따로 부르지 않는다(공유계약 L-2). 무발주 행은 널이고 화면은 「—」로 그린다(W-01-09 §5-2)"
      }
     },
     "x-internal-note": "asn_line 에 version_no 가 없다 — 낙관적 잠금 대상이 아니다(W-01-09 §5-3). orderedQty·receivedQty 는 asn_line 의 컬럼이 아니라 purchase_order_line 을 조인해 내리는 파생값이다 — W-01-09 §4-B 가 그 출처를 지정했다."
@@ -9035,7 +9057,7 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "P/O 없이 도착한 예외 입하의 유형. 값 = CUSTOMER_SUPPLY·FREE_SAMPLE·URGENT_RECEIPT·OVER_DELIVERY (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INBOUND_RECEIPT_EXCEPTION_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "ERP W/O 없이 도착한 예외 입하의 유형. 값 = CUSTOMER_SUPPLY·FREE_SAMPLE·URGENT_RECEIPT·OVER_DELIVERY (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INBOUND_RECEIPT_EXCEPTION_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "CUSTOMER_SUPPLY",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-INBOUND-RECEIPT-EXCEPTION-TYPE"
@@ -9153,7 +9175,7 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "P/O 를 고르지 않고 진행할 때 필수. 값 = CUSTOMER_SUPPLY·FREE_SAMPLE·URGENT_RECEIPT·OVER_DELIVERY (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INBOUND_RECEIPT_EXCEPTION_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "ERP W/O 를 고르지 않고 진행할 때 필수. 값 = CUSTOMER_SUPPLY·FREE_SAMPLE·URGENT_RECEIPT·OVER_DELIVERY (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INBOUND_RECEIPT_EXCEPTION_TYPE 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "CUSTOMER_SUPPLY",
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-INBOUND-RECEIPT-EXCEPTION-TYPE"
@@ -9258,7 +9280,7 @@
        "null"
       ],
       "format": "int64",
-      "description": "P/O 없이 도착한 예외 입하는 비어 있다",
+      "description": "ERP W/O 없이 도착한 예외 입하는 비어 있다",
       "example": 1001
      },
      "asnLineId": {
@@ -9589,7 +9611,7 @@
      "businessDate",
      "occurredAt"
     ],
-    "description": "초과 입하 분리. 정량분과 초과분을 한 트랜잭션으로 등록한다. mode 로 어느 쪽을 저장할지 고른다 — 세 갈래가 모두 화면의 버튼이다. 근거: W-01-03 §5-1 · §5-4",
+    "description": "초과 입하 분리. 정량분과 초과분을 한 트랜잭션으로 등록한다. mode 로 어느 쪽을 저장할지 고른다 — 세 갈래가 모두 W-01-03과 M-01-01 화면의 버튼이다. 초과분을 포함하면 예외 유형과 사유가 필수다. 근거: W-01-03 §5-1 · §5-4 · M-01-01 §5-2-2",
     "properties": {
      "mode": {
       "type": "string",
@@ -9622,7 +9644,62 @@
       "example": "2026-08-06T09:12:00+09:00"
      }
     },
-    "x-internal-note": "businessDate·occurredAt 은 바깥에서 한 번만 받는다 — 두 건이 같은 순간의 한 트랜잭션이기 때문이다. ⚠ mode 에 따른 normal·excess 의 조건부 필수를 oneOf 로 표현하지 않았다 — 초안 단계라 description 으로 둔다. 목 서버·검증기는 mode 와 어긋나는 조합을 통과시킨다."
+    "oneOf": [
+     {
+      "properties": {
+       "mode": {
+        "const": "BOTH"
+       },
+       "excess": {
+        "required": [
+         "exceptionTypeCode",
+         "exceptionReason"
+        ]
+       }
+      },
+      "required": [
+       "normal",
+       "excess"
+      ]
+     },
+     {
+      "properties": {
+       "mode": {
+        "const": "NORMAL_ONLY"
+       }
+      },
+      "required": [
+       "normal"
+      ],
+      "not": {
+       "required": [
+        "excess"
+       ]
+      }
+     },
+     {
+      "properties": {
+       "mode": {
+        "const": "EXCESS_ONLY"
+       },
+       "excess": {
+        "required": [
+         "exceptionTypeCode",
+         "exceptionReason"
+        ]
+       }
+      },
+      "required": [
+       "excess"
+      ],
+      "not": {
+       "required": [
+        "normal"
+       ]
+      }
+     }
+    ],
+    "x-internal-note": "businessDate·occurredAt 은 바깥에서 한 번만 받는다 — 두 건이 같은 순간의 한 트랜잭션이기 때문이다. mode 별 본문 모양과 초과 예외 유형·사유 필수를 oneOf 로 강제한다."
    },
    "InboundReceiptSplitResponse": {
     "type": "object",
@@ -10950,7 +11027,7 @@
       "x-source-column": "source_document_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "원천 문서 유형. **A-10 다형 참조 판별자**이고 값은 «대상 테이블 이름»이다 — sourceDocumentId 는 그 표의 식별자다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다. 지금은 하나다 — 생산오더(PRODUCTION_ORDER → production.production_order). ⭐ W-02-01 §5-4 가 「P/O 의 «자재예약정보»가 production_order 에 없고 inventory_reservation 이 P/O 를 가리킨다」로 이 축을 세웠고 2026-09-02 에 「서버가 건다」로 해소됐다. ⚠ 값이 하나라고 축이 없는 것이 아니다 — 판별자는 «무엇을 가리키는지»를 말하고, 가리킬 표가 늘면 계약을 고친다.",
+      "description": "원천 문서 유형. **A-10 다형 참조 판별자**이고 값은 «대상 테이블 이름»이다 — sourceDocumentId 는 그 표의 식별자다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다. 지금은 하나다 — 생산오더(PRODUCTION_ORDER → production.production_order). ⭐ W-02-01 §5-4 가 「ERP W/O 의 «자재예약정보»가 production_order 에 없고 inventory_reservation 이 ERP W/O 를 가리킨다」로 이 축을 세웠고 2026-09-02 에 「서버가 건다」로 해소됐다. ⚠ 값이 하나라고 축이 없는 것이 아니다 — 판별자는 «무엇을 가리키는지»를 말하고, 가리킬 표가 늘면 계약을 고친다.",
       "x-no-example": true,
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-INVENTORY-RESERVATION-SOURCE-DOCUMENT-TYPE",
@@ -11391,7 +11468,9 @@
      "uomId",
      "sourceTypeCode",
      "sourceId",
-     "statusCode"
+     "statusCode",
+     "workOrderSequenceNo",
+     "workOrderLotCount"
     ],
     "description": "자재 LOT. 공장 안에서 번호가 유일하다. 근거: M-01-02 · P-01-01",
     "properties": {
@@ -11494,6 +11573,27 @@
       "example": "WAITING",
       "x-code-key": "CD-LOT-LIFECYCLE-STATUS"
      },
+     "workOrderSequenceNo": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "minimum": 1,
+      "readOnly": true,
+      "description": "W/O 전개 시 확정된 생산 LOT 순번. W/O 원천 생산 LOT에는 항상 내리고 그 외 LOT은 null이다. 현재 LOT 결정과 ‘현재/전체’ 표시에 쓴다. 화면이 lotNo 또는 생성시각으로 순서를 추측하지 않는다.",
+      "example": 2,
+      "x-internal-note": "📨 물리 저장 컬럼 신설 또는 확인 대상 — W/O 전개 시 함께 고정한다. 계약이 앞서 세우고 데이터 모델 담당에게 통지한다. 근거: 02-SW설계사양서 §4.6 · P-02-04"
+     },
+     "workOrderLotCount": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "minimum": 1,
+      "readOnly": true,
+      "description": "같은 W/O에서 선발행된 생산 LOT 슬롯 전체 수. W/O 원천 생산 LOT에는 서버가 계산해 항상 내리고 그 외 LOT은 null이다. P-02-04의 ‘현재 LOT 번호(순서대로)’ 표시용이며 폐번 슬롯도 전체 수에는 포함한다.",
+      "example": 8
+     },
      "parentLotId": {
       "x-source-column": "parent_lot_id",
       "type": [
@@ -11511,7 +11611,7 @@
        "null"
       ],
       "format": "date-time",
-      "description": "생산 LOT 완료 처리(P-02-06)가 찍는 시각. 비어 있으면 아직 완료되지 않았다. ⭐ 상태 코드 문자열을 몰라도 완료 여부가 판정된다 — 완료 시각이 있고 없고로 갈리기 때문이다. ⛔ 「완료」·「미달 마감」은 statusCode(품질 판정)에도 lifecycleStatusCode(생명주기)에도 값으로 넣지 않는다. 자재·제품 LOT 은 null. 근거: P-02-06 §5-5 · 공유계약 §I-32·§I-49",
+      "description": "생산 LOT 완료 처리(P-02-04)가 찍는 시각. 비어 있으면 아직 완료되지 않았다. ⭐ 상태 코드 문자열을 몰라도 완료 여부가 판정된다 — 완료 시각이 있고 없고로 갈리기 때문이다. ⛔ 「완료」·「미달 마감」은 statusCode(품질 판정)에도 lifecycleStatusCode(생명주기)에도 값으로 넣지 않는다. 자재·제품 LOT 은 null. 근거: P-02-04 §5-5 · 공유계약 §I-32·§I-49",
       "example": "2026-08-11T17:40:00+09:00",
       "x-internal-note": "📨 물리 컬럼 신설 통지 대상 — x-source-column 은 대응 컬럼이 확인되면 단다(계약이 앞서 있는 상태이며 기다리지 않는다 · data-model-boundary.md). lifecycleStatusCode 와 한 묶음으로 데이터 모델 담당에게 통지한다. ⛔ Lot 에 두 번째 판정값을 두지 않는다 — 완료/미달 배지의 판정값은 W/O 진행 스키마의 completionJudgmentCode 와 같은 어휘로 서버가 한 곳에서만 낸다(W-02-08 §5-2). 근거: omf-mes#269"
      },
@@ -11567,7 +11667,7 @@
       ]
      }
     },
-    "x-internal-note": "입하 시점의 LOT 은 Hold 로 생긴다 — 가용 재고가 아니다(M-01-01 §5-4 · ✓확정 §재정의 #5). 📨 「W/O 내 순번」(별도 속성 — 선발행 슬롯 구간 지정용)은 계약이 앞서 세울 자리이고 저장 컬럼은 통지 대상이다 — 기다리지 않는다. 근거: 02-SW설계사양서 §4.6 · omf-mes#46."
+    "x-internal-note": "입하 시점의 LOT 은 Hold 로 생긴다 — 가용 재고가 아니다(M-01-01 §5-4 · ✓확정 §재정의 #5). 생산 LOT의 W/O 내 순번은 workOrderSequenceNo 로 계약을 세웠고 저장 컬럼은 데이터 모델 통지 대상이다. workOrderLotCount 는 같은 W/O 슬롯 수의 서버 파생값이다. 근거: 02-SW설계사양서 §4.6 · P-02-04 · omf-mes#46."
    },
    "LotComplete": {
     "type": "object",
@@ -11575,18 +11675,8 @@
      "businessDate",
      "occurredAt"
     ],
-    "description": "생산 LOT 완료. 계획 수량에 미달하면 사유 코드가 필요하고, 서버가 작업지시에 그 사유를 함께 기록한다 — 한 트랜잭션이다(공유계약 B-8). 근거: P-02-06 §5-5",
+    "description": "생산 LOT 완료. 부착 라벨 스캔으로 LOT 생산 등록을 확정한다. 미달 사유·잔량 처리는 W/O 마감 소관이므로 이 본문에서 받지 않는다. 근거: P-02-04 §3-3",
     "properties": {
-     "completionVarianceReasonCode": {
-      "type": [
-       "string",
-       "null"
-      ],
-      "description": "미달 마감 사유. 계획 수량에 미달하면 필수이고 서버가 400 으로 막는다(P-02-06 §5-5). ⚠ W/O 마감(POST /production/work-orders/{id}:close 의 reasonCode)이 «같은 축»을 쓴다 — 생산LOT 완료는 S10, W/O 마감은 S12 라 마감이 나중이다. 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_ORDER_COMPLETION_VARIANCE_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
-      "example": "MATERIAL_SHORTAGE",
-      "x-internal-note": "공유계약 B-13(한 컬럼을 여러 경로가 바꾸면 누가 정하고 누가 반영하나를 계약이 가른다)이 미충족이다. LOT 단위 사유를 보존하려면 trace.lot 쪽 칸이 필요하다 — 데이터모델 소관(P-02-06 §8 미결 2). ⚠ LOT 은 미달인데 W/O 합계는 정상인 조합에서 마감이 빈 값으로 앞 사유를 지우는지 유지하는지 아직 정해지지 않았다 — 서버가 한 곳에서 정한다.",
-      "x-code-key": "CD-WORK-ORDER-COMPLETION-VARIANCE-REASON"
-     },
      "remarks": {
       "x-source-column": "remarks",
       "type": [
@@ -12241,7 +12331,7 @@
    },
    "LotProgress": {
     "type": "object",
-    "description": "이 LOT 의 생산 진척. 서버가 계산해 내린다 — 화면이 각자 계산하면 완료 화면과 라벨 화면의 값이 갈린다(공유계약 L-2). 근거: P-02-04 §5 · P-02-06 §5-2",
+    "description": "이 LOT 의 생산 진척. 서버가 계산해 내린다 — 화면이 각자 계산하면 완료 화면과 라벨 화면의 값이 갈린다(공유계약 L-2). 근거: P-02-04 §5 · P-02-04 §5-2",
     "required": [
      "goodQty",
      "achievementRate",
@@ -13033,7 +13123,7 @@
      "orderDate",
      "statusCode"
     ],
-    "description": "P/O 헤더. 근거: W-01-11 · W-01-09 · W-01-03",
+    "description": "ERP W/O 헤더. 근거: W-01-11 · W-01-09 · W-01-03",
     "properties": {
      "purchaseOrderId": {
       "x-source-column": "purchase_order_id",
@@ -13055,8 +13145,8 @@
        "null"
       ],
       "maxLength": 100,
-      "description": "ERP 발주번호. MES 에서 먼저 만든 P/O 는 비어 있다",
-      "x-internal-note": "⚠ 유일 제약이 없다(실측) — 같은 ERP 번호를 두 MES P/O가 가질 수 있다. 의도인지 누락인지 미확정 — 화면은 중복을 경고할 수 있으나 강제는 서버·DB 몫이다. 근거: W-01-11 §6·§8-3 · omf-mes#75",
+      "description": "ERP 발주번호. MES 에서 먼저 만든 ERP W/O 는 비어 있다",
+      "x-internal-note": "⚠ 유일 제약이 없다(실측) — 같은 ERP 번호를 두 MES ERP W/O가 가질 수 있다. 의도인지 누락인지 미확정 — 화면은 중복을 경고할 수 있으나 강제는 서버·DB 몫이다. 근거: W-01-11 §6·§8-3 · omf-mes#75",
       "example": "EPO-2026-000123"
      },
      "supplierId": {
@@ -13124,7 +13214,7 @@
      "orderDate",
      "lines"
     ],
-    "description": "P/O 등록 요청. 헤더와 라인을 한 트랜잭션으로 저장한다 — 헤더만 남고 라인이 없는 P/O 는 만들지 않는다. purchaseOrderNo 와 statusCode 는 서버가 정한다. 근거: W-01-11 §5-1",
+    "description": "ERP W/O 등록 요청. 헤더와 라인을 한 트랜잭션으로 저장한다 — 헤더만 남고 라인이 없는 ERP W/O 는 만들지 않는다. purchaseOrderNo 와 statusCode 는 서버가 정한다. 근거: W-01-11 §5-1",
     "properties": {
      "supplierId": {
       "x-source-column": "supplier_id",
@@ -13209,7 +13299,7 @@
      "toleranceOverQty",
      "toleranceUnderQty"
     ],
-    "description": "P/O 라인.",
+    "description": "ERP W/O 라인.",
     "properties": {
      "purchaseOrderLineId": {
       "x-source-column": "purchase_order_line_id",
@@ -13346,7 +13436,7 @@
      "supplierId",
      "orderDate"
     ],
-    "description": "P/O 헤더 수정. 작성중 상태에서만 허용한다 — 확정 후에는 400 STATE_LOCKED. 근거: W-01-11 · 공유계약 G-1",
+    "description": "ERP W/O 헤더 수정. 작성중 상태에서만 허용한다 — 확정 후에는 400 STATE_LOCKED. 근거: W-01-11 · 공유계약 G-1",
     "properties": {
      "supplierId": {
       "x-source-column": "supplier_id",

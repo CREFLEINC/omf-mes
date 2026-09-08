@@ -96,9 +96,9 @@
 | 자재 투입 | `can_input_material` | **false** | `P-02-03` · `P-02-11` |
 | 실적 입력 | `can_input_result` | **false** | `P-02-04` |
 | 검사 입력 | `can_input_inspection` | **false** | `P-02-13` |
-| 라벨 발행 | `can_print_label` | **false** | `P-02-05` · `P-02-07` · `P-02-09` |
+| 라벨 발행 | `can_print_label` | **false** | `P-02-04` · `P-02-09` |
 | 작업 시작 | `can_start_work` | **false** | `P-02-01` |
-| 작업 완료 | `can_complete_work` | **false** | `P-02-06` |
+| 작업 완료 | `can_complete_work` | **false** | `P-02-04`의 생산 LOT 스캔 마감 |
 | 투입 취소 | `can_cancel_input` | **false** | ⛔ **소비 화면 0건** |
 | 자재 반납 | `can_return_material` | **false** | ⛔ **소비 화면 0건** |
 
