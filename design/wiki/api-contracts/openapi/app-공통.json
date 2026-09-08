@@ -4,7 +4,7 @@
   "title": "omf-mes 공통 도메인 API — 승인 워크플로우 · 출력물 발행 (초안)",
   "version": "0.2.0",
   "description": "전 도메인이 함께 쓰는 승인 워크플로우 계약. 정의(결재선)와 실행(요청·결재)이 나뉘어 있고 화면도 그렇게 갈린다 — 정의는 W-06-15, 실행은 W-CO-09 다.\n\n요청 생성은 이 파일이 갖지 않는다. 각 도메인 계약의 :request-approval 이 만든다(logistics-01자재창고.json 에 세 곳). 이 파일은 그 뒤의 조회와 결재를 덮는다.\n\n1차 범위에서 정한 것 셋 — ① 결재선 승인자는 USER 만 쓴다(상신 시 사람을 고를 입력이 모델에 없다) ② 값 구간(min/max)은 쓰지 않는다(비교할 값이 없고 금액 컬럼이 0건이다) ③ 대리 결재·위임을 두지 않는다(승인자가 부재하면 결재가 멈추는 것을 감수한다).\n\n승인은 자물쇠를 풀 뿐 실행하지 않는다 — 전기·출고는 대상 화면이 별도로 한다.\n\n## 출력물 발행 (v0.2)\n\n라벨·검사성적서·추적보고서를 발행하고 그 사실을 회차로 쌓는다. 화면이 10장이고 도메인이 셋(01·02·04)에 걸치는데 발행·재발행 규약이 하나(공유계약 §K)라 계약도 하나여야 한다.\n\n지키는 규약 넷 — ① 발행은 회차로 쌓고 이전 것을 지우지 않는다(회차는 서버가 매긴다) ② 재발행에는 사유가 필수다 ③ 발행 기록에 단말과 프린터를 남긴다 ④ 인쇄는 트랜잭션 밖이다 — 발행 기록이 남고 물리 인쇄만 실패하는 경우가 정상적으로 생기며, 그것을 보고하는 경로를 따로 둔다.\n\n라벨 이미지는 서버가 그린다. 클라이언트는 받은 이미지를 프린터로 보낼 뿐이라 단말마다 라벨이 달라지지 않는다.\n\n대상 참조가 두 갈래다 — targetType+targetId 로 무엇을 발행했는지 가리키고, lotId 는 소속을 따로 가리킨다. 개체 단위 출력물은 이 둘이 서로 다른 것을 가리키므로 targetType 을 먼저 보고 판정한다.",
-  "x-internal-note": "근거·맥락은 deliverables/06-API-요구서-app공통승인.md 를 본다. 도출은 uiux/2026-08-07-화면상세스펙-확대7차/ 의 W-06-15·W-CO-09 두 장이다. 출력물 발행(app.document_issue_log)은 v0.2 에서 이 파일에 들어왔다 — 아래 ▸ v0.2 출력물 편 참조. 첨부(app.attachment)는 이번에 세 경로를 신설했다. 재활성 경로(:activate)를 둔다 — 결재선은 목록에 「사용 안 함」 행을 보이고 다시 켜는 것이 정상 운용이다. 같은 이유로 mdm-기준정보.json 의 putaway-rules 에도 :activate 를 더했다(W-06-14). 2026-08-29 재판정 — 「사용 중지」만 있고 「다시 사용」이 없는 자원이 mdm-기준정보.json 에 15개였다. 되돌릴 수단이 없는 것은 화면이 요구하지 않아서가 아니라 아무도 세지 않아서였다. 그 15자원에 :activate 를 세웠다. ▸ v0.2 출력물 편 — 근거는 deliverables/06-API-요구서-app공통출력물.md 다. 도출 화면 8장(P-01-01·P-01-02·P-02-05·P-02-07·P-02-09·P-04-02·P-04-04·W-05-13). M-02-01·P-04-01 은 출력 액션이 없고, W-04-03 은 04 요구서 §3-3 이 CoA 양식 미정으로 잡고 있다. W-06-07 은 mdm 요구서 §3-10 이 센다. 공유계약 §K-1~K-7 이 규약 정본이다. P-02-05·P-02-07·P-02-09 는 액션 표가 없어 §5 본문에서 사람이 읽어 옮겼다(생성기가 경고로 표시한다). 라벨 양식 마스터는 여기가 아니라 mdm 소관이다(W-06-07)."
+  "x-internal-note": "근거·맥락은 deliverables/06-API-요구서-app공통승인.md 를 본다. 도출은 uiux/2026-08-07-화면상세스펙-확대7차/ 의 W-06-15·W-CO-09 두 장이다. 출력물 발행(app.document_issue_log)은 v0.2 에서 이 파일에 들어왔다 — 아래 ▸ v0.2 출력물 편 참조. 첨부(app.attachment)는 이번에 세 경로를 신설했다. 재활성 경로(:activate)를 둔다 — 결재선은 목록에 「사용 안 함」 행을 보이고 다시 켜는 것이 정상 운용이다. 같은 이유로 mdm-기준정보.json 의 putaway-rules 에도 :activate 를 더했다(W-06-14). 2026-08-29 재판정 — 「사용 중지」만 있고 「다시 사용」이 없는 자원이 mdm-기준정보.json 에 15개였다. 되돌릴 수단이 없는 것은 화면이 요구하지 않아서가 아니라 아무도 세지 않아서였다. 그 15자원에 :activate 를 세웠다. ▸ v0.2 출력물 편 — 근거는 deliverables/06-API-요구서-app공통출력물.md 다. 도출 화면은 P-01-01·P-01-02·P-02-04·P-02-09·P-04-01·P-04-04·W-05-13이다. 2026-09-08 통합으로 P-02-04가 생산 LOT·인식표를 함께, P-04-01이 포장·납품 라벨을 함께 발행한다. W-04-03 은 04 요구서 §3-3 이 CoA 양식 미정으로 잡고 있다. W-06-07 은 mdm 요구서 §3-10 이 센다. 공유계약 §K-1~K-7 이 규약 정본이다. 라벨 양식 마스터는 여기가 아니라 mdm 소관이다(W-06-07)."
  },
  "servers": [
   {
@@ -1328,7 +1328,7 @@
        "default": "png"
       },
       "description": "라벨은 이미지 또는 명령문이고 성적서·보고서는 문서다. tspl 은 TSPL 명령문(원시 바이트) — 미리보기는 계속 png 다. CERTIFICATE_OF_ANALYSIS(검사성적서)는 tspl 을 지원하지 않는다. 발행 종류가 지원하지 않는 형식이면 422 다.",
-      "x-internal-note": "값이 선 근거 = §3.4 2026-09-06 확정 · 개발팀 실측(omf-mes-client#798)을 전제로 받았다. 미리보기는 png 를 계속 쓴다 — 화면 다섯이 미리보기를 <img> 로 확정했다: 출고 QR 발행 화면(P-01-02) · 납품 포장 라벨 출력 화면(P-04-02) · 재구성 신규 라벨 발행 화면(P-04-04) · 툴·금형·지그 마스터 화면(W-05-13) · 창고·Location 마스터 화면(W-06-07). printerName 은 이름일 뿐이고 물리 포트 대응은 계약이 갖지 않는다(셸 설정값 — 개발팀 소관). 규격(라벨 치수)은 질의 파라미터로 받지 않는다 — documentTypeCode 와 대상에서 서버가 정한다(요구서 조항 K-5). TOOL_LABEL·LOCATION_LABEL 은 라벨이라 tspl 을 지원하나(계약 판정), 소유 화면이 관리웹(W-05-13·W-06-07)이라 브라우저에는 원시 바이트를 포트로 흘려보낼 수단이 없어 실제로는 png 를 계속 쓴다."
+      "x-internal-note": "값이 선 근거 = §3.4 2026-09-06 확정 · 개발팀 실측(omf-mes-client#798)을 전제로 받았다. 미리보기는 png 를 계속 쓴다 — 화면 다섯이 미리보기를 <img> 로 확정했다: 출고 QR 발행 화면(P-01-02) · 납품 포장 라벨 출력 화면(P-04-01) · 재구성 신규 라벨 발행 화면(P-04-04) · 툴·금형·지그 마스터 화면(W-05-13) · 창고·Location 마스터 화면(W-06-07). printerName 은 이름일 뿐이고 물리 포트 대응은 계약이 갖지 않는다(셸 설정값 — 개발팀 소관). 규격(라벨 치수)은 질의 파라미터로 받지 않는다 — documentTypeCode 와 대상에서 서버가 정한다(요구서 조항 K-5). TOOL_LABEL·LOCATION_LABEL 은 라벨이라 tspl 을 지원하나(계약 판정), 소유 화면이 관리웹(W-05-13·W-06-07)이라 브라우저에는 원시 바이트를 포트로 흘려보낼 수단이 없어 실제로는 png 를 계속 쓴다."
      }
     ],
     "responses": {
@@ -1450,7 +1450,7 @@
       }
      }
     },
-    "x-internal-note": "귀속 필수판이다. 부르는 화면은 P-01-01·P-01-02·P-04-02 셋 전부 현장 단말이고 관리웹은 부르지 않는다 — W-05-13 은 QR 이미지 생성까지이고 물리 인쇄가 범위 밖이다(06-API-요구서-05설비툴.md §3-12). 같은 계열의 POST /app/document-issues 가 선택판인 것은 그쪽만 W-05-13 이 겸용하기 때문이다. 이 자리는 요구서가 POST …:report-print 로 축약해 적어 omf-mes#178 의 전수 스캔에 걸리지 않았다. 근거: 공유계약 D-5 · omf-mes#178."
+    "x-internal-note": "귀속 필수판이다. 부르는 화면은 P-01-01·P-01-02·P-04-01 셋 전부 현장 단말이고 관리웹은 부르지 않는다 — W-05-13 은 QR 이미지 생성까지이고 물리 인쇄가 범위 밖이다(06-API-요구서-05설비툴.md §3-12). 같은 계열의 POST /app/document-issues 가 선택판인 것은 그쪽만 W-05-13 이 겸용하기 때문이다. 이 자리는 요구서가 POST …:report-print 로 축약해 적어 omf-mes#178 의 전수 스캔에 걸리지 않았다. 근거: 공유계약 D-5 · omf-mes#178."
    }
   },
   "/app/printers": {
@@ -2009,7 +2009,7 @@
       }
      }
     },
-    "x-internal-note": "발생 지점 — 설비 고장 발생 = POST /maintenance/breakdowns(equipment-05) 뒤 · 적정타수 초과 = POST /maintenance/tool-usages 저장 뒤 서버가 적정타수 대비 비율을 판정 · P/O 변경 수신 = ERP 수신 메시지가 P/O 변경을 담을 때 · 연계 실패 = 연계 메시지가 실패로 떨어질 때 · 승인 요청·결재 도착 = 도메인 :request-approval 이 단계를 전개할 때와 앞 단계가 승인돼 다음 결재자 차례가 될 때. ⛔ 검교정 만료 임박 = 미확정 — 시간 트리거(배치)이고 임박 일수 기준이 정해진 적이 없다. 소관 화면 W-05-10 에는 「알림」이라는 낱말이 0건이다. ⛔ eventCode 에 enum 을 넣지 않는다 — 코드 문자열 자체가 아직 확정된 적이 없어 이 표는 «이벤트명»으로만 적는다. 각 쓰기 쪽 계약에 「이 쓰기 뒤에 이벤트 X 가 난다」를 적는 것은 이 지시서 밖(A7·A8 소관)이다."
+    "x-internal-note": "발생 지점 — 설비 고장 발생 = POST /maintenance/breakdowns(equipment-05) 뒤 · 적정타수 초과 = POST /maintenance/tool-usages 저장 뒤 서버가 적정타수 대비 비율을 판정 · ERP W/O 변경 수신 = ERP 수신 메시지가 ERP W/O 변경을 담을 때 · 연계 실패 = 연계 메시지가 실패로 떨어질 때 · 승인 요청·결재 도착 = 도메인 :request-approval 이 단계를 전개할 때와 앞 단계가 승인돼 다음 결재자 차례가 될 때. ⛔ 검교정 만료 임박 = 미확정 — 시간 트리거(배치)이고 임박 일수 기준이 정해진 적이 없다. 소관 화면 W-05-10 에는 「알림」이라는 낱말이 0건이다. ⛔ eventCode 에 enum 을 넣지 않는다 — 코드 문자열 자체가 아직 확정된 적이 없어 이 표는 «이벤트명»으로만 적는다. 각 쓰기 쪽 계약에 「이 쓰기 뒤에 이벤트 X 가 난다」를 적는 것은 이 지시서 밖(A7·A8 소관)이다."
    }
   },
   "/app/notification-subscriptions": {
@@ -3728,7 +3728,7 @@
      "approvalTypeCode": {
       "x-source-column": "approval_type_code",
       "type": "string",
-      "description": "승인 유형. ✅ **값 목록 확정 2026-09-01(사용자 · omf-mes#336)** — **9값이다**(2026-09-04 — 실적 정정 승인이 늘었다). ⭐ 승인유형 값 집합과 생성 경로 대응은 06-API-요구서-app공통승인.md §1-2 표를 참조한다. 승인유형 개수와 생성 경로(method+path) 개수는 다르며 본문 스키마 이름으로 세지 않는다. GOODS_ISSUE_DISPOSAL 기타출고 품의(폐기) · INVENTORY_ADJUSTMENT 재고조정 · PURCHASE_ORDER 신규 P/O · INBOUND_RECEIPT_CANCEL 입하 취소 · GOODS_RECEIPT_CANCEL 입고 취소 · GOODS_ISSUE_CANCEL 출고 취소 · SHIPMENT_CANCEL 출하 취소 · PRODUCTION_RESULT_CORRECT 작업실적 A급 정정(수불·기간업무시스템 영향 — 2026-08-31 사용자 확정 · 등급은 서버가 판정한다) · IQC_SKIP 긴급 IQC 생략(공유계약 A-16 기확정). 상신 화면은 승인 유형을 보내지 않고 서버가 상신 오퍼레이션에서 정하며, 결재선 정의 화면(W-06-15)은 이 값 집합에서 유형을 선택한다. ⭐ 자재 폐기(W-01-06)와 제품 폐기(W-04-10)는 «같은» GOODS_ISSUE_DISPOSAL 이다 — 둘의 결재선을 가르는 것은 유형이 아니라 결재선 정의의 businessUnitId 축이고, 서버가 전표의 reasonCode 로 결재선을 파생한다(✓확정 2026-09-01 사용자 · 공유계약 G-31 이 「승인 게이트가 사유 값을 보고 걸린다」로 이 연결을 2026-08-31 에 이미 세웠다). ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 W-06-06 에서 값을 늘려도 상신할 오퍼레이션이 없어 «쓰이지 않는 결재선»만 생긴다. 근거: W-06-15 §8-2 · 공유계약 A-16",
+      "description": "승인 유형. ✅ **값 목록 확정 2026-09-01(사용자 · omf-mes#336)** — **9값이다**(2026-09-04 — 실적 정정 승인이 늘었다). ⭐ 승인유형 값 집합과 생성 경로 대응은 06-API-요구서-app공통승인.md §1-2 표를 참조한다. 승인유형 개수와 생성 경로(method+path) 개수는 다르며 본문 스키마 이름으로 세지 않는다. GOODS_ISSUE_DISPOSAL 기타출고 품의(폐기) · INVENTORY_ADJUSTMENT 재고조정 · PURCHASE_ORDER 신규 ERP W/O · INBOUND_RECEIPT_CANCEL 입하 취소 · GOODS_RECEIPT_CANCEL 입고 취소 · GOODS_ISSUE_CANCEL 출고 취소 · SHIPMENT_CANCEL 출하 취소 · PRODUCTION_RESULT_CORRECT 작업실적 A급 정정(수불·기간업무시스템 영향 — 2026-08-31 사용자 확정 · 등급은 서버가 판정한다) · IQC_SKIP 긴급 IQC 생략(공유계약 A-16 기확정). 상신 화면은 승인 유형을 보내지 않고 서버가 상신 오퍼레이션에서 정하며, 결재선 정의 화면(W-06-15)은 이 값 집합에서 유형을 선택한다. ⭐ 자재 폐기(W-01-06)와 제품 폐기(W-04-10)는 «같은» GOODS_ISSUE_DISPOSAL 이다 — 둘의 결재선을 가르는 것은 유형이 아니라 결재선 정의의 businessUnitId 축이고, 서버가 전표의 reasonCode 로 결재선을 파생한다(✓확정 2026-09-01 사용자 · 공유계약 G-31 이 「승인 게이트가 사유 값을 보고 걸린다」로 이 연결을 2026-08-31 에 이미 세웠다). ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 W-06-06 에서 값을 늘려도 상신할 오퍼레이션이 없어 «쓰이지 않는 결재선»만 생긴다. 근거: W-06-15 §8-2 · 공유계약 A-16",
       "example": "GOODS_ISSUE_DISPOSAL",
       "enum": [
        "GOODS_ISSUE_DISPOSAL",
@@ -3812,7 +3812,7 @@
        "IQC_SKIP",
        "PRODUCTION_RESULT_CORRECT"
       ],
-      "description": "승인 유형. ✅ **값 목록 확정 2026-09-01(사용자 · omf-mes#336)** — **9값이다**(2026-09-04 — 실적 정정 승인이 늘었다). ⭐ 승인유형 값 집합과 생성 경로 대응은 06-API-요구서-app공통승인.md §1-2 표를 참조한다. 승인유형 개수와 생성 경로(method+path) 개수는 다르며 본문 스키마 이름으로 세지 않는다. GOODS_ISSUE_DISPOSAL 기타출고 품의(폐기) · INVENTORY_ADJUSTMENT 재고조정 · PURCHASE_ORDER 신규 P/O · INBOUND_RECEIPT_CANCEL 입하 취소 · GOODS_RECEIPT_CANCEL 입고 취소 · GOODS_ISSUE_CANCEL 출고 취소 · SHIPMENT_CANCEL 출하 취소 · PRODUCTION_RESULT_CORRECT 작업실적 A급 정정(수불·기간업무시스템 영향 — 2026-08-31 사용자 확정 · 등급은 서버가 판정한다) · IQC_SKIP 긴급 IQC 생략(공유계약 A-16 기확정). 상신 화면은 승인 유형을 보내지 않고 서버가 상신 오퍼레이션에서 정하며, 결재선 정의 화면(W-06-15)은 이 값 집합에서 유형을 선택한다. ⭐ 자재 폐기(W-01-06)와 제품 폐기(W-04-10)는 «같은» GOODS_ISSUE_DISPOSAL 이다 — 둘의 결재선을 가르는 것은 유형이 아니라 결재선 정의의 businessUnitId 축이고, 서버가 전표의 reasonCode 로 결재선을 파생한다(✓확정 2026-09-01 사용자 · 공유계약 G-31 이 「승인 게이트가 사유 값을 보고 걸린다」로 이 연결을 2026-08-31 에 이미 세웠다). ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 W-06-06 에서 값을 늘려도 상신할 오퍼레이션이 없어 «쓰이지 않는 결재선»만 생긴다. 근거: W-06-15 §8-2 · 공유계약 A-16",
+      "description": "승인 유형. ✅ **값 목록 확정 2026-09-01(사용자 · omf-mes#336)** — **9값이다**(2026-09-04 — 실적 정정 승인이 늘었다). ⭐ 승인유형 값 집합과 생성 경로 대응은 06-API-요구서-app공통승인.md §1-2 표를 참조한다. 승인유형 개수와 생성 경로(method+path) 개수는 다르며 본문 스키마 이름으로 세지 않는다. GOODS_ISSUE_DISPOSAL 기타출고 품의(폐기) · INVENTORY_ADJUSTMENT 재고조정 · PURCHASE_ORDER 신규 ERP W/O · INBOUND_RECEIPT_CANCEL 입하 취소 · GOODS_RECEIPT_CANCEL 입고 취소 · GOODS_ISSUE_CANCEL 출고 취소 · SHIPMENT_CANCEL 출하 취소 · PRODUCTION_RESULT_CORRECT 작업실적 A급 정정(수불·기간업무시스템 영향 — 2026-08-31 사용자 확정 · 등급은 서버가 판정한다) · IQC_SKIP 긴급 IQC 생략(공유계약 A-16 기확정). 상신 화면은 승인 유형을 보내지 않고 서버가 상신 오퍼레이션에서 정하며, 결재선 정의 화면(W-06-15)은 이 값 집합에서 유형을 선택한다. ⭐ 자재 폐기(W-01-06)와 제품 폐기(W-04-10)는 «같은» GOODS_ISSUE_DISPOSAL 이다 — 둘의 결재선을 가르는 것은 유형이 아니라 결재선 정의의 businessUnitId 축이고, 서버가 전표의 reasonCode 로 결재선을 파생한다(✓확정 2026-09-01 사용자 · 공유계약 G-31 이 「승인 게이트가 사유 값을 보고 걸린다」로 이 연결을 2026-08-31 에 이미 세웠다). ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 W-06-06 에서 값을 늘려도 상신할 오퍼레이션이 없어 «쓰이지 않는 결재선»만 생긴다. 근거: W-06-15 §8-2 · 공유계약 A-16",
       "x-code-key": "CD-APPROVAL-TYPE"
      },
      "businessUnitId": {
@@ -4215,7 +4215,7 @@
        "IQC_SKIP",
        "PRODUCTION_RESULT_CORRECT"
       ],
-      "description": "승인 유형. ✅ **값 목록 확정 2026-09-01(사용자 · omf-mes#336)** — **9값이다**(2026-09-04 — 실적 정정 승인이 늘었다). ⭐ 승인유형 값 집합과 생성 경로 대응은 06-API-요구서-app공통승인.md §1-2 표를 참조한다. 승인유형 개수와 생성 경로(method+path) 개수는 다르며 본문 스키마 이름으로 세지 않는다. GOODS_ISSUE_DISPOSAL 기타출고 품의(폐기) · INVENTORY_ADJUSTMENT 재고조정 · PURCHASE_ORDER 신규 P/O · INBOUND_RECEIPT_CANCEL 입하 취소 · GOODS_RECEIPT_CANCEL 입고 취소 · GOODS_ISSUE_CANCEL 출고 취소 · SHIPMENT_CANCEL 출하 취소 · PRODUCTION_RESULT_CORRECT 작업실적 A급 정정(수불·기간업무시스템 영향 — 2026-08-31 사용자 확정 · 등급은 서버가 판정한다) · IQC_SKIP 긴급 IQC 생략(공유계약 A-16 기확정). 상신 화면은 승인 유형을 보내지 않고 서버가 상신 오퍼레이션에서 정하며, 결재선 정의 화면(W-06-15)은 이 값 집합에서 유형을 선택한다. ⭐ 자재 폐기(W-01-06)와 제품 폐기(W-04-10)는 «같은» GOODS_ISSUE_DISPOSAL 이다 — 둘의 결재선을 가르는 것은 유형이 아니라 결재선 정의의 businessUnitId 축이고, 서버가 전표의 reasonCode 로 결재선을 파생한다(✓확정 2026-09-01 사용자 · 공유계약 G-31 이 「승인 게이트가 사유 값을 보고 걸린다」로 이 연결을 2026-08-31 에 이미 세웠다). ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 W-06-06 에서 값을 늘려도 상신할 오퍼레이션이 없어 «쓰이지 않는 결재선»만 생긴다. 근거: W-06-15 §8-2 · 공유계약 A-16",
+      "description": "승인 유형. ✅ **값 목록 확정 2026-09-01(사용자 · omf-mes#336)** — **9값이다**(2026-09-04 — 실적 정정 승인이 늘었다). ⭐ 승인유형 값 집합과 생성 경로 대응은 06-API-요구서-app공통승인.md §1-2 표를 참조한다. 승인유형 개수와 생성 경로(method+path) 개수는 다르며 본문 스키마 이름으로 세지 않는다. GOODS_ISSUE_DISPOSAL 기타출고 품의(폐기) · INVENTORY_ADJUSTMENT 재고조정 · PURCHASE_ORDER 신규 ERP W/O · INBOUND_RECEIPT_CANCEL 입하 취소 · GOODS_RECEIPT_CANCEL 입고 취소 · GOODS_ISSUE_CANCEL 출고 취소 · SHIPMENT_CANCEL 출하 취소 · PRODUCTION_RESULT_CORRECT 작업실적 A급 정정(수불·기간업무시스템 영향 — 2026-08-31 사용자 확정 · 등급은 서버가 판정한다) · IQC_SKIP 긴급 IQC 생략(공유계약 A-16 기확정). 상신 화면은 승인 유형을 보내지 않고 서버가 상신 오퍼레이션에서 정하며, 결재선 정의 화면(W-06-15)은 이 값 집합에서 유형을 선택한다. ⭐ 자재 폐기(W-01-06)와 제품 폐기(W-04-10)는 «같은» GOODS_ISSUE_DISPOSAL 이다 — 둘의 결재선을 가르는 것은 유형이 아니라 결재선 정의의 businessUnitId 축이고, 서버가 전표의 reasonCode 로 결재선을 파생한다(✓확정 2026-09-01 사용자 · 공유계약 G-31 이 「승인 게이트가 사유 값을 보고 걸린다」로 이 연결을 2026-08-31 에 이미 세웠다). ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 W-06-06 에서 값을 늘려도 상신할 오퍼레이션이 없어 «쓰이지 않는 결재선»만 생긴다. 근거: W-06-15 §8-2 · 공유계약 A-16",
       "x-code-key": "CD-APPROVAL-TYPE"
      },
      "requestedBy": {
@@ -4395,7 +4395,7 @@
        "TOOL_LABEL",
        "LOCATION_LABEL"
       ],
-      "description": "출력물 종류. 라벨 6종·검사성적서·툴 QR·Location 라벨 — 값마다 «찍는 화면»과 «서버가 그리는 렌디션»이 다르다(공유계약 K-5). ⛔ 고객이 늘리는 공통코드 그룹이 아니다 — 값을 늘려도 렌디션이 없어 안 찍힌다(A-16 「가르는 물음 넷」: 가 거짓 + 다 참 ⇒ 설계가 정하는 업무 코드). MATERIAL_LOT_LABEL=자재 LOT 라벨(P-01-01) · GOODS_ISSUE_QR=출고 QR(P-01-02) · PRODUCTION_LOT_LABEL=생산 LOT 라벨(P-02-07) · IDENTIFICATION_TAG=인식표(P-02-05·P-02-09) · PACKING_LABEL=포장 라벨(P-02-09·P-04-02·P-04-04) · DELIVERY_LABEL=납품 라벨(P-04-02) · CERTIFICATE_OF_ANALYSIS=검사성적서(W-04-03) · TOOL_LABEL=툴 QR 라벨(W-05-13) · LOCATION_LABEL=Location 코드 라벨(W-06-07)",
+      "description": "출력물 종류. 라벨 6종·검사성적서·툴 QR·Location 라벨 — 값마다 «찍는 화면»과 «서버가 그리는 렌디션»이 다르다(공유계약 K-5). ⛔ 고객이 늘리는 공통코드 그룹이 아니다 — 값을 늘려도 렌디션이 없어 안 찍힌다(A-16 「가르는 물음 넷」: 가 거짓 + 다 참 ⇒ 설계가 정하는 업무 코드). MATERIAL_LOT_LABEL=자재 LOT 라벨(P-01-01) · GOODS_ISSUE_QR=출고 QR(P-01-02) · PRODUCTION_LOT_LABEL=생산 LOT 라벨(P-02-04) · IDENTIFICATION_TAG=인식표(P-02-04·P-02-09) · PACKING_LABEL=포장 라벨(P-02-09·P-04-01·P-04-04) · DELIVERY_LABEL=납품 라벨(P-04-01) · CERTIFICATE_OF_ANALYSIS=검사성적서(W-04-03) · TOOL_LABEL=툴 QR 라벨(W-05-13) · LOCATION_LABEL=Location 코드 라벨(W-06-07)",
       "example": "PACKING_LABEL",
       "x-code-key": "CD-PRINT-DOCUMENT-TYPE"
      },
@@ -4600,7 +4600,7 @@
       "example": null
      }
     },
-    "x-internal-note": "⭐ documentTypeCode 는 2026-09-02 에 enum 9종으로 닫았다(omf-mes#145). A-16 「가르는 물음 넷」에서 «가 거짓 + 다 참» ⇒ 설계가 정하는 업무 코드다 — ⛔ 등록부(G-32)에 올리지 않는다. 값 ↔ 발행 화면 대응의 정본은 06-API-요구서-app공통출력물.md §3-8 이다. 이 한 축에 발행 화면 9장이 걸린다 — P-01-01·P-01-02·P-02-05·P-02-07·P-02-09·P-04-02·P-04-04 + W-05-13(구현 완료 · omf-mes-client#212) + W-06-07(Location 라벨). 예정 1장 = W-04-03(검사성적서 · 양식 미정이라 아직 안 부른다). ⚠ 아직 열린 것 둘 — reissueReasonCode 값 목록(omf-mes#145) · CoC(적합증명서)를 CoA 와 가를지(W-04-03 §8-3). TRACE_REPORT 는 발행 화면이 0건이라 값을 두지 않았다 — 생기면 enum 확장이다. 대상 유형(targetTypeCode) 대응표의 정본은 같은 문서 §3-7 이고 «다른 축»이다. ⛔ reissueReasonCode 의 example 은 되살리지 마라 — omf-mes#191(example 오염) 대상이다. ⚠ reissueReasonCode 의 example 이던 PRINT_FAILED 는 우리 제안안(01-2차-제안안.md 492행)의 PRINT_FAILURE 와 한 단어 어긋난 값이었다 — 그래서 지웠다."
+    "x-internal-note": "⭐ documentTypeCode 는 2026-09-02 에 enum 9종으로 닫았다(omf-mes#145). A-16 「가르는 물음 넷」에서 «가 거짓 + 다 참» ⇒ 설계가 정하는 업무 코드다 — ⛔ 등록부(G-32)에 올리지 않는다. 값 ↔ 발행 화면 대응의 정본은 06-API-요구서-app공통출력물.md §3-8 이다. 2026-09-08 통합 뒤 발행 화면은 P-01-01·P-01-02·P-02-04·P-02-09·P-04-01·P-04-04 + W-05-13(구현 완료 · omf-mes-client#212) + W-06-07(Location 라벨)이다. 예정 1장 = W-04-03(검사성적서 · 양식 미정이라 아직 안 부른다). ⚠ 아직 열린 것 둘 — reissueReasonCode 값 목록(omf-mes#145) · CoC(적합증명서)를 CoA 와 가를지(W-04-03 §8-3). TRACE_REPORT 는 발행 화면이 0건이라 값을 두지 않았다 — 생기면 enum 확장이다. 대상 유형(targetTypeCode) 대응표의 정본은 같은 문서 §3-7 이고 «다른 축»이다. ⛔ reissueReasonCode 의 example 은 되살리지 마라 — omf-mes#191(example 오염) 대상이다. ⚠ reissueReasonCode 의 example 이던 PRINT_FAILED 는 우리 제안안(01-2차-제안안.md 492행)의 PRINT_FAILURE 와 한 단어 어긋난 값이었다 — 그래서 지웠다."
    },
    "DocumentIssueListResponse": {
     "type": "object",
@@ -5014,7 +5014,7 @@
      },
      "targetTypeCode": {
       "type": "string",
-      "description": "무엇에 대한 알림인가 — EQUIPMENT → 설비(설비 고장 발생) · MOLD → 툴·금형(적정타수 초과) · INSTRUMENT → 계측기(검교정 만료 임박) · PURCHASE_ORDER → 구매발주(P/O 변경 수신) · INTEGRATION_SYNC → 연계 메시지(연계 실패) · APPROVAL_REQUEST → 승인 요청(승인·결재 도착) · LOT / WORK_ORDER / NONCONFORMANCE. ⚠ 뒤 셋은 대응 이벤트가 알림센터 목록에 아직 없다. ⛔ 다형 참조 판별자라 값이 «우리 계약의 대상 표 이름»이다 — 공통코드 그룹으로 받지 않는다(A-10 · A-16 · 2026-09-03 정정). ⚠ 대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다",
+      "description": "무엇에 대한 알림인가 — EQUIPMENT → 설비(설비 고장 발생) · MOLD → 툴·금형(적정타수 초과) · INSTRUMENT → 계측기(검교정 만료 임박) · PURCHASE_ORDER → 구매발주(ERP W/O 변경 수신) · INTEGRATION_SYNC → 연계 메시지(연계 실패) · APPROVAL_REQUEST → 승인 요청(승인·결재 도착) · LOT / WORK_ORDER / NONCONFORMANCE. ⚠ 뒤 셋은 대응 이벤트가 알림센터 목록에 아직 없다. ⛔ 다형 참조 판별자라 값이 «우리 계약의 대상 표 이름»이다 — 공통코드 그룹으로 받지 않는다(A-10 · A-16 · 2026-09-03 정정). ⚠ 대응표에 없는 유형은 화면이 「대상으로 이동」을 열지 않는다",
       "x-code-key": "CD-NOTIFICATION-TARGET-TYPE",
       "enum": [
        "EQUIPMENT",

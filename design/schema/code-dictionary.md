@@ -217,7 +217,7 @@ CD-<계열>-<축>
 | `CD-INVENTORY-COUNT-CLOSE-BLOCKED-REASON` | `COUNT_REMAINING` `VARIANCE_UNADJUSTED` `ALREADY_CLOSED` `STATE_LOCKED` | — | `closeBlockedReasonCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `InventoryCountSummary`(`logistics-01자재창고`). ⭐ 뜻 넷은 확정이었고 문자열만 없었다. 화면은 이 값으로 안내 문구와 「조정 등록」 경로를 가른다(`G-3`) |
 | `CD-INVENTORY-COUNT-STATUS` | `PLANNED` `IN_PROGRESS` `COMPLETED` | `INVENTORY_COUNT_STATUS` | `statusCode` | `registry-system` | 2 | 재고 실사. ⚠ **전표 상태와 다른 축** — 전기·취소가 없다. `W-01-04` §3 목업 · 사용자 결정 2026-09-02 |
 | `CD-INVENTORY-COUNT-TYPE` | `PERIODIC` `ADHOC` `CYCLE` | `INVENTORY_COUNT_TYPE` | `countTypeCode` | `registry` | 3 | 재고실사 유형. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
-| `CD-INVENTORY-RESERVATION-SOURCE-DOCUMENT-TYPE` | `PRODUCTION_ORDER` | — | `sourceDocumentTypeCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `InventoryReservation`(`logistics-01자재창고`) **한 자리**. ⚠ 계수 `2` 는 형제 행(`GoodsIssue`·`GoodsReceipt` 처럼 «조회 + 생성» 두 스키마를 갖는 자리)의 수를 그대로 따라 적은 것이었다 — 이 자원은 **조회만 제공한다**(예약은 출고 요청·피킹의 결과로 서버가 걸고 푼다 · `M-01-08` §5-5). 둘째 자리가 «생길 수 없다»(2026-09-03 정정). ⭐ `W-02-01` §5-4 가 「P/O 의 자재예약정보가 `production_order` 에 없고 `inventory_reservation` 이 P/O 를 가리킨다」로 세운 축이다(2026-09-02 해소). ⚠ 값이 하나라고 축이 없는 것이 아니다 |
+| `CD-INVENTORY-RESERVATION-SOURCE-DOCUMENT-TYPE` | `PRODUCTION_ORDER` | — | `sourceDocumentTypeCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `InventoryReservation`(`logistics-01자재창고`) **한 자리**. ⚠ 계수 `2` 는 형제 행(`GoodsIssue`·`GoodsReceipt` 처럼 «조회 + 생성» 두 스키마를 갖는 자리)의 수를 그대로 따라 적은 것이었다 — 이 자원은 **조회만 제공한다**(예약은 출고 요청·피킹의 결과로 서버가 걸고 푼다 · `M-01-08` §5-5). 둘째 자리가 «생길 수 없다»(2026-09-03 정정). ⭐ `W-02-01` §5-4 가 「ERP W/O 의 자재예약정보가 `production_order` 에 없고 `inventory_reservation` 이 ERP W/O 를 가리킨다」로 세운 축이다(2026-09-02 해소). ⚠ 값이 하나라고 축이 없는 것이 아니다 |
 | `CD-INVENTORY-TRANSACTION-SOURCE-DOCUMENT-TYPE` | `GOODS_RECEIPT` `GOODS_ISSUE` `INVENTORY_ADJUSTMENT` `STOCK_TRANSFER` | — | `sourceDocumentTypeCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `InventoryTransaction`(`logistics-01자재창고`). ⭐ 원장 한 줄의 «성격»을 말하는 축이다 — 방향(입고·출고·이동)은 라인의 `from*`/`to*` 가 이미 말한다. ⚠ `STOCK_TRANSFER` 는 추론이라 다른 셋보다 근거가 얕다 |
 | `CD-ISSUE-TYPE` | `PRODUCTION` `SUPPLIER_RETURN` `OTHER` `SHIPMENT` | `ISSUE_TYPE` | `issueTypeCode` | `registry` | 4 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
 | `CD-ITEM-TYPE` | `RAW_MATERIAL` `SEMI_FINISHED` `FINISHED` `MERCHANDISE` ⬜ | `ITEM_TYPE` | `itemTypeCode` | `registry` | 2 | 품목 유형. ⭐ 뜻 넷은 2026-08-22 분류표 20 이 「원자재/반제품/제품/상품」으로 이미 적었다 — 문자열만 없었다. ⛔ 예비품을 여기 넣지 않는다(QA #7 「품목 통합 아님」) |
@@ -268,7 +268,7 @@ CD-<계열>-<축>
 | `CD-PRINT-DOCUMENT-TYPE` | `MATERIAL_LOT_LABEL` `GOODS_ISSUE_QR` `PRODUCTION_LOT_LABEL` `IDENTIFICATION_TAG` `PACKING_LABEL` `DELIVERY_LABEL` `CERTIFICATE_OF_ANALYSIS` `TOOL_LABEL` `LOCATION_LABEL` | — | `documentTypeCode` `supportedDocumentTypeCodes` | `enum` | 6 | 출력물 종류. `app-공통.json` — `omf-mes#145` · `22c08f5` · 요구서 `app공통출력물` §3-8 |
 | `CD-PROCESS-TYPE` | `MACHINING` `ASSEMBLY` `INSPECTION` `PACKAGING` | `PROCESS_TYPE` | `processTypeCode` | `registry` | 3 | 공정 유형. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-PRODUCTION-LINE-TYPE` | `LINE` `WORK_AREA` | — | `lineTypeCode` `groupTypeCode` | `enum` | 4 | 계약이 `enum` 으로 닫은 값 — `ProductionLine`·`EquipmentGroup`(`mdm-기준정보`). ⚠ 둘은 «같은 물리 컬럼**(`mdm.production_line.line_type_code`)을 다른 API 이름으로 노출한 것이다 |
-| `CD-PRODUCTION-ORDER-STATUS` | `RECEIVED` `UPDATED` `CANCELLED` | `PRODUCTION_ORDER_STATUS` | `statusCode` | `registry-system` | 2 | P/O 상태. ⭐ 「수정됨(UPDATED)」은 사용자가 추가했다 — `W-02-06` 이 P/O 변경 이벤트를 다루는데 그 사실을 담을 값이 없었다 · ERP 매핑 없음(사용자 결정 2026-09-02) |
+| `CD-PRODUCTION-ORDER-STATUS` | `RECEIVED` `UPDATED` `CANCELLED` | `PRODUCTION_ORDER_STATUS` | `statusCode` | `registry-system` | 2 | ERP W/O 상태. ⭐ 「수정됨(UPDATED)」은 사용자가 추가했다 — `W-02-06` 이 ERP W/O 변경 이벤트를 다루는데 그 사실을 담을 값이 없었다 · ERP 매핑 없음(사용자 결정 2026-09-02) |
 | `CD-PRODUCTION-PLAN-SPLIT-REASON` | `ENGINEERING_CHANGE` `PART_SHORTAGE` `QUALITY_ISSUE` `SUPPLIER_CHANGE` `OTHER` | `PRODUCTION_PLAN_SPLIT_REASON` | `reasonCode` | `registry` | 1 | 생산계획 분할 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-PRODUCTION-PLAN-STATUS` | `DRAFT` `CONFIRMED` | `PRODUCTION_PLAN_STATUS` | `statusCode` | `registry-system` | 2 | 생산계획 편집 잠금. ⭐ `MASTER_VERSION_STATUS`(작성중·확정·폐기)와 «같은 축»이라 낱말을 맞췄다 — 다만 「폐기」가 이 리소스에 없어 둘이다 |
 | `CD-PRODUCTION-RESULT-CORRECT-REASON` | ⬜ | `PRODUCTION_RESULT_CORRECT_REASON` | `reasonCode` | `registry` | 1 | 실적 정정 사유. ⭐ 「정정이 몇 건이고 왜인가」를 세려면 코드 축이어야 한다 — 사유 코드 17자리가 이미 같은 형태다(스키마별 전용 그룹 + 고객이 늘림) |
@@ -328,7 +328,7 @@ CD-<계열>-<축>
 출력물 9값 · 물류 9값 · 취소 가능 3값. 사용자가 든 예(「검사 항목」과 「검증 항목」이 둘 다
 `inspection` 이어도 키는 달라야 한다)의 실물이다.
 
-⛔ **합치면 무엇이 깨지나** — 취소 오퍼레이션이 9값을 받으면 **취소할 수 없는 문서**(P/O·피킹 …)가
+⛔ **합치면 무엇이 깨지나** — 취소 오퍼레이션이 9값을 받으면 **취소할 수 없는 문서**(ERP W/O·피킹 …)가
 취소 목록에 뜬다. 조회 축이 3값만 받으면 **진행현황에 6종이 안 보인다.**
 
 **② 같은 컬럼에 두 계열이면 키가 둘이다.** `equipmentTypeCode` 컬럼 하나에
