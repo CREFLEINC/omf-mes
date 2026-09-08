@@ -94,7 +94,7 @@
 | --- | --- | :-: | --- |
 | 공정 | `process_id` | ✅ 필수 | `uq_terminal_process UNIQUE(단말, 공정)` — 같은 공정을 두 번 못 넣는다 |
 | 자재 투입 | `can_input_material` | **false** | `P-02-03` · `P-02-11` |
-| 실적 입력 | `can_input_result` | **false** | `P-02-04` |
+| 실적 입력 | `can_input_result` | **false** | `P-02-04`와 툴 사용실적(P-05-01)·비가동 입력(P-05-02) 포함(2026-09-08 확정) |
 | 검사 입력 | `can_input_inspection` | **false** | `P-02-13` |
 | 라벨 발행 | `can_print_label` | **false** | `P-02-05` · `P-02-07` · `P-02-09` |
 | 작업 시작 | `can_start_work` | **false** | `P-02-01` |
