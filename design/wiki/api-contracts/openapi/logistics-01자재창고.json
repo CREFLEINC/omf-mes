@@ -11531,7 +11531,8 @@
       "x-source-column": "uom_id",
       "type": "integer",
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "LOT 수량의 단위. **품목 기준단위와 같다 — LOT 마다 단위를 새로 고르지 않는다.** 자재 LOT 은 입하 라인에서 승계하고(P-01-01 §3-6) 생산 LOT 은 W/O 에서 승계한다(W-02-04). 근거: 사용자 확정 2026-09-09"
      },
      "manufacturedAt": {
       "x-source-column": "manufactured_at",
@@ -11606,6 +11607,15 @@
       "readOnly": true,
       "description": "같은 W/O에서 선발행된 생산 LOT 슬롯 전체 수. W/O 원천 생산 LOT에는 서버가 계산해 항상 내리고 그 외 LOT은 null이다. P-02-04의 ‘현재 LOT 번호(순서대로)’ 표시용이며 폐번 슬롯도 전체 수에는 포함한다.",
       "example": 8
+     },
+     "identificationTagRequired": {
+      "type": [
+       "boolean",
+       "null"
+      ],
+      "readOnly": true,
+      "description": "이 LOT 의 품목이 인식표(제품 개체 일련번호) 대상인가. 서버가 품목·작업 조건에서 계산해 내린다 — 화면이 판단하지 않는다. 생산 LOT 이 아닌 LOT 은 null 이다. P-02-04 가 인식표 영역 표시와 「실제 생산수량 = 개체 수」 검증의 활성 조건으로 쓴다. ⛔ Item.serialControlTypeCode 와 다른 축이다 — 그쪽은 관리 «방식»이고 이 값은 «대상 여부»다. 근거: P-02-04 §3-2·§4",
+      "example": true
      },
      "parentLotId": {
       "x-source-column": "parent_lot_id",
@@ -11788,7 +11798,8 @@
       "x-source-column": "uom_id",
       "type": "integer",
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "필수이되 화면이 «고르는» 값이 아니다 — 자재 LOT 은 입하 라인, 생산 LOT 은 W/O 에서 승계한 값을 그대로 싣는다. 근거: 사용자 확정 2026-09-09 · P-01-01 §3-6 · W-02-04"
      },
      "manufacturedAt": {
       "x-source-column": "manufactured_at",
