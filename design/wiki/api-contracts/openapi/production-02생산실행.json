@@ -5077,6 +5077,16 @@
       "x-source-column": "defect_record_id",
       "description": "원 불량. 기록 전용 테이블이라 이쪽을 갱신하지 않고 여기에 쌓는다"
      },
+     "lotNo": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "maxLength": 100,
+      "readOnly": true,
+      "example": "PLOT-2026-0805-0031-D",
+      "description": "원 불량이 매인 LOT 번호. 화면이 보이는 값 — 식별자를 사람이 읽는 값으로 바꾸려 다른 자원을 되짚지 않게 한다. ⚠ 비어 올 수 있다 — 원 불량에 LOT 이 매이지 않는 건이 있다(M-02-02 §4-B 「LOT · lot_id · FK — nullable」). ⭐ 같은 목록이 이미 lotId 로 거를 수 있다(GET /production/repair-executions?lotId=) — 서버가 그 연결을 이미 푼다. 근거: M-02-02 §3 「투입 대기」 목록"
+     },
      "repairProcessId": {
       "type": [
        "integer",

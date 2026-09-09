@@ -5969,7 +5969,7 @@
        "type": "integer",
        "format": "int64"
       },
-     "description": "이 W/O 를 원천으로 발행된 LOT 만. 선발행 슬롯을 빠짐없이 훑는 경로다 — 마감(W-02-05 §3)과 POP 의 실적 대상 LOT 선택(P-02-04 §5)·생산LOT 완료(P-02-04 §3 좌단 LOT 목록)가 같은 축을 쓴다. ⭐ 저장된 형태는 다형 참조 짝(sourceTypeCode + sourceId)이지만 판별자 값 목록이 아직 미확정이라 짝 필터를 열지 않았다 — 값을 모르는 채 열면 눌러도 아무것도 안 걸린다(공유계약 G-23). 서버가 W/O 원천으로 풀어 준다"
+      "description": "이 W/O 를 원천으로 발행된 LOT 만. 선발행 슬롯을 빠짐없이 훑는 경로다 — 마감(W-02-05 §3)과 POP 의 실적 대상 LOT 선택(P-02-04 §5)·생산LOT 완료(P-02-04 §3 좌단 LOT 목록)가 같은 축을 쓴다. ⭐ 저장된 형태는 다형 참조 짝(sourceTypeCode + sourceId)이지만 판별자 값 목록이 아직 미확정이라 짝 필터를 열지 않았다 — 값을 모르는 채 열면 눌러도 아무것도 안 걸린다(공유계약 G-23). 서버가 W/O 원천으로 풀어 준다"
      },
      {
       "name": "currentOnly",
@@ -13029,7 +13029,7 @@
       "x-source-column": "source_document_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "원천 문서 유형. **A-10 다형 참조 판별자**이고 값은 «대상 테이블 이름»이다 — sourceDocumentId 는 그 표의 식별자다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다. 둘이다 — 자재 출고요청(MATERIAL_ISSUE_REQUEST → logistics.material_issue_request · M-01-08 자재 출고 피킹) · 출하 지시(SHIPMENT_REQUEST → logistics.shipment_request · M-04-01 제품 LOT 피킹 스캔). ⭐ 자재 피킹과 제품 피킹이 같은 표를 쓰고 이 값이 둘을 가른다.",
+      "description": "원천 문서 유형. **A-10 다형 참조 판별자**이고 값은 «대상 테이블 이름»이다 — sourceDocumentId 는 그 표의 식별자다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다. 둘이다 — 자재 출고요청(MATERIAL_ISSUE_REQUEST → logistics.material_issue_request · M-01-08 자재 출고 피킹) · 출하 지시(SHIPMENT_REQUEST → logistics.shipment_request). ⛔ 「그러니 제품 LOT 피킹 스캔(M-04-01)이 이 경로를 부른다」로 읽지 않는다 — 그 화면의 목록·상세·피킹 확정은 04 계약의 출하작업지시 계열이고, 요구서 04 §5-4 가 2026-08-26 에 「01 계약을 고치지 않았다 … 진입 목록이 shipment-requests 이므로 같은 리소스에 액션을 달았다」로 이유와 함께 정했다(요구서 04 §3-14 가 그 액션표다). ⭐ 앞판의 「자재 피킹과 제품 피킹이 같은 표를 쓴다」를 걷었다(2026-09-09) — 제품 피킹은 권장이 «순서 제안»이라 권장 외 LOT 을 집어도 통과하는데(M-04-01 §5-5), 이 표의 라인은 lotId 가 필수이고 PickingLinePick 이 「스캔한 LOT. 계획과 다르면 400」이라 그 규칙이 성립하지 않는다. 이 값으로 선 행을 «부르는 화면»은 계약 7벌·요구서 8벌·화면 스펙 전건에 0건이다(2026-09-09 실측).",
       "x-no-example": true,
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-PICKING-ORDER-SOURCE-DOCUMENT-TYPE",
