@@ -195,8 +195,8 @@ BASELINE = 0
 #      화면이 «보이는» 자리가 아니고, `W-04-08` §3 목록은 이미 8열로 차 있다.
 #      ⇒ **설계 변동이 얻는 것보다 크다.** 다시 여는 조건을 `W-04-08` §4-A 에 적었다.
 # 2026-09-08: 테이블을 읽는다고 모든 코드 칸을 소비하지 않는다.
-# 필드 소비 대조 후 4건(소유 축 1·참조 필드 상태 1·파싱 불가 2)을 유지한다.
-BASELINE_SCREEN = 4
+# 필드 소비 대조 후 3건(소유 축 1·참조 필드 상태 2)을 유지한다.
+BASELINE_SCREEN = 3
 
 # 필드 귀속이 없으면 None: 기존 테이블 단위 검사를 보수적으로 유지한다.
 GroupFields = dict[tuple[str, str], Optional[set[str]]]
@@ -352,6 +352,8 @@ def table_screens() -> dict[str, set[str]]:
         screen = m.group(1)
         with open(path, encoding="utf-8") as fh:
             text = fh.read()
+        if _rift.is_retired_screen(text):
+            continue
         for tables, _body in _rift.field_sections(text):
             for t in tables:
                 out.setdefault(t, set()).add(screen)

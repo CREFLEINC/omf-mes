@@ -2235,7 +2235,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th class="nw">구분·분류</th><td>기능</td></tr>
 <tr><th class="nw">원문 요지</th><td>자재 입고 시 거래명세서 기반 입고(창고 입고 X) 등록 기능 — 작업자 편의 · To-Be: 선택적 기능 · 수기 입력 가능</td></tr>
 <tr><th class="nw">해석·판정</th><td>신규 · <code>[의견]</code> IQC·LOT 생성 순서 확인 필요 (통합분석 §7-4)</td></tr>
-<tr><th class="nw">확정·재정의</th><td><strong>QA #29 (해석 정정 — QA 기록 §3.5-1)</strong>: '창고 입고 생략 간이 경로' 아님 — <strong>입하(도착) 등록의 문서 분석 자동화</strong>(P/O 대조·REQ-OA-0011 초과 검증 결합)→IQC→LOT 생성, 순서 정합 문제 없음. 수기=대안 경로. 구현 방식=<strong>온프레미스 OCR</strong>(Python)·인식 실패·저신뢰 시 수기 폴백 (TS 결정 19) «(정합주: '창고 입고 생략 간이 경로' 구서술은 WF01 S2·질문지 v2 B8④·모델 C6 입하에 잔존 — 전면 정정 대상으로 명기됨, QA 기록 §3.5-1 채택)»</td></tr>
+<tr><th class="nw">확정·재정의</th><td><strong>QA #29 (해석 정정 — QA 기록 §3.5-1)</strong>: '창고 입고 생략 간이 경로' 아님 — <strong>입하(도착) 등록의 문서 분석 자동화</strong>(ERP W/O 대조·REQ-OA-0011 초과 검증 결합)→IQC→LOT 생성, 순서 정합 문제 없음. 수기=대안 경로. 구현 방식=<strong>온프레미스 OCR</strong>(Python)·인식 실패·저신뢰 시 수기 폴백 (TS 결정 19) «(정합주: '창고 입고 생략 간이 경로' 구서술은 WF01 S2·질문지 v2 B8④·모델 C6 입하에 잔존 — 전면 정정 대상으로 명기됨, QA 기록 §3.5-1 채택)»</td></tr>
 <tr><th class="nw">반영 위치</th><td>WF01 S2 · 모델 C6 입하 · 질문지 v2 B8④·E17 · 화면 M-01-01(입하 등록)</td></tr>
 <tr><th class="nw">잔여 미결</th><td>— (OCR 엔진 선정·한/베 혼재 인식률 검증은 02 소관 잔여 — TS §6 #9)</td></tr>
 </tbody></table>
@@ -2246,7 +2246,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th class="nw">구분·분류</th><td>기능</td></tr>
 <tr><th class="nw">원문 요지</th><td>IQC 합격 시점에 LOT 생성인지, 입하 시점에 이미 생성돼 있는지 결정 필요 · As-Is: 없음 · To-Be(미팅 확정): <strong>IQC 합격 시점에 LOT 생성</strong></td></tr>
 <tr><th class="nw">해석·판정</th><td>미결해소(C4·A1)+개정 — 확정④ (통합분석 §2)</td></tr>
-<tr><th class="nw">확정·재정의</th><td>C4 ✓[확정 2026-07-01] (당시 "IQC 합격='생성', Release 아님") → <strong>재정의(2026-07-20 MLOT #5·#7)</strong>: <strong>"LOT 등록=입하(Lot Status=Hold·검사 대기) · Release=IQC 합격"</strong> — 구 "생성 2단계" 폐기. Hold 통제가 자재LOT에도 적용 · 불합격=Hold 유지·반품(재고 미가용) · 재고 편입=입하 등록 시(Hold 행 즉시 생성·가용 아님 — MLOT §3) · IQC 생략=정책적 생략 아님, 긴급 시 작업자 요청→권한자 승인→한도승인(MLOT #8) · 사전부착 번호만으론 어떤 P/O 물품인지 확정 불가 → <strong>입하 등록 시 담당자가 P/O 확인</strong>(MLOT #6) «(정합주: 질문지 v2 C4의 "IQC 합격 시점 '생성'·합격 전 자재LOT 부재('입하 대기' 상태로 설계)" 구서술은 재정의로 대체 — MLOT §2 #5·#7. "불합격=LOT 미생성" 표기는 전 정본 일괄 대체 대상으로 확정 — MLOT §3)»</td></tr>
+<tr><th class="nw">확정·재정의</th><td>C4 ✓[확정 2026-07-01] (당시 "IQC 합격='생성', Release 아님") → <strong>재정의(2026-07-20 MLOT #5·#7)</strong>: <strong>"LOT 등록=입하(Lot Status=Hold·검사 대기) · Release=IQC 합격"</strong> — 구 "생성 2단계" 폐기. Hold 통제가 자재LOT에도 적용 · 불합격=Hold 유지·반품(재고 미가용) · 재고 편입=입하 등록 시(Hold 행 즉시 생성·가용 아님 — MLOT §3) · IQC 생략=정책적 생략 아님, 긴급 시 작업자 요청→권한자 승인→한도승인(MLOT #8) · 사전부착 번호만으론 어떤 ERP W/O 물품인지 확정 불가 → <strong>입하 등록 시 담당자가 ERP W/O 확인</strong>(MLOT #6) «(정합주: 질문지 v2 C4의 "IQC 합격 시점 '생성'·합격 전 자재LOT 부재('입하 대기' 상태로 설계)" 구서술은 재정의로 대체 — MLOT §2 #5·#7. "불합격=LOT 미생성" 표기는 전 정본 일괄 대체 대상으로 확정 — MLOT §3)»</td></tr>
 <tr><th class="nw">반영 위치</th><td>WF01 S3·S4 · WF03 S5 보정·S8(OQC 접점 — WF03 접점 표) · 모델 C3·C4 · 질문지 v2 C4 · MLOT · 화면 W-01-10(정상품 입하 처리)·P-01-01</td></tr>
 <tr><th class="nw">잔여 미결</th><td>—</td></tr>
 </tbody></table>
@@ -2400,7 +2400,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th class="nw">구분·분류</th><td>기능</td></tr>
 <tr><th class="nw">원문 요지</th><td>LOCATION은 사용자 설정/수정 가능해야 함 · To-Be: $모든 정보는 수정 가능</td></tr>
 <tr><th class="nw">해석·판정</th><td>일치검증(MES 소유) · §7-3 "$모든 정보" 문구 범위 불명 (통합분석)</td></tr>
-<tr><th class="nw">확정·재정의</th><td>E27(질문지) ✓종결(QA #34): <strong>MES 정본 마스터 전체 수정 가능+변경 이력 필수</strong> · 연계 수신본(품목·BOM·P/O)=읽기 전용+<strong>MES 확장 속성만 편집 가능</strong> — 마스터 편집 통일 규칙</td></tr>
+<tr><th class="nw">확정·재정의</th><td>E27(질문지) ✓종결(QA #34): <strong>MES 정본 마스터 전체 수정 가능+변경 이력 필수</strong> · 연계 수신본(품목·BOM·ERP W/O)=읽기 전용+<strong>MES 확장 속성만 편집 가능</strong> — 마스터 편집 통일 규칙</td></tr>
 <tr><th class="nw">반영 위치</th><td>WF01 S5 · WF06 S6 · 모델 C1 · 질문지 v2 E27 · 화면 W-06-07(창고·Location 마스터 — v1.3에서 Location 코드 라벨 이미지 생성 포함 명시)</td></tr>
 <tr><th class="nw">잔여 미결</th><td>마스터별 편집 권한 매트릭스(회신 E-9 연계 잔존)</td></tr>
 </tbody></table>
@@ -2426,14 +2426,14 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th class="nw">반영 위치</th><td>WF02 S5 교체 · WF05 S2·S3 · 질문지 v2 D1 · 화면 P-02-01·P-02-02·P-CO-01(사번 인증)</td></tr>
 <tr><th class="nw">잔여 미결</th><td>POP 사번 인증과 권한의 정합(D1 잔여 — 회신 E-9와 연동)</td></tr>
 </tbody></table>
-<h3>REQ-PR-0024 — P/O 변경 시 W/O 변경 (중단/수량 변경+관리자 확인)</h3>
+<h3>REQ-PR-0024 — ERP W/O 변경 시 W/O 변경 (중단/수량 변경+관리자 확인)</h3>
 <table>
 <thead><tr><th class="nw">항목</th><th>내용</th></tr></thead>
 <tbody>
 <tr><th class="nw">구분·분류</th><td>기능</td></tr>
-<tr><th class="nw">원문 요지</th><td>생산 계획 실행 후 P/O 변경 상황 발생 가능 → P/O 변경 시 W/O 변경 필요 · To-Be: ① 중단→생산 계획 중단 ② 수량 변경→계획 수량 변경, 관리자 확인 요청 · "P/O 변경 무시하고 강행하는 옵션도 있어야 하는지?"(원문 미결)</td></tr>
+<tr><th class="nw">원문 요지</th><td>생산 계획 실행 후 ERP W/O 변경 상황 발생 가능 → ERP W/O 변경 시 W/O 변경 필요 · To-Be: ① 중단→생산 계획 중단 ② 수량 변경→계획 수량 변경, 관리자 확인 요청 · "ERP W/O 변경 무시하고 강행하는 옵션도 있어야 하는지?"(원문 미결)</td></tr>
 <tr><th class="nw">해석·판정</th><td>미결해소(D10 확정) (통합분석 §2)</td></tr>
-<tr><th class="nw">확정·재정의</th><td>D10 ✓[확정 2026-07-01] + E11(회신) ✓종결(QA #23): <strong>강행 옵션 필요</strong> — 관리자 확인 화면에서 '변경 반영 vs 기존 유지(강행)' 선택 · <strong>강행 시 P/O-W/O 불일치 플래그 명시</strong> → D10 완전 종결</td></tr>
+<tr><th class="nw">확정·재정의</th><td>D10 ✓[확정 2026-07-01] + E11(회신) ✓종결(QA #23): <strong>강행 옵션 필요</strong> — 관리자 확인 화면에서 '변경 반영 vs 기존 유지(강행)' 선택 · <strong>강행 시 ERP W/O-W/O 불일치 플래그 명시</strong> → D10 완전 종결</td></tr>
 <tr><th class="nw">반영 위치</th><td>WF02 S1 · 모델 C2(변경 전파) · 질문지 v2 D10·E11 · 화면 W-02-01·W-02-06·W-01-09·M-01-01</td></tr>
 <tr><th class="nw">잔여 미결</th><td>—</td></tr>
 </tbody></table>
@@ -2680,16 +2680,16 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th class="nw">반영 위치</th><td>WF01 S7·S8 · 모델 C3(분할 계보) · 질문지 v2 A4·D12 · 화면 P-01-02</td></tr>
 <tr><th class="nw">잔여 미결</th><td>자재 분할 QR 체계 설계(발번·라벨 규격 — 내부 설계 입력)</td></tr>
 </tbody></table>
-<h3>REQ-OA-0011 — P/O 초과 입고 시 초과 물량 식별 【해석 정정】</h3>
+<h3>REQ-OA-0011 — ERP W/O 초과 입고 시 초과 물량 식별 【해석 정정】</h3>
 <table>
 <thead><tr><th class="nw">항목</th><th>내용</th></tr></thead>
 <tbody>
 <tr><th class="nw">구분·분류</th><td>기능</td></tr>
-<tr><th class="nw">원문 요지</th><td>P/O 수량 초과 자재 입고 시 초과 물량으로 확인되어야 함 · To-Be: 입고 처리할지, 초과 수량 반품할지 기능 선택</td></tr>
-<tr><th class="nw">해석·판정</th><td>미결해소(D14 부분)+신규 — 입하 검증에 P/O 대비 수량 체크 신설 (통합분석 §3)</td></tr>
-<tr><th class="nw">확정·재정의</th><td><strong>QA #36(2026-07-06) ✓확정: 초과분만 별도 입하 정보 분리 생성(P/O 비귀속)</strong> — 원문 '선택'=분리 생성된 초과 입하 건의 <strong>후속 처리</strong>(입고 진행/공급사 반품)로 수용. raw 재검증 결과 전사 오류 아님(정리본 무수정) «(정합주: '식별 즉시 입고/반품 선택 분기' 해석은 QA #36으로 폐기 — 분리 생성 후 후속 처리 선택 채택)»</td></tr>
-<tr><th class="nw">반영 위치</th><td>WF01 S1·S2(Exception) · 모델 C6 입하 검증 · 질문지 v2 D14 · QA 기록 §2.1 · 화면 W-01-03(초과 입하 분리)·W-01-11(신규 P/O 등록)</td></tr>
-<tr><th class="nw">잔여 미결</th><td>01-SB1(협의 대기): 초과분 입고 진행의 승인 주체 · ERP 신규 P/O 발행-MES 분리 입하 매칭 절차 (QA 기록 §4)</td></tr>
+<tr><th class="nw">원문 요지</th><td>ERP W/O 수량 초과 자재 입고 시 초과 물량으로 확인되어야 함 · To-Be: 입고 처리할지, 초과 수량 반품할지 기능 선택</td></tr>
+<tr><th class="nw">해석·판정</th><td>미결해소(D14 부분)+신규 — 입하 검증에 ERP W/O 대비 수량 체크 신설 (통합분석 §3)</td></tr>
+<tr><th class="nw">확정·재정의</th><td><strong>QA #36(2026-07-06) ✓확정: 초과분만 별도 입하 정보 분리 생성(ERP W/O 비귀속)</strong> — 원문 '선택'=분리 생성된 초과 입하 건의 <strong>후속 처리</strong>(입고 진행/공급사 반품)로 수용. raw 재검증 결과 전사 오류 아님(정리본 무수정) «(정합주: '식별 즉시 입고/반품 선택 분기' 해석은 QA #36으로 폐기 — 분리 생성 후 후속 처리 선택 채택)»</td></tr>
+<tr><th class="nw">반영 위치</th><td>WF01 S1·S2(Exception) · 모델 C6 입하 검증 · 질문지 v2 D14 · QA 기록 §2.1 · 화면 W-01-03(초과 입하 분리)·W-01-11(신규 ERP W/O 등록)</td></tr>
+<tr><th class="nw">잔여 미결</th><td>01-SB1(협의 대기): 초과분 입고 진행의 승인 주체 · ERP 신규 ERP W/O 발행-MES 분리 입하 매칭 절차 (QA 기록 §4)</td></tr>
 </tbody></table>
 <h2>§5. 비기능 요구사항 — 6군 재정리</h2>
 <div class="callout"><p>원문 '구분' 열의 기능/비기능 분류가 관례와 다른 경우(예: 다국어=원문 '기능') <strong>원문 구분을 병기</strong>하고 재분류했다(명세서 정리 §5-7 — 원문 유지·재분류는 해석 계층 소관). 47건 중 원문 '비기능' 기재는 PR-0017·PR-0018·PR-0036·OA-0005·OA-0006 5건이다.</p></div>
@@ -2740,9 +2740,9 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <h3>6.4 일관 설계 원칙·정본 지도 (QA 기록 §3 — 문답 전반에서 확립)</h3>
 <p><strong>설계 원칙 3건 (QA 기록 §3.4):</strong></p>
 <ol><li><strong>설정형(configurable) 우선</strong> — 점검 통제 3단계·ERP 송신 on/off·중단 사유 코드·FIFO 강제/선택·알람 채널·타발수 환산·위치 관리 선택적.</li><li><strong>기록은 생략하지 않는다</strong> — 긴급 직행도 기록상 입고+출하 생성 · 전량 출고에도 출고 QR · 재생재도 내부 genealogy 완전 기록.</li><li><strong>연계 원본 읽기 전용 + MES 확장 속성 편집</strong> (QA #34·#35).</li></ol>
-<p><strong>정본 지도 (QA 기록 §3.1):</strong> LOT 3종=MES 발번 / Routing·툴·검사기준·Location·예비품=MES(엑셀→DX) / 품목·BOM(Rev)·공통코드·조직·작업자·P/O=ERP(UNIERP)«(정합주: 수신 목록은 🔹2026-07-08 확정으로 개명·승격 — 02-SW설계사양서 §5.2 참조)» / 출하지시=고객사 문서 import(D+1·시간대별). «(정합주: §3.1 비고의 "자재LOT: 사전발행+IQC 합격 생성 2단계"는 2026-07-20 재정의 이전 서술(QA 기록 최종 갱신 v1.4=2026-07-13이라 미반영) — <strong>"등록=입하(Hold)·Release=IQC 합격·발번 경로 이원화"로 대체해 읽는다</strong>, MLOT §2)»</p>
-<p><strong>UNIERP 연계 스펙 (QA 기록 §3.2):</strong> DB 중계 테이블. 수신=품목·BOM·공통코드·조직·작업자·P/O «(정합주: 2026-08-31 — <strong>인용은 QA 기록 원문 그대로다.</strong> 지금 확정 목록은 품목·자재명세(BOM)·조직·작업자·구매발주 <strong>다섯</strong>이다. ① 공통코드는 2026-08-22 확정으로 빠졌다(MES 정본 · 공유계약 B-4-3 · omf-mes#197). ② <del>거래처(공급사) 승격</del> 은 2026-08-31 확정으로 <strong>되돌렸다</strong> — 확정 목록은 QA §3.2 계보를 따른다(omf-mes#197). ③ '작업자'→'사용자' 개명·P/O 트랜잭션 계열 분리는 <strong>그대로 유효</strong>하다. 정본은 공유계약 B-4-1)». 송신=생산 실적(필수·개발품 제외)·G/R(IQC 합격 직후 건별)·출하(PGI)·반품·실사조정 — 송신은 항목별 선택(on/off). 검사 결과 비연계. + 추적관리시스템 병행+연계 · 설비 데이터 수집 표준 I/F(캠데코=1차).</p>
-<p><strong>신규 구조 결정 목록 (QA 기록 §3.3):</strong> 출고 QR 항상 발행 · 손실 3원 집계 · 재생재 코드 2단 · 자재LOT 보관단위 기본값+override · FEFO/FIFO 품목별 · 긴급 직행=기록 2건 자동 생성 · 러닝체인지=W/O 무분할·생산LOT만 분할(BOM 스냅샷=LOT 레벨) · 문서 자동 등록 패턴 2종(거래명세서 입하·출하지시서 import) · P/O 변경 강행 옵션+불일치 플래그 · 미달 마감 이월/소멸 관리자 선택 · 클레임 입고 원천 구분 · 다국어 전범위(사용자별 언어) · POP 로컬 버퍼링 폴백 · P/O 초과=별도 입하 분리 생성.</p>
+<p><strong>정본 지도 (QA 기록 §3.1):</strong> LOT 3종=MES 발번 / Routing·툴·검사기준·Location·예비품=MES(엑셀→DX) / 품목·BOM(Rev)·공통코드·조직·작업자·ERP W/O=ERP(UNIERP)«(정합주: 수신 목록은 🔹2026-07-08 확정으로 개명·승격 — 02-SW설계사양서 §5.2 참조)» / 출하지시=고객사 문서 import(D+1·시간대별). «(정합주: §3.1 비고의 "자재LOT: 사전발행+IQC 합격 생성 2단계"는 2026-07-20 재정의 이전 서술(QA 기록 최종 갱신 v1.4=2026-07-13이라 미반영) — <strong>"등록=입하(Hold)·Release=IQC 합격·발번 경로 이원화"로 대체해 읽는다</strong>, MLOT §2)»</p>
+<p><strong>UNIERP 연계 스펙 (QA 기록 §3.2):</strong> DB 중계 테이블. 수신=품목·BOM·공통코드·조직·작업자·ERP W/O «(정합주: 2026-08-31 — <strong>인용은 QA 기록 원문 그대로다.</strong> 지금 확정 목록은 품목·자재명세(BOM)·조직·작업자·구매발주 <strong>다섯</strong>이다. ① 공통코드는 2026-08-22 확정으로 빠졌다(MES 정본 · 공유계약 B-4-3 · omf-mes#197). ② <del>거래처(공급사) 승격</del> 은 2026-08-31 확정으로 <strong>되돌렸다</strong> — 확정 목록은 QA §3.2 계보를 따른다(omf-mes#197). ③ '작업자'→'사용자' 개명·ERP W/O 트랜잭션 계열 분리는 <strong>그대로 유효</strong>하다. 정본은 공유계약 B-4-1)». 송신=생산 실적(필수·개발품 제외)·G/R(IQC 합격 직후 건별)·출하(PGI)·반품·실사조정 — 송신은 항목별 선택(on/off). 검사 결과 비연계. + 추적관리시스템 병행+연계 · 설비 데이터 수집 표준 I/F(캠데코=1차).</p>
+<p><strong>신규 구조 결정 목록 (QA 기록 §3.3):</strong> 출고 QR 항상 발행 · 손실 3원 집계 · 재생재 코드 2단 · 자재LOT 보관단위 기본값+override · FEFO/FIFO 품목별 · 긴급 직행=기록 2건 자동 생성 · 러닝체인지=W/O 무분할·생산LOT만 분할(BOM 스냅샷=LOT 레벨) · 문서 자동 등록 패턴 2종(거래명세서 입하·출하지시서 import) · ERP W/O 변경 강행 옵션+불일치 플래그 · 미달 마감 이월/소멸 관리자 선택 · 클레임 입고 원천 구분 · 다국어 전범위(사용자별 언어) · POP 로컬 버퍼링 폴백 · ERP W/O 초과=별도 입하 분리 생성.</p>
 <h2>§7. 고객 액션·회신 대기 — 12항목 현행 상태 + 파생</h2>
 <div class="callout"><p>원천: 명세서 정리 §4(명세서에 명시된 후속 자료·회신 12항목) → 질문지 v2 E1~E12 → QA 기록 §4 (2026-07-13 v1.4 기준). E코드는 「회신 E-n」으로 표기(§1.3 다중 체계 참조).</p></div>
 <table>
@@ -2758,7 +2758,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th class="nw">8</th><td>보고서 양식 파일 (PR-0013)</td><td class="nw">회신 E-8</td><td><strong>회수 대기 유지</strong>(QA #22) — 후속 회신 E-22(보고서 범위)도 대기</td></tr>
 <tr><th class="nw">9</th><td>사용자 유형/권한/접근 범위 정의 (PR-0015)</td><td class="nw">회신 E-9</td><td><strong>회수 대기 유지</strong>(QA #22 — 양측 워크숍) — 편집 권한 매트릭스(QA #34) 연계</td></tr>
 <tr><th class="nw">10</th><td>현행 출하 프로세스·ERP 기록 정보 (PR-0030)</td><td class="nw">회신 E-10</td><td><strong>회수 대기 유지</strong> — 통신 축은 확정분 반영(UNIERP·DB 중계 — QA #18·#22). <strong>2026-07-04 범위 확대: 반품·실사조정 전표의 ERP 연계 방식 추가</strong>(QA #6 — 방향=항목별 on/off 확정·방식 정보만 미회수)</td></tr>
-<tr><th class="nw">11</th><td>P/O 변경 강행 옵션 필요 여부 (PR-0024)</td><td class="nw">회신 E-11</td><td><strong>✓종결</strong>(QA #23: 필요 — 강행 시 P/O-W/O 불일치 플래그. D10 완전 종결)</td></tr>
+<tr><th class="nw">11</th><td>ERP W/O 변경 강행 옵션 필요 여부 (PR-0024)</td><td class="nw">회신 E-11</td><td><strong>✓종결</strong>(QA #23: 필요 — 강행 시 ERP W/O-W/O 불일치 플래그. D10 완전 종결)</td></tr>
 <tr><th class="nw">12</th><td>알람 메시지 전달 매체·Zalo 검토 (OA-0009)</td><td class="nw">회신 E-12</td><td><strong>✓종결</strong>(QA #24: 카카오톡/Zalo 선택형 채널 어댑터) — <strong>Zalo 기업 API 검토는 고객→CREFLE 액션 재분류</strong> · 결정 15의 채널 조정은 §3 REQ-PR-0016 정합주 참조</td></tr>
 </tbody></table>
 <p><strong>집계</strong>: 종결 2건(회신 E-11·E-12) / 대기 10건(회신 E-1~E-10) + <strong>파생 대기 2건</strong>(회신 E-22 보고서 범위 · 회신 E-24 대시보드 구성 — QA 기록 §4는 "고객 회수 대기 10건 + E22·E24"로 표기).</p>
@@ -2768,7 +2768,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tbody>
 <tr><th>고객 측 확인 2건</th><td>BOM 유효기간 관리 여부(ERP 스키마 — QA #3) · 네트워크 단절 원인(인프라=고객 책임 — QA #32)</td></tr>
 <tr><th>CREFLE 액션 2건</th><td>Zalo 기업 API 기술 검토(회신 E-12 재분류 — QA #24) · OA MES↔추적관리시스템 역할·데이터 경계 정의(QA #19)</td></tr>
-<tr><th>협의 대기 4건 (도식 검토 발 — QA 기록 §4)</th><td>01-SA1 반품 거부 시 폐기 전환 <code>[가설]</code>(회신 E-4 연동) · 01-SB1 초과 입하 사후 P/O 승인 주체·ERP 매칭(QA #36 후속) · 01-SC1 IQC 부분 불량 판정 유형 <code>[가설]</code>(회신 E-3 연계) · <code>[가설]</code> 임시 Location 운영 방식(사전 등록 임시 Location 코드 가능 여부) ※QA 기록 §4 협의 대기 중 U9(긴급 W/O 자재 조달)는 EWO로 종결 — §3 REQ-PR-0014 정합주</td></tr>
+<tr><th>협의 대기 4건 (도식 검토 발 — QA 기록 §4)</th><td>01-SA1 반품 거부 시 폐기 전환 <code>[가설]</code>(회신 E-4 연동) · 01-SB1 초과 입하 사후 ERP W/O 승인 주체·ERP 매칭(QA #36 후속) · 01-SC1 IQC 부분 불량 판정 유형 <code>[가설]</code>(회신 E-3 연계) · <code>[가설]</code> 임시 Location 운영 방식(사전 등록 임시 Location 코드 가능 여부) ※QA 기록 §4 협의 대기 중 U9(긴급 W/O 자재 조달)는 EWO로 종결 — §3 REQ-PR-0014 정합주</td></tr>
 <tr><th>문서 명기 기타 잔여 9건</th><td><strong>47건 우선순위(필수/중요/선택) 고객 확정</strong>(명세서 정리 §5-3 · 통합분석 §9 후속 과제 ① — 이후 원본 어디에도 해소 기록 없음) · E21 보존 대상 범위 합의 · 마스터별 편집 권한 매트릭스(QA #34 — 회신 E-9 연계) · PR-0002 엑셀 이중입력 여부 · PR-0003 설비(기계) 대장 매체 미검증 · PR-0011 재작업 LOT 승계·수율 반영 · PR-0026 Routing As-Is 실제 운용 확인 · OA-0010/A4 자재 분할 QR 발번·라벨 규격(내부 설계 입력) · A1~A3·B3 현장 실태 재확인(확정 후 실태만 확인)</td></tr>
 </tbody></table>
 <h2>§8. 추적성 매트릭스 — REQ 47행 요약</h2>

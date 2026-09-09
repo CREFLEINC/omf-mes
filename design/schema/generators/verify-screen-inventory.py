@@ -9,8 +9,8 @@
 #
 # 무엇을 보나
 #   ① 각 문서 안에서 메뉴 트리 ↔ 화면표가 같은 집합인가
-#   ② 두 문서가 같은 화면 집합을 갖는가
-#   ③ 인벤토리 §1 요약 표의 숫자가 실제 계수와 맞는가
+#   ② 동결 원본에서 후행 폐지 화면을 제외한 활성 집합과 통합 IA 가 같은가
+#   ③ 동결 인벤토리 §1 요약 표의 숫자가 당시 전건 계수와 맞는가
 #
 # 표준 라이브러리만 쓴다(저장소 관행).
 import io
@@ -24,6 +24,7 @@ ROOT = os.path.normpath(os.path.join(HERE, '..', '..', '..'))
 INVENTORY = os.path.join(ROOT, 'design', 'raw', 'process', 'uiux',
                          '2026-07-25-화면목록-IA', 'screen-inventory-ia.md')
 INTEGRATED = os.path.join(ROOT, 'design', 'wiki', 'project-spec', '04-통합-IA.md')
+SCREENS = os.path.join(ROOT, 'design', 'wiki', 'screens')
 
 SCREEN = re.compile(r'([WMP]-(?:CO|\d{2})-\d{2})')
 PROGRAM = {'W': '관리웹', 'P': 'POP', 'M': '모바일'}
@@ -32,6 +33,21 @@ PROGRAM = {'W': '관리웹', 'P': 'POP', 'M': '모바일'}
 def read(path):
     with io.open(path, encoding='utf-8') as f:
         return f.read()
+
+
+def retired_screens():
+    """동결 원본 이후 상세 스펙에서 통합·폐지된 화면 ID를 모은다."""
+    out = set()
+    for base, _, files in os.walk(SCREENS):
+        for name in files:
+            if not name.endswith('.md'):
+                continue
+            path = os.path.join(base, name)
+            first = read(path).split('\n', 1)[0]
+            found = SCREEN.search(first)
+            if found and '~~' in first and '폐지' in first:
+                out.add(found.group(1))
+    return out
 
 
 def section(text, start_pattern, end_pattern):
@@ -99,12 +115,16 @@ def main():
     errors = []
 
     inventory = read(INVENTORY)
-    inv_tree = (from_tree(section(inventory, r'^### 2\.1 ', r'^### 2\.2 '))
-                + from_tree(section(inventory, r'^### 2\.2 ', r'^### 2\.3 '))
-                + from_tree(section(inventory, r'^### 2\.3 ', r'^## 3\. ')))
-    inv_table = from_table(section(inventory, r'^## 3\. ', r'^## 4\. '))
-    compare('인벤토리', inv_tree, inv_table, errors)
-    check_summary(inventory, inv_table, errors)
+    inv_tree_all = (from_tree(section(inventory, r'^### 2\.1 ', r'^### 2\.2 '))
+                    + from_tree(section(inventory, r'^### 2\.2 ', r'^### 2\.3 '))
+                    + from_tree(section(inventory, r'^### 2\.3 ', r'^## 3\. ')))
+    inv_table_all = from_table(section(inventory, r'^## 3\. ', r'^## 4\. '))
+    compare('동결 인벤토리', inv_tree_all, inv_table_all, errors)
+    check_summary(inventory, inv_table_all, errors)
+
+    retired = retired_screens()
+    inv_tree = [sid for sid in inv_tree_all if sid not in retired]
+    inv_table = [sid for sid in inv_table_all if sid not in retired]
 
     integrated = read(INTEGRATED)
     int_tree, int_table = [], []
@@ -124,8 +144,10 @@ def main():
         errors.append('두 문서 — 통합 IA 에만 있다: %s' % ' '.join(only_int))
 
     counted = Counter(s[0] for s in inv_table)
-    print('화면 %d — %s' % (len(inv_table),
-                           ' · '.join('%s %d' % (PROGRAM[k], counted[k]) for k in 'WPM')))
+    print('활성 화면 %d — %s · 후행 폐지 %d' % (
+        len(inv_table),
+        ' · '.join('%s %d' % (PROGRAM[k], counted[k]) for k in 'WPM'),
+        len(retired)))
     if not errors:
         print('✅ 트리·표·요약이 모두 맞습니다.')
         return 0
