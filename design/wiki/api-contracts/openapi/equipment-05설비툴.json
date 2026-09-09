@@ -2162,7 +2162,7 @@
      "maintenance"
     ],
     "summary": "툴 사용실적 목록",
-    "description": "툴별 타발수 입력 이력이다.",
+    "description": "툴별 타발수 입력 이력이다. 당시 누계 스냅샷이 없어 cumulativeShotCount와 cumulativeAsOf를 함께 생략한다. 현재 툴 누계나 과거 이력 합계를 당시 누계처럼 반환하지 않는다.",
     "parameters": [
      {
       "name": "moldId",
@@ -2266,7 +2266,7 @@
      "maintenance"
     ],
     "summary": "툴 사용실적 등록",
-    "description": "이번 타발수만 보낸다. 누계는 서버가 더해서 응답에 담고 기준 시각을 함께 낸다 — 화면이 누계를 계산하거나 덮어쓰지 않는다. 오프라인 큐에서 올라올 수 있어 멱등키가 필수다.",
+    "description": "이번 타발수만 보낸다. 누계는 서버가 더해서 응답에 담고 기준 시각을 함께 낸다 — 화면이 누계를 계산하거나 덮어쓰지 않는다. 오프라인 큐에서 올라올 수 있어 멱등키가 필수다. 제출한 양의 안전 정수 증분과 환산 근거를 그대로 보존하며 현재 정책·캐비티로 다시 계산하거나 곱과 엄격 대조하지 않는다. CONVERTED의 기준수량·비율은 양수 Decimal(20,6) 무손실 범위이며 DIRECT에 숫자 환산 근거를 보내면 400 INVALID다. 실적·툴 누계·버전·누계 기준시각·멱등 완료를 한 트랜잭션으로 반영한다. occurredAt은 현장 발생시각이고 cumulativeAsOf는 누계 갱신 기준시각이다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -2326,7 +2326,8 @@
        }
       }
      }
-    }
+    },
+    "x-internal-note": "통보119(omf-mes#519): 소수 곱의 반올림/절사·최소 증분과 표현 정밀도 정책은 최종 자료 보완 대상이다. 제출 증분 보존은 특정 Math.round를 승인한 것이 아니다. 기존 이력·생산 실적·원장·자동 PM을 수정하지 않는다."
    }
   },
   "/maintenance/tool-usages/{toolUsageId}": {
@@ -2335,7 +2336,7 @@
      "maintenance"
     ],
     "summary": "툴 사용실적 한 건",
-    "description": "입력 한 건의 상세.",
+    "description": "입력 한 건의 상세. 당시 누계 스냅샷이 없어 cumulativeShotCount와 cumulativeAsOf를 함께 생략한다. 현재 툴 누계나 과거 이력 합계를 당시 누계처럼 반환하지 않는다.",
     "parameters": [
      {
       "name": "toolUsageId",
@@ -2678,7 +2679,7 @@
      "maintenance"
     ],
     "summary": "최근 수신 신호",
-    "description": "아직 연결되지 않은 신호를 포함해 최근 들어온 것을 보인다 — 수집 채널 등록 화면의 「수신 로그에서 가져오기」가 부른다.",
+    "description": "아직 연결되지 않은 신호를 포함해 최근 들어온 것을 보인다 — 수집 채널 등록 화면의 「수신 로그에서 가져오기」가 부른다. 설비와 channelKey별 저장된 최신 관측 한 행의 실제 lastValue·observedAt을 함께 반환하고 null 값도 보존한다. NOW·수신시각·임의 통합 메시지 JSON에서 값을 재구성하지 않는다. alreadyMapped는 등록 행 존재이고 unmappedOnly는 활성 항목 연결 부재다. 등록됐지만 미연결 또는 비활성인 행은 alreadyMapped=true여도 미매핑 목록에 포함된다. 어떤 조건에든 활성 연결이 있으면 다른 조건이 미연결이어도 제외한다. 현재 생산 조건의 적용 가능성을 판정하는 조회는 아니다. 필터에 맞는 전체 items와 totalCount를 반환한다.",
     "parameters": [
      {
       "name": "equipmentId",
@@ -2696,7 +2697,7 @@
        "type": "boolean",
        "example": true
       },
-      "description": "연결 안 된 것만"
+      "description": "같은 설비·키에 활성 상태이고 inspectionItemId가 연결된 채널이 하나도 없는 관측만 반환한다. 등록 행 존재 여부와 다르다."
      }
     ],
     "responses": {
@@ -2739,7 +2740,8 @@
        }
       }
      }
-    }
+    },
+    "x-internal-note": "통보118(omf-mes#519): 조회 정본은 저장된 실제 관측이다. producer·관측시각 원천·역순/동률 처리·운영 활성화 책임은 최종 결정문 보완 대상이며 GET 완료가 수집 운영 인수를 뜻하지 않는다. 번호 없는 채널 단위 해제/import 실패 건수는 재정리 §2에 제목만 있어 null/생략 처리·계수 단위·응답 필드를 임의로 신설하지 않는다."
    }
   },
   "/maintenance/calibrations": {
@@ -2857,7 +2859,8 @@
        }
       }
      }
-    }
+    },
+    "x-internal-note": "통보117(omf-mes#519)은 2026-09-08 사용자 계측기 UI 제외·데이터 보존·업무 판정 영향 없음 결정을 뒤집지 않는다. 보존 계약의 PASS/ADJUSTED 날짜 갱신·사용 차단을 이번 활성 기능으로 복원하지 않는다."
    },
    "post": {
     "tags": [
@@ -2921,7 +2924,8 @@
        }
       }
      }
-    }
+    },
+    "x-internal-note": "통보117(omf-mes#519)은 2026-09-08 사용자 계측기 UI 제외·데이터 보존·업무 판정 영향 없음 결정을 뒤집지 않는다. 보존 계약의 PASS/ADJUSTED 날짜 갱신·사용 차단을 이번 활성 기능으로 복원하지 않는다."
    }
   },
   "/maintenance/calibrations/{calibrationId}": {
@@ -2964,7 +2968,8 @@
        }
       }
      }
-    }
+    },
+    "x-internal-note": "통보117(omf-mes#519)은 2026-09-08 사용자 계측기 UI 제외·데이터 보존·업무 판정 영향 없음 결정을 뒤집지 않는다. 보존 계약의 PASS/ADJUSTED 날짜 갱신·사용 차단을 이번 활성 기능으로 복원하지 않는다."
    }
   },
   "/maintenance/calibrations/{calibrationId}:clear": {
@@ -3010,7 +3015,8 @@
     },
     "tags": [
      "maintenance"
-    ]
+    ],
+    "x-internal-note": "통보117(omf-mes#519)은 2026-09-08 사용자 계측기 UI 제외·데이터 보존·업무 판정 영향 없음 결정을 뒤집지 않는다. 보존 계약의 PASS/ADJUSTED 날짜 갱신·사용 차단을 이번 활성 기능으로 복원하지 않는다."
    }
   }
  },
@@ -4695,13 +4701,13 @@
      },
      "cumulativeShotCount": {
       "type": "integer",
-      "description": "서버가 더한 뒤의 누계다",
+      "description": "POST 성공 시 서버가 더한 뒤의 누계. 과거 GET 목록·상세는 당시 스냅샷이 없어 cumulativeAsOf와 함께 생략한다.",
       "example": 413550
      },
      "cumulativeAsOf": {
       "type": "string",
       "format": "date-time",
-      "description": "누계가 어느 시각 기준인지",
+      "description": "POST 성공 시 누계 갱신 기준시각이며 occurredAt과 다르다. 과거 GET은 cumulativeShotCount와 함께 생략한다.",
       "example": "2026-08-18T09:40:00+07:00"
      }
     },
@@ -4730,8 +4736,10 @@
      },
      "shotCount": {
       "type": "integer",
-      "description": "이번 값만 보낸다 — 누계를 보내지 않는다",
-      "example": 1250
+      "description": "화면이 정한 양의 안전 정수 증분이다. 서버는 제출값을 보존하며 현재 환산 정책이나 캐비티로 재계산하지 않는다.",
+      "example": 1250,
+      "minimum": 1,
+      "maximum": 9007199254740991
      },
      "collectionMethodCode": {
       "type": "string",
@@ -4749,7 +4757,8 @@
        "null"
       ],
       "format": "double",
-      "example": 5000
+      "example": 5000,
+      "description": "CONVERTED일 때 양수 Decimal(20,6) 무손실 범위의 환산 근거를 보존한다. DIRECT에 숫자 값을 제공하면 400 INVALID다."
      },
      "conversionRatio": {
       "type": [
@@ -4757,7 +4766,8 @@
        "null"
       ],
       "format": "double",
-      "example": 0.25
+      "example": 0.25,
+      "description": "CONVERTED일 때 양수 Decimal(20,6) 무손실 범위의 환산 근거를 보존한다. DIRECT에 숫자 값을 제공하면 400 INVALID다."
      },
      "occurredAt": {
       "type": "string",
@@ -5021,17 +5031,23 @@
       "example": "PRS01.TEMP.01"
      },
      "lastValue": {
-      "type": "string",
-      "example": "182.4"
+      "type": [
+       "string",
+       "null"
+      ],
+      "example": "182.4",
+      "description": "observedAt과 같은 저장 행의 실제 관측값. null도 보존하며 0이나 빈 문자열로 대체하지 않는다."
      },
      "observedAt": {
       "type": "string",
       "format": "date-time",
-      "example": "2026-08-18T09:40:00+07:00"
+      "example": "2026-08-18T09:40:00+07:00",
+      "description": "같은 저장 행의 실제 관측시각을 마이크로초까지 보존한다. 조회 시각이나 수신시각으로 대체하지 않는다."
      },
      "alreadyMapped": {
       "type": "boolean",
-      "example": false
+      "example": false,
+      "description": "같은 설비·키의 등록 행이 존재하면 true다. 활성 항목 연결이나 현재 생산 조건에 적용 가능하다는 뜻이 아니다."
      }
     },
     "required": [
