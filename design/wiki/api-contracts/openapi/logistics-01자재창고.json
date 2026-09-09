@@ -747,7 +747,7 @@
      "inventory"
     ],
     "summary": "실사 목록",
-    "description": "근거: W-01-04 §3 · M-01-11 §3",
+    "description": "실사 목록. plannedDate 내림차순, 동률이면 inventoryCountId 내림차순으로 고정 정렬한다. plannedDateFrom과 plannedDateTo는 양끝 날짜를 모두 포함한다.",
     "parameters": [
      {
       "name": "warehouseId",
@@ -764,7 +764,7 @@
        "type": "string",
        "format": "date"
       },
-      "description": "계획일 시작"
+      "description": "계획일 시작(해당 날짜 포함)"
      },
      {
       "name": "plannedDateTo",
@@ -773,7 +773,7 @@
        "type": "string",
        "format": "date"
       },
-      "description": "계획일 종료"
+      "description": "계획일 종료(해당 날짜 포함)"
      },
      {
       "name": "countTypeCode",
@@ -852,7 +852,7 @@
      "inventory"
     ],
     "summary": "실사 개시",
-    "description": "라인은 서버가 장부에서 만든다. 위치·품목·LOT·단위별 잔액 합계를 개시 시점 장부수량으로 보존하며 합계 0인 묶음은 제외한다. 음수 합계는 실제값으로 포함한다. 음수 잔액만을 이유로 창고 전체 개시를 거부하거나 해당 묶음을 제외하거나 0으로 저장하지 않는다.",
+    "description": "라인은 서버가 장부에서 만든다. 위치·품목·LOT·단위별 잔액 합계를 개시 시점 장부수량으로 보존하며 합계 0인 묶음은 제외한다. 음수 합계는 실제값으로 포함한다. 음수 잔액만을 이유로 창고 전체 개시를 거부하거나 해당 묶음을 제외하거나 0으로 저장하지 않는다. 품질·재고상태·소유·파트너·취급단위 축은 합산한다. 네 축 안정 정렬로 lineNo를 1부터 부여한다. 실사 번호는 INVENTORY_COUNT의 기본 접두어 IC, 창고의 공장 범위, plannedDate 기간키로 채번한다. 생성 상태는 IN_PROGRESS이며 PLANNED는 과거·외부 적재 행 조회용으로 유지한다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -1052,7 +1052,7 @@
      "inventory"
     ],
     "summary": "한 위치의 실사 라인 치환",
-    "description": "위치 단위로 끊어 치환한다 — 화면이 「이 위치 완료」로 끊기 때문이다. 마감된 실사는 400 이다. 근거: M-01-11 §5-6 · 공유계약 C-3 기존 라인의 systemQty는 개시 스냅샷을 유지한다. 현장에서 추가한 신규 라인은 등록 시점의 동일 위치·품목·LOT·단위 잔액 합계를 장부수량으로 보존하며 음수도 그대로 기록한다. 실물수량은 0 이상이고 차이는 실물수량에서 장부수량을 뺀 값이다.",
+    "description": "해당 위치의 계수 라인 전체를 치환한다. 본문에서 빠진 기존 라인은 삭제하지 않고 counted=false, countedQty=0, 사유·행위자=null로 되돌린다. 기존 systemQty와 lineNo는 보존하고 다른 위치는 변경하지 않는다. 같은 위치·품목·LOT·단위 중복은 400이다. PLANNED의 첫 정상 치환은 IN_PROGRESS로 전이하고 COMPLETED는 400 STATE_LOCKED다. 기존 장부는 개시 스냅샷이다. id 없는 현장 신규 라인만 등록 시점의 같은 네 축 실제 잔액 합계를 고정하며 없으면 0이고 음수도 보존한다. 차이 사유는 활성값이어야 하되 블라인드 미실사 최초 제출의 생략 예외를 적용한다. 사후 보완 대기 중인 기존 블라인드 라인을 수량·계수시각 변경 없이 재동봉할 때에는 미입력 사유를 유지할 수 있다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -1136,7 +1136,7 @@
      "inventory"
     ],
     "summary": "실사 마감",
-    "description": "미실사가 0 이고 차이가 없거나 모두 조정된 뒤에만 통과한다. 조건을 못 채우면 400 으로 무엇이 남았는지 돌려준다. 근거: W-01-04 §5-5",
+    "description": "요약과 같은 기준으로 마감 가능 여부를 판정하며 부모 헤더 잠금 안에서 다시 계산한다. 미실사 0이고 차이 라인마다 POSTED 조정이 연결된 IN_PROGRESS 실사만 마감한다. 실패 사유 우선순위는 ALREADY_CLOSED, STATE_LOCKED, COUNT_REMAINING, VARIANCE_UNADJUSTED다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -10539,7 +10539,8 @@
       "x-source-column": "inventory_count_no",
       "type": "string",
       "maxLength": 100,
-      "example": "IC-2026-000019"
+      "example": "IC-2026-000019",
+      "description": "INVENTORY_COUNT 기본 접두어 IC, 창고의 공장 범위, 요청 plannedDate 기간키로 서버가 채번한다."
      },
      "countTypeCode": {
       "x-source-column": "count_type_code",
@@ -10566,7 +10567,7 @@
       "x-source-column": "blind_count",
       "type": "boolean",
       "default": false,
-      "description": "참이면 장부 수량을 내려보내지 않는다. 개시 전에만 바꿀 수 있다. 근거: W-01-04 §5-2",
+      "description": "참이면 미실사 라인의 장부 수량을 생략하고 실물·차이 수량을 0으로 마스킹한다. 실제 계수 제출 뒤에는 장부 및 실제 차이를 반환한다. 개시 후에는 변경하지 않는다.",
       "example": false
      },
      "statusCode": {
@@ -10575,7 +10576,7 @@
       "maxLength": 50,
       "description": "재고 실사의 진행 상태 — 계획(PLANNED) · 진행중(IN_PROGRESS) · 완료(COMPLETED). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INVENTORY_COUNT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⛔ 시스템 소유다 — 실사가 개시된 뒤의 잠금 판정이 이 값에 걸린다(W-01-04 §5 — 400 STATE_LOCKED 는 풀리지 않고 새 실사를 개시한다). 근거: W-01-04 §3 목업(사용자 결정 2026-09-02).",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-internal-note": "통보272 반영. 상태 값 목록은 기존 INVENTORY_COUNT_STATUS 시스템 코드 그룹에 확정되어 있다. 생성은 IN_PROGRESS, 과거 PLANNED는 첫 정상 라인 치환 시 IN_PROGRESS로 전이한다.",
       "x-code-key": "CD-INVENTORY-COUNT-STATUS"
      }
     }
@@ -10585,12 +10586,12 @@
     "required": [
      "businessDate"
     ],
-    "description": "실사 마감. 미실사가 0 이고 차이가 없거나 모두 조정된 뒤에만 통과한다 — 조건을 못 채우면 400 으로 무엇이 남았는지 돌려준다. 근거: W-01-04 §5-5",
+    "description": "요약과 같은 기준으로 마감 가능 여부를 판정하며 부모 헤더 잠금 안에서 다시 계산한다. 미실사 0이고 차이 라인마다 POSTED 조정이 연결된 IN_PROGRESS 실사만 마감한다. 실패 사유 우선순위는 ALREADY_CLOSED, STATE_LOCKED, COUNT_REMAINING, VARIANCE_UNADJUSTED다.",
     "properties": {
      "businessDate": {
       "type": "string",
       "format": "date",
-      "description": "근거: 공유계약 C-8",
+      "description": "원장을 만들지 않는 마감 작업이므로 업무일 형식만 검증하고 저장하지 않는다.",
       "example": "2026-08-06"
      }
     }
@@ -10603,7 +10604,7 @@
      "warehouseId",
      "plannedDate"
     ],
-    "description": "실사 개시. 라인은 서버가 장부에서 만든다 — 화면이 대상을 열거하지 않는다. 근거: W-01-04 §5-7",
+    "description": "라인은 서버가 장부에서 만든다. 위치·품목·LOT·단위별 잔액 합계를 개시 시점 장부수량으로 보존하며 합계 0인 묶음은 제외한다. 음수 합계는 실제값으로 포함한다. 음수 잔액만을 이유로 창고 전체 개시를 거부하거나 해당 묶음을 제외하거나 0으로 저장하지 않는다. 품질·재고상태·소유·파트너·취급단위 축은 합산한다. 네 축 안정 정렬로 lineNo를 1부터 부여한다. 실사 번호는 INVENTORY_COUNT의 기본 접두어 IC, 창고의 공장 범위, plannedDate 기간키로 채번한다. 생성 상태는 IN_PROGRESS이며 PLANNED는 과거·외부 적재 행 조회용으로 유지한다.",
     "properties": {
      "countTypeCode": {
       "x-source-column": "count_type_code",
@@ -10658,7 +10659,6 @@
      "lineNo",
      "locationId",
      "itemId",
-     "systemQty",
      "countedQty",
      "varianceQty",
      "uomId",
@@ -10710,22 +10710,22 @@
      "systemQty": {
       "x-source-column": "system_qty",
       "type": "number",
-      "description": "장부 수량. 음수 허용 품목의 실제 음수 잔액도 그대로 보존하며 0으로 바꾸거나 실사 대상에서 제외하지 않는다. 기존 라인은 개시 시점 스냅샷을 유지한다. 블라인드 실사에서는 내려보내지 않는다.",
+      "description": "장부 수량. 음수 실제값을 보존하고 기존 라인의 개시 스냅샷을 유지한다. blindCount=true이고 counted=false이면 필드를 생략한다. 그 밖의 라인에는 반환한다.",
       "example": 100.0,
-      "x-internal-note": "omf-mes#513 질의276 반영. InventoryBalance.onHandQty는 음수 허용 품목의 음수를 이미 허용한다. 장부 사실의 보존과 물리 저장 도메인의 대응은 구분하며, 물리 모델 반영은 개발팀 소관이다. 블라인드 마스킹 통보273은 #521에서 별도 정합한다."
+      "x-internal-note": "질의276 음수 보존과 통보273 조건부 마스킹 반영. 저장값은 마스킹 때문에 변경하지 않는다. 물리 저장 대응은 개발팀 소관이다."
      },
      "countedQty": {
       "x-source-column": "counted_qty",
       "type": "number",
       "minimum": 0,
-      "description": "실물 수량. counted 가 참일 때만 뜻이 있다",
+      "description": "실물 수량. counted=true일 때만 실제 계수다. 블라인드 미실사에서는 0으로 마스킹하며 이 0을 실물 없음으로 해석하지 않는다.",
       "example": 98.0
      },
      "varianceQty": {
       "x-source-column": "variance_qty",
       "type": "number",
       "readOnly": true,
-      "description": "실물 − 장부. 서버가 계산한다. counted 가 참일 때만 뜻이 있다 — 거짓인 줄의 0 을 「차이 없음」으로 읽지 않는다 장부 -5, 실물 0이면 차이는 +5다. 장부를 0으로 보정한 뒤 계산하지 않는다.",
+      "description": "counted=true이면 실물 − 장부를 서버가 계산한다. 장부 -5·실물 0이면 +5다. 블라인드 미실사에서는 장부 역산을 막기 위해 0으로 마스킹한다. counted=false인 줄의 0은 차이 없음이 아니다.",
       "example": -2.0
      },
      "uomId": {
@@ -10753,7 +10753,7 @@
        "null"
       ],
       "format": "int64",
-      "description": "누가 세었나. counted 가 거짓이면 널이다 — 미실사 판정은 counted 로 하고 이 필드로 하지 않는다",
+      "description": "계수 행위자의 사용자 계정 ID. X-Worker-No가 있으면 작업자의 연결 계정을 쓰며 연결 계정이 없으면 null이다. 계정 토큰으로 헤더 생략이 허용된 경우에만 세션 사용자다. 단말 토큰의 사번 필수 검증은 유지한다. counted=false이면 null이며 counted=true여도 계정 미연결이면 null일 수 있다. 미실사 판정에 사용하지 않는다.",
       "example": 1001
      },
      "countedAt": {
@@ -10765,8 +10765,9 @@
      "counted": {
       "type": "boolean",
       "readOnly": true,
-      "description": "이 라인을 실제로 세었는가. 거짓이면 countedQty·countedAt·varianceQty 는 뜻이 없다 — 화면은 「미실사」로 보이고 0 으로 읽지 않는다. uncountedOnly=true 로 거른 줄은 전부 거짓이다. 근거: M-01-11 §5-2 · W-01-04 §5-4",
-      "example": false
+      "description": "실제 계수 여부의 정본이다. 수량 0이나 countedBy의 null로 추정하지 않는다. false이면 countedQty·countedAt·varianceQty를 실사 결과로 읽지 않는다. 실제 계수 제출 시 true, 위치 치환에서 빠지면 false다.",
+      "example": false,
+      "x-source-column": "counted"
      },
      "itemCode": {
       "type": "string",
@@ -10802,7 +10803,7 @@
       "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 위치 마스터의 행을 가리킨다 — Location.locationCode 가 같은 판정으로 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      }
     },
-    "x-internal-note": "블라인드 실사에서 systemQty 를 내려보내지 않는 것은 W-01-04 §5-2. 계약은 필드를 두되 서버가 생략한다."
+    "x-internal-note": "통보273: 물리 counted boolean 기본 false 추가 결정은 개발팀 기록이다. 응답 systemQty는 블라인드 미실사에서만 생략하며 required에서 제거한다. countedQty/varianceQty의 미실사 0은 마스킹 값이다. 과거 모든 블라인드 라인에서 장부·차이를 숨기는 설명보다 이 계수 전후 규칙이 우선한다."
    },
    "InventoryCountLineListResponse": {
     "type": "object",
@@ -10830,7 +10831,7 @@
      "occurredAt",
      "lines"
     ],
-    "description": "한 위치의 실사 라인을 치환한다. 실사 전체가 아니라 위치 단위로 끊는 것은 화면이 「이 위치 완료」로 끊기 때문이다 — 창고 하나의 라인이 수천 건이라 전체 치환은 보낼 수 없다. 근거: M-01-11 §5-6 · 공유계약 C-3",
+    "description": "해당 위치의 계수 라인 전체를 치환한다. 본문에서 빠진 기존 라인은 삭제하지 않고 counted=false, countedQty=0, 사유·행위자=null로 되돌린다. 기존 systemQty와 lineNo는 보존하고 다른 위치는 변경하지 않는다. 같은 위치·품목·LOT·단위 중복은 400이다. PLANNED의 첫 정상 치환은 IN_PROGRESS로 전이하고 COMPLETED는 400 STATE_LOCKED다.",
     "properties": {
      "locationId": {
       "x-source-column": "location_id",
@@ -10842,13 +10843,13 @@
      "businessDate": {
       "type": "string",
       "format": "date",
-      "description": "근거: 공유계약 C-8",
+      "description": "업무일 형식만 검증하며 이 위치 치환에서 저장하지 않는다. 라인별 countedAt이 계수 시각의 정본이다.",
       "example": "2026-08-06"
      },
      "occurredAt": {
       "type": "string",
       "format": "date-time",
-      "description": "근거: 공유계약 C-1",
+      "description": "발생시각 형식만 검증하며 이 위치 치환에서 저장하지 않는다. 계수 시각은 각 라인의 countedAt으로 보존한다.",
       "example": "2026-08-06T09:12:00+09:00"
      },
      "lines": {
@@ -10919,16 +10920,17 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "차이가 0 이 아니면 필수. 값 = MISPLACED·DAMAGED_IN_TRANSIT·SPILL·COUNT_ERROR·THEFT_LOSS·EVAPORATION_LOSS (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=VARIANCE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "차이가 0이 아니면 활성 사유가 필수다. 단, 블라인드 미실사 라인의 최초 계수 제출(현장 신규 라인 포함)에서는 사유를 생략할 수 있고, 계수 후 관리 화면에서 보완한다. 제공한 사유는 최초 제출 예외에서도 활성값인지 검증한다. 값 = MISPLACED·DAMAGED_IN_TRANSIT·SPILL·COUNT_ERROR·THEFT_LOSS·EVAPORATION_LOSS (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=VARIANCE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. 기존 블라인드 라인의 수량·계수시각을 바꾸지 않고 전량 치환에 그대로 포함하는 경우에는 사후 보완 대기 중인 미입력 사유를 유지할 수 있다. 계수값을 수정하는 경우에는 최초 제출 예외를 다시 적용하지 않는다.",
       "example": "MISPLACED",
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-internal-note": "통보274의 일률 사유 필수는 블라인드 최초 계수 이전에 차이를 알 수 없다는 기존 M-01-11 §5-1과 충돌한다. 사용자 자율 결정 승인에 따라 첫 제출만 예외로 보완한다. 개발팀 통보를 그대로 옮긴 부분과 구분하며, 개발팀이 이 예외를 구현했다고 주장하지 않는다. 위치별 후속 계수 시 이미 제출한 라인을 그대로 동봉해야 하므로 미입력 사유의 변경 없는 유지도 허용한다. 이 예외가 없으면 다음 위치 내 부분 계수가 관리웹 보완 전까지 막힌다.",
       "x-code-key": "CD-VARIANCE-REASON"
      },
      "countedAt": {
       "x-source-column": "counted_at",
       "type": "string",
       "format": "date-time",
-      "example": "2026-08-06T09:12:00+09:00"
+      "example": "2026-08-06T09:12:00+09:00",
+      "description": "이 라인을 실제 센 시각의 정본. 최상위 occurredAt 대신 이 값을 보존한다."
      }
     }
    },
@@ -10950,22 +10952,22 @@
      },
      "countedCount": {
       "type": "integer",
-      "description": "카운트된 라인 수",
+      "description": "counted=true인 라인 수. 수량·행위자로 추정하지 않는다.",
       "example": 1180
      },
      "uncountedCount": {
       "type": "integer",
-      "description": "미실사 라인 수. 마감하려면 0 이어야 한다",
+      "description": "counted=false인 라인 수. 마감하려면 0이어야 한다.",
       "example": 60
      },
      "varianceCount": {
       "type": "integer",
-      "description": "차이가 있는 라인 수",
+      "description": "counted=true이고 실제 차이가 0이 아닌 라인 수.",
       "example": 12
      },
      "closable": {
       "type": "boolean",
-      "description": "지금 마감할 수 있는가. 미실사 0 이고 차이가 없거나 모두 조정된 상태인지를 서버가 함께 본 결과다 — 화면이 조정 목록을 따로 조회해 판정하지 않는다(공유계약 L-2). 근거: W-01-04 §5-5·§5-7",
+      "description": "IN_PROGRESS이고 미실사 0이며 모든 차이 라인에 POSTED 상태의 부모 조정이 하나 이상 연결되었을 때 참이다. 등록·승인중·반려 조정은 완료로 세지 않는다. 차이 0 라인은 조정이 없어도 된다. 서버 요약과 마감이 같은 판정 기준을 사용한다.",
       "example": false
      },
      "closeBlockedReasonCode": {
@@ -10973,7 +10975,7 @@
        "string",
        "null"
       ],
-      "description": "closable 이 «거짓인 이유» — 미실사 잔여(COUNT_REMAINING) · 차이 미조정(VARIANCE_UNADJUSTED) · 이미 마감(ALREADY_CLOSED) · 상태 잠김(STATE_LOCKED). ⭐ 화면은 이 값으로 안내 문구와 「조정 등록」 경로를 가른다(G-3). ⛔ 서버가 판정한다 — 화면이 조건을 따로 조합하면 화면마다 갈린다",
+      "description": "closable 이 «거짓인 이유» — 미실사 잔여(COUNT_REMAINING) · 차이 미조정(VARIANCE_UNADJUSTED) · 이미 마감(ALREADY_CLOSED) · 상태 잠김(STATE_LOCKED). ⭐ 화면은 이 값으로 안내 문구와 「조정 등록」 경로를 가른다(G-3). ⛔ 서버가 판정한다 — 화면이 조건을 따로 조합하면 화면마다 갈린다 여러 조건이 겹치면 ALREADY_CLOSED → STATE_LOCKED → COUNT_REMAINING → VARIANCE_UNADJUSTED 순서로 반환한다. COMPLETED는 ALREADY_CLOSED, 그 외 IN_PROGRESS가 아닌 상태는 STATE_LOCKED다.",
       "example": "COUNT_REMAINING",
       "x-code-key": "CD-INVENTORY-COUNT-CLOSE-BLOCKED-REASON",
       "enum": [
@@ -10983,7 +10985,8 @@
        "STATE_LOCKED"
       ]
      }
-    }
+    },
+    "x-internal-note": "통보275. 조정 연결은 inventory_adjustment_line.inventory_count_line_id와 부모 inventory_adjustment.status_code=POSTED로 판단한다. 물리 조회 구현은 개발팀 소관이다."
    },
    "InventoryReservation": {
     "x-source-table": "inventory.inventory_reservation",
