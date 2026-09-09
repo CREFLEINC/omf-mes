@@ -3,7 +3,7 @@
  "info": {
   "title": "omf-mes 01 자재창고 도메인 API (초안)",
   "version": "0.1.0",
-  "description": "01 자재창고 도메인 API 계약. 입하·입고·적치·출고·이동·실사·조정과 그 결과인 수불 원장·재고 잔액, 그리고 자재 LOT 을 덮는다. 경로는 물리 모델의 스키마를 그대로 네임스페이스로 쓰므로 /logistics · /inventory · /trace 셋으로 나뉜다. 업무 문서에는 끄기(:deactivate)가 없다 — 문서는 끄는 것이 아니라 상태를 옮긴다. 수불 원장과 재고 잔액에는 쓰기 경로를 두지 않는다 — 전표의 전기가 만들고 서버가 파생한다. 개별 변경 이력 경로는 두지 않으며 횡단 조회 GET /audit/events 하나로 받는다.",
+  "description": "01 자재창고 도메인 API 계약. 입하·입고·적치·출고·이동·실사·조정과 그 결과인 수불 원장·재고 잔액, 그리고 자재 LOT 을 덮는다. 경로는 물리 모델의 스키마를 그대로 네임스페이스로 쓰므로 /logistics · /inventory · /trace 셋으로 나뉜다. 업무 문서에는 끄기(:deactivate)가 없다 — 문서는 끄는 것이 아니라 상태를 옮긴다. 수불 원장과 재고 잔액에는 쓰기 경로를 두지 않는다 — 전표의 전기가 만들고 서버가 파생한다. 개별 변경 이력 경로는 두지 않으며 횡단 조회 GET /audit/events 하나로 받는다.\n\n인증 규약은 이 파일이 오퍼레이션마다 선언하지 않는다. 현장 단말과 모바일은 단말 토큰을 Authorization: Bearer 로 싣고, 쓰기에는 귀속용 사번 헤더(X-Worker-No)를 함께 싣는다 — 그 헤더는 각 쓰기 오퍼레이션이 선언한다. 스킴 정의는 공통 계약 한 벌(app-공통)이 갖는다. 관리웹 계정 토큰의 운반 수단이 아직 확정되지 않아 오퍼레이션별 security 배선을 «의도적으로» 비워 두었다 — 관리웹과 현장 셸이 같은 오퍼레이션을 공유하는 자리가 있어 단말 토큰만 배선하면 「단말 토큰만 받는다」는 틀린 선언이 되기 때문이다. 비어 있음은 「인증이 없다」가 아니다. 규약 정본은 공유계약 D-5 와 공통 도메인 API 요구서 1-1절 이다.",
   "x-internal-note": "근거·맥락은 deliverables/06-API-요구서-01자재창고.md 를 본다. 도출 과정은 uiux/2026-08-06-API스펙-01자재창고/ 의 00~02 문서다. 승인 워크플로우(app.approval_request) · 출력물 발행(app.document_issue_log) · 첨부(app.attachment) 는 이 파일이 갖지 않는다 — app-공통 파일 소관이며 01-리소스도출.md §1 이 근거다. putaway_rule 은 성격이 마스터라 mdm-기준정보.json 에 둔다(02-URL동작규약.md §1)."
  },
  "servers": [
@@ -1258,6 +1258,14 @@
       "description": "이 LOT 을 담은 취급 단위만(handling_unit_content 경유). 출고 시 파렛트를 좁히는 축 — 창고 전체가 아니라 이 출고 라인의 LOT 이 실제로 실린 파렛트만 낸다. 근거: P-01-02 §5-2(2026-09-06 게이트 승인 · M-01-08 이 만든 취급 단위를 조회만 한다)"
      },
      {
+      "name": "handlingUnitNo",
+      "in": "query",
+      "schema": {
+       "type": "string"
+      },
+      "description": "취급 단위 번호 정확 일치. 스캔 화면이 쓴다 — 스캔값 하나로 한 건을 집어야 하므로 부분 검색(q)으로는 성립하지 않는다(여러 건이 온다). 공장 안에서 유일하다. 근거: M-04-03 §5-7 · M-04-04 §5-6 · 공유계약 D-2"
+     },
+     {
       "name": "q",
       "in": "query",
       "schema": {
@@ -1537,7 +1545,9 @@
        "schema": {
         "type": "object",
         "required": [
-         "items"
+         "items",
+         "repackTypeCode",
+         "occurredAt"
         ],
         "properties": {
          "items": {
@@ -1545,6 +1555,23 @@
           "items": {
            "$ref": "#/components/schemas/HandlingUnitContentUpsert"
           }
+         },
+         "repackTypeCode": {
+          "type": "string",
+          "enum": [
+           "MERGE",
+           "SPLIT",
+           "RECONFIGURE"
+          ],
+          "example": "SPLIT",
+          "description": "이 치환이 무슨 재구성인가 — 합병(MERGE)·분할(SPLIT)·재구성(RECONFIGURE). 작업자가 화면에서 고른다. 서버가 기록하는 재구성 사건 헤더의 같은 이름 칸이 이 값을 받는다. 근거: M-04-03 §5-7",
+          "x-code-key": "CD-REPACK-TYPE"
+         },
+         "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2026-08-12T10:22:00+09:00",
+          "description": "단말에서 실제로 일어난 시각. 근거: 공유계약 C-8"
          }
         }
        }
@@ -1592,7 +1619,8 @@
        }
       }
      }
-    }
+    },
+    "x-internal-note": "설계결정서 결정 13 이 재구성 이벤트 헤더를 「작업유형·일시·작업자」로 확정했는데 이 요청이 그중 둘을 못 실어 서버가 헤더를 지어내야 했다(2026-09-09 재실측). 작업자는 X-Worker-No 헤더가 이미 받는다. ⛔ 신규 발번분(roleCode=RESULT)을 이 요청이 담지 않는 것은 그대로다 — 그 몫은 POST /inventory/handling-units 가 갖고, 「한 사건을 어느 호출이 여닫는가」는 아직 정해지지 않았다. 합병(N:1)이 한 사건으로 담기지 않는 것도 같은 뿌리다. 근거: M-04-03 §5-2"
    }
   },
   "/inventory/handling-units/{handlingUnitId}/repack-events": {
@@ -8411,6 +8439,33 @@
       "exclusiveMinimum": 0,
       "example": 100.0
      },
+     "expectedQty": {
+      "type": [
+       "number",
+       "null"
+      ],
+      "example": 500.0,
+      "description": "인수 «전»에 알고 있던 수량. 화면이 보내면 그대로 남고, 안 보냈으면 널이다"
+     },
+     "varianceQty": {
+      "type": [
+       "number",
+       "null"
+      ],
+      "readOnly": true,
+      "example": 2.0,
+      "description": "expectedQty − receiptQty. ⛔ 서버가 계산한다 — 화면이 다시 계산하지 않는다. expectedQty 가 비면 널이다"
+     },
+     "varianceReasonCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "maxLength": 50,
+      "description": "차이 사유. 값 = MISPLACED·DAMAGED_IN_TRANSIT·SPILL·COUNT_ERROR·THEFT_LOSS·EVAPORATION_LOSS (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=VARIANCE_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "SPILL",
+      "x-code-key": "CD-VARIANCE-REASON"
+     },
      "uomId": {
       "x-source-column": "uom_id",
       "type": "integer",
@@ -8479,7 +8534,8 @@
       "description": "되돌아온 물건이 어느 출하의 어느 배분이었나 — 반품 입고에서 genealogy 가 역방향으로 이어지는 자리다(W-04-06 §4-B · 머리말). ⭐ 비울 수 있다 — 원 출하를 못 찾는 갈래가 정상이다(W-04-06 §5-3 · omf-mes#302 ①과 같은 근거). ⭐ 서버가 lotId 만으로는 못 잇는다 — 한 LOT 이 여러 출하에 나뉘어 나가므로 «어느 배분»인지를 화면이 보낸다(W-04-06 §5-3 「여러 출하가 섞였을 때」). 화면이 그 값을 얻는 곳: GET /logistics/shipments/{shipmentId} 응답의 lines[].allocations[].shipmentLotAllocationId. ⚠ 가리키는 곳은 04 제품출하 계약의 ShipmentLotAllocation 이다 — 계약이 갈린다.",
       "x-internal-note": "저장 컬럼은 late FK 로 이미 실재한다(goods_receipt_line.original_shipment_lot_allocation_id) — 데이터 모델 담당 대기 사항 없음. 근거: W-04-06 §2 · omf-mes#302"
      }
-    }
+    },
+    "x-internal-note": "M-04-04 §5-4 가 「되살리기 잔여」로 남겨 둔 자리를 되살린 것이다(2026-09-09). 축소의 근거는 물리 모델 결손이었고 공유계약 A-11 v4.6 이 그 근거를 철회했다 — §I 대장 40 이 이 자리를 이름으로 열어 두었다. 형판은 같은 계약의 ShopfloorReceiptLine 이다(반대 방향에는 원래 있었다). 사유 코드 그룹을 새로 가르지 않고 VARIANCE_REASON 을 함께 쓴다 — 같은 물음(「인수하며 세어 보니 다르더라」)이고 그룹을 가르면 「차이가 몇 건인가」를 두 그룹에서 세게 된다. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다."
    },
    "GoodsReceiptLineCreate": {
     "x-source-table": "logistics.goods_receipt_line",
@@ -8521,6 +8577,24 @@
       "type": "number",
       "exclusiveMinimum": 0,
       "example": 100.0
+     },
+     "expectedQty": {
+      "type": [
+       "number",
+       "null"
+      ],
+      "example": 500.0,
+      "description": "인수 «전»에 알고 있던 수량. 제품 입고는 스캔한 취급 단위의 내용물 수량이다(GET /inventory/handling-units/{handlingUnitId}/contents 의 qty). 모르면 비운다 — 그때는 차이를 세지 않는다"
+     },
+     "varianceReasonCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "maxLength": 50,
+      "description": "차이 사유. expectedQty 가 있고 차이가 0 이 아니면 필수. 값 = MISPLACED·DAMAGED_IN_TRANSIT·SPILL·COUNT_ERROR·THEFT_LOSS·EVAPORATION_LOSS (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=VARIANCE_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "SPILL",
+      "x-code-key": "CD-VARIANCE-REASON"
      },
      "uomId": {
       "x-source-column": "uom_id",
@@ -9305,6 +9379,33 @@
       "exclusiveMinimum": 0,
       "example": 100.0
      },
+     "orderedQty": {
+      "type": [
+       "number",
+       "null"
+      ],
+      "readOnly": true,
+      "example": 500.0,
+      "description": "이 라인이 가리키는 ERP W/O 라인의 발주 수량. purchaseOrderLineId 가 비면(무발주) 널이다"
+     },
+     "purchaseOrderReceivedQty": {
+      "type": [
+       "number",
+       "null"
+      ],
+      "readOnly": true,
+      "example": 480.0,
+      "description": "그 ERP W/O 라인의 «누적» 입하 수량. ⚠ 같은 스키마의 receivedQty 와 분모가 다르다 — receivedQty 는 «이 라인 한 건»의 실입하이고 이 값은 «그 ERP W/O 라인 전체»의 누계다. 무발주 행은 널이다"
+     },
+     "remainingExpectedQty": {
+      "type": [
+       "number",
+       "null"
+      ],
+      "readOnly": true,
+      "example": 20.0,
+      "description": "남은 예정 수량 = orderedQty − purchaseOrderReceivedQty. ⛔ 서버가 계산한다 — 화면이 다시 계산하지 않는다. ⛔ 발주 총량이 아니다 — 한 발주에 여러 번 도착할 수 있어 총량과 견주면 정확히 남은 만큼 온 도착이 「부족」으로 판정된다. 무발주 행은 널이고 화면은 「—」로 그린다"
+     },
      "uomId": {
       "x-source-column": "uom_id",
       "type": "integer",
@@ -9393,7 +9494,8 @@
       "description": "이 라인으로 만들어진 자재 LOT. 사전부착 라인은 입하 등록과 같은 트랜잭션에서 생기고, 미부착 라인은 P-01-01 이 채울 때까지 비어 있다. 근거: M-01-01 §5-4",
       "example": 1001
      }
-    }
+    },
+    "x-internal-note": "세 칸 다 inbound_receipt_line 의 컬럼이 아니라 purchase_order_line 을 조인해 내리는 파생값이다 — AsnLine.orderedQty·receivedQty 가 같은 방식으로 이미 서 있다(공유계약 L-2). 이름을 receivedQty 로 쓰지 못한 이유는 이 스키마에 같은 이름이 이미 있고 분모가 다르기 때문이다(L-2-1 ⑶). remainingExpectedQty 를 함께 내리는 이유는 M-01-01 §5-2 가 「남은 예정」을 판정 축으로 확정했고(omf-mes#347) 화면 둘이 같은 수를 각자 빼면 L-2 가 막으려던 것에 다시 걸리기 때문이다. 저장 컬럼은 데이터 모델 담당에게 통지 — 기다리지 않는다."
    },
    "InboundReceiptLineListResponse": {
     "type": "object",
