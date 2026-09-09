@@ -137,11 +137,15 @@ POP·모바일 셸            ⛔ 없음 (apps/web 하나)
 | 수신자 조회 | `GET /app/notification-subscriptions?eventCode=` — ⚠ **저장 직전 잠금 토큰은 `?eventCode=` 를 붙인 조회에서만 온다** | §5 |
 | 조직×역할 추가 · 개인 추가 · 해제 · 저장 | `PUT /app/notification-subscriptions` — **이벤트 단위 치환** | §5 |
 | Zalo 토글 | `PUT /app/notification-subscriptions`의 `zaloEnabled`. 이벤트별 기본 끔, 수신자는 사용자관리의 선택 `phoneNumber`를 사용한다(2026-09-08 사용자 확정). | §5 · 아래 주 |
-| 이벤트별 수신자 수 표시 | `GET /app/notification-subscriptions`(`eventCode` 생략) 응답 `recipients` 의 길이 | §4 · G-12 |
+| 이벤트별 규칙 수 표시 | `GET /app/notification-subscriptions`(`eventCode` 생략) 응답 `recipients`의 길이. 실제 활성 수신 인원은 미리보기 `totalCount` | §4 · G-12 |
 | 지금 받는 사람 미리보기 | `POST /app/notification-subscriptions/recipients:preview` — 저장 «전» 규칙을 본문에 실어 보낸다 | §5-3 · B-17 보완 |
 | 이벤트 목록의 정본·발생 지점 | `GET /app/notification-events` — 목록과 발생 지점은 계약 정본. 검교정 만료 임박 이벤트는 이번 버전 발생·수신설정·대상 이동에서 제외하고 다른 이벤트는 유지한다 | §5-1 · 2026-09-08 사용자 확정 |
 
 - ⭐ **이벤트 목록의 정본은 계약이다.** 공통코드 마스터에 두면 편집 가능해지고, **코드가 바뀌면 보내는 쪽이 조용히 깨진다.**
+- **통보 099~103 반영**(`omf-mes#515`): 서버 카탈로그는 `EQUIPMENT_BREAKDOWN_OCCURRED`·`MOLD_RECOMMENDED_SHOTS_EXCEEDED`·`CALIBRATION_EXPIRY_APPROACHING`·`PURCHASE_ORDER_CHANGE_RECEIVED`·`INTEGRATION_FAILED`·`APPROVAL_ACTION_REQUIRED` 6종이다. 사용자 확정(2026-09-08)을 우선해 UI는 검교정 항목을 숨긴 5종만 선택·설정하며 해당 발생·대상 이동을 복원하지 않는다. 과거 알림의 카탈로그 밖 `eventCode`는 보존한다. 카탈로그·설정 API 완료는 알림 발생기나 외부 Zalo 전송 완료를 뜻하지 않는다.
+- 단일 `eventCode` GET만 저장용 `ETag`를 내린다. 알려진 미설정 이벤트는 빈 `recipients`, `zaloEnabled=false`, 버전 1 토큰을 반환하며 첫 PUT은 버전 2다. 이후 PUT의 `zaloEnabled` 생략은 기존 값 보존이다. 전체 GET에는 토큰이 없고 알 수 없는 이벤트 GET은 빈 목록·토큰 없음, PUT은 400이다. 이벤트별 전량 치환과 Zalo 설정은 한 번에 성공하거나 실패한다.
+- 미리보기의 `users`는 중복 제거한 활성·비활성 사용자 전체이며 `totalCount`는 활성 실제 수신 인원이다. `recipients.length`는 규칙 수이므로 인원으로 표시하지 않는다. 규칙 0건과 활성 수신자 0명을 구분한다.
+- 알림의 `openable=false`는 매핑 부재도 포함하므로 대상 삭제의 증거가 아니다. 대상 이동·위치 정보는 서버 응답을 따른다. 모두 읽음은 필터 밖까지 포함한 본인의 미읽음 전체에 적용한다. 같은 키의 재전송은 기존 결과를 재생하므로 그 후 도착한 알림이 남을 수 있어 성공 후 미읽음 수와 목록을 다시 조회한다.
 - 사용자관리 전화번호는 선택 입력이다. 미리보기의 `missingPhoneNumberCount`는 중복 제거된 활성 실제 수신자 중 전화번호 미등록 인원수이며 번호 원문은 노출하지 않는다. 값 생략은 0이 아니라 확인 불가로 안내한다. 미등록 경고는 설정 저장을 막지 않으며 Zalo 발송 불가·실패에도 알림센터 수신은 유지하고 실패는 로그만 남긴다.
 
 ### 3-7. `W-CO-04` 공지·전달 게시/조회 *(관리웹)*
