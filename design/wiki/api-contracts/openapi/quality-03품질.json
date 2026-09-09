@@ -199,7 +199,8 @@
        "type": "integer",
        "format": "int64",
        "example": 1001
-      }
+      },
+      "description": "이 LOT 의 불량 기록만. ⭐ 기간 쌍의 «대안 축»이다 — 이 값을 보내면 기간을 생략할 수 있다\n(공유계약 L-3-2 ⑶ 의 「상위 식별자」 자리다). M-02-02 가 LOT 을 스캔해 수리 대상 불량을 찾을 때\n쓴다(요구서 02 §3-14) — 스캔이 주는 것은 lotId 뿐이고 POST /production/repair-executions 는\ndefectRecordId 를 필수로 받는다. 근거: M-02-02 §5 · 요구서 02 §3-14"
      },
      {
       "name": "defectCodeId",
@@ -246,7 +247,7 @@
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
       },
-      "description": "기간 필수 — 공유계약 L-3"
+      "description": "기간 시작. ⭐ 조건부 필수 — lotId 없이 전 이력을 훑을 때는 «반드시» 보낸다(공유계약 L-3 ·\n무제한이면 원장이 누적된 뒤 화면이 멎는다). 없으면 400 이다(공유계약 L-3-2 ⑵).\n⛔ lotId 로 «한 LOT 의 불량 기록»을 읽을 때는 보내지 않는다 — M-02-02 §5(수리 대상 불량 조회 ·\n요구서 02 §3-14)가 그 경로이고, 거기에 기간을 요구하면 화면이 없는 기간을 지어내게 된다\n(스캔하는 쪽은 그 불량이 언제 났는지 모른다). 형이 조건부 필수를 표현하지 못해 설명이 말한다.\n끝 경계는 date-time 이라 반열림이다 — From 이상 · To 미만(공유계약 L-3-1)."
      },
      {
       "name": "detectedTo",
@@ -255,7 +256,8 @@
        "type": "string",
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
-      }
+      },
+      "description": "기간 끝. detectedFrom 과 한 쌍이다 — 함께 보내거나 함께 생략한다. To 미만이다(공유계약 L-3-1)."
      },
      {
       "name": "page",
@@ -354,7 +356,8 @@
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
       },
-      "description": "필수"
+      "description": "기간 시작. 부르는 화면 전건(W-03-05 §5-9·§6)이 기간을 싣는다 — 기간 미입력이면 조회 자체가\n비활성이다. 없으면 400 이다(공유계약 L-3-2 ⑵). 형이 필수를 표현하지 못해 설명이 말한다.\n⭐ required 승격 후보다(아래 x-internal-note) — 요청 축 optional→required 는 별건으로 사람\n승인을 받는다. 끝 경계는 date-time 이라 반열림이다 — From 이상 · To 미만(공유계약 L-3-1).",
+      "x-internal-note": "required 승격 후보 — 부르는 화면 전건(W-03-05)이 기간을 싣는다(§5-9·§6, 2026-09-09 실측).\n승격은 별건으로 사람 승인을 받는다."
      },
      {
       "name": "detectedTo",
@@ -363,7 +366,8 @@
        "type": "string",
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
-      }
+      },
+      "description": "기간 끝. detectedFrom 과 한 쌍이다 — 함께 보내거나 함께 생략한다. To 미만이다(공유계약 L-3-1)."
      }
     ],
     "responses": {
@@ -439,7 +443,7 @@
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
       },
-      "description": "기간 — 이력 모드에서 필수(공유계약 L-3)"
+      "description": "기간 — 처리 이력 탭(W-03-10 §3 탭)에서 필수(공유계약 L-3). 없으면 400 이다(공유계약 L-3-2 ⑵).\n⛔ 이력 모드가 «아닌» 경로 — 폐기 품의 대상 선택(W-04-10 §3 — dispositionTypeCode=SCRAP ·\nfollowUpPending=true)과 재고 재등록 조회·필터(W-04-11 §3·§5-2 — reinstatable=true·warehouseId ·\nfollowUpPending=true) — 에서는 보내지 않는다."
      },
      {
       "name": "decidedTo",
@@ -448,7 +452,8 @@
        "type": "string",
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
-      }
+      },
+      "description": "기간 끝. decidedFrom 과 한 쌍이다 — 함께 보내거나 함께 생략한다. To 미만이다(공유계약 L-3-1)."
      },
      {
       "name": "warehouseId",
@@ -1053,7 +1058,8 @@
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
       },
-      "description": "필수"
+      "description": "기간 시작. 부르는 화면 전건(W-03-05 §5-9·§6)이 기간을 싣는다 — 목록·요약과 같은 필터 축이다\n(§3-5 「분리해 보기」 행 — 위 셋이 같은 모집단을 쓴다). 없으면 400 이다(공유계약 L-3-2 ⑵).\n형이 필수를 표현하지 못해 설명이 말한다. ⭐ required 승격 후보다(아래 x-internal-note) — 요청\n축 optional→required 는 별건으로 사람 승인을 받는다. 끝 경계는 date-time 이라 반열림이다 —\nFrom 이상 · To 미만(공유계약 L-3-1).",
+      "x-internal-note": "required 승격 후보 — 부르는 화면 전건(W-03-05)이 기간을 싣는다(§5-9·§6, 2026-09-09 실측).\n승격은 별건으로 사람 승인을 받는다."
      },
      {
       "name": "inspectedTo",
@@ -1062,7 +1068,8 @@
        "type": "string",
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
-      }
+      },
+      "description": "기간 끝. inspectedFrom 과 한 쌍이다 — 함께 보내거나 함께 생략한다. To 미만이다(공유계약 L-3-1)."
      },
      {
       "name": "calibrationExpired",
@@ -1155,7 +1162,8 @@
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
       },
-      "description": "필수 — 공유계약 L-3"
+      "description": "기간 시작. 부르는 화면 전건(W-03-05 §5-9·§6, §3-5 「필터·조회」 행)이 기간을 싣는다 — 목록과\n같은 필터 축이다. 없으면 400 이다(공유계약 L-3-2 ⑵). 형이 필수를 표현하지 못해 설명이 말한다.\n⭐ required 승격 후보다(아래 x-internal-note) — 요청 축 optional→required 는 별건으로 사람\n승인을 받는다. 끝 경계는 date-time 이라 반열림이다 — From 이상 · To 미만(공유계약 L-3-1).",
+      "x-internal-note": "required 승격 후보 — 부르는 화면 전건(W-03-05)이 기간을 싣는다(§5-9·§6, 2026-09-09 실측).\n승격은 별건으로 사람 승인을 받는다."
      },
      {
       "name": "inspectedTo",
@@ -1164,7 +1172,8 @@
        "type": "string",
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
-      }
+      },
+      "description": "기간 끝. inspectedFrom 과 한 쌍이다 — 함께 보내거나 함께 생략한다. To 미만이다(공유계약 L-3-1)."
      },
      {
       "name": "finalRoundOnly",
@@ -1771,7 +1780,7 @@
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
       },
-      "description": "기간 — W-03-01 이력 모드에서 필수(공유계약 L-3)"
+      "description": "기간 — W-03-01 이력 모드에서 필수(공유계약 L-3). 없으면 400 이다(공유계약 L-3-2 ⑵).\n⛔ LOT 단위로 조회할 때(lotId 를 보내는 경로 — W-03-01 §3 LOT 선택 드로어 · 보류 건 선택 ·\nW-04-11 §5-2 보류 찾기)는 보내지 않는다."
      },
      {
       "name": "heldTo",
@@ -1780,7 +1789,8 @@
        "type": "string",
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
-      }
+      },
+      "description": "기간 끝. heldFrom 과 한 쌍이다 — 함께 보내거나 함께 생략한다. To 미만이다(공유계약 L-3-1)."
      },
      {
       "name": "page",

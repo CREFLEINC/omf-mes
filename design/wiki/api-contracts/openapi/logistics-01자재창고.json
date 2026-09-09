@@ -134,6 +134,9 @@
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
+     },
+     {
+      "$ref": "#/components/parameters/WorkerNoOptional"
      }
     ],
     "requestBody": {
@@ -10197,7 +10200,7 @@
      },
      "adjustmentQty": {
       "type": "number",
-      "description": "증감 수량. 음수가 올 수 있다",
+      "description": "증감 수량 — «차이»다. 절대량이 아니다. 음수가 올 수 있다. 화면이 빼서 보낸 값을 그대로 낸다(쓰기 쪽 InventoryAdjustmentLineUpsert.adjustmentQty 와 같은 정의다).",
       "example": -2.0
      },
      "uomId": {
@@ -10277,7 +10280,8 @@
      },
      "adjustmentQty": {
       "type": "number",
-      "example": -2.0
+      "example": -2.0,
+      "description": "증감 수량 — «차이»다. 절대량(실측한 현재 수량)이 아니다. 양수면 늘고 음수면 준다.\n⭐ 빼는 쪽은 «화면»이다 — 서버는 이 값을 그대로 원장에 태우고 실측 절대량을 받지 않는다.\n⚠ 호퍼 잔량 실측(M-01-09 §5-4)에서 화면은 실측값에서 장부 잔량을 빼서 이 칸을 채운다. 그때\n장부 잔량은 판정에 쓰이는 값이라 캐시하지 않는다(공유계약 C-6) — 조정 직전에 다시 읽는다.\n⛔ 전기(POST /inventory/adjustments/{id}:post) 전에는 재고가 움직이지 않는다.\n근거: W-01-12 §5-6 · M-01-09 §5-4"
      },
      "uomId": {
       "type": "integer",
@@ -10758,9 +10762,7 @@
      "lineNo",
      "locationId",
      "itemId",
-     "systemQty",
      "countedQty",
-     "varianceQty",
      "uomId",
      "countedAt",
      "counted"
@@ -10811,7 +10813,7 @@
       "x-source-column": "system_qty",
       "type": "number",
       "minimum": 0,
-      "description": "장부 수량. 블라인드 실사에서는 내려보내지 않는다",
+      "description": "장부 수량. ⭐ 조건부로 온다 — 블라인드 실사(InventoryCount.blindCount 가 참)에서는 서버가 이\n필드를 «생략한다». null 을 보내는 것이 아니라 키 자체가 없다 — 응답 본문에 남으면 개발자\n도구로 보이기 때문이다(M-01-11 §5-1 · §9-1). ⛔ 화면은 이 값이 없는 것을 「0」이나 「모름 = 차이\n없음」으로 읽지 않는다. 블라인드가 아닌 실사에서는 항상 온다. 형이 조건부 존재를 표현하지\n못해 설명이 말한다. 근거: M-01-11 §5-1 · W-01-04 §5-2",
       "example": 100.0
      },
      "countedQty": {
@@ -10825,7 +10827,7 @@
       "x-source-column": "variance_qty",
       "type": "number",
       "readOnly": true,
-      "description": "실물 − 장부. 서버가 계산한다. counted 가 참일 때만 뜻이 있다 — 거짓인 줄의 0 을 「차이 없음」으로 읽지 않는다",
+      "description": "실물 − 장부. 서버가 계산한다(공유계약 L-2). counted 가 참일 때만 뜻이 있다 — 거짓인 줄의 0 을\n「차이 없음」으로 읽지 않는다. ⭐ 조건부로 온다 — 블라인드 실사에서는 systemQty 와 «함께»\n생략한다. 차이만 내리면 장부 = 실물 − 차이 로 감춘 값이 복원되어 systemQty 를 감춘 뜻이 없어진다\n(M-01-11 §5-1 이 「차이도 보이지 않음」으로 확정했다). 근거: M-01-11 §5-1 · W-01-04 §5-2",
       "example": -2.0
      },
      "uomId": {
@@ -10902,7 +10904,7 @@
       "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 위치 마스터의 행을 가리킨다 — Location.locationCode 가 같은 판정으로 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      }
     },
-    "x-internal-note": "블라인드 실사에서 systemQty 를 내려보내지 않는 것은 W-01-04 §5-2. 계약은 필드를 두되 서버가 생략한다."
+    "x-internal-note": "블라인드 실사에서 systemQty 와 varianceQty 를 내려보내지 않는 것은 W-01-04 §5-2 · M-01-11 §5-1.\n계약은 필드를 두되 서버가 생략한다 — 그래서 둘 다 required 에서 뺐다(2026-09-09). 응답 required\n제거는 등급표상 ⛔ 다. 뺀 이유는 「계약이 지켜지지 않는 약속을 하고 있었다」이고, 새로 값이\n없어지는 것이 아니다."
    },
    "InventoryCountLineListResponse": {
     "type": "object",
@@ -11019,9 +11021,9 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "차이가 0 이 아니면 필수. 값 = MISPLACED·DAMAGED_IN_TRANSIT·SPILL·COUNT_ERROR·THEFT_LOSS·EVAPORATION_LOSS (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=VARIANCE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "⭐ 조건부 필수 — 차이가 0 이 아닐 때 «관리웹 재고 실사 화면(W-01-04)»에서 보내면 필수다.\n⛔ 블라인드 실사의 모바일 경로(M-01-11)에서는 요구하지 않는다 — 이 스키마에 장부 수량도 차이도\n없어 보내는 쪽이 차이를 알 수 없고, 그래서 사유는 W-01-04 에서 받는 것으로 확정했다\n(M-01-11 §5-1 · W-01-04 §8 차이 사유 행). 형이 조건부 필수를\n표현하지 못해 설명이 말한다. 값 = MISPLACED·DAMAGED_IN_TRANSIT·SPILL·COUNT_ERROR·THEFT_LOSS·EVAPORATION_LOSS (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=VARIANCE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "MISPLACED",
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다. 차이 사유 축은 M-01-11 §8 미결 1 이 2026-09-02 에 해소하며 W-01-04 에서 받는 것으로 확정했다.",
       "x-code-key": "CD-VARIANCE-REASON"
      },
      "countedAt": {
@@ -13903,7 +13905,7 @@
       "example": 1001,
       "x-source-table": "inventory.inventory_balance",
       "x-source-column": "warehouse_id",
-      "description": "기본값은 단말에 묶인 창고다"
+      "description": "LOT 과 재고를 세울 창고. ⬜ 기본값의 근거가 아직 없다 — 「단말에 묶인 창고」를 받치는 조항이\n설계 자료에 없다(M-01-12 §8). 화면은 그때까지 작업자가 고른 값을 그대로 보낸다.\n근거: M-01-12 §5-A"
      },
      "locationId": {
       "type": "integer",
