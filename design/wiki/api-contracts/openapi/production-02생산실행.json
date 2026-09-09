@@ -2856,7 +2856,7 @@
      "production"
     ],
     "summary": "4M 배정 유효성 점검",
-    "description": "자원 배정이 서로 부딪히는지 본다. 저장하지 않으므로 상태 전이가 아니다 — :동사 를 쓰지 않는다. 근거: W-02-03 §5",
+    "description": "자원 배정이 서로 부딪히는지 본다. 저장하지 않으므로 상태 전이가 아니다 — :동사 를 쓰지 않는다. 이번 버전에는 계측기 정밀도·검교정 상태·사용 차단 이력을 점검 항목이나 경고·차단 조건으로 사용하지 않는다. 작업자 자격·금형 수명·중복 배정 등 다른 자원 점검은 유지한다. 근거: W-02-03 §5 · 2026-09-08 사용자 확정",
     "parameters": [
      {
       "name": "workOrderId",
@@ -5815,10 +5815,11 @@
      "workerId",
      "statusCode"
     ],
-    "description": "수량은 다섯 컬럼 그대로 내려준다. 정본이 3원(양품/불량/손실)이라는 지적이 열려 있으나(omf-mes#60) 계약이 임의로 접지 않는다."
+    "description": "다섯 세부 수량은 보존한다. 양품=goodQty, 불량 집계=defectQty+holdQty+reworkQty, 손실=scrapQty. defectQty 자체에 보류·재작업을 합쳐 저장하지 않는다. reworkQty는 재작업 대상이지 완료 수량이 아니다. 검사 수량 자동 전환은 하지 않는다."
    },
    "ProductionResultCorrect": {
     "type": "object",
+    "description": "다섯 세부 수량은 보존한다. 양품=goodQty, 불량 집계=defectQty+holdQty+reworkQty, 손실=scrapQty. defectQty 자체에 보류·재작업을 합쳐 저장하지 않는다. reworkQty는 재작업 대상이지 완료 수량이 아니다. 검사 수량 자동 전환은 하지 않는다.",
     "properties": {
      "reasonCode": {
       "type": "string",
@@ -5951,7 +5952,7 @@
      "uomId",
      "occurredAt"
     ],
-    "description": "다섯 수량의 합이 0 이면 400 이다 — ck_production_result_qty 가 물리적으로도 막는다."
+    "description": "다섯 수량의 합이 0 이면 400 이다 — ck_production_result_qty 가 물리적으로도 막는다. 다섯 세부 수량은 보존한다. 양품=goodQty, 불량 집계=defectQty+holdQty+reworkQty, 손실=scrapQty. defectQty 자체에 보류·재작업을 합쳐 저장하지 않는다. reworkQty는 재작업 대상이지 완료 수량이 아니다. 검사 수량 자동 전환은 하지 않는다."
    },
    "ResultLotAllocation": {
     "type": "object",
@@ -6186,7 +6187,7 @@
    },
    "ValidationSummary": {
     "type": "object",
-    "description": "4M 배정 유효성 점검의 요약. 상세 findings 는 GET /production/work-orders/{workOrderId}/validation 이 낸다.",
+    "description": "4M 배정 유효성 점검의 요약. 상세 findings 는 GET /production/work-orders/{workOrderId}/validation 이 낸다. 이번 버전에는 계측기 정밀도·검교정 상태에 따른 경고·차단을 집계하지 않으며 계측기 정보가 passed 판정에 영향을 주지 않는다.",
     "properties": {
      "passed": {
       "type": "boolean",
@@ -6622,7 +6623,7 @@
    },
    "WorkOrderListSummary": {
     "type": "object",
-    "description": "목록 요약 집계 — 필터 전체 기준이며 쪽과 무관하다. 목록과 같은 트랜잭션에서 낸다.",
+    "description": "목록 요약 집계 — 필터 전체 기준이며 쪽과 무관하다. 목록과 같은 트랜잭션에서 낸다. 다섯 세부 수량은 보존한다. 양품=goodQty, 불량 집계=defectQty+holdQty+reworkQty, 손실=scrapQty. defectQty 자체에 보류·재작업을 합쳐 저장하지 않는다. reworkQty는 재작업 대상이지 완료 수량이 아니다. 검사 수량 자동 전환은 하지 않는다.",
     "properties": {
      "totalCount": {
       "type": "integer",
@@ -6646,7 +6647,7 @@
       "type": "number",
       "format": "double",
       "example": 12.0,
-      "description": "불량 합계 — 필터 전체 기준. 기간 축의 뜻은 goodQty 와 같다."
+      "description": "세부 불량 수량 합계 — 보류·재작업 제외. 화면의 불량 집계는 defectQty+holdQty+reworkQty다. 필터 전체 기준이며 기간 축의 뜻은 goodQty와 같다."
      },
      "holdQty": {
       "type": "number",
@@ -6664,7 +6665,7 @@
       "type": "number",
       "format": "double",
       "example": 5.0,
-      "description": "재작업 합계 — 필터 전체 기준. 기간 축의 뜻은 goodQty 와 같다."
+      "description": "재작업 대상 수량 합계 — 완료 수량이 아니다. 필터 전체 기준이며 기간 축의 뜻은 goodQty와 같다."
      },
      "achievementRate": {
       "type": "number",
@@ -7183,7 +7184,7 @@
    },
    "WorkOrderProgress": {
     "type": "object",
-    "description": "실적 누계 — 이 W/O 의 생산 실적 «전체» 합계다. 쪽(page)과 무관하며 정정(상쇄) 실적이 반영된 값이다. withProgress=true 일 때만 채워진다. 근거: W-02-05 §4-B · W-02-08 §4-A",
+    "description": "실적 누계 — 이 W/O 의 생산 실적 «전체» 합계다. 쪽(page)과 무관하며 정정(상쇄) 실적이 반영된 값이다. withProgress=true 일 때만 채워진다. 근거: W-02-05 §4-B · W-02-08 §4-A 다섯 세부 수량은 보존한다. 양품=goodQty, 불량 집계=defectQty+holdQty+reworkQty, 손실=scrapQty. defectQty 자체에 보류·재작업을 합쳐 저장하지 않는다. reworkQty는 재작업 대상이지 완료 수량이 아니다. 검사 수량 자동 전환은 하지 않는다.",
     "properties": {
      "goodQty": {
       "type": "number",
@@ -7194,7 +7195,7 @@
      "defectQty": {
       "type": "number",
       "format": "double",
-      "description": "불량 합계",
+      "description": "세부 불량 수량 합계 — 보류·재작업 제외. 화면의 불량 집계는 defectQty+holdQty+reworkQty다.",
       "example": 120.0
      },
      "holdQty": {
@@ -7212,7 +7213,7 @@
      "reworkQty": {
       "type": "number",
       "format": "double",
-      "description": "재작업 합계",
+      "description": "재작업 대상 수량 합계 — 완료 수량이 아니다.",
       "example": 10.0
      },
      "achievementRate": {

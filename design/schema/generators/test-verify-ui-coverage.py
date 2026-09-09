@@ -146,7 +146,7 @@ class Domain01Test(unittest.TestCase):
         #    실제로 그랬다 — 99 는 `535f068`(2026-08-30) 부터 낡았는데 시험이 사흘을
         #    빨간 채로 서 있었고, 고칠 때도 왜 늘었는지는 안 적혔다(`omf-mes#358`).
         # ⭐ 마지막 1은 2026-09-05 W-06-06 §5-1 인증자 선택 추가(요청 #445)다.
-        self.assertEqual(len(rows), 105)
+        self.assertEqual(len(rows), 106)
         self.assertEqual(len({r["screen"] for r in rows}), 14)
 
 
