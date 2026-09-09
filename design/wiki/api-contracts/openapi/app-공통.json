@@ -1076,7 +1076,7 @@
     ],
     "operationId": "listDocumentIssues",
     "summary": "발행 이력 조회",
-    "description": "회차가 쌓인 그대로 돌려준다. 대상 하나의 이력을 보려면 targetTypeCode 와 targetId 를 함께 준다 — targetId 만으로는 유형이 갈리지 않는다.",
+    "description": "회차가 쌓인 그대로 돌려준다. 대상 하나의 이력을 보려면 targetTypeCode 와 targetId 를 함께 준다 — targetId 만으로는 유형이 갈리지 않는다. 기간은 issuedFrom 포함·issuedTo 제외다. 마이크로초보다 정밀한 입력 경계는 마이크로초 격자로 올림하고 밀리초로 먼저 절단하지 않는다. issuedAt 내림차순, 동률이면 documentIssueLogId 내림차순이며 목록·전체 건수·대상 표시명은 같은 스냅샷에서 읽는다. lotId는 저장된 발행 이력의 LOT만으로 거르고 현재 HU 내용물로 과거 귀속을 재구성하지 않는다.",
     "parameters": [
      {
       "name": "documentTypeCode",
@@ -1135,7 +1135,7 @@
        "type": "integer",
        "format": "int64"
       },
-      "description": "소속 LOT 로 찾는다. 개체 단위 출력물을 LOT 단위로 모아 볼 때 쓴다."
+      "description": "저장된 발행 이력의 LOT로만 거른다. 현재 HU 내용물에서 과거 LOT를 재구성하지 않는다."
      },
      {
       "name": "issuedFrom",
@@ -1143,7 +1143,8 @@
       "schema": {
        "type": "string",
        "format": "date-time"
-      }
+      },
+      "description": "시작 시각 포함. 6자리보다 긴 소수 경계는 마이크로초 격자로 올림한다."
      },
      {
       "name": "issuedTo",
@@ -1151,7 +1152,8 @@
       "schema": {
        "type": "string",
        "format": "date-time"
-      }
+      },
+      "description": "종료 시각 제외. 6자리보다 긴 소수 경계는 마이크로초 격자로 올림한다."
      },
      {
       "name": "printOutcome",
@@ -1214,7 +1216,7 @@
     ],
     "operationId": "createDocumentIssues",
     "summary": "발행 · 재발행",
-    "description": "대상마다 회차를 매겨 기록을 만든다. 이미 발행된 대상이면 회차가 오르고 재발행 사유가 필수다.\n\n인쇄하지 않는다 — 이 호출은 기록만 만든다. 이미지는 별도로 받아 프린터로 보내고 결과를 따로 보고한다. 프린터가 죽어도 기록은 남는다.",
+    "description": "대상마다 회차를 매겨 기록을 만든다. 이미 발행된 대상이면 회차가 오르고 재발행 사유가 필수다.\n\n인쇄하지 않는다 — 이 호출은 기록만 만든다. 이미지는 별도로 받아 프린터로 보내고 결과를 따로 보고한다. 프린터가 죽어도 기록은 남는다. 대상 부모를 실제 변경 작업과 같은 순서로 잠근 뒤 상태·경로를 다시 읽고 발행 회차와 로그를 한 트랜잭션으로 저장한다. 툴 라벨 발행 이력은 PENDING·FAILED여도 툴 코드 변경을 제한한다. 발행 API 성공은 라벨 이미지 생성이나 물리 인쇄 완료가 아니다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -1396,7 +1398,8 @@
        }
       }
      }
-    }
+    },
+    "x-internal-note": "통보 I-27 최종결정(omf-mes#516): 바이너리 생성 원천 부재로 현재 기술적 제외다. 설계상 출력 계약은 보존하지만 발행 API 완료를 이 경로의 렌디션 생성·문서9종 물리출력 완료로 표현하지 않는다."
    }
   },
   "/app/document-issues/{documentIssueLogId}:report-print": {
@@ -1481,7 +1484,7 @@
     ],
     "operationId": "listPrinters",
     "summary": "프린터 목록 · 상태",
-    "description": "이 단말이 쓸 수 있는 프린터와 그 상태. 화면 머리에 상시 보인다 — 인쇄가 안 될 때 사용자가 가장 먼저 보는 곳이다.",
+    "description": "단말-프린터 명시 매핑·기본값·지원 문서 종류로만 목록을 구성한다. 같은 공장·활성값·첫 행으로 프린터를 추론하지 않는다. 기본 프린터는 단말당 최대 하나다. 요청 terminalId 우선, 없으면 검증된 단말 토큰 ID, 둘 다 없으면 빈 목록이다. 서버가 장치에 접속하거나 poll·driver·spool 동작을 하지 않는다.",
     "parameters": [
      {
       "name": "terminalId",
@@ -1490,7 +1493,7 @@
        "type": "integer",
        "format": "int64"
       },
-      "description": "주지 않으면 요청 단말 기준이다."
+      "description": "명시한 terminalId를 우선한다. 없으면 검증된 단말 토큰의 ID이며 둘 다 없으면 빈 목록이다."
      },
      {
       "name": "documentTypeCode",
@@ -4492,7 +4495,7 @@
      "displayName": {
       "type": "string",
       "maxLength": 200,
-      "description": "화면에 그대로 쓰는 표시명. 클라이언트가 조립하지 않는다.",
+      "description": "서버가 만든 표시명. 출고 라인은 전표번호 #라인번호, 삭제된 대상은 TYPE#id로 표시한다. 삭제 대상의 이동 화면은 생략한다.",
       "example": "LOT-SAMPLE-0001"
      },
      "screenId": {
@@ -4549,7 +4552,7 @@
        "null"
       ],
       "format": "int64",
-      "description": "소속 LOT. 대상이 LOT 자신이면 targetId 와 같고, 개체 단위 출력물이면 다르다.",
+      "description": "소속 LOT. 대상이 LOT 자신이면 targetId 와 같고, 개체 단위 출력물이면 다르다. 이력 조회의 필터는 저장값만 사용하며 현재 포장 내용물로 소급 변경하지 않는다.",
       "example": 90101
      },
      "lotNo": {
@@ -4582,7 +4585,8 @@
        "null"
       ],
       "maxLength": 200,
-      "example": "인쇄 실패"
+      "example": "인쇄 실패",
+      "description": "과거 이력 표시이므로 현재 비활성인 재발행 사유의 표시명도 보존해 조회한다."
      },
      "issuedBy": {
       "type": "integer",
@@ -4837,7 +4841,8 @@
        "OFFLINE",
        "ERROR"
       ],
-      "example": "READY"
+      "example": "READY",
+      "description": "저장된 READY·BUSY·OFFLINE·ERROR만 반환한다. 관측 원천이 없어 NULL인 과거 행은 OFFLINE으로 표시하며 READY를 추정하지 않는다."
      },
      "statusMessage": {
       "type": [
@@ -4845,12 +4850,13 @@
        "null"
       ],
       "maxLength": 200,
-      "description": "사람이 읽는 상태 설명. 클라이언트가 status 로 문구를 조립하지 않는다.",
+      "description": "저장된 상태 메시지 원문을 보존한다. 클라이언트가 status로 문구를 재조립하지 않는다.",
       "example": "대기 중"
      },
      "isDefault": {
       "type": "boolean",
-      "example": true
+      "example": true,
+      "description": "단말-프린터 명시 매핑의 기본값이다. 단말당 최대 하나이며 첫 행으로 추론하지 않는다."
      },
      "supportedDocumentTypeCodes": {
       "type": "array",
