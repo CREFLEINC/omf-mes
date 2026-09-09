@@ -11480,7 +11480,7 @@
      "mdm"
     ],
     "summary": "툴 수정",
-    "description": "근거: W-05-13 §4-A",
+    "description": "근거: W-05-13 §4-A 툴 코드를 변경할 때 툴 잠금·참조 및 발행 이력 검사·버전 비교를 한 트랜잭션으로 처리한다. TOOL_LABEL 발행 이력은 PENDING·FAILED 상태여도 코드 변경을 제한한다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
