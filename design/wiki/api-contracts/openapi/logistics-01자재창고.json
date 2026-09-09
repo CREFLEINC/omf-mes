@@ -1914,12 +1914,13 @@
         "GOODS_RECEIPT",
         "GOODS_ISSUE",
         "INVENTORY_ADJUSTMENT",
-        "STOCK_TRANSFER"
+        "STOCK_TRANSFER",
+        "RECYCLE_ENTRY"
        ],
        "example": "GOODS_RECEIPT"
       },
       "x-code-key": "CD-INVENTORY-TRANSACTION-SOURCE-DOCUMENT-TYPE",
-      "description": "원천 문서 유형으로 거른다. 원천 문서 유형. **A-10 다형 참조 판별자**이고 값은 «대상 테이블 이름»이다 — sourceDocumentId 는 그 표의 식별자다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다. 넷이다 — 입고(GOODS_RECEIPT) · 출고(GOODS_ISSUE) · 재고조정(INVENTORY_ADJUSTMENT) · 재고이동(STOCK_TRANSFER). ⭐ 근거 — W-04-05 가 「입고·출고 전기 각 1건」을 명시하고, W-01-12 §5-2 가 「inventory_transaction.source_document_type_code 에 「재고조정」 값이 있으면 source_document_id = inventory_adjustment_id 로 잇는다」로 적었다. ⚠ STOCK_TRANSFER 는 «재고를 움직이므로 원장을 남긴다»는 추론이다 — 다른 셋보다 근거가 얕다. ⭐ 이 축이 원장 한 줄의 «성격»을 말한다 — 방향(입고·출고·이동)은 라인의 from*/to* 가 이미 말하므로 transactionTypeCode 를 따로 두지 않는다(L-2-1 · 2026-09-02 판정)."
+      "description": "원천 문서 유형으로 거른다. 원천 문서 유형. sourceDocumentId와 함께 원천을 식별한다. GOODS_RECEIPT, GOODS_ISSUE, INVENTORY_ADJUSTMENT, STOCK_TRANSFER, RECYCLE_ENTRY를 사용한다. RECYCLE_ENTRY의 sourceDocumentId는 등록 결과의 recycleEntryId이며 lotId나 다른 전표 식별자가 아니다. 고객이 편집하는 공통코드가 아니다. 재고 이동 방향은 라인의 from*/to*로 구분한다."
      },
      {
       "name": "page",
@@ -5153,7 +5154,7 @@
      "logistics"
     ],
     "summary": "재생재 등록",
-    "description": "분쇄재가 생기면 현장이 등록한다. 새 자재 LOT 을 만들고 그 수량만큼 재고를 늘린다 — 한 트랜잭션이다. **LOT 번호는 서버가 매긴다**: 번호를 클라이언트가 정하면 오프라인 두 단말이 같은 번호를 만든다(공유계약 C-2). 그래서 화면이 「번호는 저장 후 정해집니다」를 먼저 말한다. 근거: M-01-12 §5-1·§5-3 · DR-006 확정. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다.",
+    "description": "재생재 등록은 등록 기록·새 자재 LOT·수불 원장 1건과 라인 1건·재고 증가를 같은 트랜잭션으로 처리한다. 하나라도 실패하면 전체를 반영하지 않는다. 원장의 sourceDocumentTypeCode는 RECYCLE_ENTRY이고 sourceDocumentId는 응답 recycleEntryId다. 원장과 라인의 businessDate는 요청 영업일이며 원장의 occurredAt은 요청 발생시각이다. 라인은 등록 품목·새 LOT·등록 수량·품목 기본 단위를 기록한다. 출발 창고·위치는 없고 도착 창고·위치는 요청 warehouseId·locationId다. 같은 요청을 같은 Idempotency-Key로 다시 보내면 기존 결과를 반환하고 LOT·원장·재고 증가를 중복 반영하지 않는다. LOT 번호는 서버가 부여한다. 오프라인 요청은 단말 큐에 보관한 뒤 연결 시 전송하며 성공 응답은 서버에 반영된 뒤 반환한다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -5217,7 +5218,7 @@
       }
      }
     },
-    "x-internal-note": "혼적 제약은 화면 경고 후 현장 판단을 유지한다. 2026-09-08 사용자 승인: 기존 itemId를 재사용하고 새 LOT별 구분을 기록한다. 품목 생성·기존 품목 분류 변경·원료 계보 생성은 하지 않는다. 저장 모델링은 개발팀 소관이다."
+    "x-internal-note": "혼적 제약은 화면 경고 후 현장 판단을 유지한다. 2026-09-08 사용자 승인: 기존 itemId를 재사용하고 새 LOT별 구분을 기록한다. 품목 생성·기존 품목 분류 변경·원료 계보 생성은 하지 않는다. 저장 모델링은 개발팀 소관이다. 재생재 원장 판별자 omf-mes#512. M-01-12 §5-2-a 및 요구서 §3-24. 별도 입고 전표나 등록 취소 경로를 신설하지 않는다."
    }
   },
   "/logistics/shopfloor-receipts": {
@@ -5969,7 +5970,7 @@
        "type": "integer",
        "format": "int64"
       },
-     "description": "이 W/O 를 원천으로 발행된 LOT 만. 선발행 슬롯을 빠짐없이 훑는 경로다 — 마감(W-02-05 §3)과 POP 의 실적 대상 LOT 선택(P-02-04 §5)·생산LOT 완료(P-02-04 §3 좌단 LOT 목록)가 같은 축을 쓴다. ⭐ 저장된 형태는 다형 참조 짝(sourceTypeCode + sourceId)이지만 판별자 값 목록이 아직 미확정이라 짝 필터를 열지 않았다 — 값을 모르는 채 열면 눌러도 아무것도 안 걸린다(공유계약 G-23). 서버가 W/O 원천으로 풀어 준다"
+      "description": "이 W/O 를 원천으로 발행된 LOT 만. 선발행 슬롯을 빠짐없이 훑는 경로다 — 마감(W-02-05 §3)과 POP 의 실적 대상 LOT 선택(P-02-04 §5)·생산LOT 완료(P-02-04 §3 좌단 LOT 목록)가 같은 축을 쓴다. ⭐ 저장된 형태는 다형 참조 짝(sourceTypeCode + sourceId)이지만 판별자 값 목록이 아직 미확정이라 짝 필터를 열지 않았다 — 값을 모르는 채 열면 눌러도 아무것도 안 걸린다(공유계약 G-23). 서버가 W/O 원천으로 풀어 준다"
      },
      {
       "name": "currentOnly",
@@ -11122,7 +11123,7 @@
      "sourceDocumentId",
      "statusCode"
     ],
-    "description": "수불 원장. 조회만 제공한다 — 전표의 전기가 만들며 화면이 직접 쓰지 않는다. 취소도 행을 지우지 않고 역처리 행을 더한다. 근거: W-01-07 §5-4",
+    "description": "수불 원장. 전표 전기 또는 재생재 등록으로 생성하며 화면은 직접 쓰지 않고 조회한다. 취소가 허용된 전표의 취소는 기존 원장을 삭제하지 않고 역처리 행을 추가한다. 재생재 원장 생성 자체가 등록 취소 기능을 의미하지 않는다.",
     "properties": {
      "inventoryTransactionId": {
       "x-source-column": "inventory_transaction_id",
@@ -11176,15 +11177,16 @@
       "x-source-column": "source_document_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "원천 문서 유형. **A-10 다형 참조 판별자**이고 값은 «대상 테이블 이름»이다 — sourceDocumentId 는 그 표의 식별자다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다. 넷이다 — 입고(GOODS_RECEIPT) · 출고(GOODS_ISSUE) · 재고조정(INVENTORY_ADJUSTMENT) · 재고이동(STOCK_TRANSFER). ⭐ 근거 — W-04-05 가 「입고·출고 전기 각 1건」을 명시하고, W-01-12 §5-2 가 「inventory_transaction.source_document_type_code 에 「재고조정」 값이 있으면 source_document_id = inventory_adjustment_id 로 잇는다」로 적었다. ⚠ STOCK_TRANSFER 는 «재고를 움직이므로 원장을 남긴다»는 추론이다 — 다른 셋보다 근거가 얕다. ⭐ 이 축이 원장 한 줄의 «성격»을 말한다 — 방향(입고·출고·이동)은 라인의 from*/to* 가 이미 말하므로 transactionTypeCode 를 따로 두지 않는다(L-2-1 · 2026-09-02 판정).",
+      "description": "원천 문서 유형. sourceDocumentId와 함께 원천을 식별한다. GOODS_RECEIPT, GOODS_ISSUE, INVENTORY_ADJUSTMENT, STOCK_TRANSFER, RECYCLE_ENTRY를 사용한다. RECYCLE_ENTRY의 sourceDocumentId는 등록 결과의 recycleEntryId이며 lotId나 다른 전표 식별자가 아니다. 고객이 편집하는 공통코드가 아니다. 재고 이동 방향은 라인의 from*/to*로 구분한다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-internal-note": "공유계약 A-10 및 M-01-12 §5-2-a. omf-mes#512: 기존 원천 유형을 보존하고 재생재 등록 건을 독립 원천으로 추가한다.",
       "x-code-key": "CD-INVENTORY-TRANSACTION-SOURCE-DOCUMENT-TYPE",
       "enum": [
        "GOODS_RECEIPT",
        "GOODS_ISSUE",
        "INVENTORY_ADJUSTMENT",
-       "STOCK_TRANSFER"
+       "STOCK_TRANSFER",
+       "RECYCLE_ENTRY"
       ],
       "example": "GOODS_RECEIPT"
      },
@@ -11192,7 +11194,8 @@
       "x-source-column": "source_document_id",
       "type": "integer",
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "원천 문서 유형과 짝인 식별자. RECYCLE_ENTRY이면 RecycleEntry.recycleEntryId를 가리킨다. 숫자가 같아도 유형이 다르면 다른 원천이다."
      },
      "statusCode": {
       "x-source-column": "status_code",
@@ -13730,7 +13733,7 @@
       "type": "integer",
       "format": "int64",
       "example": 1001,
-      "description": "등록 건 자체의 번호. 새로 만든 LOT 의 원천 참조가 이것을 가리킨다 — 원천 유형 코드는 RECYCLE_ENTRY 다"
+      "description": "등록 건 자체의 식별자. 새 LOT의 sourceTypeCode와 원장의 sourceDocumentTypeCode가 RECYCLE_ENTRY일 때 각각 sourceId와 sourceDocumentId가 이 값을 가리킨다."
      },
      "lotId": {
       "type": "integer",
@@ -13797,7 +13800,7 @@
      "businessDate",
      "occurredAt"
     ],
-    "description": "재생재 등록. 새 자재 LOT 을 만들고 그 수량만큼 재고를 늘린다. LOT 번호는 서버가 매긴다 — 화면이 미리 보이지 못한다. 근거: M-01-12 §5-1",
+    "description": "재생재 등록. 등록 기록·새 자재 LOT·수불 원장과 라인·재고 증가를 한 트랜잭션으로 처리한다. LOT 번호는 서버가 부여한다.",
     "properties": {
      "itemId": {
       "type": "integer",
