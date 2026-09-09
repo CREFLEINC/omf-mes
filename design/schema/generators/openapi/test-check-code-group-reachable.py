@@ -177,9 +177,9 @@ class IntegrationTest(unittest.TestCase):
         offending = [g for g in gaps if g[0] == "W-04-10" and g[2] == "GOODS_ISSUE_REASON"]
         self.assertEqual(offending, [])
 
-    def test_새_LOT구분을_소비하지않는_아홉화면은_가짜호출을_요구하지않는다(self):
-        screens = {"M-04-04", "P-01-01", "P-02-06", "P-02-07", "W-02-04",
-                   "W-03-01", "W-03-02", "W-03-03", "W-04-08"}
+    def test_새_LOT구분을_소비하지않는_일곱화면은_가짜호출을_요구하지않는다(self):
+        screens = {"M-04-04", "P-01-01", "W-02-04", "W-03-01", "W-03-02",
+                   "W-03-03", "W-04-08"}
         raw = ccgr.gaps_from(ccgr.table_groups(), ccgr.table_screens(),
                              ccgr.screen_sections())
         gaps, candidates = ccgr.split_consumed_gaps(

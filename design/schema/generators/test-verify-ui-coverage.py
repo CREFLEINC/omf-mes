@@ -146,7 +146,7 @@ class Domain01Test(unittest.TestCase):
         #    실제로 그랬다 — 99 는 `535f068`(2026-08-30) 부터 낡았는데 시험이 사흘을
         #    빨간 채로 서 있었고, 고칠 때도 왜 늘었는지는 안 적혔다(`omf-mes#358`).
         # ⭐ 마지막 1은 2026-09-05 W-06-06 §5-1 인증자 선택 추가(요청 #445)다.
-        self.assertEqual(len(rows), 105)
+        self.assertEqual(len(rows), 106)
         self.assertEqual(len({r["screen"] for r in rows}), 14)
 
 
@@ -186,12 +186,12 @@ class DomainAppTest(unittest.TestCase):
 
 
 class DomainPrintTest(unittest.TestCase):
-    # 공통 출력물 5장. ⚠ 이 편은 화면을 소유하지 않는다 — 출력이 주 기능이고
-    # 도메인 요구서가 아직 없는 것만 등록한다. 범위가 다시 넓어지면 여기서 걸린다.
-    def test_다섯_화면이_등록돼_있다(self):
+    # 공통 출력물 2장. 통합된 P-02-04·P-04-01은 각 도메인이 세고,
+    # 출력이 주 기능인 독립 화면만 등록한다.
+    def test_두_화면이_등록돼_있다(self):
         self.assertEqual(
             sorted(cov.SCREENS_PRINT),
-            ["P-02-05", "P-02-07", "P-02-09", "P-04-02", "P-04-04"],
+            ["P-02-09", "P-04-04"],
         )
 
     def test_이미_다른_도메인이_세는_화면은_없다(self):
@@ -199,15 +199,15 @@ class DomainPrintTest(unittest.TestCase):
         overlap = set(cov.SCREENS_PRINT) & set(cov.SCREENS_01)
         self.assertEqual(overlap, set())
 
-    def test_액션이_17건이다(self):
-        # 액션 표가 있는 두 장(P-04-02 8 · P-04-04 9)만 센다.
-        self.assertEqual(len(cov.extract_all(SCREENS_ROOT, cov.SCREENS_PRINT)), 17)
+    def test_액션이_9건이다(self):
+        # 액션 표가 있는 P-04-04의 9건만 센다.
+        self.assertEqual(len(cov.extract_all(SCREENS_ROOT, cov.SCREENS_PRINT)), 9)
 
-    def test_액션_표_없는_화면_셋을_알린다(self):
+    def test_액션_표_없는_화면_하나를_알린다(self):
         # 확대 3차 서식이라 표가 없다. 조용히 0건으로 넘어가면 안 된다.
         self.assertEqual(
             cov.screens_without_action_table(SCREENS_ROOT, cov.SCREENS_PRINT),
-            ["P-02-05", "P-02-07", "P-02-09"],
+            ["P-02-09"],
         )
 
 class Domain03Test(unittest.TestCase):

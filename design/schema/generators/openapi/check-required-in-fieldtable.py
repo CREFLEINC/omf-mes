@@ -68,17 +68,23 @@ CONTRACTS_DIR = os.path.join(HERE, "..", "..", "..", "wiki", "api-contracts", "o
 SPECS_GLOB = os.path.join(HERE, "..", "..", "..", "wiki", "screens", "**", "*.md")
 
 SCREEN_ID = re.compile(r"^([WPM]-(?:CO|\d{2})-\d{2})")
+RETIRED_HEAD = re.compile(r"^#\s*~~")
 SECTION4_HEAD = re.compile(r"^(#{2,4})\s*§4.*$", re.M)
 ANY_HEAD = re.compile(r"^#{1,4}\s", re.M)
 BACKTICK_TABLE = re.compile(r"`([a-z_]+\.[a-z_]+)`")
 CAMEL = re.compile(r"(?<!^)(?=[A-Z])")
 
-# 기준선 — 2026-09-01 실측(`omf-mes#336`). ⛔ 늘리지 않는다. 줄었으면 이 수를 낮춘다.
-BASELINE = 122
+# 기준선 — 2026-09-08 활성 화면 실측. 통합·폐지본은 제외한다. ⛔ 늘리지 않는다.
+BASELINE = 106
 
 
 def to_snake(name: str) -> str:
     return CAMEL.sub("_", name).lower()
+
+
+def is_retired_screen(text: str) -> bool:
+    """통합·폐지된 화면 스펙은 활성 화면 계약 대조에서 제외한다."""
+    return RETIRED_HEAD.match(text) is not None
 
 
 def columns_from_doc(doc: dict) -> dict[str, set[str]]:
@@ -147,6 +153,8 @@ def main() -> int:
         screen = m.group(1)
         with open(path, encoding="utf-8") as f:
             text = f.read()
+        if is_retired_screen(text):
+            continue
         for tables, body in field_sections(text):
             for table in tables:
                 cols = table_required.get(table)
