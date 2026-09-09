@@ -1083,7 +1083,7 @@
        "example": "UNCONFIRMED"
       },
       "x-code-key": "CD-SHIPMENT-STATUS",
-      "description": "출하의 진행 상태 — 미확정(UNCONFIRMED) · 확정(CONFIRMED) · 취소(CANCELLED). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 확정이 PGI 송신을 부르고 취소가 그것을 되돌린다(W-04-04 §5-1 · W-04-12 §5-2). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=SHIPMENT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "출하의 진행 상태 — 미확정(UNCONFIRMED) · 확정(CONFIRMED) · 취소(CANCELLED). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 이번 버전 확정은 MES 상태 확정만 수행하며 ERP 송신을 적재하지 않는다. 취소는 미확정 구간에서만 가능하다(W-04-04 §5-1 · W-04-12 §5-2). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=SHIPMENT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "warehouseId",
@@ -1270,7 +1270,7 @@
       }
      }
     },
-    "x-internal-note": "재고 차감(goods_issue)은 01 자재창고 계약이, ERP 송신 적재는 06 연계가 소유한다 — 2026-08-07 출하 2단 확정으로 «ERP 송신 적재만» W-04-12 확정 시점으로 갔고 재고 차감은 이 시점에 남았다(W-04-04 §5-1 도식). shipment_line.goods_issue_line_id 가 nullable 인 것은 1차 판정(출고 전표를 만든다)의 잔재다."
+    "x-internal-note": "재고 차감(수불 원장 전기)은 출하 생성 시 유지한다. 확정은 MES 상태 확정이며 이번 버전 ERP 송신 적재는 제외한다(2026-09-08 사용자 확정). ShipmentLine.goodsIssueLineId의 nullable은 유지한다. 출고 전표 필수성은 W-04-04 §8-2의 별도 미결이며 ERP 제외 결정으로 확정하지 않는다."
    }
   },
   "/logistics/shipments/{shipmentId}": {
@@ -1434,7 +1434,7 @@
      "shipment"
     ],
     "summary": "출하 확정",
-    "description": "미확정 → 확정. ⭐ 이 시점에 ERP 송신 적재가 걸린다(2026-08-07 출하 2단 확정) — 재고는 앞 단계(출하 처리)에서 이미 차감됐다. 취소 결재가 진행 중이면 409 CANCEL_IN_PROGRESS 다(공유계약 J-7). ⛔ 확정 취소 경로가 없다 — 되돌릴 수 없다. 근거: W-04-12 §5-3·§5-8",
+    "description": "미확정 → 확정. 2026-09-08 사용자 확정으로 이번 버전에는 ERP 송신을 적재하지 않는다 — 재고는 앞 단계(출하 처리)에서 이미 차감됐다. 취소 결재가 진행 중이면 409 CANCEL_IN_PROGRESS 다(공유계약 J-7). ⛔ 확정 취소 경로가 없다 — 되돌릴 수 없다. 근거: W-04-12 §5-3·§5-8",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -2643,7 +2643,7 @@
      },
      "erpSalesOrderNo": {
       "type": "string",
-      "description": "ERP 원번호. 연계로 들어온 건에만 있다",
+      "description": "ERP 원번호. 기존 수신 데이터를 보존한다. 이번 버전 출하 ERP 연계·매칭은 제외하며 MES 단독 생성의 선행조건이 아니다",
       "example": "ERP-SO-99001"
      },
      "customerId": {
@@ -2686,7 +2686,7 @@
      "orderDate",
      "statusCode"
     ],
-    "description": "고객사 출하지시서 수신본. ⛔ 등록 경로를 두지 않는다 — ⭐ 원천이 «둘»이다 — 고객사 출하지시서(엑셀) import 와 ERP 연계 수신을 «모두» 쓴다(사용자 확정 2026-09-02). 어느 쪽이든 MES 는 받기만 하므로 목록에 그냥 나타난다(W-04-01 §5-6). 파일 업로드는 고객사마다 형식이 달라 요청 본문을 정할 수 없고 화면도 비활성이다. ⭐ 상위지시는 nullable 이 확정이다 — 무지시 standalone 이 예외가 아니라 상시 구조다"
+    "description": "고객사 출하지시서 수신본. 기존 고객사 엑셀 import·ERP 수신 원천과 식별자 데이터는 보존한다. 이번 버전 출하 ERP 수신·주문 매칭은 제외하며 MES 생성·출하의 선행조건으로 사용하지 않는다(2026-09-08 사용자 확정). 고객사별 파일 형식 미정에 따른 업로드 비활성은 그대로다. 상위지시는 nullable이며 무지시 standalone은 상시 구조다."
    },
    "SalesOrderLine": {
     "type": "object",
@@ -2804,7 +2804,7 @@
      },
      "statusCode": {
       "type": "string",
-      "description": "출하의 진행 상태 — 미확정(UNCONFIRMED) · 확정(CONFIRMED) · 취소(CANCELLED). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 확정이 PGI 송신을 부르고 취소가 그것을 되돌린다(W-04-04 §5-1 · W-04-12 §5-2). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=SHIPMENT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "출하의 진행 상태 — 미확정(UNCONFIRMED) · 확정(CONFIRMED) · 취소(CANCELLED). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 이번 버전 확정은 MES 상태 확정만 수행하며 ERP 송신을 적재하지 않는다. 취소는 미확정 구간에서만 가능하다(W-04-04 §5-1 · W-04-12 §5-2). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=SHIPMENT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "example": "UNCONFIRMED",
       "x-code-key": "CD-SHIPMENT-STATUS"
      },
@@ -2813,7 +2813,7 @@
        "string",
        "null"
       ],
-      "description": "ERP 납품 번호. 확정 후 연계가 채운다 — 04 가 쓰지 않는다",
+      "description": "ERP 납품 번호. 기존 데이터를 보존하며 이번 버전 화면 표시·송신·확정 선행조건으로 사용하지 않는다",
       "example": "SH-2026-0813-0031"
      },
      "remarks": {
@@ -2853,7 +2853,7 @@
      "statusCode",
      "expedited"
     ],
-    "description": "실물 출하. ⭐ 2026-08-07 「출하 2단 확정」으로 ERP 송신 적재가 W-04-12 확정 시점으로 갔다 — 이 리소스를 만드는 것은 미확정 출하까지이고, 실물이 나갔으므로 재고는 그 시점에 차감한다(W-04-04 §5-1)"
+    "description": "실물 출하. 출하 생성은 미확정 상태까지이며 실물이 나갔으므로 이때 재고를 차감한다. :confirm은 MES 상태를 확정하고 재고를 다시 차감하지 않는다. 이번 버전 ERP 송신 적재·주문 매칭은 제외하되 기존 ERP 식별자 데이터는 보존한다(2026-09-08 사용자 확정 · W-04-04 §5-1)."
    },
    "ShipmentCancel": {
     "type": "object",
@@ -2982,7 +2982,7 @@
      "occurredAt",
      "lines"
     ],
-    "description": "출하 처리. 출하·라인·LOT 배분을 한 트랜잭션으로 만든다(공유계약 B-8). ⛔ 확정하지 않는다 — 미확정 출하까지다. 확정은 :confirm 이다. ⭐ 재고 차감(수불 원장 전기 = 출고 전기)은 이 오퍼레이션 안이다 — 실물이 나갔으므로 여기서 차감한다(W-04-04 §5-1 도식). expedited=true 이면 제품 입고 전표와 입고 전기를 여기서 함께 만든다. ⛔ :confirm 으로 가는 것은 ERP 송신 적재 하나뿐이다(2026-08-07 출하 2단 확정 · W-04-05 §5-1 · 공유계약 B-8). ⭐ businessDate·occurredAt 을 반드시 싣는다 — 이 오퍼레이션이 재고 원장을 지나고 그 유일 제약에 영업일이 들어 있다(공유계약 C-8)"
+    "description": "출하 처리. 출하·라인·LOT 배분을 한 트랜잭션으로 만든다(공유계약 B-8). ⛔ 확정하지 않는다 — 미확정 출하까지다. 확정은 :confirm 이다. ⭐ 재고 차감(수불 원장 전기 = 출고 전기)은 이 오퍼레이션 안이다 — 실물이 나갔으므로 여기서 차감한다(W-04-04 §5-1 도식). expedited=true 이면 제품 입고 전표와 입고 전기를 여기서 함께 만든다. 이번 버전 :confirm은 MES 상태만 확정하며 ERP 송신을 적재하지 않는다(2026-09-08 사용자 확정). ⭐ businessDate·occurredAt 을 반드시 싣는다 — 이 오퍼레이션이 재고 원장을 지나고 그 유일 제약에 영업일이 들어 있다(공유계약 C-8)"
    },
    "ShipmentLine": {
     "type": "object",

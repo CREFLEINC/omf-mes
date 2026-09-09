@@ -40,9 +40,12 @@
    공통코드 그룹을 모은다 — `check-required-in-fieldtable.py` 의 판정과 같은 다리다.
 2. 화면 스펙(`design/wiki/screens/**/*.md`)의 `§4-X. … `테이블`` 소절 제목으로
    「이 테이블을 쓰는 화면」을 모은다.
-3. 한 테이블을 **둘 이상의 화면이 함께 쓰면**(형제가 있으면), 그 화면들의 요구서
-   §3 소절 각각에 그 그룹의 `codeGroupCode=` 포인터가 있는지 하나씩 본다.
-   **형제 하나라도 없으면** 그 화면·그룹 짝이 결손이다.
+3. 한 테이블을 **둘 이상의 화면이 함께 쓰면**(형제가 있으면), 해당 코드 필드의
+   프로퍼티명·원본 컬럼명과 화면 §4를 대조한다(2026-09-08 보강).
+4. 필드를 소비하면 요구서 §3의 `codeGroupCode=` 포인터를 요구한다. 필드를 쓰지
+   않는 후보는 별도 출력하며 가짜 호출을 요구하지 않는다. 필드 귀속이나 표 파싱이
+   불명확하면 기존 테이블 단위 검사를 유지한다. 명시적인 같은 테이블의 §4 참조만
+   따라가고, 없는 참조·순환 참조는 판정 불가로 남긴다.
 
 ⚠ 형제가 없는(그 테이블을 쓰는 화면이 하나뿐인) 그룹은 이 축에서 «가려질» 대상이
 없으므로 보지 않는다 — ①이 이미 그 자리를 본다.
@@ -57,7 +60,9 @@
   - ②는 **§4 필드표에 테이블 이름을 backtick 소절 제목으로 적은 화면만** 본다 —
     아직 §4 를 안 쓴 화면은 «형제 없음»과 구분되지 않는다
   - ②는 그 테이블을 쓰는 스키마가 «필수»로 요구하는 그룹인지는 가르지 않는다 —
-    선택 칸이라도 형제가 이미 부르면 결손으로 잡는다(선택 칸도 값 목록은 필요하다)
+    선택 칸이라도 화면이 소비하면 결손으로 잡는다(선택 칸도 값 목록은 필요하다)
+  - 한국어 라벨만으로 코드 필드의 의미를 추론하지 않는다. 비소비 후보는 확정된
+    불요 목록이 아니라 독립 검토할 진단이다. 실제 필드명의 정확한 표기가 필요하다.
 
 쓰기
 ----
@@ -72,6 +77,7 @@ import json
 import os
 import re
 import sys
+from typing import Optional
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -188,7 +194,121 @@ BASELINE = 0
 #      축이라 완제품 창고에 서는 일이 드물며, `W-01-10` §4-C 는 「갱신 대상」 표라
 #      화면이 «보이는» 자리가 아니고, `W-04-08` §3 목록은 이미 8열로 차 있다.
 #      ⇒ **설계 변동이 얻는 것보다 크다.** 다시 여는 조건을 `W-04-08` §4-A 에 적었다.
-BASELINE_SCREEN = 16
+# 2026-09-08: 테이블을 읽는다고 모든 코드 칸을 소비하지 않는다.
+# 필드 소비 대조 후 3건(소유 축 1·참조 필드 상태 2)을 유지한다.
+BASELINE_SCREEN = 3
+
+# 필드 귀속이 없으면 None: 기존 테이블 단위 검사를 보수적으로 유지한다.
+GroupFields = dict[tuple[str, str], Optional[set[str]]]
+ScreenBodies = dict[tuple[str, str], str]
+
+
+def field_aliases(name: str, prop: dict) -> set[str]:
+    """프로퍼티명·명시 컬럼·약어를 보존한 snake_case 이름을 대응한다."""
+    snake = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", name)
+    snake = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", snake).lower()
+    aliases = {name, snake}
+    column = prop.get("x-source-column")
+    if isinstance(column, str):
+        aliases.add(column)
+    return aliases
+
+
+def group_fields_from_doc(doc: dict) -> GroupFields:
+    """테이블·그룹별 필드 어휘. 스키마 수준 포인터는 귀속 불명으로 보존한다."""
+    result: GroupFields = {}
+    for schema in (doc.get("components", {}).get("schemas") or {}).values():
+        if not isinstance(schema, dict) or not schema.get("x-source-table"):
+            continue
+        table = schema["x-source-table"]
+        properties = schema.get("properties") or {}
+        if not isinstance(properties, dict):
+            properties = {}
+        for field, prop in properties.items():
+            if not isinstance(prop, dict):
+                continue
+            for _where, description in _cg.descriptions(prop):
+                for group in POINTER.findall(description):
+                    key = (table, group)
+                    if key not in result:
+                        result[key] = set()
+                    if result[key] is not None:
+                        result[key].update(field_aliases(field, prop))
+        unassigned = {key: value for key, value in schema.items()
+                      if key != "properties"}
+        for _where, description in _cg.descriptions(unassigned):
+            for group in POINTER.findall(description):
+                result[(table, group)] = None
+    return result
+
+
+def group_fields() -> GroupFields:
+    """계약 전체의 필드 귀속을 합친다. 불명확한 귀속은 항상 우선한다."""
+    result: GroupFields = {}
+    for path in sorted(glob.glob(os.path.join(CONTRACTS, "*.json"))):
+        with open(path, encoding="utf-8") as source:
+            document = json.load(source)
+        for key, fields in group_fields_from_doc(document).items():
+            if fields is None or (key in result and result[key] is None):
+                result[key] = None
+            else:
+                result.setdefault(key, set()).update(fields)
+    return result
+
+
+def screen_field_bodies() -> ScreenBodies:
+    """테이블을 명시한 화면 §4 본문을 수집한다. 같은 테이블 소절은 합친다."""
+    result: ScreenBodies = {}
+    for path in sorted(glob.glob(SCREENS, recursive=True)):
+        match = _rift.SCREEN_ID.match(os.path.basename(path))
+        if not match:
+            continue
+        with open(path, encoding="utf-8") as source:
+            sections = _rift.field_sections(source.read())
+        for tables, body in sections:
+            for table in tables:
+                key = (match.group(1), table)
+                result[key] = result.get(key, "") + body
+    return result
+
+
+def resolved_field_body(
+    screen: str, table: str, bodies: ScreenBodies,
+    visited: frozenset[str] = frozenset(),
+) -> str | None:
+    """같은 테이블의 명시 §4 참조만 따라간다. 누락·순환은 판정 불가다."""
+    if screen in visited or (screen, table) not in bodies:
+        return None
+    body = bodies[(screen, table)]
+    references = re.findall(r"`([WMP]-(?:CO|\d{2})-\d{2})`\s*§4\b", body)
+    for reference in references:
+        referenced = resolved_field_body(
+            reference, table, bodies, visited | {screen})
+        if referenced is None:
+            return None
+        body += "\n" + referenced
+    return body
+
+
+def split_consumed_gaps(
+    gaps: list[tuple[str, str, str]], fields: GroupFields, bodies: ScreenBodies,
+) -> tuple[list[tuple[str, str, str]], list[tuple[str, str, str]]]:
+    """필드 소비 결손과 비소비 후보를 분리한다. 파싱 불가이면 결손에 남긴다."""
+    consumed = []
+    candidates = []
+    for gap in gaps:
+        screen, table, group = gap
+        aliases = fields.get((table, group))
+        body = resolved_field_body(screen, table, bodies) or ""
+        # 소절/필드표가 없는 상태를 «필드를 안 쓴다»로 단정하지 않는다.
+        parsed = bool(re.search(r"^\s*\|.+\|\s*$", body, re.M))
+        uses_field = not aliases or not parsed or any(
+            re.search(r"(?<![A-Za-z0-9_])" + re.escape(alias)
+                      + r"(?![A-Za-z0-9_])", body)
+            for alias in aliases
+        )
+        (consumed if uses_field else candidates).append(gap)
+    return consumed, candidates
 
 
 def table_groups_from_doc(doc: dict) -> dict[str, set[str]]:
@@ -289,7 +409,8 @@ def gaps_from(tg: dict[str, set[str]], ts: dict[str, set[str]],
 
 
 def screen_axis_gaps() -> list[tuple[str, str, str]]:
-    return gaps_from(table_groups(), table_screens(), screen_sections())
+    gaps = gaps_from(table_groups(), table_screens(), screen_sections())
+    return split_consumed_gaps(gaps, group_fields(), screen_field_bodies())[0]
 
 
 def main() -> int:
@@ -333,6 +454,14 @@ def main() -> int:
 
     print("\n" + "─" * 60)
     screen_gaps = screen_axis_gaps()
+    all_gaps = gaps_from(table_groups(), table_screens(), screen_sections())
+    _consumed, candidates = split_consumed_gaps(
+        all_gaps, group_fields(), screen_field_bodies())
+    if candidates:
+        print("② 비소비 후보 %d건 — 해당 §4에 코드 필드가 없다. 가짜 호출을 추가하지 않는다."
+              % len(candidates))
+        for screen, table, group in candidates:
+            print("   %-10s %-32s %s" % (screen, table, group))
     print("② 화면 축 — 테이블을 함께 쓰는 형제 화면 중 그룹을 안 부르는 화면 **%d**건"
           % len(screen_gaps))
     if screen_gaps:
