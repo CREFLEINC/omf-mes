@@ -3,7 +3,7 @@
  "info": {
   "title": "omf-mes 04 제품출하 도메인 API (초안)",
   "version": "0.1.0",
-  "description": "04 제품출하 도메인 API 계약. 출하 3층(고객사 지시서 수신본 - MES 출하작업지시 - 실물 출하)과 출하 LOT 배분, 부적합, 처분 결정 조회를 덮는다. 출하지시서는 연계 수신이 기본이라 등록 경로를 두지 않고, 상위 지시가 없는 단독 편성이 상시 구조다. 출하는 2단 확정이다 — 출하 처리가 «재고 차감»과 미확정 출하 생성을 한 트랜잭션으로 하고, 확정이 연계 송신 적재를 건다. 확정 취소 경로는 없다. 이 계약은 남의 계약을 많이 쓴다 — 검사는 품질, 입고·출고·재고·취급 단위는 자재창고, 실적은 생산실행, 승인과 출력물은 공통, 품목과 연계는 기준정보가 소유한다. ⛔ 오프라인 대상 오퍼레이션이 없다 — 이 계약의 테이블에 쓰는 현장 화면 하나가 판정값을 캐시할 수 없어 오프라인 진입을 차단하기 때문이다.",
+  "description": "04 제품출하 도메인 API 계약. 출하 3층(고객사 지시서 수신본 - MES 출하작업지시 - 실물 출하)과 출하 LOT 배분, 부적합, 처분 결정 조회를 덮는다. 출하지시서는 연계 수신이 기본이라 등록 경로를 두지 않고, 상위 지시가 없는 단독 편성이 상시 구조다. 출하는 2단 확정이다 — 출하 처리가 «재고 차감»과 미확정 출하 생성을 한 트랜잭션으로 하고, 확정이 연계 송신 적재를 건다. 확정 취소 경로는 없다. 이 계약은 남의 계약을 많이 쓴다 — 검사는 품질, 입고·출고·재고·취급 단위는 자재창고, 실적은 생산실행, 승인과 출력물은 공통, 품목과 연계는 기준정보가 소유한다. ⛔ 오프라인 대상 오퍼레이션이 없다 — 이 계약의 테이블에 쓰는 현장 화면 하나가 판정값을 캐시할 수 없어 오프라인 진입을 차단하기 때문이다.\n\n인증 규약은 이 파일이 오퍼레이션마다 선언하지 않는다. 현장 단말과 모바일은 단말 토큰을 Authorization: Bearer 로 싣고, 쓰기에는 귀속용 사번 헤더(X-Worker-No)를 함께 싣는다 — 그 헤더는 각 쓰기 오퍼레이션이 선언한다. 스킴 정의는 공통 계약 한 벌(app-공통)이 갖는다. 관리웹 계정 토큰의 운반 수단이 아직 확정되지 않아 오퍼레이션별 security 배선을 «의도적으로» 비워 두었다 — 관리웹과 현장 셸이 같은 오퍼레이션을 공유하는 자리가 있어 단말 토큰만 배선하면 「단말 토큰만 받는다」는 틀린 선언이 되기 때문이다. 비어 있음은 「인증이 없다」가 아니다. 규약 정본은 공유계약 D-5 와 공통 도메인 API 요구서 1-1절 이다.",
   "x-internal-note": "설계·도출 근거는 uiux/2026-08-13-API스펙-04제품출하/ 의 00~03 단계 문서다. 대상 화면 16 — 도메인 배지 18 에서 출력물 계약이 덮는 P-04-01·P-04-04 를 뺀 것이다. 리소스 5 · 라인 4 · 읽기만 1 · 액션 근거 147건(화면 액션 표 · 본문 도출 0). 미해소를 계약이 드러낸다 — ⛔⛔ 처분 결정을 만드는 화면이 인벤토리 116 전체에 0건이라 세 화면(W-04-10·W-04-11·P-04-03)의 진입 목록이 빈다 «(정합주: 2026-09-01 — ⭐ 2026-08-13 DR-008 확정 3-A 로 처분 판정 화면 W-03-10 이 신설돼 해소됐다)». ⛔ 01 계약에 POST /inventory/reservations 가 없어 M-04-01 제품 피킹이 걸린다. omf-mes#117(재구성 이벤트 기록 테이블 부재)로 M-04-03 되돌리기 경로를 두지 않았다. omf-mes#118 로 선별 실행 경로를 두지 않았다."
  },
  "servers": [
@@ -342,7 +342,7 @@
       "format": "int64",
       "example": 1001
      }
-   }
+    }
    ],
    "get": {
     "tags": [
@@ -610,7 +610,9 @@
        "format": "date",
        "example": "2026-08-13"
       },
-      "description": "필수 — 공유계약 L-3"
+      "description": "출하일 시작 날짜 이상. 필수이며 누락 시 400 REQUIRED. itemId 등 다른 필터가 있어도 필수다. 서버가 화면 이름으로 오늘을 자동 대입하지 않는다. 목록과 요약은 동일 조건으로 조회한다.",
+      "required": true,
+      "x-internal-note": "PR #509 재검토 승인: 통보201의 기존 시작일 필수를 required:true로 정식 표현한다. 요청 형식 optional→required 승격(⛔). M-04-01은 오늘 두 날짜, W-04-05는 표시된 기간을 전송한다."
      },
      {
       "name": "shipDateTo",
@@ -619,7 +621,8 @@
        "type": "string",
        "format": "date",
        "example": "2026-08-13"
-      }
+      },
+      "description": "출하일 끝 날짜. date 기준 From 이상 · To 이하이다. 선택이며 생략 시 상한 미지정이다. shipDateFrom은 항상 필수이므로 To만 전송하면 400 REQUIRED. 서버가 생략한 To를 오늘로 자동 대입하지 않는다."
      },
      {
       "name": "pickingCompleteOnly",
@@ -689,6 +692,16 @@
           "items",
           "page"
          ]
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "shipDateFrom 누락 시 400 REQUIRED. shipDateTo는 선택이며 기존 날짜·요청 검증은 유지한다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
         }
        }
       }
@@ -841,7 +854,9 @@
        "format": "date",
        "example": "2026-08-13"
       },
-      "description": "필수 — 공유계약 L-3. 목록과 같은 기준을 쓴다"
+      "description": "출하일 시작 날짜 이상. 필수이며 누락 시 400 REQUIRED. itemId 등 다른 필터가 있어도 필수다. 서버가 화면 이름으로 오늘을 자동 대입하지 않는다. 목록과 요약은 동일 조건으로 조회한다.",
+      "required": true,
+      "x-internal-note": "PR #509 재검토 승인: 통보201의 기존 시작일 필수를 required:true로 정식 표현한다. 요청 형식 optional→required 승격(⛔). M-04-01은 오늘 두 날짜, W-04-05는 표시된 기간을 전송한다."
      },
      {
       "name": "shipDateTo",
@@ -850,7 +865,8 @@
        "type": "string",
        "format": "date",
        "example": "2026-08-13"
-      }
+      },
+      "description": "출하일 끝 날짜. date 기준 From 이상 · To 이하이다. 선택이며 생략 시 상한 미지정이다. shipDateFrom은 항상 필수이므로 To만 전송하면 400 REQUIRED. 서버가 생략한 To를 오늘로 자동 대입하지 않는다."
      },
      {
       "name": "pickingCompleteOnly",
@@ -888,6 +904,16 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/ShipmentRequestSummary"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "shipDateFrom 누락 시 400 REQUIRED. shipDateTo는 선택이며 기존 날짜·요청 검증은 유지한다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
         }
        }
       }
@@ -1721,7 +1747,7 @@
      "quality"
     ],
     "summary": "부적합 목록",
-    "description": "W-04-07 조회·필터. 상태는 의뢰 전 · 판정 대기 · 판정 완료 세 값이다 — ⭐ 세 값짜리 진행 단계라 열림/닫힘 두 값으로 판정하지 않는다. 근거: W-04-07 §5",
+    "description": "등록된 부적합 목록. 상태는 의뢰 전·판정 대기·판정 완료이다. 정확히 statusCode=PENDING_DECISION이면 openedFrom·openedTo를 함께 생략할 수 있다. 다른 상태 또는 상태 없음에서 둘 다 생략하면 400 REQUIRED. 상태와 관계없이 한쪽만 전송하면 누락 쪽 400 REQUIRED. 둘 다 있으면 기존 필터와 교집합이다. warehouseId만으로 기간 예외를 허용하지 않는다. 기존 인증·공장/데이터 범위·페이지·정렬을 유지한다.",
     "parameters": [
      {
       "name": "statusCode",
@@ -1730,7 +1756,7 @@
        "type": "string",
        "example": "NOT_REQUESTED"
       },
-      "description": "부적합 건의 진행 상태 — 의뢰 전(NOT_REQUESTED) · 판정 대기(PENDING_DECISION) · 판정 완료(DECIDED). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 이 값이 처분 판정 화면의 진입 목록을 가른다(W-04-07 §3 · W-03-10 §5-5). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=NONCONFORMANCE_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "부적합 건의 진행 상태 — 의뢰 전(NOT_REQUESTED) · 판정 대기(PENDING_DECISION) · 판정 완료(DECIDED). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. 이 값이 처분 판정 화면의 진입 목록을 가른다(W-04-07 §3 · W-03-10 §5-5). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=NONCONFORMANCE_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. 정확히 PENDING_DECISION이면 openedFrom·openedTo를 함께 생략할 수 있다. 다른 상태나 상태 생략에는 이 예외를 적용하지 않는다.",
       "x-code-key": "CD-NONCONFORMANCE-STATUS"
      },
      {
@@ -1792,7 +1818,7 @@
        "format": "date-time",
        "example": "2026-08-13T10:22:00+09:00"
       },
-      "description": "기간 필수 — 공유계약 L-3"
+      "description": "접수 시작 시각 이상. openedTo와 함께 필수이나 정확히 statusCode=PENDING_DECISION일 때만 두 날짜 함께 생략 가능하다. 한쪽만 전송하면 상태와 관계없이 누락 쪽 400 REQUIRED. 두 날짜를 보내면 상태·창고 등과 교집합이다."
      },
      {
       "name": "openedTo",
@@ -1801,7 +1827,8 @@
        "type": "string",
        "format": "date-time",
        "example": "2026-08-13T10:22:00+09:00"
-      }
+      },
+      "description": "접수 끝 시각 미만. openedFrom과 함께 전송한다. 정확히 statusCode=PENDING_DECISION일 때만 두 날짜 함께 생략 가능하며 한쪽만 전송은 400 REQUIRED."
      },
      {
       "name": "page",
@@ -1847,8 +1874,19 @@
         }
        }
       }
+     },
+     "400": {
+      "description": "기간 검증 실패: statusCode=PENDING_DECISION 이외에서 기간 둘 다 누락 또는 상태와 무관하게 한쪽만 전송하면 400 REQUIRED. 기존 ID 형식·범위 검증 유지.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
      }
-    }
+    },
+    "x-internal-note": " PR #509 재검토: 통보186 일반 기간 필수를 보존하고 W-03-10·W-04-11의 기존 PENDING_DECISION 미처리에만 새로운 기간 생략 예외를 승인했다. W-04-07 진입은 기존 disposition-candidates이며 이 예외의 근거가 아니다."
    },
    "post": {
     "tags": [
@@ -3475,6 +3513,14 @@
       "type": "integer",
       "format": "int64",
       "example": 1001
+     },
+     "itemCode": {
+      "type": "string",
+      "maxLength": 50,
+      "readOnly": true,
+      "example": "FG-1001",
+      "description": "화면이 보이는 품목 코드. 식별자를 사람이 읽는 값으로 바꾸려 마스터를 다시 부르지 않게 한다 — 모바일은 오프라인에서 그 마스터를 갱신할 수 없다. 근거: M-04-01 §3 목업 「FG-1001 배정 300 · 피킹 120」 · §6 「이 라인의 품목이 아닙니다」",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 품목 마스터의 행을 가리킨다 — Item.itemCode 가 같은 판정으로 이미 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      },
      "requestedQty": {
       "type": "number",

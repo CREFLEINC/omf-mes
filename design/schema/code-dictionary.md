@@ -1,7 +1,7 @@
 # 코드 사전 (2026-09-02)
 
-> ⭐ **완성 — 177키 / 514자리.** 공유계약 `G-32` 등록부 **104그룹 전부**와 계약이
-> `enum` 으로 닫은 자리를 담는다. 계약 `*Code(s)` 자리 **665 전건**이 판정을
+> ⭐ **완성 — 177키 / 518자리.** 공유계약 `G-32` 등록부 **104그룹 전부**와 계약이
+> `enum` 으로 닫은 자리를 담는다. 계약 `*Code(s)` 자리 **670 전건**이 판정을
 > 받았다(판정 없음 0 · 2026-09-03). ⚠ 「639」로 적었던 앞선 수는 **경로 안에 «인라인»으로 정의된 스키마와 배열 `items` 안의 자리를 세지 않은 분모**였다 — 검사기 ㉨ 가 그 사각지대를 없앴다. `check-code-dictionary.py` 가 ⓪ 규칙으로 «막는다» —
 > 등록부에 이름이 오르면 여기에도 행이 있어야 한다.
 > «(정합주: 2026-09-03 — 1차 완성 시점의 「103키 / 257자리 · 62그룹 · 41종」을 지금 수치로
@@ -92,7 +92,7 @@ CD-<계열>-<축>
 
 ---
 
-## 사전 — **177키 / 514자리**
+## 사전 — **177키 / 518자리**
 
 | 소유 | 키 |
 | --- | :-: |
@@ -182,7 +182,7 @@ CD-<계열>-<축>
 | `CD-EQUIPMENT-BREAKDOWN-CAUSE` | ⬜ | `EQUIPMENT_BREAKDOWN_CAUSE` | `causeCode` | `registry` | 3 | 설비 고장 원인 — `BreakdownHandling`·`BreakdownHandlingUpdate`·`BreakdownComplete`. 고객 관리 활성값의 자연키를 사용한다(통보 090 · `omf-mes#514`). 초기 값 원문이 없어 예시를 시드로 승격하지 않는다 |
 | `CD-EQUIPMENT-BREAKDOWN-STATUS` | `RECEIVED` `HANDLING` `DONE` | `EQUIPMENT_BREAKDOWN_STATUS` | `statusCode` | `registry-system` | 2 | 고장 접수. **값이 계약 산문에 이미 있었다**(2026-09-02 꺼냄) · `W-05-04` |
 | `CD-EQUIPMENT-INSPECTION-JUDGMENT-METHOD` | `VISUAL` `MEASUREMENT` | `EQUIPMENT_INSPECTION_JUDGMENT_METHOD` | `judgmentMethodCode` | `registry-system` | 5 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
-| `CD-EQUIPMENT-INSPECTION-RESOLVED-FROM-LEVEL` | `EQUIPMENT` `EQUIPMENT_GROUP` `NONE` | — | `resolvedFromLevelCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `EquipmentInspectionItemAssignmentsResponse`(`mdm-기준정보`) **한 자리**. ⚠ 계수 `2` 는 가름 회차(`b0becc5`)의 전사 오류였다 — **가름은 자리를 늘리지 않는다**(옛 `CD-RESOLVED-FROM-LEVEL` 이 1 이었고 설비 점검 1 + 작업 캘린더 1 로 나뉜 것뿐이다 · 2026-09-03 정정). ⭐ **2026-09-03 개명·가름** — 작업 캘린더의 같은 이름과 «값집합이 다르다»(그쪽은 `EQUIPMENT_GROUP`·`PLANT`). 한 그룹으로 묶으면 화면이 남의 선택지를 본다(`B-28`). 접두 규약은 결정 1 「가」 |
+| `CD-EQUIPMENT-INSPECTION-RESOLVED-FROM-LEVEL` | `EQUIPMENT` `EQUIPMENT_GROUP` `NONE` | — | `resolvedFromLevelCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `EquipmentInspectionItemAssignmentsResponse`(`mdm-기준정보`) **두 자리**(설비 하나짜리 조회와 배치 조회). ⚠ 계수 `2` 는 가름 회차(`b0becc5`)의 전사 오류였다 — **가름은 자리를 늘리지 않는다**(옛 `CD-RESOLVED-FROM-LEVEL` 이 1 이었고 설비 점검 1 + 작업 캘린더 1 로 나뉜 것뿐이다 · 2026-09-03 정정). ⭐ **2026-09-03 개명·가름** — 작업 캘린더의 같은 이름과 «값집합이 다르다»(그쪽은 `EQUIPMENT_GROUP`·`PLANT`). 한 그룹으로 묶으면 화면이 남의 선택지를 본다(`B-28`). 접두 규약은 결정 1 「가」 ⭐ **2026-09-09 로 다시 2 가 됐다 — 이번에는 «자리가 실제로 늘어서»다**(설비 여러 대를 한 번에 받는 조회 신설). |
 | `CD-EQUIPMENT-INSPECTION-TYPE` | `DAILY` `MONTHLY` `MAINTENANCE` | `EQUIPMENT_INSPECTION_TYPE` | `inspectionTypeCode` | `registry` | 8 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
 | `CD-EQUIPMENT-STATUS` | `IN_SERVICE` `DISPOSED` | `EQUIPMENT_STATUS` | `statusCode` | `registry-system` | 4 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
 | `CD-EQUIPMENT-TYPE` | `INJECTION_MOLDING` `PRESS` `WATER_HEATER` | `EQUIPMENT_TYPE` | `equipmentTypeCode` | `registry` | 4 | 설비 계열. `#186` · 통지 `client#415` |
@@ -283,7 +283,7 @@ CD-<계열>-<축>
 | `CD-REINSPECTION-REASON` | ⬜ | `REINSPECTION_REASON` | `reinspectionReasonCode` | `registry` | 2 | 재검사 사유. ⭐ 번복은 「수정」이 아니라 «재검사 회차»라 이 사유가 그 회차의 근거다 |
 | `CD-REISSUE-REASON` | `DAMAGED` `LOST` `PRINT_FAILURE` `PACKAGING` `QUANTITY_CHANGE` | `REISSUE_REASON` | `reissueReasonCode` | `registry` | 2 | 출력물 재발행 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-REMAINDER-DISPOSITION` | `CARRY_OVER` `WRITE_OFF` | — | `remainderDispositionCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `WorkOrderClose`(`production-02생산실행`) |
-| `CD-REPACK-TYPE` | `MERGE` `RECONFIGURE` `SPLIT` | — | `repackTypeCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `HandlingUnitRepackEvent`(`logistics-01자재창고`) |
+| `CD-REPACK-TYPE` | `MERGE` `RECONFIGURE` `SPLIT` | — | `repackTypeCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `HandlingUnitRepackEvent` 와 재구성 확정 요청 본문(`PUT /inventory/handling-units/{handlingUnitId}/contents`) 둘 다 `logistics-01자재창고` 다 |
 | `CD-REPAIR-RESULT` | `FAILED` `SUCCEEDED` | — | `repairResultCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `RepairExecution` · `RepairExecutionReturn`(`production-02생산실행`) |
 | `CD-RESERVATION-TYPE` | `MATERIAL` `SHIPMENT` `PRODUCTION` | `RESERVATION_TYPE` | `reservationTypeCode` | `registry` | 1 | 재고예약 유형. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-RESOURCE-TYPE` | `EQUIPMENT` `MOLD` `WORKER` | — | `resourceTypeCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `WorkOrderResourcePlan` · `WorkOrderResourcePlanCreate`(`production-02생산실행`) |
@@ -309,7 +309,7 @@ CD-<계열>-<축>
 | `CD-TOOL-USAGE-COLLECTION-METHOD` | `DIRECT` `CONVERTED` | — | `collectionMethodCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `ToolUsage`·`ToolUsageCreate`(`equipment-05설비툴`). ⛔ 환산 파라미터가 걸리는 갈래가 `CONVERTED` 하나라 «구조»를 가른다 |
 | `CD-TRIGGER-TYPE` | `EVENT` `TIME_SCHEDULE` | — | `triggerTypeCode` | `enum` | 3 | 계약이 `enum` 으로 닫은 값 — `InterfaceDefinition` · `InterfaceDefinitionCreate`(`mdm-기준정보`) |
 | `CD-VALUE-STATUS` | `AVAILABLE` `NOT_YET` `PARTIAL` | — | `valueStatusCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `DashboardCard`(`app-공통`) |
-| `CD-VARIANCE-REASON` | `MISPLACED` `DAMAGED_IN_TRANSIT` `SPILL` `COUNT_ERROR` `THEFT_LOSS` `EVAPORATION_LOSS` | `VARIANCE_REASON` | `varianceReasonCode` | `registry` | 4 | 재고실사·생산창고입고 차이 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
+| `CD-VARIANCE-REASON` | `MISPLACED` `DAMAGED_IN_TRANSIT` `SPILL` `COUNT_ERROR` `THEFT_LOSS` `EVAPORATION_LOSS` | `VARIANCE_REASON` | `varianceReasonCode` | `registry` | 6 | 재고실사·생산창고입고·**제품입고** 차이 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-WAREHOUSE-TYPE` | `MATERIAL` `PRODUCT` `SPARE_PART` `GENERAL` | `WAREHOUSE_TYPE` | `warehouseTypeCode` | `registry` | 4 | 공유계약 `G-32` 등록부 표의 근거 칸에서 옮겼다 |
 | `CD-WORK-CALENDAR-DAY-REASON` | `PUBLIC_HOLIDAY` `COMPANY_FOUNDING_DAY` `SUMMER_VACATION` `PLANNED_MAINTENANCE` `MAKEUP_WORKING_DAY` `OTHER` | `WORK_CALENDAR_DAY_REASON` | `reasonCode` | `registry` | 1 | 근무캘린더 예외일 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-WORK-CALENDAR-RESOLVED-FROM-LEVEL` | `EQUIPMENT_GROUP` `PLANT` | — | `resolvedFromLevelCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `WorkCalendarEffectiveResponse`(`mdm-기준정보`). ⭐ **2026-09-03 신설** — 부재를 `null` 로 표현한다(설비 점검 쪽은 `NONE` «값»으로 표현해 값집합이 다르다 · `B-28`) |

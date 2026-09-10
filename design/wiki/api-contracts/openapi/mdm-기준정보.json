@@ -3,7 +3,7 @@
  "info": {
   "title": "omf-mes 기준정보 도메인 API (초안)",
   "version": "0.1.0",
-  "description": "기준정보 도메인 API 계약. 필드가 무엇을 받는지·필수 여부·값 목록은 이 계약이 정한다 — 물리 모델은 타입·길이만 따른다. 마스터 형 패턴에 개별 「변경 이력」(/history) 엔드포인트는 두지 않는다 — 전 마스터의 변경 이력은 횡단 조회 GET /audit/events 하나로 받으며, 원본 컬럼(beforeValue·afterValue 포함)을 해석하지 않고 그대로 노출한다.",
+  "description": "기준정보 도메인 API 계약. 필드가 무엇을 받는지·필수 여부·값 목록은 이 계약이 정한다 — 물리 모델은 타입·길이만 따른다. 마스터 형 패턴에 개별 「변경 이력」(/history) 엔드포인트는 두지 않는다 — 전 마스터의 변경 이력은 횡단 조회 GET /audit/events 하나로 받으며, 원본 컬럼(beforeValue·afterValue 포함)을 해석하지 않고 그대로 노출한다.\n\n인증 규약은 이 파일이 오퍼레이션마다 선언하지 않는다. 현장 단말과 모바일은 단말 토큰을 Authorization: Bearer 로 싣고, 쓰기에는 귀속용 사번 헤더(X-Worker-No)를 함께 싣는다 — 그 헤더는 각 쓰기 오퍼레이션이 선언한다. 스킴 정의는 공통 계약 한 벌(app-공통)이 갖는다. 관리웹 계정 토큰의 운반 수단이 아직 확정되지 않아 오퍼레이션별 security 배선을 «의도적으로» 비워 두었다 — 관리웹과 현장 셸이 같은 오퍼레이션을 공유하는 자리가 있어 단말 토큰만 배선하면 「단말 토큰만 받는다」는 틀린 선언이 되기 때문이다. 비어 있음은 「인증이 없다」가 아니다. 규약 정본은 공유계약 D-5 와 공통 도메인 API 요구서 1-1절 이다.",
   "x-internal-note": "근거·맥락은 deliverables/06-API-요구서.md 를 본다. WBS P0.4 API 계약 v0 의 초안 입력이며 계약 확정·소유는 통합 Agent 소관이다. /history 를 두지 않는 이유는 이슈 omf-mes#68(→ 지금은 omf-mes-server#74) 해소 전이기 때문이다 — target_id 가 FK 가 아니고 before_value/after_value jsonb 의 키 규약이 없어 지금 만들면 필드를 지어내게 된다. 횡단 조회 근거 = W-06-11 §4-A·§5-1."
  },
  "servers": [
@@ -11291,6 +11291,92 @@
     }
    }
   },
+  "/mdm/equipments/inspection-items": {
+   "get": {
+    "tags": [
+     "mdm"
+    ],
+    "summary": "여러 설비의 점검 항목 — 한 번에",
+    "description": "여러 설비의 점검 항목 부여와 해석 결과를 한 번에 돌려준다.\n\n현장 앱은 통신이 끊긴 상태에서도 점검을 시작해야 하므로 앱을 열 때 설비별 부여를 미리 받아 둔다. 공장 설비가 수십에서 수백이면 설비 하나씩 부르는 것으로는 그 시점에 다 받을 수 없다.\n\n요청한 설비를 «전건» 돌려준다 — 부여가 없는 설비도 resolvedFromLevelCode 를 NONE 으로 함께 낸다. 빠뜨리면 화면이 「아직 못 받았다」와 「점검 대상이 아니다」를 구분할 수 없다. 근거: M-05-01 §6 · 공유계약 C-11 · C-13 · G-9 존재하고 조회가 허용된 설비만 NONE(부여 없음)으로 표현한다. 미존재 설비는 404, 인증 실패는 401, 권한·공장 범위 밖은 403이며 요청 전체가 실패한다. 오류를 NONE이나 누락된 성공 항목으로 바꾸지 않는다. 설비 ID 중복은 하나로 정규화하며 응답은 유일 ID당 한 항목이다. 해석 우선순위·effective 값의 의미는 단일 설비 점검 부여 조회와 같다.",
+    "parameters": [
+     {
+      "name": "equipmentIds",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 1000,
+       "items": {
+        "type": "integer",
+        "format": "int64"
+       }
+      },
+      "style": "form",
+      "explode": false,
+      "example": [
+       1001,
+       1002,
+       1003
+      ],
+      "description": "설비 식별자 목록. 쉼표로 이어 보낸다. 상한 1000 은 같은 형태의 배치 조회(GET /app/document-issues/summary)와 같은 수다."
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "설비별 부여와 해석 결과 — 요청한 전건",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/EquipmentInspectionItemAssignmentsBatchResponse"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "equipmentIds 가 비었거나 상한을 넘었다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "인증 실패",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "요청 설비의 조회 권한 또는 공장 범위 밖",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "요청한 설비가 존재하지 않음",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-internal-note": "형태는 GET /app/document-issues/summary 를 옮긴 것이다 — 배치 조회이고 쪽을 두지 않는다(요청한 전건을 낸다). 상한 1000 도 그 선례와 같은 수다. ⛔ 설비 수만큼 건별로 부르는 안은 기각했다 — 공유계약 C-13 규칙 2 가 「받기 전에는 다음 화면으로 넘기지 않는다」이므로 앱 시작이 설비 수만큼의 왕복에 묶이고, 상한·부분 실패·재수신 주기를 새로 정해야 한다. ⛔ 오프라인 선반입 제외 안도 기각했다 — M-05-01 §6 이 오프라인 허용을 판정으로 세웠고 점검 항목을 캐시 금지 목록에서 명시적으로 뺐다. 근거: omf-mes 요청서 001"
+   }
+  },
   "/mdm/molds": {
    "get": {
     "tags": [
@@ -21735,6 +21821,70 @@
       "example": 1001,
       "format": "int64",
       "description": "EQUIPMENT_GROUP 에서 왔을 때 그 그룹"
+     }
+    }
+   },
+   "EquipmentInspectionItemAssignmentsBatchItem": {
+    "type": "object",
+    "required": [
+     "equipmentId",
+     "assigned",
+     "effective",
+     "resolvedFromLevelCode"
+    ],
+    "description": "설비 하나의 몫. 칸 넷의 뜻은 설비 하나짜리 조회(GET /mdm/equipments/{equipmentId}/inspection-items)의 응답과 같다.",
+    "properties": {
+     "equipmentId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "assigned": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/InspectionItemAssignment"
+      }
+     },
+     "effective": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/InspectionItemAssignment"
+      }
+     },
+     "resolvedFromLevelCode": {
+      "type": "string",
+      "enum": [
+       "EQUIPMENT",
+       "EQUIPMENT_GROUP",
+       "NONE"
+      ],
+      "example": "EQUIPMENT_GROUP",
+      "description": "effective 가 어느 층에서 왔는가 — 설비(EQUIPMENT) · 설비그룹(EQUIPMENT_GROUP) · 없음(NONE). NONE 이면 점검 대상이 아니며 화면은 입력을 열지 않는다.",
+      "x-code-key": "CD-EQUIPMENT-INSPECTION-RESOLVED-FROM-LEVEL"
+     },
+     "resolvedFromGroupId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "example": 1001,
+      "description": "EQUIPMENT_GROUP 에서 왔을 때 그 그룹"
+     }
+    }
+   },
+   "EquipmentInspectionItemAssignmentsBatchResponse": {
+    "type": "object",
+    "required": [
+     "items"
+    ],
+    "properties": {
+     "items": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/EquipmentInspectionItemAssignmentsBatchItem"
+      },
+      "description": "요청한 설비 전건. 순서는 보장하지 않는다 — equipmentId 로 맞춘다"
      }
     }
    },
