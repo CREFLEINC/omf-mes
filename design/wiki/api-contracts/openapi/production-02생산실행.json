@@ -458,16 +458,6 @@
         }
        }
       }
-     },
-     "500": {
-      "description": "필수 공정 참조를 해석할 수 없는 내부 데이터 오류",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ErrorResponse"
-        }
-       }
-      }
      }
     }
    },
@@ -577,16 +567,6 @@
      },
      "404": {
       "description": "없다",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ErrorResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "필수 공정 참조를 해석할 수 없는 내부 데이터 오류",
       "content": {
        "application/json": {
         "schema": {
@@ -2499,6 +2479,16 @@
         }
        }
       }
+     },
+     "500": {
+      "description": "필수 공정 참조를 해석할 수 없는 내부 데이터 오류",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
      }
     }
    },
@@ -2636,6 +2626,16 @@
      },
      "404": {
       "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "필수 공정 참조를 해석할 수 없는 내부 데이터 오류",
       "content": {
        "application/json": {
         "schema": {
