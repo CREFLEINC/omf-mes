@@ -2395,19 +2395,23 @@
       "schema": {
        "type": "string",
        "enum": [
+        "workOrderNo",
         "workOrderNo,asc",
         "workOrderNo,desc",
+        "plannedStartAt",
         "plannedStartAt,asc",
         "plannedStartAt,desc",
+        "statusCode",
         "statusCode,asc",
         "statusCode,desc",
+        "priorityNo",
         "priorityNo,asc",
         "priorityNo,desc"
        ],
        "default": "priorityNo,asc"
       },
-      "description": "W/O 번호·계획 시작 시각·상태·우선순위 네 키와 asc·desc만 받는다. achievementRate는 응답에 표시하는 파생 값이지만 정렬 키가 아니며 보내면 400 INVALID(field=sort)다. 근거: 공유계약 L-4",
-      "x-internal-note": "서버 지원 정렬 키와 W-02-08 화면을 정합했다: omf-mes#564"
+      "description": "W/O 번호·계획 시작 시각·상태·우선순위 네 키를 받는다. 방향은 asc·desc이며 생략하면 asc다. achievementRate는 응답에 표시하는 파생 값이지만 정렬 키가 아니며 보내면 400 INVALID(field=sort)다.",
+      "x-internal-note": "서버 지원 정렬 키와 W-02-08 화면을 정합했다: 공유계약 L-4 · omf-mes#564"
      },
      {
       "name": "withProgress",
