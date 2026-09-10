@@ -229,7 +229,7 @@
        "type": "boolean",
        "example": true
       },
-      "description": "아직 포장에 담기지 않은 것만 — 배분 잔여가 남은 것"
+      "description": "아직 포장에 연결되지 않은 배분만. handlingUnitId가 빈 배분이다"
      },
      {
       "name": "oqcPassed",
@@ -378,7 +378,7 @@
      "shipment"
     ],
     "summary": "배분에 포장 단위 연결",
-    "description": "P-04-01 이 포장을 확정할 때 배분과 취급 단위를 잇는다. 취급 단위 자체는 01 자재창고 계약이 소유한다(POST /inventory/handling-units · :pack). 근거: P-04-01 §4-C",
+    "description": "배분 한 건 전체와 취급 단위 하나를 잇는다. 수량을 받지 않으며 한 배분의 부분 포장은 지원하지 않는다",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -449,7 +449,7 @@
       }
      }
     },
-    "x-internal-note": "If-Match 를 쓰지 않는다 — shipment_lot_allocation 에 version_no 가 없다(기록 전용). 같은 배분에 다른 포장이 이미 붙어 있으면 409 다."
+    "x-internal-note": "포장 확정 화면은 P-04-01 §3-2이다. 취급 단위 생성·포장은 01 자재창고 계약 POST /inventory/handling-units·:pack이 소유한다. If-Match를 쓰지 않는다 — shipment_lot_allocation에 version_no가 없다(기록 전용). 같은 배분에 다른 포장이 이미 붙어 있으면 409다."
    }
   },
   "/logistics/stock-reinstatements": {
@@ -3209,7 +3209,7 @@
      "packedQty": {
       "type": "number",
       "format": "double",
-      "description": "이미 포장에 담긴 수량. 배분 잔여 = allocatedQty − packedQty 를 서버가 파생한다(L-2) ⛔ 없으면 화면이 잔여를 계산할 수 없다 — 항상 내린다(P-04-01 §5-6).",
+      "description": "포장 연결 상태를 수량으로 표시한다. handlingUnitId가 비어 있으면 0, 채워져 있으면 allocatedQty와 같다. 중간 수량은 지원하지 않는다",
       "example": 120.0
      }
     },
@@ -3275,7 +3275,8 @@
     "required": [
      "handlingUnitId"
     ],
-    "description": "포장 연결. P-04-01 이 포장을 확정할 때 배분에 포장 단위를 잇는다"
+    "description": "포장 연결. 배분 한 건 전체를 포장 단위 하나에 잇는다. 수량을 받지 않으므로 부분 포장은 표현하지 않는다",
+    "x-internal-note": "근거: P-04-01 §3-2 · omf-mes#598"
    },
    "ShipmentRequest": {
     "type": "object",
