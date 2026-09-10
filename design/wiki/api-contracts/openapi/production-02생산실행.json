@@ -2574,7 +2574,7 @@
       }
      }
     },
-    "x-internal-note": "2026-08-26 — 501(상류 미해소)을 걷었다. 긴급 W/O 가 계획 없이 서야 하는데 물리 모델의 NOT NULL 체인에 막혀 있던 건이다(omf-mes#76). ⭐ W-02-07 §5-2 의 ①안(내부 ERP W/O 자동 생성)으로 확정했다 — 「ERP W/O 비귀속」은 「ERP ERP W/O 에 귀속되지 않는다」는 뜻이고, erp_order_no 가 nullable 이라 데이터가 이미 허용한다. ②안(계획 참조 nullable 화)은 택하지 않았다 — 「계획이 없을 수 있다」가 모든 W/O 조회의 예외가 되어 비용이 하류 전체로 퍼진다. ①은 비용을 발행 트랜잭션 한 곳에 가둔다."
+    "x-internal-note": "2026-08-26 — 501(상류 미해소)을 걷었다. 긴급 W/O 가 계획 없이 서야 하는데 물리 모델의 NOT NULL 체인에 막혀 있던 건이다(omf-mes#76). ⭐ W-02-07 §5-2 의 ①안(내부 ERP W/O 자동 생성)으로 확정했다 — 「ERP W/O 비귀속」은 「ERP W/O 에 귀속되지 않는다」는 뜻이고, erp_order_no 가 nullable 이라 데이터가 이미 허용한다. ②안(계획 참조 nullable 화)은 택하지 않았다 — 「계획이 없을 수 있다」가 모든 W/O 조회의 예외가 되어 비용이 하류 전체로 퍼진다. ①은 비용을 발행 트랜잭션 한 곳에 가둔다."
    }
   },
   "/production/work-orders/{workOrderId}": {
@@ -6240,7 +6240,8 @@
      },
      "workOrderNo": {
       "type": "string",
-      "example": "WO-DEMO-001"
+      "example": "W/O-DEMO-001",
+      "description": "표시용 작업지시 번호. 목록·도면의 「W/O-…」 표기가 이 값이다. 표기 규약은 공유계약 G-35 가 정한다."
      },
      "productionPlanId": {
       "type": "integer",
