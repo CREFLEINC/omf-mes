@@ -3517,7 +3517,7 @@
      "production"
     ],
     "summary": "작업 시작 — 세션 열기",
-    "description": "단말 게이팅(can_start_work)을 서버가 강제한다. 통제 우회는 controlOverride 로 함께 보낸다. ⛔ 오프라인 대상이 아니다 — 이 오퍼레이션을 부르는 화면은 온라인에서만 세션을 연다 (P-02-01 §6-1 · P-02-02 §6-1). 여는 조건이 전부 «판정값»이라(can_start_work · 점검 이력 · W/O 상태) 캐시하면 차단해야 할 작업이 열린다 — 공유계약 C-14 가 그렇게 가르고, C-18 이 이 화면을 소비자 쪽 대표 사례로 이름 붙였다. ⛔ 셸의 outbox 에 담지 않는다. ⛔ 큐 접수 202 를 두지 않는다 — 오프라인이면 HTTP 요청 자체가 일어나지 않아 서버가 202 를 보낼 자리가 없다 (2026-08-12 정정 · omf-mes-client#97). Idempotency-Key 는 필수다 — 오프라인 큐 때문이 아니라 재시도 중복을 막기 위해서다(공유계약 C-8). If-Match 는 선택이다 — 신규 생성이라 대조할 version_no 가 아직 없다(공유계약 C-9 의 큐 조항과는 무관하다). 근거: P-02-01 §5-1·§6-1 · P-02-02 §6-1 · 공유계약 F-1·F-6·C-14·C-18",
+    "description": "단말 게이팅(can_start_work)을 서버가 강제한다. 통제 우회는 controlOverride 로 함께 보낸다. X-Worker-No는 요청 작업자의 유효성을 확인하지만 참여 명단을 만들지 않는다. 참여자는 workerIds에 명시한 경우에만 기록하며, workerIds를 생략하거나 빈 배열로 보내면 참여자 0명으로 세션이 열린다. ⛔ 오프라인 대상이 아니다 — 이 오퍼레이션을 부르는 화면은 온라인에서만 세션을 연다 (P-02-01 §6-1 · P-02-02 §6-1). 여는 조건이 전부 «판정값»이라(can_start_work · 점검 이력 · W/O 상태) 캐시하면 차단해야 할 작업이 열린다 — 공유계약 C-14 가 그렇게 가르고, C-18 이 이 화면을 소비자 쪽 대표 사례로 이름 붙였다. ⛔ 셸의 outbox 에 담지 않는다. ⛔ 큐 접수 202 를 두지 않는다 — 오프라인이면 HTTP 요청 자체가 일어나지 않아 서버가 202 를 보낼 자리가 없다 (2026-08-12 정정 · omf-mes-client#97). Idempotency-Key 는 필수다 — 오프라인 큐 때문이 아니라 재시도 중복을 막기 위해서다(공유계약 C-8). If-Match 는 선택이다 — 신규 생성이라 대조할 version_no 가 아직 없다(공유계약 C-9 의 큐 조항과는 무관하다). 근거: P-02-01 §5-1·§6-1 · P-02-02 §6-1 · 공유계약 F-1·F-6·C-14·C-18",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -3769,7 +3769,7 @@
      "production"
     ],
     "summary": "세션 작업자 목록",
-    "description": "근거: P-02-01 §5",
+    "description": "세션의 참여 구간 목록. 기본 active=true는 leftAt이 비어 있는 참여만 반환하며 0건도 정상이다. 세션 종료는 참여 구간을 자동 종료하지 않으므로 종료된 세션에서도 명시적으로 이탈하지 않은 참여가 반환될 수 있다.",
     "parameters": [
      {
       "name": "workSessionId",
@@ -3788,7 +3788,7 @@
        "type": "boolean",
        "default": true
       },
-      "description": "떠나지 않은 사람만"
+      "description": "true면 leftAt이 비어 있는 참여, false면 leftAt이 있는 참여만"
      }
     ],
     "responses": {
@@ -3805,14 +3805,15 @@
        }
       }
      }
-    }
+    },
+    "x-internal-note": "참여 0건·종료 뒤 active 잔존 근거: 통보 057·058 · production-work-session.e2e-spec.ts의 workerIds 생략 및 종료 후 이탈 경계 · omf-mes#581"
    },
    "post": {
     "tags": [
      "production"
     ],
     "summary": "작업자 참여",
-    "description": "세션을 닫지 않고 사람을 더한다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다. 미확정 표식은 셸이 붙인다(공유계약 C-7 — 화면 조항).",
+    "description": "세션을 닫지 않고 참여 구간을 더한다. 종료된 세션에는 새로 참여할 수 없다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다. 미확정 표식은 셸이 붙인다(공유계약 C-7 — 화면 조항).",
     "parameters": [
      {
       "name": "workSessionId",
@@ -3892,7 +3893,8 @@
        }
       }
      }
-    }
+    },
+    "x-internal-note": "종료 세션 신규 참여 차단 근거: 통보 058 · work-session-worker.service.ts · production-work-session.e2e-spec.ts · omf-mes#581. 참여·이탈을 부르는 화면은 아직 정해지지 않았다."
    }
   },
   "/production/work-sessions/{workSessionId}/workers/{workSessionWorkerId}:leave": {
@@ -3901,7 +3903,7 @@
      "production"
     ],
     "summary": "작업자 이탈",
-    "description": "떠난 시각을 찍는다. 행을 지우지 않는다 — 누가 언제까지 있었는지가 기록이다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다. 미확정 표식은 셸이 붙인다(공유계약 C-7 — 화면 조항). 근거: 공유계약 B-4 의 정신",
+    "description": "떠난 시각을 찍는다. 행을 지우지 않는다 — 누가 언제까지 있었는지가 기록이다. 세션이 종료된 뒤에도 아직 leftAt이 비어 있는 기존 참여는 이 경로로 이탈할 수 있다. 이미 이탈한 참여는 다시 이탈할 수 없다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다. 미확정 표식은 셸이 붙인다(공유계약 C-7 — 화면 조항). 근거: 공유계약 B-4 의 정신",
     "parameters": [
      {
       "name": "workSessionId",
@@ -3988,7 +3990,8 @@
        }
       }
      }
-    }
+    },
+    "x-internal-note": "종료 뒤 기존 참여 이탈 허용 근거: 통보 058 · work-session-worker.service.ts · production-work-session.e2e-spec.ts · omf-mes#581. 참여·이탈을 부르는 화면은 아직 정해지지 않았다."
    }
   },
   "/production/work-sessions/{workSessionId}:end": {
@@ -3997,7 +4000,7 @@
      "production"
     ],
     "summary": "세션 닫기",
-    "description": "끝 시각을 찍어 구간을 닫는다. ⚠ 이 표는 status_code 를 함께 갖는다 — 끝 시각을 찍으면서 status_code 도 「종료」로 옮긴다(공유계약 G-16 의 보완). 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다. 미확정 표식은 셸이 붙인다(공유계약 C-7 — 화면 조항). 근거: 공유계약 G-16 · C-16(큐에서 가장 먼저 보낸다)",
+    "description": "끝 시각을 찍어 세션 구간을 닫는다. 참여 작업자의 leftAt은 자동으로 기록하지 않는다. 따라서 종료 뒤에도 active=true 참여 목록에 명시적으로 이탈하지 않은 참여가 남을 수 있고, 그 기존 참여는 이탈 경로로 닫는다. 새 참여는 허용하지 않는다. ⚠ 이 표는 status_code 를 함께 갖는다 — 끝 시각을 찍으면서 status_code 도 「종료」로 옮긴다(공유계약 G-16 의 보완). 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다. 미확정 표식은 셸이 붙인다(공유계약 C-7 — 화면 조항). 근거: 공유계약 G-16 · C-16(큐에서 가장 먼저 보낸다)",
     "parameters": [
      {
       "name": "workSessionId",
@@ -4080,7 +4083,8 @@
        }
       }
      }
-    }
+    },
+    "x-internal-note": "참여자의 left_at을 자동 기록하지 않는 근거: 통보 058 · work-session-end.service.ts 및 단위·e2e 테스트 · omf-mes#581. stopReasonCode 비사용 결정은 변경하지 않는다."
    }
   },
   "/trace/serial-numbers": {
@@ -7002,7 +7006,7 @@
        "format": "int64",
        "example": 1001
       },
-      "description": "시작 시점 작업자"
+      "description": "시작 시점 참여 작업자 ID 목록. 선택 필드이며 생략하거나 빈 배열이면 참여자 0명으로 세션이 열린다. X-Worker-No의 요청 작업자와는 다른 축이다"
      },
      "controlOverride": {
       "$ref": "#/components/schemas/ControlOverride"
