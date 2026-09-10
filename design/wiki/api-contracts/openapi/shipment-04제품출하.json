@@ -29,7 +29,8 @@
      "shipment"
     ],
     "summary": "출하지시서 목록",
-    "description": "고객사 지시서 수신본. 연계가 채운다 — 등록 경로가 없다. 근거: W-04-01 §5-6",
+    "description": "고객사 지시서 수신본 목록. 각 항목은 전체 lines를 포함하며 라인 수와 요청 수량은 lines에서 확인한다. unassignedOnly=true는 연결된 출하작업지시가 없는 지시서만 반환하고 false 또는 생략은 전체를 반환한다. 응답은 부분편성과 편성완료를 구분하지 않는다.",
+    "x-internal-note": "W-04-01 §3·§5-6·§5-7. 별도 라인 수·합계·편성 상태 필드와 salesOrderId 역방향 필터를 신설하지 않는다.",
     "parameters": [
      {
       "name": "customerId",
@@ -75,7 +76,7 @@
        "type": "boolean",
        "example": true
       },
-      "description": "아직 편성되지 않은 것만 — 「편성 여부」 필터"
+      "description": "true이면 연결된 출하작업지시가 하나도 없는 지시서만 반환한다. false 또는 생략은 필터를 적용하지 않아 전체를 반환한다"
      },
      {
       "name": "q",
@@ -522,7 +523,8 @@
      "shipment"
     ],
     "summary": "출하작업지시 목록",
-    "description": "W-04-02 출하 예정 목록. 기간이 필수다(공유계약 L-3). 근거: W-04-02 §5",
+    "description": "출하작업지시 목록. 기간 시작은 필수다. 각 항목은 전체 lines를 포함하며 요청·배정·출하 수량과 라인 수는 lines에서 계산한다.",
+    "x-internal-note": "W-04-02 §3·§4-A·§5. 행 단위 합계 필드를 신설하지 않는다.",
     "parameters": [
      {
       "name": "customerId",
@@ -2706,6 +2708,7 @@
      },
      "lines": {
       "type": "array",
+      "description": "목록과 단건 응답에 항상 포함되는 전체 지시서 라인. 라인 수와 요청 수량은 이 배열에서 확인한다",
       "items": {
        "$ref": "#/components/schemas/SalesOrderLine"
       }
@@ -2721,7 +2724,8 @@
      "customerId",
      "shipToPartnerId",
      "orderDate",
-     "statusCode"
+     "statusCode",
+     "lines"
     ],
     "description": "고객사 출하지시서 수신본. 기존 고객사 엑셀 import·ERP 수신 원천과 식별자 데이터는 보존한다. 이번 버전 출하 ERP 수신·주문 매칭은 제외하며 MES 생성·출하의 선행조건으로 사용하지 않는다(2026-09-08 사용자 확정). 고객사별 파일 형식 미정에 따른 업로드 비활성은 그대로다. 상위지시는 nullable이며 무지시 standalone은 상시 구조다."
    },
@@ -3359,6 +3363,7 @@
      },
      "lines": {
       "type": "array",
+      "description": "목록과 단건 응답에 항상 포함되는 전체 작업지시 라인. 요청·배정·출하 수량 합계와 라인 수는 이 배열에서 계산한다",
       "items": {
        "$ref": "#/components/schemas/ShipmentRequestLine"
       }
@@ -3376,7 +3381,8 @@
      "requestedShipDate",
      "statusCode",
      "shippingInspectionStatusCode",
-     "shipmentProgressCode"
+     "shipmentProgressCode",
+     "lines"
     ],
     "description": "MES 출하작업지시. W-04-01 「편성」·「단독 생성」이 만든다"
    },
