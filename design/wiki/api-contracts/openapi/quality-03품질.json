@@ -2116,7 +2116,7 @@
      "quality"
     ],
     "summary": "LOT 상태 요약",
-    "description": "LOT 상태 4값 집계 — 요약은 필터 전체 기준이다(공유계약 L-1). ⚠ 판정 불가를 0 으로 내리지 않는다(L-8). 근거: W-03-01 §3 · §5-4",
+    "description": "LOT 상태별 합계는 4값을 항상 내리고, 실제 LOT이 없는 상태는 lotTypeCode 없이 lotCount=0 한 행만 낸다. LOT 유형별 행은 실제로 존재하는 상태·유형 조합만 내리며 빠진 조합을 0으로 채우지 않는다. 요약은 필터 전체 기준이다. 판정 불가를 0으로 내리지 않는다.",
     "parameters": [
      {
       "name": "lotTypeCode",
@@ -2238,7 +2238,7 @@
      "quality"
     ],
     "summary": "갈 수 있는 LOT 상태",
-    "description": "현재 상태에서 갈 수 있는 곳을 서버가 판정해 내린다 — 화면이 전이 표를 갖지 않는다(공유계약 G-8). 규칙이 바뀌어도 화면 3벌을 고치지 않는다. ⛔ 저장하지 않으므로 :동사 가 아니다. 근거: W-03-02 §5-5",
+    "description": "현재 상태를 전이표와 대조한 선택지와 영향 미리보기를 내린다. allowed는 현재 상태가 전이표의 출발 상태에 포함되는지만 뜻하며, 실제 쓰기 성공을 보장하지 않는다. 저장하지 않는 조회다.",
     "parameters": [
      {
       "name": "lotId",
@@ -4344,17 +4344,20 @@
      "warehouseId": {
       "type": "integer",
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "보유 수량이 0이 아닌 재고 잔액 행의 창고가 정확히 하나일 때만 포함한다. 재고가 없거나 여러 창고에 걸치면 생략한다. 생략된 경우만으로 두 원인을 구별할 수 없다."
      },
      "locationId": {
       "type": "integer",
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "보유 수량이 0이 아닌 재고 잔액 행의 위치가 정확히 하나일 때만 포함한다. 재고가 없거나 여러 위치에 걸치면 생략한다. 생략된 경우만으로 두 원인을 구별할 수 없다."
      },
      "onHandQty": {
       "type": "number",
       "format": "double",
-      "example": 30.0
+      "example": 30.0,
+      "description": "LOT의 모든 재고 잔액 행을 창고·위치·품질·단위 구분 없이 합산한 수량이다. 단위가 여러 개인 경우 자동 환산하지 않으며 uomId를 생략한다."
      },
      "heldQty": {
       "type": "number",
@@ -4371,7 +4374,8 @@
      "uomId": {
       "type": "integer",
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "보유 수량이 0이 아닌 재고 잔액 행의 단위가 정확히 하나일 때만 포함한다. 재고가 없거나 여러 단위가 섞이면 생략하며, 생략된 경우만으로 두 원인을 구별할 수 없다. 서로 다른 단위를 자동 환산하지 않는다."
      },
      "openHoldCount": {
       "type": "integer",
@@ -4421,7 +4425,7 @@
      },
      "lotTypeCode": {
       "type": "string",
-      "description": "자재·생산·제품 3종(결정 10). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_TYPE 로 받는다(MATERIAL·PRODUCTION·PRODUCT). ⚠ 셋을 합쳐 집계하지 않는다(공유계약 L-7) — 같은 「보류 38건」이라도 자재와 제품은 대응이 다르다. 근거: omf-mes#176",
+      "description": "자재·생산·제품 3종. 상태·유형별 행은 실제 LOT이 존재하는 조합에만 포함되며, 없는 조합을 0건 행으로 만들지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_TYPE 로 받는다.",
       "example": "MATERIAL",
       "x-code-key": "CD-LOT-TYPE"
      }
@@ -4455,7 +4459,7 @@
      "counts",
      "asOf"
     ],
-    "description": "LOT 상태 4값(정상·불량·검사 대기·폐기) 집계. 근거: 회신 E-3 종결 2026-08-07"
+    "description": "LOT 상태 4값 집계. 상태별 합계는 항상 네 상태를 포함한다. 한 상태의 전체 건수가 0이면 lotTypeCode를 생략한 0건 행 하나만 내리고, 0이 아니면 실제로 존재하는 LOT 유형 조합만 내린다."
    },
    "LotStatusTransition": {
     "type": "object",
@@ -4468,7 +4472,8 @@
      },
      "allowed": {
       "type": "boolean",
-      "example": true
+      "example": true,
+      "description": "현재 LOT 상태가 해당 전이의 출발 상태 목록에 포함되는지 나타낸다. 실제 쓰기 요청의 성공 보장은 아니며, 보류 중복·상태·수량·낙관적 잠금 등은 쓰기 시 다시 검증한다."
      },
      "actionCode": {
       "type": "string",
@@ -4494,13 +4499,13 @@
       "properties": {
        "openPickingCount": {
         "type": "integer",
-        "description": "진행 중인 피킹 요청 건수 — 이 전이로 함께 막힌다. 화면 문구: 「피킹 중인 요청 N건이 막힙니다」(§6)",
+        "description": "이 LOT 라인 중 pickedQty가 plannedQty보다 작은 라인을 하나 이상 가진 피킹 요청의 중복 제거 건수다. CANCELLED 요청만 제외하며 CANCEL_REQUESTED는 포함한다.",
         "example": 2
        },
        "shippedQty": {
         "type": "number",
         "format": "double",
-        "description": "이미 출고된 수량 — 이 전이로 회수되지 않는다. 화면 문구: 「이미 출고된 N EA는 이 전이로 회수되지 않습니다」(§6) — ⛔ 되돌릴 수 없음을 알리는 것이지 막는 것이 아니다",
+        "description": "이 LOT의 출고 전표 라인 issueQty 합계다. POSTED와 CANCEL_REQUESTED 전표를 포함하고 CANCELLED는 제외한다. 예약·피킹 수량은 섞지 않는다. 이 전이로 회수되지 않는다.",
         "example": 300.0
        }
       },
@@ -4604,7 +4609,7 @@
        "HOLD_QTY_EXCEEDED",
        "DISPOSITION_QTY_EXCEEDED"
       ],
-      "description": "DUPLICATE_HOLD 는 해제되지 않은 전량 보류가 이미 있다는 뜻이다. HOLD_QTY_EXCEEDED 는 부분 보류 합계가 보유 수량을 넘는다는 뜻이다. 둘 다 서버가 판정한다 — 화면이 계산하지 않는다. DISPOSITION_QTY_EXCEEDED 는 처분 결정 수량 합이 대상 수량을 넘는다는 뜻이고 remainingQty 를 함께 내린다 — 같은 형태다. INVALID_STATE 는 이미 종결된 부적합에 판정을 저장하려 할 때도 쓴다. 근거: W-03-03 §5-5 · W-03-10 §6 · 공유계약 A-9 ⓑ · omf-mes#253",
+      "description": "DUPLICATE_HOLD는 해제되지 않은 전량 보류가 이미 있다는 뜻이다. HOLD_QTY_EXCEEDED는 열린 부분 보류 합계와 신규 수량이 LOT의 전체 재고 잔액 onHandQty 합을 넘는다는 뜻이다. 창고·위치·품질·단위 구분 없이 합산하며 단위 환산은 하지 않는다. 합계가 한도와 같으면 허용하고, 재고 잔액 행이 없으면 한도는 0이므로 수량을 적은 부분 보류는 거부한다. 전량 보류는 수량 검사를 거치지 않는다. 둘 다 서버가 판정한다. DISPOSITION_QTY_EXCEEDED는 처분 결정 수량 합이 대상 수량을 넘는다는 뜻이고 remainingQty를 함께 내린다. INVALID_STATE는 이미 종결된 부적합에 판정을 저장하려 할 때도 쓴다.",
       "example": "VERSION_CONFLICT"
      },
      "message": {
