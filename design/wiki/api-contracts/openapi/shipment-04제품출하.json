@@ -3971,7 +3971,7 @@
        "HOLD_ALREADY_RELEASED",
        "DISPOSITION_NOT_REINSTATABLE"
       ],
-      "description": "ALREADY_REINSTATED는 이 처분 결정의 누적 재등록 수량이 결정 수량에 이미 닿았다는 뜻이며 한 번의 부분 재등록만으로 발생하지 않는다. 완료 결정은 followUpPending=false가 되어 목록에서 빠진다. HOLD_ALREADY_RELEASED는 다른 경로에서 보류가 먼저 풀렸다는 뜻이다. DISPOSITION_NOT_REINSTATABLE은 정상 처분이 아닌 결정이라는 뜻이다.",
+      "description": "ALREADY_REINSTATED는 이 처분 결정의 누적 재등록 수량이 결정 수량에 이미 닿았다는 뜻이며 한 번의 부분 재등록만으로 발생하지 않는다. 요구 계약상 완료 결정은 followUpPending=false가 되어 목록에서 빠져야 하지만 현재 서버 조회는 정상 처분의 재등록 누적을 연결하지 않아 이를 보장하지 않는다. HOLD_ALREADY_RELEASED는 다른 경로에서 보류가 먼저 풀렸다는 뜻이다. DISPOSITION_NOT_REINSTATABLE은 정상 처분이 아닌 결정이라는 뜻이다.",
       "example": "VERSION_CONFLICT"
      },
      "message": {
