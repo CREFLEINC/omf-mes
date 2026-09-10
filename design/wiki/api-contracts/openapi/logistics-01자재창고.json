@@ -3258,7 +3258,8 @@
      "logistics"
     ],
     "summary": "입하 차이 목록",
-    "description": "근거: M-01-06 §4",
+    "description": "알려진 입하 라인 식별자로 그 라인의 오류 이력을 조회한다. 입하 목록 검색이나 오류 유무 필터는 제공하지 않는다.",
+    "x-internal-note": "M-01-06 §4·§5-3·§8-6. 현재 화면에는 등록 뒤 이력으로 다시 진입하는 동선이 없으며 새 목록·필터 API를 추정하지 않는다.",
     "responses": {
      "200": {
       "description": "차이",
@@ -3455,7 +3456,7 @@
      "logistics"
     ],
     "summary": "입하 등록",
-    "description": "입하·라인·자재 LOT 이 한 트랜잭션으로 만들어진다. 근거: M-01-01 §5-4 · 공유계약 B-8",
+    "description": "입하·라인·공급사 LOT이 부착된 라인의 자재 LOT을 한 트랜잭션으로 등록한다. supplierLotMissing이 false이면 supplierLotNo가 필수이며 누락은 해당 필드의 400 PAIR 오류다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -3498,7 +3499,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "검증 실패. supplierLotMissing=false인데 supplierLotNo가 없으면 해당 필드에 PAIR를 반환하며, 같은 공장·같은 LOT 번호의 별도 등록 중복은 특정 필드 없는 UNIQUE_VIOLATION을 반환한다",
       "content": {
        "application/json": {
         "schema": {
@@ -3528,7 +3529,7 @@
       }
      }
     },
-    "x-internal-note": "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9)."
+    "x-internal-note": "M-01-01 §5-4 · 공유계약 B-8. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9)."
    }
   },
   "/logistics/inbound-receipts/{inboundReceiptId}": {
@@ -3713,7 +3714,7 @@
      "logistics"
     ],
     "summary": "입하 라인 치환",
-    "description": "LOT 이 이미 만들어진 라인은 지울 수 없다. 근거: 공유계약 A-5 · G-1 ⭐ 이 경로의 조회는 ETag 를 내리지 않는다 — If-Match 에 담을 토큰은 부모 자원 GET /logistics/inbound-receipts/{inboundReceiptId} 200 의 ETag 다. 잠그는 단위가 부모이기 때문이다. 근거: 공유계약 B-1-1",
+    "description": "LOT이 이미 만들어진 라인은 품목·입하 수량·단위를 변경하거나 삭제할 수 없다. 이 경로의 조회는 ETag를 내리지 않으며 If-Match에는 부모 경로 GET /logistics/inbound-receipts/{inboundReceiptId} 응답의 ETag를 사용한다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -3793,7 +3794,7 @@
      "logistics"
     ],
     "summary": "초과 입하 분리 등록",
-    "description": "정량분과 초과분을 한 트랜잭션으로 등록한다. 관리웹 W-01-03과 모바일 M-01-01의 초과 입하 단계가 함께 사용한다. 단말 토큰 요청은 X-Worker-No가 필수다. 근거: W-01-03 §5-1 · §5-4 · M-01-01 §5-2-2",
+    "description": "정량분과 초과분을 한 트랜잭션으로 등록한다. 같은 공장의 두 결과에 같은 공급사 LOT 번호를 사용할 수 없으며 중복이면 초과분 supplierLotNo에 400 INVALID를 반환하고 전체 요청을 롤백한다. 단말 토큰 요청은 X-Worker-No가 필수다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -3824,7 +3825,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "검증 실패. 같은 공장의 정량분·초과분에 같은 공급사 LOT 번호가 있으면 초과분 supplierLotNo에 INVALID를 반환한다",
       "content": {
        "application/json": {
         "schema": {
@@ -3844,7 +3845,7 @@
       }
      }
     },
-    "x-internal-note": "세 갈래(BOTH·NORMAL_ONLY·EXCESS_ONLY)가 모두 화면의 버튼이다. 부분 실패를 허용하지 않는다 — 화면이 「한 트랜잭션」이라고 못박았다(W-01-03 §5-4). 관리웹과 모바일이 같은 경로를 사용하므로 WorkerNoOptional을 선언한다. 계정 토큰은 인증 주체에서 행위자를 풀고, 단말 토큰은 X-Worker-No가 없으면 거부한다(공유계약 D-5)."
+    "x-internal-note": "W-01-03 §5-1·§5-4 · M-01-01 §5-2-2. 세 갈래(BOTH·NORMAL_ONLY·EXCESS_ONLY)가 모두 화면의 버튼이다. 부분 실패를 허용하지 않는다. 관리웹과 모바일이 같은 경로를 사용하므로 WorkerNoOptional을 선언한다. 계정 토큰은 인증 주체에서 행위자를 풀고, 단말 토큰은 X-Worker-No가 없으면 거부한다(공유계약 D-5)."
    }
   },
   "/logistics/material-issue-requests": {
@@ -9198,8 +9199,8 @@
      "occurredAt",
      "lines"
     ],
-    "description": "입하 등록. 헤더·라인이 한 트랜잭션으로 만들어지고, 자재 LOT 은 공급사 LOT 이 부착된 라인에만 함께 생긴다. supplierLotMissing=true 인 라인은 LOT 없이 저장되고 P-01-01 이 POST /trace/lots(numberSourceCode=MES)로 나중에 채운다. 부착 라인의 LOT 이 없으면 이후 흐름이 통째로 막힌다. 근거: M-01-01 §5-4 · P-01-01 §3-6 · 공유계약 B-8",
-    "x-internal-note": "⚠ 거래명세서 촬영본의 OCR 파싱 결과(인식된 품목·수량·명세서 번호)를 담을 곳이 없다 — 첨부(attachment) 스키마는 파일 자체만 보관하고, 인식 결과 필드는 이 요청 본문에도 물리 모델에도 없다(실측). 근거: M-01-01 §4·§8-2 · omf-mes#75 ⚠ 승인 절차 자체(누가·언제)는 아직 정해지지 않았다 — M-01-01 §8-4. 계약은 approvalRequestId 자리만 갖는다.",
+    "description": "입하 등록. 헤더·라인이 한 트랜잭션으로 만들어지고 자재 LOT은 공급사 LOT이 부착된 라인에만 함께 생긴다. supplierLotMissing=true인 라인은 LOT 없이 저장된다. false이면 supplierLotNo가 필수이며 누락은 400 PAIR다.",
+    "x-internal-note": "M-01-01 §5-4 · P-01-01 §3-6 · 공유계약 B-8. ⚠ 거래명세서 촬영본의 OCR 파싱 결과(인식된 품목·수량·명세서 번호)를 담을 곳이 없다 — 첨부 스키마는 파일 자체만 보관하고 인식 결과 필드는 이 요청 본문에도 물리 모델에도 없다(실측). 근거: M-01-01 §4·§8-2 · omf-mes#75 ⚠ 승인 절차 자체(누가·언제)는 아직 정해지지 않았다 — M-01-01 §8-4. 계약은 approvalRequestId 자리만 갖는다.",
     "properties": {
      "supplierId": {
       "x-source-column": "supplier_id",
@@ -9524,7 +9525,8 @@
      "uomId",
      "supplierLotMissing"
     ],
-    "description": "라인 전체 치환 항목. inboundReceiptLineId 가 없으면 신규 행, 있으면 갱신, 요청에서 빠진 기존 행은 삭제한다. 이미 LOT 이 만들어진 라인은 삭제할 수 없다 — 400 STATE_LOCKED. 근거: M-01-01 §5-4 · 공유계약 A-5",
+    "description": "라인 전체 치환 항목. inboundReceiptLineId가 없으면 신규 행, 있으면 갱신, 요청에서 빠진 기존 행은 삭제한다. supplierLotMissing=false이면 supplierLotNo가 필수다. 이미 LOT이 만들어진 라인은 품목·입하 수량·단위를 변경하거나 삭제할 수 없다.",
+    "x-internal-note": "M-01-01 §5-4·§8-6-b · 공유계약 A-5. 현재 서버는 LOT 연결 라인 삭제와 후속 레코드가 있는 라인의 수량 변경만 거부한다. LOT만 생성된 라인의 수량 변경과 품목·단위 변경은 비교하지 않아 불변 요구를 완전히 보장하지 못하며 서버 보완이 필요하다.",
     "properties": {
      "inboundReceiptLineId": {
       "x-source-column": "inbound_receipt_line_id",
@@ -9717,7 +9719,7 @@
      "businessDate",
      "occurredAt"
     ],
-    "description": "초과 입하 분리. 정량분과 초과분을 한 트랜잭션으로 등록한다. mode 로 어느 쪽을 저장할지 고른다 — 세 갈래가 모두 W-01-03과 M-01-01 화면의 버튼이다. 초과분을 포함하면 예외 유형과 사유가 필수다. 근거: W-01-03 §5-1 · §5-4 · M-01-01 §5-2-2",
+    "description": "초과 입하 분리. 정량분과 초과분을 한 트랜잭션으로 등록한다. mode로 저장할 쪽을 고르고 초과분을 포함하면 예외 유형과 사유가 필수다. 같은 공장의 두 결과에는 같은 공급사 LOT 번호를 사용할 수 없다.",
     "properties": {
      "mode": {
       "type": "string",
@@ -9805,7 +9807,7 @@
       }
      }
     ],
-    "x-internal-note": "businessDate·occurredAt 은 바깥에서 한 번만 받는다 — 두 건이 같은 순간의 한 트랜잭션이기 때문이다. mode 별 본문 모양과 초과 예외 유형·사유 필수를 oneOf 로 강제한다."
+    "x-internal-note": "W-01-03 §5-1·§5-4 · M-01-01 §5-2-2. businessDate·occurredAt 은 바깥에서 한 번만 받는다 — 두 건이 같은 순간의 한 트랜잭션이기 때문이다. mode 별 본문 모양과 초과 예외 유형·사유 필수를 oneOf 로 강제한다. 한 요청의 공장·LOT 번호 중복은 excess.lines.{i}.supplierLotNo에 400 INVALID다. 별도 POST 중복은 데이터베이스 유일 제약에 따른 특정 필드 없는 400 UNIQUE_VIOLATION이다."
    },
    "InboundReceiptSplitResponse": {
     "type": "object",
