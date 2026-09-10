@@ -71,7 +71,7 @@
        "type": "boolean",
        "example": true
       },
-      "description": "⭐ 지금 쓸 수 있는 것만 — 상태·유효기간·잔여의 3항 논리곱을 서버가 판정한다"
+      "description": "참이면 상태가 APPROVED이고, 기준일이 validFrom 이상이며 validTo가 없거나 기준일 이상이고, 승인 수량에서 소진 수량을 뺀 값이 0보다 큰 특채만 낸다. 시작일과 종료일은 모두 포함한다."
      },
      {
       "name": "validOn",
@@ -81,7 +81,7 @@
        "format": "date",
        "example": "2026-08-12"
       },
-      "description": "이 날짜에 유효한 것"
+      "description": "사용 가능 여부를 판정할 기준일. 생략하면 서버 UTC 달력일을 사용한다."
      },
      {
       "name": "page",
@@ -172,7 +172,7 @@
       }
      }
     },
-    "x-internal-note": "승인·반려는 app-공통 계약이다(POST /app/approval-requests/{id}:approve · :reject). ⛔ 조건 수정 경로를 두지 않는다 — 결재는 예/아니오이고 값을 바꾸면 무엇을 승인했는지가 흐려진다(공유계약 J-10 · W-03-09 §5-4). 반려 사유로 돌려보낸다. ⛔ 생성 경로도 없다 — 특채 요청을 만드는 화면이 아직 특정되지 않았다(W-03-09 §8-4). nonconformance_id 가 NOT NULL 이라 부적합(04 계약)이 선행한다."
+    "x-internal-note": "승인·반려는 app-공통 계약이다(POST /app/approval-requests/{id}:approve · :reject). ⛔ 조건 수정 경로를 두지 않는다 — 결재는 예/아니오이고 값을 바꾸면 무엇을 승인했는지가 흐려진다(공유계약 J-10 · W-03-09 §5-4). 반려 사유로 돌려보낸다. ⛔ 생성 경로도 없다 — 특채 요청을 만드는 화면이 아직 특정되지 않았다(W-03-09 §8-4). nonconformance_id 가 NOT NULL 이라 부적합(04 계약)이 선행한다. #594 · 서버 통보 089 §2~3 정합."
    }
   },
   "/quality/defect-records": {
@@ -2749,12 +2749,14 @@
      "validFrom": {
       "type": "string",
       "format": "date",
-      "example": "2026-08-12"
+      "example": "2026-08-12",
+      "description": "사용 가능 기간의 시작일. 기준일과 같은 날부터 유효하다."
      },
      "validTo": {
       "type": "string",
       "format": "date",
-      "example": "2026-08-12"
+      "example": "2026-08-12",
+      "description": "사용 가능 기간의 종료일. 기준일과 같은 날까지 유효하며, 생략하면 만료 제한이 없다."
      },
      "allowedWorkOrderId": {
       "type": "integer",
@@ -2775,9 +2777,15 @@
       "type": "array",
       "items": {
        "type": "string",
-       "example": "값"
+       "enum": [
+        "allowedWorkOrderId",
+        "allowedProcessId",
+        "allowedCustomerId"
+       ],
+       "example": "allowedWorkOrderId"
       },
-      "description": "⭐ 비어 있는 허용 축의 이름을 서버가 짚어 내려준다 — 「비었다」가 「제한 없음」이므로 화면이 빈칸으로 두면 의도보다 넓게 승인된다. 근거: W-03-09 §5-3"
+      "description": "값이 없는 허용 축을 제한 없음으로 표시하기 위한 키 목록. allowedWorkOrderId는 작업지시 제한 없음, allowedProcessId는 공정 제한 없음, allowedCustomerId는 고객 제한 없음을 뜻한다.",
+      "x-no-code-key": "공통코드가 아니라 Concession 응답 프로퍼티 이름을 가리키는 구조 키다."
      },
      "approvalRequestId": {
       "type": "integer",
@@ -2788,11 +2796,11 @@
       "type": "string",
       "x-no-code-key": "코드 그룹을 세우지 않는다 — 특채의 승인 상태는 approval_request 가 갖는다(approval_request_id 가 NOT NULL). 값 후보 셋이 APPROVAL_REQUEST_STATUS 와 정확히 겹치고, 이 리소스를 움직이는 오퍼레이션이 0건이다. ⭐ usable 은 「상태 유효 ∧ validTo ∧ 잔여>0」 3항 논리곱이라 만료·소진은 이 축이 아니다.",
       "x-no-example": "코드 그룹을 세우지 않는다 — 특채의 승인 상태는 approval_request 가 갖는다(approval_request_id 가 NOT NULL). 값 후보 셋이 APPROVAL_REQUEST_STATUS 와 정확히 겹치고, 이 리소스를 움직이는 오퍼레이션이 0건이다. ⭐ usable 은 「상태 유효 ∧ validTo ∧ 잔여>0」 3항 논리곱이라 만료·소진은 이 축이 아니다.",
-      "description": "독립 승인 상태 코드를 사용하지 않는다. 승인 상태는 연결된 결재 요청에서 확인하며, 사용 가능 여부는 usable로 확인한다."
+      "description": "독립 특채 상태 그룹을 사용하지 않는다. 연결된 결재 요청의 승인 상태 어휘를 따르며 APPROVED일 때만 사용 가능 후보가 된다. 최종 사용 가능 여부는 usable로 확인한다."
      },
      "usable": {
       "type": "boolean",
-      "description": "⭐ 서버가 파생한 3항 논리곱 — 상태가 유효하고 valid_to 가 지나지 않았고 approvedQty − consumedQty > 0 인가. 화면이 세 조건을 계산하지 않는다(공유계약 L-2).",
+      "description": "서버가 계산한 사용 가능 여부. statusCode가 APPROVED이고, 기준일이 validFrom 이상이며 validTo가 없거나 기준일 이상이고, approvedQty에서 consumedQty를 뺀 값이 0보다 크면 참이다. 목록의 validOn을 생략하면 서버 UTC 달력일을 기준으로 한다.",
       "example": true,
       "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 03 계약 1단계 §2-3"
      },
@@ -2817,7 +2825,7 @@
      "approvalRequestId",
      "statusCode"
     ],
-    "description": "특채 — 단순 판정이 아니라 사용 범위 통제 데이터다. ⛔ 생성 경로를 두지 않는다(요청을 만드는 화면이 미정 · W-03-09 §8-4). ⛔ 승인·반려는 app-공통 계약이다. ⛔ 조건 수정을 두지 않는다 — 결재는 예/아니오다(공유계약 J-10)"
+    "description": "특채 사용 범위와 잔여를 조회하는 데이터. 현재 계약은 생성·조건 등록·조건 수정을 제공하지 않으며, 연결된 결재 요청의 승인·반려와 기존 조건 조회만 지원한다."
    },
    "DefectDistribution": {
     "type": "object",
