@@ -1,6 +1,6 @@
 # 코드 사전 (2026-09-02)
 
-> ⭐ **완성 — 176키 / 511자리.** 공유계약 `G-32` 등록부 **103그룹 전부**와 계약이
+> ⭐ **완성 — 177키 / 514자리.** 공유계약 `G-32` 등록부 **104그룹 전부**와 계약이
 > `enum` 으로 닫은 자리를 담는다. 계약 `*Code(s)` 자리 **665 전건**이 판정을
 > 받았다(판정 없음 0 · 2026-09-03). ⚠ 「639」로 적었던 앞선 수는 **경로 안에 «인라인»으로 정의된 스키마와 배열 `items` 안의 자리를 세지 않은 분모**였다 — 검사기 ㉨ 가 그 사각지대를 없앴다. `check-code-dictionary.py` 가 ⓪ 규칙으로 «막는다» —
 > 등록부에 이름이 오르면 여기에도 행이 있어야 한다.
@@ -14,8 +14,8 @@
 >
 > ⭐ **드러난 것 — 미결의 대부분은 「안 정했다」가 아니라 「정했는데 이름이 없었다」였다.**
 > 1차 완성 때 등록부 62그룹 중 45그룹의 값이 **이미 저장소 어딘가에 적혀 있었다** —
-> 결정 부재가 아니라 **기록 분산**이다 «(구표기 보존: 그때의 수다 · 지금은 103그룹)».
-> 지금 값이 «전량» ⬜ 인 키는 **13** 이고 **그 전부가 「없는 것이 정상」이다** — 고객이
+> 결정 부재가 아니라 **기록 분산**이다 «(구표기 보존: 그때의 수다 · 지금은 104그룹)».
+> 지금 값이 «전량» ⬜ 인 키는 **14** 이고 **그 전부가 「없는 것이 정상」이다** — 고객이
 > `W-06-06` 에서 운영 중에 채우는 `registry` 갈래다(아래 「사전」 절 참조).
 > 옛 서술: ~~시험판이다 · 653개 중 41개만 담았다~~ (2026-09-02 1~3단계로 해소)
 
@@ -92,17 +92,17 @@ CD-<계열>-<축>
 
 ---
 
-## 사전 — **176키 / 511자리**
+## 사전 — **177키 / 514자리**
 
 | 소유 | 키 |
 | --- | :-: |
 | `enum` — 계약이 닫았다 | **71** |
-| `registry` — 고객이 늘린다 | **58** |
+| `registry` — 고객이 늘린다 | **59** |
 | `registry-system` — ⛔ 고객 편집 불가 | **45** |
 
-⬜ 값이 «전량» ⬜ 인 키는 **13** — **그 전부가 「없는 것이 정상」이다.** 고객이 `W-06-06`
+⬜ 값이 «전량» ⬜ 인 키는 **14** — **그 전부가 「없는 것이 정상」이다.** 고객이 `W-06-06`
 에서 운영 중에 채우는 `registry` 갈래라 우리가 값을 지어낼 자리가 아니다
-(`CD-CALIBRATION-RESULT` · `CD-DEFECT-RESPONSIBILITY-TYPE` · `CD-GOODS-RECEIPT-REASON` ·
+(`CD-CALIBRATION-RESULT` · `CD-DEFECT-RESPONSIBILITY-TYPE` · `CD-EQUIPMENT-BREAKDOWN-CAUSE` · `CD-GOODS-RECEIPT-REASON` ·
 `CD-JUDGMENT-TYPE` · `CD-LATE-ENTRY-REASON` · `CD-MAINTENANCE-RESULT-LINE-RESULT` ·
 `CD-MATERIAL-CHANGE-REASON` · `CD-PRODUCTION-RESULT-CORRECT-REASON` · `CD-QUALITY-ZONE` ·
 `CD-REINSPECTION-REASON` · `CD-STOCK-REINSTATEMENT-REASON` · `CD-STOCK-TRANSFER-REASON` ·
@@ -156,7 +156,7 @@ CD-<계열>-<축>
 | `CD-ATTACHMENT-TARGET-TYPE` | `NOTICE` `WAREHOUSE` | — | `targetTypeCode` | `enum` | 3 | 계약이 `enum` 으로 닫은 값 — `Attachment`(`app-공통`). ⭐ **두 화면이 이미 문자열을 스펙에 적어 두고 있었다** — `W-CO-08` §3 창고 도면 · `W-CO-04` §4 공지 첨부 |
 | `CD-AUDIT-EVENT-TYPE` | `CREATE` `UPDATE` `DELETE` `GRANT` `REVOKE` ⬜ | `AUDIT_EVENT_TYPE` | `eventTypeCode` | `registry-system` | 2 | 감사 이벤트 유형. ⭐ `GRANT`·`REVOKE` 의 근거는 `W-CO-02` §8-8 — 「누가 언제 권한을 줬나」가 남는 곳이 그동안 하나도 없었다. ⛔ 무엇을 기록할지는 시스템이 정한다 |
 | `CD-AUDIT-TARGET-TYPE` | `APP_USER` `ROLE` `WORKER` `TERMINAL` `ITEM` `ROUTING` `INSPECTION_PLAN_VERSION` | — | `targetTypeCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `AuditEvent`(`mdm-기준정보`). ⭐ **값 일곱은 사용자와 협의해 확정했다**(2026-09-03) — 변경 이력이 «남아야 하는» 마스터만 든다. ⛔ **2026-09-03 정정** — 전에는 `registry-system` 으로 등록부에 올라 있었는데 `A-16` 위반이다(다형 참조 판별자는 `enum` 으로 닫고 `G-32` 에 «올리지 않는다»). ⚠ 개체 마스터는 안 든다 — 과거 판정이 소급해 달라지지 않는다. 버전 마스터도 안 든다 — `결정 07` 이 「Rev 이력 그 자체로 충족」이라 했다 |
-| `CD-BREAKDOWN-OCCURRENCE-STATE` | `STOPPED` `ABNORMAL` | `BREAKDOWN_OCCURRENCE_STATE` | `occurrenceStateCode` | `registry-system` | 2 | 고장 시점의 설비 상태. ⭐ 현장이 보고할 때 «고르는» 값이다(`M-05-02`). ⛔ **시스템 소유** — 비가동 집계에 드는가가 이 값으로 갈린다 |
+| `CD-BREAKDOWN-OCCURRENCE-STATE` | `STOPPED` `ABNORMAL` | `BREAKDOWN_OCCURRENCE_STATE` | `occurrenceStateCode` | `registry-system` | 2 | 고장 시점의 설비 상태. ⭐ 현장이 보고할 때 «고르는» 값이다(`M-05-02`). ⛔ **시스템 소유** — 현장 보고 분류·화면 입력 분기에 사용하며 자동 비가동 생성·집계는 하지 않는다 |
 | `CD-CALIBRATION-AGENCY-TYPE` | `INTERNAL` `EXTERNAL` | `CALIBRATION_AGENCY_TYPE` | `agencyTypeCode` | `registry-system` | 2 | 교정 기관 구분. ⭐ 뜻 둘은 `W-05-10` §3-2·§5-4 가 확정했고 문자열만 없었다. ⚠ 외부 기관이면 `agencyName` 이 필수이고 `performedByUserId` 를 비운다(`A-2` 짝 제약) |
 | `CD-CALIBRATION-HISTORY-TYPE` | `CALIBRATION` `CHECK` ⬜ | `CALIBRATION_HISTORY_TYPE` | `historyTypeCode` | `registry` | 3 | 계측기 이력 유형. ⭐ **2026-09-02 사용자 결정으로 시스템이 «이름으로 지목하는» 값이 `CALIBRATION` 하나가 됐다** — 사용 가부 판정이 「열린 «수리» 이력」 대신 `blocksUse`+`clearedAt` 를 읽는다(`W-05-11` §5-2). 그래서 「수리」·「폐기」의 문자열을 우리가 정할 필요가 없고, 계약이 원래 적은 「관리자 설정형」이 그제서야 성립한다 |
 | `CD-CALIBRATION-RESULT` | ⬜ | `CALIBRATION_RESULT` | `resultCode` | `registry` | 2 | 계측기 이력의 결과. ⚠ 값 집합이 «이력 유형마다 다르다». ⛔ 설비 점검의 `resultCode`(`CD-MAINTENANCE-INSPECTION-RESULT`)와 이름만 같고 값집합이 다르다 — 한 그룹으로 묶으면 화면이 남의 선택지를 본다(`B-28`) |
@@ -179,6 +179,7 @@ CD-<계열>-<축>
 | `CD-DOCUMENT-ISSUE-TARGET-TYPE` | `GOODS_ISSUE_LINE` `HANDLING_UNIT` `INSPECTION_RESULT` `LOCATION` `LOT` `MOLD` `SERIAL_NUMBER` `SHIPMENT_LOT_ALLOCATION` | — | `targetTypeCode` | `enum` | 5 | 계약이 `enum` 으로 닫은 값 — `DocumentTarget` · `DocumentIssueSummary`(`app-공통`). ⭐ 납품 라벨의 대상은 출하 LOT 배분(`SHIPMENT_LOT_ALLOCATION`)이다(P-04-01). 나머지 일곱 뜻과 문자열은 2026-09-02 §G 에서 확정했다. |
 | `CD-DOCUMENT-SUCCESSOR-TYPE` | `GOODS_RECEIPT` `GOODS_ISSUE` `PICKING_ORDER` `INVENTORY_TRANSACTION` `MATERIAL_CONSUMPTION` | — | `successorTypeCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `DocumentSuccessor`(`logistics-01자재창고`). ⭐ `W-01-13` §5-3 이 「후속 판정이 두 갈래」로 이미 적어 두었다 — 앞 넷은 «문서 하류», 자재 투입은 «재고 사용»이다 |
 | `CD-DOWNTIME-REASON` | `EQUIPMENT_FAILURE` `MOLD_CHANGE` `MATERIAL_WAIT` `LABOR_WAIT` `PREVENTIVE_MAINTENANCE` `OTHER` | `DOWNTIME_REASON` | `reasonCode`(쿼리) | `registry` | 5 | 설비 비가동 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
+| `CD-EQUIPMENT-BREAKDOWN-CAUSE` | ⬜ | `EQUIPMENT_BREAKDOWN_CAUSE` | `causeCode` | `registry` | 3 | 설비 고장 원인 — `BreakdownHandling`·`BreakdownHandlingUpdate`·`BreakdownComplete`. 고객 관리 활성값의 자연키를 사용한다(통보 090 · `omf-mes#514`). 초기 값 원문이 없어 예시를 시드로 승격하지 않는다 |
 | `CD-EQUIPMENT-BREAKDOWN-STATUS` | `RECEIVED` `HANDLING` `DONE` | `EQUIPMENT_BREAKDOWN_STATUS` | `statusCode` | `registry-system` | 2 | 고장 접수. **값이 계약 산문에 이미 있었다**(2026-09-02 꺼냄) · `W-05-04` |
 | `CD-EQUIPMENT-INSPECTION-JUDGMENT-METHOD` | `VISUAL` `MEASUREMENT` | `EQUIPMENT_INSPECTION_JUDGMENT_METHOD` | `judgmentMethodCode` | `registry-system` | 5 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
 | `CD-EQUIPMENT-INSPECTION-RESOLVED-FROM-LEVEL` | `EQUIPMENT` `EQUIPMENT_GROUP` `NONE` | — | `resolvedFromLevelCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `EquipmentInspectionItemAssignmentsResponse`(`mdm-기준정보`) **한 자리**. ⚠ 계수 `2` 는 가름 회차(`b0becc5`)의 전사 오류였다 — **가름은 자리를 늘리지 않는다**(옛 `CD-RESOLVED-FROM-LEVEL` 이 1 이었고 설비 점검 1 + 작업 캘린더 1 로 나뉜 것뿐이다 · 2026-09-03 정정). ⭐ **2026-09-03 개명·가름** — 작업 캘린더의 같은 이름과 «값집합이 다르다»(그쪽은 `EQUIPMENT_GROUP`·`PLANT`). 한 그룹으로 묶으면 화면이 남의 선택지를 본다(`B-28`). 접두 규약은 결정 1 「가」 |
