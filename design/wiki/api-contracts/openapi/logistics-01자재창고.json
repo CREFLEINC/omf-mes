@@ -5435,7 +5435,7 @@
      "logistics"
     ],
     "summary": "재고 이동 목록",
-    "description": "inTransitOnly 로 아직 도착하지 않은 건을 찾는다 — 이어하기 목록이 이것이다. 근거: M-01-10 §5-6",
+    "description": "inTransitOnly로 receivedAt이 아직 없는 반출 건을 찾는다. 부분 도착도 receivedAt이 채워져 이 목록에서 빠지므로 미도착 잔량을 이어 처리하는 목록은 아니다.",
     "parameters": [
      {
       "name": "inTransitOnly",
@@ -5444,7 +5444,7 @@
        "type": "boolean",
        "default": false
       },
-      "description": "반출됐으나 도착하지 않은 건만"
+      "description": "반출됐고 receivedAt이 없는 건만. 부분 도착 후 남은 운송중 수량은 이 필터로 조회되지 않는다"
      },
      {
       "name": "fromWarehouseId",
@@ -5711,7 +5711,7 @@
      "logistics"
     ],
     "summary": "이동 라인 치환",
-    "description": "반출이 끝난 라인은 바꿀 수 없다. 근거: 공유계약 A-5 · G-1 ⭐ 이 경로의 조회는 ETag 를 내리지 않는다 — If-Match 에 담을 토큰은 부모 자원 GET /logistics/stock-transfers/{stockTransferId} 200 의 ETag 다. 잠그는 단위가 부모이기 때문이다. 근거: 공유계약 B-1-1",
+    "description": "생성과 반출이 한 오퍼레이션이어서 반출 전 수정 구간이 없다. 이 경로는 항상 400 STATE_LOCKED로 거부된다. If-Match 토큰 원천은 부모 자원 GET /logistics/stock-transfers/{stockTransferId}의 ETag지만 현재 호출 화면은 없다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -5753,7 +5753,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "항상 400 STATE_LOCKED. 생성 시점에 반출이 끝나 라인을 치환할 수 없다",
       "content": {
        "application/json": {
         "schema": {
@@ -5802,7 +5802,7 @@
      "logistics"
     ],
     "summary": "도착 확정",
-    "description": "반출한 수량 이하만 받을 수 있다. 근거: M-01-10 §5-6",
+    "description": "반출 수량 이하를 한 번만 도착 확정한다. 부분 수량도 허용하지만 receivedAt이 채워진 뒤 둘째 호출은 400 STATE_LOCKED이므로 잔량 재도착은 지원하지 않는다. 도착 품질 상태는 반출 원장 값을 유지하고 재고 상태는 반출 전 상태로 복원한다. 반출 원장 전기와 실물 도착 완료는 별개다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
