@@ -55,7 +55,7 @@
 │  │ 미달       150 EA      │                                        │   │
 │  └────────────────────────┴────────────────────────────────────────┘   │
 │  판정   미달 (3분류 자동)                                              │
-│  잔량   ( ) 이월 — 새 W/O 로 넘긴다   ( ) 소멸 — 종결한다             │
+│  잔량   ( ) 이월 — 처분 기록만 남김   ( ) 소멸 — 종결한다             │
 │  사유   [ 자재 결품                                    ▾ ]            │
 │  ⚠ 이 W/O 는 ERP W/O 와 불일치 상태입니다 (poMismatch)                    │
 ├───────────────────────────────────────────────────────────────────────┤
@@ -137,7 +137,7 @@
 | 지시 수량 | `order_qty` | `qty_t` | ✅ | 읽기 |
 | **완료 시각** | `completed_at` | timestamptz | — | 생산 완료 |
 | **마감 시각** | `closed_at` | timestamptz | — | **이 화면이 채운다** |
-| **미달·초과 사유** | `completion_variance_reason_code` | `code_t` | — | ✅ **R80이 그대로 착지** §5-1 |
+| **미달·초과 사유** | `completion_variance_reason_code` | `code_t` | — | W/O 한 칸을 LOT 미달 완료와 W/O 마감이 함께 쓴다. LOT별 이력이 아니며 마지막 기록만 남는다 §5-1 |
 | 상태 | `status_code` | `code_t` | ✅ | 마감 상태 |
 
 ✅ **「이월/소멸」은 이미 계약에 있다** — `WorkOrderClose.remainderDispositionCode`(`CARRY_OVER`·`WRITE_OFF`)가 처분을, `completion_variance_reason_code`가 사유를 각각 담는다. §5-2.
@@ -205,10 +205,12 @@ work_order.completion_variance_reason_code   app.code_t
 
 | 처분 | 실재 |
 | --- | --- |
-| **이월** | `remainderDispositionCode=CARRY_OVER` + 새 `work_order`(`parentWorkOrderId`로 원본을 가리킨다) |
+| **이월** | `remainderDispositionCode=CARRY_OVER`를 원 W/O에 기록한다. **현재 마감은 잔량 W/O를 자동 생성하지 않는다** |
 | **소멸** | `remainderDispositionCode=WRITE_OFF` + `remarks`(선택 이유) — **집계 가능**: 코드값으로 셀 수 있다 |
 
 ⚠ **이전 버전은 `completion_variance_reason_code`(사유)와 처분을 혼동해 「담을 컬럼이 없다」로 잘못 적었다** — 실제로는 사유·처분이 각각 다른 컬럼(`reasonCode`·`remainderDispositionCode`)으로 이미 분리돼 있었다.
+
+업무상 이월 선택 요구는 유지한다. 다만 현재 서버가 보장하는 결과는 처분 코드 기록까지이며, 후속 W/O 생성·귀속은 지원하지 않는다. 화면은 이월을 선택해 마감한 뒤 새 W/O가 생겼다고 안내하지 않는다.
 
 ### §5-3. R82 자동 폐번 — 값이 없어 실행할 수 없다
 

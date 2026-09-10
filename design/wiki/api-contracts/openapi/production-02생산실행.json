@@ -3045,7 +3045,7 @@
      "production"
     ],
     "summary": "마감 · ERP 실적 송신",
-    "description": "잔량 처분을 함께 정한다. 미달 슬롯은 이 시점에 자동 폐번된다. ERP 실제 전송만 트랜잭션 밖이다. 근거: W-02-05 §5 · R27·R82\n\n⭐ 저장 충돌 보호 — If-Match 는 필수다. 토큰은 GET /production/work-orders/{workOrderId} 의 ETag 를 그대로 싣는다. 마감은 관리웹 온라인 전제이고 되돌릴 수 없는 전이라(재오픈 금지 · R83) 형제 전이 :hold·:resume 처럼 선택으로 두지 않는다 — 그 둘은 POP 오프라인 대상이라 큐가 토큰을 싣지 못해 선택이다(공유계약 C-9). 근거: W-02-05 §6\n\n⭐ ERP 생산 실적 송신 — 이 마감이 대기열에 적재한다. 품목이 개발품이면 제외한다(판정 축은 품목이다). ⚠ 개발품 여부를 담을 컬럼이 아직 없어 서버는 그때까지 전건을 적재한다. 실제 전송과 재처리는 이 계약 밖이다.\n\n⭐ 본문 검증 — 서버가 스스로 낸 마감 3분류 판정과 본문을 대조한다(판정은 WorkOrderProgress.completionJudgmentCode 와 같은 식이다).\n  · 미달인데 remainderDispositionCode 가 없다 → 400\n  · 정상·초과인데 remainderDispositionCode 가 있다 → 400 (넘길 잔량도 없앨 잔량도 없다)\n  · 미달·초과인데 reasonCode 가 없다 → 400 (미달·초과 사유는 R80 이 요구한다)\n  · 정상은 두 칸을 다 비운다\n⚠ 「정상」의 폭(허용 오차)은 서버 정책이 정한다 — 규칙은 그대로고 미달의 경계만 움직인다(W-02-05 §5-1·§8-1)\n⛔ 같은 W/O 에 열린 작업 세션이 있으면 409 OPEN_SESSION_EXISTS 로 거절한다 — 화면은 그 문구를 띄운다.\n⭐ 잔량 처분의 결과 — 이월은 새 W/O 로 표현되고 그 W/O 가 parentWorkOrderId 로 원본을 가리킨다. 소멸은 아무 자원도 만들지 않으므로 본문 remarks 에 사유를 남긴다. ⚠ 이월이 잔량 W/O 를 «자동으로» 만드는지는 아직 정해지지 않았다 — 정해지기 전까지 이 오퍼레이션은 만들지 않는다.",
+    "description": "잔량 처분을 함께 정하고 미달 슬롯을 자동 폐번한다. 마감은 관리웹 온라인 전용이며 재오픈할 수 없다. If-Match는 필수이고 토큰은 작업지시 상세 응답의 ETag를 사용한다. 같은 W/O에 열린 작업 세션이 있으면 409 OPEN_SESSION_EXISTS로 거절한다.\n\n서버가 계산한 마감 판정이 미달이면 remainderDispositionCode와 reasonCode가 필요하고, 정상이면 둘을 비우며, 초과이면 reasonCode만 필요하다. 허용 오차가 바뀌어도 이 본문 규칙은 유지되고 서버 판정 경계만 바뀐다. CARRY_OVER와 WRITE_OFF 모두 처분 코드를 원 W/O에 기록한다. 현재 CARRY_OVER는 잔량 W/O를 자동 생성하지 않는다.\n\nreasonCode는 생산 LOT 미달 완료도 사용하는 W/O 사유 한 칸에 기록된다. 미달·초과 마감이면 기존 값을 덮고, 정상 마감이면 null로 지운다. 이 값은 LOT별 사유 이력이 아니다.\n\n마감 트랜잭션은 ERP 생산 실적 메시지를 대기열에 적재하며 실제 전송과 재처리는 이 오퍼레이션 밖이다. 생산 실적은 필수 송신 대상이고 품목이 개발품이면 제외한다. 개발품 여부를 공급하지 못하는 동안에는 전건을 적재한다.",
     "parameters": [
      {
       "name": "workOrderId",
@@ -3126,7 +3126,7 @@
       }
      }
     },
-    "x-internal-note": "개발품 제외 판정 축 = 품목(사용자 확정 2026-08-24 · omf-mes#70) · 컬럼 신설 통지 omf-mes#215 · ✅ 화면·계약은 확정대로 개발품을 제외한다(2026-08-31 — 구판 A-11 물러남 인용을 걷었다 · A-11 v4.6) · 근거 W-02-05 §5-6 · W-06-12 §4-B. ⚠ 저장소 접두를 반드시 붙여 읽는다 — omf-mes#70(개발품 판정 축 · CLOSED)과 omf-mes-client#70(W-02-05 착수 통지 · CLOSED)은 다른 이슈다. 마감 전 게이트: POP 버퍼 미동기 실적·미종료 홀드·실적 완결성 체크를 통과할 때만 마감한다(✓확정 2026-07-14 · 마감후정정 운영방식 확정기록 설계원칙 5 — 지연 실적이 마감 뒤 도착하는 구조적 케이스의 원천 차단). ⚠ 서버가 단말 버퍼를 볼 수단이 계약에 없다 — 게이트를 무엇으로 판정하는지가 열려 있다. ⛔ 사람 판정 대기 — 「이월을 서버가 자동 전개하는가, 사람이 W-02-02 에서 다시 세우는가」. «자동»으로 판정되면 응답에 parentWorkOrderId 로 원본을 가리키는 자식 W/O 가 생기는 것으로 표현한다. 잔량 처분 컬럼(remainder_disposition_code)은 물리 모델에 없다 — 공유계약 §I-25 가 그 자리다(새 §I 항목을 세우지 않는다) · 📨 작업 통지 대상."
+    "x-internal-note": "근거: W-02-05 §5 · R27·R80·R81·R82 · 문의 039·043. 개발품 제외 판정 축은 품목이다. 마감 전 게이트 셋 중 현 서버가 판정하는 것은 열린 세션뿐이다. CARRY_OVER 자동 전개 여부는 미정이며 현 구현은 close_disposition_code 기록만 한다. LOT 완료와 W/O 마감은 completion_variance_reason_code 한 칸을 공유한다. ⚠ 문의 043의 정상 마감 시 기존 LOT 사유 유지 서술과 서버 main 9db397f406b4db263552fc2481c8ab05dd94c5b3의 WorkOrderCloseService가 갈린다. 실제 구현은 completion_variance_reason_code: body.reasonCode ?? null이므로 정상 마감에서 null로 지운다."
    }
   },
   "/production/work-orders/{workOrderId}:hold": {
@@ -6558,9 +6558,10 @@
        "CARRY_OVER",
        "WRITE_OFF"
       ],
-      "description": "잔량 처분 — 이월 / 소멸. ⭐ 미달 판정일 때만 보낸다(조건부 필수). 정상·초과 마감에서는 이 칸을 «비운다» — 넘길 잔량도 없앨 잔량도 없어 두 값 중 어느 것도 뜻이 맞지 않는다. ⛔ 그래서 정상·초과용 세 번째 값을 두지 않았다 — 없는 업무 개념을 만들게 된다(공유계약 A-21 · R81 은 「미달 잔량 = 이월/소멸」 둘만 정했다 · ✓확정 QA #27). 평면적인 required 로는 「미달일 때만」을 적을 수 없어 목록에서 뺐고 서버가 판정과 대조해 검증한다. 근거: W-02-05 §5-2·§5-7 · omf-mes#209",
+      "description": "잔량 처분 — 이월 / 소멸. 미달 판정일 때만 보내며 정상·초과 마감에서는 비운다. CARRY_OVER도 현재는 처분 코드만 기록하고 잔량 W/O를 자동 생성하지 않는다. 조건부 필수라 평면 required 목록에는 넣지 않고 서버가 판정과 대조한다.",
       "example": "CARRY_OVER",
-      "x-code-key": "CD-REMAINDER-DISPOSITION"
+      "x-code-key": "CD-REMAINDER-DISPOSITION",
+      "x-internal-note": "근거: W-02-05 §5-2·§5-7 · R81 · omf-mes#209 · 문의 039."
      },
      "reasonCode": {
       "type": "string",
@@ -6759,9 +6760,9 @@
      },
      "handoverNote": {
       "type": "string",
-      "description": "전달사항. 공지 확인 이력이 별도로 받는다 — 근거: DR-005",
+      "description": "전달사항 입력. 현재 서버는 이 값을 받아도 저장하거나 응답하지 않으므로 저장 성공을 보장하지 않는다.",
       "example": "비고",
-      "x-internal-note": "현장 도달 경로는 판정 대기다 — W-CO-04 §8 미결 4 · 미결-대장 1259행. 확정 노선은 DR-005 5-C(전사 + 작업지시 두 범위)로, 전달사항은 작업지시 범위 공지로 현장에 내려간다. ⛔ POP 두 화면(P-02-01 96행 · P-02-02 95행)은 「미확인 공지를 셸이 먼저 띄운다 · 화면이 그리지 않는다」(G-14)이므로 이 값을 POP 화면이 직접 읽는 것으로 적지 않는다."
+      "x-internal-note": "근거: W-02-04 §5-1 · 전달분 7-3 · omf-mes#563. 현 서버 WorkOrderReleaseService는 handoverNote를 사용하지 않으며 work_order.remarks나 Notice에 기록하지 않는다. 작업지시 범위 공지·확인 이력이라는 업무 요구는 DR-005에 보존한다."
      }
     },
     "required": [

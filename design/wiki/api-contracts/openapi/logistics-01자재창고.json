@@ -6712,7 +6712,7 @@
      "trace"
     ],
     "summary": "생산 LOT 완료",
-    "description": "생산 LOT 라벨을 부착한 뒤 스캔한 현재 LOT을 완료로 옮긴다. 이 동작은 LOT 생산 등록 확정이며 W/O 마감이 아니다. 계획 수량 미달 사유와 잔량 처리는 받지 않고 관리웹 W-02-05의 W/O 마감에서 처리한다. 라벨 발행은 이 오퍼레이션 밖이며 공통 출력물 계약이 소유한다. 오프라인 대상이다(공유계약 C-9). 근거: P-02-04 §3-3",
+    "description": "생산 LOT 라벨을 부착한 뒤 스캔한 현재 LOT의 완료 시각을 기록한다. 이 동작은 W/O 마감이 아니다. 누적 배분 수량이 계획 수량보다 적으면 completionVarianceReasonCode가 필요하고, 정상·초과이면 보내지 않는다. 미달 사유는 원천 W/O의 사유 한 칸에 기록되어 여러 LOT의 마지막 기록만 남는다. 잔량 처리는 W/O 마감 소관이다. 오프라인 대상이다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -6786,7 +6786,7 @@
       }
      }
     },
-    "x-internal-note": "02 요구서 §3-16 이 이 오퍼레이션을 「01 계약」이라 적었는데 경로 자체가 없었다. 역방향 ② 검사기가 찾아 2026-08-12 에 더했다(client #75). 품질 판정 축(정상·불량 등)은 03 품질 계약이 옮긴다 — 여기서 바꾸는 것은 생산 LOT 의 수명주기 상태다."
+    "x-internal-note": "근거: P-02-06 §5-3·§5-5·§8-2 · 공유계약 C-9 · 문의 043. 미달 완료는 work_order.completion_variance_reason_code를 덮어쓰고 LOT별 사유 칸은 만들지 않는다. 마감된 W/O의 미달 LOT 완료는 400 STATE_LOCKED다."
    }
   },
   "/logistics/document-progress/{documentTypeCode}/{documentId}:request-cancel": {
@@ -11809,7 +11809,7 @@
      "businessDate",
      "occurredAt"
     ],
-    "description": "생산 LOT 완료. 부착 라벨 스캔으로 LOT 생산 등록을 확정한다. 미달 사유·잔량 처리는 W/O 마감 소관이므로 이 본문에서 받지 않는다. 근거: P-02-04 §3-3",
+    "description": "생산 LOT 완료. 누적 배분 수량이 계획 수량보다 적으면 completionVarianceReasonCode가 필요하고, 정상·초과이면 보내지 않는다. 미달 사유는 LOT별로 보존되지 않고 원천 W/O의 마지막 사유 한 칸에 기록된다.",
     "properties": {
      "remarks": {
       "x-source-column": "remarks",
@@ -11831,6 +11831,16 @@
       "format": "date-time",
       "description": "단말에서 실제로 일어난 시각. 근거: 공유계약 C-8",
       "example": "2026-08-12T10:22:00+09:00"
+     },
+     "completionVarianceReasonCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "계획 수량 미달 완료 사유. 미달일 때 필수이고 정상·초과이면 보내지 않는다. 원천 W/O의 사유 한 칸을 덮어쓰므로 LOT별 독립 이력은 보장하지 않는다.",
+      "example": "MATERIAL_SHORTAGE",
+      "x-code-key": "CD-WORK-ORDER-COMPLETION-VARIANCE-REASON",
+      "x-internal-note": "근거: P-02-06 §5-3·§8-2 · 문의 043. 값은 WORK_ORDER_COMPLETION_VARIANCE_REASON 그룹과 대조한다."
      }
     }
    },
