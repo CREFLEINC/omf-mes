@@ -1916,12 +1916,13 @@
         "GOODS_ISSUE",
         "INVENTORY_ADJUSTMENT",
         "STOCK_TRANSFER",
-        "RECYCLE_ENTRY"
+        "RECYCLE_ENTRY",
+        "PUTAWAY_TASK"
        ],
        "example": "GOODS_RECEIPT"
       },
       "x-code-key": "CD-INVENTORY-TRANSACTION-SOURCE-DOCUMENT-TYPE",
-      "description": "원천 문서 유형으로 거른다. 원천 문서 유형. sourceDocumentId와 함께 원천을 식별한다. GOODS_RECEIPT, GOODS_ISSUE, INVENTORY_ADJUSTMENT, STOCK_TRANSFER, RECYCLE_ENTRY를 사용한다. RECYCLE_ENTRY의 sourceDocumentId는 등록 결과의 recycleEntryId이며 lotId나 다른 전표 식별자가 아니다. 고객이 편집하는 공통코드가 아니다. 재고 이동 방향은 라인의 from*/to*로 구분한다."
+      "description": "원천 문서 유형으로 거른다. 원천 문서 유형. sourceDocumentId와 함께 원천을 식별한다. GOODS_RECEIPT, GOODS_ISSUE, INVENTORY_ADJUSTMENT, STOCK_TRANSFER, RECYCLE_ENTRY를 사용한다. RECYCLE_ENTRY의 sourceDocumentId는 등록 결과의 recycleEntryId이며 lotId나 다른 전표 식별자가 아니다. 고객이 편집하는 공통코드가 아니다. 재고 이동 방향은 라인의 from*/to*로 구분한다. PUTAWAY_TASK는 적치 지시 putawayTaskId를 가리키며 신규 임시 적치와 정위치 복귀 원장을 구분 추적한다."
      },
      {
       "name": "page",
@@ -4829,7 +4830,7 @@
      "logistics"
     ],
     "summary": "적치 지시 목록",
-    "description": "담당자에게 할당된 지시를 내린다. 근거: M-01-05 §3 · M-01-07 §3",
+    "description": "담당자에게 할당된 지시를 내린다. 근거: M-01-05 §3 · M-01-07 §3. temporaryOnly=true는 현재 COMPLETED_TEMPORARY인 지시만 반환한다. 복귀 완료 후 제외하며 과거 임시 이력만으로 포함하지 않는다. 같은 LOT의 여러 지시는 번호로 구분하여 선택한다.",
     "parameters": [
      {
       "name": "assignedWorkerId",
@@ -4855,7 +4856,7 @@
        "type": "string"
       },
       "x-code-key": "CD-PUTAWAY-TASK-STATUS",
-      "description": "적치 작업 상태로 거른다 — 적치 대기(PENDING) · 적치 완료(COMPLETED) · 임시 적치 완료(COMPLETED_TEMPORARY). ⚠ 임시 적치는 사유가 함께 필수다(PUTAWAY_TASK_TEMPORARY_REASON). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PUTAWAY_TASK_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "적치 작업 상태로 거른다 — 적치 대기(PENDING) · 적치 완료(COMPLETED) · 임시 적치 완료(COMPLETED_TEMPORARY). ⚠ 임시 적치는 사유 코드(PUTAWAY_TASK_TEMPORARY_REASON)와 비고 중 하나가 필수다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PUTAWAY_TASK_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "lotId",
@@ -4872,7 +4873,7 @@
        "type": "boolean",
        "default": false
       },
-      "description": "임시 위치에 적재된 건만. 정위치 이동 대상을 찾는다"
+      "description": "현재 COMPLETED_TEMPORARY인 지시만. 아직 정위치 복귀하지 않은 대상이다."
      },
      {
       "name": "page",
@@ -4998,7 +4999,7 @@
      "logistics"
     ],
     "summary": "적치 완료",
-    "description": "권장 위치가 있는데 다른 위치로 적치하면 400 으로 막는다. 권장 위치가 없는 품목은 confirmedNoRule 을 참으로 보내면 통과하며, 이때도 실제 위치는 반드시 남는다. 근거: M-01-05 §5-2-1",
+    "description": "권장 위치가 있는데 다른 위치로 적치하면 400 으로 막는다. 권장 위치가 없는 품목은 confirmedNoRule 을 참으로 보내면 통과하며, 이때도 실제 위치는 반드시 남는다. 근거: M-01-05 §5-2-1. PENDING에서 정상 완료 또는 COMPLETED_TEMPORARY에서 정위치 복귀를 받아 COMPLETED로 전이한다. 다음 위치·수량·원천 보존 규칙은 COMPLETED_TEMPORARY의 복귀에만 적용한다. 최초 PENDING 정상 적치는 기존 출발 위치·창고 규칙을 유지한다. 복귀 출발은 서버가 잠근 현재 actualLocationId이며 최초 fromLocationId는 보존한다. 목적지는 지시의 동일 창고 안 다른 활성 비임시 위치다. 권장 위치 검증과 권장 없음 확인을 그대로 적용하며 혼적 위반은 차단, 수용량 초과는 경고다. 원 임시 적치와 추적되는 동일 품목·LOT·소유·단위·품질 축의 taskQty 전량만 이동한다. 부분수량·잔여 자동축소·다른 재고로 부족분 대체는 금지한다. 예약/피킹 수량 침해, 소비·다른 이동으로 전량 부족, 원천 식별 불가는 400 INVALID(field=putawayTaskId)와 사유로 전량 거부한다. 음수 재고 허용으로 우회하지 않는다. Hold만으로 차단하지 않고 경고하며 품질·보류 상태를 보존한다. availableQty는 보류까지 차감하므로 이 값만으로 복귀 가부를 판정하지 않는다. 지시와 재고를 잠가 재검증 후 출발 차감·도착 증가·원장 추가·지시 상태/현재위치/완료시각/버전·감사·멱등 완료를 원자적으로 저장한다. 창고 및 품목·LOT 총수량은 불변이며 입고를 다시 전기하지 않는다. 원 임시 위치·사유/비고·시각·작업자와 원장은 불변 이력으로 남긴다. 현재 completedAt은 복귀 occurredAt이다. 복귀 원장은 PUTAWAY_TASK와 putawayTaskId로 원천을 식별하고 과거 원장은 재작성하지 않는다. 일반 창고 내 임의 이동이나 파렛트 재편성 경로가 아니다. 임시 적치와 복귀는 별도 업무여서 새 Idempotency-Key를 쓴다. 동일 복귀 키·본문·주체의 재전송은 완료 상태여도 최초 응답을 재생하며 원장은 추가하지 않는다. COMPLETED 지시의 새 키는 400 STATE_LOCKED, 같은 키의 다른 내용은 409다. businessDate·occurredAt은 재전송에도 유지한다. 온라인은 상세 ETag를 If-Match에 쓰고 큐는 If-Match 없이 보내되 상태·재고 검증은 유지한다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -5032,7 +5033,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "상태 불허는 STATE_LOCKED. 복귀 원천 불명확·전량 부족·예약/피킹 침해는 INVALID(field=putawayTaskId)와 사유를 반환한다. 입력 보존·재조회하며 다른 재고로 대체하지 않는다. 목적지·권장 위치·혼적 등 검증 실패도 여기에 포함한다.",
       "content": {
        "application/json": {
         "schema": {
@@ -5052,7 +5053,7 @@
       }
      },
      "409": {
-      "description": "저장 충돌. 다시 읽어 오면 풀린다",
+      "description": "버전 또는 멱등 충돌. 입력 보존·재조회하며 새 키로 자동 재시도하지 않는다.",
       "content": {
        "application/json": {
         "schema": {
@@ -5062,7 +5063,7 @@
       }
      }
     },
-    "x-internal-note": "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9)."
+    "x-internal-note": "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). omf-mes#454: 경로/본문 재사용이나 행동 의미는 변경된다. 복귀 첫 스캔은 로컬 초안이고 도착 확인 후 complete 1회다. 확정된 임시 지시 캐시가 있어야 오프라인 복귀를 시작하며 미동기 임시 작업의 후속 복귀는 서버 확정 전 시작하지 않는다. 원 입고 취소의 기존 후속 판정은 적치/복귀 이력도 추적한다. 별도 적치 취소는 신설하지 않는다."
    }
   },
   "/logistics/putaway-tasks/{putawayTaskId}:complete-temporary": {
@@ -5082,7 +5083,7 @@
      "logistics"
     ],
     "summary": "임시 위치 적재",
-    "description": "정상 적치와 상태가 구분된다. 사유 코드와 비고 중 적어도 하나는 있어야 한다. 근거: M-01-07 §5-5",
+    "description": "정상 적치와 상태가 구분된다. 사유 코드와 비고 중 적어도 하나는 있어야 한다. 근거: M-01-07 §5-5. PENDING에서 COMPLETED_TEMPORARY로만 전이한다. 동일 키·본문·주체의 재전송은 원응답을 재생하지만 임시/정상 완료 지시의 새 키 요청은 400 STATE_LOCKED다. taskQty 전량의 실제 임시 이동을 원자적으로 기록하며 위치·사유/비고·시각·작업자와 원장을 불변 이력으로 남긴다. 신규 임시 적치 원장의 원천은 PUTAWAY_TASK와 putawayTaskId다. 업무 상태·재고·원장·감사·멱등 완료는 원자적으로 저장한다. 정위치 복귀는 별도 새 키로 적치 완료를 호출하며 최초 임시 원장을 덮어쓰지 않는다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -11127,7 +11128,7 @@
      "sourceDocumentId",
      "statusCode"
     ],
-    "description": "수불 원장. 전표 전기 또는 재생재 등록으로 생성하며 화면은 직접 쓰지 않고 조회한다. 취소가 허용된 전표의 취소는 기존 원장을 삭제하지 않고 역처리 행을 추가한다. 재생재 원장 생성 자체가 등록 취소 기능을 의미하지 않는다.",
+    "description": "수불 원장. 전표 전기 또는 재생재 등록으로 생성하며 화면은 직접 쓰지 않고 조회한다. 취소가 허용된 전표의 취소는 기존 원장을 삭제하지 않고 역처리 행을 추가한다. 재생재 원장 생성 자체가 등록 취소 기능을 의미하지 않는다. 적치 지시의 임시 적치와 정위치 복귀도 불변 원장을 생성한다.",
     "properties": {
      "inventoryTransactionId": {
       "x-source-column": "inventory_transaction_id",
@@ -11181,7 +11182,7 @@
       "x-source-column": "source_document_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "원천 문서 유형. sourceDocumentId와 함께 원천을 식별한다. GOODS_RECEIPT, GOODS_ISSUE, INVENTORY_ADJUSTMENT, STOCK_TRANSFER, RECYCLE_ENTRY를 사용한다. RECYCLE_ENTRY의 sourceDocumentId는 등록 결과의 recycleEntryId이며 lotId나 다른 전표 식별자가 아니다. 고객이 편집하는 공통코드가 아니다. 재고 이동 방향은 라인의 from*/to*로 구분한다.",
+      "description": "원천 문서 유형. sourceDocumentId와 함께 원천을 식별한다. GOODS_RECEIPT, GOODS_ISSUE, INVENTORY_ADJUSTMENT, STOCK_TRANSFER, RECYCLE_ENTRY를 사용한다. RECYCLE_ENTRY의 sourceDocumentId는 등록 결과의 recycleEntryId이며 lotId나 다른 전표 식별자가 아니다. 고객이 편집하는 공통코드가 아니다. 재고 이동 방향은 라인의 from*/to*로 구분한다. PUTAWAY_TASK는 적치 지시 putawayTaskId를 가리키며 신규 임시 적치와 정위치 복귀의 별도 불변 원장 건을 적치 상세로 추적한다.",
       "x-no-example": true,
       "x-internal-note": "공유계약 A-10 및 M-01-12 §5-2-a. omf-mes#512: 기존 원천 유형을 보존하고 재생재 등록 건을 독립 원천으로 추가한다.",
       "x-code-key": "CD-INVENTORY-TRANSACTION-SOURCE-DOCUMENT-TYPE",
@@ -11190,7 +11191,8 @@
        "GOODS_ISSUE",
        "INVENTORY_ADJUSTMENT",
        "STOCK_TRANSFER",
-       "RECYCLE_ENTRY"
+       "RECYCLE_ENTRY",
+       "PUTAWAY_TASK"
       ],
       "example": "GOODS_RECEIPT"
      },
@@ -11199,7 +11201,7 @@
       "type": "integer",
       "format": "int64",
       "example": 1001,
-      "description": "원천 문서 유형과 짝인 식별자. RECYCLE_ENTRY이면 RecycleEntry.recycleEntryId를 가리킨다. 숫자가 같아도 유형이 다르면 다른 원천이다."
+      "description": "원천 문서 유형과 짝인 식별자. RECYCLE_ENTRY이면 RecycleEntry.recycleEntryId를 가리킨다. 숫자가 같아도 유형이 다르면 다른 원천이다. PUTAWAY_TASK이면 putawayTaskId이며 입고 전표나 LOT 식별자가 아니다."
      },
      "statusCode": {
       "x-source-column": "status_code",
@@ -13543,7 +13545,7 @@
       "x-source-column": "from_location_id",
       "type": "integer",
       "format": "int64",
-      "description": "지시가 시작되는 위치",
+      "description": "지시가 시작되는 위치. 최초 출발 위치로 보존하며 복귀 출발 위치로 재사용하지 않는다.",
       "example": 1001
      },
      "recommendedLocationId": {
@@ -13573,7 +13575,7 @@
        "null"
       ],
       "format": "int64",
-      "description": "실제 적치된 위치. 완료되면 반드시 채워지며, 재고 잔액의 위치 축이 이 값을 따른다",
+      "description": "실제 적치된 위치. 완료되면 반드시 채워지며, 재고 잔액의 위치 축이 이 값을 따른다. 임시 완료이면 현재 임시 위치, 복귀 완료이면 정위치다. 최초 임시 위치는 원장/이력에 보존한다.",
       "example": 1001
      },
      "warehouseId": {
@@ -13587,7 +13589,7 @@
       "maxLength": 50,
       "description": "이 지시가 속한 창고의 위치 관리 수준 — 창고(WAREHOUSE) · 구역(ZONE) · 랙(RACK) · 셀(CELL). ⭐ «위치 스캔을 요구할지»가 이 값으로 갈린다. 값 목록은 GET /mdm/code-values?codeGroupCode=MANAGEMENT_LEVEL 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-internal-note": "CD-MANAGEMENT-LEVEL 확정값으로 위치 입력 방식을 가른다. 적치 상태와 다른 코드 축이다.",
       "x-code-key": "CD-MANAGEMENT-LEVEL"
      },
      "priorityNo": {
@@ -13609,9 +13611,9 @@
       "x-source-column": "status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "적치 작업의 상태 — 적치 대기(PENDING) · 적치 완료(COMPLETED) · 임시 적치 완료(COMPLETED_TEMPORARY). ⚠ 임시 적치는 사유가 함께 필수다(PUTAWAY_TASK_TEMPORARY_REASON). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PUTAWAY_TASK_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "적치 작업의 상태 — 적치 대기(PENDING) · 적치 완료(COMPLETED) · 임시 적치 완료(COMPLETED_TEMPORARY). ⚠ 임시 적치는 사유 코드(PUTAWAY_TASK_TEMPORARY_REASON)와 비고 중 하나가 필수다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PUTAWAY_TASK_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-internal-note": "CD-PUTAWAY-TASK-STATUS 시스템 소유 3값 확정. PENDING→COMPLETED 또는 PENDING→COMPLETED_TEMPORARY→COMPLETED이며 역전이 없다(omf-mes#454).",
       "x-code-key": "CD-PUTAWAY-TASK-STATUS"
      },
      "completedAt": {
@@ -13621,7 +13623,8 @@
        "null"
       ],
       "format": "date-time",
-      "example": "2026-08-06T09:12:00+09:00"
+      "example": "2026-08-06T09:12:00+09:00",
+      "description": "현재 완료 단계의 occurredAt. 임시 완료 시각과 복귀 완료 시각을 구분하며 최초 임시 시각은 불변 이력에 보존한다."
      },
      "remarks": {
       "x-source-column": "remarks",
@@ -13641,13 +13644,13 @@
      "businessDate",
      "occurredAt"
     ],
-    "description": "적치 완료. 권장 위치가 있는데 다른 위치로 적치하면 400 으로 막는다. 권장 위치가 없는 품목은 확인 후 통과하며, 이때도 실제 적치 위치는 반드시 남는다. 근거: M-01-05 §5-2-1",
+    "description": "적치 완료. 권장 위치가 있는데 다른 위치로 적치하면 400 으로 막는다. 권장 위치가 없는 품목은 확인 후 통과하며, 이때도 실제 적치 위치는 반드시 남는다. 근거: M-01-05 §5-2-1. 임시 복귀도 이 본문으로 지시 taskQty 전량을 이동한다. 원임시 기록의 덮어쓰기 수정 요청이 아니다.",
     "properties": {
      "actualLocationId": {
       "x-source-column": "actual_location_id",
       "type": "integer",
       "format": "int64",
-      "description": "실제 적치한 위치",
+      "description": "실제 적치 목적지. 복귀에서는 지시 창고 안 현재 임시 위치와 다른 활성 비임시 위치이며 기존 권장 검증을 적용한다.",
       "example": 1001
      },
      "confirmedNoRule": {
