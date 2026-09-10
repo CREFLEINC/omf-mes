@@ -1734,7 +1734,7 @@
       }
      },
      "409": {
-      "description": "포장 확정 충돌. conflictCause=workerLease는 앞의 동일 요청을 처리 중이므로 입력을 보존하고 잠시 뒤 같은 멱등키·본문으로 재전송한다. conflictCause=user는 이미 확정된 포장 또는 낡은 ETag일 수 있어 message를 기계 파싱하지 않고 상세를 재조회한다. PACKED면 재확정하지 않고 OPEN이면 최신 ETag와 원래 멱등키·본문으로 재전송한다.",
+      "description": "포장 확정 충돌. 이 요청의 멱등 처리에서 conflictCause=workerLease가 오면 입력을 보존하고 잠시 뒤 같은 멱등키·본문으로 재전송한다. conflictCause=user에는 이미 확정, 낡은 ETag, 같은 키의 다른 본문이 포함될 수 있어 message를 기계 파싱하지 않고 상세·내용물을 재조회한다. PACKED이면 현재 확정 상태만 확인하고 원요청 성공이나 라벨 출력을 추정하지 않는다. OPEN이어도 자동 재전송하지 않고 서버 내용물과 보존 입력의 차이를 사용자가 확인한 뒤 명시적으로 재확정한다. 본문이 같으면 원래 멱등키를 재사용하고 수정하면 새 키를 쓴다.",
       "content": {
        "application/json": {
         "schema": {
@@ -7346,7 +7346,7 @@
        "erpSync",
        "workerLease"
       ],
-      "description": "충돌 원인. workerLease는 같은 요청 처리 중이라 잠시 뒤 동일 요청을 재전송할 수 있다. user와 erpSync는 입력을 보존하고 자원을 재조회하며 자동 재전송하지 않는다.",
+      "description": "충돌 원인. user는 사용자 또는 업무 충돌, erpSync는 기간계 재동기화, workerLease는 워커가 자료를 처리 중이라는 뜻이다. 호출자는 입력을 보존하고 자원을 재조회한다. 개별 오퍼레이션이 멱등 처리 중이라고 명시한 경우에만 원래 멱등키·본문 재전송 규칙을 적용한다.",
       "example": "user"
      },
      "message": {
@@ -11146,12 +11146,13 @@
       "x-source-column": "source_document_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "원천 문서 유형. **A-10 다형 참조 판별자**이고 값은 «대상 테이블 이름»이다 — sourceDocumentId 는 그 표의 식별자다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다. 지금은 하나다 — 생산오더(PRODUCTION_ORDER → production.production_order). ⭐ W-02-01 §5-4 가 「ERP W/O 의 «자재예약정보»가 production_order 에 없고 inventory_reservation 이 ERP W/O 를 가리킨다」로 이 축을 세웠고 2026-09-02 에 「서버가 건다」로 해소됐다. ⚠ 값이 하나라고 축이 없는 것이 아니다 — 판별자는 «무엇을 가리키는지»를 말하고, 가리킬 표가 늘면 계약을 고친다.",
+      "description": "원천 문서 유형. **A-10 다형 참조 판별자**이고 sourceDocumentId와 짝으로 대상 행을 가리킨다. 값은 생산오더(PRODUCTION_ORDER → production.production_order)와 제품 피킹의 출하요청 라인(SHIPMENT_REQUEST_LINE → logistics.shipment_request_line)이다. SHIPMENT_REQUEST_LINE의 sourceDocumentId는 라인 ID이며 부모 출하요청 ID가 아니다. 일반 예약 응답에는 부모 ID가 없으므로 이 값만으로 출하요청 상세로 이동하지 않는다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-internal-note": "W-02-01 §5-4와 omf-mes#595·통보190/212 및 서버 shipment-progress.ts의 SHIPMENT_REQUEST_LINE 상수를 대조했다. 이 칸은 status_code가 아니라 닫힌 다형 참조 판별자이므로 실제 대상 테이블 집합을 enum으로 둔다.",
       "x-code-key": "CD-INVENTORY-RESERVATION-SOURCE-DOCUMENT-TYPE",
       "enum": [
-       "PRODUCTION_ORDER"
+       "PRODUCTION_ORDER",
+       "SHIPMENT_REQUEST_LINE"
       ],
       "example": "PRODUCTION_ORDER"
      },
