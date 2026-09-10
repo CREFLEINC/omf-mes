@@ -6501,7 +6501,11 @@
         "C9",
         "C10",
         "C14",
-        "C15"
+        "C15",
+        "C17",
+        "C18",
+        "C19",
+        "C20"
        ]
       },
       "description": "「이력으로 찾기」의 판정유형 축",
@@ -12283,7 +12287,7 @@
    },
    "LotStatusHistoryEvent": {
     "type": "object",
-    "description": "LOT 상태 전이 사건 1건. 결정 10 「현재 1행 + 변경이력 1:N」을 되살린 전용 이력(2026-08-30) — 도식스펙03 §1.3 전이 9종(C4·C5·C6·C7·C8·C9·C10·C14·C15) 전건을 담는다. 저장 테이블(trace.lot_status_history 성격)은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-03-01 §5-1·§5-2",
+    "description": "LOT 상태 전이 사건 1건. 검사·보류 9종(C4·C5·C6·C7·C8·C9·C10·C14·C15)과 처분·재등록 4종(C17·C18·C19·C20)을 담는다.",
     "required": [
      "lotStatusHistoryId",
      "lotId",
@@ -12333,9 +12337,13 @@
        "C9",
        "C10",
        "C14",
-       "C15"
+       "C15",
+       "C17",
+       "C18",
+       "C19",
+       "C20"
       ],
-      "description": "전이 9종 — 도식스펙03 §1.3 · W-03-01 §5-1 표",
+      "description": "LOT 상태 전이 유형. 기존 검사·보류 9종과 처분 재작업(C17)·폐기(C18)·정상(C19), 재고 재등록(C20)을 구분한다.",
       "example": "C7",
       "x-code-key": "CD-LOT-STATUS-HISTORY-EVENT-TRANSITION"
      },
@@ -12351,12 +12359,14 @@
        "string",
        "null"
       ],
-      "description": "A-10 다형 참조 판별자 — 값이 «대상 리소스 이름»이고 짝 id 가 그 리소스의 식별자다. ⭐ 대응표는 «설계»가 정한다(A-10 규칙 1 · 2026-09-03 사용자 결정). 이 전이를 일으킨 것 — 검사 결과(INSPECTION_RESULT) · LOT 보류/해제(LOT_HOLD) · 부적합(NONCONFORMANCE). ⭐ 전이 9종에서 도출했다(W-03-01 §5-1 표) — C4「합격」·C6「불합격」·C14「합격판정개수 초과」·C15「전수 재검 양품」은 검사 결과가, C5·C10「의심자재등록」은 보류가, C7·C8「재판정」은 검사 결과가, C9「클레임·리콜」은 부적합이 일으킨다.",
+      "description": "원천 문서 판별자. 짝인 sourceDocumentId는 해당 문서의 식별자다. C4·C6·C7·C8·C14·C15는 INSPECTION_RESULT와 검사 결과 식별자를, C5·C10은 LOT_HOLD와 LOT 보류 식별자를, C9는 NONCONFORMANCE와 부적합 식별자를 싣는다. C17·C18·C19는 DISPOSITION_DECISION과 처분 판정 식별자를, C20은 STOCK_TRANSFER와 재등록 재고 이동 식별자를 싣는다.",
       "x-code-key": "CD-LOT-STATUS-EVENT-SOURCE-DOCUMENT-TYPE",
       "enum": [
        "INSPECTION_RESULT",
        "LOT_HOLD",
-       "NONCONFORMANCE"
+       "NONCONFORMANCE",
+       "DISPOSITION_DECISION",
+       "STOCK_TRANSFER"
       ],
       "example": "INSPECTION_RESULT"
      },
@@ -12378,7 +12388,8 @@
       "format": "date-time",
       "example": "2026-08-06T09:12:00+09:00"
      }
-    }
+    },
+    "x-internal-note": "결정 10의 현재 1행 + 변경이력 1:N을 되살린 전용 이력. 근거: W-03-01 §5-1·§5-2 · omf-mes#557 · 서버 통보 089·154·218"
    },
    "LotLifecycleHistoryEvent": {
     "type": "object",
