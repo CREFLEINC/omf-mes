@@ -406,7 +406,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "검증 실패. 긴급 직행에서 WAREHOUSE 관리수준의 활성 위치가 0개 또는 2개 이상이면 warehouseId에 RANGE, ZONE·RACK·CELL 관리수준이면 위치 입력칸이 없어 warehouseId에 REQUIRED다. 고쳐야 풀린다",
       "content": {
        "application/json": {
         "schema": {
@@ -455,7 +455,7 @@
      "shipment"
     ],
     "summary": "재고 재등록 확정",
-    "description": "판정이 끝난 반품품을 판매 가능 재고로 되돌린다. 반출·도착·보류 해제·Lot Status 전이를 한 트랜잭션으로 처리한다 — 이 화면의 「재등록 확정」은 한 번의 확정이고 중간 상태를 남기지 않는다(공유계약 B-8 규칙 1 · B-8-1). ⭐ 이 경로에서만 반영 목적의 Hold → 정상 전이가 허용된다 — 「Release 로 할 것인가」를 정하는 것은 W-03-02·W-04-03 이고 이 경로는 그 결정을 재고에 반영할 뿐이다(공유계약 B-13). ⛔ 창고 간 이동의 2단계 스캔(POST /logistics/stock-transfers → :arrive)을 쓰지 않는다 — 재등록은 이동 중 구간이 없는 한 번의 행위라 그 형태가 맞지 않는다. 근거: W-04-11 §0 · §5-3 · §5-6",
+    "description": "판정이 끝난 반품품을 판매 가능 재고로 되돌린다. 반출·도착·보류 해제·Lot Status 전이를 한 트랜잭션으로 처리한다 — 이 화면의 「재등록 확정」은 한 번의 확정이고 중간 상태를 남기지 않는다(공유계약 B-8 규칙 1 · B-8-1). ⭐ 이 경로에서만 반영 목적의 Hold → 정상 전이가 허용된다 — 「Release 로 할 것인가」를 정하는 것은 W-03-02·W-04-03 이고 이 경로는 그 결정을 재고에 반영할 뿐이다(공유계약 B-13). ⛔ 창고 간 이동의 2단계 스캔(POST /logistics/stock-transfers → :arrive)을 쓰지 않는다 — 재등록은 이동 중 구간이 없는 한 번의 행위라 그 형태가 맞지 않는다. 대상 창고가 WAREHOUSE 관리수준이면 활성 위치가 정확히 하나일 때 그 위치로 해소하고, ZONE·RACK·CELL 관리수준이면 toLocationId가 필요하다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -483,7 +483,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "검증 실패. WAREHOUSE 관리수준에서 활성 위치를 하나로 정할 수 없으면 toWarehouseId에 RANGE, 보낸 위치가 유일 위치와 다르면 toLocationId에 INVALID다. ZONE·RACK·CELL 관리수준에서 위치를 생략하면 toLocationId에 REQUIRED, 비활성이거나 다른 창고의 위치면 INVALID다. 고쳐야 풀린다",
       "content": {
        "application/json": {
         "schema": {
@@ -513,7 +513,7 @@
       }
      }
     },
-    "x-internal-note": "WorkerNo 계열을 넣지 않는다 — 관리웹 전용이고 서버가 계정 토큰에서 행위자를 푼다(공유계약 D-5 · F-2) — POST /quality/lot-holds/{id}:release 와 같은 형태다. If-Match 헤더를 넣지 않는다 — 컬렉션 POST 라 헤더 토큰의 원천이 될 GET 이 없다(공유계약 B-1-1) — 토큰은 본문 lot.versionNo 로 싣는다(A-4-1). 201 에 ETag 를 두지 않는다 — 만들어진 이동 문서를 이 화면이 다시 고치지 않는다(W-04-11 §5-6 「되돌리기 ⛔ 두지 않는다」)."
+    "x-internal-note": "WorkerNo 계열을 넣지 않는다 — 관리웹 전용이고 서버가 계정 토큰에서 행위자를 푼다(공유계약 D-5 · F-2) — POST /quality/lot-holds/{id}:release 와 같은 형태다. If-Match 헤더를 넣지 않는다 — 컬렉션 POST 라 헤더 토큰의 원천이 될 GET 이 없다(공유계약 B-1-1) — 토큰은 본문 lot.versionNo 로 싣는다(A-4-1). 201 에 ETag 를 두지 않는다 — 만들어진 이동 문서를 이 화면이 다시 고치지 않는다(W-04-11 §5-6 「되돌리기 ⛔ 두지 않는다」). 위치 해소 경계 근거: W-04-11 §4-B·§6, 설계 통보 222, 서버 destination-location.ts."
    }
   },
   "/logistics/shipment-requests": {
@@ -1235,7 +1235,7 @@
      "shipment"
     ],
     "summary": "출하 처리",
-    "description": "출하·라인·LOT 배분을 한 트랜잭션으로 만든다(공유계약 B-8). ⛔ 확정하지 않는다 — 미확정 출하까지이고 확정은 :confirm 이다(2026-08-07 출하 2단 확정). 긴급 직행이면 expedited 를 참으로 보내고 사유가 필수다(W-04-05). 근거: W-04-04 §5 · W-04-05 §5-5",
+    "description": "출하·라인·LOT 배분을 한 트랜잭션으로 만든다(공유계약 B-8). ⛔ 확정하지 않는다 — 미확정 출하까지이고 확정은 :confirm 이다(2026-08-07 출하 2단 확정). 긴급 직행이면 expedited 를 참으로 보내고 사유가 필수다. 긴급 직행은 위치 입력이 없으므로 WAREHOUSE 관리수준이고 활성 위치가 정확히 하나인 창고만 지원한다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -1293,7 +1293,7 @@
       }
      }
     },
-    "x-internal-note": "재고 차감(수불 원장 전기)은 출하 생성 시 유지한다. 확정은 MES 상태 확정이며 이번 버전 ERP 송신 적재는 제외한다(2026-09-08 사용자 확정). ShipmentLine.goodsIssueLineId의 nullable은 유지한다. 출고 전표 필수성은 W-04-04 §8-2의 별도 미결이며 ERP 제외 결정으로 확정하지 않는다."
+    "x-internal-note": "재고 차감(수불 원장 전기)은 출하 생성 시 유지한다. 확정은 MES 상태 확정이며 이번 버전 ERP 송신 적재는 제외한다(2026-09-08 사용자 확정). ShipmentLine.goodsIssueLineId의 nullable은 유지한다. 출고 전표 필수성은 W-04-04 §8-2의 별도 미결이며 ERP 제외 결정으로 확정하지 않는다. 위치 해소 경계 근거: W-04-05 §4-D·§6, 설계 통보 221, 서버 destination-location.ts 및 shipment.service.ts."
    }
   },
   "/logistics/shipments/{shipmentId}": {
@@ -2945,6 +2945,7 @@
      "warehouseId": {
       "type": "integer",
       "format": "int64",
+      "description": "출하 창고. expedited=true이면 WAREHOUSE 관리수준이고 활성 위치가 정확히 하나여야 서버가 그 위치를 도착 위치로 해소한다. 활성 위치가 0개 또는 2개 이상이면 400 RANGE, ZONE·RACK·CELL 관리수준이면 위치 입력칸이 없으므로 400 REQUIRED다. 서버는 첫 위치를 선택하거나 위치를 자동 생성하지 않는다.",
       "example": 1001
      },
      "vehicleNo": {
@@ -2976,7 +2977,7 @@
      "expedited": {
       "type": "boolean",
       "default": false,
-      "description": "When true, bypasses warehouse routing, picking and packing without bypassing quality checks. Returns HTTP 400 if an allocated lot is not released. The server creates a product goods receipt and posts the receipt in the same transaction; the client does not create a separate goods receipt. The receipt type is PRODUCT, and the server determines the source document type. The receipt warehouse is the client-selected warehouseId in this request.",
+      "description": "When true, bypasses warehouse routing, picking and packing without bypassing quality checks. Returns HTTP 400 if an allocated lot is not released. The server creates a product goods receipt and posts the receipt in the same transaction; the client does not create a separate goods receipt. The receipt type is PRODUCT, and the server determines the source document type. The receipt warehouse is the client-selected warehouseId in this request. Because this request has no destination-location field, expedited shipment supports only a WAREHOUSE-managed warehouse with exactly one active location.",
       "example": true,
       "x-internal-note": "근거: W-04-05 §5-1·§5-3·§5-4 및 §8-4, 결정 10, G-32 RECEIPT_TYPE(2026-08-31 확정). 2026-09-07 정합화 — GoodsReceipt.sourceDocumentTypeCode 및 GoodsReceiptCreate.sourceDocumentTypeCode의 enum 목록(INBOUND_RECEIPT·SHIPMENT·PRODUCTION_RESULT·SUBCONTRACT_ISSUE)은 이미 존재한다. InventoryTransaction.sourceDocumentTypeCode는 수불 원장용의 다른 목록이므로 입고 원천 목록과 혼용하지 않는다. 목록 존재와 긴급직행출하의 실제 원천 ID 선택·연결은 별개이며 후자는 W-04-05 §8-4에서 열어 둔다. 서버가 입고를 생성하는 기존 책임을 유지하며 특정 원천 ID의 자동선택 규칙을 확정하지 않는다. «(정합주: 2026-09-07 — 구 description의 「입고 유형은 제품입고(PRODUCT)로 확정됐고 … 원천 문서 유형의 값 목록만 아직 확정 전이다(omf-mes#145)」 및 구 x-internal-note의 「receiptTypeCode·sourceDocumentTypeCode 의 값 목록 미확정 — 추적 omf-mes#145·#213. 서버가 정하므로 이 화면은 막히지 않는다」는 당시 대기 기록으로 보존한다. 현재 목록 부재 전제만 철회하며 #145·#213 전체 종료를 뜻하지 않는다)»"
      },
@@ -3808,7 +3809,7 @@
        "null"
       ],
       "format": "int64",
-      "description": "창고가 위치를 관리하면 필수 — 서버가 판정한다. 근거: W-04-11 §4-B",
+      "description": "대상 창고가 WAREHOUSE 관리수준이면 생략한다. 활성 위치가 정확히 하나일 때 서버가 그 위치로 해소하며, 값을 보냈다면 그 유일 위치와 같아야 한다. ZONE·RACK·CELL 관리수준이면 필수이고 대상 창고 소속의 활성 위치여야 한다.",
       "example": 1001
      },
      "qty": {
