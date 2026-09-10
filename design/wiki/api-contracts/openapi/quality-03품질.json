@@ -181,7 +181,7 @@
      "quality"
     ],
     "summary": "불량 실적 목록",
-    "description": "근거: W-03-05 §4-D",
+    "description": "근거: W-03-05 §4-D 유효 형식 lotId가 있으면 detectedFrom·detectedTo를 함께 생략할 수 있다. 두 날짜를 보내면 LOT 등 필터와 교집합이며 한쪽만 보내면 400 REQUIRED. lotId 없이 두 날짜 모두 없으면 400 REQUIRED. 다른 식별자·필터에 같은 예외를 적용하지 않으며 기존 인증·공장/데이터 범위·페이지 검증은 유지한다.",
     "parameters": [
      {
       "name": "workOrderId",
@@ -200,7 +200,7 @@
        "format": "int64",
        "example": 1001
       },
-      "description": "이 LOT 의 불량 기록만. ⭐ 기간 쌍의 «대안 축»이다 — 이 값을 보내면 기간을 생략할 수 있다\n(공유계약 L-3-2 ⑶ 의 「상위 식별자」 자리다). M-02-02 가 LOT 을 스캔해 수리 대상 불량을 찾을 때\n쓴다(요구서 02 §3-14) — 스캔이 주는 것은 lotId 뿐이고 POST /production/repair-executions 는\ndefectRecordId 를 필수로 받는다. 근거: M-02-02 §5 · 요구서 02 §3-14"
+      "description": "이 LOT의 불량 기록만 조회한다. 유효 형식 lotId가 있으면 detectedFrom·detectedTo를 함께 생략할 수 있다. 기간을 둘 다 보내면 LOT와 교집합으로 적용하며 한쪽만 전송은 허용하지 않는다."
      },
      {
       "name": "defectCodeId",
@@ -247,7 +247,7 @@
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
       },
-      "description": "기간 시작. ⭐ 조건부 필수 — lotId 없이 전 이력을 훑을 때는 «반드시» 보낸다(공유계약 L-3 ·\n무제한이면 원장이 누적된 뒤 화면이 멎는다). 없으면 400 이다(공유계약 L-3-2 ⑵).\n⛔ lotId 로 «한 LOT 의 불량 기록»을 읽을 때는 보내지 않는다 — M-02-02 §5(수리 대상 불량 조회 ·\n요구서 02 §3-14)가 그 경로이고, 거기에 기간을 요구하면 화면이 없는 기간을 지어내게 된다\n(스캔하는 쪽은 그 불량이 언제 났는지 모른다). 형이 조건부 필수를 표현하지 못해 설명이 말한다.\n끝 경계는 date-time 이라 반열림이다 — From 이상 · To 미만(공유계약 L-3-1)."
+      "description": "검출 시작 시각 이상. lotId가 없으면 detectedTo와 함께 필수이며 누락 시 400 REQUIRED. 유효 형식 lotId가 있으면 두 기간을 함께 생략할 수 있지만 한쪽만 전송하면 누락 쪽 400 REQUIRED. 둘 다 보내면 다른 필터와 교집합이다."
      },
      {
       "name": "detectedTo",
@@ -257,7 +257,7 @@
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
       },
-      "description": "기간 끝. detectedFrom 과 한 쌍이다 — 함께 보내거나 함께 생략한다. To 미만이다(공유계약 L-3-1)."
+      "description": "검출 끝 시각 미만. detectedFrom과 함께 전송한다. 유효 형식 lotId가 있을 때만 두 날짜 함께 생략 가능. 한쪽만 전송하면 400 REQUIRED."
      },
      {
       "name": "page",
@@ -303,9 +303,19 @@
         }
        }
       }
+     },
+     "400": {
+      "description": "기간 검증 실패: lotId 없이 기간 둘 다 누락하거나 lotId 유무와 관계없이 한쪽만 전송하면 400 REQUIRED. 기존 ID 형식·접근 범위 검증은 유지한다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
      }
     },
-    "x-internal-note": "등록 경로를 두지 않았다 — 03 화면 7장에 불량코드 입력이 0건이다. 이 계약에 만드는 경로가 없다. M-02-02(수리 왕복)는 읽어 쓰는 쪽이고(POST /production/repair-executions 가 defectRecordId 를 필수로 받는다), P-04-03 은 04 계약 미착수다. omf-mes#83 은 2026-08-25 CLOSED — 「#83 로 막힘」 표기는 낡았다. ⛔ 04 트랙이 POST 를 더할 때 새 경로를 만들지 말고 이 경로에 얹는다 — 접두어는 공유해도 경로는 한 계약에만 둔다(03 계약 2단계 §3)."
+    "x-internal-note": "등록 경로를 두지 않았다 — 03 화면 7장에 불량코드 입력이 0건이다. 이 계약에 만드는 경로가 없다. M-02-02(수리 왕복)는 읽어 쓰는 쪽이고(POST /production/repair-executions 가 defectRecordId 를 필수로 받는다), P-04-03 은 04 계약 미착수다. omf-mes#83 은 2026-08-25 CLOSED — 「#83 로 막힘」 표기는 낡았다. ⛔ 04 트랙이 POST 를 더할 때 새 경로를 만들지 말고 이 경로에 얹는다 — 접두어는 공유해도 경로는 한 계약에만 둔다(03 계약 2단계 §3). PR #509 재검토: 통보074 일반 기간 필수를 보존하고 M-02-02 실제 LOT 불량 조회에만 새 기간 생략 예외를 설계 승인했다. 집계에는 전파하지 않는다."
    }
   },
   "/quality/defect-records/distribution": {
@@ -356,8 +366,9 @@
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
       },
-      "description": "기간 시작. 부르는 화면 전건(W-03-05 §5-9·§6)이 기간을 싣는다 — 기간 미입력이면 조회 자체가\n비활성이다. 없으면 400 이다(공유계약 L-3-2 ⑵). 형이 필수를 표현하지 못해 설명이 말한다.\n⭐ required 승격 후보다(아래 x-internal-note) — 요청 축 optional→required 는 별건으로 사람\n승인을 받는다. 끝 경계는 date-time 이라 반열림이다 — From 이상 · To 미만(공유계약 L-3-1).",
-      "x-internal-note": "required 승격 후보 — 부르는 화면 전건(W-03-05)이 기간을 싣는다(§5-9·§6, 2026-09-09 실측).\n승격은 별건으로 사람 승인을 받는다."
+      "description": "조회 기간 시작 시각 이상. 시작·끝 모두 필수이며 누락 시 400 REQUIRED. LOT·상태 등의 필터가 있어도 기간 생략 예외를 적용하지 않는다.",
+      "x-internal-note": "PR #509 재검토 승인: 기존 기간 필수 동작을 required:true로 정식 표현한다. 요청 형식 optional→required 승격(⛔)이며 사용자 자율 설계 승인 범위에 포함한다.",
+      "required": true
      },
      {
       "name": "detectedTo",
@@ -367,7 +378,9 @@
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
       },
-      "description": "기간 끝. detectedFrom 과 한 쌍이다 — 함께 보내거나 함께 생략한다. To 미만이다(공유계약 L-3-1)."
+      "description": "조회 기간 끝 시각 미만. 시작·끝 모두 필수이며 누락 시 400 REQUIRED. LOT·상태 등의 필터가 있어도 기간 생략 예외를 적용하지 않는다.",
+      "required": true,
+      "x-internal-note": "PR #509 재검토 승인: 기존 기간 필수 동작을 required:true로 정식 표현한다. 요청 형식 optional→required 승격(⛔)이며 사용자 자율 설계 승인 범위에 포함한다."
      }
     ],
     "responses": {
@@ -377,6 +390,16 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/DefectDistribution"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "기간 시작·끝 모두 필수. 누락 시 400 REQUIRED. 기존 요청 형식·필터 검증을 유지한다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
         }
        }
       }
@@ -443,7 +466,7 @@
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
       },
-      "description": "기간 — 처리 이력 탭(W-03-10 §3 탭)에서 필수(공유계약 L-3). 없으면 400 이다(공유계약 L-3-2 ⑵).\n⛔ 이력 모드가 «아닌» 경로 — 폐기 품의 대상 선택(W-04-10 §3 — dispositionTypeCode=SCRAP ·\nfollowUpPending=true)과 재고 재등록 조회·필터(W-04-11 §3·§5-2 — reinstatable=true·warehouseId ·\nfollowUpPending=true) — 에서는 보내지 않는다."
+      "description": "판정 시작 시각 이상. decidedTo와 함께 전송하거나 둘 다 생략할 수 있다. 한쪽만 있으면 400 PAIR. 두 날짜를 보내면 기존 필터와 교집합으로 적용한다."
      },
      {
       "name": "decidedTo",
@@ -453,7 +476,7 @@
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
       },
-      "description": "기간 끝. decidedFrom 과 한 쌍이다 — 함께 보내거나 함께 생략한다. To 미만이다(공유계약 L-3-1)."
+      "description": "판정 끝 시각 미만. decidedFrom과 함께 전송하거나 둘 다 생략할 수 있다. 한쪽만 있으면 400 PAIR."
      },
      {
       "name": "warehouseId",
@@ -524,6 +547,16 @@
           "items",
           "page"
          ]
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "기간 한쪽만 전송하면 400 PAIR. 기간 둘 다 생략은 허용한다. 기존 요청 검증을 유지한다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
         }
        }
       }
@@ -1058,8 +1091,9 @@
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
       },
-      "description": "기간 시작. 부르는 화면 전건(W-03-05 §5-9·§6)이 기간을 싣는다 — 목록·요약과 같은 필터 축이다\n(§3-5 「분리해 보기」 행 — 위 셋이 같은 모집단을 쓴다). 없으면 400 이다(공유계약 L-3-2 ⑵).\n형이 필수를 표현하지 못해 설명이 말한다. ⭐ required 승격 후보다(아래 x-internal-note) — 요청\n축 optional→required 는 별건으로 사람 승인을 받는다. 끝 경계는 date-time 이라 반열림이다 —\nFrom 이상 · To 미만(공유계약 L-3-1).",
-      "x-internal-note": "required 승격 후보 — 부르는 화면 전건(W-03-05)이 기간을 싣는다(§5-9·§6, 2026-09-09 실측).\n승격은 별건으로 사람 승인을 받는다."
+      "description": "조회 기간 시작 시각 이상. 시작·끝 모두 필수이며 누락 시 400 REQUIRED. LOT·상태 등의 필터가 있어도 기간 생략 예외를 적용하지 않는다.",
+      "x-internal-note": "PR #509 재검토 승인: 기존 기간 필수 동작을 required:true로 정식 표현한다. 요청 형식 optional→required 승격(⛔)이며 사용자 자율 설계 승인 범위에 포함한다.",
+      "required": true
      },
      {
       "name": "inspectedTo",
@@ -1069,7 +1103,9 @@
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
       },
-      "description": "기간 끝. inspectedFrom 과 한 쌍이다 — 함께 보내거나 함께 생략한다. To 미만이다(공유계약 L-3-1)."
+      "description": "조회 기간 끝 시각 미만. 시작·끝 모두 필수이며 누락 시 400 REQUIRED. LOT·상태 등의 필터가 있어도 기간 생략 예외를 적용하지 않는다.",
+      "required": true,
+      "x-internal-note": "PR #509 재검토 승인: 기존 기간 필수 동작을 required:true로 정식 표현한다. 요청 형식 optional→required 승격(⛔)이며 사용자 자율 설계 승인 범위에 포함한다."
      },
      {
       "name": "calibrationExpired",
@@ -1096,7 +1132,7 @@
       }
      },
      "400": {
-      "description": "요청 오류 — 기간 누락 등 검증 실패. 주소 조작·서버 검증 실패를 표준 오류로 보인다(omf-mes#192 문7)",
+      "description": "기간 시작·끝 모두 필수. 누락 시 400 REQUIRED. 기존 요청 형식·필터 검증을 유지한다.",
       "content": {
        "application/json": {
         "schema": {
@@ -1162,8 +1198,9 @@
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
       },
-      "description": "기간 시작. 부르는 화면 전건(W-03-05 §5-9·§6, §3-5 「필터·조회」 행)이 기간을 싣는다 — 목록과\n같은 필터 축이다. 없으면 400 이다(공유계약 L-3-2 ⑵). 형이 필수를 표현하지 못해 설명이 말한다.\n⭐ required 승격 후보다(아래 x-internal-note) — 요청 축 optional→required 는 별건으로 사람\n승인을 받는다. 끝 경계는 date-time 이라 반열림이다 — From 이상 · To 미만(공유계약 L-3-1).",
-      "x-internal-note": "required 승격 후보 — 부르는 화면 전건(W-03-05)이 기간을 싣는다(§5-9·§6, 2026-09-09 실측).\n승격은 별건으로 사람 승인을 받는다."
+      "description": "조회 기간 시작 시각 이상. 시작·끝 모두 필수이며 누락 시 400 REQUIRED. LOT·상태 등의 필터가 있어도 기간 생략 예외를 적용하지 않는다.",
+      "x-internal-note": "PR #509 재검토 승인: 기존 기간 필수 동작을 required:true로 정식 표현한다. 요청 형식 optional→required 승격(⛔)이며 사용자 자율 설계 승인 범위에 포함한다.",
+      "required": true
      },
      {
       "name": "inspectedTo",
@@ -1173,7 +1210,9 @@
        "format": "date-time",
        "example": "2026-08-12T10:22:00+09:00"
       },
-      "description": "기간 끝. inspectedFrom 과 한 쌍이다 — 함께 보내거나 함께 생략한다. To 미만이다(공유계약 L-3-1)."
+      "description": "조회 기간 끝 시각 미만. 시작·끝 모두 필수이며 누락 시 400 REQUIRED. LOT·상태 등의 필터가 있어도 기간 생략 예외를 적용하지 않는다.",
+      "required": true,
+      "x-internal-note": "PR #509 재검토 승인: 기존 기간 필수 동작을 required:true로 정식 표현한다. 요청 형식 optional→required 승격(⛔)이며 사용자 자율 설계 승인 범위에 포함한다."
      },
      {
       "name": "finalRoundOnly",
@@ -1228,7 +1267,7 @@
       }
      },
      "400": {
-      "description": "요청 오류 — 기간 누락 등 검증 실패. 주소 조작·서버 검증 실패를 표준 오류로 보인다(omf-mes#192 문7)",
+      "description": "기간 시작·끝 모두 필수. 누락 시 400 REQUIRED. 기존 요청 형식·필터 검증을 유지한다.",
       "content": {
        "application/json": {
         "schema": {

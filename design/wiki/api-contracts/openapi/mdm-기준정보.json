@@ -11297,7 +11297,7 @@
      "mdm"
     ],
     "summary": "여러 설비의 점검 항목 — 한 번에",
-    "description": "여러 설비의 점검 항목 부여와 해석 결과를 한 번에 돌려준다.\n\n현장 앱은 통신이 끊긴 상태에서도 점검을 시작해야 하므로 앱을 열 때 설비별 부여를 미리 받아 둔다. 공장 설비가 수십에서 수백이면 설비 하나씩 부르는 것으로는 그 시점에 다 받을 수 없다.\n\n요청한 설비를 «전건» 돌려준다 — 부여가 없는 설비도 resolvedFromLevelCode 를 NONE 으로 함께 낸다. 빠뜨리면 화면이 「아직 못 받았다」와 「점검 대상이 아니다」를 구분할 수 없다. 근거: M-05-01 §6 · 공유계약 C-11 · C-13 · G-9",
+    "description": "여러 설비의 점검 항목 부여와 해석 결과를 한 번에 돌려준다.\n\n현장 앱은 통신이 끊긴 상태에서도 점검을 시작해야 하므로 앱을 열 때 설비별 부여를 미리 받아 둔다. 공장 설비가 수십에서 수백이면 설비 하나씩 부르는 것으로는 그 시점에 다 받을 수 없다.\n\n요청한 설비를 «전건» 돌려준다 — 부여가 없는 설비도 resolvedFromLevelCode 를 NONE 으로 함께 낸다. 빠뜨리면 화면이 「아직 못 받았다」와 「점검 대상이 아니다」를 구분할 수 없다. 근거: M-05-01 §6 · 공유계약 C-11 · C-13 · G-9 존재하고 조회가 허용된 설비만 NONE(부여 없음)으로 표현한다. 미존재 설비는 404, 인증 실패는 401, 권한·공장 범위 밖은 403이며 요청 전체가 실패한다. 오류를 NONE이나 누락된 성공 항목으로 바꾸지 않는다. 설비 ID 중복은 하나로 정규화하며 응답은 유일 ID당 한 항목이다. 해석 우선순위·effective 값의 의미는 단일 설비 점검 부여 조회와 같다.",
     "parameters": [
      {
       "name": "equipmentIds",
@@ -11335,6 +11335,36 @@
      },
      "400": {
       "description": "equipmentIds 가 비었거나 상한을 넘었다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "인증 실패",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "요청 설비의 조회 권한 또는 공장 범위 밖",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "요청한 설비가 존재하지 않음",
       "content": {
        "application/json": {
         "schema": {

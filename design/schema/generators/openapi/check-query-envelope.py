@@ -75,7 +75,7 @@ STANDARD_SHAPES = (
 BASELINE_OFF_SHAPE = 13   # (1) 표준형 밖의 목록 응답
 BASELINE_NO_ASOF = 11     # (4) 집계인데 `asOf` 가 required 가 아니다
 BASELINE_SORT_FREE = 5    # (5) `sort` 에 enum 이 없다
-BASELINE_UNBOUNDED = 47   # (6) 무계 목록 후보
+BASELINE_UNBOUNDED = 42   # (6) 무계 목록 후보
 
 SUMMARY_WORDS = ("summary", "distribution", "trend")
 PAGING_AXES = frozenset({"page", "size", "sort"})
