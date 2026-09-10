@@ -25,7 +25,7 @@
      "maintenance"
     ],
     "summary": "점검 기록 목록",
-    "description": "설비 점검 이력을 조회한다. 작업 전 점검 통제처럼 전 이력을 훑을 때는 기간이 필수다(공유계약 L-3). 보전 지시 발행의 미발행 트리거 목록은 예외다(공유계약 L-12) — 기본이 미처리 전건이고 정렬은 경과일 긴 순이다. 작업 전 점검 통제가 이 목록을 근거로 삼는다. 단말에 아직 남아 있는 입력분은 여기 포함되지 않는다. ⭐ 기본 정렬이 점검 시각 내림차순이라, equipmentId·inspectionTypeCode 로 좁히고 size=1 로 부르면 통제 판정이 쓰는 「가장 최근 한 건」이 된다(P-02-02 §5-5).",
+    "description": "설비 점검 이력을 조회한다. 작업 전 점검 통제처럼 전 이력을 훑을 때는 기간이 필수다(공유계약 L-3). 보전 지시 발행의 미발행 트리거 목록은 기간 필수의 예외다(공유계약 L-12). 경과일 긴 순이 필요하면 정렬을 명시한다. 작업 전 점검 통제가 이 목록을 근거로 삼는다. 단말에 아직 남아 있는 입력분은 여기 포함되지 않는다. ⭐ 기본 정렬이 점검 시각 내림차순이라, equipmentId·inspectionTypeCode 로 좁히고 size=1 로 부르면 통제 판정이 쓰는 「가장 최근 한 건」이 된다(P-02-02 §5-5). 기간은 각 설비 공장 로컬 달력일이며 시작일 포함·종료일 다음 달력일 제외다. 서버 시간대·고정 오프셋이나 시작+24시간으로 대체하지 않는다. withoutMaintenanceOrder=true만 기간 생략 예외이며 FAIL·오름차순을 자동 설정하지 않는다. 최신 통제는 설비·유형·주기 기간·size=1로 조회하고 overallResultCode 필터를 보내지 않아 최신 FAIL을 숨기지 않는다. 기간 필터는 전체 건수·페이지·정렬에 동일하게 적용한다. 저장 시간대 또는 달력 경계가 확정 불가하면 500 INTERNAL_ERROR이며 UTC 대체나 행 숨김을 하지 않는다.",
     "parameters": [
      {
       "name": "equipmentId",
@@ -158,6 +158,26 @@
         }
        }
       }
+     },
+     "401": {
+      "description": "인증 계정 세션이 없다. 사번은 귀속 정보이며 로그인을 대신하지 않는다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "과거 필수 시각·사번·판정/발생 상태의 결손 또는 표현 불가 — INTERNAL_ERROR. 행이나 전체 건수를 숨기거나 계정에서 사번을 추정하지 않는다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
      }
     }
    },
@@ -166,7 +186,7 @@
      "maintenance"
     ],
     "summary": "점검 기록 등록",
-    "description": "설비 점검 입력 화면이 부른다. 헤더 1건과 항목별 라인 N건을 한 번에 만든다. 오프라인에서 큐에 쌓였다가 올라올 수 있어 멱등키가 필수다.",
+    "description": "설비 점검 입력 화면이 부른다. 헤더 1건과 항목별 라인 N건을 한 번에 만든다. 오프라인에서 큐에 쌓였다가 올라올 수 있어 멱등키가 필수다. 단말은 캐시된 유효 점검 항목의 필수 완결성과 측정 자동 판정을 책임진다. 서버는 제출 PASS/FAIL을 보존해 종합하고 현재 기준으로 재판정하지 않는다. 빈 lines는 422 LINE_REQUIRED, FAIL이 있으면 헤더 remarks가 필요해 없으면 422 REQUIRED다. 라인 비고가 헤더 비고를 대신하지 않는다. 측정값은 null 또는 Decimal(20,6)에 손실 없이 표현 가능한 값만 저장하며 불가능하면 400 RANGE(field=lines[i].measuredValue)로 전량 거부한다. 멱등 지문은 method·path·본문·인증 계정과 해당 요청의 원문 사번을 포함하고 If-Match는 제외한다. 사번을 받는 등록 요청은 사번 필수·형식 검사를 재생도 우회하지 않는다. 동일 주체·키·본문은 낡은 If-Match로도 최초 응답을 재생하고 다른 주체는 409로 거부한다. 업무 변경·응답·멱등 완료는 같은 트랜잭션이며 응답 실패도 함께 롤백한다. 번호 기본형식은 EQI-{YYYYMMDD}-{SEQ4}이며 inspectedAt의 UTC 날짜를 사용한다. 설비 공장별 채번 규칙이 전역 규칙보다 우선한다. 번호 사전 예약과 업무 저장은 분리돼 경합·업무 실패 결번을 허용하며 기존 번호를 다시 매기지 않는다. 정상 멱등 재생은 최초 번호와 응답을 보존한다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -225,8 +245,39 @@
         }
        }
       }
+     },
+     "401": {
+      "description": "인증 계정 세션이 없다. 사번은 귀속 정보이며 로그인을 대신하지 않는다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "멱등 키에 다른 작업·본문·주체를 재사용했다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "응답에 필요한 과거 필수값 결손 등 내부 오류. 업무 상태·감사·버전·멱등 완료를 함께 롤백한다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
      }
-    }
+    },
+    "x-internal-note": "통보097(omf-mes#514): 당시 기준 버전/필수 집합이 없어 서버가 누락 필수 라인과 정상 옛 기준 제출을 완전히 구별하지 못한다. itemName/judgeMethod는 현재 표시값이며 당시 기준 스냅샷이 아니다. 현재 유형 활성 검증은 유지한다. 계측기 제외와 일반 설비 점검은 별개다."
    }
   },
   "/maintenance/inspections/{inspectionId}": {
@@ -268,6 +319,36 @@
         }
        }
       }
+     },
+     "401": {
+      "description": "인증 계정 세션이 없다. 사번은 귀속 정보이며 로그인을 대신하지 않는다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "과거 필수 시각·사번·판정/발생 상태의 결손 또는 표현 불가 — INTERNAL_ERROR. 행이나 전체 건수를 숨기거나 계정에서 사번을 추정하지 않는다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "경로·질의·필수 헤더의 입력 형식 오류다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
      }
     }
    }
@@ -278,7 +359,7 @@
      "maintenance"
     ],
     "summary": "고장 기록 목록",
-    "description": "설비고장 상세처리 화면의 목록이다. 기본은 처리되지 않은 전건이고 경과일이 긴 순으로 온다(공유계약 L-12).",
+    "description": "설비고장 상세처리 화면의 목록이다. 기본은 처리되지 않은 전건이고 경과일이 긴 순으로 온다(공유계약 L-12). 기본 openOnly=true는 DONE을 제외하고 완료 이력 조회(openOnly=false)는 기간이 필요하다. 기간은 각 설비 공장의 로컬 달력일 시작 포함·종료일 다음 달력일 제외다. withoutMaintenanceOrder는 직접 지시 FK와 BREAKDOWN 트리거의 존재를 함께 보며 복수·취소 지시도 발행 흔적이다. 목록의 비가동 집계 0은 실제 미존재나 경고 해제 근거가 아니며 상세로 확인한다. 기간 필터는 전체 건수·페이지·정렬에 동일하게 적용한다. 저장 시간대 또는 달력 경계가 확정 불가하면 500 INTERNAL_ERROR이며 UTC 대체나 행 숨김을 하지 않는다.",
     "parameters": [
      {
       "name": "equipmentId",
@@ -401,6 +482,26 @@
         }
        }
       }
+     },
+     "401": {
+      "description": "인증 계정 세션이 없다. 사번은 귀속 정보이며 로그인을 대신하지 않는다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "과거 필수 시각·사번·판정/발생 상태의 결손 또는 표현 불가 — INTERNAL_ERROR. 행이나 전체 건수를 숨기거나 계정에서 사번을 추정하지 않는다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
      }
     }
    },
@@ -409,7 +510,7 @@
      "maintenance"
     ],
     "summary": "고장 보고 등록",
-    "description": "설비고장 현장보고 화면이 부른다. 사진은 이 요청에 싣지 않는다 — 만들어진 건에 따로 붙인다. 오프라인 큐에서 올라올 수 있어 멱등키가 필수다.",
+    "description": "설비고장 현장보고 본문을 접수한다. 201은 본문 접수이며 알림 발생·Zalo 전송·사진 업로드 완료가 아니다. notifyAssignee 생략은 true, false는 그대로 보존하고 전송 의사만 뜻한다. 현재 사진 연결은 미지원이며 연결 복구 뒤 자동 전송을 약속하지 않는다. 급한 건 직접 연락하도록 안내한다. 선택 stoppedAt은 ABNORMAL에서도 원문을 유지하고 reportedAt과의 선후를 근거 없이 보정하지 않는다. 오프라인 큐에서 올라올 수 있어 멱등키가 필수다. 멱등 지문은 method·path·본문·인증 계정과 해당 요청의 원문 사번을 포함하고 If-Match는 제외한다. 사번을 받는 등록 요청은 사번 필수·형식 검사를 재생도 우회하지 않는다. 동일 주체·키·본문은 낡은 If-Match로도 최초 응답을 재생하고 다른 주체는 409로 거부한다. 업무 변경·응답·멱등 완료는 같은 트랜잭션이며 응답 실패도 함께 롤백한다. 번호 기본형식은 MLF-{YYYYMMDD}-{SEQ4}이며 reportedAt의 UTC 날짜를 사용한다. 설비 공장별 채번 규칙이 전역 규칙보다 우선한다. 번호 사전 예약과 업무 저장은 분리돼 경합·업무 실패 결번을 허용하며 기존 번호를 다시 매기지 않는다. 정상 멱등 재생은 최초 번호와 응답을 보존한다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -449,6 +550,26 @@
        }
       }
      },
+     "401": {
+      "description": "인증 계정 세션이 없다. 사번은 귀속 정보이며 로그인을 대신하지 않는다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "멱등 키에 다른 작업·본문·주체를 재사용했다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     },
      "400": {
       "description": "입력이 규칙에 어긋난다",
       "content": {
@@ -468,6 +589,16 @@
         }
        }
       }
+     },
+     "500": {
+      "description": "응답에 필요한 과거 필수값 결손 등 내부 오류. 업무 상태·감사·버전·멱등 완료를 함께 롤백한다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
      }
     }
    }
@@ -478,7 +609,7 @@
      "maintenance"
     ],
     "summary": "고장 기록 한 건",
-    "description": "현장이 적은 내용과 처리 내역, 사진을 함께 낸다.",
+    "description": "현장이 적은 내용과 처리 내역, 사진을 함께 낸다. 현재 attachments=[]는 사진 연결 미지원 경계이며 사진이 실제로 없다는 증거가 아니다. 상세 ETag만 다음 수정/처리의 버전 토큰이다. 생성·PUT·start 뒤 상세를 재조회하고 내용 해시 ETag를 If-Match로 쓰지 않는다.",
     "parameters": [
      {
       "name": "breakdownId",
@@ -520,6 +651,36 @@
         }
        }
       }
+     },
+     "401": {
+      "description": "인증 계정 세션이 없다. 사번은 귀속 정보이며 로그인을 대신하지 않는다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "과거 필수 시각·사번·판정/발생 상태의 결손 또는 표현 불가 — INTERNAL_ERROR. 행이나 전체 건수를 숨기거나 계정에서 사번을 추정하지 않는다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "경로·질의·필수 헤더의 입력 형식 오류다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
      }
     }
    },
@@ -528,7 +689,7 @@
      "maintenance"
     ],
     "summary": "처리 내역 저장",
-    "description": "원인 코드와 처리 내역만 고친다. 현장이 적은 증상·발생 상태·정지 시각·사진은 고칠 수 없다.",
+    "description": "원인 코드와 처리 내역만 고친다. 현장이 적은 증상·발생 상태·정지 시각·사진은 고칠 수 없다. causeCode 생략은 유지, null은 해제, 문자열은 활성 설비 고장 원인 그룹과 값을 검증한다. 완료된 행은 수정하지 않는다. 멱등 지문은 method·path·본문·인증 계정과 해당 요청의 원문 사번을 포함하고 If-Match는 제외한다. 사번을 받는 등록 요청은 사번 필수·형식 검사를 재생도 우회하지 않는다. 동일 주체·키·본문은 낡은 If-Match로도 최초 응답을 재생하고 다른 주체는 409로 거부한다. 업무 변경·응답·멱등 완료는 같은 트랜잭션이며 응답 실패도 함께 롤백한다.",
     "parameters": [
      {
       "name": "breakdownId",
@@ -614,6 +775,26 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "인증 계정 세션이 없다. 사번은 귀속 정보이며 로그인을 대신하지 않는다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "응답에 필요한 과거 필수값 결손 등 내부 오류. 업무 상태·감사·버전·멱등 완료를 함께 롤백한다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
         }
        }
       }
@@ -717,7 +898,8 @@
        }
       }
      }
-    }
+    },
+    "x-internal-note": "통보092(omf-mes#514): 현재 바이너리/고장 첨부 연결은 기술적 미지원이다. 설계 요구는 보존하지만 본문201 뒤 이 경로까지 성공한 것으로 안내하지 않는다."
    }
   },
   "/maintenance/breakdowns/{breakdownId}:start-handling": {
@@ -726,7 +908,7 @@
      "maintenance"
     ],
     "summary": "처리 중으로",
-    "description": "접수된 고장을 처리 중으로 옮긴다. 되돌리는 길은 없다.",
+    "description": "접수된 고장을 처리 중으로 옮긴다. 되돌리는 길은 없다. 멱등 지문은 method·path·본문·인증 계정과 해당 요청의 원문 사번을 포함하고 If-Match는 제외한다. 사번을 받는 등록 요청은 사번 필수·형식 검사를 재생도 우회하지 않는다. 동일 주체·키·본문은 낡은 If-Match로도 최초 응답을 재생하고 다른 주체는 409로 거부한다. 업무 변경·응답·멱등 완료는 같은 트랜잭션이며 응답 실패도 함께 롤백한다.",
     "parameters": [
      {
       "name": "breakdownId",
@@ -795,6 +977,36 @@
         }
        }
       }
+     },
+     "401": {
+      "description": "인증 계정 세션이 없다. 사번은 귀속 정보이며 로그인을 대신하지 않는다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "업무 상태 잠김은 STATE_LOCKED. 버전 충돌 409와 구분한다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "응답에 필요한 과거 필수값 결손 등 내부 오류. 업무 상태·감사·버전·멱등 완료를 함께 롤백한다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
      }
     }
    }
@@ -805,7 +1017,7 @@
      "maintenance"
     ],
     "summary": "고장 완료",
-    "description": "원인 코드와 처리 내역이 있어야 완료된다. 경미한 건은 처리 중을 거치지 않고 바로 완료할 수 있다. 완료된 건은 잠기며 되돌리는 길은 없다 — 잘못됐으면 새 고장 건으로 등록한다. ⛔ 이 호출은 작업지시를 재개시키지도, 연결된 비가동을 종료시키지도 않는다 — 멈춘 작업을 다시 돌리는 것은 현장 작업자의 판단이고, 비가동 종료는 현장 단말의 몫이다. 되돌릴 수 없는 행위를 자동화하지 않는다.",
+    "description": "원인 코드와 처리 내역이 있어야 완료된다. 경미한 건은 처리 중을 거치지 않고 바로 완료할 수 있다. 완료된 건은 잠기며 되돌리는 길은 없다 — 잘못됐으면 새 고장 건으로 등록한다. ⛔ 이 호출은 작업지시를 재개시키지도, 연결된 비가동을 종료시키지도 않는다 — 멈춘 작업을 다시 돌리는 것은 현장 작업자의 판단이고, 비가동 종료는 현장 단말의 몫이다. 되돌릴 수 없는 행위를 자동화하지 않는다. RECEIVED 또는 HANDLING에서 DONE으로만 전이한다. 비공백 causeCode·handlingNote가 필요하며 활성 EQUIPMENT_BREAKDOWN_CAUSE 그룹의 활성 값을 검증한다. 원천이 없으면 400 INVALID(field=causeCode)다. 작업세션·설비 상태·알림·재고도 자동 변경하지 않는다. 멱등 지문은 method·path·본문·인증 계정과 해당 요청의 원문 사번을 포함하고 If-Match는 제외한다. 사번을 받는 등록 요청은 사번 필수·형식 검사를 재생도 우회하지 않는다. 동일 주체·키·본문은 낡은 If-Match로도 최초 응답을 재생하고 다른 주체는 409로 거부한다. 업무 변경·응답·멱등 완료는 같은 트랜잭션이며 응답 실패도 함께 롤백한다.",
     "parameters": [
      {
       "name": "breakdownId",
@@ -891,6 +1103,26 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/ConflictResponse"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "인증 계정 세션이 없다. 사번은 귀속 정보이며 로그인을 대신하지 않는다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "응답에 필요한 과거 필수값 결손 등 내부 오류. 업무 상태·감사·버전·멱등 완료를 함께 롤백한다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
         }
        }
       }
@@ -3155,7 +3387,7 @@
        "null"
       ],
       "format": "double",
-      "description": "측정 방식일 때만",
+      "description": "측정 방식일 때만 null 또는 Decimal(20,6) 무손실 범위만 허용하며 저장 반올림으로 측정 근거를 바꾸지 않는다.",
       "example": 12.5
      },
      "remarks": {
@@ -3196,7 +3428,8 @@
        "null"
       ],
       "format": "double",
-      "example": 12.5
+      "example": 12.5,
+      "description": "null 또는 Decimal(20,6) 무손실 범위만 허용하며 저장 반올림으로 측정 근거를 바꾸지 않는다."
      },
      "remarks": {
       "type": [
@@ -3221,7 +3454,8 @@
      },
      "inspectionNo": {
       "type": "string",
-      "example": "EQI-2026-0088"
+      "x-no-example": true,
+      "description": "신규 기본형식은 EQI-{YYYYMMDD}-{SEQ4}, inspectedAt의 UTC 날짜 기준이다. 공장별 규칙이 우선하며 과거 번호는 재번호화하지 않는다."
      },
      "equipmentId": {
       "type": "integer",
@@ -3361,9 +3595,9 @@
        "string",
        "null"
       ],
-      "description": "원인 코드 — 완료로 갈 때 필요하다",
-      "example": "HYD_LEAK",
-      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 원인코드 마스터(mdm.cause_code)의 행을 가리킨다 — 선택 목록은 그 마스터가 준다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
+      "description": "설비 고장 원인. 선택 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_BREAKDOWN_CAUSE이며 고객이 관리한다. 활성 그룹의 활성 mdm.code_value.code 자연키를 사용하고 품질 원인 마스터를 재사용하지 않는다. 과거 응답은 저장된 원문을 보존하며 현재 마스터 존재·활성 여부로 재검증하지 않는다.",
+      "x-code-key": "CD-EQUIPMENT-BREAKDOWN-CAUSE",
+      "x-no-example": true
      },
      "handlingNote": {
       "type": [
@@ -3395,7 +3629,7 @@
        "null"
       ],
       "format": "int64",
-      "description": "보전 지시를 발행했으면 연결된다",
+      "description": "직접 FK와 BREAKDOWN 트리거를 합쳐 중복 제거한 연결이 정확히 한 건이면 ID, 0건 또는 복수면 null이다. null을 미발행 통계 근거로 삼지 않는다.",
       "example": 1001
      }
     }
@@ -3410,7 +3644,8 @@
      },
      "breakdownNo": {
       "type": "string",
-      "example": "MLF-2026-0088"
+      "x-no-example": true,
+      "description": "신규 기본형식은 MLF-{YYYYMMDD}-{SEQ4}, reportedAt의 UTC 날짜 기준이다. 공장별 규칙이 우선하며 과거 번호는 재번호화하지 않는다."
      },
      "equipmentId": {
       "type": "integer",
@@ -3429,7 +3664,7 @@
      },
      "occurrenceStateCode": {
       "type": "string",
-      "description": "고장 시점의 설비 상태 — 멈췄다(STOPPED) · 돌지만 이상하다(ABNORMAL). ⭐ 현장이 보고할 때 «고르는» 값이다(M-05-02). ⛔ 시스템 소유다 — 비가동 집계에 드는가가 이 값으로 갈린다. 값 목록은 GET /mdm/code-values?codeGroupCode=BREAKDOWN_OCCURRENCE_STATE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "고장 시점의 설비 상태 — 멈췄다(STOPPED) · 돌지만 이상하다(ABNORMAL). ⭐ 현장이 보고할 때 «고르는» 값이다(M-05-02). ⛔ 시스템 소유다 — 현장 보고 분류와 화면 입력 분기에 쓰며 비가동을 자동 생성·집계하지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=BREAKDOWN_OCCURRENCE_STATE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-code-key": "CD-BREAKDOWN-OCCURRENCE-STATE",
       "x-no-example": true
      },
@@ -3439,7 +3674,7 @@
        "null"
       ],
       "format": "date-time",
-      "description": "모르면 비어 있다",
+      "description": "모르면 비어 있다. ABNORMAL에서도 입력 원문을 보존하며 reportedAt과의 선후를 임의 보정하지 않는다.",
       "example": "2026-08-18T14:20:00+07:00"
      },
      "reportedAt": {
@@ -3449,7 +3684,8 @@
      },
      "reporterWorkerNo": {
       "type": "string",
-      "example": "3391"
+      "example": "3391",
+      "description": "현장 보고 사번 원문이며 처리자 계정이나 reported_by에서 역추정하지 않는다."
      },
      "statusCode": {
       "type": "string",
@@ -3460,12 +3696,12 @@
      },
      "notifyAssignee": {
       "type": "boolean",
-      "description": "설비담당에게 알릴지",
+      "description": "알림 전송 의사다. 현재 본문 접수 성공이 알림 전송을 보장하지 않는다.",
       "example": true
      },
      "linkedDowntimeCount": {
       "type": "integer",
-      "description": "이 고장에 연결된 비가동 건수. ⚠ 상세 응답에서만 채운다 — 목록에서는 0 이다",
+      "description": "이 고장에 연결된 비가동 건수. ⚠ 상세 응답에서만 채운다 — 목록에서는 0이다. 목록 0으로 실제 비가동 없음이나 경고 해제를 판단하지 않는다.",
       "example": 3
      },
      "linkedDowntimeMinutes": {
@@ -3473,7 +3709,7 @@
        "integer",
        "null"
       ],
-      "description": "연결된 비가동의 합계 분. 끝나지 않은 구간이 있으면 그 몫은 빠지고 openLinkedDowntimeCount 로 따로 센다. ⚠ 상세 응답에서만 채운다",
+      "description": "상세에서 닫힌 연결 구간의 초를 먼저 합산하고 정확한 정수 분일 때만 반환한다. 소수 분은 null이며 반올림하거나 같은 설비 합집합으로 바꾸지 않는다. 열린 구간의 시간은 제외하되 건수는 따로 센다. 30초 두 건은 1분, 0초는 0분이다.",
       "example": 112
      },
      "openLinkedDowntimeCount": {
@@ -3516,7 +3752,7 @@
      "occurrenceStateCode": {
       "type": "string",
       "x-code-key": "CD-BREAKDOWN-OCCURRENCE-STATE",
-      "description": "고장 시점의 설비 상태 — 멈췄다(STOPPED) · 돌지만 이상하다(ABNORMAL). ⭐ 현장이 보고할 때 «고르는» 값이다(M-05-02). ⛔ 시스템 소유다 — 비가동 집계에 드는가가 이 값으로 갈린다. 값 목록은 GET /mdm/code-values?codeGroupCode=BREAKDOWN_OCCURRENCE_STATE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "고장 시점의 설비 상태 — 멈췄다(STOPPED) · 돌지만 이상하다(ABNORMAL). ⭐ 현장이 보고할 때 «고르는» 값이다(M-05-02). ⛔ 시스템 소유다 — 현장 보고 분류와 화면 입력 분기에 쓰며 비가동을 자동 생성·집계하지 않는다. 값 목록은 GET /mdm/code-values?codeGroupCode=BREAKDOWN_OCCURRENCE_STATE 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-no-example": true
      },
      "stoppedAt": {
@@ -3525,7 +3761,8 @@
        "null"
       ],
       "format": "date-time",
-      "example": "2026-08-18T14:20:00+07:00"
+      "example": "2026-08-18T14:20:00+07:00",
+      "description": "ABNORMAL에서도 입력 원문을 보존하며 reportedAt과의 선후를 임의 보정하지 않는다."
      },
      "reportedAt": {
       "type": "string",
@@ -3535,8 +3772,9 @@
      },
      "notifyAssignee": {
       "type": "boolean",
-      "description": "기본 참 — 연결이 끊겨도 끄지 않는다",
-      "example": true
+      "description": "알림 전송 의사다. 현재 본문 접수 성공이 알림 전송을 보장하지 않는다. 생략은 true이며 명시 false를 보존한다.",
+      "example": true,
+      "default": true
      }
     },
     "required": [
@@ -3554,8 +3792,9 @@
        "string",
        "null"
       ],
-      "example": "HYD_LEAK",
-      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 원인코드 마스터(mdm.cause_code)의 행을 가리킨다 — 선택 목록은 그 마스터가 준다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
+      "x-code-key": "CD-EQUIPMENT-BREAKDOWN-CAUSE",
+      "x-no-example": true,
+      "description": "설비 고장 원인. 선택 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_BREAKDOWN_CAUSE이며 고객이 관리한다. 활성 그룹의 활성 mdm.code_value.code 자연키를 사용하고 품질 원인 마스터를 재사용하지 않는다. 생략은 유지, null은 해제, 문자열은 활성 원천에 존재해야 하며 아니면 400 INVALID(field=causeCode)다."
      },
      "handlingNote": {
       "type": [
@@ -3571,9 +3810,9 @@
     "properties": {
      "causeCode": {
       "type": "string",
-      "description": "완료에는 반드시 있어야 한다",
-      "example": "HYD_LEAK",
-      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 원인코드 마스터(mdm.cause_code)의 행을 가리킨다 — 선택 목록은 그 마스터가 준다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
+      "description": "설비 고장 원인. 선택 목록은 GET /mdm/code-values?codeGroupCode=EQUIPMENT_BREAKDOWN_CAUSE이며 고객이 관리한다. 활성 그룹의 활성 mdm.code_value.code 자연키를 사용하고 품질 원인 마스터를 재사용하지 않는다. 완료 시 공백이 아닌 값이 필수다. 그룹/값 부재·비활성·품질 원인은 400 INVALID(field=causeCode)다.",
+      "x-code-key": "CD-EQUIPMENT-BREAKDOWN-CAUSE",
+      "x-no-example": true
      },
      "handlingNote": {
       "type": "string",
