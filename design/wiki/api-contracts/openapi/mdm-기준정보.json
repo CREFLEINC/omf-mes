@@ -9334,6 +9334,8 @@
      "mdm"
     ],
     "summary": "단말 한 건",
+    "description": "관리웹은 기존 단말 조회 권한으로 호출한다. 단말 토큰은 인증된 자기 terminalId와 경로가 같은 경우만 조회할 수 있고 작업자 사번은 불필요하다. 서버가 서명, kind=terminal, 현재 세대, 활성 여부와 만료를 검증한다. 다른 단말 조회는 403이며 없는 단말, 위조, 만료, 세대 폐기, 비활성 토큰은 401이다. 관리웹의 없는 ID는 404를 유지한다. 단말 마스터 목록, 쓰기, 발급 권한은 추가하지 않는다.",
+    "x-internal-note": "단말 등록 요청 #536 부분 반영 — 공유계약 F-4, P-CO-01 §5-1, M-CO-01 §5-2. 자기 단말 GET의 관리웹 권한과 단말 토큰 읽기 범위를 함께 유지한다.",
     "parameters": [
      {
       "name": "terminalId",
@@ -9342,7 +9344,8 @@
       "schema": {
        "type": "integer",
        "format": "int64",
-       "example": 1001
+       "example": 1001,
+       "description": "단말 ID. 표시용 terminalCode와 다른 식별자이며 토큰 sub와 같은 단말을 가리킨다."
       }
      }
     ],
@@ -9367,7 +9370,27 @@
       }
      },
      "404": {
-      "description": "없다",
+      "description": "관리웹 요청의 단말 ID가 없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "단말 토큰이 위조, 만료, 세대 폐기, 비활성이거나 토큰의 단말이 없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "관리웹 조회 권한이 없거나 인증된 단말이 다른 단말 ID를 요청했다",
       "content": {
        "application/json": {
         "schema": {
@@ -9541,7 +9564,8 @@
      "mdm"
     ],
     "summary": "단말 등록 토큰 발급",
-    "description": "⭐ 관리웹이 부르고, 받은 토큰을 화면에 «QR 로» 보인다. 기기는 그것을 스캔해 저장한다 — 기기가 서버를 부르지 않으므로 토큰 없이 열리는 경로가 생기지 않는다. **재발급하면 이전 기기 전부가 끊긴다** — 세대 번호(tokenVersion)를 올리고 클레임과 대조한다. 화면이 그 사실을 안내한다. 근거: M-CO-01 §5-2 B안(2026-08-13 확정) · W-CO-06 §5-4",
+    "description": "관리웹이 기존 발급 권한으로 호출한다. 결과 대화상자에서 MOBILE에는 QR을, POP에는 토큰 필드와 복사 버튼을 한 번 제공한다. 기기는 QR 또는 붙여넣기로 후보 토큰을 입력한 뒤 온라인 자기 단말 조회의 서버 검증과 단말 코드 확인을 거쳐 적용한다. 토큰 없이 열리는 등록 경로는 없다. 재발급마다 tokenVersion이 증가하여 이전 토큰 전부가 즉시 무효화된다. 대화상자를 닫은 뒤 같은 토큰은 재조회할 수 없고 재발급해야 한다.",
+    "x-internal-note": "폼팩터별 토큰 주입 — 공유계약 F-4, W-CO-06 §5-4, P-CO-01 §5-1, M-CO-01 §5-2. 요청 #536 부분 반영.",
     "parameters": [
      {
       "name": "terminalId",
@@ -9597,7 +9621,8 @@
      "mdm"
     ],
     "summary": "단말 기능 구성 조회",
-    "description": "이 단말에서 어떤 공정의 무엇이 열려 있나. POP 셸이 화면을 그리기 전에 읽는다. 근거: W-CO-06 §5 · P-CO-01 §5-1\n\n⭐ 0건이 정상인 단말이 있다 — 창고 전용 단말은 공정 행이 없다. 셸은 0건을 「전부 금지」로도 「전부 허용」으로도 읽지 않는다. 기능 구성 축이 이 단말에 걸리지 않는다는 뜻이고, 게이팅은 서버의 403 이 맡는다. 근거: 공유계약 F-1·F-5 · omf-mes#245",
+    "description": "관리웹의 기존 조회 권한을 유지한다. 단말 토큰은 인증된 자기 terminalId와 경로가 같은 경우만 조회할 수 있고 작업자 사번은 불필요하다. 서버가 서명, kind=terminal, 현재 세대, 활성 여부와 만료를 검증한다. 다른 단말 조회는 403이며 없는 단말, 위조, 만료, 세대 폐기, 비활성 토큰은 401이다. 관리웹의 없는 ID는 404를 유지한다. 단말 토큰으로 공정 구성을 저장할 수 없다. 셸은 전체 items를 공급하며 전역 단일 공정을 선택하지 않는다. 창고 단말의 0행은 정상이며 인증 실패, 전부 허용 또는 전부 금지를 뜻하지 않는다. 빈 목록과 조회 실패는 구분한다. 액션에는 실제 업무 공정에 해당하는 행만 사용하며 첫 행 선택이나 플래그 OR 합산으로 대신하지 않는다.",
+    "x-internal-note": "공유계약 F-1·F-4·F-5, P-CO-01 §8-8. 요청 #536 ②-b의 업무 대상별 실제 공정 원천 공급은 잔여로 유지한다. 화면 이동 후보 G-34는 이번 반영에서 수정하지 않는다.",
     "parameters": [
      {
       "name": "terminalId",
@@ -9606,7 +9631,8 @@
       "schema": {
        "type": "integer",
        "format": "int64",
-       "example": 1001
+       "example": 1001,
+       "description": "단말 ID. 표시용 terminalCode와 다른 식별자이며 토큰 sub와 같은 단말을 가리킨다."
       }
      }
     ],
@@ -9642,7 +9668,27 @@
       }
      },
      "404": {
-      "description": "없다",
+      "description": "관리웹 요청의 단말 ID가 없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "단말 토큰이 위조, 만료, 세대 폐기, 비활성이거나 토큰의 단말이 없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "관리웹 조회 권한이 없거나 인증된 단말이 다른 단말 ID를 요청했다",
       "content": {
        "application/json": {
         "schema": {
@@ -20276,7 +20322,8 @@
      "terminalId": {
       "type": "integer",
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "단말 ID. 표시용 terminalCode와 다른 식별자이며 토큰 sub와 같은 단말을 가리킨다."
      },
      "terminalCode": {
       "x-source-column": "terminal_code",
@@ -20461,17 +20508,18 @@
      "token",
      "issuedAt"
     ],
-    "description": "기기에 넣을 등록용 토큰. ⭐ 관리웹이 이것을 받아 «QR 로 그려» 보이고 기기가 스캔해 읽는다 — 기기는 서버를 부르지 않는다. 그래서 토큰 없이 열리는 경로가 생기지 않는다. 근거: M-CO-01 §5-2 B안",
+    "description": "기기에 넣을 후보 등록 토큰. 관리웹 발급 결과 대화상자에서 MOBILE은 QR, POP는 토큰 복사로 한 번 제공한다. 기기는 입력 후 이 토큰으로 온라인 자기 단말 조회를 검증하고 단말 코드와 유형을 확인하여 적용한다. 로컬 입력만으로 등록되지 않으며 토큰 없는 등록 경로는 없다.",
     "properties": {
      "terminalId": {
       "type": "integer",
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "단말 ID. 표시용 terminalCode와 다른 식별자이며 토큰 sub와 같은 단말을 가리킨다."
      },
      "token": {
       "type": "string",
       "x-no-example": "실제 토큰 모양을 공개 계약에 남기지 않는다",
-      "description": "기기가 저장한다. 관리웹은 화면에 QR 로만 보인다"
+      "description": "관리웹은 MOBILE용 QR 또는 POP용 복사 필드로 한 번 제공한다. 기기는 서버 검증과 단말 코드 확인 후 보관한다. 대화상자를 닫으면 재조회할 수 없다."
      },
      "issuedAt": {
       "type": "string",
