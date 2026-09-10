@@ -4192,8 +4192,9 @@
      "actorId": {
       "type": "integer",
       "format": "int64",
-      "description": "등록이면 held_by, 해제면 released_by. 기록되지 않은 자동·기존 보류 사건에서는 actorName과 함께 키를 생략한다. null이나 가짜 사용자를 싣지 않는다.",
-      "example": 1001
+      "description": "보류 등록 또는 해제 행위자. 기록되지 않은 자동·기존 사건에서는 actorName과 함께 키를 생략한다. null이나 가짜 사용자를 싣지 않는다.",
+      "example": 1001,
+      "x-internal-note": "등록 사건은 held_by, 해제 사건은 released_by에서 가져온다. 생략 규약 근거: omf-mes#566 · 서버 통보 072."
      },
      "actorName": {
       "type": "string",
