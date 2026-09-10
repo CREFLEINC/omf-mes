@@ -2394,9 +2394,24 @@
       "in": "query",
       "schema": {
        "type": "string",
+       "enum": [
+        "workOrderNo",
+        "workOrderNo,asc",
+        "workOrderNo,desc",
+        "plannedStartAt",
+        "plannedStartAt,asc",
+        "plannedStartAt,desc",
+        "statusCode",
+        "statusCode,asc",
+        "statusCode,desc",
+        "priorityNo",
+        "priorityNo,asc",
+        "priorityNo,desc"
+       ],
        "default": "priorityNo,asc"
       },
-      "description": "정렬 키는 제한한다. 근거: 공유계약 L-4"
+      "description": "W/O 번호·계획 시작 시각·상태·우선순위 네 키를 받는다. 방향은 asc·desc이며 생략하면 asc다. achievementRate는 응답에 표시하는 파생 값이지만 정렬 키가 아니며 보내면 400 INVALID(field=sort)다.",
+      "x-internal-note": "서버 지원 정렬 키와 W-02-08 화면을 정합했다: 공유계약 L-4 · omf-mes#564"
      },
      {
       "name": "withProgress",
@@ -2405,7 +2420,7 @@
        "type": "boolean",
        "default": true
       },
-      "description": "실적 누계를 함께 받는다"
+      "description": "실적 누계를 함께 받는다. 달성률을 포함하지만 최근 작업 세션 번호나 세션 목록은 포함하지 않는다."
      },
      {
       "name": "page",
@@ -2476,6 +2491,16 @@
           "items",
           "page"
          ]
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "정렬 키 또는 방향이 지원 범위 밖이다. achievementRate 정렬도 INVALID이며 field는 sort다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
         }
        }
       }
