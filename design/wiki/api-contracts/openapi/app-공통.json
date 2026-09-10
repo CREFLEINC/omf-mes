@@ -3855,7 +3855,8 @@
    "ApprovalRoute": {
     "x-source-table": "app.approval_route",
     "type": "object",
-    "description": "결재선 정의. 승인 유형과 사업부로 고른다.\n\n⚠ 물리 모델에 유일 제약이 없어 같은 (approvalTypeCode, businessUnitId) 로 활성 결재선이 여럿 생길 수 있다. 선택 규칙을 계약이 정본으로 갖는다 — ① 사업부 지정본이 전 사업부 공통본(businessUnitId=null)을 이긴다 ② 그러고도 둘 이상이면 상신이 400(code=ROUTE_AMBIGUOUS)이다. 서버가 임의로 하나를 고르지 않는다. 근거: W-06-15 §5-3 · 공유계약 B-12",
+    "description": "결재선 정의. PURCHASE_ORDER 상신은 전표의 사업부 지정본을 전 사업부 공통본보다 우선하고, 지정본이 없으면 공통본을 선택한다. 나머지 승인 유형은 전 사업부 공통본만 선택한다. 선택 후보가 둘 이상이면 상신이 400(code=ROUTE_AMBIGUOUS)이며 서버가 임의로 하나를 고르지 않는다.",
+    "x-internal-note": "진행 건수와 사업부 선택 범위 근거: 설계 문의 018·022, W-06-15 §5-3·§5-7, 공유계약 B-12·J-9, omf-mes#571.",
     "required": [
      "approvalRouteId",
      "approvalTypeCode",
@@ -3873,7 +3874,7 @@
      "approvalTypeCode": {
       "x-source-column": "approval_type_code",
       "type": "string",
-      "description": "승인 유형. ✅ **값 목록 확정 2026-09-01(사용자 · omf-mes#336)** — **9값이다**(2026-09-04 — 실적 정정 승인이 늘었다). ⭐ 승인유형 값 집합과 생성 경로 대응은 06-API-요구서-app공통승인.md §1-2 표를 참조한다. 승인유형 개수와 생성 경로(method+path) 개수는 다르며 본문 스키마 이름으로 세지 않는다. GOODS_ISSUE_DISPOSAL 기타출고 품의(폐기) · INVENTORY_ADJUSTMENT 재고조정 · PURCHASE_ORDER 신규 ERP W/O · INBOUND_RECEIPT_CANCEL 입하 취소 · GOODS_RECEIPT_CANCEL 입고 취소 · GOODS_ISSUE_CANCEL 출고 취소 · SHIPMENT_CANCEL 출하 취소 · PRODUCTION_RESULT_CORRECT 작업실적 A급 정정(수불·기간업무시스템 영향 — 2026-08-31 사용자 확정 · 등급은 서버가 판정한다) · IQC_SKIP 긴급 IQC 생략(공유계약 A-16 기확정). 상신 화면은 승인 유형을 보내지 않고 서버가 상신 오퍼레이션에서 정하며, 결재선 정의 화면(W-06-15)은 이 값 집합에서 유형을 선택한다. ⭐ 자재 폐기(W-01-06)와 제품 폐기(W-04-10)는 «같은» GOODS_ISSUE_DISPOSAL 이다 — 둘의 결재선을 가르는 것은 유형이 아니라 결재선 정의의 businessUnitId 축이고, 서버가 전표의 reasonCode 로 결재선을 파생한다(✓확정 2026-09-01 사용자 · 공유계약 G-31 이 「승인 게이트가 사유 값을 보고 걸린다」로 이 연결을 2026-08-31 에 이미 세웠다). ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 W-06-06 에서 값을 늘려도 상신할 오퍼레이션이 없어 «쓰이지 않는 결재선»만 생긴다. 근거: W-06-15 §8-2 · 공유계약 A-16",
+      "description": "승인 유형 9값. GOODS_ISSUE_DISPOSAL은 기타출고 품의(자재·제품 폐기), INVENTORY_ADJUSTMENT는 재고조정, PURCHASE_ORDER는 신규 ERP W/O, INBOUND_RECEIPT_CANCEL은 입하 취소, GOODS_RECEIPT_CANCEL은 입고 취소, GOODS_ISSUE_CANCEL은 출고 취소, SHIPMENT_CANCEL은 출하 취소, PRODUCTION_RESULT_CORRECT는 작업실적 A급 정정, IQC_SKIP은 긴급 IQC 생략이다. 상신 화면은 승인 유형을 보내지 않고 서버가 상신 오퍼레이션에서 정하며, 결재선 정의 화면은 이 값 집합에서 유형을 선택한다. PURCHASE_ORDER만 전표의 businessUnitId 지정본을 우선 선택하고, 나머지 승인 유형은 전 사업부 공통 결재선만 선택한다. 공통코드 그룹에서 값을 추가하지 않는다.",
       "example": "GOODS_ISSUE_DISPOSAL",
       "enum": [
        "GOODS_ISSUE_DISPOSAL",
@@ -3929,7 +3930,7 @@
      },
      "inProgressCount": {
       "type": "integer",
-      "description": "이 결재선으로 진행 중인 요청 수. 결재선을 고쳐도 이 요청들은 옛 결재선으로 끝난다 — 화면이 그것을 보인다(공유계약 J-9)",
+      "description": "같은 approvalTypeCode에서 상태가 PENDING인 요청 전체 건수. 특정 결재선별 건수가 아니며, 같은 승인 유형의 결재선에는 같은 값이 표시되므로 서로 합산하지 않는다. 기존 요청의 결재 단계는 결재선 정의를 고쳐도 바뀌지 않는다.",
       "example": 3
      }
     }
@@ -3957,7 +3958,7 @@
        "IQC_SKIP",
        "PRODUCTION_RESULT_CORRECT"
       ],
-      "description": "승인 유형. ✅ **값 목록 확정 2026-09-01(사용자 · omf-mes#336)** — **9값이다**(2026-09-04 — 실적 정정 승인이 늘었다). ⭐ 승인유형 값 집합과 생성 경로 대응은 06-API-요구서-app공통승인.md §1-2 표를 참조한다. 승인유형 개수와 생성 경로(method+path) 개수는 다르며 본문 스키마 이름으로 세지 않는다. GOODS_ISSUE_DISPOSAL 기타출고 품의(폐기) · INVENTORY_ADJUSTMENT 재고조정 · PURCHASE_ORDER 신규 ERP W/O · INBOUND_RECEIPT_CANCEL 입하 취소 · GOODS_RECEIPT_CANCEL 입고 취소 · GOODS_ISSUE_CANCEL 출고 취소 · SHIPMENT_CANCEL 출하 취소 · PRODUCTION_RESULT_CORRECT 작업실적 A급 정정(수불·기간업무시스템 영향 — 2026-08-31 사용자 확정 · 등급은 서버가 판정한다) · IQC_SKIP 긴급 IQC 생략(공유계약 A-16 기확정). 상신 화면은 승인 유형을 보내지 않고 서버가 상신 오퍼레이션에서 정하며, 결재선 정의 화면(W-06-15)은 이 값 집합에서 유형을 선택한다. ⭐ 자재 폐기(W-01-06)와 제품 폐기(W-04-10)는 «같은» GOODS_ISSUE_DISPOSAL 이다 — 둘의 결재선을 가르는 것은 유형이 아니라 결재선 정의의 businessUnitId 축이고, 서버가 전표의 reasonCode 로 결재선을 파생한다(✓확정 2026-09-01 사용자 · 공유계약 G-31 이 「승인 게이트가 사유 값을 보고 걸린다」로 이 연결을 2026-08-31 에 이미 세웠다). ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 W-06-06 에서 값을 늘려도 상신할 오퍼레이션이 없어 «쓰이지 않는 결재선»만 생긴다. 근거: W-06-15 §8-2 · 공유계약 A-16",
+      "description": "승인 유형 9값. GOODS_ISSUE_DISPOSAL은 기타출고 품의(자재·제품 폐기), INVENTORY_ADJUSTMENT는 재고조정, PURCHASE_ORDER는 신규 ERP W/O, INBOUND_RECEIPT_CANCEL은 입하 취소, GOODS_RECEIPT_CANCEL은 입고 취소, GOODS_ISSUE_CANCEL은 출고 취소, SHIPMENT_CANCEL은 출하 취소, PRODUCTION_RESULT_CORRECT는 작업실적 A급 정정, IQC_SKIP은 긴급 IQC 생략이다. 상신 화면은 승인 유형을 보내지 않고 서버가 상신 오퍼레이션에서 정하며, 결재선 정의 화면은 이 값 집합에서 유형을 선택한다. PURCHASE_ORDER만 전표의 businessUnitId 지정본을 우선 선택하고, 나머지 승인 유형은 전 사업부 공통 결재선만 선택한다. 공통코드 그룹에서 값을 추가하지 않는다.",
       "x-code-key": "CD-APPROVAL-TYPE"
      },
      "businessUnitId": {
@@ -4360,7 +4361,7 @@
        "IQC_SKIP",
        "PRODUCTION_RESULT_CORRECT"
       ],
-      "description": "승인 유형. ✅ **값 목록 확정 2026-09-01(사용자 · omf-mes#336)** — **9값이다**(2026-09-04 — 실적 정정 승인이 늘었다). ⭐ 승인유형 값 집합과 생성 경로 대응은 06-API-요구서-app공통승인.md §1-2 표를 참조한다. 승인유형 개수와 생성 경로(method+path) 개수는 다르며 본문 스키마 이름으로 세지 않는다. GOODS_ISSUE_DISPOSAL 기타출고 품의(폐기) · INVENTORY_ADJUSTMENT 재고조정 · PURCHASE_ORDER 신규 ERP W/O · INBOUND_RECEIPT_CANCEL 입하 취소 · GOODS_RECEIPT_CANCEL 입고 취소 · GOODS_ISSUE_CANCEL 출고 취소 · SHIPMENT_CANCEL 출하 취소 · PRODUCTION_RESULT_CORRECT 작업실적 A급 정정(수불·기간업무시스템 영향 — 2026-08-31 사용자 확정 · 등급은 서버가 판정한다) · IQC_SKIP 긴급 IQC 생략(공유계약 A-16 기확정). 상신 화면은 승인 유형을 보내지 않고 서버가 상신 오퍼레이션에서 정하며, 결재선 정의 화면(W-06-15)은 이 값 집합에서 유형을 선택한다. ⭐ 자재 폐기(W-01-06)와 제품 폐기(W-04-10)는 «같은» GOODS_ISSUE_DISPOSAL 이다 — 둘의 결재선을 가르는 것은 유형이 아니라 결재선 정의의 businessUnitId 축이고, 서버가 전표의 reasonCode 로 결재선을 파생한다(✓확정 2026-09-01 사용자 · 공유계약 G-31 이 「승인 게이트가 사유 값을 보고 걸린다」로 이 연결을 2026-08-31 에 이미 세웠다). ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 W-06-06 에서 값을 늘려도 상신할 오퍼레이션이 없어 «쓰이지 않는 결재선»만 생긴다. 근거: W-06-15 §8-2 · 공유계약 A-16",
+      "description": "승인 유형 9값. GOODS_ISSUE_DISPOSAL은 기타출고 품의(자재·제품 폐기), INVENTORY_ADJUSTMENT는 재고조정, PURCHASE_ORDER는 신규 ERP W/O, INBOUND_RECEIPT_CANCEL은 입하 취소, GOODS_RECEIPT_CANCEL은 입고 취소, GOODS_ISSUE_CANCEL은 출고 취소, SHIPMENT_CANCEL은 출하 취소, PRODUCTION_RESULT_CORRECT는 작업실적 A급 정정, IQC_SKIP은 긴급 IQC 생략이다. 상신 화면은 승인 유형을 보내지 않고 서버가 상신 오퍼레이션에서 정하며, 결재선 정의 화면은 이 값 집합에서 유형을 선택한다. PURCHASE_ORDER만 전표의 businessUnitId 지정본을 우선 선택하고, 나머지 승인 유형은 전 사업부 공통 결재선만 선택한다. 공통코드 그룹에서 값을 추가하지 않는다.",
       "x-code-key": "CD-APPROVAL-TYPE"
      },
      "requestedBy": {
