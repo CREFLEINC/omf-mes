@@ -1734,7 +1734,7 @@
       }
      },
      "409": {
-      "description": "저장 충돌. 다시 읽어 오면 풀린다",
+      "description": "포장 확정 충돌. conflictCause=workerLease는 앞의 동일 요청을 처리 중이므로 입력을 보존하고 잠시 뒤 같은 멱등키·본문으로 재전송한다. conflictCause=user는 이미 확정된 포장 또는 낡은 ETag일 수 있어 message를 기계 파싱하지 않고 상세를 재조회한다. PACKED면 재확정하지 않고 OPEN이면 최신 ETag와 원래 멱등키·본문으로 재전송한다.",
       "content": {
        "application/json": {
         "schema": {
@@ -7346,7 +7346,7 @@
        "erpSync",
        "workerLease"
       ],
-      "description": "충돌 원인. 근거: 공유계약 B-1 확장",
+      "description": "충돌 원인. workerLease는 같은 요청 처리 중이라 잠시 뒤 동일 요청을 재전송할 수 있다. user와 erpSync는 입력을 보존하고 자원을 재조회하며 자동 재전송하지 않는다.",
       "example": "user"
      },
      "message": {
