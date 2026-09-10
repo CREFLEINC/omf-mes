@@ -126,6 +126,9 @@ OQC가 필요한 제품이 포장 시점에 미합격이면 포장 라벨만 자
 | 발행 요약/이력 | `GET /app/document-issues/summary` · `GET /app/document-issues` |
 | 렌더링/인쇄 보고 | `GET /app/document-issues/{documentIssueLogId}/rendition` · `POST …:report-print` |
 
+⚠ 공유계약 F-1 이 이 화면을 `can_input_result` 게이팅 대상으로 싣고 있으나 이 장은 아직 그리지
+않았다(2026-09-10).
+
 ## §9. 명시적 비범위
 
 - 포장 라벨·납품 라벨을 별도 화면으로 이동시키지 않는다.

@@ -3701,6 +3701,31 @@
      }
     ]
    }
+  },
+  "/app/terminal-context": {
+   "get": {
+    "tags": [
+     "app"
+    ],
+    "operationId": "getTerminalContext",
+    "summary": "단말 자기 정보",
+    "description": "단말 토큰으로 온 요청에 그 단말 자신의 식별 정보를 내린다. POP·모바일 셸이 진입 직후 한 번 부르고, 이후 terminalId 를 경로에 요구하는 호출(예 기능 구성 조회)에 그 값을 쓴다. ⭐ 서버가 토큰에서 단말을 푼다 — 화면이 단말을 지정하지 않는다. 근거: P-CO-01 §5-1 · 공유계약 F-1",
+    "responses": {
+     "200": {
+      "description": "단말 자기 정보.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TerminalContext"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "단말 토큰이 없거나 만료·세대 불일치다. 세대 번호가 어긋나면 재발급이 일어난 것이다(공유계약 F-4)"
+     }
+    }
+   }
   }
  },
  "components": {
@@ -6113,13 +6138,79 @@
       "example": 1001
      }
     }
+   },
+   "TerminalContext": {
+    "type": "object",
+    "required": [
+     "terminalId",
+     "terminalCode",
+     "plantId",
+     "tokenVersion"
+    ],
+    "properties": {
+     "terminalId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "terminalCode": {
+      "x-source-column": "terminal_code",
+      "type": "string",
+      "maxLength": 50,
+      "example": "POP-A-01",
+      "description": "설치 후에는 바꾸지 않는다 — 키다",
+      "x-no-code-key": "코드 그룹이 아니다 — Terminal 마스터 «한 건»을 가리키는 인스턴스 식별자다. 값 목록이 있는 것이 아니라 그 마스터의 행이 곧 값이다."
+     },
+     "plantId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "tokenVersion": {
+      "x-source-column": "token_version",
+      "type": "integer",
+      "example": 3,
+      "description": "재발급마다 서버가 +1 — 이전 값의 토큰은 클레임 tv 가 이 값과 어긋나 거부된다(공유계약 F-4 · ✓확정 2026-07-28 §6-②)"
+     },
+     "equipmentId": {
+      "x-source-column": "equipment_id",
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "example": 2001,
+      "description": "이 단말이 붙어 있는 설비. POP 이 「이 설비」를 전제로 도는 화면들이 이 값을 쓴다 — P-02-01 의 기본 목록 필터와 P-05-02 의 헤더 고정이 그것이다. 비어 있을 수 있다 — 설비에 붙지 않은 단말이 있다."
+     },
+     "equipmentCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "maxLength": 50,
+      "example": "PRS-01",
+      "description": "설비 코드. 헤더가 「PRS-01 · 프레스 1호기」로 그리므로 함께 내린다 — 왕복 한 번을 없앤다.",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 설비 마스터의 행을 가리킨다 — Equipment.equipmentCode 가 같은 판정으로 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
+     },
+     "equipmentName": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "example": "프레스 1호기",
+      "description": "설비명. equipmentCode 와 짝이다."
+     }
+    },
+    "description": "단말이 자기 자신을 아는 데 필요한 최소값. 근거: P-CO-01 §5-1",
+    "x-internal-note": "개발팀 1차 구현에 같은 뜻의 경로 GET /pop/context 가 있다(설계사양서 §3.2.2 각주). 이름이 갈리는 사실은 답변서에 적는다 — 어느 쪽으로 맞출지는 이 계약이 정하지 않는다. 자기 이슈 #536."
    }
   },
   "securitySchemes": {
    "terminalToken": {
     "type": "http",
     "scheme": "bearer",
-    "description": "POP·모바일 단말 토큰. 단말 등록 때 발급한 값을 기기가 저장해 보낸다. 서버는 이 토큰의 «종류»로 X-Worker-No 필수 여부를 가른다."
+    "description": "POP·모바일 단말 토큰. 단말 등록 때 발급한 값을 기기가 저장해 보낸다. 서버는 이 토큰의 «종류»로 X-Worker-No 필수 여부를 가른다.",
+    "x-internal-note": "2026-09-10 실측 — 계약 7벌에서 401 을 선언한 오퍼레이션 19건은 전부 «계정 세션» 축이고, 단말 토큰의 만료·세대 불일치(클레임 tv 대조 실패)를 뜻하는 401 은 0건이다. 세대 폐기 규칙은 공유계약 F-4 가 확정했으나 그 결과를 단말이 어떤 응답으로 받는지는 아직 계약에 없다 — 자기 이슈 #536."
    }
   }
  }
