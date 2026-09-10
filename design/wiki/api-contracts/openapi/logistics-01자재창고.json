@@ -1327,7 +1327,7 @@
      "inventory"
     ],
     "summary": "취급 단위 등록",
-    "description": "근거: P-02-08 §5-2 · P-04-01 §5 · M-04-03 §5",
+    "description": "취급 단위를 생성한다. contents 생략 또는 빈 배열은 기존 빈 취급 단위 생성이며 이후 별도 포장 확정 흐름을 유지한다. 비어 있지 않은 contents는 전체를 일괄 검증하여 취급 단위와 내용물을 한 트랜잭션으로 확정 생성한다. 검증/저장 실패 시 이 요청이 생성한 취급 단위와 내용물은 모두 0건이다. 같은 멱등키 재전송은 기존 결과를 재생하고 새 포장을 만들지 않는다. 내용물을 포함하는 현장 포장 확정은 businessDate와 occurredAt을 보내며 오프라인 큐에서도 원래 값을 보존한다. 기존 빈 취급 단위 생성에 이 속성들을 전역 필수로 요구하지 않는다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -1386,7 +1386,8 @@
        }
       }
      }
-    }
+    },
+    "x-internal-note": "2026-09-09 — P-02-08 은 contents 를 실어 한 요청으로 확정한다(요청 p-02-08-포장취소-호출모양). 「스캔이 여러 번이라 두 왕복」이라는 옛 근거는 그 화면에서 성립하지 않았다 — 담는 동안 서버를 부르지 않는다(02 요구서 §3-17). P-04-01·M-04-03 은 두 번 호출을 유지한다. 요청 #510 — P-02-08 §5-6·§6의 한 요청 원자 확정과 공유계약 C-8·C-9. P-04-01의 빈 POST → :pack → 미확정 DELETE 소비는 유지한다."
    }
   },
   "/inventory/handling-units/{handlingUnitId}": {
@@ -1444,7 +1445,7 @@
      "inventory"
     ],
     "summary": "포장 단위 취소",
-    "description": "확정 전에만 지운다 — 내용물이 0일 때만 허용한다. 내용물이 있으면 409, 이미 확정된 포장 단위면 409 다. 근거: P-02-08 §5-7 · P-04-01 §5-6",
+    "description": "확정 전에만 지운다 — 내용물이 0일 때만 허용한다. 내용물이 있으면 409, 이미 확정된 포장 단위면 409 다. 근거: P-04-01 §5-6",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -1491,7 +1492,7 @@
       }
      }
     },
-    "x-internal-note": "공유계약 B-8-1③(부분 성공 되찾을 경로 신설) — 담기 시작에 취급 단위를 만들되(POST /inventory/handling-units) 확정 전 그만두면 이 경로로 거둔다. ⛔ PUT …/contents 를 재사용하지 않는다 — 그 경로는 수량 합 보존 제약이 걸려 해체가 아니다(P-02-08 §6). 오프라인 표기는 붙이지 않는다 — 이 조작이 온라인 전용이라 볼 근거가 없어 사람 게이트에서 보류했다(2026-09-06 요청 p-02-08-오프라인-큐잉-성립조건). 확정 후 해체 경로는 여전히 없다(별건 미결)."
+    "x-internal-note": "공유계약 B-8-1③(부분 성공 되찾을 경로 신설) — 담기 시작에 취급 단위를 만들되(POST /inventory/handling-units) 확정 전 그만두면 이 경로로 거둔다. ⛔ PUT …/contents 를 재사용하지 않는다 — 그 경로는 수량 합 보존 제약이 걸려 해체가 아니다(P-02-08 §6). 오프라인 표기는 붙이지 않는다 — 이 조작이 온라인 전용이라 볼 근거가 없어 사람 게이트에서 보류했다(2026-09-06 요청 p-02-08-오프라인-큐잉-성립조건). 확정 후 해체 경로는 여전히 없다(별건 미결). ⚠ 2026-09-09 — P-02-08 은 호출이 하나가 되어 이 경로를 부르지 않는다(그 화면 §5-7). 신설 근거였던 B-8-1③ 은 P-04-01 에서 계속 유효하다."
    }
   },
   "/inventory/handling-units/{handlingUnitId}/contents": {
@@ -1761,7 +1762,7 @@
       }
      }
     },
-    "x-internal-note": "02 요구서 §3-17 이 이 오퍼레이션을 「01 계약」이라 적었는데 경로 자체가 없었다. 역방향 ② 검사기가 찾아 2026-08-12 에 더했다(client #76). POST /inventory/handling-units 는 빈 포장 단위를 만들고, 이 액션이 내용물과 함께 닫는다 — 두 왕복인 것은 스캔이 여러 번 일어나기 때문이다."
+    "x-internal-note": "02 요구서 §3-17 이 이 오퍼레이션을 「01 계약」이라 적었는데 경로 자체가 없었다. 역방향 ② 검사기가 찾아 2026-08-12 에 더했다(client #76). POST /inventory/handling-units 는 빈 포장 단위를 만들고, 이 액션이 내용물과 함께 닫는다 — 두 왕복인 것은 스캔이 여러 번 일어나기 때문이다. ⚠ 2026-09-09 — 「두 왕복인 것은 스캔이 여러 번 일어나기 때문이다」는 P-02-08 에서는 성립하지 않았다(담는 동안 서버 호출 0 · 02 요구서 §3-17). 이 경로를 부르는 화면은 P-04-01·M-04-03 이다."
    }
   },
   "/inventory/reservations": {
@@ -8850,7 +8851,7 @@
     "required": [
      "handlingUnitTypeCode"
     ],
-    "description": "취급 단위 등록.",
+    "description": "취급 단위 등록. contents 생략/빈 배열은 빈 취급 단위를 생성한다. 비어 있지 않은 contents는 모든 내용물을 검증하여 취급 단위와 함께 한 트랜잭션으로 확정 생성한다. 실패 시 이 요청의 취급 단위·내용물은 모두 0건이며 같은 멱등키는 기존 결과를 재생한다. 내용물 있는 현장 포장 확정은 businessDate·occurredAt을 함께 전송하되 기존 빈 생성 요청의 선택 속성은 유지한다.",
     "properties": {
      "handlingUnitTypeCode": {
       "x-source-column": "handling_unit_type_code",
@@ -8888,12 +8889,24 @@
       "format": "int64",
       "example": 1001
      },
+     "businessDate": {
+      "type": "string",
+      "format": "date",
+      "description": "근거: 공유계약 C-8",
+      "example": "2026-08-12"
+     },
+     "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "단말에서 실제로 일어난 시각. 근거: 공유계약 C-8",
+      "example": "2026-08-12T10:22:00+09:00"
+     },
      "contents": {
       "type": "array",
       "items": {
        "$ref": "#/components/schemas/HandlingUnitContentUpsert"
       },
-      "description": "초기 구성"
+      "description": "초기 구성. 생략 또는 빈 배열은 빈 취급 단위 생성이고 확정은 별도 :pack 흐름이다. 비어 있지 않으면 전체 검증 후 취급 단위와 내용물을 함께 확정 생성하며 실패 시 이 요청의 생성분은 모두 0건이다. 동일 멱등키는 기존 결과를 재생한다."
      }
     }
    },
@@ -11633,7 +11646,8 @@
       "x-source-column": "uom_id",
       "type": "integer",
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "LOT 수량의 단위. **품목 기준단위와 같다 — LOT 마다 단위를 새로 고르지 않는다.** 자재 LOT 은 입하 라인에서 승계하고(P-01-01 §3-6) 생산 LOT 은 W/O 에서 승계한다(W-02-04). 근거: 사용자 확정 2026-09-09"
      },
      "manufacturedAt": {
       "x-source-column": "manufactured_at",
@@ -11708,6 +11722,15 @@
       "readOnly": true,
       "description": "같은 W/O에서 선발행된 생산 LOT 슬롯 전체 수. W/O 원천 생산 LOT에는 서버가 계산해 항상 내리고 그 외 LOT은 null이다. P-02-04의 ‘현재 LOT 번호(순서대로)’ 표시용이며 폐번 슬롯도 전체 수에는 포함한다.",
       "example": 8
+     },
+     "identificationTagRequired": {
+      "type": [
+       "boolean",
+       "null"
+      ],
+      "readOnly": true,
+      "description": "이 LOT 의 품목이 인식표(제품 개체 일련번호) 대상인가. 서버가 품목·작업 조건에서 계산해 내린다 — 화면이 판단하지 않는다. 생산 LOT 이 아닌 LOT 은 null 이다. 생산 LOT의 null 또는 필드 생략은 판정 원천 미제공이며 false가 아니다. 인식표 영역을 숨기거나 수량 대조를 건너뛰어 LOT을 완료하지 않고 원천 확인 사유를 표시한다. 이 필드는 판정 결과 전달 자리이며 구체적인 품목/작업 조건 생산자 규칙을 새로 확정한 것은 아니다. P-02-04 가 인식표 영역 표시와 「실제 생산수량 = 개체 수」 검증의 활성 조건으로 쓴다. ⛔ Item.serialControlTypeCode 와 다른 축이다 — 그쪽은 관리 «방식»이고 이 값은 «대상 여부»다. 근거: P-02-04 §3-2·§4",
+      "example": true
      },
      "parentLotId": {
       "x-source-column": "parent_lot_id",
@@ -11890,7 +11913,8 @@
       "x-source-column": "uom_id",
       "type": "integer",
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "필수이되 화면이 «고르는» 값이 아니다 — 자재 LOT 은 입하 라인, 생산 LOT 은 W/O 에서 승계한 값을 그대로 싣는다. 근거: 사용자 확정 2026-09-09 · P-01-01 §3-6 · W-02-04"
      },
      "manufacturedAt": {
       "x-source-column": "manufactured_at",

@@ -458,6 +458,16 @@
         }
        }
       }
+     },
+     "500": {
+      "description": "필수 공정 참조를 해석할 수 없는 내부 데이터 오류",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
      }
     }
    },
@@ -567,6 +577,16 @@
      },
      "404": {
       "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "필수 공정 참조를 해석할 수 없는 내부 데이터 오류",
       "content": {
        "application/json": {
         "schema": {
@@ -4151,7 +4171,7 @@
      "production"
     ],
     "summary": "제품 개체 대량 발번",
-    "description": "LOT 중간 실적으로 개체 N행을 만든다 — 인식표가 개체별 1:1 이기 때문이다(R69). 번호는 서버가 매긴다. ⛔ 기존 production_result 또는 goodQty는 선행조건이 아니다. 최종 생산 LOT 출력 시 실제 생산수량과 이 LOT의 전체 개체 수가 같은지 검증한다. ⛔ 한 트랜잭션이고 부분 발번이 없다 — 하나라도 실패하면 전량 되돌린다. 개체 N행 전량 또는 0행이며, 이 원자성은 예약 번호의 무결번 보장이 아니다. 근거: P-02-04 §5-3·§6 · 공유계약 B-8. ⭐ 발행 기록은 이 경로가 만들지 않는다 — 공통 계약의 POST /app/document-issues 가 이어서 만든다. 개체가 먼저 있어야 그쪽 targets 에 담을 수 있다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다. 미확정 표식은 셸이 붙인다(공유계약 C-7 — 화면 조항). 전역 SERIAL_NUMBER 규칙 SN-{YYYYMMDD}-{SEQ4}를 plantId=null로 사용한다. 한 요청 N개는 한 번의 카운터 증가로 연속 구간을 예약하되 실패·경합 결번은 허용한다. 신규 상태는 REGISTERED다. 선택 If-Match는 정상 형식이면 값 비교 없이 허용하고 형식 오류만 400으로 거부한다. 로그인 계정은 created_by, 필수 사번은 마스터 존재, 실제 단말은 can_print_label 권한을 검증한다. 계정·사번·단말은 멱등 지문에 포함되며 기존 기록 보존 중에만 원 응답 재생을 보장한다. 발번과 발행은 서로 다른 키를 쓰고, 발행 실패 때문에 새 개체를 만들거나 목록 첫 페이지로 원 배치를 복원하지 않는다.",
+    "description": "LOT 중간 실적으로 개체 N행을 만든다 — 인식표가 개체별 1:1 이기 때문이다(R69). ⛔ **`quantity` 를 LOT 실적 배분 수량에서 도출하지 않는다** — 인식표는 단위를 갖지 않아 환산 대상이 아니다. 발번한 개체 수가 곧 이 LOT 의 중간 실적이다. 번호는 서버가 매긴다. ⛔ 기존 production_result 또는 goodQty는 선행조건이 아니다. 최종 생산 LOT 출력 시 실제 생산수량과 이 LOT의 전체 개체 수가 같은지 검증한다. ⛔ 한 트랜잭션이고 부분 발번이 없다 — 하나라도 실패하면 전량 되돌린다. 개체 N행 전량 또는 0행이며, 이 원자성은 예약 번호의 무결번 보장이 아니다. 근거: P-02-04 §5-3·§6 · 공유계약 B-8. ⭐ 발행 기록은 이 경로가 만들지 않는다 — 공통 계약의 POST /app/document-issues 가 이어서 만든다. 개체가 먼저 있어야 그쪽 targets 에 담을 수 있다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다. 미확정 표식은 셸이 붙인다(공유계약 C-7 — 화면 조항). 전역 SERIAL_NUMBER 규칙 SN-{YYYYMMDD}-{SEQ4}를 plantId=null로 사용한다. 한 요청 N개는 한 번의 카운터 증가로 연속 구간을 예약하되 실패·경합 결번은 허용한다. 신규 상태는 REGISTERED다. 선택 If-Match는 정상 형식이면 값 비교 없이 허용하고 형식 오류만 400으로 거부한다. 로그인 계정은 created_by, 필수 사번은 마스터 존재, 실제 단말은 can_print_label 권한을 검증한다. 계정·사번·단말은 멱등 지문에 포함되며 기존 기록 보존 중에만 원 응답 재생을 보장한다. 발번과 발행은 서로 다른 키를 쓰고, 발행 실패 때문에 새 개체를 만들거나 목록 첫 페이지로 원 배치를 복원하지 않는다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -5902,7 +5922,8 @@
      "uomId": {
       "type": "integer",
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "이 실적 전체의 수량 단위. **품목 기준단위(`Item.baseUomId`)와 같다 — LOT 마다 다른 단위를 쓰지 않는다.** 다섯 수량과 `lotAllocations` 전 행이 이 단위 하나를 공유하므로 한 실적 안에서 배분 행마다 단위가 갈리지 않는다. 근거: 사용자 확정 2026-09-09 · P-02-04 §3-1"
      },
      "resultSourceCode": {
       "type": "string",
@@ -5965,7 +5986,8 @@
      "allocatedQty": {
       "type": "number",
       "format": "double",
-      "example": 120.0
+      "example": 120.0,
+      "description": "배분 수량. 단위는 실적 헤더의 `uomId` 다 — **배분 행은 단위를 따로 갖지 않는다.** 근거: 사용자 확정 2026-09-09"
      }
     },
     "required": [
@@ -6035,7 +6057,7 @@
       "minimum": 1,
       "maximum": 1000,
       "example": 480,
-      "description": "이번에 등록할 인식표 개체 수(1~1000). 기존 production_result 또는 goodQty를 요구하지 않는다. 최종 생산 LOT 출력 때 화면 입력 수량과 LOT 전체 개체 수를 대조한다. 근거: P-02-04 §5-3·§6"
+      "description": "이번에 등록할 인식표 개체 수(1~1000). 기존 production_result 또는 goodQty를 요구하지 않는다. 최종 생산 LOT 출력 때 화면 입력 수량과 LOT 전체 개체 수를 대조한다. 근거: P-02-04 §5-3·§6 ⭐ **인식표는 단위 정보를 갖지 않는다 — 개체 1행이 무조건 1개다.** 그래서 이 값은 배분 수량을 환산해 얻는 값이 아니고, 환산도 소수도 발생하지 않는다(생성된 개체 행 수가 곧 개수이며 API 호출 횟수와 다르다). 인식표 대상 품목은 생산 LOT 출력 전에 **실제 생산수량 = 이 LOT 의 전체 개체 수**여야 한다(P-02-04 §4). ⚠ 1회 상한이 1000 이므로 개체가 그보다 많은 LOT 은 나누어 보낸다. 근거: 사용자 확정 2026-09-09 · P-02-04 §3-2·§4"
      },
      "producedAt": {
       "type": "string",
@@ -6417,6 +6439,13 @@
      },
      "validation": {
       "$ref": "#/components/schemas/ValidationSummary"
+     },
+     "processId": {
+      "type": "integer",
+      "format": "int64",
+      "readOnly": true,
+      "example": 1001,
+      "description": "이 작업지시가 실제 참조하는 routingOperationId의 공정 식별자. 비활성 공정이나 과거 버전 지시도 실제 참조값을 반환한다. 설비, 원본 재작업 지시, 품목 기본 라우팅 또는 단말 매핑의 공정으로 대체하지 않는다. 필수 참조를 해석할 수 없으면 정상 응답에 null, 0 또는 임의값을 넣지 않고 내부 데이터 오류로 실패한다. 목록에서도 문제 지시만 조용히 제외하지 않는다."
      }
     },
     "required": [
@@ -6429,9 +6458,10 @@
      "uomId",
      "workOrderTypeCode",
      "statusCode",
-     "priorityNo"
+     "priorityNo",
+     "processId"
     ],
-    "x-internal-note": "표시용 파생 넷(productionOrderId·productionOrderNo·routingOperationName·itemCode)은 W-02-08 목록이 이름 열을 그리려고 요구한 것이다. 화면이 계획→오더를 타고 들어가 이름을 얻으면 50줄에 100호출이 된다(공유계약 L-2 · omf-mes#265 덧④). itemCode 는 요청 범위 밖이나 같은 조인에서 나오므로 함께 낸다 — 품목명은 화면이 GET /mdm/items 로 만든 이름표를 쓴다."
+    "x-internal-note": "표시용 파생 넷(productionOrderId·productionOrderNo·routingOperationName·itemCode)은 W-02-08 목록이 이름 열을 그리려고 요구한 것이다. 화면이 계획→오더를 타고 들어가 이름을 얻으면 50줄에 100호출이 된다(공유계약 L-2 · omf-mes#265 덧④). itemCode 는 요청 범위 밖이나 같은 조인에서 나오므로 함께 낸다 — 품목명은 화면이 GET /mdm/items 로 만든 이름표를 쓴다. 작업지시 공정 공급(요청 #536): 기존 WorkOrder.routingOperationId → RoutingOperation.processId 관계의 읽기 값을 응답에 보장한다. 목록·상세·생성·수정 등 WorkOrder 응답 전체에 적용하며 생성/수정 요청은 불변이다. 공유계약 F-1, 작업지시 연결 활성 화면과 PQC 의뢰의 실제 작업지시 대상 공정 판정 원천."
    },
    "WorkOrderAdjustment": {
     "type": "object",
