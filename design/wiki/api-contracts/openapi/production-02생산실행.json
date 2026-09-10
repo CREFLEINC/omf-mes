@@ -458,6 +458,16 @@
         }
        }
       }
+     },
+     "500": {
+      "description": "필수 공정 참조를 해석할 수 없는 내부 데이터 오류",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
      }
     }
    },
@@ -567,6 +577,16 @@
      },
      "404": {
       "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "필수 공정 참조를 해석할 수 없는 내부 데이터 오류",
       "content": {
        "application/json": {
         "schema": {
@@ -6409,6 +6429,13 @@
      },
      "validation": {
       "$ref": "#/components/schemas/ValidationSummary"
+     },
+     "processId": {
+      "type": "integer",
+      "format": "int64",
+      "readOnly": true,
+      "example": 1001,
+      "description": "이 작업지시가 실제 참조하는 routingOperationId의 공정 식별자. 비활성 공정이나 과거 버전 지시도 실제 참조값을 반환한다. 설비, 원본 재작업 지시, 품목 기본 라우팅 또는 단말 매핑의 공정으로 대체하지 않는다. 필수 참조를 해석할 수 없으면 정상 응답에 null, 0 또는 임의값을 넣지 않고 내부 데이터 오류로 실패한다. 목록에서도 문제 지시만 조용히 제외하지 않는다."
      }
     },
     "required": [
@@ -6421,9 +6448,10 @@
      "uomId",
      "workOrderTypeCode",
      "statusCode",
-     "priorityNo"
+     "priorityNo",
+     "processId"
     ],
-    "x-internal-note": "표시용 파생 넷(productionOrderId·productionOrderNo·routingOperationName·itemCode)은 W-02-08 목록이 이름 열을 그리려고 요구한 것이다. 화면이 계획→오더를 타고 들어가 이름을 얻으면 50줄에 100호출이 된다(공유계약 L-2 · omf-mes#265 덧④). itemCode 는 요청 범위 밖이나 같은 조인에서 나오므로 함께 낸다 — 품목명은 화면이 GET /mdm/items 로 만든 이름표를 쓴다."
+    "x-internal-note": "표시용 파생 넷(productionOrderId·productionOrderNo·routingOperationName·itemCode)은 W-02-08 목록이 이름 열을 그리려고 요구한 것이다. 화면이 계획→오더를 타고 들어가 이름을 얻으면 50줄에 100호출이 된다(공유계약 L-2 · omf-mes#265 덧④). itemCode 는 요청 범위 밖이나 같은 조인에서 나오므로 함께 낸다 — 품목명은 화면이 GET /mdm/items 로 만든 이름표를 쓴다. 작업지시 공정 공급(요청 #536): 기존 WorkOrder.routingOperationId → RoutingOperation.processId 관계의 읽기 값을 응답에 보장한다. 목록·상세·생성·수정 등 WorkOrder 응답 전체에 적용하며 생성/수정 요청은 불변이다. 공유계약 F-1, 작업지시 연결 활성 화면과 PQC 의뢰의 실제 작업지시 대상 공정 판정 원천."
    },
    "WorkOrderAdjustment": {
     "type": "object",
