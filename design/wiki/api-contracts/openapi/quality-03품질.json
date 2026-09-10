@@ -3650,7 +3650,7 @@
      },
      "overallJudgmentCode": {
       "type": "string",
-      "description": "합격·불합격·보류 3값. ⛔ enum 으로 못박지 않는다 — 값 목록은 공통코드가 갖고 늘 수 있다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_OVERALL_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격)·HELD(보류) — 검사 결과 수량 세 칸(accepted/rejected/held)과 같은 이름이다. 근거: 회신 E-3 종결 2026-08-07 · omf-mes#179",
+      "description": "DRAFT에서 아직 판정하지 않았으면 키를 생략한다. CONFIRMED에서는 반드시 값이 있다. 합격·불합격·보류 3값. ⛔ enum 으로 못박지 않는다 — 값 목록은 공통코드가 갖고 늘 수 있다(공유계약 G-2·G-6). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INSPECTION_RESULT_OVERALL_JUDGMENT 로 받는다. 값은 ACCEPTED(합격)·REJECTED(불합격)·HELD(보류) — 검사 결과 수량 세 칸(accepted/rejected/held)과 같은 이름이다. 근거: 회신 E-3 종결 2026-08-07 · omf-mes#179",
       "example": "ACCEPTED",
       "x-code-key": "CD-INSPECTION-OVERALL-JUDGMENT"
      },
@@ -3735,7 +3735,6 @@
      "rejectedQty",
      "heldQty",
      "uomId",
-     "overallJudgmentCode",
      "inspectorId",
      "inspectedAt",
      "statusCode"
@@ -4193,7 +4192,7 @@
      "actorId": {
       "type": "integer",
       "format": "int64",
-      "description": "등록이면 held_by, 해제면 released_by",
+      "description": "등록이면 held_by, 해제면 released_by. 기록되지 않은 자동·기존 보류 사건에서는 actorName과 함께 키를 생략한다. null이나 가짜 사용자를 싣지 않는다.",
       "example": 1001
      },
      "actorName": {
@@ -4260,8 +4259,7 @@
      "eventTypeCode",
      "occurredAt",
      "lotId",
-     "lotNo",
-     "actorId"
+     "lotNo"
     ],
     "x-internal-note": "⛔ 이것은 «전체 전이 이력이 아니다» — 보류 등록·해제만이다. ⛔ 되살리기 잔여 — 전이 9건 중 5건이 남지 않아(W-03-01 §5-1 실측) 경로 이름이 lot-status-events 가 아니라 lot-hold-events 이고, 화면은 「보류 이력만 보입니다」를 문구로 밝힌다. 이 축소의 근거였던 «변경이력 테이블이 물리 모델에 없다»는 A-11 v4.6 이 철회했다 — omf-mes#299(LOT 생명주기 전이 이력)가 계약 쪽 자리를 세우기 시작했다. ⭐ 새 테이블을 요구하지 않는다 — trace.lot_hold 한 행이 held_by/held_at 와 released_by/released_at 를 둘 다 가지므로 서버가 한 행을 최대 두 사건으로 편다(공유계약 L-2 파생은 서버 계산). 이슈 #176. 신설 2026-09-03 — `W-03-01` §3 이력 표의 「사유」 열이 **해제 행에서 «비어 있었다»**(목업 원문 `08-02 11:30 …0007 보류 → (해제) 박품질 —`). 같은 화면 §5-1 도 「C7 보류 → Release 재판정 합격 — ⚠ **해제 시각만** — 「합격이라서」가 안 남는다」로 그 결손을 적어 두었다. `W-03-02` §5-4 가 `releaseReasonCode` 를 되살린 이유가 「집계가 가능해졌다 — 「재판정으로 풀린 건이 몇 건인가」를 이 값으로 센다」인데, **세는 화면이 바로 이 이력 조회다** — 응답에 없으면 되살린 칸을 아무도 읽지 않는다. ⚠ 단건 조회(`LotHold`)에는 이미 있었고 사건 목록에만 빠져 있었다."
    },
