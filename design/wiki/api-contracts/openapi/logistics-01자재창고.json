@@ -3714,7 +3714,7 @@
      "logistics"
     ],
     "summary": "입하 라인 치환",
-    "description": "LOT이 이미 만들어진 라인은 품목·입하 수량·단위를 변경하거나 삭제할 수 없다. 이 경로의 조회는 ETag를 내리지 않으며 If-Match에는 부모 경로 GET /logistics/inbound-receipts/{inboundReceiptId} 응답의 ETag를 사용한다.",
+    "description": "LOT이 이미 만들어진 라인은 품목·입하 수량·단위를 변경하거나 삭제할 수 없어야 한다. 현재 구현은 LOT 연결 라인 삭제와 후속 레코드가 있는 라인의 수량 변경만 거부하며, LOT만 연결된 라인의 수량 변경과 품목·단위 변경은 아직 보장하지 않는다. 이 경로의 조회는 ETag를 내리지 않으며 If-Match에는 부모 경로 GET /logistics/inbound-receipts/{inboundReceiptId} 응답의 ETag를 사용한다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -9199,7 +9199,7 @@
      "occurredAt",
      "lines"
     ],
-    "description": "입하 등록. 헤더·라인이 한 트랜잭션으로 만들어지고 자재 LOT은 공급사 LOT이 부착된 라인에만 함께 생긴다. supplierLotMissing=true인 라인은 LOT 없이 저장된다. false이면 supplierLotNo가 필수이며 누락은 400 PAIR다.",
+    "description": "입하 등록. 헤더·라인이 한 트랜잭션으로 만들어지고 자재 LOT은 공급사 LOT이 부착된 라인에만 함께 생긴다. supplierLotMissing=true인 라인은 LOT 없이 저장되며 이후 POST /trace/lots에서 numberSourceCode=MES로 생성한다. false이면 supplierLotNo가 필수이며 누락은 400 PAIR다.",
     "x-internal-note": "M-01-01 §5-4 · P-01-01 §3-6 · 공유계약 B-8. ⚠ 거래명세서 촬영본의 OCR 파싱 결과(인식된 품목·수량·명세서 번호)를 담을 곳이 없다 — 첨부 스키마는 파일 자체만 보관하고 인식 결과 필드는 이 요청 본문에도 물리 모델에도 없다(실측). 근거: M-01-01 §4·§8-2 · omf-mes#75 ⚠ 승인 절차 자체(누가·언제)는 아직 정해지지 않았다 — M-01-01 §8-4. 계약은 approvalRequestId 자리만 갖는다.",
     "properties": {
      "supplierId": {
@@ -9525,7 +9525,7 @@
      "uomId",
      "supplierLotMissing"
     ],
-    "description": "라인 전체 치환 항목. inboundReceiptLineId가 없으면 신규 행, 있으면 갱신, 요청에서 빠진 기존 행은 삭제한다. supplierLotMissing=false이면 supplierLotNo가 필수다. 이미 LOT이 만들어진 라인은 품목·입하 수량·단위를 변경하거나 삭제할 수 없다.",
+    "description": "라인 전체 치환 항목. inboundReceiptLineId가 없으면 신규 행, 있으면 갱신, 요청에서 빠진 기존 행은 삭제한다. supplierLotMissing=false이면 supplierLotNo가 필수다. LOT 생성 뒤에는 품목·입하 수량·단위 변경과 삭제를 허용하지 않는 것이 요구 규칙이다. 현재 구현은 LOT 연결 라인 삭제와 후속 레코드가 있는 라인의 수량 변경만 거부하며, LOT만 연결된 라인의 수량 변경과 품목·단위 변경은 아직 보장하지 않는다.",
     "x-internal-note": "M-01-01 §5-4·§8-6-b · 공유계약 A-5. 현재 서버는 LOT 연결 라인 삭제와 후속 레코드가 있는 라인의 수량 변경만 거부한다. LOT만 생성된 라인의 수량 변경과 품목·단위 변경은 비교하지 않아 불변 요구를 완전히 보장하지 못하며 서버 보완이 필요하다.",
     "properties": {
      "inboundReceiptLineId": {
