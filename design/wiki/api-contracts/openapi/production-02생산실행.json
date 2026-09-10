@@ -811,7 +811,8 @@
      "production"
     ],
     "summary": "자재 투입 목록",
-    "description": "근거: P-02-03 §3",
+    "description": "근거: P-02-03 §3. LOT가 NORMAL일 때만 투입할 수 있다. 재생재 등록 직후의 INSPECTION_PENDING LOT은 모든 열린 보류를 해제하고 마지막 합격 해제로 NORMAL 전이가 완료된 뒤 재시도하며, 입하 원천 전용 IQC 생략 요청으로 우회할 수 없다. 부분 해제 또는 다른 열린 보류 잔존으로 LOT 상태 전이가 생략되면 투입할 수 없다.",
+    "x-internal-note": "재생재 등록→품질 해제→투입 경계: 통보 214 · omf-mes#604",
     "parameters": [
      {
       "name": "workOrderId",
