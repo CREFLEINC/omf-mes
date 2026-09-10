@@ -98,6 +98,8 @@
 
 ### 3-2. `P-02-04` 생산 LOT 출력·스캔 마감 통합 영역 *(POP)*
 
+발번 전 생산 실적·개체 생성·LOT 마감은 기존 `WorkOrder.processId` 판정을 유지한다. 아직 없는 개체에 summary를 요구하지 않는다. 이미 존재하는 LOT/개체의 발행·재출력은 `GET /app/document-issues/summary`에 실제 `documentTypeCode`와 대상 유형·ID를 함께 보내 `requiredProcessIds`를 받는다. 실제 대상 LOT 자체 발행 W/O와 선택 W/O 귀속이 같아야 하며 필요한 공정 전체의 동일 단말 `canPrintLabel`을 요구한다. 순수 건수 조회는 문서종류 생략 시 null이어도 건수 표시를 유지한다(공유계약 F-1).
+
 | 화면 요구(§5 본문) | 엔드포인트 | 근거 |
 | --- | --- | --- |
 | 단말 게이팅 | 동상 — `POST` 403 | §5-1 · F-1 |
@@ -113,19 +115,25 @@
 
 ### 3-3. `P-02-09` 포장 라벨·인식표 재출력 *(POP)* — ⚠ 본문 도출
 
+한 번의 발행 선택은 같은 documentTypeCode·최대 1000개 대상이다. 요약 읽기는 조합별/페이지별로 나눌 수 있지만 혼합 문서종류·1000개 초과 선택을 묵시적으로 여러 POST로 분할하지 않고 선택 조정 안내를 제공한다. 다른 문서종류는 사용자가 별도 발행 단위로 실행한다. 전체 AND와 원자성은 실제 한 POST의 모든 targets에 적용하며 서로 다른 POST를 하나의 원자적 작업으로 보장하지 않는다.
+
+공정 판정용 summary는 `PACKING_LABEL/LOT` 또는 `IDENTIFICATION_TAG/SERIAL_NUMBER`의 실제 조합별 `documentTypeCode`·`targetTypeCode`·다건 `targetIds`로 조회한다. 기존 1~1000 한도를 유지하고 조합별 요청으로 나눠도 최종 선택 전체를 AND 검증한다. `requiredProcessIds`의 ID 배열은 실제 생산 LOT 자체 발행 W/O 공정 전부 허용, `[]`는 기존 유효 비적용 조합, null은 문서 생략·대상/원천 결손·모순·부적합으로 판정 불가다. 현재 라우팅·투입 자재 이력·계보 조상 공정을 대신 넣지 않는다. null과 미발행 `issueCount=0`은 다르며 삭제 대상 이력·건수는 유지한다. 발행 서버는 실제 대상에서 재계산하여 행 없음/false는 403, 원천/대상 부적합은 422로 전건 거부한다. 부분 발행·다른 공정 OR는 없다. 오프라인 새 큐는 같은 문서/대상의 이용 가능한 확정 원천과 동일 단말 매핑 캐시가 선행하며 문서/대상 변경 시 재판정한다. 기존 큐·멱등 재생·회차·인쇄 분리는 유지한다.
+
 **★ 재발행이 정상 경로인 유일한 화면이다.**
 
 | 화면 요구(§5 본문) | 엔드포인트 | 근거 |
 | --- | --- | --- |
 | 재출력 대상 조회 | 목록 판정은 **`GET /app/document-issues/summary`**(대상 다건 한 번에) · 회차 상세는 `GET /app/document-issues?targetTypeCode=&targetId=` — **둘을 함께** 준다 | §5-3 · A-10 |
 | 무엇을 재출력할지 — 포장 구성이 정한다 | **없음 — 04 제품출하 계약 소관**(포장 구성 조회) | §5-2 · §7 |
-| 재출력 | `POST /app/document-issues` + `reissueReasonCode` **필수**. ⭐ **이 화면은 `documentTypeCode` 두 값을 다룬다** — `PACKING_LABEL`(포장 라벨) · `IDENTIFICATION_TAG`(인식표). `A-10` 규칙 4 「한 화면이 여러 대상 유형을 다루면 대상마다 판정한다」가 그대로 적용된다(§3-8) | §5-1 · K-2 · A-10 |
+| 재출력 | `POST /app/document-issues` + 기존 발행 이력이 있는 대상에 `reissueReasonCode` **필수**(최초 발행 대상에는 남기지 않음). ⭐ **이 화면은 `documentTypeCode` 두 값을 다룬다** — `PACKING_LABEL`(포장 라벨) · `IDENTIFICATION_TAG`(인식표). `A-10` 규칙 4 「한 화면이 여러 대상 유형을 다루면 대상마다 판정한다」가 그대로 적용된다(§3-8) | §5-1 · K-2 · A-10 |
 | ⭐ 재출력 사유 선택 | ✅ **열린다** — `GET /mdm/code-values?codeGroupCode=REISSUE_REASON`. 값 = `DAMAGED`·`LOST`·`PRINT_FAILURE`·`PACKAGING`·`QUANTITY_CHANGE`(2026-09-03 등재). ⭐ **「인쇄 실패」가 시드에 실재한다**(`K-7` 요구 충족) | K-7 · G-32 |
 | 대상 유형이 갈린다(LOT ↔ 개체) | `targetTypeCode` 로 판정 — 계약이 **FK 가 아니라 유형을 먼저** 보게 만든다 | §5-3 |
 | 단말 게이팅 | `POST` 403 | §6 · F-1 |
 | ⭐ **재발행 사유 선택지·표시명** | **`GET /mdm/code-values?codeGroupCode=REISSUE_REASON`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `DAMAGED`·`LOST`·`PRINT_FAILURE`·`PACKAGING`·`QUANTITY_CHANGE`(**2026-09-03 등재**) · ⭐ **고객이 늘린다** — 위 값은 초기 시드다 | G-32 |
 
 ### 3-4. `P-04-01` 출하 실적 등록의 라벨 출력 *(POP)*
+
+물류 포장 입력은 이번 요청 #536의 정합 결정으로 F-1의 `canInputResult` 적용에서 제외한다. `PACKING_LABEL/HANDLING_UNIT`의 발행 요약 `requiredProcessIds=[]`는 생산 라벨 기능 구성 비적용이며 생산 LOT 내용물이 있어도 매트릭스를 확장하지 않는다. 기존 인증·물류·OQC·서버 403·발행 조건은 그대로다.
 
 | 화면 액션 | 엔드포인트 | 근거 |
 | --- | --- | --- |
@@ -141,6 +149,8 @@
 ⚠ **미리보기가 발행 뒤에 온다** — `rendition` 이 발행 기록 ID 를 받기 때문이다. **발행 전 미리보기가 필요하면 계약이 부족하다** → §5-1.
 
 ### 3-5. `P-04-04` 재구성 신규 라벨 발행 *(POP)*
+
+`PACKING_LABEL/HANDLING_UNIT`은 물류 출력으로 생산 라벨 기능 구성 비적용(`requiredProcessIds=[]`)이다. 생산 LOT 내용물이 있어도 `canPrintLabel`을 추가하지 않으며 기존 인증·물류·발행 조건은 유지한다.
 
 | 화면 액션 | 엔드포인트 | 근거 |
 | --- | --- | --- |
@@ -198,7 +208,8 @@
 | `GOODS_ISSUE_QR` | 출고 QR | `P-01-02` | 이동 단위(§3-7 「출고 라인」) |
 | `PRODUCTION_LOT_LABEL` | 생산 LOT 라벨 | `P-02-04` | LOT |
 | `IDENTIFICATION_TAG` | 인식표 | `P-02-04` · `P-02-09`(재출력) | 개체 |
-| `PACKING_LABEL` | 포장 라벨 | `P-02-09` · `P-04-01` · `P-04-04` | 포장 |
+| `PACKING_LABEL` | 포장 라벨 | `P-02-09` | `LOT` — 해당 생산 LOT 자체 발행 W/O 공정 |
+| `PACKING_LABEL` | 포장 라벨 | `P-04-01` · `P-04-04` | `HANDLING_UNIT` — 물류 포장, 생산 라벨 기능 구성 비적용 |
 | `DELIVERY_LABEL` | 납품 라벨 | `P-04-01` | 출하 배분(`SHIPMENT_LOT_ALLOCATION`) |
 | `CERTIFICATE_OF_ANALYSIS` | 검사성적서(CoA) | `W-04-03` ⚠ **양식 미정이라 아직 안 부른다** | 검사 결과 |
 | `TOOL_LABEL` | 툴 QR 라벨 | **`W-05-13`** ⛔ **구현 완료** | 툴·금형 |
