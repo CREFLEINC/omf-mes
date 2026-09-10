@@ -3216,13 +3216,13 @@
        "REJECTED",
        "HELD"
       ],
-      "description": "이 배분의 출하검사 상태. NOT_REQUIRED=검사 절차 없음 · PENDING=결과 대기 · PASSED=합격 · REJECTED=불합격 · HELD=보류. 03 품질 결과를 서버가 배분 단위로 판정한다. 화면은 이 값을 그대로 표시하고 자체 조합하지 않는다(P-04-01 §5-1).",
+      "description": "이 배분이 매달린 출하작업지시 라인의 출하검사 상태. 그 라인이 피킹한 LOT 전건을 모집단으로 삼아 LOT 대상 OQC와 출하작업지시 대상 OQC를 함께 판정한다. 출하작업지시 대상 의뢰의 lotId가 있으면 그 LOT을 피킹한 라인에만, 없으면 같은 지시의 모든 검사 대상 라인에 적용한다. CONFIRMED 결과 중 의뢰별 최신 회차만 세며 REJECTED > HELD > PENDING > PASSED > NOT_REQUIRED 순으로 판정한다. NOT_REQUIRED=검사 절차 없음 · PENDING=결과 대기 · PASSED=합격 · REJECTED=불합격 · HELD=보류. 화면은 이 값을 그대로 표시하고 자체 조합하지 않는다.",
       "example": "NOT_REQUIRED",
       "x-code-key": "CD-SHIPPING-INSPECTION-STATUS"
      },
      "oqcPassed": {
       "type": "boolean",
-      "description": "⭐ 서버가 판정한 납품 라벨 발행 게이트. shippingInspectionStatusCode 가 PASSED 또는 NOT_REQUIRED 이면 true, 나머지는 false 다. 검사 결과는 03 품질 계약이 소유한다. ⛔ 화면이 상태 문자열로 다시 계산하지 않는다 — 이 값을 활성 조건으로 쓴다(P-04-01 §5-1).",
+      "description": "서버가 판정한 납품 라벨 발행 게이트. 같은 배분의 shippingInspectionStatusCode와 동일한 라인·피킹 LOT·LOT/출하작업지시 대상 OQC·최신 확정 회차 모집단을 쓴다. shippingInspectionStatusCode가 PASSED 또는 NOT_REQUIRED이면 true, 나머지는 false다. NOT_REQUIRED는 라벨 발행을 허용한다는 뜻이지 검사 합격을 뜻하지 않으므로 화면은 상태를 PASSED로 바꾸지 않는다. 검사 결과는 03 품질 계약이 소유하며 화면은 상태 문자열로 이 값을 다시 계산하지 않는다.",
       "example": true
      },
      "packedQty": {
@@ -3357,7 +3357,7 @@
        "REJECTED",
        "HELD"
       ],
-      "description": "⭐ W-04-02 「검사」 열의 판정 근거 — 라인 전체(shippingInspectionRequired + 03 품질 inspection-results)를 서버가 롤업해 하나로 낸다. NOT_REQUIRED=대상 라인 없음(「—」) · PENDING=대상인데 결과 없음(「● 대기」) · PASSED=전 대상 라인 합격(「✅ 합격」) · REJECTED=불합격 라인 존재(「⛔ 불합격」) · HELD=보류 라인 존재, 불합격 없음(「⚠ 보류」). ⭐ 롤업 우선순위(가장 나쁜 것이 이긴다): REJECTED > HELD > PENDING > PASSED > NOT_REQUIRED. ⛔ 화면이 라인을 순회해 판정하지 않는다(공유계약 G-8과 같은 결 — W-04-02 §5-3) — 03 계약과의 조인은 서버 몫이다. ⚠ 이 필드를 이미 소비 중인 코드는 PASSED 외 값을 몰라도 PENDING과 동일하게(대기 취급) 두면 당장은 안전하다. 근거: W-04-02 §5-3·§5-4 · omf-mes#232 · omf-mes#235",
+      "description": "출하작업지시 라인 전체의 검사 상태를 서버가 롤업한 값. 각 검사 대상 라인이 피킹한 LOT 전건에 대해 LOT 대상 OQC와 이 출하작업지시 대상 OQC를 함께 판정한다. 지시 대상 의뢰의 lotId가 있으면 그 LOT을 피킹한 라인에만, 없으면 같은 지시의 모든 검사 대상 라인에 적용한다. DRAFT는 제외하고 CONFIRMED 결과 중 의뢰별 최대 회차만 센다. NOT_REQUIRED=대상 라인 없음(「—」) · PENDING=대상인데 최신 확정 결과 없음(「● 대기」) · PASSED=전 대상 라인 합격(「✅ 합격」) · REJECTED=불합격 라인 존재(「⛔ 불합격」) · HELD=보류 라인 존재, 불합격 없음(「⚠ 보류」). 롤업 우선순위는 REJECTED > HELD > PENDING > PASSED > NOT_REQUIRED다. 화면은 라인을 순회해 다시 판정하지 않는다.",
       "example": "PENDING",
       "x-code-key": "CD-SHIPPING-INSPECTION-STATUS"
      },
