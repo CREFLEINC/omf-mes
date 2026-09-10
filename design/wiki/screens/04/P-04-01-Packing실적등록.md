@@ -125,7 +125,7 @@ OQC가 필요한 제품이 포장 시점에 미합격이면 포장 라벨만 자
 
 | 목적 | 계약 |
 | --- | --- |
-| 최초 출하번호 스캔 | `GET /logistics/shipments?pickedOnly=true&shipmentNo=` → `GET /logistics/shipment-lot-allocations?shipmentId=&unpackedOnly=true` |
+| 최초 출하번호 스캔 | `GET /logistics/shipments?pickedOnly=true&shipmentNo=&shipDateFrom={businessDate}&shipDateTo={businessDate}` → `GET /logistics/shipment-lot-allocations?shipmentId=&unpackedOnly=true`. 요구 계약상 정확 일치는 기간 생략 가능해야 하나 현재 서버는 시작일 누락을 400으로 거부하므로 영업일을 함께 보내고, 과거 번호는 기간을 넓혀 재조회한다 |
 | 최초 출하 목록 선택 | `GET /logistics/shipments?pickedOnly=true&shipDateFrom={businessDate}&shipDateTo={businessDate}&page=&size=` — 팝업 검색은 수신한 현재 표시 목록만 로컬 필터 → 선택 후 배분 조회 |
 | 기존 납품 라벨 재진입 | `GET /logistics/shipment-lot-allocations?q=` |
 | 출하 배분/LOT 매칭 | `GET /logistics/shipment-lot-allocations?shipmentId=&lotQ=` |

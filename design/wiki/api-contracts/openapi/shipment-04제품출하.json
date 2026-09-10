@@ -1070,7 +1070,7 @@
      "shipment"
     ],
     "summary": "출하 목록",
-    "description": "W-04-02·W-04-04·W-04-12·P-04-01이 함께 쓴다. 목록 조회는 기간 필수(L-3)다. P-04-01의 출하번호 스캔처럼 shipmentNo를 정확 일치로 주는 단건 식별 조회는 기간을 생략할 수 있다.",
+    "description": "W-04-02·W-04-04·W-04-12·P-04-01이 함께 쓴다. 목록 조회는 기간 필수(L-3)다. 기간은 shippedAt을 각 출하 창고 소속 공장의 로컬 날짜로 판정하며 끝 날짜를 포함한다. 요구 계약상 P-04-01의 출하번호 스캔처럼 shipmentNo를 정확 일치로 주는 단건 식별 조회는 기간을 생략할 수 있어야 하지만, 현재 서버는 이 예외를 적용하지 않고 shipDateFrom 누락을 400으로 거부한다.",
     "parameters": [
      {
       "name": "shipmentNo",
@@ -1145,7 +1145,7 @@
        "format": "date",
        "example": "2026-08-13"
       },
-      "description": "목록 조회에서는 필수. shipmentNo 정확 일치 조회에서는 생략 가능"
+      "description": "목록 조회에서는 필수. shippedAt이 각 출하 창고 소속 공장의 로컬 시작 날짜 이상인 행을 찾는다. 요구 계약상 shipmentNo 정확 일치 조회에서는 생략 가능해야 하나 현재 서버는 생략을 400 REQUIRED로 거부한다"
      },
      {
       "name": "shipDateTo",
@@ -1155,7 +1155,7 @@
        "format": "date",
        "example": "2026-08-13"
       },
-      "description": "목록 조회에서는 필수. shipmentNo 정확 일치 조회에서는 생략 가능"
+      "description": "목록 조회에서는 필수. 각 출하 창고 소속 공장의 로컬 끝 날짜 다음 날 자정 전까지의 shippedAt을 찾는 반열림 구간이라 끝 날짜의 전 시간을 포함한다. shipmentNo 정확 일치 조회에서는 생략 가능"
      },
      {
       "name": "q",
@@ -1181,9 +1181,14 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "enum": [
+        "shippedAt",
+        "shipmentNo"
+       ],
+       "default": "shippedAt",
+       "example": "shippedAt"
       },
-      "description": "경과일 긴 순이 기본이다. 근거: W-04-12 §5-7"
+      "description": "shippedAt(기본)·shipmentNo 두 키만 허용한다. 모두 오름차순이며 동률은 shipmentId 오름차순이다. 기본 shippedAt 오름차순은 오래된 출하가 먼저인 경과일 긴 순이다. 그 밖의 값은 400 INVALID다. 근거: W-04-12 §5-7"
      },
      {
       "name": "page",
@@ -1226,6 +1231,16 @@
           "items",
           "page"
          ]
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "현재 서버는 shipmentNo 정확 일치 여부와 무관하게 shipDateFrom 누락을 REQUIRED로 거부한다. 허용하지 않은 sort 값은 INVALID이며 기존 질의 형식·범위 검증 오류도 포함한다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
         }
        }
       }
