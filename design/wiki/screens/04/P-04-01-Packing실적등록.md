@@ -128,7 +128,7 @@ OQC가 필요한 제품이 포장 시점에 미합격이면 포장 라벨만 자
 
 | 목적 | 계약 |
 | --- | --- |
-| 최초 출하번호 스캔 | `GET /logistics/shipments?pickedOnly=true&shipmentNo=` → `GET /logistics/shipment-lot-allocations?shipmentId=&unpackedOnly=true` |
+| 최초 출하번호 스캔 | 현재는 `GET /logistics/shipments?pickedOnly=true&q={스캔번호}&shipDateFrom=&shipDateTo=&page=&size=`의 **전 페이지**에서 응답 `shipmentNo`가 스캔값과 정확히 같은 행만 선택 → `GET /logistics/shipment-lot-allocations?shipmentId=&unpackedOnly=true`. 부분검색 첫 행을 고르지 않는다. 정확 일치가 없으면 현재 기간·피킹완료 조건 안에 없다는 뜻만 안내하고 기간 확장·필터 확인을 제공한다. 같은 번호가 복수면 자동 선택하지 않고 후보를 보여 준다 |
 | 최초 출하 목록 선택 | `GET /logistics/shipments?pickedOnly=true&shipDateFrom={businessDate}&shipDateTo={businessDate}&page=&size=` — 팝업 검색은 수신한 현재 표시 목록만 로컬 필터 → 선택 후 배분 조회 |
 | 기존 납품 라벨 재진입 | `GET /logistics/shipment-lot-allocations?q=` |
 | 출하 배분/LOT 매칭 | `GET /logistics/shipment-lot-allocations?shipmentId=&lotQ=` |
@@ -147,6 +147,13 @@ OQC가 필요한 제품이 포장 시점에 미합격이면 포장 라벨만 자
 - 저장하지 않은 입력에 대한 화면 이동 확인 팝업은 만들지 않는다.
 - 배분 한 건을 여러 포장에 나누는 부분 포장은 지원하지 않는다. 중간 표나 배분 분할 API를 임의로 만들지 않는다.
 - 확정 전 빈 포장 취소 요구는 `omf-mes#562`에 남긴다. 향후 삭제 경로는 미확정·현재 내용물 0뿐 아니라 재포장 이력 0도 확인한다. 확정 후 해체·일반 재편성은 이 범위가 아니다.
+
+## §10. 미결
+
+| # | 항목 | 성격 | 등급 | 처리 |
+| --- | --- | --- | :-: | --- |
+| 1 | 정확한 출하번호 조건과 기간 생략 예외 미지원 | API 구현 결손 | **조정** | `omf-mes#558` — 요구 계약은 `shipmentNo` 정확 일치 시 기간 생략을 허용하지만 현재 서버는 `shipmentNo`를 조회 조건에 적용하지 않고 `shipDateFrom` 누락도 400 `REQUIRED`로 거부한다. 보완 전에는 기간을 넓혀가며 `q` 부분검색의 전 페이지에서 응답 번호를 엄격히 대조한다. 0건은 해당 기간·필터 안의 부재일 뿐이고 복수 일치는 자동 선택하지 않는다 |
+| 2 | 확정 전 빈 포장 단위 취소 미지원 | API 구현 결손 | **조정** | `omf-mes#562` — 미래 요구로 유지한다. 현재 서버에는 `DELETE /inventory/handling-units/{handlingUnitId}` 라우트·서비스가 없어 화면은 호출하거나 취소 성공으로 표시하지 않는다. 향후에는 미확정·현재 내용물 0·재포장 이력 0을 모두 검증해야 하며, 확정 후 해체·일반 재편성은 이 항목 범위가 아니다 |
 
 ## 변경 이력
 
