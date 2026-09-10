@@ -59,7 +59,7 @@
 - `POST /inventory/handling-units`로 빈 포장 단위를 만든다.
 - 유형과 선택 가능한 상위 포장은 선택 팝업으로 고른다.
 - 내용물 1건 이상을 구성한 뒤 `POST /inventory/handling-units/{handlingUnitId}:pack`으로 확정하고, 선택한 배분의 전량을 그 포장 단위에 연결한다.
-- 생성 후 확정 전 취소는 `DELETE /inventory/handling-units/{handlingUnitId}`를 사용한다.
+- 생성 후 확정 전 취소 요구는 보존하지만 `DELETE /inventory/handling-units/{handlingUnitId}`는 현재 서버에 구현되지 않았다. 화면은 취소 성공으로 표시하지 않고 미지원 안내를 보이며, 생성된 빈 포장 단위가 남을 수 있음을 알린다. 구현 전에는 호출하지 않는다.
 - 확정 후 해체 기능은 이 화면에 두지 않는다.
 
 ## §4. 포장 확정 후 자동 출력
@@ -101,7 +101,7 @@ OQC가 필요한 제품이 포장 시점에 미합격이면 포장 라벨만 자
 | 대상/유형/상위 포장 선택 | 해당 후보가 로드됨 | G-34 선택 팝업 |
 | 다시 스캔 | 항상 | 마지막 스캔 입력 취소 |
 | 포장 확정 | 전량 포장할 배분 1건 이상 · 유형 선택 · 매칭 오류 없음 | 선택한 배분별 0 또는 배분 전량 상태로 포장 확정 후 자동 라벨 흐름 |
-| 포장 취소 | 포장 단위 생성됨 · 미확정 | 빈 포장 단위 삭제 |
+| 포장 취소 | **현재 비활성** — 서버 DELETE 미구현 | 미지원 안내. 빈 포장 단위를 삭제했다고 표시하지 않음 |
 | 납품 라벨 출력 | OQC 합격/비대상 · 미발행 | 지연된 최초 발행 |
 | 재출력 | 대상·사유 선택 · OQC 게이트 충족 | 선택 라벨 수동 재출력 |
 
@@ -115,6 +115,7 @@ OQC가 필요한 제품이 포장 시점에 미합격이면 포장 라벨만 자
 | 같은 배분 재스캔 | 중복 추가·수량 증가 없이 「이미 선택한 배분입니다」 안내 |
 | 같은 LOT의 다른 미포장 배분 | 배분 ID별 전량을 각각 선택하고 표시 수량 합산 |
 | 이미 포장에 연결된 배분 | ⛔ 재선택 차단 — 기존 포장 단위 표시 |
+| 확정 전 빈 포장 취소 | ⛔ 현재 서버 미지원. 「현재 내용물 0」만으로 이력 없음이라 판단하지 않는다. 향후에는 미확정·현재 내용물 0·재포장 이력 0을 모두 확인하고 하나라도 어긋나면 409 |
 | OQC 필요·미합격 | 포장 라벨만 출력, 납품 라벨은 숨기지 않고 대기 상태/조건 표시 |
 | OQC 비대상 | 검사 절차 없이 납품 라벨 자동 출력 |
 | 자동 출력 실패 | 포장 확정 상태 유지, 실패한 라벨만 재시도 |
@@ -132,7 +133,7 @@ OQC가 필요한 제품이 포장 시점에 미합격이면 포장 라벨만 자
 | 기존 납품 라벨 재진입 | `GET /logistics/shipment-lot-allocations?q=` |
 | 출하 배분/LOT 매칭 | `GET /logistics/shipment-lot-allocations?shipmentId=&lotQ=` |
 | 포장 단위 생성/조회 | `POST /inventory/handling-units` · `GET /inventory/handling-units/{handlingUnitId}` |
-| 포장 확정/취소 | `POST /inventory/handling-units/{handlingUnitId}:pack` · `DELETE /inventory/handling-units/{handlingUnitId}` |
+| 포장 확정/취소 | 확정은 `POST /inventory/handling-units/{handlingUnitId}:pack`. 취소 DELETE는 계약 요구만 있고 현재 서버 미구현이라 호출하지 않음 (`omf-mes#562`) |
 | 라벨 발행 | `POST /app/document-issues` (`PACKING_LABEL`·`DELIVERY_LABEL`) |
 | 발행 요약/이력 | `GET /app/document-issues/summary` · `GET /app/document-issues` |
 | 렌더링/인쇄 보고 | `GET /app/document-issues/{documentIssueLogId}/rendition` · `POST …:report-print` |
@@ -145,12 +146,14 @@ OQC가 필요한 제품이 포장 시점에 미합격이면 포장 라벨만 자
 - 재출력은 자동 실행하지 않으며 대상·사유 선택을 생략하지 않는다.
 - 저장하지 않은 입력에 대한 화면 이동 확인 팝업은 만들지 않는다.
 - 배분 한 건을 여러 포장에 나누는 부분 포장은 지원하지 않는다. 중간 표나 배분 분할 API를 임의로 만들지 않는다.
+- 확정 전 빈 포장 취소 요구는 `omf-mes#562`에 남긴다. 향후 삭제 경로는 미확정·현재 내용물 0뿐 아니라 재포장 이력 0도 확인한다. 확정 후 해체·일반 재편성은 이 범위가 아니다.
 
 ## §10. 미결
 
 | # | 항목 | 성격 | 등급 | 처리 |
 | --- | --- | --- | :-: | --- |
 | 1 | 정확한 출하번호 조건과 기간 생략 예외 미지원 | API 구현 결손 | **조정** | `omf-mes#558` — 요구 계약은 `shipmentNo` 정확 일치 시 기간 생략을 허용하지만 현재 서버는 `shipmentNo`를 조회 조건에 적용하지 않고 `shipDateFrom` 누락도 400 `REQUIRED`로 거부한다. 보완 전에는 기간을 넓혀가며 `q` 부분검색의 전 페이지에서 응답 번호를 엄격히 대조한다. 0건은 해당 기간·필터 안의 부재일 뿐이고 복수 일치는 자동 선택하지 않는다 |
+| 2 | 확정 전 빈 포장 단위 취소 미지원 | API 구현 결손 | **조정** | `omf-mes#562` — 미래 요구로 유지한다. 현재 서버에는 `DELETE /inventory/handling-units/{handlingUnitId}` 라우트·서비스가 없어 화면은 호출하거나 취소 성공으로 표시하지 않는다. 향후에는 미확정·현재 내용물 0·재포장 이력 0을 모두 검증해야 하며, 확정 후 해체·일반 재편성은 이 항목 범위가 아니다 |
 
 ## 변경 이력
 
