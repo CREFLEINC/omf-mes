@@ -2287,7 +2287,7 @@
       "schema": {
        "type": "boolean"
       },
-      "description": "지금 중단 중인가로 거른다 — true 면 미종료 작업홀드이력이 있는 것만 낸다(✓설계확정 결정 14 — 「현재 중단 중」 = 미종료 홀드이력 존재). ⭐ 상태 코드 문자열을 몰라도 판정된다 — 구간이 열려 있고 없고로 갈리기 때문이다(released 와 같은 형태다). 설비고장 상세처리가 plannedEquipmentId 와 함께 걸어 「이 설비의 W/O 중단 N건」을 page.total 로 받는다. ⛔ 응답을 화면이 거르는 것으로는 성립하지 않는다 — 목록이 쪽 단위다"
+      "description": "지금 중단 중인가로 거른다. 현재 서버는 별도 작업홀드 구간을 저장하지 않아 true를 statusCode=SUSPENDED로, false를 그 여집합으로 판정한다. 이는 미종료 홀드이력 존재의 근사이며 사유·시각·메모를 복원하지 않는다. 설비고장 상세처리가 plannedEquipmentId와 함께 걸어 이 설비의 W/O 중단 N건을 page.total로 받는다. ⛔ 응답을 화면이 거르는 것으로는 성립하지 않는다 — 목록이 쪽 단위다"
      },
      {
       "name": "open",
@@ -6547,7 +6547,8 @@
     "required": [
      "reasonCode"
     ],
-    "description": "취소하면 선발행된 생산LOT 슬롯이 자동 폐번된다 — 화면이 저장 전에 그 파급을 말한다. 근거: DR-007 · 공유계약 G-19"
+    "description": "취소하면 선발행된 생산LOT 슬롯이 자동 폐번된다. 이미 발행된 자재 출고요청은 취소·삭제하지 않고 기존 상태로 남는다. 화면이 저장 전에 두 파급을 모두 말한다. 근거: DR-007 · 공유계약 G-19",
+    "x-internal-note": "취소 후 출고요청 잔존 경계: 통보 038 · omf-mes#576"
    },
    "WorkOrderClose": {
     "type": "object",
@@ -6679,7 +6680,8 @@
      "reasonCode",
      "occurredAt"
     ],
-    "description": "POP 에서 누른다 — occurredAt 은 단말 시계가 정한다. 근거: 공유계약 C-12"
+    "description": "POP 에서 누른다 — occurredAt 은 단말 시계가 정한다. reasonCode·occurredAt·note는 현재 W/O 층에 저장되지 않아 조회로 되읽을 수 없다. W/O 상태 전환과 세션 STOP 사건 기록은 별도 호출이다. 근거: 공유계약 C-12",
+    "x-internal-note": "현 서버 저장·조회 경계와 통보 035 정합: omf-mes#576"
    },
    "WorkOrderListSummary": {
     "type": "object",
@@ -6785,7 +6787,8 @@
     "required": [
      "occurredAt"
     ],
-    "description": "재시작은 상태가 아니라 중단→진행 전이 이벤트다 — 그래서 발생 시각을 받는다. 근거: ✓설계확정 결정 14 · 공유계약 C-12"
+    "description": "재시작은 상태가 아니라 중단→진행 W/O 상태 전이다 — 그래서 발생 시각을 받는다. 세션을 새로 열지 않으므로 RELEASED에서 중단한 W/O는 열린 세션 없이 IN_PROGRESS가 될 수 있으며, 세션 RESUME 사건의 성공을 보장하지 않는다. 근거: ✓설계확정 결정 14 · 공유계약 C-12",
+    "x-internal-note": "세션 없는 진행 경계: 통보 035 · omf-mes#576"
    },
    "WorkOrderUpdate": {
     "type": "object",
