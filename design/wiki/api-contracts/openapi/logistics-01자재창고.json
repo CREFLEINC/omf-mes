@@ -5711,7 +5711,8 @@
      "logistics"
     ],
     "summary": "이동 라인 치환",
-    "description": "생성과 반출이 한 오퍼레이션이어서 반출 전 수정 구간이 없다. 이 경로는 항상 400 STATE_LOCKED로 거부된다. If-Match 토큰 원천은 부모 자원 GET /logistics/stock-transfers/{stockTransferId}의 ETag지만 현재 호출 화면은 없다.",
+    "description": "생성과 반출이 한 오퍼레이션이어서 반출 전 수정 구간이 없다. 없는 ID는 404, 낡은 If-Match는 409가 먼저이며, 이를 통과한 실재 전표는 400 STATE_LOCKED라 수정 성공 경로가 없다. If-Match 토큰 원천은 부모 자원 GET /logistics/stock-transfers/{stockTransferId}의 ETag다.",
+    "x-internal-note": "부모 자원 소유 화면 M-01-10을 권한 근거로 쓴다. 현재 화면 액션은 이 PUT을 호출하지 않는다(통보 162 ⓓ·ⓔ).",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -5753,7 +5754,7 @@
       }
      },
      "400": {
-      "description": "항상 400 STATE_LOCKED. 생성 시점에 반출이 끝나 라인을 치환할 수 없다",
+      "description": "유효한 ID와 최신 If-Match를 통과한 실재 전표는 생성 시점에 반출이 끝나 있으므로 400 STATE_LOCKED. 없는 ID의 404와 낡은 토큰의 409가 먼저다",
       "content": {
        "application/json": {
         "schema": {
