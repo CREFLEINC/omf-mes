@@ -2336,7 +2336,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th class="nw">해석·판정</th><td>미결해소(D1 확정) · §7-2 POP 로그인 생략(REQ-PR-0023)과 긴장 → 이원화로 해소 (통합분석)</td></tr>
 <tr><th class="nw">확정·재정의</th><td>D1 ✓[확정 2026-07-01] 권한 마스터 MES 기준정보 편입 — <strong>이원화</strong>: 관리 화면=계정 권한 / POP=사번 귀속. 파생: 권한 정의 목록에 '긴급 W/O 발행 권한' 등재 필요 (EWO #1·§4)</td></tr>
 <tr><th class="nw">반영 위치</th><td>WF06 S9 · 모델 C1(권한 마스터) · 질문지 v2 D1·E9 · 화면 W-CO-02(사용자·역할·권한 관리)</td></tr>
-<tr><th class="nw">잔여 미결</th><td><strong>회신 E-9 사용자 유형/권한/접근 범위 정의(양측 워크숍·고객 액션)</strong> · 권한 입도(메뉴·데이터·법인) · 마스터별 편집 권한 매트릭스(QA #34 확정과 연계)</td></tr>
+<tr><th class="nw">잔여 미결</th><td><strong>회신 E-9 사용자 유형/권한/접근 범위 정의(양측 워크숍·고객 액션)</strong> · <del>권한 입도(메뉴·데이터·법인)</del> · <del>마스터별 편집 권한 매트릭스(QA #34 확정과 연계)</del> ✅ 두 축 해소(2026-09-01 — <code>W-CO-02</code> §8 항목 7·8)</td></tr>
 </tbody></table>
 <h3>REQ-PR-0016 — 불량 등 이벤트 알람 (SNS+대시보드)</h3>
 <table>
@@ -2402,7 +2402,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th class="nw">해석·판정</th><td>일치검증(MES 소유) · §7-3 "$모든 정보" 문구 범위 불명 (통합분석)</td></tr>
 <tr><th class="nw">확정·재정의</th><td>E27(질문지) ✓종결(QA #34): <strong>MES 정본 마스터 전체 수정 가능+변경 이력 필수</strong> · 연계 수신본(품목·BOM·ERP W/O)=읽기 전용+<strong>MES 확장 속성만 편집 가능</strong> — 마스터 편집 통일 규칙</td></tr>
 <tr><th class="nw">반영 위치</th><td>WF01 S5 · WF06 S6 · 모델 C1 · 질문지 v2 E27 · 화면 W-06-07(창고·Location 마스터 — v1.3에서 Location 코드 라벨 이미지 생성 포함 명시)</td></tr>
-<tr><th class="nw">잔여 미결</th><td>마스터별 편집 권한 매트릭스(회신 E-9 연계 잔존)</td></tr>
+<tr><th class="nw">잔여 미결</th><td><del>마스터별 편집 권한 매트릭스(회신 E-9 연계 잔존)</del> ✅ 해소(2026-09-01 — <code>W-CO-02</code> §8 항목 8)</td></tr>
 </tbody></table>
 <h3>REQ-PR-0022 — 작업계획 기반 자재 출고 요청 자동화</h3>
 <table>
@@ -2699,7 +2699,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th>① 백업·보존</th><td>PR-0018(비기능 · <strong>우선순위 '중요' — 47건 중 유일 기재</strong>) · OA-0006(비기능)</td><td>최소 5년 보장·최대 10년 고려 · 백업 구조=추적관리시스템 참조 · 장애 복구</td><td>E21 ✓종결(QA #18): 추적관리시스템=자사(CTO) 개발 시스템 → 참조 구조=내부 지식·열람 의존성 소멸. 5~10년 보존 볼륨 설계로 이행(결정 15: 일 논리 백업+WAL PITR→NAS→콜드 아카이브)</td><td>보존 대상 범위(전체/실적만) 합의 — 설계 시 확인</td></tr>
 <tr><th>② 네트워크·오프라인 내성</th><td>OA-0005(비기능)</td><td>통신 불안정으로 생산 중단 빈번(현행) → 단절 대응</td><td>E20 ✓종결(QA #32): <strong>인프라 관리=고객 책임 / 단절 내성 설계=CREFLE</strong> · 폴백=POP 로컬 버퍼링+복구 시 자동 동기화 · 결정 17: 범위=최소 운영 확정 시나리오 2건 한정 (§4 REQ-OA-0005 정합주 참조)</td><td>단절 원인 조사(고객 책임 영역)</td></tr>
 <tr><th>③ 다국어</th><td>PR-0012(원문 '기능' 기재 — 관례상 비기능으로 재분류·원문 구분 병기, 명세서 정리 §5-7)</td><td>한국어·베트남어 지원</td><td>E23 ✓종결(QA #33): <strong>전범위</strong>(UI+마스터 명칭 한/베+출력물 라벨·보고서) · 언어=<strong>사용자별 설정</strong>(베트남인 관리자급 존재) · 라벨=서버 폰트 렌더링(결정 18)</td><td>다국어 물리 설계(내부)</td></tr>
-<tr><th>④ 권한·인증</th><td>PR-0015(원문 '기능') · PR-0023(원문 '기능')</td><td>사용자별(부서·기능) 접근 분리 + POP 로그인 생략(사번만 입력)</td><td>D1 ✓확정: 권한 마스터 MES 편입 · <strong>이원화</strong>(관리 화면=계정 권한 / POP=사번 귀속 — 도용 리스크 수용, 통합분석 §7-2) · QA #34(E27): 정본 마스터 수정+이력 필수·연계본 읽기 전용</td><td><strong>회신 E-9</strong> 사용자 유형/권한/범위 정의(고객·양측) · 권한 입도(메뉴·데이터·법인) · 편집 권한 매트릭스 · '긴급 W/O 발행 권한' 등재(EWO §4)</td></tr>
+<tr><th>④ 권한·인증</th><td>PR-0015(원문 '기능') · PR-0023(원문 '기능')</td><td>사용자별(부서·기능) 접근 분리 + POP 로그인 생략(사번만 입력)</td><td>D1 ✓확정: 권한 마스터 MES 편입 · <strong>이원화</strong>(관리 화면=계정 권한 / POP=사번 귀속 — 도용 리스크 수용, 통합분석 §7-2) · QA #34(E27): 정본 마스터 수정+이력 필수·연계본 읽기 전용</td><td><strong>회신 E-9</strong> 사용자 유형/권한/범위 정의(고객·양측) · <del>권한 입도(메뉴·데이터·법인)</del> · <del>편집 권한 매트릭스</del> ✅ 두 축 해소(2026-09-01 — <code>W-CO-02</code> §8 항목 7·8) · '긴급 W/O 발행 권한' 등재(EWO §4)</td></tr>
 <tr><th>⑤ 단말·인프라</th><td>PR-0017(비기능)</td><td>POP·바코드 스캐너·라벨 프린터 설치(공정·위치 확인 필요)</td><td>일치검증(인프라 부재 가설) — 설치 공정·위치 확정 없음. 폼팩터·인쇄 지점은 확정(결정 16·18 · BADGE §2·#10) — 상세는 03-HW구성안.md</td><td><strong>회신 E-2</strong> 설치 공정·위치(고객 정리 대기)</td></tr>
 <tr><th>⑥ 대시보드·모니터링</th><td>PR-0036(비기능 — 원문 구분 기재)</td><td>일일생산실적+알람 설비 위치+레이아웃 표시</td><td>QA #20: 1차 범위 포함(Analytics=OMF-AI 이연 · 설비제어=제외)</td><td><strong>회신 E-7</strong> 배치도 · <strong>회신 E-24</strong> 구성 정보(고객 대기)</td></tr>
 </tbody></table>
@@ -2756,7 +2756,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th class="nw">6</th><td>납품 라벨 형식 (PR-0036 비고)</td><td class="nw">회신 E-6</td><td><strong>회수 대기 유지</strong>(QA #22)</td></tr>
 <tr><th class="nw">7</th><td>현장 공장·창고 레이아웃 배치도 (PR-0036)</td><td class="nw">회신 E-7</td><td><strong>회수 대기 유지</strong>(QA #22) — 회신 E-24 대시보드와 연계</td></tr>
 <tr><th class="nw">8</th><td>보고서 양식 파일 (PR-0013)</td><td class="nw">회신 E-8</td><td><strong>회수 대기 유지</strong>(QA #22) — 후속 회신 E-22(보고서 범위)도 대기</td></tr>
-<tr><th class="nw">9</th><td>사용자 유형/권한/접근 범위 정의 (PR-0015)</td><td class="nw">회신 E-9</td><td><strong>회수 대기 유지</strong>(QA #22 — 양측 워크숍) — 편집 권한 매트릭스(QA #34) 연계</td></tr>
+<tr><th class="nw">9</th><td>사용자 유형/권한/접근 범위 정의 (PR-0015)</td><td class="nw">회신 E-9</td><td><strong>회수 대기 유지</strong>(QA #22 — 양측 워크숍) — <del>편집 권한 매트릭스(QA #34) 연계</del> ✅ 해소(2026-09-01 — <code>W-CO-02</code> §8 항목 8)</td></tr>
 <tr><th class="nw">10</th><td>현행 출하 프로세스·ERP 기록 정보 (PR-0030)</td><td class="nw">회신 E-10</td><td><strong>회수 대기 유지</strong> — 통신 축은 확정분 반영(UNIERP·DB 중계 — QA #18·#22). <strong>2026-07-04 범위 확대: 반품·실사조정 전표의 ERP 연계 방식 추가</strong>(QA #6 — 방향=항목별 on/off 확정·방식 정보만 미회수)</td></tr>
 <tr><th class="nw">11</th><td>ERP W/O 변경 강행 옵션 필요 여부 (PR-0024)</td><td class="nw">회신 E-11</td><td><strong>✓종결</strong>(QA #23: 필요 — 강행 시 ERP W/O-W/O 불일치 플래그. D10 완전 종결)</td></tr>
 <tr><th class="nw">12</th><td>알람 메시지 전달 매체·Zalo 검토 (OA-0009)</td><td class="nw">회신 E-12</td><td><strong>✓종결</strong>(QA #24: 카카오톡/Zalo 선택형 채널 어댑터) — <strong>Zalo 기업 API 검토는 고객→CREFLE 액션 재분류</strong> · 결정 15의 채널 조정은 §3 REQ-PR-0016 정합주 참조</td></tr>
@@ -2769,7 +2769,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <tr><th>고객 측 확인 2건</th><td>BOM 유효기간 관리 여부(ERP 스키마 — QA #3) · 네트워크 단절 원인(인프라=고객 책임 — QA #32)</td></tr>
 <tr><th>CREFLE 액션 2건</th><td>Zalo 기업 API 기술 검토(회신 E-12 재분류 — QA #24) · OA MES↔추적관리시스템 역할·데이터 경계 정의(QA #19)</td></tr>
 <tr><th>협의 대기 4건 (도식 검토 발 — QA 기록 §4)</th><td>01-SA1 반품 거부 시 폐기 전환 <code>[가설]</code>(회신 E-4 연동) · 01-SB1 초과 입하 사후 ERP W/O 승인 주체·ERP 매칭(QA #36 후속) · 01-SC1 IQC 부분 불량 판정 유형 <code>[가설]</code>(회신 E-3 연계) · <code>[가설]</code> 임시 Location 운영 방식(사전 등록 임시 Location 코드 가능 여부) ※QA 기록 §4 협의 대기 중 U9(긴급 W/O 자재 조달)는 EWO로 종결 — §3 REQ-PR-0014 정합주</td></tr>
-<tr><th>문서 명기 기타 잔여 9건</th><td><strong>47건 우선순위(필수/중요/선택) 고객 확정</strong>(명세서 정리 §5-3 · 통합분석 §9 후속 과제 ① — 이후 원본 어디에도 해소 기록 없음) · E21 보존 대상 범위 합의 · 마스터별 편집 권한 매트릭스(QA #34 — 회신 E-9 연계) · PR-0002 엑셀 이중입력 여부 · PR-0003 설비(기계) 대장 매체 미검증 · PR-0011 재작업 LOT 승계·수율 반영 · PR-0026 Routing As-Is 실제 운용 확인 · OA-0010/A4 자재 분할 QR 발번·라벨 규격(내부 설계 입력) · A1~A3·B3 현장 실태 재확인(확정 후 실태만 확인)</td></tr>
+<tr><th>문서 명기 기타 잔여 9건</th><td><strong>47건 우선순위(필수/중요/선택) 고객 확정</strong>(명세서 정리 §5-3 · 통합분석 §9 후속 과제 ① — 이후 원본 어디에도 해소 기록 없음) · E21 보존 대상 범위 합의 · <del>마스터별 편집 권한 매트릭스(QA #34 — 회신 E-9 연계)</del> ✅ 해소(2026-09-01 — <code>W-CO-02</code> §8 항목 8) · PR-0002 엑셀 이중입력 여부 · PR-0003 설비(기계) 대장 매체 미검증 · PR-0011 재작업 LOT 승계·수율 반영 · PR-0026 Routing As-Is 실제 운용 확인 · OA-0010/A4 자재 분할 QR 발번·라벨 규격(내부 설계 입력) · A1~A3·B3 현장 실태 재확인(확정 후 실태만 확인)</td></tr>
 </tbody></table>
 <h2>§8. 추적성 매트릭스 — REQ 47행 요약</h2>
 <div class="callout"><p>열 설명 — <strong>WF</strong>: 도메인 워크플로우 반영 단계(WF01 자재창고 / 02 생산실행 / 03 품질 / 04 제품출하 / 05 설비·툴 / 06 기준정보). <strong>주요 화면</strong>: 화면 인벤토리 v1.3 표 근거 열의 해당 REQ 인용 실측(§1.3 한계 참조 — 미인용은 「—」). <strong>관련 결정·확정</strong>: QA #n·결정 nn·확정기록. 상세는 §3·§4 각 블록.</p></div>
