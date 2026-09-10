@@ -3774,7 +3774,7 @@
      "dispositionDecisionId": {
       "type": "integer",
       "format": "int64",
-      "description": "진입 목록에서 고른 처분 결정. 누적 재등록 수량이 결정 수량에 닿으면 후속 처리가 완료되어 followUpPending=false가 된다.",
+      "description": "진입 목록에서 고른 처분 결정. 요구 계약상 누적 재등록 수량이 결정 수량보다 작으면 followUpPending=true이고, 결정 수량에 닿으면 false가 되어 완료 목록에서 빠져야 한다. 현재 서버 조회는 정상 처분의 재등록 누적을 연결하지 않아 이 동작을 보장하지 않는다.",
       "x-internal-note": "현재 조회 구현은 NORMAL 결정의 재등록 누적을 followUpPending에 연결하지 않는다(통보 222 ⓓ). 계약 결정을 바꾸지 않고 구현 결손으로 구분한다.",
       "example": 1001
      },
@@ -3941,7 +3941,7 @@
        "null"
       ],
       "format": "double",
-      "description": "처리 후 열린 보류에서 읽은 수량. 숫자면 해당 잔여 보류 수량이다. null은 숫자로 정해진 잔여 보류가 없다는 뜻이며, 다른 전량 보류가 열려 있을 수도 있으므로 보류가 모두 해제됐다는 뜻으로 사용하지 않는다. LOT 정상화 여부는 lotStatusCode로 판정한다.",
+      "description": "처리 후 열린 보류를 lotHoldId 내림차순으로 조회한 첫 한 건의 보류 수량이며 열린 보류의 합계가 아니다. 숫자면 그 한 건의 잔여 보류 수량이다. null은 조회한 보류가 없거나 그 한 건이 전량 보류여서 수량이 정해지지 않았다는 뜻이므로, 보류가 모두 해제됐다는 뜻으로 사용하지 않는다. LOT 정상화 여부는 lotStatusCode로 판정한다.",
       "example": 80.0
      }
     },
