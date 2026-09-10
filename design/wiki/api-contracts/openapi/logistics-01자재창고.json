@@ -12359,7 +12359,7 @@
        "string",
        "null"
       ],
-      "description": "원천 문서 판별자. 짝인 sourceDocumentId는 해당 문서의 식별자다. C17·C18·C19는 DISPOSITION_DECISION과 처분 판정 식별자를, C20은 STOCK_TRANSFER와 재등록 재고 이동 식별자를 싣는다. 기존 검사·보류 전이의 대응은 유지한다.",
+      "description": "원천 문서 판별자. 짝인 sourceDocumentId는 해당 문서의 식별자다. C4·C6·C7·C8·C14·C15는 INSPECTION_RESULT와 검사 결과 식별자를, C5·C10은 LOT_HOLD와 LOT 보류 식별자를, C9는 NONCONFORMANCE와 부적합 식별자를 싣는다. C17·C18·C19는 DISPOSITION_DECISION과 처분 판정 식별자를, C20은 STOCK_TRANSFER와 재등록 재고 이동 식별자를 싣는다.",
       "x-code-key": "CD-LOT-STATUS-EVENT-SOURCE-DOCUMENT-TYPE",
       "enum": [
        "INSPECTION_RESULT",
