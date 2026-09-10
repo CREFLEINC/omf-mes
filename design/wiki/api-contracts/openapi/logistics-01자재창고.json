@@ -11143,12 +11143,13 @@
       "x-source-column": "source_document_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "원천 문서 유형. **A-10 다형 참조 판별자**이고 값은 «대상 테이블 이름»이다 — sourceDocumentId 는 그 표의 식별자다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다. 지금은 하나다 — 생산오더(PRODUCTION_ORDER → production.production_order). ⭐ W-02-01 §5-4 가 「ERP W/O 의 «자재예약정보»가 production_order 에 없고 inventory_reservation 이 ERP W/O 를 가리킨다」로 이 축을 세웠고 2026-09-02 에 「서버가 건다」로 해소됐다. ⚠ 값이 하나라고 축이 없는 것이 아니다 — 판별자는 «무엇을 가리키는지»를 말하고, 가리킬 표가 늘면 계약을 고친다.",
+      "description": "원천 문서 유형. **A-10 다형 참조 판별자**이고 sourceDocumentId와 짝으로 대상 행을 가리킨다. 값은 생산오더(PRODUCTION_ORDER → production.production_order)와 제품 피킹의 출하요청 라인(SHIPMENT_REQUEST_LINE → logistics.shipment_request_line)이다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-internal-note": "W-02-01 §5-4와 omf-mes#595·통보190/212 및 서버 shipment-progress.ts의 SHIPMENT_REQUEST_LINE 상수를 대조했다. 이 칸은 status_code가 아니라 닫힌 다형 참조 판별자이므로 실제 대상 테이블 집합을 enum으로 둔다.",
       "x-code-key": "CD-INVENTORY-RESERVATION-SOURCE-DOCUMENT-TYPE",
       "enum": [
-       "PRODUCTION_ORDER"
+       "PRODUCTION_ORDER",
+       "SHIPMENT_REQUEST_LINE"
       ],
       "example": "PRODUCTION_ORDER"
      },
