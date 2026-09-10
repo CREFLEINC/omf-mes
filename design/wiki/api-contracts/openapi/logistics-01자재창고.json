@@ -750,7 +750,7 @@
      "inventory"
     ],
     "summary": "실사 목록",
-    "description": "근거: W-01-04 §3 · M-01-11 §3",
+    "description": "실사 목록. plannedDate 내림차순, 동률이면 inventoryCountId 내림차순으로 고정 정렬한다. plannedDateFrom과 plannedDateTo는 양끝 날짜를 모두 포함한다.",
     "parameters": [
      {
       "name": "warehouseId",
@@ -767,7 +767,7 @@
        "type": "string",
        "format": "date"
       },
-      "description": "계획일 시작"
+      "description": "계획일 시작(해당 날짜 포함)"
      },
      {
       "name": "plannedDateTo",
@@ -776,7 +776,7 @@
        "type": "string",
        "format": "date"
       },
-      "description": "계획일 종료"
+      "description": "계획일 종료(해당 날짜 포함)"
      },
      {
       "name": "countTypeCode",
@@ -855,7 +855,7 @@
      "inventory"
     ],
     "summary": "실사 개시",
-    "description": "라인은 서버가 장부에서 만든다 — 화면이 대상을 열거하지 않는다. 근거: W-01-04 §5-7",
+    "description": "라인은 서버가 장부에서 만든다. 위치·품목·LOT·단위별 잔액 합계를 개시 시점 장부수량으로 보존하며 합계 0인 묶음은 제외한다. 음수 합계는 실제값으로 포함한다. 음수 잔액만을 이유로 창고 전체 개시를 거부하거나 해당 묶음을 제외하거나 0으로 저장하지 않는다. 품질·재고상태·소유·파트너·취급단위 축은 합산한다. 네 축 안정 정렬로 lineNo를 1부터 부여한다. 실사 번호는 INVENTORY_COUNT의 기본 접두어 IC, 창고의 공장 범위, plannedDate 기간키로 채번한다. 생성 상태는 IN_PROGRESS이며 PLANNED는 과거·외부 적재 행 조회용으로 유지한다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -911,7 +911,8 @@
        }
       }
      }
-    }
+    },
+    "x-internal-note": "근거: W-01-04 §5-4 및 omf-mes#513 질의276. 음수 보존의 물리 저장 방식은 개발팀 소관이며 설계 반영이 마이그레이션 완료를 뜻하지 않는다."
    }
   },
   "/inventory/counts/{inventoryCountId}": {
@@ -1054,7 +1055,7 @@
      "inventory"
     ],
     "summary": "한 위치의 실사 라인 치환",
-    "description": "위치 단위로 끊어 치환한다 — 화면이 「이 위치 완료」로 끊기 때문이다. 마감된 실사는 400 이다. 근거: M-01-11 §5-6 · 공유계약 C-3",
+    "description": "해당 위치의 계수 라인 전체를 치환한다. 본문에서 빠진 기존 라인은 삭제하지 않고 counted=false, countedQty=0, 사유·행위자=null로 되돌린다. 기존 systemQty와 lineNo는 보존하고 다른 위치는 변경하지 않는다. 같은 위치·품목·LOT·단위 중복은 400이다. PLANNED의 첫 정상 치환은 IN_PROGRESS로 전이하고 COMPLETED는 400 STATE_LOCKED다. 기존 장부는 개시 스냅샷이다. id 없는 현장 신규 라인만 등록 시점의 같은 네 축 실제 잔액 합계를 고정하며 없으면 0이고 음수도 보존한다. 차이 사유는 활성값이어야 하되 블라인드 미실사 최초 제출의 생략 예외를 적용한다. 사후 보완 대기 중인 기존 블라인드 라인을 수량·계수시각 변경 없이 재동봉할 때에는 미입력 사유를 유지할 수 있다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -1138,7 +1139,7 @@
      "inventory"
     ],
     "summary": "실사 마감",
-    "description": "미실사가 0 이고 차이가 없거나 모두 조정된 뒤에만 통과한다. 조건을 못 채우면 400 으로 무엇이 남았는지 돌려준다. 근거: W-01-04 §5-5",
+    "description": "요약과 같은 기준으로 마감 가능 여부를 판정하며 부모 헤더 잠금 안에서 다시 계산한다. 미실사 0이고 차이 라인마다 POSTED 조정이 연결된 IN_PROGRESS 실사만 마감한다. 실패 사유 우선순위는 ALREADY_CLOSED, STATE_LOCKED, COUNT_REMAINING, VARIANCE_UNADJUSTED다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -1945,12 +1946,14 @@
         "GOODS_RECEIPT",
         "GOODS_ISSUE",
         "INVENTORY_ADJUSTMENT",
-        "STOCK_TRANSFER"
+        "STOCK_TRANSFER",
+        "RECYCLE_ENTRY",
+        "PUTAWAY_TASK"
        ],
        "example": "GOODS_RECEIPT"
       },
       "x-code-key": "CD-INVENTORY-TRANSACTION-SOURCE-DOCUMENT-TYPE",
-      "description": "원천 문서 유형으로 거른다. 원천 문서 유형. **A-10 다형 참조 판별자**이고 값은 «대상 테이블 이름»이다 — sourceDocumentId 는 그 표의 식별자다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다. 넷이다 — 입고(GOODS_RECEIPT) · 출고(GOODS_ISSUE) · 재고조정(INVENTORY_ADJUSTMENT) · 재고이동(STOCK_TRANSFER). ⭐ 근거 — W-04-05 가 「입고·출고 전기 각 1건」을 명시하고, W-01-12 §5-2 가 「inventory_transaction.source_document_type_code 에 「재고조정」 값이 있으면 source_document_id = inventory_adjustment_id 로 잇는다」로 적었다. ⚠ STOCK_TRANSFER 는 «재고를 움직이므로 원장을 남긴다»는 추론이다 — 다른 셋보다 근거가 얕다. ⭐ 이 축이 원장 한 줄의 «성격»을 말한다 — 방향(입고·출고·이동)은 라인의 from*/to* 가 이미 말하므로 transactionTypeCode 를 따로 두지 않는다(L-2-1 · 2026-09-02 판정)."
+      "description": "원천 문서 유형으로 거른다. 원천 문서 유형. sourceDocumentId와 함께 원천을 식별한다. GOODS_RECEIPT, GOODS_ISSUE, INVENTORY_ADJUSTMENT, STOCK_TRANSFER, RECYCLE_ENTRY를 사용한다. RECYCLE_ENTRY의 sourceDocumentId는 등록 결과의 recycleEntryId이며 lotId나 다른 전표 식별자가 아니다. 고객이 편집하는 공통코드가 아니다. 재고 이동 방향은 라인의 from*/to*로 구분한다. PUTAWAY_TASK는 적치 지시 putawayTaskId를 가리키며 신규 임시 적치와 정위치 복귀 원장을 구분 추적한다."
      },
      {
       "name": "page",
@@ -4858,7 +4861,7 @@
      "logistics"
     ],
     "summary": "적치 지시 목록",
-    "description": "담당자에게 할당된 지시를 내린다. 근거: M-01-05 §3 · M-01-07 §3",
+    "description": "담당자에게 할당된 지시를 내린다. 근거: M-01-05 §3 · M-01-07 §3. temporaryOnly=true는 현재 COMPLETED_TEMPORARY인 지시만 반환한다. 복귀 완료 후 제외하며 과거 임시 이력만으로 포함하지 않는다. 같은 LOT의 여러 지시는 번호로 구분하여 선택한다.",
     "parameters": [
      {
       "name": "assignedWorkerId",
@@ -4884,7 +4887,7 @@
        "type": "string"
       },
       "x-code-key": "CD-PUTAWAY-TASK-STATUS",
-      "description": "적치 작업 상태로 거른다 — 적치 대기(PENDING) · 적치 완료(COMPLETED) · 임시 적치 완료(COMPLETED_TEMPORARY). ⚠ 임시 적치는 사유가 함께 필수다(PUTAWAY_TASK_TEMPORARY_REASON). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PUTAWAY_TASK_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "적치 작업 상태로 거른다 — 적치 대기(PENDING) · 적치 완료(COMPLETED) · 임시 적치 완료(COMPLETED_TEMPORARY). ⚠ 임시 적치는 사유 코드(PUTAWAY_TASK_TEMPORARY_REASON)와 비고 중 하나가 필수다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PUTAWAY_TASK_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      },
      {
       "name": "lotId",
@@ -4901,7 +4904,7 @@
        "type": "boolean",
        "default": false
       },
-      "description": "임시 위치에 적재된 건만. 정위치 이동 대상을 찾는다"
+      "description": "현재 COMPLETED_TEMPORARY인 지시만. 아직 정위치 복귀하지 않은 대상이다."
      },
      {
       "name": "page",
@@ -5027,7 +5030,7 @@
      "logistics"
     ],
     "summary": "적치 완료",
-    "description": "권장 위치가 있는데 다른 위치로 적치하면 400 으로 막는다. 권장 위치가 없는 품목은 confirmedNoRule 을 참으로 보내면 통과하며, 이때도 실제 위치는 반드시 남는다. 근거: M-01-05 §5-2-1",
+    "description": "권장 위치가 있는데 다른 위치로 적치하면 400 으로 막는다. 권장 위치가 없는 품목은 confirmedNoRule 을 참으로 보내면 통과하며, 이때도 실제 위치는 반드시 남는다. 근거: M-01-05 §5-2-1. PENDING에서 정상 완료 또는 COMPLETED_TEMPORARY에서 정위치 복귀를 받아 COMPLETED로 전이한다. 다음 위치·수량·원천 보존 규칙은 COMPLETED_TEMPORARY의 복귀에만 적용한다. 최초 PENDING 정상 적치는 기존 출발 위치·창고 규칙을 유지한다. 복귀 출발은 서버가 잠근 현재 actualLocationId이며 최초 fromLocationId는 보존한다. 목적지는 지시의 동일 창고 안 다른 활성 비임시 위치다. 권장 위치 검증과 권장 없음 확인을 그대로 적용하며 혼적 위반은 차단, 수용량 초과는 경고다. 원 임시 적치와 추적되는 동일 품목·LOT·소유·단위·품질 축의 taskQty 전량만 이동한다. 부분수량·잔여 자동축소·다른 재고로 부족분 대체는 금지한다. 예약/피킹 수량 침해, 소비·다른 이동으로 전량 부족, 원천 식별 불가는 400 INVALID(field=putawayTaskId)와 사유로 전량 거부한다. 음수 재고 허용으로 우회하지 않는다. Hold만으로 차단하지 않고 경고하며 품질·보류 상태를 보존한다. availableQty는 보류까지 차감하므로 이 값만으로 복귀 가부를 판정하지 않는다. 지시와 재고를 잠가 재검증 후 출발 차감·도착 증가·원장 추가·지시 상태/현재위치/완료시각/버전·감사·멱등 완료를 원자적으로 저장한다. 창고 및 품목·LOT 총수량은 불변이며 입고를 다시 전기하지 않는다. 원 임시 위치·사유/비고·시각·작업자와 원장은 불변 이력으로 남긴다. 현재 completedAt은 복귀 occurredAt이다. 복귀 원장은 PUTAWAY_TASK와 putawayTaskId로 원천을 식별하고 과거 원장은 재작성하지 않는다. 일반 창고 내 임의 이동이나 파렛트 재편성 경로가 아니다. 임시 적치와 복귀는 별도 업무여서 새 Idempotency-Key를 쓴다. 동일 복귀 키·본문·주체의 재전송은 완료 상태여도 최초 응답을 재생하며 원장은 추가하지 않는다. COMPLETED 지시의 새 키는 400 STATE_LOCKED, 같은 키의 다른 내용은 409다. businessDate·occurredAt은 재전송에도 유지한다. 온라인은 상세 ETag를 If-Match에 쓰고 큐는 If-Match 없이 보내되 상태·재고 검증은 유지한다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -5061,7 +5064,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "상태 불허는 STATE_LOCKED. 복귀 원천 불명확·전량 부족·예약/피킹 침해는 INVALID(field=putawayTaskId)와 사유를 반환한다. 입력 보존·재조회하며 다른 재고로 대체하지 않는다. 목적지·권장 위치·혼적 등 검증 실패도 여기에 포함한다.",
       "content": {
        "application/json": {
         "schema": {
@@ -5081,7 +5084,7 @@
       }
      },
      "409": {
-      "description": "저장 충돌. 다시 읽어 오면 풀린다",
+      "description": "버전 또는 멱등 충돌. 입력 보존·재조회하며 새 키로 자동 재시도하지 않는다.",
       "content": {
        "application/json": {
         "schema": {
@@ -5091,7 +5094,7 @@
       }
      }
     },
-    "x-internal-note": "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9)."
+    "x-internal-note": "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). omf-mes#454: 경로/본문 재사용이나 행동 의미는 변경된다. 복귀 첫 스캔은 로컬 초안이고 도착 확인 후 complete 1회다. 확정된 임시 지시 캐시가 있어야 오프라인 복귀를 시작하며 미동기 임시 작업의 후속 복귀는 서버 확정 전 시작하지 않는다. 원 입고 취소의 기존 후속 판정은 적치/복귀 이력도 추적한다. 별도 적치 취소는 신설하지 않는다."
    }
   },
   "/logistics/putaway-tasks/{putawayTaskId}:complete-temporary": {
@@ -5111,7 +5114,7 @@
      "logistics"
     ],
     "summary": "임시 위치 적재",
-    "description": "정상 적치와 상태가 구분된다. 사유 코드와 비고 중 적어도 하나는 있어야 한다. 근거: M-01-07 §5-5",
+    "description": "정상 적치와 상태가 구분된다. 사유 코드와 비고 중 적어도 하나는 있어야 한다. 근거: M-01-07 §5-5. PENDING에서 COMPLETED_TEMPORARY로만 전이한다. 동일 키·본문·주체의 재전송은 원응답을 재생하지만 임시/정상 완료 지시의 새 키 요청은 400 STATE_LOCKED다. taskQty 전량의 실제 임시 이동을 원자적으로 기록하며 위치·사유/비고·시각·작업자와 원장을 불변 이력으로 남긴다. 신규 임시 적치 원장의 원천은 PUTAWAY_TASK와 putawayTaskId다. 업무 상태·재고·원장·감사·멱등 완료는 원자적으로 저장한다. 정위치 복귀는 별도 새 키로 적치 완료를 호출하며 최초 임시 원장을 덮어쓰지 않는다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -5184,7 +5187,7 @@
      "logistics"
     ],
     "summary": "재생재 등록",
-    "description": "분쇄재가 생기면 현장이 등록한다. 새 자재 LOT 을 만들고 그 수량만큼 재고를 늘린다 — 한 트랜잭션이다. **LOT 번호는 서버가 매긴다**: 번호를 클라이언트가 정하면 오프라인 두 단말이 같은 번호를 만든다(공유계약 C-2). 그래서 화면이 「번호는 저장 후 정해집니다」를 먼저 말한다. 근거: M-01-12 §5-1·§5-3 · DR-006 확정. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다.",
+    "description": "재생재 등록은 등록 기록·새 자재 LOT·수불 원장 1건과 라인 1건·재고 증가를 같은 트랜잭션으로 처리한다. 하나라도 실패하면 전체를 반영하지 않는다. 원장의 sourceDocumentTypeCode는 RECYCLE_ENTRY이고 sourceDocumentId는 응답 recycleEntryId다. 원장과 라인의 businessDate는 요청 영업일이며 원장의 occurredAt은 요청 발생시각이다. 라인은 등록 품목·새 LOT·등록 수량·품목 기본 단위를 기록한다. 출발 창고·위치는 없고 도착 창고·위치는 요청 warehouseId·locationId다. 같은 요청을 같은 Idempotency-Key로 다시 보내면 기존 결과를 반환하고 LOT·원장·재고 증가를 중복 반영하지 않는다. LOT 번호는 서버가 부여한다. 오프라인 요청은 단말 큐에 보관한 뒤 연결 시 전송하며 성공 응답은 서버에 반영된 뒤 반환한다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -5248,7 +5251,7 @@
       }
      }
     },
-    "x-internal-note": "혼적 제약은 화면 경고 후 현장 판단을 유지한다. 2026-09-08 사용자 승인: 기존 itemId를 재사용하고 새 LOT별 구분을 기록한다. 품목 생성·기존 품목 분류 변경·원료 계보 생성은 하지 않는다. 저장 모델링은 개발팀 소관이다."
+    "x-internal-note": "혼적 제약은 화면 경고 후 현장 판단을 유지한다. 2026-09-08 사용자 승인: 기존 itemId를 재사용하고 새 LOT별 구분을 기록한다. 품목 생성·기존 품목 분류 변경·원료 계보 생성은 하지 않는다. 저장 모델링은 개발팀 소관이다. 재생재 원장 판별자 omf-mes#512. M-01-12 §5-2-a 및 요구서 §3-24. 별도 입고 전표나 등록 취소 경로를 신설하지 않는다."
    }
   },
   "/logistics/shopfloor-receipts": {
@@ -10643,7 +10646,8 @@
       "x-source-column": "inventory_count_no",
       "type": "string",
       "maxLength": 100,
-      "example": "IC-2026-000019"
+      "example": "IC-2026-000019",
+      "description": "INVENTORY_COUNT 기본 접두어 IC, 창고의 공장 범위, 요청 plannedDate 기간키로 서버가 채번한다."
      },
      "countTypeCode": {
       "x-source-column": "count_type_code",
@@ -10670,7 +10674,7 @@
       "x-source-column": "blind_count",
       "type": "boolean",
       "default": false,
-      "description": "참이면 장부 수량을 내려보내지 않는다. 개시 전에만 바꿀 수 있다. 근거: W-01-04 §5-2",
+      "description": "참이면 미실사 라인의 장부 수량을 생략하고 실물·차이 수량을 0으로 마스킹한다. 실제 계수 제출 뒤에는 장부 및 실제 차이를 반환한다. 개시 후에는 변경하지 않는다.",
       "example": false
      },
      "statusCode": {
@@ -10679,7 +10683,7 @@
       "maxLength": 50,
       "description": "재고 실사의 진행 상태 — 계획(PLANNED) · 진행중(IN_PROGRESS) · 완료(COMPLETED). ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=INVENTORY_COUNT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⛔ 시스템 소유다 — 실사가 개시된 뒤의 잠금 판정이 이 값에 걸린다(W-01-04 §5 — 400 STATE_LOCKED 는 풀리지 않고 새 실사를 개시한다). 근거: W-01-04 §3 목업(사용자 결정 2026-09-02).",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-internal-note": "통보272 반영. 상태 값 목록은 기존 INVENTORY_COUNT_STATUS 시스템 코드 그룹에 확정되어 있다. 생성은 IN_PROGRESS, 과거 PLANNED는 첫 정상 라인 치환 시 IN_PROGRESS로 전이한다.",
       "x-code-key": "CD-INVENTORY-COUNT-STATUS"
      }
     }
@@ -10689,12 +10693,12 @@
     "required": [
      "businessDate"
     ],
-    "description": "실사 마감. 미실사가 0 이고 차이가 없거나 모두 조정된 뒤에만 통과한다 — 조건을 못 채우면 400 으로 무엇이 남았는지 돌려준다. 근거: W-01-04 §5-5",
+    "description": "요약과 같은 기준으로 마감 가능 여부를 판정하며 부모 헤더 잠금 안에서 다시 계산한다. 미실사 0이고 차이 라인마다 POSTED 조정이 연결된 IN_PROGRESS 실사만 마감한다. 실패 사유 우선순위는 ALREADY_CLOSED, STATE_LOCKED, COUNT_REMAINING, VARIANCE_UNADJUSTED다.",
     "properties": {
      "businessDate": {
       "type": "string",
       "format": "date",
-      "description": "근거: 공유계약 C-8",
+      "description": "원장을 만들지 않는 마감 작업이므로 업무일 형식만 검증하고 저장하지 않는다.",
       "example": "2026-08-06"
      }
     }
@@ -10707,7 +10711,7 @@
      "warehouseId",
      "plannedDate"
     ],
-    "description": "실사 개시. 라인은 서버가 장부에서 만든다 — 화면이 대상을 열거하지 않는다. 근거: W-01-04 §5-7",
+    "description": "라인은 서버가 장부에서 만든다. 위치·품목·LOT·단위별 잔액 합계를 개시 시점 장부수량으로 보존하며 합계 0인 묶음은 제외한다. 음수 합계는 실제값으로 포함한다. 음수 잔액만을 이유로 창고 전체 개시를 거부하거나 해당 묶음을 제외하거나 0으로 저장하지 않는다. 품질·재고상태·소유·파트너·취급단위 축은 합산한다. 네 축 안정 정렬로 lineNo를 1부터 부여한다. 실사 번호는 INVENTORY_COUNT의 기본 접두어 IC, 창고의 공장 범위, plannedDate 기간키로 채번한다. 생성 상태는 IN_PROGRESS이며 PLANNED는 과거·외부 적재 행 조회용으로 유지한다.",
     "properties": {
      "countTypeCode": {
       "x-source-column": "count_type_code",
@@ -10763,6 +10767,7 @@
      "locationId",
      "itemId",
      "countedQty",
+     "varianceQty",
      "uomId",
      "countedAt",
      "counted"
@@ -10812,22 +10817,22 @@
      "systemQty": {
       "x-source-column": "system_qty",
       "type": "number",
-      "minimum": 0,
-      "description": "장부 수량. ⭐ 조건부로 온다 — 블라인드 실사(InventoryCount.blindCount 가 참)에서는 서버가 이\n필드를 «생략한다». null 을 보내는 것이 아니라 키 자체가 없다 — 응답 본문에 남으면 개발자\n도구로 보이기 때문이다(M-01-11 §5-1 · §9-1). ⛔ 화면은 이 값이 없는 것을 「0」이나 「모름 = 차이\n없음」으로 읽지 않는다. 블라인드가 아닌 실사에서는 항상 온다. 형이 조건부 존재를 표현하지\n못해 설명이 말한다. 근거: M-01-11 §5-1 · W-01-04 §5-2",
-      "example": 100.0
+      "description": "장부 수량. 음수 실제값을 보존하고 기존 라인의 개시 스냅샷을 유지한다. blindCount=true이고 counted=false이면 필드를 생략한다. 그 밖의 라인에는 반환한다.",
+      "example": 100.0,
+      "x-internal-note": "질의276 음수 보존과 통보273 조건부 마스킹 반영. 저장값은 마스킹 때문에 변경하지 않는다. 물리 저장 대응은 개발팀 소관이다."
      },
      "countedQty": {
       "x-source-column": "counted_qty",
       "type": "number",
       "minimum": 0,
-      "description": "실물 수량. counted 가 참일 때만 뜻이 있다",
+      "description": "실물 수량. counted=true일 때만 실제 계수다. 블라인드 미실사에서는 0으로 마스킹하며 이 0을 실물 없음으로 해석하지 않는다.",
       "example": 98.0
      },
      "varianceQty": {
       "x-source-column": "variance_qty",
       "type": "number",
       "readOnly": true,
-      "description": "실물 − 장부. 서버가 계산한다(공유계약 L-2). counted 가 참일 때만 뜻이 있다 — 거짓인 줄의 0 을\n「차이 없음」으로 읽지 않는다. ⭐ 조건부로 온다 — 블라인드 실사에서는 systemQty 와 «함께»\n생략한다. 차이만 내리면 장부 = 실물 − 차이 로 감춘 값이 복원되어 systemQty 를 감춘 뜻이 없어진다\n(M-01-11 §5-1 이 「차이도 보이지 않음」으로 확정했다). 근거: M-01-11 §5-1 · W-01-04 §5-2",
+      "description": "counted=true이면 실물 − 장부를 서버가 계산한다. 장부 -5·실물 0이면 +5다. 블라인드 미실사에서는 장부 역산을 막기 위해 0으로 마스킹한다. counted=false인 줄의 0은 차이 없음이 아니다.",
       "example": -2.0
      },
      "uomId": {
@@ -10855,7 +10860,7 @@
        "null"
       ],
       "format": "int64",
-      "description": "누가 세었나. counted 가 거짓이면 널이다 — 미실사 판정은 counted 로 하고 이 필드로 하지 않는다",
+      "description": "계수 행위자의 사용자 계정 ID. X-Worker-No가 있으면 작업자의 연결 계정을 쓰며 연결 계정이 없으면 null이다. 계정 토큰으로 헤더 생략이 허용된 경우에만 세션 사용자다. 단말 토큰의 사번 필수 검증은 유지한다. counted=false이면 null이며 counted=true여도 계정 미연결이면 null일 수 있다. 미실사 판정에 사용하지 않는다.",
       "example": 1001
      },
      "countedAt": {
@@ -10867,8 +10872,9 @@
      "counted": {
       "type": "boolean",
       "readOnly": true,
-      "description": "이 라인을 실제로 세었는가. 거짓이면 countedQty·countedAt·varianceQty 는 뜻이 없다 — 화면은 「미실사」로 보이고 0 으로 읽지 않는다. uncountedOnly=true 로 거른 줄은 전부 거짓이다. 근거: M-01-11 §5-2 · W-01-04 §5-4",
-      "example": false
+      "description": "실제 계수 여부의 정본이다. 수량 0이나 countedBy의 null로 추정하지 않는다. false이면 countedQty·countedAt·varianceQty를 실사 결과로 읽지 않는다. 실제 계수 제출 시 true, 위치 치환에서 빠지면 false다.",
+      "example": false,
+      "x-source-column": "counted"
      },
      "itemCode": {
       "type": "string",
@@ -10904,7 +10910,7 @@
       "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 위치 마스터의 행을 가리킨다 — Location.locationCode 가 같은 판정으로 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
      }
     },
-    "x-internal-note": "블라인드 실사에서 systemQty 와 varianceQty 를 내려보내지 않는 것은 W-01-04 §5-2 · M-01-11 §5-1.\n계약은 필드를 두되 서버가 생략한다 — 그래서 둘 다 required 에서 뺐다(2026-09-09). 응답 required\n제거는 등급표상 ⛔ 다. 뺀 이유는 「계약이 지켜지지 않는 약속을 하고 있었다」이고, 새로 값이\n없어지는 것이 아니다."
+    "x-internal-note": "통보273: 물리 counted boolean 기본 false 추가 결정은 개발팀 기록이다. 응답 systemQty는 블라인드 미실사에서만 생략하며 required에서 제거한다. countedQty/varianceQty의 미실사 0은 마스킹 값이다. 과거 모든 블라인드 라인에서 장부·차이를 숨기는 설명보다 이 계수 전후 규칙이 우선한다."
    },
    "InventoryCountLineListResponse": {
     "type": "object",
@@ -10932,7 +10938,7 @@
      "occurredAt",
      "lines"
     ],
-    "description": "한 위치의 실사 라인을 치환한다. 실사 전체가 아니라 위치 단위로 끊는 것은 화면이 「이 위치 완료」로 끊기 때문이다 — 창고 하나의 라인이 수천 건이라 전체 치환은 보낼 수 없다. 근거: M-01-11 §5-6 · 공유계약 C-3",
+    "description": "해당 위치의 계수 라인 전체를 치환한다. 본문에서 빠진 기존 라인은 삭제하지 않고 counted=false, countedQty=0, 사유·행위자=null로 되돌린다. 기존 systemQty와 lineNo는 보존하고 다른 위치는 변경하지 않는다. 같은 위치·품목·LOT·단위 중복은 400이다. PLANNED의 첫 정상 치환은 IN_PROGRESS로 전이하고 COMPLETED는 400 STATE_LOCKED다.",
     "properties": {
      "locationId": {
       "x-source-column": "location_id",
@@ -10944,13 +10950,13 @@
      "businessDate": {
       "type": "string",
       "format": "date",
-      "description": "근거: 공유계약 C-8",
+      "description": "업무일 형식만 검증하며 이 위치 치환에서 저장하지 않는다. 라인별 countedAt이 계수 시각의 정본이다.",
       "example": "2026-08-06"
      },
      "occurredAt": {
       "type": "string",
       "format": "date-time",
-      "description": "근거: 공유계약 C-1",
+      "description": "발생시각 형식만 검증하며 이 위치 치환에서 저장하지 않는다. 계수 시각은 각 라인의 countedAt으로 보존한다.",
       "example": "2026-08-06T09:12:00+09:00"
      },
      "lines": {
@@ -11021,16 +11027,17 @@
        "null"
       ],
       "maxLength": 50,
-      "description": "⭐ 조건부 필수 — 차이가 0 이 아닐 때 «관리웹 재고 실사 화면(W-01-04)»에서 보내면 필수다.\n⛔ 블라인드 실사의 모바일 경로(M-01-11)에서는 요구하지 않는다 — 이 스키마에 장부 수량도 차이도\n없어 보내는 쪽이 차이를 알 수 없고, 그래서 사유는 W-01-04 에서 받는 것으로 확정했다\n(M-01-11 §5-1 · W-01-04 §8 차이 사유 행). 형이 조건부 필수를\n표현하지 못해 설명이 말한다. 값 = MISPLACED·DAMAGED_IN_TRANSIT·SPILL·COUNT_ERROR·THEFT_LOSS·EVAPORATION_LOSS (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=VARIANCE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "차이가 0이 아니면 활성 사유가 필수다. 단, 블라인드 미실사 라인의 최초 계수 제출(현장 신규 라인 포함)에서는 사유를 생략할 수 있고, 계수 후 관리 화면에서 보완한다. 제공한 사유는 최초 제출 예외에서도 활성값인지 검증한다. 값 = MISPLACED·DAMAGED_IN_TRANSIT·SPILL·COUNT_ERROR·THEFT_LOSS·EVAPORATION_LOSS (2026-09-03 코드 사전 등재) — ⭐ 고객이 늘린다 — 위 값은 초기 시드다(공유계약 G-31) ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=VARIANCE_REASON 로 받는다(공유계약 G-32 · omf-mes#198 확정). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. 기존 블라인드 라인의 수량·계수시각을 바꾸지 않고 전량 치환에 그대로 포함하는 경우에는 사후 보완 대기 중인 미입력 사유를 유지할 수 있다. 계수값을 수정하는 경우에는 최초 제출 예외를 다시 적용하지 않는다.",
       "example": "MISPLACED",
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다. 차이 사유 축은 M-01-11 §8 미결 1 이 2026-09-02 에 해소하며 W-01-04 에서 받는 것으로 확정했다.",
+      "x-internal-note": "통보274의 일률 사유 필수는 블라인드 최초 계수 이전에 차이를 알 수 없다는 기존 M-01-11 §5-1과 충돌한다. 사용자 자율 결정 승인에 따라 첫 제출만 예외로 보완한다. 개발팀 통보를 그대로 옮긴 부분과 구분하며, 개발팀이 이 예외를 구현했다고 주장하지 않는다. 위치별 후속 계수 시 이미 제출한 라인을 그대로 동봉해야 하므로 미입력 사유의 변경 없는 유지도 허용한다. 이 예외가 없으면 다음 위치 내 부분 계수가 관리웹 보완 전까지 막힌다.",
       "x-code-key": "CD-VARIANCE-REASON"
      },
      "countedAt": {
       "x-source-column": "counted_at",
       "type": "string",
       "format": "date-time",
-      "example": "2026-08-06T09:12:00+09:00"
+      "example": "2026-08-06T09:12:00+09:00",
+      "description": "이 라인을 실제 센 시각의 정본. 최상위 occurredAt 대신 이 값을 보존한다."
      }
     }
    },
@@ -11052,22 +11059,22 @@
      },
      "countedCount": {
       "type": "integer",
-      "description": "카운트된 라인 수",
+      "description": "counted=true인 라인 수. 수량·행위자로 추정하지 않는다.",
       "example": 1180
      },
      "uncountedCount": {
       "type": "integer",
-      "description": "미실사 라인 수. 마감하려면 0 이어야 한다",
+      "description": "counted=false인 라인 수. 마감하려면 0이어야 한다.",
       "example": 60
      },
      "varianceCount": {
       "type": "integer",
-      "description": "차이가 있는 라인 수",
+      "description": "counted=true이고 실제 차이가 0이 아닌 라인 수.",
       "example": 12
      },
      "closable": {
       "type": "boolean",
-      "description": "지금 마감할 수 있는가. 미실사 0 이고 차이가 없거나 모두 조정된 상태인지를 서버가 함께 본 결과다 — 화면이 조정 목록을 따로 조회해 판정하지 않는다(공유계약 L-2). 근거: W-01-04 §5-5·§5-7",
+      "description": "IN_PROGRESS이고 미실사 0이며 모든 차이 라인에 POSTED 상태의 부모 조정이 하나 이상 연결되었을 때 참이다. 등록·승인중·반려 조정은 완료로 세지 않는다. 차이 0 라인은 조정이 없어도 된다. 서버 요약과 마감이 같은 판정 기준을 사용한다.",
       "example": false
      },
      "closeBlockedReasonCode": {
@@ -11075,7 +11082,7 @@
        "string",
        "null"
       ],
-      "description": "closable 이 «거짓인 이유» — 미실사 잔여(COUNT_REMAINING) · 차이 미조정(VARIANCE_UNADJUSTED) · 이미 마감(ALREADY_CLOSED) · 상태 잠김(STATE_LOCKED). ⭐ 화면은 이 값으로 안내 문구와 「조정 등록」 경로를 가른다(G-3). ⛔ 서버가 판정한다 — 화면이 조건을 따로 조합하면 화면마다 갈린다",
+      "description": "closable 이 «거짓인 이유» — 미실사 잔여(COUNT_REMAINING) · 차이 미조정(VARIANCE_UNADJUSTED) · 이미 마감(ALREADY_CLOSED) · 상태 잠김(STATE_LOCKED). ⭐ 화면은 이 값으로 안내 문구와 「조정 등록」 경로를 가른다(G-3). ⛔ 서버가 판정한다 — 화면이 조건을 따로 조합하면 화면마다 갈린다 여러 조건이 겹치면 ALREADY_CLOSED → STATE_LOCKED → COUNT_REMAINING → VARIANCE_UNADJUSTED 순서로 반환한다. COMPLETED는 ALREADY_CLOSED, 그 외 IN_PROGRESS가 아닌 상태는 STATE_LOCKED다.",
       "example": "COUNT_REMAINING",
       "x-code-key": "CD-INVENTORY-COUNT-CLOSE-BLOCKED-REASON",
       "enum": [
@@ -11085,7 +11092,8 @@
        "STATE_LOCKED"
       ]
      }
-    }
+    },
+    "x-internal-note": "통보275. 조정 연결은 inventory_adjustment_line.inventory_count_line_id와 부모 inventory_adjustment.status_code=POSTED로 판단한다. 물리 조회 구현은 개발팀 소관이다."
    },
    "InventoryReservation": {
     "x-source-table": "inventory.inventory_reservation",
@@ -11226,7 +11234,7 @@
      "sourceDocumentId",
      "statusCode"
     ],
-    "description": "수불 원장. 조회만 제공한다 — 전표의 전기가 만들며 화면이 직접 쓰지 않는다. 취소도 행을 지우지 않고 역처리 행을 더한다. 근거: W-01-07 §5-4",
+    "description": "수불 원장. 전표 전기 또는 재생재 등록으로 생성하며 화면은 직접 쓰지 않고 조회한다. 취소가 허용된 전표의 취소는 기존 원장을 삭제하지 않고 역처리 행을 추가한다. 재생재 원장 생성 자체가 등록 취소 기능을 의미하지 않는다. 적치 지시의 임시 적치와 정위치 복귀도 불변 원장을 생성한다.",
     "properties": {
      "inventoryTransactionId": {
       "x-source-column": "inventory_transaction_id",
@@ -11280,15 +11288,17 @@
       "x-source-column": "source_document_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "원천 문서 유형. **A-10 다형 참조 판별자**이고 값은 «대상 테이블 이름»이다 — sourceDocumentId 는 그 표의 식별자다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다. 넷이다 — 입고(GOODS_RECEIPT) · 출고(GOODS_ISSUE) · 재고조정(INVENTORY_ADJUSTMENT) · 재고이동(STOCK_TRANSFER). ⭐ 근거 — W-04-05 가 「입고·출고 전기 각 1건」을 명시하고, W-01-12 §5-2 가 「inventory_transaction.source_document_type_code 에 「재고조정」 값이 있으면 source_document_id = inventory_adjustment_id 로 잇는다」로 적었다. ⚠ STOCK_TRANSFER 는 «재고를 움직이므로 원장을 남긴다»는 추론이다 — 다른 셋보다 근거가 얕다. ⭐ 이 축이 원장 한 줄의 «성격»을 말한다 — 방향(입고·출고·이동)은 라인의 from*/to* 가 이미 말하므로 transactionTypeCode 를 따로 두지 않는다(L-2-1 · 2026-09-02 판정).",
+      "description": "원천 문서 유형. sourceDocumentId와 함께 원천을 식별한다. GOODS_RECEIPT, GOODS_ISSUE, INVENTORY_ADJUSTMENT, STOCK_TRANSFER, RECYCLE_ENTRY를 사용한다. RECYCLE_ENTRY의 sourceDocumentId는 등록 결과의 recycleEntryId이며 lotId나 다른 전표 식별자가 아니다. 고객이 편집하는 공통코드가 아니다. 재고 이동 방향은 라인의 from*/to*로 구분한다. PUTAWAY_TASK는 적치 지시 putawayTaskId를 가리키며 신규 임시 적치와 정위치 복귀의 별도 불변 원장 건을 적치 상세로 추적한다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-internal-note": "공유계약 A-10 및 M-01-12 §5-2-a. omf-mes#512: 기존 원천 유형을 보존하고 재생재 등록 건을 독립 원천으로 추가한다.",
       "x-code-key": "CD-INVENTORY-TRANSACTION-SOURCE-DOCUMENT-TYPE",
       "enum": [
        "GOODS_RECEIPT",
        "GOODS_ISSUE",
        "INVENTORY_ADJUSTMENT",
-       "STOCK_TRANSFER"
+       "STOCK_TRANSFER",
+       "RECYCLE_ENTRY",
+       "PUTAWAY_TASK"
       ],
       "example": "GOODS_RECEIPT"
      },
@@ -11296,7 +11306,8 @@
       "x-source-column": "source_document_id",
       "type": "integer",
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "원천 문서 유형과 짝인 식별자. RECYCLE_ENTRY이면 RecycleEntry.recycleEntryId를 가리킨다. 숫자가 같아도 유형이 다르면 다른 원천이다. PUTAWAY_TASK이면 putawayTaskId이며 입고 전표나 LOT 식별자가 아니다."
      },
      "statusCode": {
       "x-source-column": "status_code",
@@ -13640,7 +13651,7 @@
       "x-source-column": "from_location_id",
       "type": "integer",
       "format": "int64",
-      "description": "지시가 시작되는 위치",
+      "description": "지시가 시작되는 위치. 최초 출발 위치로 보존하며 복귀 출발 위치로 재사용하지 않는다.",
       "example": 1001
      },
      "recommendedLocationId": {
@@ -13670,7 +13681,7 @@
        "null"
       ],
       "format": "int64",
-      "description": "실제 적치된 위치. 완료되면 반드시 채워지며, 재고 잔액의 위치 축이 이 값을 따른다",
+      "description": "실제 적치된 위치. 완료되면 반드시 채워지며, 재고 잔액의 위치 축이 이 값을 따른다. 임시 완료이면 현재 임시 위치, 복귀 완료이면 정위치다. 최초 임시 위치는 원장/이력에 보존한다.",
       "example": 1001
      },
      "warehouseId": {
@@ -13684,7 +13695,7 @@
       "maxLength": 50,
       "description": "이 지시가 속한 창고의 위치 관리 수준 — 창고(WAREHOUSE) · 구역(ZONE) · 랙(RACK) · 셀(CELL). ⭐ «위치 스캔을 요구할지»가 이 값으로 갈린다. 값 목록은 GET /mdm/code-values?codeGroupCode=MANAGEMENT_LEVEL 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-internal-note": "CD-MANAGEMENT-LEVEL 확정값으로 위치 입력 방식을 가른다. 적치 상태와 다른 코드 축이다.",
       "x-code-key": "CD-MANAGEMENT-LEVEL"
      },
      "priorityNo": {
@@ -13706,9 +13717,9 @@
       "x-source-column": "status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "적치 작업의 상태 — 적치 대기(PENDING) · 적치 완료(COMPLETED) · 임시 적치 완료(COMPLETED_TEMPORARY). ⚠ 임시 적치는 사유가 함께 필수다(PUTAWAY_TASK_TEMPORARY_REASON). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PUTAWAY_TASK_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "적치 작업의 상태 — 적치 대기(PENDING) · 적치 완료(COMPLETED) · 임시 적치 완료(COMPLETED_TEMPORARY). ⚠ 임시 적치는 사유 코드(PUTAWAY_TASK_TEMPORARY_REASON)와 비고 중 하나가 필수다. ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PUTAWAY_TASK_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-internal-note": "CD-PUTAWAY-TASK-STATUS 시스템 소유 3값 확정. PENDING→COMPLETED 또는 PENDING→COMPLETED_TEMPORARY→COMPLETED이며 역전이 없다(omf-mes#454).",
       "x-code-key": "CD-PUTAWAY-TASK-STATUS"
      },
      "completedAt": {
@@ -13718,7 +13729,8 @@
        "null"
       ],
       "format": "date-time",
-      "example": "2026-08-06T09:12:00+09:00"
+      "example": "2026-08-06T09:12:00+09:00",
+      "description": "현재 완료 단계의 occurredAt. 임시 완료 시각과 복귀 완료 시각을 구분하며 최초 임시 시각은 불변 이력에 보존한다."
      },
      "remarks": {
       "x-source-column": "remarks",
@@ -13738,13 +13750,13 @@
      "businessDate",
      "occurredAt"
     ],
-    "description": "적치 완료. 권장 위치가 있는데 다른 위치로 적치하면 400 으로 막는다. 권장 위치가 없는 품목은 확인 후 통과하며, 이때도 실제 적치 위치는 반드시 남는다. 근거: M-01-05 §5-2-1",
+    "description": "적치 완료. 권장 위치가 있는데 다른 위치로 적치하면 400 으로 막는다. 권장 위치가 없는 품목은 확인 후 통과하며, 이때도 실제 적치 위치는 반드시 남는다. 근거: M-01-05 §5-2-1. 임시 복귀도 이 본문으로 지시 taskQty 전량을 이동한다. 원임시 기록의 덮어쓰기 수정 요청이 아니다.",
     "properties": {
      "actualLocationId": {
       "x-source-column": "actual_location_id",
       "type": "integer",
       "format": "int64",
-      "description": "실제 적치한 위치",
+      "description": "실제 적치 목적지. 복귀에서는 지시 창고 안 현재 임시 위치와 다른 활성 비임시 위치이며 기존 권장 검증을 적용한다.",
       "example": 1001
      },
      "confirmedNoRule": {
@@ -13834,7 +13846,7 @@
       "type": "integer",
       "format": "int64",
       "example": 1001,
-      "description": "등록 건 자체의 번호. 새로 만든 LOT 의 원천 참조가 이것을 가리킨다 — 원천 유형 코드는 RECYCLE_ENTRY 다"
+      "description": "등록 건 자체의 식별자. 새 LOT의 sourceTypeCode와 원장의 sourceDocumentTypeCode가 RECYCLE_ENTRY일 때 각각 sourceId와 sourceDocumentId가 이 값을 가리킨다."
      },
      "lotId": {
       "type": "integer",
@@ -13901,7 +13913,7 @@
      "businessDate",
      "occurredAt"
     ],
-    "description": "재생재 등록. 새 자재 LOT 을 만들고 그 수량만큼 재고를 늘린다. LOT 번호는 서버가 매긴다 — 화면이 미리 보이지 못한다. 근거: M-01-12 §5-1",
+    "description": "재생재 등록. 등록 기록·새 자재 LOT·수불 원장과 라인·재고 증가를 한 트랜잭션으로 처리한다. LOT 번호는 서버가 부여한다.",
     "properties": {
      "itemId": {
       "type": "integer",
