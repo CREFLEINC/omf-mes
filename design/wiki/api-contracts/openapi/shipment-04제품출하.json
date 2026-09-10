@@ -406,7 +406,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 긴급 직행에서 WAREHOUSE 관리수준의 활성 위치가 0개 또는 2개 이상이면 warehouseId에 RANGE, ZONE·RACK·CELL 관리수준이면 위치 입력칸이 없어 warehouseId에 REQUIRED다. 고쳐야 풀린다",
+      "description": "검증 실패. 고쳐야 풀린다",
       "content": {
        "application/json": {
         "schema": {
@@ -1263,7 +1263,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "검증 실패. 긴급 직행에서 WAREHOUSE 관리수준의 활성 위치가 0개 또는 2개 이상이면 warehouseId에 RANGE, ZONE·RACK·CELL 관리수준이면 위치 입력칸이 없어 warehouseId에 REQUIRED다. 고쳐야 풀린다",
       "content": {
        "application/json": {
         "schema": {
