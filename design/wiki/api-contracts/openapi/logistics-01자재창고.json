@@ -4449,7 +4449,7 @@
      "logistics"
     ],
     "summary": "ERP W/O 등록",
-    "description": "헤더와 라인을 한 트랜잭션으로 저장한다. 근거: W-01-11 §5-1",
+    "description": "헤더와 라인을 한 트랜잭션으로 저장한다. 발주번호와 상태는 서버가 정하며 신규 P/O의 상태는 등록이다. 요청 본문으로 상태를 선택할 수 없다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -4564,7 +4564,7 @@
      "logistics"
     ],
     "summary": "ERP W/O 헤더 수정",
-    "description": "작성중 상태에서만 허용한다. 근거: 공유계약 B-1 · G-1",
+    "description": "등록 상태에서만 허용한다. 승인 요청을 보내도 P/O 상태는 등록으로 유지되므로 승인 대기 중에도 수정할 수 있다. 수정하면 P/O의 현재 값과 ETag가 바뀌지만 이미 만들어진 승인 요청과 결재 단계는 그대로다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -4634,7 +4634,7 @@
       }
      }
     },
-    "x-internal-note": "확정·전기된 전표의 수정은 400 STATE_LOCKED 다 — 재로드로 풀리는 409 와 섞지 않는다(공유계약 G-1)."
+    "x-internal-note": "근거: W-01-11 §5-7 · 문의 023·025. 승인 요청은 P/O 값 스냅샷을 만들지 않는다. 기존 P/O 재진입 화면이 없어 현재 UI가 이 PUT을 제공한다고 해석하지 않는다. 등록 외 상태의 수정은 400 STATE_LOCKED이고 저장 충돌 409와 구분한다."
    }
   },
   "/logistics/purchase-orders/{purchaseOrderId}/lines": {
@@ -4673,7 +4673,7 @@
      "logistics"
     ],
     "summary": "ERP W/O 라인 치환",
-    "description": "라인 배열을 통째로 치환한다. 이미 입하가 붙은 라인은 지울 수 없다. 근거: W-01-11 §5-1 · 공유계약 A-5 ⭐ 이 경로의 조회는 ETag 를 내리지 않는다 — If-Match 에 담을 토큰은 부모 자원 GET /logistics/purchase-orders/{purchaseOrderId} 200 의 ETag 다. 잠그는 단위가 부모이기 때문이다. 근거: 공유계약 B-1-1",
+    "description": "등록 상태의 라인 배열을 통째로 치환한다. 승인 요청을 보내도 P/O 상태는 등록으로 유지되어 승인 대기 중에도 치환할 수 있다. 이미 입하가 붙은 라인은 지울 수 없다. If-Match에는 부모 자원 GET /logistics/purchase-orders/{purchaseOrderId} 응답의 ETag를 사용한다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -4773,7 +4773,7 @@
      "logistics"
     ],
     "summary": "ERP W/O 승인 요청",
-    "description": "등록이 끝난 ERP W/O 에 승인을 건다. 결재선이 없으면 400(code=ROUTE_NOT_FOUND)이다 — 상신할 곳이 없는 요청을 만들지 않는다. 진행 중인 승인 요청이 이미 있으면 400 이다 — 한 전표에 살아 있는 요청은 하나다. 반려된 요청은 진행 중이 아니므로 다시 상신할 수 있고 그때는 새 요청이 만들어진다(공유계약 J-6). 근거: W-01-11 §5-1 · 공유계약 J-4",
+    "description": "등록이 끝난 ERP W/O에 승인을 건다. 결재선이 없으면 400 ROUTE_NOT_FOUND이고 진행 중인 승인 요청이 이미 있으면 400이다. 반려 뒤 다시 상신하면 새 요청이 만들어진다. 상신은 P/O 상태나 버전을 바꾸지 않고 P/O 값의 스냅샷도 만들지 않는다. 이후 헤더·라인 수정은 기존 승인 요청과 결재 단계를 갱신하지 않는다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -4834,7 +4834,7 @@
       }
      }
     },
-    "x-internal-note": "승인 진행 상태 조회·결재 오퍼레이션은 app-공통 파일 소관이다(01-리소스도출 §1-1)."
+    "x-internal-note": "근거: W-01-11 §5-7 · 문의 023·025. 승인 진행 상태 조회·결재 오퍼레이션은 app-공통 파일 소관이다. 기존 P/O 재진입 화면이 없어 반려 후 재상신을 현재 화면이 제공한다고 해석하지 않는다."
    }
   },
   "/logistics/putaway-tasks": {
@@ -13366,7 +13366,7 @@
      "orderDate",
      "lines"
     ],
-    "description": "ERP W/O 등록 요청. 헤더와 라인을 한 트랜잭션으로 저장한다 — 헤더만 남고 라인이 없는 ERP W/O 는 만들지 않는다. purchaseOrderNo 와 statusCode 는 서버가 정한다. 근거: W-01-11 §5-1",
+    "description": "ERP W/O 등록 요청. 헤더와 라인을 한 트랜잭션으로 저장하며 헤더만 남고 라인이 없는 P/O는 만들지 않는다. purchaseOrderNo와 statusCode는 서버가 정하고 상태는 등록으로 시작한다. 요청에서 상태를 선택할 수 없다.",
     "properties": {
      "supplierId": {
       "x-source-column": "supplier_id",
@@ -13588,7 +13588,7 @@
      "supplierId",
      "orderDate"
     ],
-    "description": "ERP W/O 헤더 수정. 작성중 상태에서만 허용한다 — 확정 후에는 400 STATE_LOCKED. 근거: W-01-11 · 공유계약 G-1",
+    "description": "ERP W/O 헤더 수정. 등록 상태에서만 허용한다. 승인 요청 뒤에도 P/O 상태가 등록으로 유지되므로 승인 대기 중 수정이 허용되며, 승인 요청은 수정된 값을 별도 스냅샷으로 보존하지 않는다.",
     "properties": {
      "supplierId": {
       "x-source-column": "supplier_id",
