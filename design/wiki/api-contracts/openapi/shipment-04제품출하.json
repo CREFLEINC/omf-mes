@@ -1051,7 +1051,7 @@
       }
      },
      "409": {
-      "description": "충돌 — LOT 이 Hold 이거나 가용이 모자라거나 배정을 넘는다",
+      "description": "피킹 충돌. code=INVALID_STATE라도 conflictCause=workerLease면 앞의 동일 요청을 처리 중이므로 입력을 보존하고 잠시 뒤 같은 멱등키·본문으로 재전송한다. conflictCause=user면 Hold·가용 부족·배정 초과 중 먼저 판정된 업무 거부다. 자동 재전송하거나 message를 기계 파싱하지 않고, message를 그대로 표시한 뒤 보류·잔액·지시를 재조회한다.",
       "content": {
        "application/json": {
         "schema": {
@@ -3690,7 +3690,7 @@
        "ALREADY_CONFIRMED",
        "CANCEL_IN_PROGRESS"
       ],
-      "description": "ALREADY_CONFIRMED 는 이미 확정된 출하라는 뜻이다 — 확정 취소 경로가 없으므로 되돌릴 수 없다(W-04-12 §5-3). CANCEL_IN_PROGRESS 는 취소 결재가 진행 중이라 확정할 수 없다는 뜻이다(J-7). 근거: W-04-12 §5-8",
+      "description": "ALREADY_CONFIRMED는 이미 확정된 출하, CANCEL_IN_PROGRESS는 취소 결재 진행 중이다. DUPLICATE_KEY는 같은 멱등키를 다른 요청에 재사용한 경우다. INVALID_STATE는 업무 상태 거부뿐 아니라 멱등 처리 중에도 쓰므로 code만으로 재시도 여부를 정하지 않고 conflictCause를 함께 본다.",
       "example": "VERSION_CONFLICT"
      },
      "message": {
@@ -3709,7 +3709,7 @@
        "erpSync",
        "workerLease"
       ],
-      "description": "충돌 원인. 근거: 공유계약 B-1 확장 — user=다른 사용자, erpSync=ERP 재동기화 배치, workerLease=워커가 처리 중. 구분 없이 내려주면 화면이 「다른 사용자가 먼저 수정했습니다」라는 사실과 다른 안내를 하게 된다 — code=VERSION_CONFLICT 일 때 함께 내린다",
+      "description": "충돌 원인. workerLease는 같은 요청 처리 중이므로 잠시 뒤 원래 멱등키·본문으로 재전송한다. user는 사용자 입력·업무 상태·같은 키의 다른 본문 충돌이므로 자동 재전송하지 않고 입력을 보존해 관련 자원을 재조회한다. erpSync도 재조회가 필요하다. INVALID_STATE는 workerLease와 user 양쪽에서 올 수 있어 code만으로 분기하지 않는다.",
       "example": "user"
      }
     },
