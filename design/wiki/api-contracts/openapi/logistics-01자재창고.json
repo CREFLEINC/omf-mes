@@ -381,7 +381,7 @@
      "inventory"
     ],
     "summary": "재고 조정 전기",
-    "description": "재고가 움직이는 순간이다. 승인이 필요한데 끝나지 않았으면 400이다. 저장된 라인의 단일 공장과 정확히 한 잔액 차원을 다시 확인하고 현재 잔액·예약·피킹·보류 및 음수 재고 허용 규칙을 적용한다. 전기 후 취소 API는 없으며 정정은 같은 차원에 반대 부호의 새 조정을 전기한다. 새 조정도 이 검사를 다시 통과해야 하므로 원복 성공을 보장하지 않고 두 조정과 두 수불 기록을 모두 보존한다.",
+    "description": "재고가 움직이는 순간이다. 승인이 필요한데 끝나지 않았으면 400이다. 저장된 라인의 단일 공장과 정확히 한 잔액 차원을 다시 확인하며, 전기 시 잔액 행이 없으면 조정 부호와 무관하게 NEGATIVE_BALANCE다. 현재 잔액·예약·피킹·보류 및 음수 재고 허용 규칙도 적용한다. 전기 후 취소 API는 없으며 정정은 같은 차원에 반대 부호의 새 조정을 전기한다. 새 조정도 이 검사를 다시 통과해야 하므로 원복 성공을 보장하지 않고 두 조정과 두 수불 기록을 모두 보존한다.",
     "x-internal-note": "화면 근거 W-01-12 §5-6·§5-7. 반대 조정은 취소 상태 전이가 아니다.",
     "parameters": [
      {
@@ -5436,7 +5436,7 @@
      "logistics"
     ],
     "summary": "재고 이동 목록",
-    "description": "inTransitOnly 로 아직 도착하지 않은 건을 찾는다 — 이어하기 목록이 이것이다. 근거: M-01-10 §5-6",
+    "description": "inTransitOnly로 receivedAt이 아직 없는 반출 건을 찾는다. 부분 도착도 receivedAt이 채워져 이 목록에서 빠지므로 미도착 잔량을 이어 처리하는 목록은 아니다.",
     "parameters": [
      {
       "name": "inTransitOnly",
@@ -5445,7 +5445,7 @@
        "type": "boolean",
        "default": false
       },
-      "description": "반출됐으나 도착하지 않은 건만"
+      "description": "반출됐고 receivedAt이 없는 건만. 부분 도착 후 남은 운송중 수량은 이 필터로 조회되지 않는다"
      },
      {
       "name": "fromWarehouseId",
@@ -5712,7 +5712,8 @@
      "logistics"
     ],
     "summary": "이동 라인 치환",
-    "description": "반출이 끝난 라인은 바꿀 수 없다. 근거: 공유계약 A-5 · G-1 ⭐ 이 경로의 조회는 ETag 를 내리지 않는다 — If-Match 에 담을 토큰은 부모 자원 GET /logistics/stock-transfers/{stockTransferId} 200 의 ETag 다. 잠그는 단위가 부모이기 때문이다. 근거: 공유계약 B-1-1",
+    "description": "생성과 반출이 한 오퍼레이션이어서 반출 전 수정 구간이 없다. 없는 ID는 404, 낡은 If-Match는 409가 먼저이며, 이를 통과한 실재 전표는 400 STATE_LOCKED라 수정 성공 경로가 없다. If-Match 토큰 원천은 부모 자원 GET /logistics/stock-transfers/{stockTransferId}의 ETag다.",
+    "x-internal-note": "부모 자원 소유 화면 M-01-10을 권한 근거로 쓴다. 현재 화면 액션은 이 PUT을 호출하지 않는다(통보 162 ⓓ·ⓔ).",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -5754,7 +5755,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "유효한 ID와 최신 If-Match를 통과한 실재 전표는 생성 시점에 반출이 끝나 있으므로 400 STATE_LOCKED. 없는 ID의 404와 낡은 토큰의 409가 먼저다",
       "content": {
        "application/json": {
         "schema": {
@@ -5803,7 +5804,7 @@
      "logistics"
     ],
     "summary": "도착 확정",
-    "description": "반출한 수량 이하만 받을 수 있다. 근거: M-01-10 §5-6",
+    "description": "반출 수량 이하를 한 번만 도착 확정한다. 부분 수량도 허용하지만 receivedAt이 채워진 뒤 둘째 호출은 400 STATE_LOCKED이므로 잔량 재도착은 지원하지 않는다. 도착 품질 상태는 반출 원장 값을 유지하고 재고 상태는 반출 전 상태로 복원한다. 반출 원장 전기와 실물 도착 완료는 별개다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -10119,7 +10120,7 @@
      "sendToErp": {
       "type": "boolean",
       "default": true,
-      "description": "ERP 송신 요청값. 현재 서버는 값을 받지만 저장하거나 ERP 메시지를 만들지 않는다. true여도 응답 erpMessageQueued는 false이므로 송신 여부를 이 값으로 판단하면 안 된다.",
+      "description": "ERP 송신 요청값. 채택 업무정책은 전역 송신 설정과 이 건별 값의 논리곱이며 전역 설정이 정본이다. 현재 서버는 값을 받지만 저장하거나 ERP 메시지를 만들지 않는다. true여도 응답 erpMessageQueued는 false이므로 송신 여부를 이 값으로 판단하면 안 된다.",
       "example": false,
       "x-internal-note": "W-01-12에서는 미지원 안내와 함께 토글을 비활성화한다. ERP 연계 구현은 이 계약 변경 범위가 아니다."
      },
@@ -10289,8 +10290,8 @@
      "adjustmentQty": {
       "type": "number",
       "example": -2.0,
-      "description": "증감 수량 — 차이이며 절대량이 아니다. 양수면 늘고 음수면 줄며 0은 INVALID다. 서버는 값을 그대로 원장에 반영하고 실측 절대량을 받지 않는다. 잔액이 없는 차원은 새로 만들지 않으며 증가는 INVALID, 감소는 NEGATIVE_BALANCE다. 전기 전에는 재고가 움직이지 않는다.",
-      "x-internal-note": "호퍼 잔량 실측에서는 화면이 실측값에서 조정 직전 다시 읽은 장부 잔량을 빼 이 값을 만든다. 근거 W-01-12 §5-6, M-01-09 §5-4, 공유계약 C-6."
+      "description": "증감 수량 — 차이이며 절대량이 아니다. 양수면 늘고 음수면 줄며 0은 INVALID다. 서버는 값을 그대로 원장에 반영하고 실측 절대량을 받지 않는다. 호퍼 잔량 실측에서는 화면이 조정 직전에 장부 잔량을 다시 읽고 실측값에서 빼 이 값을 만든다. 등록·치환은 잔액이 없는 차원을 새로 만들지 않으며 증가는 INVALID, 감소는 NEGATIVE_BALANCE다. 전기 전에는 재고가 움직이지 않는다.",
+      "x-internal-note": "근거 W-01-12 §5-6, M-01-09 §5-4, 공유계약 C-6."
      },
      "uomId": {
       "type": "integer",
