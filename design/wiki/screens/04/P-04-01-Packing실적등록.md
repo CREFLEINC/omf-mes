@@ -125,7 +125,7 @@ OQC가 필요한 제품이 포장 시점에 미합격이면 포장 라벨만 자
 
 | 목적 | 계약 |
 | --- | --- |
-| 최초 출하번호 스캔 | `GET /logistics/shipments?pickedOnly=true&shipmentNo=&shipDateFrom={businessDate}&shipDateTo={businessDate}` → `GET /logistics/shipment-lot-allocations?shipmentId=&unpackedOnly=true`. 요구 계약상 정확 일치는 기간 생략 가능해야 하나 현재 서버는 시작일 누락을 400으로 거부하므로 영업일을 함께 보내고, 과거 번호는 기간을 넓혀 재조회한다 |
+| 최초 출하번호 스캔 | 현재는 `GET /logistics/shipments?pickedOnly=true&q={스캔번호}&shipDateFrom=&shipDateTo=&page=&size=`의 **전 페이지**에서 응답 `shipmentNo`가 스캔값과 정확히 같은 행만 선택 → `GET /logistics/shipment-lot-allocations?shipmentId=&unpackedOnly=true`. 부분검색 첫 행을 고르지 않으며 전 페이지를 소진한 뒤에만 없음으로 안내한다. 과거 번호는 기간을 넓혀 재조회한다 |
 | 최초 출하 목록 선택 | `GET /logistics/shipments?pickedOnly=true&shipDateFrom={businessDate}&shipDateTo={businessDate}&page=&size=` — 팝업 검색은 수신한 현재 표시 목록만 로컬 필터 → 선택 후 배분 조회 |
 | 기존 납품 라벨 재진입 | `GET /logistics/shipment-lot-allocations?q=` |
 | 출하 배분/LOT 매칭 | `GET /logistics/shipment-lot-allocations?shipmentId=&lotQ=` |
@@ -143,6 +143,12 @@ OQC가 필요한 제품이 포장 시점에 미합격이면 포장 라벨만 자
 - 재출력은 자동 실행하지 않으며 대상·사유 선택을 생략하지 않는다.
 - 저장하지 않은 입력에 대한 화면 이동 확인 팝업은 만들지 않는다.
 - 배분 한 건을 여러 포장에 나누는 부분 포장은 지원하지 않는다. 중간 표나 배분 분할 API를 임의로 만들지 않는다.
+
+## §10. 미결
+
+| # | 항목 | 성격 | 등급 | 처리 |
+| --- | --- | --- | :-: | --- |
+| 1 | 정확한 출하번호 조건과 기간 생략 예외 미지원 | API 구현 결손 | **조정** | `omf-mes#558` — 요구 계약은 `shipmentNo` 정확 일치 시 기간 생략을 허용하지만 현재 서버는 `shipmentNo`를 조회 조건에 적용하지 않고 `shipDateFrom` 누락도 400 `REQUIRED`로 거부한다. 보완 전에는 기간을 넓혀가며 `q` 부분검색의 전 페이지에서 응답 번호를 엄격히 대조한다 |
 
 ## 변경 이력
 
