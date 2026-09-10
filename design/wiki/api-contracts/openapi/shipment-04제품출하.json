@@ -741,7 +741,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "검증 실패. 요청·배정 수량이 0 이하이거나 배정 수량이 요청 수량을 넘으면 400 RANGE를 내린다",
       "content": {
        "application/json": {
         "schema": {
@@ -3486,7 +3486,7 @@
      "requestedShipDate",
      "lines"
     ],
-    "description": "편성. 라인 1건 이상이고 배정 수량이 1 이상이어야 한다(W-04-01 §5-7). ⛔ 편성 취소를 두지 않는다 — 출하작업지시 취소는 범위 밖이다"
+    "description": "편성. 라인은 1건 이상이고 각 라인의 요청·배정 수량은 0보다 커야 한다. 배정 수량은 요청 수량을 넘을 수 없다(W-04-01 §5-1·§5-7). ⛔ 편성 취소를 두지 않는다 — 출하작업지시 취소는 범위 밖이다"
    },
    "ShipmentRequestLine": {
     "type": "object",
@@ -3610,11 +3610,17 @@
      "requestedQty": {
       "type": "number",
       "format": "double",
+      "exclusiveMinimum": 0,
+      "description": "요청 수량. 0보다 커야 하며 양의 소수를 허용한다",
+      "x-internal-note": "근거: W-04-01 §4-C·§5-7 · omf-mes#601",
       "example": 120.0
      },
      "allocatedQty": {
       "type": "number",
       "format": "double",
+      "exclusiveMinimum": 0,
+      "description": "배정 수량. 0보다 커야 하고 요청 수량을 넘을 수 없으며, 양의 소수를 허용한다",
+      "x-internal-note": "근거: W-04-01 §4-C·§5-7 · omf-mes#601",
       "example": 120.0
      },
      "uomId": {
