@@ -3544,8 +3544,8 @@
      "pickedQty": {
       "type": "number",
       "example": 120,
-      "x-source-column": "picked_qty",
-      "description": "누적 피킹 수량. ⭐ 서버가 유지한다 — 화면이 더하지 않는다(공유계약 L-2). 배정 잔여 = allocatedQty − pickedQty"
+      "description": "누적 피킹 수량. 이 출하요청 라인을 원천으로 한 예약의 Σ(reservedQty − releasedQty)를 서버가 계산한다. consumedQty는 빼지 않으므로 출하로 소진된 수량도 피킹 실적으로 유지된다. 미확정 출하 취소로 releasedQty가 늘면 이 값과 출하 진행 코드가 다시 계산된다. 화면이 더하지 않는다(공유계약 L-2). 배정 잔여 = allocatedQty − pickedQty",
+      "x-internal-note": "저장 컬럼이 아니라 inventory.inventory_reservation 롤업이다. sourceDocumentTypeCode=SHIPMENT_REQUEST_LINE이고 sourceDocumentId=shipmentRequestLineId인 행을 합산한다(omf-mes#595·통보192/208/212·서버 shipment-request-view.ts)."
      },
      "shippedQty": {
       "type": "number",
