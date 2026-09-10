@@ -10427,7 +10427,7 @@
      "mdm"
     ],
     "summary": "설비 상세",
-    "description": "코드 수정 가부와 사유를 응답이 함께 내린다 — 화면이 따로 세지 않는다. 근거: W-05-12 §4-B · W-05-11 §4-A",
+    "description": "코드 수정 가부와 사유를 응답이 함께 내린다. 실제 소속공정은 equipment.processId다. 기존 인증과 공장별 조회 범위를 유지하며 기준정보 읽기는 단말 토큰으로 사번 없이 호출할 수 있다. POP는 검증된 자기 단말에 연결된 설비를 조회한다. 모든 단말의 모든 설비 조회를 새로 허용하지 않는다. 관리웹 조회·편집 권한은 그대로다. 인증·조회 범위·미존재 오류를 성공 응답의 공정 null로 대체하지 않는다.",
     "responses": {
      "200": {
       "description": "상세",
@@ -10447,8 +10447,39 @@
         "x-internal-note": "본문 필드로 내리지 않는 이유는 공유계약 A-4(version_no 는 화면에 노출하지 않는다)이고, 전송 자체는 A-4 가 함께 요구하는 B-1(낙관적 잠금) 구현에 필요하다"
        }
       }
+     },
+     "401": {
+      "description": "유효한 인증이 없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "기존 인증·공장 조회 범위를 벗어났다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "대상 설비가 없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
      }
-    }
+    },
+    "x-internal-note": "공유계약 D-5의 기존 기준정보 읽기 규칙 유지. P-05-02 §4-A·§5-1, W-05-12 §4-B. 요청 #536의 비가동 공정 원천을 EquipmentDetailResponse.equipment.processId로 연결한다."
    },
    "put": {
     "tags": [
@@ -19904,7 +19935,8 @@
        "null"
       ],
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "이 설비의 실제 소속공정. 명시적 null은 공정 미지정이며 속성 생략은 공정값 미제공이다. 설비 마스터에서는 선택값을 유지한다. POP 비가동 쓰기에는 실제 공정값과 같은 공정의 단말 기능 허용이 필요하다."
      },
      "productionLineId": {
       "x-source-column": "production_line_id",
