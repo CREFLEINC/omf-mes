@@ -117,7 +117,7 @@
 | 조회·필터 | 같은 GET — `approvalTypeCode`·`statusCode`·`requestedAtFrom/To`·`q` | §3 · L-3 |
 | 페이지 이동 | 같은 GET 의 `page`·`size` | §5-8 · G-12 |
 | 요청 선택 | `GET /app/approval-requests/{id}` — 단계 배열을 함께 내린다 · **승인자도 상신자도 아니면 403** | §5-8 |
-| 대상 화면에서 보기 | 같은 GET 의 `target` — **`displayName`·`screenId`·`openable`** | §5-2 · **A-10 보강** |
+| 대상 화면에서 보기 | 같은 GET 의 `target` — 현재 `displayName={targetTypeCode} #{targetId}`, `screenId` 생략, `openable=false`. 미래 화면 연결은 서버 응답이 열릴 때만 사용 | §5-2 · **A-10 보강** |
 | 의견 입력 | `ApprovalDecision.comment`(승인 · 선택) · **`ApprovalRejection.comment`**(반려 · **required**) | §5-5 · A-12 |
 | 승인 | `POST /app/approval-requests/{id}:approve` | §5-6·§5-7 · **J-8** |
 | 반려 | `POST …:reject` — **스키마가 `comment`를 required 로 강제**한다 | §5-5 · A-12 |
@@ -125,13 +125,13 @@
 | 대리 지정 | **없음 — 범위 밖**(2026-08-07 사용자 결정) | §5-8 |
 | 상신 철회 | **없음 — 범위 밖.** 승인자 반려로 대신한다 | §5-8 · **J-6·G-24** |
 | ⭐ **선택지·표시명 — `APPROVAL_REQUEST_STATUS`** | **`GET /mdm/code-values?codeGroupCode=APPROVAL_REQUEST_STATUS`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = PENDING·APPROVED·REJECTED · ⛔ 고객이 편집할 수 없다 | G-32 |
-| ⛔ **유형 선택칸의 표시명 — 원천 없음**(2026-09-04) | `approvalTypeCode` 9값은 계약이 닫은 값이라 표시명이 안 온다. `omf-mes#352` 가 같은 형태를 판정 중이다 | `A-16`·`G-32` |
+| ⛔ **유형 선택칸의 표시명 — 원천 없음**(2026-09-04) | `approvalTypeCode` 9값은 계약이 닫은 값이라 표시명이 안 온다. 현재 결재선 목록의 `q`는 표시명이 아니라 승인 유형 코드 부분검색이다. 화면은 G-33 다국어 사전을 유지하며 코드 그룹이나 한·베 응답 필드를 새로 만들지 않는다 | `A-16`·`G-32`·`G-33` |
 
 **계약이 정본으로 갖는 것 셋**
 
 1. ⭐ **승인은 자물쇠를 풀 뿐 실행하지 않는다**(J-8) — `:approve`는 상태만 바꾼다. 전기는 대상 화면의 `:post`가 하고, 그 `:post`는 **승인 전이면 400**이다(01 계약 실측)
 2. **순차 결재를 서버가 강제한다** — 앞 단계가 전부 승인이 아니면 **400 `NOT_YOUR_TURN`**. 물리 모델에 이 제약이 없으므로 **화면 검증만으로는 API 직접 호출에 뚫린다**
-3. **대상은 표시명·화면 ID·열 수 있는지까지 서버가 내려 준다**(A-10 보강) — 프런트가 「유형 → 화면」 표를 갖지 않는다
+3. **대상 표시·열기는 현재와 목표를 구분한다** — 현재 서버는 코드 대체 표시와 `openable=false`만 보장한다. 목표는 표시명·화면 ID·열 수 있는지까지 서버가 내리는 것이며, 프런트가 「유형 → 화면」 표를 먼저 만들지 않는다
 
 ⚠ **`isMyTurn`·`currentStepNo`를 목록 행에 내린다** — 상단 대기 건수와 「내 결재 대기」 탭이 이 값으로 선다. 화면이 단계 배열을 받아 스스로 계산하면 **서버 규칙과 갈린다**(§5-4의 순차 판정이 서버에 있다). **셋 다 `required`다.**
 
