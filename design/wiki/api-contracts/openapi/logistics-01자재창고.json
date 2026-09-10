@@ -7448,13 +7448,14 @@
        "string",
        "null"
       ],
-      "description": "cancellable 이 «거짓인 이유» — 후속 문서가 있다 · 이미 취소됐다 · 취소 진행 중이다 · 상태가 잠겼다 · 이 문서 유형에 취소 경로가 없다(`TYPE_NOT_CANCELABLE` — 취소 실행 경로가 있는 것은 입하·입고·출고 3종뿐이다). ⭐ 화면이 이 값으로 안내 문구와 다음 경로를 가른다(G-3). ⛔ 서버가 판정한다 — 화면이 조건을 따로 조합하면 화면마다 갈린다",
+      "description": "cancellable이 거짓인 이유. 채택한 우선순위는 TYPE_NOT_CANCELABLE → ALREADY_CANCELLED → CANCEL_IN_PROGRESS → OWNED_BY_UPSTREAM → STATE_LOCKED → SUCCESSOR_EXISTS다. OWNED_BY_UPSTREAM은 출하 같은 상류 문서가 소유한 입고·출고 전표이므로 그 상류 문서에서 취소해야 한다는 뜻이다. STATE_LOCKED는 상류 소유를 포함할 수도 있는 공통 상태 잠금이며, 이 값만으로 상류 소유를 확정하지 않는다. 현재 서버는 상류 소유에도 STATE_LOCKED를 반환하고 OWNED_BY_UPSTREAM은 아직 반환하지 않는다. 화면은 서버가 내린 사유에 맞춰 안내하며 조건을 따로 조합하지 않는다.",
       "example": "SUCCESSOR_EXISTS",
       "x-code-key": "CD-CANCEL-BLOCKED-REASON",
       "enum": [
        "SUCCESSOR_EXISTS",
        "ALREADY_CANCELLED",
        "CANCEL_IN_PROGRESS",
+       "OWNED_BY_UPSTREAM",
        "STATE_LOCKED",
        "TYPE_NOT_CANCELABLE"
       ]
@@ -7691,15 +7692,16 @@
       "x-source-column": "source_document_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "원천 문서 유형. **A-10 다형 참조 판별자**이고 값은 **대상 테이블 이름**이다 — 피킹 지시(`PICKING_ORDER` → `logistics.picking_order`, 생산 투입) · 입고 전표(`GOODS_RECEIPT` → `logistics.goods_receipt`, 공급사 반품·자재 폐기) · 처분 결정(`DISPOSITION_DECISION` → `quality.disposition_decision`, 제품 폐기) 셋이다. `sourceDocumentId` 는 그 표의 식별자다. ⛔ 공통코드 그룹으로 받지 않는다 — 값이 우리 계약의 리소스 이름이라 **고객이 늘릴 수 있는 값이 아니다**(공유계약 A-10·A-16, `GoodsIssue.destinationTypeCode` 와 같은 처리). 새 대상이 생기면 화면이 문자열을 정하기 전에 이 목록에 등재한다(A-16). ⚠ 같은 이름의 다른 자리(`GoodsReceipt`·`InventoryTransaction` 등)는 값 집합이 다르다 — 자리마다 닫는다.",
+      "description": "조회 응답의 원천 문서 유형. 피킹 지시(PICKING_ORDER), 입고 전표(GOODS_RECEIPT), 처분 결정(DISPOSITION_DECISION), 출하(SHIPMENT)를 허용하며 sourceDocumentId는 각 원천 리소스의 식별자다. SHIPMENT이면 logistics.shipment의 shipmentId다. 출하가 내부에서 만든 출고도 조회에 나타나므로 생성 입력의 3값보다 한 값이 많다. InventoryTransaction의 원천은 이 경우에도 GOODS_ISSUE다.",
       "x-no-example": true,
-      "x-internal-note": "2026-09-01 `omf-mes#336` — 자유 문자열에서 `enum` 3값으로 닫았다. 구 주석의 「`enum` 을 못박으면 값이 정해질 때 계약이 깨진다 — G-2 를 계약에도 적용한다」는 **이 자리에 성립하지 않는다**: 미확정 코드 표시 조항(G-2)은 「우리가 확정해야 하는데 못 한 값」의 조항이고(마스터 판별 조항 G-31 이 범위를 줄였다), 이 값은 확정 대상이 아니라 **우리 계약의 리소스 목록**이다. ⛔ 자유 문자열→`enum` 이므로 통지 대상이다.",
+      "x-internal-note": "2026-09-01 omf-mes#336에서 자유 문자열을 3값으로 닫았고, 2026-09-10 서버 통보 217의 출하 생성 실측에 따라 조회 응답에 SHIPMENT를 추가했다. 생성 입력은 외부에서 SHIPMENT 출고를 직접 만들지 않으므로 기존 3값을 유지한다.",
       "enum": [
        "PICKING_ORDER",
        "GOODS_RECEIPT",
-       "DISPOSITION_DECISION"
+       "DISPOSITION_DECISION",
+       "SHIPMENT"
       ],
-      "x-code-key": "CD-GOODS-ISSUE-SOURCE-DOCUMENT-TYPE"
+      "x-code-key": "CD-GOODS-ISSUE-READ-SOURCE-DOCUMENT-TYPE"
      },
      "sourceDocumentId": {
       "x-source-column": "source_document_id",
