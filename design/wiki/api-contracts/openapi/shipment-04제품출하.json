@@ -3349,7 +3349,8 @@
        "PARTIALLY_SHIPPED",
        "SHIPPED"
       ],
-      "description": "⭐ W-04-02 「진행」 열의 판정 근거 — 출하작업지시 «한 건»의 진행이다. 라인 전체의 요청·배정·피킹·출하 4수량을 서버가 롤업해 하나로 낸다. ⛔ 서버가 계산한다 — 화면이 다시 계산하지 않는다(공유계약 L-2 · L-2-1 ⑴). ⛔ 저장하지 않는다 — A-17 의 두 질문이 둘 다 「아니오」다(달력이 값을 바꾸지 않고, 과거 값을 얼릴 이유도 없다). NOT_ALLOCATED=배정 합 0 · PARTIALLY_ALLOCATED=0 보다 크고 요청 합보다 작은 배정 합 · PICKING=배정 합이 요청 합과 같고 피킹 합이 배정 합보다 작다 · PICKED=피킹 합이 배정 합과 같고 출하 합 0 · PARTIALLY_SHIPPED=출하 합이 0 보다 크고 배정 합보다 작다 · SHIPPED=출하 합이 배정 합과 같다. ⭐ 판정 순서는 뒤가 이긴다 — NOT_ALLOCATED, PARTIALLY_ALLOCATED, PICKING, PICKED, PARTIALLY_SHIPPED, SHIPPED. ⚠ statusCode 와 축이 다르다 — 그 칸은 「칸 불필요」로 닫혔고(x-no-code-key) 값이 없다. ⚠ shippingInspectionStatusCode 와도 축이 다르다 — 「검사 대기」는 이 축의 값이 아니라 그 축의 PENDING 이다. 한 칸에 두 축을 담으면 어느 쪽도 못 읽는다. ⛔ 화면이 라인을 순회해 판정하지 않는다 — W-04-01·W-04-02·W-04-04 가 각자 접으면 같은 건을 다르게 부른다(W-04-02 §9-1). 근거: W-04-02 §3·§4-A·§5-3 · W-04-04 §3·§5-4 · omf-mes#402",
+      "description": "출하작업지시 한 건의 진행. 서버가 라인 전체의 요청·배정·피킹·출하 수량을 합산해 계산하며 저장하지 않는다. 배정 합이 0이면 다른 조건보다 먼저 NOT_ALLOCATED를 낸다. 배정 합이 0보다 큰 경우 PARTIALLY_ALLOCATED=배정 합이 요청 합보다 작음 · PICKING=배정 합이 요청 합과 같고 피킹 합이 배정 합보다 작음 · PICKED=피킹 합이 배정 합과 같고 출하 합이 0임 · PARTIALLY_SHIPPED=출하 합이 0보다 크고 배정 합보다 작음 · SHIPPED=출하 합이 배정 합과 같음이다. 이 다섯 조건이 겹치면 뒤의 조건이 이긴다. statusCode 및 shippingInspectionStatusCode와는 다른 축이며 검사 대기는 shippingInspectionStatusCode의 PENDING이다.",
+      "x-internal-note": "화면이 재계산하지 않는 근거: 공유계약 L-2·L-2-1 ⑴. 저장하지 않는 판정: A-17. 소비 화면: W-04-01·W-04-02·W-04-04. 근거: W-04-02 §3·§4-A·§5-3·§9-1 · W-04-04 §3·§5-4 · omf-mes#402·#567",
       "example": "PICKING",
       "x-code-key": "CD-SHIPMENT-PROGRESS"
      },
