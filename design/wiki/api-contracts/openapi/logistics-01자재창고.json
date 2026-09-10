@@ -4843,7 +4843,7 @@
      "logistics"
     ],
     "summary": "적치 지시 목록",
-    "description": "담당자에게 할당된 지시를 내린다. 근거: M-01-05 §3 · M-01-07 §3. temporaryOnly=true는 현재 COMPLETED_TEMPORARY인 지시만 반환한다. 복귀 완료 후 제외하며 과거 임시 이력만으로 포함하지 않는다. 같은 LOT의 여러 지시는 번호로 구분하여 선택한다.",
+    "description": "배정 담당자·창고·상태·LOT·원천 입고로 적치 지시를 조회한다. 취소 요청 또는 취소 완료된 입고가 만든 지시도 PENDING에 남아 목록에 포함될 수 있다. temporaryOnly=true는 현재 COMPLETED_TEMPORARY인 지시만 반환한다. 복귀 완료 후 제외하며 과거 임시 이력만으로 포함하지 않는다. 같은 LOT의 여러 지시는 번호로 구분한다.",
     "parameters": [
      {
       "name": "assignedWorkerId",
@@ -5046,7 +5046,7 @@
       }
      },
      "400": {
-      "description": "상태 불허는 STATE_LOCKED. 복귀 원천 불명확·전량 부족·예약/피킹 침해는 INVALID(field=putawayTaskId)와 사유를 반환한다. 입력 보존·재조회하며 다른 재고로 대체하지 않는다. 목적지·권장 위치·혼적 등 검증 실패도 여기에 포함한다.",
+      "description": "완료된 지시 또는 취소 요청·취소 완료된 입고의 대기 지시는 STATE_LOCKED. 복귀 원천 불명확·전량 부족·예약/피킹 침해는 INVALID(field=putawayTaskId)와 사유를 반환한다. 입력 보존·재조회하며 다른 재고로 대체하지 않는다. 목적지·권장 위치·혼적 등 검증 실패도 여기에 포함한다.",
       "content": {
        "application/json": {
         "schema": {
@@ -5076,7 +5076,7 @@
       }
      }
     },
-    "x-internal-note": "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). omf-mes#454: 경로/본문 재사용이나 행동 의미는 변경된다. 복귀 첫 스캔은 로컬 초안이고 도착 확인 후 complete 1회다. 확정된 임시 지시 캐시가 있어야 오프라인 복귀를 시작하며 미동기 임시 작업의 후속 복귀는 서버 확정 전 시작하지 않는다. 원 입고 취소의 기존 후속 판정은 적치/복귀 이력도 추적한다. 별도 적치 취소는 신설하지 않는다."
+    "x-internal-note": "근거: M-01-05 §5-8 · 문의 061·062. 기존 description의 원 임시 이력 「작업자」는 감사 updated_by의 로그인 사용자를 가리키며 X-Worker-No 사번의 실제 수행자 보존을 뜻하지 않는다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). omf-mes#454: 경로/본문 재사용이나 행동 의미는 변경된다. 복귀 첫 스캔은 로컬 초안이고 도착 확인 후 complete 1회다. 확정된 임시 지시 캐시가 있어야 오프라인 복귀를 시작하며 미동기 임시 작업의 후속 복귀는 서버 확정 전 시작하지 않는다. 원 입고 취소의 기존 후속 판정은 적치/복귀 이력도 추적한다. 별도 적치 취소는 신설하지 않는다."
    }
   },
   "/logistics/putaway-tasks/{putawayTaskId}:complete-temporary": {
@@ -5096,7 +5096,7 @@
      "logistics"
     ],
     "summary": "임시 위치 적재",
-    "description": "정상 적치와 상태가 구분된다. 사유 코드와 비고 중 적어도 하나는 있어야 한다. 근거: M-01-07 §5-5. PENDING에서 COMPLETED_TEMPORARY로만 전이한다. 동일 키·본문·주체의 재전송은 원응답을 재생하지만 임시/정상 완료 지시의 새 키 요청은 400 STATE_LOCKED다. taskQty 전량의 실제 임시 이동을 원자적으로 기록하며 위치·사유/비고·시각·작업자와 원장을 불변 이력으로 남긴다. 신규 임시 적치 원장의 원천은 PUTAWAY_TASK와 putawayTaskId다. 업무 상태·재고·원장·감사·멱등 완료는 원자적으로 저장한다. 정위치 복귀는 별도 새 키로 적치 완료를 호출하며 최초 임시 원장을 덮어쓰지 않는다.",
+    "description": "정상 적치와 상태가 구분된다. 사유 코드와 비고 중 적어도 하나는 있어야 한다. PENDING에서 COMPLETED_TEMPORARY로만 전이한다. 원천 입고가 CANCEL_REQUESTED 또는 CANCELLED이면 지시가 PENDING이어도 400 STATE_LOCKED로 거부하고 지시 상태는 그대로 남는다. X-Worker-No는 사번 존재만 확인하며 배정 담당자를 덮어쓰거나 실제 수행자로 저장하지 않는다. 동일 키·본문·주체의 재전송은 원응답을 재생하지만 임시/정상 완료 지시의 새 키 요청은 400 STATE_LOCKED다. taskQty 전량의 실제 임시 이동을 원자적으로 기록하며 위치·사유/비고·시각·원장을 불변 이력으로 남긴다. 신규 임시 적치 원장의 원천은 PUTAWAY_TASK와 putawayTaskId다. 업무 상태·재고·원장·감사·멱등 완료는 원자적으로 저장한다. 정위치 복귀는 별도 새 키로 적치 완료를 호출하며 최초 임시 원장을 덮어쓰지 않는다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -5130,7 +5130,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "취소 요청·취소 완료된 입고의 대기 지시는 STATE_LOCKED. 사유·위치·상태 등 다른 검증 실패도 포함한다.",
       "content": {
        "application/json": {
         "schema": {
@@ -5160,7 +5160,7 @@
       }
      }
     },
-    "x-internal-note": "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 도출 단계의 :temporary 를 :complete-temporary 로 다듬었다 — :complete 와 짝이라는 것이 이름에 드러나야 한다."
+    "x-internal-note": "근거: M-01-05 §5-8 · M-01-07 §5-5 · 문의 061·062. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 도출 단계의 :temporary 를 :complete-temporary 로 다듬었다 — :complete 와 짝이라는 것이 이름에 드러나야 한다."
    }
   },
   "/logistics/recycle-entries": {
@@ -13219,6 +13219,7 @@
        "null"
       ],
       "format": "int64",
+      "description": "지시를 배정받은 담당자. 실제 적치 수행자나 완료자가 아니며 완료 요청의 X-Worker-No로 덮어쓰지 않는다.",
       "example": 1001
      }
     }
