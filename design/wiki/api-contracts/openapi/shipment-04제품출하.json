@@ -2246,27 +2246,30 @@
      "requestedQty": {
       "type": "number",
       "format": "double",
-      "description": "판정을 의뢰할 수량. 1 이상이어야 한다(W-04-07 §5-7)",
+      "description": "판정을 의뢰할 수량. 1 이상이며 대상 부적합 단위와 일치해야 한다. 현재 서버는 검증에만 사용하고 의뢰 기록에는 보존하지 않는다",
       "example": 120.0
      },
      "uomId": {
       "type": "integer",
       "format": "int64",
-      "example": 1001
+      "example": 1001,
+      "description": "대상 부적합의 단위. 현재 서버는 일치 여부를 검증하지만 의뢰 기록에는 보존하지 않는다"
      },
      "remarks": {
       "type": [
        "string",
        "null"
       ],
-      "example": "값"
+      "example": "값",
+      "description": "판정 의뢰 비고. 현재 서버는 입력을 받지만 의뢰 기록이나 조회 응답에 보존하지 않는다"
      }
     },
     "required": [
      "requestedQty",
      "uomId"
     ],
-    "description": "판정 의뢰. ⭐ 이 화면은 판정하지 않는다 — 재작업/폐기 판정은 전 도메인에서 03 품질 소관으로 통일돼 있다(F04 정합 확정 2026-07-07 · W-04-07 §5-1). 받는 화면은 W-03-10 이고 처분 결정 자원은 품질 계약이 소유한다(DR-008 확정 3-A)"
+    "description": "판정 의뢰. ⭐ 이 화면은 판정하지 않는다 — 재작업/폐기 판정은 전 도메인에서 03 품질 소관으로 통일돼 있다(F04 정합 확정 2026-07-07 · W-04-07 §5-1). 받는 화면은 W-03-10 이고 처분 결정 자원은 품질 계약이 소유한다(DR-008 확정 3-A). 현재 서버는 requestedQty·uomId를 검증하고 remarks를 받지만 세 값을 의뢰 기록에 보존하지 않으므로 이후 화면에서 의뢰 내용으로 표시하지 않는다",
+    "x-internal-note": "의뢰 입력 미보존은 omf-mes#592로 추적한다."
    },
    "ErrorItem": {
     "type": "object",
@@ -2704,7 +2707,7 @@
       "type": "string",
       "example": "NORMAL",
       "x-code-key": "CD-LOT-STATUS",
-      "description": "부적합 등록 «후» 의 LOT 품질 상태. LOT 상태. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "부적합 등록 «후» 의 LOT 품질 상태 스냅샷. 처분 판정 후 상태가 아니며 현재 서버는 등록 당시 상태를 저장한 뒤 판정 결과로 갱신하지 않는다. 판정 결과는 처분 이력과 현재 LOT 상태를 따로 조회한다. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
      }
     },
     "required": [

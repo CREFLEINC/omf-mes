@@ -2639,7 +2639,7 @@
      "quality"
     ],
     "summary": "처분 판정 저장",
-    "description": "W-03-10 「판정 저장」. 처분 판정 단계에는 승인이 필요하지 않다. 폐기 실행 승인은 별개로 기존 규칙을 유지한다(2026-09-08 사용자 확정). 부적합 하나를 수량으로 갈라 여러 번 부를 수 있다 — 일부 재작업 · 일부 폐기가 성립한다. ⭐ 판정 저장과 Lot Status 전이는 한 트랜잭션이다(공유계약 B-8) — 처분만 남고 LOT 이 안 바뀌면 다음 화면이 잘못된 대상을 집는다. 근거: W-03-10 §5-1·§5-2 · DR-008 확정 3-A ⭐ 도착 상태는 처분에 따라 갈린다 — 재작업 → INSPECTION_PENDING(검사 대기) · 폐기 → SCRAPPED(폐기) · 정상 → NORMAL(정상). 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 가 갖는다. ⭐ If-Match 값은 이 경로의 GET 이 아니라 부적합 상세(GET /quality/nonconformances/{nonconformanceId} · 제품출하 계약)의 ETag 를 담는다 — 잠그는 대상이 처분 결정 한 건이 아니라 부적합이기 때문이다. ⛔ 이 경로의 목록 GET 에는 ETag 가 없다.",
+    "description": "W-03-10 「판정 저장」. 처분 판정 단계에는 승인이 필요하지 않다. 폐기 실행 승인은 별개로 기존 규칙을 유지한다(2026-09-08 사용자 확정). 부적합 하나를 수량으로 갈라 여러 번 판정 기록을 만들 수 있다. 판정 저장과 LOT 상태 전이는 한 트랜잭션이며 도착 상태는 재작업 → INSPECTION_PENDING(검사 대기) · 폐기 → SCRAPPED(폐기) · 정상 → NORMAL(정상)이다. ⛔ 현재 서버는 판정 수량을 LOT별로 귀속하지 않고 연결 LOT 전건에 같은 전이를 시도하며, 일부 LOT만 이동 가능해도 판정을 저장할 수 있다. 따라서 성공 응답을 수량별 LOT 상태 반영으로 해석하지 않는다. 수량별·LOT별 상태 보존과 전건 원자 전이는 현재 미지원이다. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 가 갖는다. ⭐ If-Match 값은 이 경로의 GET 이 아니라 부적합 상세(GET /quality/nonconformances/{nonconformanceId} · 제품출하 계약)의 ETag 를 담는다 — 잠그는 대상이 처분 결정 한 건이 아니라 부적합이기 때문이다. ⛔ 이 경로의 목록 GET 에는 ETag 가 없다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -2678,7 +2678,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "검증 실패. 대상 LOT가 모두 현재 처분 전이를 시작할 수 없으면 STATE_LOCKED이며 판정 기록과 LOT 전이를 함께 롤백한다. SCRAPPED에는 나가는 전이가 없어 후속 판정으로 복구할 수 없다.",
       "content": {
        "application/json": {
         "schema": {
@@ -2718,7 +2718,7 @@
       }
      }
     },
-    "x-internal-note": "409 는 둘이다 — 남은 수량을 넘겨 정하려 할 때, 그리고 이미 닫힌 부적합(status_code)일 때. 남은 수량 = nonconformance_lot.affected_qty 합 − 이 부적합의 decision_qty 합이고 서버가 판정한다(공유계약 L-2 — 잔액은 클라이언트가 계산하지 않는다). ⚠ disposition_type_code 값 목록은 미확정이다 — 2차 값 목록 제안안 대상. 토큰을 선택에서 필수로 조였다 — 이 화면은 관리웹 전용이고 오프라인 대상이 아니라(W-03-10 §6) IfMatchVersionOptional 의 완화 조건에 해당하지 않았다. 두 사람이 같은 부적합을 동시에 판정하는 경합을 이 토큰이 잡는다(W-03-03 §5-5 와 같은 형태). ⭐ 토큰을 받는 곳은 부적합 상세다 — 04 제품출하 계약 GET /quality/nonconformances/{nonconformanceId} 의 ETag 를 그대로 담는다. 잠그는 대상은 처분 결정 한 건이 아니라 부적합이다(잔량이 부적합 단위로 정해지기 때문). ⚠ 그래서 판정 저장은 nonconformance.version_no 를 올려야 한다 — 올리지 않으면 이 토큰이 경합을 못 잡는다. 📨 데이터 모델 통지 대상이고 추적은 W-03-10 §8 이 갖는다. ⚠ 토큰 원천 검사기는 한 파일 안에서만 후보를 찾아 이 자리를 못 본다 — 원천이 다른 계약에 있는 첫 사례다. 근거: omf-mes#253"
+    "x-internal-note": "409 는 둘이다 — 남은 수량을 넘겨 정하려 할 때, 그리고 이미 닫힌 부적합(status_code)일 때. 남은 수량 = nonconformance_lot.affected_qty 합 − 이 부적합의 decision_qty 합이고 서버가 판정한다(공유계약 L-2 — 잔액은 클라이언트가 계산하지 않는다). ⚠ disposition_type_code 값 목록은 미확정이다 — 2차 값 목록 제안안 대상. 토큰을 선택에서 필수로 조였다 — 이 화면은 관리웹 전용이고 오프라인 대상이 아니라(W-03-10 §6) IfMatchVersionOptional 의 완화 조건에 해당하지 않았다. 두 사람이 같은 부적합을 동시에 판정하는 경합을 이 토큰이 잡는다(W-03-03 §5-5 와 같은 형태). ⭐ 토큰을 받는 곳은 부적합 상세다 — 04 제품출하 계약 GET /quality/nonconformances/{nonconformanceId} 의 ETag 를 그대로 담는다. 잠그는 대상은 처분 결정 한 건이 아니라 부적합이다(잔량이 부적합 단위로 정해지기 때문). ⚠ 그래서 판정 저장은 nonconformance.version_no 를 올려야 한다 — 올리지 않으면 이 토큰이 경합을 못 잡는다. 📨 데이터 모델 통지 대상이고 추적은 W-03-10 §8 이 갖는다. ⚠ 토큰 원천 검사기는 한 파일 안에서만 후보를 찾아 이 자리를 못 본다 — 원천이 다른 계약에 있는 첫 사례다. 부분·복수 LOT 전이 결손은 omf-mes#592로 추적한다. 근거: omf-mes#253"
    }
   },
   "/quality/inspection-results/{inspectionResultId}/measurement-summary": {
