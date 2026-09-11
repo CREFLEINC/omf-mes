@@ -1020,7 +1020,7 @@
      "shipment"
     ],
     "summary": "제품 LOT 피킹 확정",
-    "description": "현장이 집은 제품 LOT 과 수량을 이 라인에 확정 기록한다. 확정 후 되돌림은 현재 지원하지 않으므로 보내기 전 LOT·수량을 재확인한다. 0·음수 피킹은 취소가 아니라 `RANGE` 검증 실패다. ⭐ 화면이 예약을 직접 쓰지 않는다 — 서버가 이 피킹의 결과로 inventory_reservation 을 걸고 푼다(01 자재창고 계약 · M-01-08 §5-5 와 같은 규약). 요청은 영업일·발생시각을 받지 않으며 현재 서버는 수신 시각의 UTC 날짜 하나를 잔여 유효기간 판정의 오늘과 예약번호 기간 축에 함께 쓴다. ⛔ 오프라인 대상이 아니다 — Release 판정값을 캐시할 수 없어 이 화면은 온라인에서만 돈다(공유계약 C-6 · M-04-01 §5-6). 권장 외 LOT 을 집어도 막지 않는다 — 경고 후 통과이고 사유는 남기지 않는다(M-04-01 §5-5). 근거: M-04-01 §5-7",
+    "description": "현장이 집은 제품 LOT 과 수량을 이 라인에 확정 기록한다. 요청은 창고·위치·품질·재고 상태·소유 유형·소유자 거래처를 받지 않고 품목+LOT 전체에서 재고잔액을 찾으므로 후보가 정확히 1건일 때만 처리한다. 0건 또는 복수 건이면 거부하며 임의의 첫 행을 고르지 않는다. 확정 후 되돌림은 현재 지원하지 않으므로 보내기 전 LOT·수량을 재확인한다. 0·음수 피킹은 취소가 아니라 `RANGE` 검증 실패다. ⭐ 화면이 예약을 직접 쓰지 않는다 — 서버가 이 피킹의 결과로 inventory_reservation 을 걸고 푼다(01 자재창고 계약 · M-01-08 §5-5 와 같은 규약). 요청은 영업일·발생시각을 받지 않으며 현재 서버는 수신 시각의 UTC 날짜 하나를 잔여 유효기간 판정의 오늘과 예약번호 기간 축에 함께 쓴다. ⛔ 오프라인 대상이 아니다 — Release 판정값을 캐시할 수 없어 이 화면은 온라인에서만 돈다(공유계약 C-6 · M-04-01 §5-6). 권장 외 LOT 을 집어도 막지 않는다 — 경고 후 통과이고 사유는 남기지 않는다(M-04-01 §5-5). 근거: M-04-01 §5-7",
     "parameters": [
      {
       "name": "shipmentRequestId",
@@ -1071,7 +1071,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. pickedQty가 0 이하면 400 RANGE를 내리며 피킹 취소로 처리하지 않는다",
+      "description": "검증 실패. pickedQty가 0 이하면 RANGE이고, 품목+LOT 재고 후보가 둘 이상이면 INVALID(field=lotId)다. 복수 후보 중 임의 선택하지 않으며 피킹 취소로 처리하지 않는다",
       "content": {
        "application/json": {
         "schema": {
@@ -1101,7 +1101,7 @@
       }
      },
      "409": {
-      "description": "피킹 충돌. code=INVALID_STATE라도 conflictCause=workerLease면 앞의 동일 요청을 처리 중이므로 입력을 보존하고 잠시 뒤 같은 멱등키·본문으로 재전송한다. conflictCause=user면 Hold·가용 부족·배정 초과 중 먼저 판정된 업무 거부다. 자동 재전송하거나 message를 기계 파싱하지 않고, message를 그대로 표시한 뒤 보류·잔액·지시를 재조회한다.",
+      "description": "피킹 충돌. 품목+LOT 재고 후보가 없으면 INVALID_STATE다. code=INVALID_STATE라도 conflictCause=workerLease면 앞의 동일 요청을 처리 중이므로 입력을 보존하고 잠시 뒤 같은 멱등키·본문으로 재전송한다. conflictCause=user면 Hold·가용 부족·배정 초과 중 먼저 판정된 업무 거부다. 자동 재전송하거나 message를 기계 파싱하지 않고, message를 그대로 표시한 뒤 보류·잔액·지시를 재조회한다.",
       "content": {
        "application/json": {
         "schema": {
@@ -3807,7 +3807,7 @@
    },
    "ShipmentLinePick": {
     "type": "object",
-    "description": "피킹 확정 요청. 사번은 본문이 아니라 X-Worker-No 헤더로 보낸다. businessDate와 occurredAt 입력은 현재 지원하지 않으며 서버 수신 시각의 UTC 날짜가 잔여 유효기간 판정과 예약번호 RS-{YYYYMMDD}-{SEQ4}의 기간 축이다",
+    "description": "피킹 확정 요청. 창고·위치·품질·재고 상태·소유 유형·소유자 거래처 입력은 없으며 기존 보류·가용·배정·유효기간 검증과 별도로 품목+LOT 재고 후보가 정확히 1건이어야 한다. 사번은 본문이 아니라 X-Worker-No 헤더로 보낸다. businessDate와 occurredAt 입력은 현재 지원하지 않으며 서버 수신 시각의 UTC 날짜가 잔여 유효기간 판정과 예약번호 RS-{YYYYMMDD}-{SEQ4}의 기간 축이다",
     "required": [
      "lotId",
      "pickedQty",
@@ -3818,7 +3818,7 @@
       "type": "integer",
       "format": "int64",
       "example": 1001,
-      "description": "현장이 실제로 집은 제품 LOT. 권장 1순위가 아니어도 된다"
+      "description": "현장이 실제로 집은 제품 LOT. 권장 1순위가 아니어도 되지만 품목+LOT에 해당하는 재고잔액이 복수 차원이면 피킹할 수 없다"
      },
      "pickedQty": {
       "type": "number",
