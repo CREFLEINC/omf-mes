@@ -7320,7 +7320,7 @@
        "null"
       ],
       "description": "역트랜잭션 번호. 전기 취소는 원 거래 번호에 -R을 붙인다.",
-      "example": "GI-20260906-0001-R"
+      "example": "TX-EXAMPLE-001-R"
      },
      "reversalBusinessDate": {
       "type": [
