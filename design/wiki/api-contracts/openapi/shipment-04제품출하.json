@@ -29,7 +29,8 @@
      "shipment"
     ],
     "summary": "출하지시서 목록",
-    "description": "고객사 지시서 수신본. 연계가 채운다 — 등록 경로가 없다. 근거: W-04-01 §5-6",
+    "description": "고객사 지시서 수신본 목록. 각 항목은 전체 lines를 포함하며 라인 수와 요청 수량은 lines에서 확인한다. unassignedOnly=true는 연결된 출하작업지시가 없는 지시서만 반환하고 false 또는 생략은 전체를 반환한다. 응답은 부분편성과 편성완료를 구분하지 않는다.",
+    "x-internal-note": "W-04-01 §3·§5-6·§5-7. 별도 라인 수·합계·편성 상태 필드와 salesOrderId 역방향 필터를 신설하지 않는다.",
     "parameters": [
      {
       "name": "customerId",
@@ -75,7 +76,7 @@
        "type": "boolean",
        "example": true
       },
-      "description": "아직 편성되지 않은 것만 — 「편성 여부」 필터"
+      "description": "true이면 연결된 출하작업지시가 하나도 없는 지시서만 반환한다. false 또는 생략은 필터를 적용하지 않아 전체를 반환한다"
      },
      {
       "name": "q",
@@ -229,7 +230,7 @@
        "type": "boolean",
        "example": true
       },
-      "description": "아직 포장에 담기지 않은 것만 — 배분 잔여가 남은 것"
+      "description": "아직 포장에 연결되지 않은 배분만. handlingUnitId가 빈 배분이다"
      },
      {
       "name": "oqcPassed",
@@ -301,11 +302,8 @@
              "example": true
             },
             "reasonCode": {
-             "type": [
-              "string",
-              "null"
-             ],
-             "description": "matched 가 거짓일 때의 사유 — LABEL_ITEM_MISMATCH(이 납품라벨은 다른 품목용이다) · LOT_NOT_ALLOCATED(이 출하에 배분되지 않은 LOT 이다). ⭐ 서버가 판정해 내리는 값이고 화면은 이 값으로 «문구»를 가른다 — 동작이 값에 걸리므로 설계가 닫는다(공유계약 G-31). ⛔ 공통코드 그룹이 아니다 — 고객이 늘리지 않는다(A-16 「가」 참). matched 가 참이면 null 이다.",
+             "type": "string",
+             "description": "matched 가 거짓일 때만 싣는 사유 — LABEL_ITEM_MISMATCH(이 납품라벨은 다른 품목용이다) · LOT_NOT_ALLOCATED(이 출하에 배분되지 않은 LOT 이다). matched 가 참이면 키를 생략한다. ⭐ 서버가 판정해 내리는 값이고 화면은 이 값으로 «문구»를 가른다 — 동작이 값에 걸리므로 설계가 닫는다(공유계약 G-31). ⛔ 공통코드 그룹이 아니다 — 고객이 늘리지 않는다(A-16 「가」 참).",
              "example": "LOT_NOT_ALLOCATED",
              "enum": [
               "LABEL_ITEM_MISMATCH",
@@ -378,7 +376,7 @@
      "shipment"
     ],
     "summary": "배분에 포장 단위 연결",
-    "description": "P-04-01 이 포장을 확정할 때 배분과 취급 단위를 잇는다. 취급 단위 자체는 01 자재창고 계약이 소유한다(POST /inventory/handling-units · :pack). 근거: P-04-01 §4-C",
+    "description": "배분 한 건 전체와 취급 단위 하나를 잇는다. 수량을 받지 않으며 한 배분의 부분 포장은 지원하지 않는다",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -449,7 +447,7 @@
       }
      }
     },
-    "x-internal-note": "If-Match 를 쓰지 않는다 — shipment_lot_allocation 에 version_no 가 없다(기록 전용). 같은 배분에 다른 포장이 이미 붙어 있으면 409 다."
+    "x-internal-note": "포장 확정 화면은 P-04-01 §3-2이다. 취급 단위 생성·포장은 01 자재창고 계약 POST /inventory/handling-units·:pack이 소유한다. If-Match를 쓰지 않는다 — shipment_lot_allocation에 version_no가 없다(기록 전용). 같은 배분에 다른 포장이 이미 붙어 있으면 409다."
    }
   },
   "/logistics/stock-reinstatements": {
@@ -458,7 +456,7 @@
      "shipment"
     ],
     "summary": "재고 재등록 확정",
-    "description": "판정이 끝난 반품품을 판매 가능 재고로 되돌린다. 반출·도착·보류 해제·Lot Status 전이를 한 트랜잭션으로 처리한다 — 이 화면의 「재등록 확정」은 한 번의 확정이고 중간 상태를 남기지 않는다(공유계약 B-8 규칙 1 · B-8-1). ⭐ 이 경로에서만 반영 목적의 Hold → 정상 전이가 허용된다 — 「Release 로 할 것인가」를 정하는 것은 W-03-02·W-04-03 이고 이 경로는 그 결정을 재고에 반영할 뿐이다(공유계약 B-13). ⛔ 창고 간 이동의 2단계 스캔(POST /logistics/stock-transfers → :arrive)을 쓰지 않는다 — 재등록은 이동 중 구간이 없는 한 번의 행위라 그 형태가 맞지 않는다. 근거: W-04-11 §0 · §5-3 · §5-6",
+    "description": "판정이 끝난 반품품을 판매 가능 재고로 되돌린다. 입력 수량의 반출·도착과 해당 수량의 보류 해제를 한 트랜잭션으로 처리한다. 모든 열린 보류가 없어질 때만 Lot Status를 정상으로 전이하며, 일부 보류가 남으면 상태와 출하 차단을 유지한다. ⭐ 이 경로에서만 반영 목적의 Hold → 정상 전이가 허용된다 — 「Release 로 할 것인가」를 정하는 것은 W-03-02·W-04-03 이고 이 경로는 그 결정을 재고에 반영할 뿐이다(공유계약 B-13). ⛔ 창고 간 이동의 2단계 스캔(POST /logistics/stock-transfers → :arrive)을 쓰지 않는다 — 재등록은 이동 중 구간이 없는 한 번의 행위라 그 형태가 맞지 않는다. 대상 창고가 WAREHOUSE 관리수준이면 활성 위치가 정확히 하나일 때 그 위치로 해소하고, ZONE·RACK·CELL 관리수준이면 toLocationId가 필요하다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -486,7 +484,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "검증 실패. 수량 지정 보류보다 qty가 크거나 전량 보류의 qty가 불량창고 잔액보다 작으면 qty에 RANGE이며 아무 이동·해제·전이도 일어나지 않는다. WAREHOUSE 관리수준에서 활성 위치를 하나로 정할 수 없으면 toWarehouseId에 RANGE, 보낸 위치가 유일 위치와 다르면 toLocationId에 INVALID다. ZONE·RACK·CELL 관리수준에서 위치를 생략하면 toLocationId에 REQUIRED, 비활성이거나 다른 창고의 위치면 INVALID다. 고쳐야 풀린다",
       "content": {
        "application/json": {
         "schema": {
@@ -516,7 +514,7 @@
       }
      }
     },
-    "x-internal-note": "WorkerNo 계열을 넣지 않는다 — 관리웹 전용이고 서버가 계정 토큰에서 행위자를 푼다(공유계약 D-5 · F-2) — POST /quality/lot-holds/{id}:release 와 같은 형태다. If-Match 헤더를 넣지 않는다 — 컬렉션 POST 라 헤더 토큰의 원천이 될 GET 이 없다(공유계약 B-1-1) — 토큰은 본문 lot.versionNo 로 싣는다(A-4-1). 201 에 ETag 를 두지 않는다 — 만들어진 이동 문서를 이 화면이 다시 고치지 않는다(W-04-11 §5-6 「되돌리기 ⛔ 두지 않는다」)."
+    "x-internal-note": "WorkerNo 계열을 넣지 않는다 — 관리웹 전용이고 서버가 계정 토큰에서 행위자를 푼다(공유계약 D-5 · F-2) — POST /quality/lot-holds/{id}:release 와 같은 형태다. If-Match 헤더를 넣지 않는다 — 컬렉션 POST 라 헤더 토큰의 원천이 될 GET 이 없다(공유계약 B-1-1) — 토큰은 본문 lot.versionNo 로 싣는다(A-4-1). 201 에 ETag 를 두지 않는다 — 만들어진 이동 문서를 이 화면이 다시 고치지 않는다(W-04-11 §5-6 「되돌리기 ⛔ 두지 않는다」). 위치 해소 경계 근거: W-04-11 §4-B·§6, 설계 통보 222, 서버 destination-location.ts."
    }
   },
   "/logistics/shipment-requests": {
@@ -525,7 +523,8 @@
      "shipment"
     ],
     "summary": "출하작업지시 목록",
-    "description": "W-04-02 출하 예정 목록. 기간이 필수다(공유계약 L-3). 근거: W-04-02 §5",
+    "description": "출하작업지시 목록. 기간 시작은 필수다. 각 항목은 전체 lines를 포함하며 요청·배정·출하 수량과 라인 수는 lines에서 계산한다.",
+    "x-internal-note": "W-04-02 §3·§4-A·§5. 행 단위 합계 필드를 신설하지 않는다.",
     "parameters": [
      {
       "name": "customerId",
@@ -741,7 +740,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "검증 실패. 요청·배정 수량이 0 이하이거나 배정 수량이 요청 수량을 넘으면 400 RANGE를 내린다",
       "content": {
        "application/json": {
         "schema": {
@@ -971,7 +970,7 @@
      "shipment"
     ],
     "summary": "제품 LOT 피킹 확정",
-    "description": "현장이 집은 제품 LOT 과 수량을 이 라인에 기록한다. ⭐ 화면이 예약을 직접 쓰지 않는다 — 서버가 이 피킹의 결과로 inventory_reservation 을 걸고 푼다(01 자재창고 계약 · M-01-08 §5-5 와 같은 규약). 자재 피킹의 :pick 과 대칭이다. ⛔ 오프라인 대상이 아니다 — Release 판정값을 캐시할 수 없어 이 화면은 온라인에서만 돈다(공유계약 C-6 · M-04-01 §5-6). 권장 외 LOT 을 집어도 막지 않는다 — 경고 후 통과이고 사유는 남기지 않는다(M-04-01 §5-5). 근거: M-04-01 §5-7",
+    "description": "현장이 집은 제품 LOT 과 수량을 이 라인에 확정 기록한다. 확정 후 되돌림은 현재 지원하지 않으므로 보내기 전 LOT·수량을 재확인한다. 0·음수 피킹은 취소가 아니라 `RANGE` 검증 실패다. ⭐ 화면이 예약을 직접 쓰지 않는다 — 서버가 이 피킹의 결과로 inventory_reservation 을 걸고 푼다(01 자재창고 계약 · M-01-08 §5-5 와 같은 규약). 자재 피킹의 :pick 과 대칭이다. ⛔ 오프라인 대상이 아니다 — Release 판정값을 캐시할 수 없어 이 화면은 온라인에서만 돈다(공유계약 C-6 · M-04-01 §5-6). 권장 외 LOT 을 집어도 막지 않는다 — 경고 후 통과이고 사유는 남기지 않는다(M-04-01 §5-5). 근거: M-04-01 §5-7",
     "parameters": [
      {
       "name": "shipmentRequestId",
@@ -1022,7 +1021,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "검증 실패. pickedQty가 0 이하면 400 RANGE를 내리며 피킹 취소로 처리하지 않는다",
       "content": {
        "application/json": {
         "schema": {
@@ -1052,7 +1051,7 @@
       }
      },
      "409": {
-      "description": "충돌 — LOT 이 Hold 이거나 가용이 모자라거나 배정을 넘는다",
+      "description": "피킹 충돌. code=INVALID_STATE라도 conflictCause=workerLease면 앞의 동일 요청을 처리 중이므로 입력을 보존하고 잠시 뒤 같은 멱등키·본문으로 재전송한다. conflictCause=user면 Hold·가용 부족·배정 초과 중 먼저 판정된 업무 거부다. 자동 재전송하거나 message를 기계 파싱하지 않고, message를 그대로 표시한 뒤 보류·잔액·지시를 재조회한다.",
       "content": {
        "application/json": {
         "schema": {
@@ -1071,7 +1070,7 @@
      "shipment"
     ],
     "summary": "출하 목록",
-    "description": "W-04-02·W-04-04·W-04-12·P-04-01이 함께 쓴다. 목록 조회는 기간 필수(L-3)다. P-04-01의 출하번호 스캔처럼 shipmentNo를 정확 일치로 주는 단건 식별 조회는 기간을 생략할 수 있다.",
+    "description": "W-04-02·W-04-04·W-04-12·P-04-01이 함께 쓴다. 목록 조회는 기간 필수(L-3)다. 기간은 shippedAt을 각 출하 창고 소속 공장의 로컬 날짜로 판정하며 끝 날짜를 포함한다. 요구 계약상 P-04-01의 출하번호 스캔은 shipmentNo 정확 일치로 기간 없이 조회할 수 있어야 한다. 현재 서버는 shipmentNo 조건을 적용하지 않고 shipDateFrom 누락도 400으로 거부하므로, 보완 전에는 기간과 q를 보내 전 페이지에서 응답 shipmentNo가 정확히 같은 행만 선택한다.",
     "parameters": [
      {
       "name": "shipmentNo",
@@ -1080,7 +1079,7 @@
        "type": "string",
        "maxLength": 100
       },
-      "description": "출하 번호 정확 일치. POP 스캔 진입이 사용하며 이 값을 주면 기간을 생략할 수 있다. 일치하지 않으면 200 빈 목록을 반환한다. 부분 검색은 q를 쓴다. 근거: P-04-01 §3-1 · 공유계약 D-2",
+      "description": "요구 계약의 출하 번호 정확 일치 조건. POP 스캔 진입이 사용하며 이 값을 주면 기간을 생략할 수 있어야 한다. 현재 서버는 이 조건을 적용하지 않으므로 보완 전에는 이 파라미터만으로 결과를 선택하지 않는다. 근거: P-04-01 §3-1 · 공유계약 D-2",
       "example": "SH-2026-0813-0031"
      },
      {
@@ -1146,7 +1145,7 @@
        "format": "date",
        "example": "2026-08-13"
       },
-      "description": "목록 조회에서는 필수. shipmentNo 정확 일치 조회에서는 생략 가능"
+      "description": "목록 조회에서는 필수. shippedAt이 각 출하 창고 소속 공장의 로컬 시작 날짜 이상인 행을 찾는다. 요구 계약상 shipmentNo 정확 일치 조회에서는 생략 가능해야 하나 현재 서버는 생략을 400 REQUIRED로 거부한다"
      },
      {
       "name": "shipDateTo",
@@ -1156,7 +1155,7 @@
        "format": "date",
        "example": "2026-08-13"
       },
-      "description": "목록 조회에서는 필수. shipmentNo 정확 일치 조회에서는 생략 가능"
+      "description": "선택. 지정하면 각 출하 창고 소속 공장의 로컬 끝 날짜 다음 날 자정 전까지의 shippedAt을 찾는 반열림 구간이라 끝 날짜의 전 시간을 포함한다. 생략하면 상한을 두지 않는다"
      },
      {
       "name": "q",
@@ -1182,9 +1181,14 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "example": "값"
+       "enum": [
+        "shippedAt",
+        "shipmentNo"
+       ],
+       "default": "shippedAt",
+       "example": "shippedAt"
       },
-      "description": "경과일 긴 순이 기본이다. 근거: W-04-12 §5-7"
+      "description": "shippedAt(기본)·shipmentNo 두 키만 허용한다. 모두 오름차순이며 동률은 shipmentId 오름차순이다. 기본 shippedAt 오름차순은 오래된 출하가 먼저인 경과일 긴 순이다. 그 밖의 값은 400 INVALID다. 근거: W-04-12 §5-7"
      },
      {
       "name": "page",
@@ -1230,6 +1234,16 @@
         }
        }
       }
+     },
+     "400": {
+      "description": "현재 서버는 요구 계약의 shipmentNo 정확 일치 조건을 적용하지 않고 shipDateFrom 누락을 REQUIRED로 거부한다. 허용하지 않은 sort 값은 INVALID이며 기존 질의 형식·범위 검증 오류도 포함한다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
      }
     }
    },
@@ -1238,7 +1252,7 @@
      "shipment"
     ],
     "summary": "출하 처리",
-    "description": "출하·라인·LOT 배분을 한 트랜잭션으로 만든다(공유계약 B-8). ⛔ 확정하지 않는다 — 미확정 출하까지이고 확정은 :confirm 이다(2026-08-07 출하 2단 확정). 긴급 직행이면 expedited 를 참으로 보내고 사유가 필수다(W-04-05). 근거: W-04-04 §5 · W-04-05 §5-5",
+    "description": "출하·라인·LOT 배분을 한 트랜잭션으로 만든다(공유계약 B-8). ⛔ 확정하지 않는다 — 미확정 출하까지이고 확정은 :confirm 이다(2026-08-07 출하 2단 확정). 긴급 직행이면 expedited 를 참으로 보내고 사유가 필수다. 긴급 직행은 위치 입력이 없으므로 WAREHOUSE 관리수준이고 활성 위치가 정확히 하나인 창고만 지원한다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -1266,7 +1280,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "검증 실패. 긴급 직행에서 WAREHOUSE 관리수준의 활성 위치가 0개 또는 2개 이상이면 warehouseId에 RANGE, ZONE·RACK·CELL 관리수준이면 위치 입력칸이 없어 warehouseId에 REQUIRED다. 고쳐야 풀린다",
       "content": {
        "application/json": {
         "schema": {
@@ -1296,7 +1310,7 @@
       }
      }
     },
-    "x-internal-note": "재고 차감(수불 원장 전기)은 출하 생성 시 유지한다. 확정은 MES 상태 확정이며 이번 버전 ERP 송신 적재는 제외한다(2026-09-08 사용자 확정). ShipmentLine.goodsIssueLineId의 nullable은 유지한다. 출고 전표 필수성은 W-04-04 §8-2의 별도 미결이며 ERP 제외 결정으로 확정하지 않는다."
+    "x-internal-note": "재고 차감(수불 원장 전기)은 출하 생성 시 유지한다. 확정은 MES 상태 확정이며 이번 버전 ERP 송신 적재는 제외한다(2026-09-08 사용자 확정). ShipmentLine.goodsIssueLineId의 nullable은 유지한다. 출고 전표 필수성은 W-04-04 §8-2의 별도 미결이며 ERP 제외 결정으로 확정하지 않는다. 위치 해소 경계 근거: W-04-05 §4-D·§6, 설계 통보 221, 서버 destination-location.ts 및 shipment.service.ts."
    }
   },
   "/logistics/shipments/{shipmentId}": {
@@ -1620,7 +1634,7 @@
      "quality"
     ],
     "summary": "처분 판정 대상 목록",
-    "description": "처분 판정을 기다리는 대상 목록 — `W-04-07` 의 진입 목록이다. ⭐ **부적합 유무를 가리지 않고** 낸다: 아직 부적합을 만들지 않은 대상은 nonconformanceId 가 null 이고, 만든 것은 그 건의 상태(NOT_REQUESTED·PENDING_DECISION·DECIDED)를 함께 싣는다 — 화면 목업의 배지 넷이 이 한 목록에서 나온다. ⭐ 원천 둘을 한 목록으로 합쳐 낸다 — 반품 입고(RETURN)와 OQC 불합격(PRODUCT). 화면이 두 질의를 합치지 않는다(공유계약 L-2). ⛔ 화면이 응답을 걸러 「아직 안 만든 것」을 고르지 않는다 — 목록이 페이지 단위라 성립하지 않는다(형제 오퍼레이션 GET /quality/disposition-decisions 의 같은 경고). 그 축은 withoutNonconformanceOnly 가 서버에서 판정한다. 근거: W-04-07 §3·§5-7 · REQ-PR-0025 「판정은 불량창고 입고 후」 · 프로세스 05 S11",
+    "description": "처분 판정을 기다리는 LOT 대상 목록. 반품 입고(RETURN)와 OQC 불합격(PRODUCT)을 한 목록으로 합쳐 낸다. 부적합 등록 이력이 없으면 nonconformanceId가 null이고, 이력이 있으면 가장 최근 부적합의 상태(NOT_REQUESTED·PENDING_DECISION·DECIDED)를 함께 싣는다. 화면이 페이지 응답을 다시 걸러 상태 목록을 만들지 않는다.",
     "parameters": [
      {
       "name": "sourceCode",
@@ -1642,7 +1656,7 @@
        "type": "boolean",
        "default": false
       },
-      "description": "참이면 **아직 부적합을 만들지 않은 대상만** 낸다. ⭐ 같은 대상을 두 번 등록하는 것을 막는 축이다 — 선례 GET /maintenance/inspections?withoutMaintenanceOrder=true(W-05-05 §7 「이미 지시가 있는 트리거는 목록에서 제외한다」). ⛔ 화면이 응답을 걸러 대신하지 않는다(페이지 단위)."
+      "description": "참이면 현재 열린 부적합이 없는 대상만 낸다. 과거 부적합 등록 이력까지 없어야 한다는 뜻은 아니므로, 최근 종결 부적합의 식별자와 상태가 응답에 함께 올 수 있다."
      },
      {
       "name": "warehouseId",
@@ -1676,7 +1690,7 @@
        "type": "string",
        "format": "date"
       },
-      "description": "대상이 불량창고에 들어온 날. ⚠ 기간을 «필수»로 두지 않는다 — 이 목록은 「지금 판정을 기다리는 것」이라 재고성이고, 기간을 강제하면 오래된 미처리 건이 화면에서 사라진다. 양끝 포함(공유계약 L-3 — date 축)."
+      "description": "반품과 OQC 불합격 모두에서 선택된 불량창고·단위 잔액 그룹의 마지막 거래 시각을 날짜로 바꾼 값을 기준으로 거른다. 잔액 그룹은 수량이 가장 큰 것을, 수량이 같으면 warehouseId가 작은 것을 선택한다. 양끝 포함이며 날짜를 알 수 없는 행은 제외하지 않는다. 기간은 선택이다."
      },
      {
       "name": "receivedTo",
@@ -1684,7 +1698,8 @@
       "schema": {
        "type": "string",
        "format": "date"
-      }
+      },
+      "description": "반품과 OQC 불합격 모두에서 선택된 불량창고·단위 잔액 그룹의 마지막 거래 시각을 날짜로 바꾼 값을 기준으로 거른다. 잔액 그룹은 수량이 가장 큰 것을, 수량이 같으면 warehouseId가 작은 것을 선택한다. 양끝 포함이며 날짜를 알 수 없는 행은 제외하지 않는다. 기간은 선택이다."
      },
      {
       "name": "q",
@@ -1738,7 +1753,7 @@
       }
      }
     },
-    "x-internal-note": "신설 2026-09-03(사용자 확정) — `W-04-07` §8-6 차단 미결의 해소다. §5-7 이 진입 목록을 GET /quality/nonconformances 로 매핑해 두었는데 그것은 «이미 만들어진» 부적합만 내므로, 부적합을 만드는 화면이 이 화면 하나로 확정된 뒤(요구서 §3-6) **아직 부적합이 없는 대상은 목록에 뜰 수 없었다** — 자기 자신을 입력으로 요구하는 순환이었다. ⭐ 축을 04 에 세운 이유 — 원천이 01(반품 입고)과 03(OQC 검사 결과)으로 갈려 있어 어느 한쪽 계약에 「부적합 미생성」 축을 달면 그 계약이 quality.nonconformance 를 알아야 한다. nonconformance 는 04 소유이므로(요구서 §1-1) 여기서 합치는 것이 소관에 맞다. ⚠ W-05-05 는 반대로 갔지만(원천별 축 + 화면이 합침) 거기는 원천이 «같은 도메인» 안이었다."
+    "x-internal-note": "신설 2026-09-03(사용자 확정) — `W-04-07` §8-6 차단 미결의 해소다. §5-7 이 진입 목록을 GET /quality/nonconformances 로 매핑해 두었는데 그것은 «이미 만들어진» 부적합만 내므로, 부적합을 만드는 화면이 이 화면 하나로 확정된 뒤(요구서 §3-6) **아직 부적합이 없는 대상은 목록에 뜰 수 없었다** — 자기 자신을 입력으로 요구하는 순환이었다. ⭐ 축을 04 에 세운 이유 — 원천이 01(반품 입고)과 03(OQC 검사 결과)으로 갈려 있어 어느 한쪽 계약에 「부적합 미생성」 축을 달면 그 계약이 quality.nonconformance 를 알아야 한다. nonconformance 는 04 소유이므로(요구서 §1-1) 여기서 합치는 것이 소관에 맞다. ⚠ W-05-05 는 반대로 갔지만(원천별 축 + 화면이 합침) 거기는 원천이 «같은 도메인» 안이었다. #591 · 서버 통보 182·183 정합."
    }
   },
   "/quality/nonconformances": {
@@ -2239,7 +2254,7 @@
      "warehouseId",
      "sourceCode"
     ],
-    "description": "처분 판정 대상 한 건 — «LOT 단위»다. ⭐ 단위가 LOT 인 근거: 부적합 등록이 NonconformanceCreate.lots[](minItems 1)로 LOT 을 받고, W-04-07 §3 목업의 목록 행도 LOT 이다. 상세 머리의 입고번호·입고일·거래처는 «그 LOT 이 들어온 전표»의 정보다.",
+    "description": "처분 판정 대상 한 건 — «LOT 단위»다. 상세 머리의 입고번호·거래 참고일·거래처를 함께 표시한다. 거래 참고일은 입고 전표의 입고일이 아니라 현재 불량창고 잔액의 마지막 거래를 기준으로 한다.",
     "properties": {
      "lotId": {
       "type": "integer",
@@ -2318,7 +2333,7 @@
       ],
       "format": "date",
       "example": "2026-08-04",
-      "description": "불량창고에 들어온 날"
+      "description": "불량창고 거래 참고일. 반품과 OQC 불합격 모두에서 선택된 불량창고·단위 잔액 그룹의 마지막 거래 시각을 날짜로 바꿔 표시한다. 잔액 그룹은 수량이 가장 큰 것을, 수량이 같으면 warehouseId가 작은 것을 선택한다. 기본 목록은 원시 마지막 거래 시각 내림차순이며 그 시각까지 완전히 같으면 lotId 내림차순이다. 응답은 날짜만 노출하므로 같은 날짜 안의 시각 순서는 응답 값만으로 판별할 수 없다. 날짜를 알 수 없는 행을 강제로 마지막에 두지 않는다."
      },
      "partnerName": {
       "type": [
@@ -2344,14 +2359,15 @@
       ],
       "format": "int64",
       "example": 1001,
-      "description": "⭐ **이 대상에 이미 만들어진 부적합.** null 이면 아직 만들지 않았다 — 화면의 「부적합 없음」 상태다"
+      "description": "이 대상의 가장 최근 부적합 식별자. 개시 시각 내림차순, 같은 시각이면 식별자 내림차순으로 한 건을 고른다. null이면 등록 이력이 없어 화면에 미등록으로 표시한다."
      },
      "nonconformanceNo": {
       "type": [
        "string",
        "null"
       ],
-      "example": "NC-2026-0031"
+      "example": "NC-2026-0031",
+      "description": "가장 최근 부적합 번호. nonconformanceId가 null이면 이 값도 null이다."
      },
      "nonconformanceStatusCode": {
       "type": [
@@ -2359,7 +2375,7 @@
        "null"
       ],
       "example": "PENDING_DECISION",
-      "description": "이미 만든 부적합의 진행 상태 — 의뢰 전(NOT_REQUESTED)·판정 대기(PENDING_DECISION)·판정 완료(DECIDED). nonconformanceId 가 null 이면 이 값도 null 이다. 값 = `NOT_REQUESTED`·`PENDING_DECISION`·`DECIDED`. 값 목록은 `GET /mdm/code-values?codeGroupCode=NONCONFORMANCE_STATUS` 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "가장 최근 부적합의 진행 상태 — 의뢰 전(NOT_REQUESTED)·판정 대기(PENDING_DECISION)·판정 완료(DECIDED). nonconformanceId가 null이면 이 값도 null이다. 열린 부적합이 없는 대상에도 최근 종결분의 DECIDED가 올 수 있다. 값 목록은 GET /mdm/code-values?codeGroupCode=NONCONFORMANCE_STATUS로 받는다.",
       "x-code-key": "CD-NONCONFORMANCE-STATUS"
      }
     }
@@ -2707,6 +2723,7 @@
      },
      "lines": {
       "type": "array",
+      "description": "목록과 단건 응답에 항상 포함되는 전체 지시서 라인. 라인 수와 요청 수량은 이 배열에서 확인한다",
       "items": {
        "$ref": "#/components/schemas/SalesOrderLine"
       }
@@ -2722,7 +2739,8 @@
      "customerId",
      "shipToPartnerId",
      "orderDate",
-     "statusCode"
+     "statusCode",
+     "lines"
     ],
     "description": "고객사 출하지시서 수신본. 기존 고객사 엑셀 import·ERP 수신 원천과 식별자 데이터는 보존한다. 이번 버전 출하 ERP 수신·주문 매칭은 제외하며 MES 생성·출하의 선행조건으로 사용하지 않는다(2026-09-08 사용자 확정). 고객사별 파일 형식 미정에 따른 업로드 비활성은 그대로다. 상위지시는 nullable이며 무지시 standalone은 상시 구조다."
    },
@@ -2946,6 +2964,7 @@
      "warehouseId": {
       "type": "integer",
       "format": "int64",
+      "description": "출하 창고. expedited=true이면 WAREHOUSE 관리수준이고 활성 위치가 정확히 하나여야 서버가 그 위치를 도착 위치로 해소한다. 활성 위치가 0개 또는 2개 이상이면 400 RANGE, ZONE·RACK·CELL 관리수준이면 위치 입력칸이 없으므로 400 REQUIRED다. 서버는 첫 위치를 선택하거나 위치를 자동 생성하지 않는다.",
       "example": 1001
      },
      "vehicleNo": {
@@ -2977,7 +2996,7 @@
      "expedited": {
       "type": "boolean",
       "default": false,
-      "description": "When true, bypasses warehouse routing, picking and packing without bypassing quality checks. Returns HTTP 400 if an allocated lot is not released. The server creates a product goods receipt and posts the receipt in the same transaction; the client does not create a separate goods receipt. The receipt type is PRODUCT, and the server determines the source document type. The receipt warehouse is the client-selected warehouseId in this request.",
+      "description": "When true, bypasses warehouse routing, picking and packing without bypassing quality checks. Returns HTTP 400 if an allocated lot is not released. The server creates a product goods receipt and posts the receipt in the same transaction; the client does not create a separate goods receipt. The receipt type is PRODUCT, and the server determines the source document type. The receipt warehouse is the client-selected warehouseId in this request. Because this request has no destination-location field, expedited shipment supports only a WAREHOUSE-managed warehouse with exactly one active location.",
       "example": true,
       "x-internal-note": "근거: W-04-05 §5-1·§5-3·§5-4 및 §8-4, 결정 10, G-32 RECEIPT_TYPE(2026-08-31 확정). 2026-09-07 정합화 — GoodsReceipt.sourceDocumentTypeCode 및 GoodsReceiptCreate.sourceDocumentTypeCode의 enum 목록(INBOUND_RECEIPT·SHIPMENT·PRODUCTION_RESULT·SUBCONTRACT_ISSUE)은 이미 존재한다. InventoryTransaction.sourceDocumentTypeCode는 수불 원장용의 다른 목록이므로 입고 원천 목록과 혼용하지 않는다. 목록 존재와 긴급직행출하의 실제 원천 ID 선택·연결은 별개이며 후자는 W-04-05 §8-4에서 열어 둔다. 서버가 입고를 생성하는 기존 책임을 유지하며 특정 원천 ID의 자동선택 규칙을 확정하지 않는다. «(정합주: 2026-09-07 — 구 description의 「입고 유형은 제품입고(PRODUCT)로 확정됐고 … 원천 문서 유형의 값 목록만 아직 확정 전이다(omf-mes#145)」 및 구 x-internal-note의 「receiptTypeCode·sourceDocumentTypeCode 의 값 목록 미확정 — 추적 omf-mes#145·#213. 서버가 정하므로 이 화면은 막히지 않는다」는 당시 대기 기록으로 보존한다. 현재 목록 부재 전제만 철회하며 #145·#213 전체 종료를 뜻하지 않는다)»"
      },
@@ -3197,19 +3216,20 @@
        "REJECTED",
        "HELD"
       ],
-      "description": "이 배분의 출하검사 상태. NOT_REQUIRED=검사 절차 없음 · PENDING=결과 대기 · PASSED=합격 · REJECTED=불합격 · HELD=보류. 03 품질 결과를 서버가 배분 단위로 판정한다. 화면은 이 값을 그대로 표시하고 자체 조합하지 않는다(P-04-01 §5-1).",
+      "description": "목표 계약 필드이며 현재 서버의 배분 조회 응답에는 아직 제공되지 않는다. 공급되면 이 배분이 매달린 출하작업지시 라인의 출하검사 상태를 나타낸다. 그 라인이 피킹한 LOT 집합을 후보로 삼는다. LOT 대상 OQC는 lotId가 있으면 이를, 없으면 targetId를 그 집합과 대조한다. 출하작업지시 대상 OQC는 targetId가 같은 지시이고 lotId가 있으면 해당 LOT 라인에만, 없으면 같은 지시의 모든 검사 대상 라인에 적용한다. CONFIRMED 결과 중 의뢰별 최신 회차만 세고, 매칭 결과가 0건일 때만 PENDING이다. 결과가 있으면 REJECTED > HELD > PASSED 순으로 판정하며 피킹 LOT마다 결과 하나를 요구하지 않는다. NOT_REQUIRED=검사 절차 없음 · PENDING=결과 대기 · PASSED=합격 · REJECTED=불합격 · HELD=보류. 공급 전 화면은 oqcPassed만으로 세부 상태를 추정하지 않는다.",
       "example": "NOT_REQUIRED",
-      "x-code-key": "CD-SHIPPING-INSPECTION-STATUS"
+      "x-code-key": "CD-SHIPPING-INSPECTION-STATUS",
+      "x-internal-note": "목표 계약 필드는 유지한다. 현재 서버 shipment-allocation-view는 oqcPassed만 반환하고 이 필드는 매핑하지 않아 P-04-01 세부 상태 표시가 미지원이다. omf-mes#599 잔여."
      },
      "oqcPassed": {
       "type": "boolean",
-      "description": "⭐ 서버가 판정한 납품 라벨 발행 게이트. shippingInspectionStatusCode 가 PASSED 또는 NOT_REQUIRED 이면 true, 나머지는 false 다. 검사 결과는 03 품질 계약이 소유한다. ⛔ 화면이 상태 문자열로 다시 계산하지 않는다 — 이 값을 활성 조건으로 쓴다(P-04-01 §5-1).",
+      "description": "서버가 판정한 납품 라벨 발행 게이트. 목표 shippingInspectionStatusCode와 동일한 라인·피킹 LOT 후보 집합·LOT/출하작업지시 대상 OQC·의뢰별 최신 확정 회차 기준을 쓴다. 매칭 결과가 0건이면 false이고, 결과가 있으면 불합격·보류 없이 합격일 때 true다. 피킹 LOT마다 결과 하나를 요구하지 않는다. 검사 비대상도 true지만 이는 라벨 발행을 허용한다는 뜻이지 검사 합격을 뜻하지 않는다. 현재 배분 응답에서는 이 값만 지원하므로 화면은 true를 PASSED 또는 NOT_REQUIRED 중 하나로 추정하지 않고 활성 조건으로만 쓴다.",
       "example": true
      },
      "packedQty": {
       "type": "number",
       "format": "double",
-      "description": "이미 포장에 담긴 수량. 배분 잔여 = allocatedQty − packedQty 를 서버가 파생한다(L-2) ⛔ 없으면 화면이 잔여를 계산할 수 없다 — 항상 내린다(P-04-01 §5-6).",
+      "description": "포장 연결 상태를 수량으로 표시한다. handlingUnitId가 비어 있으면 0, 채워져 있으면 allocatedQty와 같다. 중간 수량은 지원하지 않는다",
       "example": 120.0
      }
     },
@@ -3275,7 +3295,8 @@
     "required": [
      "handlingUnitId"
     ],
-    "description": "포장 연결. P-04-01 이 포장을 확정할 때 배분에 포장 단위를 잇는다"
+    "description": "포장 연결. 배분 한 건 전체를 포장 단위 하나에 잇는다. 수량을 받지 않으므로 부분 포장은 표현하지 않는다",
+    "x-internal-note": "근거: P-04-01 §3-2 · omf-mes#598"
    },
    "ShipmentRequest": {
     "type": "object",
@@ -3337,7 +3358,7 @@
        "REJECTED",
        "HELD"
       ],
-      "description": "⭐ W-04-02 「검사」 열의 판정 근거 — 라인 전체(shippingInspectionRequired + 03 품질 inspection-results)를 서버가 롤업해 하나로 낸다. NOT_REQUIRED=대상 라인 없음(「—」) · PENDING=대상인데 결과 없음(「● 대기」) · PASSED=전 대상 라인 합격(「✅ 합격」) · REJECTED=불합격 라인 존재(「⛔ 불합격」) · HELD=보류 라인 존재, 불합격 없음(「⚠ 보류」). ⭐ 롤업 우선순위(가장 나쁜 것이 이긴다): REJECTED > HELD > PENDING > PASSED > NOT_REQUIRED. ⛔ 화면이 라인을 순회해 판정하지 않는다(공유계약 G-8과 같은 결 — W-04-02 §5-3) — 03 계약과의 조인은 서버 몫이다. ⚠ 이 필드를 이미 소비 중인 코드는 PASSED 외 값을 몰라도 PENDING과 동일하게(대기 취급) 두면 당장은 안전하다. 근거: W-04-02 §5-3·§5-4 · omf-mes#232 · omf-mes#235",
+      "description": "출하작업지시 라인 전체의 검사 상태를 서버가 롤업한 값. 각 검사 대상 라인이 피킹한 LOT 전건에 대해 LOT 대상 OQC와 이 출하작업지시 대상 OQC를 함께 판정한다. 지시 대상 의뢰의 lotId가 있으면 그 LOT을 피킹한 라인에만, 없으면 같은 지시의 모든 검사 대상 라인에 적용한다. DRAFT는 제외하고 CONFIRMED 결과 중 의뢰별 최대 회차만 센다. NOT_REQUIRED=대상 라인 없음(「—」) · PENDING=대상인데 최신 확정 결과 없음(「● 대기」) · PASSED=전 대상 라인 합격(「✅ 합격」) · REJECTED=불합격 라인 존재(「⛔ 불합격」) · HELD=보류 라인 존재, 불합격 없음(「⚠ 보류」). 롤업 우선순위는 REJECTED > HELD > PENDING > PASSED > NOT_REQUIRED다. 화면은 라인을 순회해 다시 판정하지 않는다.",
       "example": "PENDING",
       "x-code-key": "CD-SHIPPING-INSPECTION-STATUS"
      },
@@ -3351,12 +3372,14 @@
        "PARTIALLY_SHIPPED",
        "SHIPPED"
       ],
-      "description": "⭐ W-04-02 「진행」 열의 판정 근거 — 출하작업지시 «한 건»의 진행이다. 라인 전체의 요청·배정·피킹·출하 4수량을 서버가 롤업해 하나로 낸다. ⛔ 서버가 계산한다 — 화면이 다시 계산하지 않는다(공유계약 L-2 · L-2-1 ⑴). ⛔ 저장하지 않는다 — A-17 의 두 질문이 둘 다 「아니오」다(달력이 값을 바꾸지 않고, 과거 값을 얼릴 이유도 없다). NOT_ALLOCATED=배정 합 0 · PARTIALLY_ALLOCATED=0 보다 크고 요청 합보다 작은 배정 합 · PICKING=배정 합이 요청 합과 같고 피킹 합이 배정 합보다 작다 · PICKED=피킹 합이 배정 합과 같고 출하 합 0 · PARTIALLY_SHIPPED=출하 합이 0 보다 크고 배정 합보다 작다 · SHIPPED=출하 합이 배정 합과 같다. ⭐ 판정 순서는 뒤가 이긴다 — NOT_ALLOCATED, PARTIALLY_ALLOCATED, PICKING, PICKED, PARTIALLY_SHIPPED, SHIPPED. ⚠ statusCode 와 축이 다르다 — 그 칸은 「칸 불필요」로 닫혔고(x-no-code-key) 값이 없다. ⚠ shippingInspectionStatusCode 와도 축이 다르다 — 「검사 대기」는 이 축의 값이 아니라 그 축의 PENDING 이다. 한 칸에 두 축을 담으면 어느 쪽도 못 읽는다. ⛔ 화면이 라인을 순회해 판정하지 않는다 — W-04-01·W-04-02·W-04-04 가 각자 접으면 같은 건을 다르게 부른다(W-04-02 §9-1). 근거: W-04-02 §3·§4-A·§5-3 · W-04-04 §3·§5-4 · omf-mes#402",
+      "description": "출하작업지시 한 건의 진행. 서버가 라인 전체의 요청·배정·피킹·출하 수량을 합산해 계산하며 저장하지 않는다. 배정 합이 0이면 다른 조건보다 먼저 NOT_ALLOCATED를 낸다. 배정 합이 0보다 큰 경우 PARTIALLY_ALLOCATED=배정 합이 요청 합보다 작음 · PICKING=배정 합이 요청 합과 같고 피킹 합이 배정 합보다 작음 · PICKED=피킹 합이 배정 합과 같고 출하 합이 0임 · PARTIALLY_SHIPPED=출하 합이 0보다 크고 배정 합보다 작음 · SHIPPED=출하 합이 배정 합과 같음이다. 이 다섯 조건이 겹치면 뒤의 조건이 이긴다. statusCode 및 shippingInspectionStatusCode와는 다른 축이며 검사 대기는 shippingInspectionStatusCode의 PENDING이다.",
+      "x-internal-note": "화면이 재계산하지 않는 근거: 공유계약 L-2·L-2-1 ⑴. 저장하지 않는 판정: A-17. 소비 화면: W-04-01·W-04-02·W-04-04. 근거: W-04-02 §3·§4-A·§5-3·§9-1 · W-04-04 §3·§5-4 · omf-mes#402·#567",
       "example": "PICKING",
       "x-code-key": "CD-SHIPMENT-PROGRESS"
      },
      "lines": {
       "type": "array",
+      "description": "목록과 단건 응답에 항상 포함되는 전체 작업지시 라인. 요청·배정·출하 수량 합계와 라인 수는 이 배열에서 계산한다",
       "items": {
        "$ref": "#/components/schemas/ShipmentRequestLine"
       }
@@ -3374,7 +3397,8 @@
      "requestedShipDate",
      "statusCode",
      "shippingInspectionStatusCode",
-     "shipmentProgressCode"
+     "shipmentProgressCode",
+     "lines"
     ],
     "description": "MES 출하작업지시. W-04-01 「편성」·「단독 생성」이 만든다"
    },
@@ -3486,7 +3510,7 @@
      "requestedShipDate",
      "lines"
     ],
-    "description": "편성. 라인 1건 이상이고 배정 수량이 1 이상이어야 한다(W-04-01 §5-7). ⛔ 편성 취소를 두지 않는다 — 출하작업지시 취소는 범위 밖이다"
+    "description": "편성. 라인은 1건 이상이고 각 라인의 요청·배정 수량은 0보다 커야 한다. 배정 수량은 요청 수량을 넘을 수 없다(W-04-01 §5-1·§5-7). ⛔ 편성 취소를 두지 않는다 — 출하작업지시 취소는 범위 밖이다"
    },
    "ShipmentRequestLine": {
     "type": "object",
@@ -3536,8 +3560,8 @@
      "pickedQty": {
       "type": "number",
       "example": 120,
-      "x-source-column": "picked_qty",
-      "description": "누적 피킹 수량. ⭐ 서버가 유지한다 — 화면이 더하지 않는다(공유계약 L-2). 배정 잔여 = allocatedQty − pickedQty"
+      "description": "누적 피킹 수량. 이 출하요청 라인을 원천으로 한 예약의 Σ(reservedQty − releasedQty)를 서버가 계산한다. consumedQty는 빼지 않으므로 출하로 소진된 수량도 피킹 실적으로 유지된다. 미확정 출하 취소로 releasedQty가 늘면 이 값과 출하 진행 코드가 다시 계산된다. 화면이 더하지 않는다(공유계약 L-2). 배정 잔여 = allocatedQty − pickedQty",
+      "x-internal-note": "저장 컬럼이 아니라 inventory.inventory_reservation 롤업이다. sourceDocumentTypeCode=SHIPMENT_REQUEST_LINE이고 sourceDocumentId=shipmentRequestLineId인 행을 합산한다(omf-mes#595·통보192/208/212·서버 shipment-request-view.ts)."
      },
      "shippedQty": {
       "type": "number",
@@ -3610,11 +3634,17 @@
      "requestedQty": {
       "type": "number",
       "format": "double",
+      "exclusiveMinimum": 0,
+      "description": "요청 수량. 0보다 커야 하며 양의 소수를 허용한다",
+      "x-internal-note": "근거: W-04-01 §4-C·§5-7 · omf-mes#601",
       "example": 120.0
      },
      "allocatedQty": {
       "type": "number",
       "format": "double",
+      "exclusiveMinimum": 0,
+      "description": "배정 수량. 0보다 커야 하고 요청 수량을 넘을 수 없으며, 양의 소수를 허용한다",
+      "x-internal-note": "근거: W-04-01 §4-C·§5-7 · omf-mes#601",
       "example": 120.0
      },
      "uomId": {
@@ -3661,7 +3691,7 @@
        "ALREADY_CONFIRMED",
        "CANCEL_IN_PROGRESS"
       ],
-      "description": "ALREADY_CONFIRMED 는 이미 확정된 출하라는 뜻이다 — 확정 취소 경로가 없으므로 되돌릴 수 없다(W-04-12 §5-3). CANCEL_IN_PROGRESS 는 취소 결재가 진행 중이라 확정할 수 없다는 뜻이다(J-7). 근거: W-04-12 §5-8",
+      "description": "ALREADY_CONFIRMED는 이미 확정된 출하, CANCEL_IN_PROGRESS는 취소 결재 진행 중이다. DUPLICATE_KEY는 같은 멱등키를 다른 요청에 재사용한 경우다. INVALID_STATE는 업무 상태 거부뿐 아니라 멱등 처리 중에도 쓰므로 code만으로 재시도 여부를 정하지 않고 conflictCause를 함께 본다.",
       "example": "VERSION_CONFLICT"
      },
      "message": {
@@ -3680,7 +3710,7 @@
        "erpSync",
        "workerLease"
       ],
-      "description": "충돌 원인. 근거: 공유계약 B-1 확장 — user=다른 사용자, erpSync=ERP 재동기화 배치, workerLease=워커가 처리 중. 구분 없이 내려주면 화면이 「다른 사용자가 먼저 수정했습니다」라는 사실과 다른 안내를 하게 된다 — code=VERSION_CONFLICT 일 때 함께 내린다",
+      "description": "충돌 원인. workerLease는 같은 요청 처리 중이므로 잠시 뒤 원래 멱등키·본문으로 재전송한다. user는 사용자 입력·업무 상태·같은 키의 다른 본문 충돌이므로 자동 재전송하지 않고 입력을 보존해 관련 자원을 재조회한다. erpSync도 재조회가 필요하다. INVALID_STATE는 workerLease와 user 양쪽에서 올 수 있어 code만으로 분기하지 않는다.",
       "example": "user"
      }
     },
@@ -3707,6 +3737,7 @@
      },
      "pickedQty": {
       "type": "number",
+      "exclusiveMinimum": 0,
       "example": 180,
       "description": "이번에 집은 수량. 0 보다 커야 한다"
      },
@@ -3759,7 +3790,8 @@
      "dispositionDecisionId": {
       "type": "integer",
       "format": "int64",
-      "description": "진입 목록에서 고른 처분 결정. 서버가 이 값으로 followUpPending 을 내린다 — 처리한 건이 목록에 남아 같은 LOT 을 두 번 재등록하는 것을 막는다. 근거: GET /quality/disposition-decisions 의 followUpPending",
+      "description": "진입 목록에서 고른 처분 결정. 요구 계약상 누적 재등록 수량이 결정 수량보다 작으면 followUpPending=true이고, 결정 수량에 닿으면 false가 되어 완료 목록에서 빠져야 한다. 현재 서버 조회는 정상 처분의 재등록 누적을 연결하지 않아 이 동작을 보장하지 않는다.",
+      "x-internal-note": "현재 조회 구현은 NORMAL 결정의 재등록 누적을 followUpPending에 연결하지 않는다(통보 222 ⓓ). 계약 결정을 바꾸지 않고 구현 결손으로 구분한다.",
       "example": 1001
      },
      "lot": {
@@ -3800,14 +3832,14 @@
        "null"
       ],
       "format": "int64",
-      "description": "창고가 위치를 관리하면 필수 — 서버가 판정한다. 근거: W-04-11 §4-B",
+      "description": "대상 창고가 WAREHOUSE 관리수준이면 생략한다. 활성 위치가 정확히 하나일 때 서버가 그 위치로 해소하며, 값을 보냈다면 그 유일 위치와 같아야 한다. ZONE·RACK·CELL 관리수준이면 필수이고 대상 창고 소속의 활성 위치여야 한다.",
       "example": 1001
      },
      "qty": {
       "type": "number",
       "format": "double",
       "exclusiveMinimum": 0,
-      "description": "현재 보유 이하. 부분 재등록을 허용한다. 근거: W-04-11 §6",
+      "description": "현재 불량창고 보유 이하. 수량 지정 보류는 보류 수량보다 작을 때 부분 재등록하여 잔량 보류를 유지하고, 같을 때 선택 보류를 전량 해제한다. 보류 수량보다 크면 400 RANGE다. 전량 보류는 불량창고 잔액보다 적게 부분 재등록할 수 없으며 400 RANGE로 원자 거부한다.",
       "example": 200.0
      },
      "uomId": {
@@ -3925,7 +3957,7 @@
        "null"
       ],
       "format": "double",
-      "description": "부분 재등록 후 불량창고에 남은 수량. 근거: W-04-11 §6",
+      "description": "처리 후 열린 보류를 lotHoldId 내림차순으로 조회한 첫 한 건의 보류 수량이며 열린 보류의 합계가 아니다. 숫자면 그 한 건의 잔여 보류 수량이다. null은 조회한 보류가 없거나 그 한 건이 전량 보류여서 수량이 정해지지 않았다는 뜻이므로, 보류가 모두 해제됐다는 뜻으로 사용하지 않는다. LOT 정상화 여부는 lotStatusCode로 판정한다.",
       "example": 80.0
      }
     },
@@ -3938,7 +3970,8 @@
      "reinstatedQty",
      "uomId",
      "toWarehouseId",
-     "occurredAt"
+     "occurredAt",
+     "remainingHeldQty"
     ]
    },
    "StockReinstatementConflictResponse": {
@@ -3954,7 +3987,7 @@
        "HOLD_ALREADY_RELEASED",
        "DISPOSITION_NOT_REINSTATABLE"
       ],
-      "description": "ALREADY_REINSTATED 는 이 처분 결정이 이미 재등록됐다는 뜻이다 — followUpPending 이 이미 내려갔다. HOLD_ALREADY_RELEASED 는 다른 경로에서 보류가 먼저 풀렸다는 뜻이다(판정 화면 W-03-02 가 그럴 수 있다). DISPOSITION_NOT_REINSTATABLE 은 처분이 폐기이거나 아직 판정 대기라는 뜻이다. 근거: W-04-11 §5-2 · §6",
+      "description": "ALREADY_REINSTATED는 이 처분 결정의 누적 재등록 수량이 결정 수량에 이미 닿았다는 뜻이며 한 번의 부분 재등록만으로 발생하지 않는다. 요구 계약상 완료 결정은 followUpPending=false가 되어 목록에서 빠져야 하지만 현재 서버 조회는 정상 처분의 재등록 누적을 연결하지 않아 이를 보장하지 않는다. HOLD_ALREADY_RELEASED는 다른 경로에서 보류가 먼저 풀렸다는 뜻이다. DISPOSITION_NOT_REINSTATABLE은 정상 처분이 아닌 결정이라는 뜻이다.",
       "example": "VERSION_CONFLICT"
      },
      "message": {
@@ -3965,13 +3998,24 @@
       "type": "string",
       "description": "VERSION_CONFLICT 일 때 서버의 현재 version_no",
       "example": "값"
+     },
+     "conflictCause": {
+      "type": "string",
+      "enum": [
+       "user",
+       "erpSync",
+       "workerLease"
+      ],
+      "description": "충돌을 일으킨 주체. 재등록 업무 충돌과 버전 충돌은 user이며, 공통 충돌 봉투와 같은 값 축이다.",
+      "example": "user"
      }
     },
     "required": [
      "code",
-     "message"
+     "message",
+     "conflictCause"
     ],
-    "x-internal-note": "ShipmentConflictResponse 의 enum 을 넓히지 않고 따로 만들었다 — 그 스키마는 W-04-12 출하 확정·취소가 쓰는데, 응답 enum 이 넓어지면 그 화면이 모르는 값을 받는다."
+    "x-internal-note": "ShipmentConflictResponse 의 enum 을 넓히지 않고 따로 만들었다 — 그 스키마는 W-04-12 출하 확정·취소가 쓰는데, 응답 enum 이 넓어지면 그 화면이 모르는 값을 받는다. conflictCause는 서버 공용 ConflictException이 모든 409에 항상 싣는 필드다(통보 221·222, stock-reinstatement.controller.ts)."
    }
   }
  }

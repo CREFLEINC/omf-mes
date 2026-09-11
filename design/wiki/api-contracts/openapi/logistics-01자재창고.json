@@ -51,7 +51,7 @@
        "type": "string"
       },
       "x-code-key": "CD-LOGISTICS-DOCUMENT-STATUS",
-      "description": "전표 상태로 거른다 — 등록(REGISTERED) · 전기완료(POSTED) · 취소요청(CANCEL_REQUESTED) · 취소완료(CANCELLED). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOGISTICS_DOCUMENT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다."
+      "description": "재고 조정 상태로 거른다. 현행 조정 경로가 만드는 값은 등록(REGISTERED)·전기완료(POSTED)다. 조정 취소 API는 없으며 이 값은 시스템 소유다. 표시명은 GET /mdm/code-values?codeGroupCode=LOGISTICS_DOCUMENT_STATUS로 받는다."
      },
      {
       "name": "reasonCode",
@@ -130,7 +130,7 @@
      "inventory"
     ],
     "summary": "재고 조정 등록",
-    "description": "실사에서 불러오거나 직접 입력한다. 근거: W-01-12 §5-6",
+    "description": "실사에서 불러오거나 직접 입력한다. 모든 라인은 위치에서 해소한 공장이 같아야 한다. 위치·품목·LOT 및 조직 축에 맞는 잔액 행이 정확히 1건이어야 하며, 0건이면 증가는 INVALID·감소는 NEGATIVE_BALANCE, 여러 재고 차원이면 INVALID다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -190,7 +190,7 @@
       }
      }
     },
-    "x-internal-note": "inventory_adjustment_line 은 물리 모델에 아직 없다 — #88 회신으로 신설이 확정됐고 계약이 먼저 정의했다. 조정 대상으로 요구서에 올린다."
+    "x-internal-note": "화면 근거 W-01-12 §5-6. 등록 입력의 오류 필드는 lines[i].locationId다. inventory_adjustment_line은 #88 이후 실재한다."
    }
   },
   "/inventory/adjustments/{inventoryAdjustmentId}": {
@@ -280,7 +280,7 @@
      "inventory"
     ],
     "summary": "조정 라인 치환",
-    "description": "전기된 조정은 바꿀 수 없다. 근거: 공유계약 A-5 · G-1 ⭐ 이 경로의 조회는 ETag 를 내리지 않는다 — If-Match 에 담을 토큰은 부모 자원 GET /inventory/adjustments/{inventoryAdjustmentId} 200 의 ETag 다. 잠그는 단위가 부모이기 때문이다. 근거: 공유계약 B-1-1",
+    "description": "전기된 조정은 바꿀 수 없다. 모든 라인은 위치에서 해소한 공장이 같아야 한다. 위치·품목·LOT 및 조직 축에 맞는 잔액 행이 정확히 1건이어야 하며, 0건이면 증가는 INVALID·감소는 NEGATIVE_BALANCE, 여러 재고 차원이면 INVALID다. 이 경로의 조회는 ETag를 내리지 않으며 If-Match에는 부모 자원 GET /inventory/adjustments/{inventoryAdjustmentId}의 ETag를 담는다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -361,7 +361,7 @@
       }
      }
     },
-    "x-internal-note": "inventory_adjustment_line 은 물리 모델에 아직 없다 — #88 회신으로 신설이 확정됐고 계약이 먼저 정의했다. 조정 대상으로 요구서에 올린다."
+    "x-internal-note": "화면 근거 W-01-12 §5-6, 공유계약 A-5·B-1-1·G-1. 치환 입력의 오류 필드는 items[i].locationId다."
    }
   },
   "/inventory/adjustments/{inventoryAdjustmentId}:post": {
@@ -381,7 +381,8 @@
      "inventory"
     ],
     "summary": "재고 조정 전기",
-    "description": "재고가 움직이는 순간이다. 승인이 필요한데 끝나지 않았으면 400 이다. 근거: W-01-12 §5-6",
+    "description": "재고가 움직이는 순간이다. 승인이 필요한데 끝나지 않았으면 400이다. 저장된 라인의 단일 공장과 정확히 한 잔액 차원을 다시 확인하며, 전기 시 잔액 행이 없으면 조정 부호와 무관하게 NEGATIVE_BALANCE다. 현재 잔액·예약·피킹·보류 및 음수 재고 허용 규칙도 적용한다. 전기 후 취소 API는 없으며 정정은 같은 차원에 반대 부호의 새 조정을 전기한다. 새 조정도 이 검사를 다시 통과해야 하므로 원복 성공을 보장하지 않고 두 조정과 두 수불 기록을 모두 보존한다.",
+    "x-internal-note": "화면 근거 W-01-12 §5-6·§5-7. 반대 조정은 취소 상태 전이가 아니다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -855,7 +856,7 @@
      "inventory"
     ],
     "summary": "실사 개시",
-    "description": "라인은 서버가 장부에서 만든다. 위치·품목·LOT·단위별 잔액 합계를 개시 시점 장부수량으로 보존하며 합계 0인 묶음은 제외한다. 음수 합계는 실제값으로 포함한다. 음수 잔액만을 이유로 창고 전체 개시를 거부하거나 해당 묶음을 제외하거나 0으로 저장하지 않는다. 품질·재고상태·소유·파트너·취급단위 축은 합산한다. 네 축 안정 정렬로 lineNo를 1부터 부여한다. 실사 번호는 INVENTORY_COUNT의 기본 접두어 IC, 창고의 공장 범위, plannedDate 기간키로 채번한다. 생성 상태는 IN_PROGRESS이며 PLANNED는 과거·외부 적재 행 조회용으로 유지한다.",
+    "description": "라인은 서버가 장부에서 만든다. 위치·품목·LOT·단위별 잔액 합계를 개시 시점 장부수량으로 잡고 합계 0인 묶음은 제외한다. 업무 요구는 음수 실제값 보존이지만 현재 서버는 음수 합계가 하나라도 있으면 400 INVALID(field=warehouseId)로 창고 전체 개시를 원자 거부한다. 음수 묶음만 제외하거나 0으로 저장하지 않으며 실사 헤더·라인·멱등 완료 기록과 점유·동결은 생기지 않는다. 채번은 트랜잭션 전에 이루어져 번호 공백은 생길 수 있다. 품질·재고상태·소유·파트너·취급단위 축은 합산한다. 네 축 안정 정렬로 lineNo를 1부터 부여한다. 실사 번호는 INVENTORY_COUNT의 기본 접두어 IC, 창고의 공장 범위, plannedDate 기간키로 채번한다. 생성 상태는 IN_PROGRESS이며 PLANNED는 과거·외부 적재 행 조회용으로 유지한다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -892,7 +893,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "검증 실패. 음수 장부 합계가 하나라도 있으면 INVALID(field=warehouseId)로 전체 개시를 거부하며 헤더·라인·멱등 완료 기록을 남기거나 음수 묶음을 제외·0 보정하지 않는다. 그 밖의 기존 입력 검증을 유지한다.",
       "content": {
        "application/json": {
         "schema": {
@@ -912,7 +913,7 @@
       }
      }
     },
-    "x-internal-note": "근거: W-01-04 §5-4 및 omf-mes#513 질의276. 음수 보존의 물리 저장 방식은 개발팀 소관이며 설계 반영이 마이그레이션 완료를 뜻하지 않는다."
+    "x-internal-note": "근거: W-01-04 §5-4, omf-mes#513·#561 및 통보276 최종 결정. createWithin은 snapshot의 첫 음수를 찾고 inventory_count.create 전에 예외를 내며 idempotency.run 트랜잭션이 완료 기록까지 롤백한다. NumberingService는 트랜잭션 전에 호출한다."
    }
   },
   "/inventory/counts/{inventoryCountId}": {
@@ -1055,7 +1056,7 @@
      "inventory"
     ],
     "summary": "한 위치의 실사 라인 치환",
-    "description": "해당 위치의 계수 라인 전체를 치환한다. 본문에서 빠진 기존 라인은 삭제하지 않고 counted=false, countedQty=0, 사유·행위자=null로 되돌린다. 기존 systemQty와 lineNo는 보존하고 다른 위치는 변경하지 않는다. 같은 위치·품목·LOT·단위 중복은 400이다. PLANNED의 첫 정상 치환은 IN_PROGRESS로 전이하고 COMPLETED는 400 STATE_LOCKED다. 기존 장부는 개시 스냅샷이다. id 없는 현장 신규 라인만 등록 시점의 같은 네 축 실제 잔액 합계를 고정하며 없으면 0이고 음수도 보존한다. 차이 사유는 활성값이어야 하되 블라인드 미실사 최초 제출의 생략 예외를 적용한다. 사후 보완 대기 중인 기존 블라인드 라인을 수량·계수시각 변경 없이 재동봉할 때에는 미입력 사유를 유지할 수 있다.",
+    "description": "해당 위치의 계수 라인 전체를 치환한다. 본문에서 빠진 기존 라인은 삭제하지 않고 counted=false, countedQty=0, 사유·행위자=null로 되돌린다. 기존 systemQty와 lineNo는 보존하고 다른 위치는 변경하지 않는다. 같은 위치·품목·LOT·단위 중복은 400이다. PLANNED의 첫 정상 치환은 IN_PROGRESS로 전이하고 COMPLETED는 400 STATE_LOCKED다. 기존 장부는 개시 스냅샷이며 저장된 음수도 조회·데이터에서 0으로 보정하지 않는다. 그러나 현재 서버는 음수 systemQty인 기존 라인을 본문에 제출하거나 id 없는 신규 라인의 등록 시점 네 축 합계가 음수이면 lines.{i}.inventoryCountLineId INVALID로 위치 치환 전체를 400 거부한다. 기존 음수 라인을 본문에서 생략하면 삭제하지 않고 미실사로 초기화하므로 음수 장부 스냅샷은 보존된다. 즉 음수 조회·보존은 지원하지만 음수 라인의 계수 저장은 아직 지원하지 않는다. 신규 라인의 일치 잔액이 없을 때만 systemQty는 0이다. 차이 사유는 활성값이어야 하되 블라인드 미실사 최초 제출의 생략 예외를 적용한다. 사후 보완 대기 중인 기존 블라인드 라인을 수량·계수시각 변경 없이 재동봉할 때에는 미입력 사유를 유지할 수 있다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -1445,7 +1446,7 @@
      "inventory"
     ],
     "summary": "포장 단위 취소",
-    "description": "확정 전에만 지운다 — 내용물이 0일 때만 허용한다. 내용물이 있으면 409, 이미 확정된 포장 단위면 409 다. 근거: P-04-01 §5-6",
+    "description": "미래 포장 단위 취소 계약이다. 현재 서버에는 구현되지 않아 클라이언트가 호출하면 안 된다. 구현할 때는 미확정이고 현재 내용물이 0이며 재포장 이력도 0인 단위만 허용한다. 현재 내용물 0은 과거 이력 0을 뜻하지 않는다. 조건이 하나라도 어긋나면 409로 거부하고 재포장 이력을 삭제하지 않는다. 204는 응답 본문이 없다는 뜻이며 물리 삭제나 논리 삭제 방식을 강제하지 않는다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -1459,7 +1460,7 @@
     ],
     "responses": {
      "204": {
-      "description": "삭제됨"
+      "description": "향후 취소 구현에서 처리됨 — 응답 본문 없음"
      },
      "403": {
       "description": "권한 없음",
@@ -1482,7 +1483,7 @@
       }
      },
      "409": {
-      "description": "내용물이 있거나 이미 확정됐다. 저장 충돌이면 다시 읽어 오면 풀린다",
+      "description": "향후 구현에서 이미 확정됐거나 현재 내용물이 있거나 재포장 이력이 있으면 거부한다. 낙관적 잠금 충돌도 포함하며 입력을 보존하고 상세·내용물·재포장 이력을 다시 조회한다.",
       "content": {
        "application/json": {
         "schema": {
@@ -1492,7 +1493,7 @@
       }
      }
     },
-    "x-internal-note": "공유계약 B-8-1③(부분 성공 되찾을 경로 신설) — 담기 시작에 취급 단위를 만들되(POST /inventory/handling-units) 확정 전 그만두면 이 경로로 거둔다. ⛔ PUT …/contents 를 재사용하지 않는다 — 그 경로는 수량 합 보존 제약이 걸려 해체가 아니다(P-02-08 §6). 오프라인 표기는 붙이지 않는다 — 이 조작이 온라인 전용이라 볼 근거가 없어 사람 게이트에서 보류했다(2026-09-06 요청 p-02-08-오프라인-큐잉-성립조건). 확정 후 해체 경로는 여전히 없다(별건 미결). ⚠ 2026-09-09 — P-02-08 은 호출이 하나가 되어 이 경로를 부르지 않는다(그 화면 §5-7). 신설 근거였던 B-8-1③ 은 P-04-01 에서 계속 유효하다."
+    "x-internal-note": "통보 211·omf-mes#562: 서버 라우트·서비스 미구현. 향후 정책은 재포장 이력 0까지 요구하며 이력 cascade 삭제와 새 상태 코드는 채택하지 않았다. 공유계약 B-8-1③의 미래 요구는 P-04-01에 보존한다. P-02-08은 원자 생성이라 호출하지 않는다. 확정 후 해체·일반 재편성은 별도 범위다."
    }
   },
   "/inventory/handling-units/{handlingUnitId}/contents": {
@@ -1733,7 +1734,7 @@
       }
      },
      "409": {
-      "description": "저장 충돌. 다시 읽어 오면 풀린다",
+      "description": "포장 확정 충돌. 이 요청의 멱등 처리에서 conflictCause=workerLease가 오면 입력을 보존하고 잠시 뒤 같은 멱등키·본문으로 재전송한다. conflictCause=user에는 이미 확정, 낡은 ETag, 같은 키의 다른 본문이 포함될 수 있어 message를 기계 파싱하지 않고 상세·내용물을 재조회한다. PACKED이면 현재 확정 상태만 확인하고 원요청 성공이나 라벨 출력을 추정하지 않는다. OPEN이어도 자동 재전송하지 않고 서버 내용물과 보존 입력의 차이를 사용자가 확인한 뒤 명시적으로 재확정한다. 재확정은 재조회한 최신 ETag를 If-Match에 넣고, 다시 충돌하면 재조회와 사용자 확인을 반복한다. 본문이 같으면 원래 멱등키를 재사용하고 수정하면 새 키를 쓴다. 멱등키 유지와 If-Match 갱신은 별개다.",
       "content": {
        "application/json": {
         "schema": {
@@ -3258,7 +3259,8 @@
      "logistics"
     ],
     "summary": "입하 차이 목록",
-    "description": "근거: M-01-06 §4",
+    "description": "알려진 입하 라인 식별자로 그 라인의 오류 이력을 조회한다. 입하 목록 검색이나 오류 유무 필터는 제공하지 않는다.",
+    "x-internal-note": "M-01-06 §4·§5-3·§8-6. 현재 화면에는 등록 뒤 이력으로 다시 진입하는 동선이 없으며 새 목록·필터 API를 추정하지 않는다.",
     "responses": {
      "200": {
       "description": "차이",
@@ -3455,7 +3457,7 @@
      "logistics"
     ],
     "summary": "입하 등록",
-    "description": "입하·라인·자재 LOT 이 한 트랜잭션으로 만들어진다. 근거: M-01-01 §5-4 · 공유계약 B-8",
+    "description": "입하·라인·공급사 LOT이 부착된 라인의 자재 LOT을 한 트랜잭션으로 등록한다. supplierLotMissing이 false이면 supplierLotNo가 필수이며 누락은 해당 필드의 400 PAIR 오류다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -3498,7 +3500,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "검증 실패. supplierLotMissing=false인데 supplierLotNo가 없으면 해당 필드에 PAIR를 반환하며, 같은 공장·같은 LOT 번호의 별도 등록 중복은 특정 필드 없는 UNIQUE_VIOLATION을 반환한다",
       "content": {
        "application/json": {
         "schema": {
@@ -3528,7 +3530,7 @@
       }
      }
     },
-    "x-internal-note": "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9)."
+    "x-internal-note": "M-01-01 §5-4 · 공유계약 B-8. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9)."
    }
   },
   "/logistics/inbound-receipts/{inboundReceiptId}": {
@@ -3713,7 +3715,7 @@
      "logistics"
     ],
     "summary": "입하 라인 치환",
-    "description": "LOT 이 이미 만들어진 라인은 지울 수 없다. 근거: 공유계약 A-5 · G-1 ⭐ 이 경로의 조회는 ETag 를 내리지 않는다 — If-Match 에 담을 토큰은 부모 자원 GET /logistics/inbound-receipts/{inboundReceiptId} 200 의 ETag 다. 잠그는 단위가 부모이기 때문이다. 근거: 공유계약 B-1-1",
+    "description": "supplierLotMissing이 false이면 supplierLotNo가 있어야 하며, LOT이 이미 만들어진 라인은 품목·입하 수량·단위를 변경하거나 삭제할 수 없어야 한다. 현재 구현은 대체 LOT 사유 짝, LOT 연결 라인 삭제와 후속 레코드가 있는 라인의 수량 변경만 거부한다. supplierLotMissing=false인 번호 누락, LOT만 연결된 라인의 수량 변경과 품목·단위 변경은 아직 거부를 보장하지 않는다. 이 경로의 조회는 ETag를 내리지 않으며 If-Match에는 부모 경로 GET /logistics/inbound-receipts/{inboundReceiptId} 응답의 ETag를 사용한다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -3793,7 +3795,7 @@
      "logistics"
     ],
     "summary": "초과 입하 분리 등록",
-    "description": "정량분과 초과분을 한 트랜잭션으로 등록한다. 관리웹 W-01-03과 모바일 M-01-01의 초과 입하 단계가 함께 사용한다. 단말 토큰 요청은 X-Worker-No가 필수다. 근거: W-01-03 §5-1 · §5-4 · M-01-01 §5-2-2",
+    "description": "정량분과 초과분을 한 트랜잭션으로 등록한다. 같은 공장의 두 결과에 같은 공급사 LOT 번호를 사용할 수 없으며 중복이면 초과분 supplierLotNo에 400 INVALID를 반환하고 전체 요청을 롤백한다. 단말 토큰 요청은 X-Worker-No가 필수다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -3824,7 +3826,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "검증 실패. 같은 공장의 정량분·초과분에 같은 공급사 LOT 번호가 있으면 초과분 supplierLotNo에 INVALID를 반환한다",
       "content": {
        "application/json": {
         "schema": {
@@ -3844,7 +3846,7 @@
       }
      }
     },
-    "x-internal-note": "세 갈래(BOTH·NORMAL_ONLY·EXCESS_ONLY)가 모두 화면의 버튼이다. 부분 실패를 허용하지 않는다 — 화면이 「한 트랜잭션」이라고 못박았다(W-01-03 §5-4). 관리웹과 모바일이 같은 경로를 사용하므로 WorkerNoOptional을 선언한다. 계정 토큰은 인증 주체에서 행위자를 풀고, 단말 토큰은 X-Worker-No가 없으면 거부한다(공유계약 D-5)."
+    "x-internal-note": "W-01-03 §5-1·§5-4 · M-01-01 §5-2-2. 세 갈래(BOTH·NORMAL_ONLY·EXCESS_ONLY)가 모두 화면의 버튼이다. 부분 실패를 허용하지 않는다. 관리웹과 모바일이 같은 경로를 사용하므로 WorkerNoOptional을 선언한다. 계정 토큰은 인증 주체에서 행위자를 풀고, 단말 토큰은 X-Worker-No가 없으면 거부한다(공유계약 D-5)."
    }
   },
   "/logistics/material-issue-requests": {
@@ -4018,7 +4020,8 @@
      "logistics"
     ],
     "summary": "W/O 품목별 소요·기출고·부족",
-    "description": "추가 자재 출고 요청 화면(W-02-10 §3 ②)의 표를 이 한 호출이 채운다 — 「BOM 소요량 불러오기」 버튼이 부르는 것이 이 경로다. 자재 명세(BOM) 조회를 화면이 따로 하지 않는다. 근거: W-02-10 §5 · 공유계약 L-2",
+    "description": "한 작업지시의 품목별 소요량·기출고량·부족량을 반환한다. 소요량은 작업지시 공정과 같은 자재 명세(BOM) 구성품만 requiredQty × (orderQty ÷ baseQty)로 계산하며 공정 미지정 구성품과 스크랩률은 제외한다. 기출고량은 전기 완료된 출고 전표를 피킹 지시와 자재 출고요청을 거쳐 작업지시로 연결해 품목별로 합산한다. 요청 상세 라인의 issuedQty는 이 집계에 사용하지 않는다. 응답은 품목·단위 ID만 제공하며 표시 코드·명칭은 각 기준정보에서 조회한다.",
+    "x-internal-note": "화면 W-02-10의 BOM 소요량 불러오기 호출. 공유계약 L-2 및 통보 037·046·047 반영.",
     "parameters": [
      {
       "name": "workOrderId",
@@ -4449,7 +4452,7 @@
      "logistics"
     ],
     "summary": "ERP W/O 등록",
-    "description": "헤더와 라인을 한 트랜잭션으로 저장한다. 근거: W-01-11 §5-1",
+    "description": "헤더와 라인을 한 트랜잭션으로 저장한다. 발주번호와 상태는 서버가 정하며 신규 P/O의 상태는 등록이다. 요청 본문으로 상태를 선택할 수 없다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -4564,7 +4567,7 @@
      "logistics"
     ],
     "summary": "ERP W/O 헤더 수정",
-    "description": "작성중 상태에서만 허용한다. 근거: 공유계약 B-1 · G-1",
+    "description": "등록 상태에서만 허용한다. 승인 요청을 보내도 P/O 상태는 등록으로 유지되므로 승인 대기 중에도 수정할 수 있다. 수정하면 P/O의 현재 값과 ETag가 바뀌지만 이미 만들어진 승인 요청과 결재 단계는 그대로다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -4634,7 +4637,7 @@
       }
      }
     },
-    "x-internal-note": "확정·전기된 전표의 수정은 400 STATE_LOCKED 다 — 재로드로 풀리는 409 와 섞지 않는다(공유계약 G-1)."
+    "x-internal-note": "근거: W-01-11 §5-7 · 문의 023·025. 승인 요청은 P/O 값 스냅샷을 만들지 않는다. 기존 P/O 재진입 화면이 없어 현재 UI가 이 PUT을 제공한다고 해석하지 않는다. 등록 외 상태의 수정은 400 STATE_LOCKED이고 저장 충돌 409와 구분한다."
    }
   },
   "/logistics/purchase-orders/{purchaseOrderId}/lines": {
@@ -4673,7 +4676,7 @@
      "logistics"
     ],
     "summary": "ERP W/O 라인 치환",
-    "description": "라인 배열을 통째로 치환한다. 이미 입하가 붙은 라인은 지울 수 없다. 근거: W-01-11 §5-1 · 공유계약 A-5 ⭐ 이 경로의 조회는 ETag 를 내리지 않는다 — If-Match 에 담을 토큰은 부모 자원 GET /logistics/purchase-orders/{purchaseOrderId} 200 의 ETag 다. 잠그는 단위가 부모이기 때문이다. 근거: 공유계약 B-1-1",
+    "description": "등록 상태의 라인 배열을 통째로 치환한다. 승인 요청을 보내도 P/O 상태는 등록으로 유지되어 승인 대기 중에도 치환할 수 있다. 이미 입하가 붙은 라인은 지울 수 없다. If-Match에는 부모 자원 GET /logistics/purchase-orders/{purchaseOrderId} 응답의 ETag를 사용한다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -4773,7 +4776,7 @@
      "logistics"
     ],
     "summary": "ERP W/O 승인 요청",
-    "description": "등록이 끝난 ERP W/O 에 승인을 건다. 결재선이 없으면 400(code=ROUTE_NOT_FOUND)이다 — 상신할 곳이 없는 요청을 만들지 않는다. 진행 중인 승인 요청이 이미 있으면 400 이다 — 한 전표에 살아 있는 요청은 하나다. 반려된 요청은 진행 중이 아니므로 다시 상신할 수 있고 그때는 새 요청이 만들어진다(공유계약 J-6). 근거: W-01-11 §5-1 · 공유계약 J-4",
+    "description": "등록이 끝난 ERP W/O에 승인을 건다. 결재선이 없으면 400 ROUTE_NOT_FOUND이고 진행 중인 승인 요청이 이미 있으면 400이다. 반려 뒤 다시 상신하면 새 요청이 만들어진다. 상신은 P/O 상태나 버전을 바꾸지 않고 P/O 값의 스냅샷도 만들지 않는다. 이후 헤더·라인 수정은 기존 승인 요청과 결재 단계를 갱신하지 않는다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -4834,7 +4837,7 @@
       }
      }
     },
-    "x-internal-note": "승인 진행 상태 조회·결재 오퍼레이션은 app-공통 파일 소관이다(01-리소스도출 §1-1)."
+    "x-internal-note": "근거: W-01-11 §5-7 · 문의 023·025. 승인 진행 상태 조회·결재 오퍼레이션은 app-공통 파일 소관이다. 기존 P/O 재진입 화면이 없어 반려 후 재상신을 현재 화면이 제공한다고 해석하지 않는다."
    }
   },
   "/logistics/putaway-tasks": {
@@ -4843,7 +4846,7 @@
      "logistics"
     ],
     "summary": "적치 지시 목록",
-    "description": "담당자에게 할당된 지시를 내린다. 근거: M-01-05 §3 · M-01-07 §3. temporaryOnly=true는 현재 COMPLETED_TEMPORARY인 지시만 반환한다. 복귀 완료 후 제외하며 과거 임시 이력만으로 포함하지 않는다. 같은 LOT의 여러 지시는 번호로 구분하여 선택한다.",
+    "description": "배정 담당자·창고·상태·LOT·원천 입고로 적치 지시를 조회한다. 취소 요청 또는 취소 완료된 입고가 만든 지시도 PENDING에 남아 목록에 포함될 수 있다. temporaryOnly=true는 현재 COMPLETED_TEMPORARY인 지시만 반환한다. 복귀 완료 후 제외하며 과거 임시 이력만으로 포함하지 않는다. 같은 LOT의 여러 지시는 번호로 구분한다.",
     "parameters": [
      {
       "name": "assignedWorkerId",
@@ -5046,7 +5049,7 @@
       }
      },
      "400": {
-      "description": "상태 불허는 STATE_LOCKED. 복귀 원천 불명확·전량 부족·예약/피킹 침해는 INVALID(field=putawayTaskId)와 사유를 반환한다. 입력 보존·재조회하며 다른 재고로 대체하지 않는다. 목적지·권장 위치·혼적 등 검증 실패도 여기에 포함한다.",
+      "description": "완료된 지시 또는 취소 요청·취소 완료된 입고의 대기 지시는 STATE_LOCKED. 복귀 원천 불명확·전량 부족·예약/피킹 침해는 INVALID(field=putawayTaskId)와 사유를 반환한다. 입력 보존·재조회하며 다른 재고로 대체하지 않는다. 목적지·권장 위치·혼적 등 검증 실패도 여기에 포함한다.",
       "content": {
        "application/json": {
         "schema": {
@@ -5076,7 +5079,7 @@
       }
      }
     },
-    "x-internal-note": "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). omf-mes#454: 경로/본문 재사용이나 행동 의미는 변경된다. 복귀 첫 스캔은 로컬 초안이고 도착 확인 후 complete 1회다. 확정된 임시 지시 캐시가 있어야 오프라인 복귀를 시작하며 미동기 임시 작업의 후속 복귀는 서버 확정 전 시작하지 않는다. 원 입고 취소의 기존 후속 판정은 적치/복귀 이력도 추적한다. 별도 적치 취소는 신설하지 않는다."
+    "x-internal-note": "근거: M-01-05 §5-8 · 문의 061·062. 기존 description의 원 임시 이력 「작업자」는 감사 updated_by의 로그인 사용자를 가리키며 X-Worker-No 사번의 실제 수행자 보존을 뜻하지 않는다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). omf-mes#454: 경로/본문 재사용이나 행동 의미는 변경된다. 복귀 첫 스캔은 로컬 초안이고 도착 확인 후 complete 1회다. 확정된 임시 지시 캐시가 있어야 오프라인 복귀를 시작하며 미동기 임시 작업의 후속 복귀는 서버 확정 전 시작하지 않는다. 원 입고 취소의 기존 후속 판정은 적치/복귀 이력도 추적한다. 별도 적치 취소는 신설하지 않는다."
    }
   },
   "/logistics/putaway-tasks/{putawayTaskId}:complete-temporary": {
@@ -5096,7 +5099,7 @@
      "logistics"
     ],
     "summary": "임시 위치 적재",
-    "description": "정상 적치와 상태가 구분된다. 사유 코드와 비고 중 적어도 하나는 있어야 한다. 근거: M-01-07 §5-5. PENDING에서 COMPLETED_TEMPORARY로만 전이한다. 동일 키·본문·주체의 재전송은 원응답을 재생하지만 임시/정상 완료 지시의 새 키 요청은 400 STATE_LOCKED다. taskQty 전량의 실제 임시 이동을 원자적으로 기록하며 위치·사유/비고·시각·작업자와 원장을 불변 이력으로 남긴다. 신규 임시 적치 원장의 원천은 PUTAWAY_TASK와 putawayTaskId다. 업무 상태·재고·원장·감사·멱등 완료는 원자적으로 저장한다. 정위치 복귀는 별도 새 키로 적치 완료를 호출하며 최초 임시 원장을 덮어쓰지 않는다.",
+    "description": "정상 적치와 상태가 구분된다. 사유 코드와 비고 중 적어도 하나는 있어야 한다. PENDING에서 COMPLETED_TEMPORARY로만 전이한다. 원천 입고가 CANCEL_REQUESTED 또는 CANCELLED이면 지시가 PENDING이어도 400 STATE_LOCKED로 거부하고 지시 상태는 그대로 남는다. X-Worker-No는 사번 존재만 확인하며 배정 담당자를 덮어쓰거나 실제 수행자로 저장하지 않는다. 동일 키·본문·주체의 재전송은 원응답을 재생하지만 임시/정상 완료 지시의 새 키 요청은 400 STATE_LOCKED다. taskQty 전량의 실제 임시 이동을 원자적으로 기록하며 위치·사유/비고·시각·원장을 불변 이력으로 남긴다. 신규 임시 적치 원장의 원천은 PUTAWAY_TASK와 putawayTaskId다. 업무 상태·재고·원장·감사·멱등 완료는 원자적으로 저장한다. 정위치 복귀는 별도 새 키로 적치 완료를 호출하며 최초 임시 원장을 덮어쓰지 않는다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -5130,7 +5133,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "취소 요청·취소 완료된 입고의 대기 지시는 STATE_LOCKED. 사유·위치·상태 등 다른 검증 실패도 포함한다.",
       "content": {
        "application/json": {
         "schema": {
@@ -5160,7 +5163,7 @@
       }
      }
     },
-    "x-internal-note": "오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 도출 단계의 :temporary 를 :complete-temporary 로 다듬었다 — :complete 와 짝이라는 것이 이름에 드러나야 한다."
+    "x-internal-note": "근거: M-01-05 §5-8 · M-01-07 §5-5 · 문의 061·062. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). 도출 단계의 :temporary 를 :complete-temporary 로 다듬었다 — :complete 와 짝이라는 것이 이름에 드러나야 한다."
    }
   },
   "/logistics/recycle-entries": {
@@ -5434,7 +5437,7 @@
      "logistics"
     ],
     "summary": "재고 이동 목록",
-    "description": "inTransitOnly 로 아직 도착하지 않은 건을 찾는다 — 이어하기 목록이 이것이다. 근거: M-01-10 §5-6",
+    "description": "inTransitOnly로 receivedAt이 아직 없는 반출 건을 찾는다. 부분 도착도 receivedAt이 채워져 이 목록에서 빠지므로 미도착 잔량을 이어 처리하는 목록은 아니다.",
     "parameters": [
      {
       "name": "inTransitOnly",
@@ -5443,7 +5446,7 @@
        "type": "boolean",
        "default": false
       },
-      "description": "반출됐으나 도착하지 않은 건만"
+      "description": "반출됐고 receivedAt이 없는 건만. 부분 도착 후 남은 운송중 수량은 이 필터로 조회되지 않는다"
      },
      {
       "name": "fromWarehouseId",
@@ -5710,7 +5713,8 @@
      "logistics"
     ],
     "summary": "이동 라인 치환",
-    "description": "반출이 끝난 라인은 바꿀 수 없다. 근거: 공유계약 A-5 · G-1 ⭐ 이 경로의 조회는 ETag 를 내리지 않는다 — If-Match 에 담을 토큰은 부모 자원 GET /logistics/stock-transfers/{stockTransferId} 200 의 ETag 다. 잠그는 단위가 부모이기 때문이다. 근거: 공유계약 B-1-1",
+    "description": "생성과 반출이 한 오퍼레이션이어서 반출 전 수정 구간이 없다. 없는 ID는 404, 낡은 If-Match는 409가 먼저이며, 이를 통과한 실재 전표는 400 STATE_LOCKED라 수정 성공 경로가 없다. If-Match 토큰 원천은 부모 자원 GET /logistics/stock-transfers/{stockTransferId}의 ETag다.",
+    "x-internal-note": "부모 자원 소유 화면 M-01-10을 권한 근거로 쓴다. 현재 화면 액션은 이 PUT을 호출하지 않는다(통보 162 ⓓ·ⓔ).",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -5752,7 +5756,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "유효한 ID와 최신 If-Match를 통과한 실재 전표는 생성 시점에 반출이 끝나 있으므로 400 STATE_LOCKED. 없는 ID의 404와 낡은 토큰의 409가 먼저다",
       "content": {
        "application/json": {
         "schema": {
@@ -5801,7 +5805,7 @@
      "logistics"
     ],
     "summary": "도착 확정",
-    "description": "반출한 수량 이하만 받을 수 있다. 근거: M-01-10 §5-6",
+    "description": "반출 수량 이하를 한 번만 도착 확정한다. 부분 수량도 허용하지만 receivedAt이 채워진 뒤 둘째 호출은 400 STATE_LOCKED이므로 잔량 재도착은 지원하지 않는다. 도착 품질 상태는 반출 원장 값을 유지하고 재고 상태는 반출 전 상태로 복원한다. 반출 원장 전기와 실물 도착 완료는 별개다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -6501,7 +6505,11 @@
         "C9",
         "C10",
         "C14",
-        "C15"
+        "C15",
+        "C17",
+        "C18",
+        "C19",
+        "C20"
        ]
       },
       "description": "「이력으로 찾기」의 판정유형 축",
@@ -6708,7 +6716,7 @@
      "trace"
     ],
     "summary": "생산 LOT 완료",
-    "description": "생산 LOT 라벨을 부착한 뒤 스캔한 현재 LOT을 완료로 옮긴다. 이 동작은 LOT 생산 등록 확정이며 W/O 마감이 아니다. 계획 수량 미달 사유와 잔량 처리는 받지 않고 관리웹 W-02-05의 W/O 마감에서 처리한다. 라벨 발행은 이 오퍼레이션 밖이며 공통 출력물 계약이 소유한다. 오프라인 대상이다(공유계약 C-9). 근거: P-02-04 §3-3",
+    "description": "생산 LOT 라벨을 부착한 뒤 스캔한 현재 LOT의 완료 시각을 기록한다. 이 동작은 W/O 마감이 아니다. 누적 배분 수량이 계획 수량보다 적으면 completionVarianceReasonCode가 필요하고, 정상·초과이면 보내지 않는다. 미달 사유는 원천 W/O의 사유 한 칸에 기록되어 여러 LOT의 마지막 기록만 남는다. 잔량 처리는 W/O 마감 소관이다. 오프라인 대상이다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -6782,7 +6790,7 @@
       }
      }
     },
-    "x-internal-note": "02 요구서 §3-16 이 이 오퍼레이션을 「01 계약」이라 적었는데 경로 자체가 없었다. 역방향 ② 검사기가 찾아 2026-08-12 에 더했다(client #75). 품질 판정 축(정상·불량 등)은 03 품질 계약이 옮긴다 — 여기서 바꾸는 것은 생산 LOT 의 수명주기 상태다."
+    "x-internal-note": "근거: P-02-06 §5-3·§5-5·§8-2 · 공유계약 C-9 · 문의 043. 미달 완료는 work_order.completion_variance_reason_code를 덮어쓰고 LOT별 사유 칸은 만들지 않는다. 마감된 W/O의 미달 LOT 완료는 400 STATE_LOCKED다."
    }
   },
   "/logistics/document-progress/{documentTypeCode}/{documentId}:request-cancel": {
@@ -7339,7 +7347,7 @@
        "erpSync",
        "workerLease"
       ],
-      "description": "충돌 원인. 근거: 공유계약 B-1 확장",
+      "description": "충돌 원인. user는 사용자 또는 업무 충돌, erpSync는 기간계 재동기화, workerLease는 워커가 자료를 처리 중이라는 뜻이다. 호출자는 입력을 보존하고 자원을 재조회한다. 개별 오퍼레이션이 멱등 처리 중이라고 명시한 경우에만 원래 멱등키·본문 재전송 규칙을 적용한다.",
       "example": "user"
      },
      "message": {
@@ -7443,13 +7451,14 @@
        "string",
        "null"
       ],
-      "description": "cancellable 이 «거짓인 이유» — 후속 문서가 있다 · 이미 취소됐다 · 취소 진행 중이다 · 상태가 잠겼다 · 이 문서 유형에 취소 경로가 없다(`TYPE_NOT_CANCELABLE` — 취소 실행 경로가 있는 것은 입하·입고·출고 3종뿐이다). ⭐ 화면이 이 값으로 안내 문구와 다음 경로를 가른다(G-3). ⛔ 서버가 판정한다 — 화면이 조건을 따로 조합하면 화면마다 갈린다",
+      "description": "cancellable이 거짓인 이유. 채택한 우선순위는 TYPE_NOT_CANCELABLE → ALREADY_CANCELLED → CANCEL_IN_PROGRESS → OWNED_BY_UPSTREAM → STATE_LOCKED → SUCCESSOR_EXISTS다. OWNED_BY_UPSTREAM은 출하 같은 상류 문서가 소유한 입고·출고 전표이므로 그 상류 문서에서 취소해야 한다는 뜻이다. STATE_LOCKED는 상류 소유를 포함할 수도 있는 공통 상태 잠금이며, 이 값만으로 상류 소유를 확정하지 않는다. 현재 서버는 상류 소유에도 STATE_LOCKED를 반환하고 OWNED_BY_UPSTREAM은 아직 반환하지 않는다. 화면은 서버가 내린 사유에 맞춰 안내하며 조건을 따로 조합하지 않는다.",
       "example": "SUCCESSOR_EXISTS",
       "x-code-key": "CD-CANCEL-BLOCKED-REASON",
       "enum": [
        "SUCCESSOR_EXISTS",
        "ALREADY_CANCELLED",
        "CANCEL_IN_PROGRESS",
+       "OWNED_BY_UPSTREAM",
        "STATE_LOCKED",
        "TYPE_NOT_CANCELABLE"
       ]
@@ -7686,15 +7695,16 @@
       "x-source-column": "source_document_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "원천 문서 유형. **A-10 다형 참조 판별자**이고 값은 **대상 테이블 이름**이다 — 피킹 지시(`PICKING_ORDER` → `logistics.picking_order`, 생산 투입) · 입고 전표(`GOODS_RECEIPT` → `logistics.goods_receipt`, 공급사 반품·자재 폐기) · 처분 결정(`DISPOSITION_DECISION` → `quality.disposition_decision`, 제품 폐기) 셋이다. `sourceDocumentId` 는 그 표의 식별자다. ⛔ 공통코드 그룹으로 받지 않는다 — 값이 우리 계약의 리소스 이름이라 **고객이 늘릴 수 있는 값이 아니다**(공유계약 A-10·A-16, `GoodsIssue.destinationTypeCode` 와 같은 처리). 새 대상이 생기면 화면이 문자열을 정하기 전에 이 목록에 등재한다(A-16). ⚠ 같은 이름의 다른 자리(`GoodsReceipt`·`InventoryTransaction` 등)는 값 집합이 다르다 — 자리마다 닫는다.",
+      "description": "조회 응답의 원천 문서 유형. 피킹 지시(PICKING_ORDER), 입고 전표(GOODS_RECEIPT), 처분 결정(DISPOSITION_DECISION), 출하(SHIPMENT)를 허용하며 sourceDocumentId는 각 원천 리소스의 식별자다. SHIPMENT이면 logistics.shipment의 shipmentId다. 출하가 내부에서 만든 출고도 조회에 나타나므로 생성 입력의 3값보다 한 값이 많다. InventoryTransaction의 원천은 이 경우에도 GOODS_ISSUE다.",
       "x-no-example": true,
-      "x-internal-note": "2026-09-01 `omf-mes#336` — 자유 문자열에서 `enum` 3값으로 닫았다. 구 주석의 「`enum` 을 못박으면 값이 정해질 때 계약이 깨진다 — G-2 를 계약에도 적용한다」는 **이 자리에 성립하지 않는다**: 미확정 코드 표시 조항(G-2)은 「우리가 확정해야 하는데 못 한 값」의 조항이고(마스터 판별 조항 G-31 이 범위를 줄였다), 이 값은 확정 대상이 아니라 **우리 계약의 리소스 목록**이다. ⛔ 자유 문자열→`enum` 이므로 통지 대상이다.",
+      "x-internal-note": "2026-09-01 omf-mes#336에서 자유 문자열을 3값으로 닫았고, 2026-09-10 서버 통보 217의 출하 생성 실측에 따라 조회 응답에 SHIPMENT를 추가했다. 생성 입력은 외부에서 SHIPMENT 출고를 직접 만들지 않으므로 기존 3값을 유지한다.",
       "enum": [
        "PICKING_ORDER",
        "GOODS_RECEIPT",
-       "DISPOSITION_DECISION"
+       "DISPOSITION_DECISION",
+       "SHIPMENT"
       ],
-      "x-code-key": "CD-GOODS-ISSUE-SOURCE-DOCUMENT-TYPE"
+      "x-code-key": "CD-GOODS-ISSUE-READ-SOURCE-DOCUMENT-TYPE"
      },
      "sourceDocumentId": {
       "x-source-column": "source_document_id",
@@ -9194,8 +9204,8 @@
      "occurredAt",
      "lines"
     ],
-    "description": "입하 등록. 헤더·라인이 한 트랜잭션으로 만들어지고, 자재 LOT 은 공급사 LOT 이 부착된 라인에만 함께 생긴다. supplierLotMissing=true 인 라인은 LOT 없이 저장되고 P-01-01 이 POST /trace/lots(numberSourceCode=MES)로 나중에 채운다. 부착 라인의 LOT 이 없으면 이후 흐름이 통째로 막힌다. 근거: M-01-01 §5-4 · P-01-01 §3-6 · 공유계약 B-8",
-    "x-internal-note": "⚠ 거래명세서 촬영본의 OCR 파싱 결과(인식된 품목·수량·명세서 번호)를 담을 곳이 없다 — 첨부(attachment) 스키마는 파일 자체만 보관하고, 인식 결과 필드는 이 요청 본문에도 물리 모델에도 없다(실측). 근거: M-01-01 §4·§8-2 · omf-mes#75 ⚠ 승인 절차 자체(누가·언제)는 아직 정해지지 않았다 — M-01-01 §8-4. 계약은 approvalRequestId 자리만 갖는다.",
+    "description": "입하 등록. 헤더·라인이 한 트랜잭션으로 만들어지고 자재 LOT은 공급사 LOT이 부착된 라인에만 함께 생긴다. supplierLotMissing=true인 라인은 LOT 없이 저장되며 이후 POST /trace/lots에서 numberSourceCode=MES로 생성한다. false이면 supplierLotNo가 필수이며 누락은 400 PAIR다.",
+    "x-internal-note": "M-01-01 §5-4 · P-01-01 §3-6 · 공유계약 B-8. ⚠ 거래명세서 촬영본의 OCR 파싱 결과(인식된 품목·수량·명세서 번호)를 담을 곳이 없다 — 첨부 스키마는 파일 자체만 보관하고 인식 결과 필드는 이 요청 본문에도 물리 모델에도 없다(실측). 근거: M-01-01 §4·§8-2 · omf-mes#75 ⚠ 승인 절차 자체(누가·언제)는 아직 정해지지 않았다 — M-01-01 §8-4. 계약은 approvalRequestId 자리만 갖는다.",
     "properties": {
      "supplierId": {
       "x-source-column": "supplier_id",
@@ -9520,7 +9530,8 @@
      "uomId",
      "supplierLotMissing"
     ],
-    "description": "라인 전체 치환 항목. inboundReceiptLineId 가 없으면 신규 행, 있으면 갱신, 요청에서 빠진 기존 행은 삭제한다. 이미 LOT 이 만들어진 라인은 삭제할 수 없다 — 400 STATE_LOCKED. 근거: M-01-01 §5-4 · 공유계약 A-5",
+    "description": "라인 전체 치환 항목. inboundReceiptLineId가 없으면 신규 행, 있으면 갱신, 요청에서 빠진 기존 행은 삭제한다. 요청 규칙은 supplierLotMissing=false일 때 supplierLotNo가 필수이고, LOT 생성 뒤에는 품목·입하 수량·단위 변경과 삭제를 허용하지 않는 것이다. 등록·분리 등록은 번호 누락을 거부하지만 현재 라인 치환 구현은 이를 검사하지 않는다. 라인 치환은 LOT 연결 라인 삭제와 후속 레코드가 있는 라인의 수량 변경만 거부하며, LOT만 연결된 라인의 수량 변경과 품목·단위 변경도 아직 보장하지 않는다.",
+    "x-internal-note": "M-01-01 §5-4·§8-6-b · 공유계약 A-5. 등록·분리 서비스는 inbound-receipt-rules.ts의 attachesLot 검사를 사용해 false+번호 누락을 PAIR로 거부한다. 라인 치환의 inbound-receipt-update.service.ts assertItems는 true+대체 LOT 사유 누락만 검사한다. 치환은 LOT 연결 라인 삭제와 후속 레코드가 있는 라인의 수량 변경만 거부하며, LOT만 생성된 라인의 수량 변경과 품목·단위 변경도 비교하지 않아 서버 보완이 필요하다.",
     "properties": {
      "inboundReceiptLineId": {
       "x-source-column": "inbound_receipt_line_id",
@@ -9713,7 +9724,7 @@
      "businessDate",
      "occurredAt"
     ],
-    "description": "초과 입하 분리. 정량분과 초과분을 한 트랜잭션으로 등록한다. mode 로 어느 쪽을 저장할지 고른다 — 세 갈래가 모두 W-01-03과 M-01-01 화면의 버튼이다. 초과분을 포함하면 예외 유형과 사유가 필수다. 근거: W-01-03 §5-1 · §5-4 · M-01-01 §5-2-2",
+    "description": "초과 입하 분리. 정량분과 초과분을 한 트랜잭션으로 등록한다. mode로 저장할 쪽을 고르고 초과분을 포함하면 예외 유형과 사유가 필수다. 같은 공장의 두 결과에는 같은 공급사 LOT 번호를 사용할 수 없다.",
     "properties": {
      "mode": {
       "type": "string",
@@ -9801,7 +9812,7 @@
       }
      }
     ],
-    "x-internal-note": "businessDate·occurredAt 은 바깥에서 한 번만 받는다 — 두 건이 같은 순간의 한 트랜잭션이기 때문이다. mode 별 본문 모양과 초과 예외 유형·사유 필수를 oneOf 로 강제한다."
+    "x-internal-note": "W-01-03 §5-1·§5-4 · M-01-01 §5-2-2. businessDate·occurredAt 은 바깥에서 한 번만 받는다 — 두 건이 같은 순간의 한 트랜잭션이기 때문이다. mode 별 본문 모양과 초과 예외 유형·사유 필수를 oneOf 로 강제한다. 한 요청의 공장·LOT 번호 중복은 excess.lines.{i}.supplierLotNo에 400 INVALID다. 별도 POST 중복은 데이터베이스 유일 제약에 따른 특정 필드 없는 400 UNIQUE_VIOLATION이다."
    },
    "InboundReceiptSplitResponse": {
     "type": "object",
@@ -10057,7 +10068,7 @@
       "x-source-column": "status_code",
       "type": "string",
       "maxLength": 50,
-      "description": "전표의 진행 상태 — 등록(REGISTERED) · 전기완료(POSTED) · 취소요청(CANCEL_REQUESTED) · 취소완료(CANCELLED). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOGISTICS_DOCUMENT_STATUS 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "재고 조정 진행 상태. 현행 조정 경로가 만드는 값은 등록(REGISTERED)·전기완료(POSTED)다. 조정 취소 API는 없으며 이 값은 시스템 소유다. 표시명은 GET /mdm/code-values?codeGroupCode=LOGISTICS_DOCUMENT_STATUS로 받는다.",
       "x-no-example": true,
       "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
       "x-code-key": "CD-LOGISTICS-DOCUMENT-STATUS"
@@ -10074,8 +10085,8 @@
      },
      "erpMessageQueued": {
       "type": "boolean",
-      "description": "ERP 송신 대기열에 적재됐는지",
-      "example": true
+      "description": "ERP 송신 대기열 적재 여부. 현재 조정 ERP 연계가 없어 항상 false다.",
+      "example": false
      }
     }
    },
@@ -10110,8 +10121,9 @@
      "sendToErp": {
       "type": "boolean",
       "default": true,
-      "description": "ERP 송신 여부. 화면의 송신 토글이 이 값이다. ⭐ 전역 송신 설정과 논리곱이다 — 전역이 꺼져 있으면 이 값이 참이어도 보내지 않고, 전역이 켜져 있을 때 이 값으로 이 건만 끈다. 켜고 끄기의 정본은 전역 설정이다.",
-      "example": true
+      "description": "ERP 송신 요청값. 채택 업무정책은 전역 송신 설정과 이 건별 값의 논리곱이며 전역 설정이 정본이다. 현재 서버는 값을 받지만 저장하거나 ERP 메시지를 만들지 않는다. true여도 응답 erpMessageQueued는 false이므로 송신 여부를 이 값으로 판단하면 안 된다.",
+      "example": false,
+      "x-internal-note": "W-01-12에서는 미지원 안내와 함께 토글을 비활성화한다. ERP 연계 구현은 이 계약 변경 범위가 아니다."
      },
      "lines": {
       "type": "array",
@@ -10242,7 +10254,7 @@
      "adjustmentQty",
      "uomId"
     ],
-    "description": "조정 라인 치환 항목. 전기된 조정은 바꿀 수 없다 — 400 STATE_LOCKED.",
+    "description": "조정 라인 치환 항목. 전기된 조정은 바꿀 수 없다 — 400 STATE_LOCKED. 위치에서 해소한 공장은 전표 전체에서 하나여야 하며, 각 라인은 정확히 한 잔액 차원과 대응해야 한다.",
     "properties": {
      "inventoryAdjustmentLineId": {
       "type": "integer",
@@ -10279,7 +10291,8 @@
      "adjustmentQty": {
       "type": "number",
       "example": -2.0,
-      "description": "증감 수량 — «차이»다. 절대량(실측한 현재 수량)이 아니다. 양수면 늘고 음수면 준다.\n⭐ 빼는 쪽은 «화면»이다 — 서버는 이 값을 그대로 원장에 태우고 실측 절대량을 받지 않는다.\n⚠ 호퍼 잔량 실측(M-01-09 §5-4)에서 화면은 실측값에서 장부 잔량을 빼서 이 칸을 채운다. 그때\n장부 잔량은 판정에 쓰이는 값이라 캐시하지 않는다(공유계약 C-6) — 조정 직전에 다시 읽는다.\n⛔ 전기(POST /inventory/adjustments/{id}:post) 전에는 재고가 움직이지 않는다.\n근거: W-01-12 §5-6 · M-01-09 §5-4"
+      "description": "증감 수량 — 차이이며 절대량이 아니다. 양수면 늘고 음수면 줄며 0은 INVALID다. 서버는 값을 그대로 원장에 반영하고 실측 절대량을 받지 않는다. 호퍼 잔량 실측에서는 화면이 조정 직전에 장부 잔량을 다시 읽고 실측값에서 빼 이 값을 만든다. 등록·치환은 잔액이 없는 차원을 새로 만들지 않으며 증가는 INVALID, 감소는 NEGATIVE_BALANCE다. 전기 전에는 재고가 움직이지 않는다.",
+      "x-internal-note": "근거 W-01-12 §5-6, M-01-09 §5-4, 공유계약 C-6."
      },
      "uomId": {
       "type": "integer",
@@ -10706,7 +10719,7 @@
      "warehouseId",
      "plannedDate"
     ],
-    "description": "라인은 서버가 장부에서 만든다. 위치·품목·LOT·단위별 잔액 합계를 개시 시점 장부수량으로 보존하며 합계 0인 묶음은 제외한다. 음수 합계는 실제값으로 포함한다. 음수 잔액만을 이유로 창고 전체 개시를 거부하거나 해당 묶음을 제외하거나 0으로 저장하지 않는다. 품질·재고상태·소유·파트너·취급단위 축은 합산한다. 네 축 안정 정렬로 lineNo를 1부터 부여한다. 실사 번호는 INVENTORY_COUNT의 기본 접두어 IC, 창고의 공장 범위, plannedDate 기간키로 채번한다. 생성 상태는 IN_PROGRESS이며 PLANNED는 과거·외부 적재 행 조회용으로 유지한다.",
+    "description": "실사 개시 입력. 업무 요구는 위치·품목·LOT·단위별 실제 장부 합계의 음수 보존이지만 현재 서버는 음수 합계가 하나라도 있으면 창고 전체 개시를 400으로 거부한다. 음수 묶음 제외·0 보정·부분 생성은 하지 않는다. 음수가 없으면 합계 0인 묶음만 제외하고 네 축 안정 정렬로 라인을 생성한다.",
     "properties": {
      "countTypeCode": {
       "x-source-column": "count_type_code",
@@ -11134,12 +11147,13 @@
       "x-source-column": "source_document_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "원천 문서 유형. **A-10 다형 참조 판별자**이고 값은 «대상 테이블 이름»이다 — sourceDocumentId 는 그 표의 식별자다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다. 지금은 하나다 — 생산오더(PRODUCTION_ORDER → production.production_order). ⭐ W-02-01 §5-4 가 「ERP W/O 의 «자재예약정보»가 production_order 에 없고 inventory_reservation 이 ERP W/O 를 가리킨다」로 이 축을 세웠고 2026-09-02 에 「서버가 건다」로 해소됐다. ⚠ 값이 하나라고 축이 없는 것이 아니다 — 판별자는 «무엇을 가리키는지»를 말하고, 가리킬 표가 늘면 계약을 고친다.",
+      "description": "원천 문서 유형. **A-10 다형 참조 판별자**이고 sourceDocumentId와 짝으로 대상 행을 가리킨다. 값은 생산오더(PRODUCTION_ORDER → production.production_order)와 제품 피킹의 출하요청 라인(SHIPMENT_REQUEST_LINE → logistics.shipment_request_line)이다. SHIPMENT_REQUEST_LINE의 sourceDocumentId는 라인 ID이며 부모 출하요청 ID가 아니다. 일반 예약 응답에는 부모 ID가 없으므로 이 값만으로 출하요청 상세로 이동하지 않는다. ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 늘릴 수 있는 값이 아니고, 가리킬 표가 늘면 계약을 고친다.",
       "x-no-example": true,
-      "x-internal-note": "status_code 가 app.code_t 맨몸이라 값 집합이 데이터에 없다(#64 계열). enum 을 못박으면 값이 정해질 때 계약이 깨진다 — 공유계약 G-2 를 계약에도 적용한다.",
+      "x-internal-note": "W-02-01 §5-4와 omf-mes#595·통보190/212 및 서버 shipment-progress.ts의 SHIPMENT_REQUEST_LINE 상수를 대조했다. 이 칸은 status_code가 아니라 닫힌 다형 참조 판별자이므로 실제 대상 테이블 집합을 enum으로 둔다.",
       "x-code-key": "CD-INVENTORY-RESERVATION-SOURCE-DOCUMENT-TYPE",
       "enum": [
-       "PRODUCTION_ORDER"
+       "PRODUCTION_ORDER",
+       "SHIPMENT_REQUEST_LINE"
       ],
       "example": "PRODUCTION_ORDER"
      },
@@ -11805,7 +11819,7 @@
      "businessDate",
      "occurredAt"
     ],
-    "description": "생산 LOT 완료. 부착 라벨 스캔으로 LOT 생산 등록을 확정한다. 미달 사유·잔량 처리는 W/O 마감 소관이므로 이 본문에서 받지 않는다. 근거: P-02-04 §3-3",
+    "description": "생산 LOT 완료. 누적 배분 수량이 계획 수량보다 적으면 completionVarianceReasonCode가 필요하고, 정상·초과이면 보내지 않는다. 미달 사유는 LOT별로 보존되지 않고 원천 W/O의 마지막 사유 한 칸에 기록된다.",
     "properties": {
      "remarks": {
       "x-source-column": "remarks",
@@ -11827,6 +11841,16 @@
       "format": "date-time",
       "description": "단말에서 실제로 일어난 시각. 근거: 공유계약 C-8",
       "example": "2026-08-12T10:22:00+09:00"
+     },
+     "completionVarianceReasonCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "계획 수량 미달 완료 사유. 미달일 때 필수이고 정상·초과이면 보내지 않는다. 원천 W/O의 사유 한 칸을 덮어쓰므로 LOT별 독립 이력은 보장하지 않는다.",
+      "example": "MATERIAL_SHORTAGE",
+      "x-code-key": "CD-WORK-ORDER-COMPLETION-VARIANCE-REASON",
+      "x-internal-note": "근거: P-02-06 §5-3·§8-2 · 문의 043. 값은 WORK_ORDER_COMPLETION_VARIANCE_REASON 그룹과 대조한다."
      }
     }
    },
@@ -12283,7 +12307,7 @@
    },
    "LotStatusHistoryEvent": {
     "type": "object",
-    "description": "LOT 상태 전이 사건 1건. 결정 10 「현재 1행 + 변경이력 1:N」을 되살린 전용 이력(2026-08-30) — 도식스펙03 §1.3 전이 9종(C4·C5·C6·C7·C8·C9·C10·C14·C15) 전건을 담는다. 저장 테이블(trace.lot_status_history 성격)은 데이터 모델 담당에게 통지 — 기다리지 않는다. 근거: W-03-01 §5-1·§5-2",
+    "description": "LOT 상태 전이 사건 1건. 검사·보류 9종(C4·C5·C6·C7·C8·C9·C10·C14·C15)과 처분·재등록 4종(C17·C18·C19·C20)을 담는다.",
     "required": [
      "lotStatusHistoryId",
      "lotId",
@@ -12333,9 +12357,13 @@
        "C9",
        "C10",
        "C14",
-       "C15"
+       "C15",
+       "C17",
+       "C18",
+       "C19",
+       "C20"
       ],
-      "description": "전이 9종 — 도식스펙03 §1.3 · W-03-01 §5-1 표",
+      "description": "LOT 상태 전이 유형. 기존 검사·보류 9종과 처분 재작업(C17)·폐기(C18)·정상(C19), 재고 재등록(C20)을 구분한다.",
       "example": "C7",
       "x-code-key": "CD-LOT-STATUS-HISTORY-EVENT-TRANSITION"
      },
@@ -12351,12 +12379,14 @@
        "string",
        "null"
       ],
-      "description": "A-10 다형 참조 판별자 — 값이 «대상 리소스 이름»이고 짝 id 가 그 리소스의 식별자다. ⭐ 대응표는 «설계»가 정한다(A-10 규칙 1 · 2026-09-03 사용자 결정). 이 전이를 일으킨 것 — 검사 결과(INSPECTION_RESULT) · LOT 보류/해제(LOT_HOLD) · 부적합(NONCONFORMANCE). ⭐ 전이 9종에서 도출했다(W-03-01 §5-1 표) — C4「합격」·C6「불합격」·C14「합격판정개수 초과」·C15「전수 재검 양품」은 검사 결과가, C5·C10「의심자재등록」은 보류가, C7·C8「재판정」은 검사 결과가, C9「클레임·리콜」은 부적합이 일으킨다.",
+      "description": "원천 문서 판별자. 짝인 sourceDocumentId는 해당 문서의 식별자다. C4·C6·C7·C8·C14·C15는 INSPECTION_RESULT와 검사 결과 식별자를, C5·C10은 LOT_HOLD와 LOT 보류 식별자를, C9는 NONCONFORMANCE와 부적합 식별자를 싣는다. C17·C18·C19는 DISPOSITION_DECISION과 처분 판정 식별자를, C20은 STOCK_TRANSFER와 재등록 재고 이동 식별자를 싣는다.",
       "x-code-key": "CD-LOT-STATUS-EVENT-SOURCE-DOCUMENT-TYPE",
       "enum": [
        "INSPECTION_RESULT",
        "LOT_HOLD",
-       "NONCONFORMANCE"
+       "NONCONFORMANCE",
+       "DISPOSITION_DECISION",
+       "STOCK_TRANSFER"
       ],
       "example": "INSPECTION_RESULT"
      },
@@ -12378,7 +12408,8 @@
       "format": "date-time",
       "example": "2026-08-06T09:12:00+09:00"
      }
-    }
+    },
+    "x-internal-note": "결정 10의 현재 1행 + 변경이력 1:N을 되살린 전용 이력. 근거: W-03-01 §5-1·§5-2 · omf-mes#557 · 서버 통보 089·154·218"
    },
    "LotLifecycleHistoryEvent": {
     "type": "object",
@@ -12550,7 +12581,8 @@
      "destinationLocationId",
      "statusCode"
     ],
-    "description": "자재 출고 요청. 01 화면은 읽기만 한다 — 요청을 만드는 것은 생산 도메인이다. 근거: M-01-08",
+    "description": "자재 출고 요청. 응답은 작업지시와 도착 위치의 식별자만 제공하며 번호·위치 코드·명칭은 각 리소스에서 조회한다.",
+    "x-internal-note": "M-01-08은 읽기만 하며 요청 생성은 W/O 배포 또는 추가 자재 출고 요청이 소유한다. 통보 047 반영.",
     "properties": {
      "materialIssueRequestId": {
       "x-source-column": "material_issue_request_id",
@@ -12819,7 +12851,7 @@
       "type": "number",
       "minimum": 0,
       "readOnly": true,
-      "description": "누적 출고 수량. 요청 수량을 넘지 않는다",
+      "description": "요청 라인의 저장된 출고 수량이며 요청 수량을 넘을 수 없다. 신규 요청 라인은 0으로 시작하지만 현재 출고 처리에서 이 값을 갱신하는 경로가 없어 품목별 기출고 누계로 사용하지 않는다. 기출고 누계는 부족 조회가 전기 완료된 출고 전표에서 별도로 계산한다.",
       "example": 0.0
      },
      "uomId": {
@@ -12839,7 +12871,7 @@
      "issuedQty",
      "shortageQty"
     ],
-    "description": "한 W/O 의 품목별 소요·기출고·부족 한 줄",
+    "description": "한 작업지시의 품목별 소요·기출고·부족 한 줄. 품목 코드·명칭과 단위 표시명은 포함하지 않는다.",
     "properties": {
      "itemId": {
       "type": "integer",
@@ -12861,17 +12893,17 @@
      },
      "requiredQty": {
       "type": "number",
-      "description": "자재 명세(BOM) 소요량 — 이 W/O 의 지시수량 기준",
+      "description": "작업지시 공정과 같은 자재 명세(BOM) 구성품의 requiredQty × (orderQty ÷ baseQty). 공정 미지정 구성품과 스크랩률은 제외한다.",
       "example": 200.0
      },
      "issuedQty": {
       "type": "number",
-      "description": "기출고 누계 — 이 W/O 앞으로 출고된 수량의 합. ⛔ 화면이 요청 건별 상세를 훑어 더하지 않는다(공유계약 L-2)",
+      "description": "전기 완료된 출고 전표를 피킹 지시와 자재 출고요청을 거쳐 작업지시로 연결해 계산한 품목별 출고 수량 합계. 요청 상세의 issuedQty를 합산하지 않는다.",
       "example": 120.0
      },
      "shortageQty": {
       "type": "number",
-      "description": "부족 = 소요 − 기출고. 음수면 0 으로 낸다",
+      "description": "max(소요량 − 기출고량, 0)",
       "example": 80.0
      }
     }
@@ -13198,6 +13230,7 @@
        "null"
       ],
       "format": "int64",
+      "description": "지시를 배정받은 담당자. 실제 적치 수행자나 완료자가 아니며 완료 요청의 X-Worker-No로 덮어쓰지 않는다.",
       "example": 1001
      }
     }
@@ -13345,7 +13378,7 @@
      "orderDate",
      "lines"
     ],
-    "description": "ERP W/O 등록 요청. 헤더와 라인을 한 트랜잭션으로 저장한다 — 헤더만 남고 라인이 없는 ERP W/O 는 만들지 않는다. purchaseOrderNo 와 statusCode 는 서버가 정한다. 근거: W-01-11 §5-1",
+    "description": "ERP W/O 등록 요청. 헤더와 라인을 한 트랜잭션으로 저장하며 헤더만 남고 라인이 없는 P/O는 만들지 않는다. purchaseOrderNo와 statusCode는 서버가 정하고 상태는 등록으로 시작한다. 요청에서 상태를 선택할 수 없다.",
     "properties": {
      "supplierId": {
       "x-source-column": "supplier_id",
@@ -13567,7 +13600,7 @@
      "supplierId",
      "orderDate"
     ],
-    "description": "ERP W/O 헤더 수정. 작성중 상태에서만 허용한다 — 확정 후에는 400 STATE_LOCKED. 근거: W-01-11 · 공유계약 G-1",
+    "description": "ERP W/O 헤더 수정. 등록 상태에서만 허용한다. 승인 요청 뒤에도 P/O 상태가 등록으로 유지되므로 승인 대기 중 수정이 허용되며, 승인 요청은 수정된 값을 별도 스냅샷으로 보존하지 않는다.",
     "properties": {
      "supplierId": {
       "x-source-column": "supplier_id",
@@ -14204,6 +14237,7 @@
       "x-source-column": "issued_qty",
       "type": "number",
       "minimum": 0,
+      "description": "입고 등록 시 실제 출고 라인 수량과 일치함을 검증해 저장한 출고 수량.",
       "example": 100.0
      },
      "receivedQty": {
@@ -14275,6 +14309,7 @@
       "x-source-column": "issued_qty",
       "type": "number",
       "minimum": 0,
+      "description": "선택한 출고 라인의 issueQty를 그대로 보낸다. 서버가 goodsIssueLineId의 실제 출고 수량과 대조하며 다르면 400 INVALID로 거부하고 덮어쓰지 않는다.",
       "example": 100.0
      },
      "receivedQty": {

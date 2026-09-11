@@ -73,7 +73,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "승인 유형 검색 ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
+      "description": "승인 유형 코드 부분 검색. 대소문자를 가리지 않는다. 표시명 검색은 현재 지원하지 않는다."
      },
      {
       "name": "page",
@@ -358,7 +358,7 @@
      "app"
     ],
     "summary": "결재선 사용 중지",
-    "description": "물리 삭제는 제공하지 않는다(공유계약 B-4). ⚠ 중지하면 그 유형의 상신이 400 이 된다 — 화면이 무엇이 막히는지 먼저 보인다. 진행 중인 요청은 그대로 진행된다(공유계약 J-9). 근거: W-06-15 §5-6",
+    "description": "결재선을 사용 중지한다. 물리 삭제는 제공하지 않는다. 같은 승인 유형의 새 상신은 활성 결재선이 없으면 400이 되며, 이미 만들어진 승인 요청과 결재 단계에는 소급하지 않는다. 현재 응답은 영향 화면 목록을 제공하지 않으므로 클라이언트가 화면명을 추정하지 않는다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -635,7 +635,7 @@
      "app"
     ],
     "summary": "승인 요청 목록",
-    "description": "결재함이 쓰는 목록이다. assignedToMe 는 「approver_id 가 「나」인 단계가 있는 요청」이고, pendingOnly 와 함께 쓰면 「내 결재 대기」 탭이 된다(공유계약 J-3 — 역할 기반 필터가 아니다).\n\ntargetTypeCode·targetId 로 거르면 업무 화면이 「이 문서의 승인 상태」를 찾을 수 있다 — 업무 자원이 승인 요청 식별자를 싣지 않는 경우에는 이것이 유일한 방법이다.\n\n⭐ 부르는 셸이 «둘»이다 — 관리웹 결재함(W-CO-09)과 모바일 상신 화면(M-01-13 의 「내가 올린 요청」 구획). 그래서 「나」를 묻는 세 질의(assignedToMe·requestedByMe·myTurnOnly)가 «누구»로 풀리는지가 셸마다 다르다: 관리웹은 계정 토큰에서 서버가 풀고, 현장 단말·모바일은 계정 세션이 없어 X-Worker-No 헤더로 주체를 싣는다(공유계약 D-5·F-2 · 같은 규칙의 선례가 GET /app/notices 의 unacknowledgedByMe 다). ⛔ 단말 토큰으로 풀지 않는다 — 한 단말을 여러 작업자가 «교대로» 쓰므로 남이 올린 요청이 섞인다.\n\n근거: W-CO-09 §3·§5-8 · M-01-13 §4 · omf-mes#335",
+    "description": "승인 요청 목록이다. assignedToMe는 approverId가 현재 사용자와 같은 단계가 있는 요청이며 pendingOnly와 함께 쓰면 아직 끝나지 않은 내 승인 대기를 조회한다. approvalTypeCode로 특정 승인 유형을 거르고, targetTypeCode와 targetId로 업무 문서의 승인 상태를 찾는다. 관리웹 결재함과 긴급 IQC 생략 승인 화면, 모바일의 내가 올린 요청 목록이 사용한다. 현재 서버의 사용자 판정은 계정 세션 기준이며 모바일 작업자 헤더 기반 판정은 아직 지원하지 않는다.",
     "parameters": [
      {
       "name": "assignedToMe",
@@ -643,7 +643,7 @@
       "schema": {
        "type": "boolean"
       },
-      "description": "승인자가 「나」인 요청만 — approver_id 인 단계가 있는 요청이다(공유계약 J-3). ⚠ 승인 화면은 관리웹뿐이라(W-CO-09·W-01-02·W-03-09) 지금은 계정 토큰에서만 풀린다. 현장 셸이 이 질의를 쓰게 되면 requestedByMe 와 같은 규칙으로 X-Worker-No 에 주체를 싣는다"
+      "description": "승인자가 현재 계정 사용자인 요청만 조회한다. approverId가 같은 단계가 있는 요청이며, pendingOnly와 함께 쓰면 미종결 담당 요청, myTurnOnly와 함께 쓰면 지금 결재 가능한 요청만 조회한다. 현재 서버는 작업자 사번 헤더 판정을 지원하지 않는다."
      },
      {
       "name": "requestedByMe",
@@ -651,7 +651,7 @@
       "schema": {
        "type": "boolean"
       },
-      "description": "올린 사람이 「나」인 요청만. ⭐ 「나」는 셸마다 다르게 풀린다 — 관리웹은 계정 토큰의 로그인 사용자이고, 현장 단말·모바일은 X-Worker-No 헤더의 «사번»이다(모바일 셸에는 계정 로그인이 없다 · M-CO-01 §2). ⛔ 헤더를 싣지 않으면 서버가 단말로 풀 수밖에 없고, 한 단말을 여러 작업자가 교대로 쓰므로 «남이 올린 요청이 내 목록에 섞인다». 근거: 공유계약 D-5·F-2 · M-01-13 §4 · omf-mes#335"
+      "description": "현재 계정 사용자가 올린 요청만 조회한다. 모바일 작업자 사번을 기준으로 한 조회는 목표 요구이나 현재 서버에서는 지원하지 않는다."
      },
      {
       "name": "pendingOnly",
@@ -807,7 +807,7 @@
       }
      }
     },
-    "x-internal-note": "⚠ 물류 출고 전표의 승인 요청 식별자는 계약이 앞서 갖고 물리 모델은 작업 통지 대기다 — 공유계약 #29(2026-08-18 사용자 확정). 이 문장을 description 으로 되돌리지 말 것 — 공개된다."
+    "x-internal-note": "W-CO-09·W-01-02·M-01-13 호출. 통보 189의 W-01-02·M-01-13 권한 수동표는 서버 반영 완료이며 요구서 호출표를 정합했다. 기반영 통보 181의 네 품질 경로와 M-01-13 목록은 다시 변경하지 않는다. 모바일 작업자 식별 목표는 공유계약 D-5·F-2와 omf-mes#335에 남아 있다. 물류 출고 전표 승인 요청 식별자의 물리 모델 차이는 공유계약 #29가 추적한다."
    }
   },
   "/app/approval-requests/{approvalRequestId}": {
@@ -3855,7 +3855,8 @@
    "ApprovalRoute": {
     "x-source-table": "app.approval_route",
     "type": "object",
-    "description": "결재선 정의. 승인 유형과 사업부로 고른다.\n\n⚠ 물리 모델에 유일 제약이 없어 같은 (approvalTypeCode, businessUnitId) 로 활성 결재선이 여럿 생길 수 있다. 선택 규칙을 계약이 정본으로 갖는다 — ① 사업부 지정본이 전 사업부 공통본(businessUnitId=null)을 이긴다 ② 그러고도 둘 이상이면 상신이 400(code=ROUTE_AMBIGUOUS)이다. 서버가 임의로 하나를 고르지 않는다. 근거: W-06-15 §5-3 · 공유계약 B-12",
+    "description": "결재선 정의. PURCHASE_ORDER 상신은 전표의 사업부 지정본을 전 사업부 공통본보다 우선하고, 지정본이 없으면 공통본을 선택한다. 나머지 승인 유형은 전 사업부 공통본만 선택한다. 선택 후보가 둘 이상이면 상신이 400(code=ROUTE_AMBIGUOUS)이며 서버가 임의로 하나를 고르지 않는다.",
+    "x-internal-note": "진행 건수와 사업부 선택 범위 근거: 설계 문의 018·022, W-06-15 §5-3·§5-7, 공유계약 B-12·J-9, omf-mes#571.",
     "required": [
      "approvalRouteId",
      "approvalTypeCode",
@@ -3873,7 +3874,7 @@
      "approvalTypeCode": {
       "x-source-column": "approval_type_code",
       "type": "string",
-      "description": "승인 유형. ✅ **값 목록 확정 2026-09-01(사용자 · omf-mes#336)** — **9값이다**(2026-09-04 — 실적 정정 승인이 늘었다). ⭐ 승인유형 값 집합과 생성 경로 대응은 06-API-요구서-app공통승인.md §1-2 표를 참조한다. 승인유형 개수와 생성 경로(method+path) 개수는 다르며 본문 스키마 이름으로 세지 않는다. GOODS_ISSUE_DISPOSAL 기타출고 품의(폐기) · INVENTORY_ADJUSTMENT 재고조정 · PURCHASE_ORDER 신규 ERP W/O · INBOUND_RECEIPT_CANCEL 입하 취소 · GOODS_RECEIPT_CANCEL 입고 취소 · GOODS_ISSUE_CANCEL 출고 취소 · SHIPMENT_CANCEL 출하 취소 · PRODUCTION_RESULT_CORRECT 작업실적 A급 정정(수불·기간업무시스템 영향 — 2026-08-31 사용자 확정 · 등급은 서버가 판정한다) · IQC_SKIP 긴급 IQC 생략(공유계약 A-16 기확정). 상신 화면은 승인 유형을 보내지 않고 서버가 상신 오퍼레이션에서 정하며, 결재선 정의 화면(W-06-15)은 이 값 집합에서 유형을 선택한다. ⭐ 자재 폐기(W-01-06)와 제품 폐기(W-04-10)는 «같은» GOODS_ISSUE_DISPOSAL 이다 — 둘의 결재선을 가르는 것은 유형이 아니라 결재선 정의의 businessUnitId 축이고, 서버가 전표의 reasonCode 로 결재선을 파생한다(✓확정 2026-09-01 사용자 · 공유계약 G-31 이 「승인 게이트가 사유 값을 보고 걸린다」로 이 연결을 2026-08-31 에 이미 세웠다). ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 W-06-06 에서 값을 늘려도 상신할 오퍼레이션이 없어 «쓰이지 않는 결재선»만 생긴다. 근거: W-06-15 §8-2 · 공유계약 A-16",
+      "description": "승인 유형 9값. GOODS_ISSUE_DISPOSAL은 기타출고 품의(자재·제품 폐기), INVENTORY_ADJUSTMENT는 재고조정, PURCHASE_ORDER는 신규 ERP W/O, INBOUND_RECEIPT_CANCEL은 입하 취소, GOODS_RECEIPT_CANCEL은 입고 취소, GOODS_ISSUE_CANCEL은 출고 취소, SHIPMENT_CANCEL은 출하 취소, PRODUCTION_RESULT_CORRECT는 작업실적 A급 정정, IQC_SKIP은 긴급 IQC 생략이다. 상신 화면은 승인 유형을 보내지 않고 서버가 상신 오퍼레이션에서 정하며, 결재선 정의 화면은 이 값 집합에서 유형을 선택한다. PURCHASE_ORDER만 전표의 businessUnitId 지정본을 우선 선택하고, 나머지 승인 유형은 전 사업부 공통 결재선만 선택한다. 공통코드 그룹에서 값을 추가하지 않는다.",
       "example": "GOODS_ISSUE_DISPOSAL",
       "enum": [
        "GOODS_ISSUE_DISPOSAL",
@@ -3929,7 +3930,7 @@
      },
      "inProgressCount": {
       "type": "integer",
-      "description": "이 결재선으로 진행 중인 요청 수. 결재선을 고쳐도 이 요청들은 옛 결재선으로 끝난다 — 화면이 그것을 보인다(공유계약 J-9)",
+      "description": "같은 approvalTypeCode에서 상태가 PENDING인 요청 전체 건수. 특정 결재선별 건수가 아니며, 같은 승인 유형의 결재선에는 같은 값이 표시되므로 서로 합산하지 않는다. 기존 요청의 결재 단계는 결재선 정의를 고쳐도 바뀌지 않는다.",
       "example": 3
      }
     }
@@ -3957,7 +3958,7 @@
        "IQC_SKIP",
        "PRODUCTION_RESULT_CORRECT"
       ],
-      "description": "승인 유형. ✅ **값 목록 확정 2026-09-01(사용자 · omf-mes#336)** — **9값이다**(2026-09-04 — 실적 정정 승인이 늘었다). ⭐ 승인유형 값 집합과 생성 경로 대응은 06-API-요구서-app공통승인.md §1-2 표를 참조한다. 승인유형 개수와 생성 경로(method+path) 개수는 다르며 본문 스키마 이름으로 세지 않는다. GOODS_ISSUE_DISPOSAL 기타출고 품의(폐기) · INVENTORY_ADJUSTMENT 재고조정 · PURCHASE_ORDER 신규 ERP W/O · INBOUND_RECEIPT_CANCEL 입하 취소 · GOODS_RECEIPT_CANCEL 입고 취소 · GOODS_ISSUE_CANCEL 출고 취소 · SHIPMENT_CANCEL 출하 취소 · PRODUCTION_RESULT_CORRECT 작업실적 A급 정정(수불·기간업무시스템 영향 — 2026-08-31 사용자 확정 · 등급은 서버가 판정한다) · IQC_SKIP 긴급 IQC 생략(공유계약 A-16 기확정). 상신 화면은 승인 유형을 보내지 않고 서버가 상신 오퍼레이션에서 정하며, 결재선 정의 화면(W-06-15)은 이 값 집합에서 유형을 선택한다. ⭐ 자재 폐기(W-01-06)와 제품 폐기(W-04-10)는 «같은» GOODS_ISSUE_DISPOSAL 이다 — 둘의 결재선을 가르는 것은 유형이 아니라 결재선 정의의 businessUnitId 축이고, 서버가 전표의 reasonCode 로 결재선을 파생한다(✓확정 2026-09-01 사용자 · 공유계약 G-31 이 「승인 게이트가 사유 값을 보고 걸린다」로 이 연결을 2026-08-31 에 이미 세웠다). ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 W-06-06 에서 값을 늘려도 상신할 오퍼레이션이 없어 «쓰이지 않는 결재선»만 생긴다. 근거: W-06-15 §8-2 · 공유계약 A-16",
+      "description": "승인 유형 9값. GOODS_ISSUE_DISPOSAL은 기타출고 품의(자재·제품 폐기), INVENTORY_ADJUSTMENT는 재고조정, PURCHASE_ORDER는 신규 ERP W/O, INBOUND_RECEIPT_CANCEL은 입하 취소, GOODS_RECEIPT_CANCEL은 입고 취소, GOODS_ISSUE_CANCEL은 출고 취소, SHIPMENT_CANCEL은 출하 취소, PRODUCTION_RESULT_CORRECT는 작업실적 A급 정정, IQC_SKIP은 긴급 IQC 생략이다. 상신 화면은 승인 유형을 보내지 않고 서버가 상신 오퍼레이션에서 정하며, 결재선 정의 화면은 이 값 집합에서 유형을 선택한다. PURCHASE_ORDER만 전표의 businessUnitId 지정본을 우선 선택하고, 나머지 승인 유형은 전 사업부 공통 결재선만 선택한다. 공통코드 그룹에서 값을 추가하지 않는다.",
       "x-code-key": "CD-APPROVAL-TYPE"
      },
      "businessUnitId": {
@@ -4193,7 +4194,7 @@
    },
    "ApprovalTarget": {
     "type": "object",
-    "description": "승인 대상. approval_request 는 target_type_code + target_id 다형 참조로 대상을 가리키고 유형↔테이블 규약이 아직 없다(omf-mes#68 — 그 이슈는 2026-08-25 후속 없이 닫혔고 지금 살아 있는 곳은 omf-mes-server#74 다). 그래서 계약이 표시명과 열 화면을 함께 내려 준다 — 화면이 「이 유형은 저 화면」 표를 갖지 않는다. 근거: W-CO-09 §5-2 · 공유계약 A-10 보강",
+    "description": "승인 대상이다. targetTypeCode와 targetId로 업무 리소스를 식별한다. 현재 서버는 displayName에 코드 대체 표시를 제공하고 screenId를 생략하며 openable=false를 반환한다. 화면은 openable=true이고 screenId가 있을 때만 대상 이동을 제공한다. 향후 사람이 읽는 표시명과 화면 연결을 제공하더라도 리소스 경로를 화면 ID로 추정하지 않는다.",
     "required": [
      "targetTypeCode",
      "targetId",
@@ -4226,19 +4227,19 @@
      },
      "displayName": {
       "type": "string",
-      "description": "사람이 읽는 대상 이름. 서버가 만든다",
-      "example": "기타 출고 · 문서 #4412"
+      "description": "대상 표시 문자열. 현재는 `{targetTypeCode} #{targetId}` 형식의 코드 대체 표시이며 사람이 읽는 업무명은 아직 지원하지 않는다.",
+      "example": "GOODS_ISSUE #4412"
      },
      "screenId": {
       "type": "string",
-      "description": "대상을 여는 화면 ID. 규약이 정해지면 이 값만 바뀐다 — 프런트는 화면 ID → 경로 매핑 하나만 갖는다. ⭐ 첫 확정 규칙 — 특채·한도승인 유형의 요청은 서버가 screenId = \"W-03-09\"(특채·한도승인 승인 처리)를 내린다: 이 유형의 「원문」은 승인 조건 5축이고 그것을 보이는 화면이 W-03-09 다. 근거: omf-mes#194",
+      "description": "대상을 여는 화면 ID. 현재 서버는 모든 승인 유형에서 이 필드를 생략한다. 향후 값이 제공되어도 openable=true일 때만 사용한다. 긴급 IQC 생략 대상의 목표 화면은 W-01-02이며, 대상 리소스 경로와 화면 ID는 서로 다른 축이다.",
       "example": "W-01-06",
-      "x-internal-note": "⚠ description 의 「특채·한도승인 유형의 요청은 서버가 screenId=W-03-09 를 내린다(omf-mes#194)」는 «특채»에서만 근거가 확인된다. 근거로 든 「원문 = 승인 조건 5축」이 한도승인에는 성립하지 않고(W-03-09 §0 — 한도승인은 전용 테이블 없이 approval_request 하나로 성립한다), 한도승인(IQC_SKIP)의 대상은 입하 LOT 이며 전용 승인 화면은 W-01-02 다. 값 목록 확정(omf-mes#145 · W-06-06) 때 함께 가른다."
+      "x-internal-note": "통보 019·omf-mes#572. 서버 approval.mapper는 screenId를 생략하고 openable=false를 고정한다. IQC_SKIP의 대상 INBOUND_LOT는 W-01-02가 목표 화면이며 W-03-09의 특채 판정과 분리한다. 9개 approvalTypeCode와 8개 targetTypeCode, A-10 리소스 경로를 화면 ID 대응으로 오인하지 않는다."
      },
      "openable": {
       "type": "boolean",
-      "description": "열 화면이 없으면 거짓. 화면은 버튼을 비활성하고 사유를 보인다(공유계약 G-3)",
-      "example": true
+      "description": "대상 화면을 열 수 있는지 여부. 현재 서버는 항상 거짓이며 화면은 이동 버튼을 비활성하고 미지원 사유를 보인다.",
+      "example": false
      }
     }
    },
@@ -4360,7 +4361,7 @@
        "IQC_SKIP",
        "PRODUCTION_RESULT_CORRECT"
       ],
-      "description": "승인 유형. ✅ **값 목록 확정 2026-09-01(사용자 · omf-mes#336)** — **9값이다**(2026-09-04 — 실적 정정 승인이 늘었다). ⭐ 승인유형 값 집합과 생성 경로 대응은 06-API-요구서-app공통승인.md §1-2 표를 참조한다. 승인유형 개수와 생성 경로(method+path) 개수는 다르며 본문 스키마 이름으로 세지 않는다. GOODS_ISSUE_DISPOSAL 기타출고 품의(폐기) · INVENTORY_ADJUSTMENT 재고조정 · PURCHASE_ORDER 신규 ERP W/O · INBOUND_RECEIPT_CANCEL 입하 취소 · GOODS_RECEIPT_CANCEL 입고 취소 · GOODS_ISSUE_CANCEL 출고 취소 · SHIPMENT_CANCEL 출하 취소 · PRODUCTION_RESULT_CORRECT 작업실적 A급 정정(수불·기간업무시스템 영향 — 2026-08-31 사용자 확정 · 등급은 서버가 판정한다) · IQC_SKIP 긴급 IQC 생략(공유계약 A-16 기확정). 상신 화면은 승인 유형을 보내지 않고 서버가 상신 오퍼레이션에서 정하며, 결재선 정의 화면(W-06-15)은 이 값 집합에서 유형을 선택한다. ⭐ 자재 폐기(W-01-06)와 제품 폐기(W-04-10)는 «같은» GOODS_ISSUE_DISPOSAL 이다 — 둘의 결재선을 가르는 것은 유형이 아니라 결재선 정의의 businessUnitId 축이고, 서버가 전표의 reasonCode 로 결재선을 파생한다(✓확정 2026-09-01 사용자 · 공유계약 G-31 이 「승인 게이트가 사유 값을 보고 걸린다」로 이 연결을 2026-08-31 에 이미 세웠다). ⛔ 공통코드 그룹으로 받지 않는다 — 고객이 W-06-06 에서 값을 늘려도 상신할 오퍼레이션이 없어 «쓰이지 않는 결재선»만 생긴다. 근거: W-06-15 §8-2 · 공유계약 A-16",
+      "description": "승인 유형 9값. GOODS_ISSUE_DISPOSAL은 기타출고 품의(자재·제품 폐기), INVENTORY_ADJUSTMENT는 재고조정, PURCHASE_ORDER는 신규 ERP W/O, INBOUND_RECEIPT_CANCEL은 입하 취소, GOODS_RECEIPT_CANCEL은 입고 취소, GOODS_ISSUE_CANCEL은 출고 취소, SHIPMENT_CANCEL은 출하 취소, PRODUCTION_RESULT_CORRECT는 작업실적 A급 정정, IQC_SKIP은 긴급 IQC 생략이다. 상신 화면은 승인 유형을 보내지 않고 서버가 상신 오퍼레이션에서 정하며, 결재선 정의 화면은 이 값 집합에서 유형을 선택한다. PURCHASE_ORDER만 전표의 businessUnitId 지정본을 우선 선택하고, 나머지 승인 유형은 전 사업부 공통 결재선만 선택한다. 공통코드 그룹에서 값을 추가하지 않는다.",
       "x-code-key": "CD-APPROVAL-TYPE"
      },
      "requestedBy": {
@@ -4409,7 +4410,7 @@
      },
      "isMyTurn": {
       "type": "boolean",
-      "description": "이 요청의 지금 단계 승인자가 「나」인가. 목록의 「내 결재 대기」 탭이 이 값으로 걸러진다. ⚠ 「나」는 서버가 «요청 주체»에서 푼다 — 관리웹은 계정 토큰, 현장 단말·모바일은 X-Worker-No(공유계약 D-5). ⭐ 상신자로 보는 목록(requestedByMe)에서는 뜻이 없다 — 승인 화면은 관리웹뿐이다",
+      "description": "현재 계정 사용자가 이 요청의 지금 단계 승인자인지 나타낸다. 내 결재 대기 목록의 근거이며, requestedByMe로 상신자 목록을 조회할 때는 사용하지 않는다.",
       "example": true
      }
     }
