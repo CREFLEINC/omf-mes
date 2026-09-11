@@ -1034,7 +1034,7 @@
      "production"
     ],
     "summary": "자재 반출 목록",
-    "description": "근거: M-02-02 §3",
+    "description": "P-02-03에서 W/O 잔여 자재 반출 기록을 조회한다. 현재 응답은 기록 전용이며 실제 재고 이동이나 창고 도착을 증명하지 않는다.",
     "parameters": [
      {
       "name": "workOrderId",
@@ -1050,10 +1050,10 @@
       "in": "query",
       "schema": {
        "type": "string",
-       "x-no-example": "코드 그룹을 세우지 않는다 — ⛔ 부르는 화면이 0건이고(02 요구서 §5 미착지 5 — 경로가 고아다) 전이 액션도 없다. 구간 형 리소스라 진행은 requestedAt ↔ receivedAt 의 유무로 판정한다 — 작업 세션·LOT 보류가 쓴 그 방식이다(A-21)."
+       "x-no-example": "P-02-03이 소유하지만 현재 등록 흐름에는 상태 전이·도착 수령 액션이 없어 값 목록을 확정하지 않는다."
       },
-      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 부르는 화면이 0건이고(02 요구서 §5 미착지 5 — 경로가 고아다) 전이 액션도 없다. 구간 형 리소스라 진행은 requestedAt ↔ receivedAt 의 유무로 판정한다 — 작업 세션·LOT 보류가 쓴 그 방식이다(A-21).",
-      "description": "독립 상태 코드를 사용하는 조회 조건이 아니다. 독립 상태 코드를 사용하지 않는다. 반납 진행은 requestedAt과 receivedAt으로 확인한다."
+      "x-no-code-key": "P-02-03이 소유하지만 현재 등록 흐름에는 상태 전이·도착 수령 액션이 없어 코드 그룹을 세우지 않는다.",
+      "description": "독립 상태 코드를 사용하는 조회 조건이 아니다. 현재 도착 수령 경로가 없어 requestedAt 이후 진행을 완료할 수 없으며 receivedAt은 채워지지 않는다."
      },
      {
       "name": "requestedFrom",
@@ -1123,7 +1123,7 @@
      "production"
     ],
     "summary": "자재 반출 등록",
-    "description": "⚠ 2026-08-26 — 근거였던 M-02-02(수리 왕복)가 이 경로를 쓰지 않는 것으로 정정됐다. 수리 반출은 자재 반납이 아니라서 전용 자원(/production/repair-executions:return)으로 갔다. 이 경로는 「W/O 잔여 자재를 창고로 반납」이라는 실재 업무이나 부르는 화면이 아직 매핑되지 않았다 — 소유 화면이 정해지면 근거를 다시 적는다. 오프라인 대상 오퍼레이션이다 — Idempotency-Key 는 필수이고 If-Match 는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않는다(공유계약 C-9). ⛔ 오프라인일 때는 이 오퍼레이션이 호출되지 않는다 — 셸의 outbox 가 들고 있다가 연결되면 그때 보낸다. 그래서 서버 응답은 온라인일 때의 것 하나뿐이다. 미확정 표식은 셸이 붙인다(공유계약 C-7 — 화면 조항).",
+    "description": "P-02-03에서 W/O 잔여 자재의 반출 사실을 기록한다. 현재 서버는 전표와 라인만 생성하고 재고 잔액·수불 원장을 바꾸지 않는다. 목적 위치·현장 발생 시각을 받지 않으며 requestedAt은 서버 수신 시각이다. 도착 수령 경로도 없어 receivedAt은 채워지지 않는다. 성공은 실제 재고 이동이나 창고 도착 완료를 뜻하지 않는다. 오프라인 대상 오퍼레이션이며 Idempotency-Key는 필수이고 If-Match는 선택이다. 큐는 낙관적 잠금 토큰을 싣지 않고, 오프라인에서는 셸의 outbox가 보관했다가 연결되면 호출한다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -1195,7 +1195,7 @@
      "production"
     ],
     "summary": "자재 반출 한 건",
-    "description": "근거: M-02-02 §3",
+    "description": "P-02-03에서 자재 반출 기록 한 건과 라인을 조회한다. receivedAt 생략은 현재 도착 수령 경로가 없다는 뜻이며 실제 이동 완료를 추정하지 않는다.",
     "parameters": [
      {
       "name": "materialReturnId",
@@ -4677,9 +4677,9 @@
      },
      "statusCode": {
       "type": "string",
-      "x-no-code-key": "코드 그룹을 세우지 않는다 — ⛔ 부르는 화면이 0건이고(02 요구서 §5 미착지 5 — 경로가 고아다) 전이 액션도 없다. 구간 형 리소스라 진행은 requestedAt ↔ receivedAt 의 유무로 판정한다 — 작업 세션·LOT 보류가 쓴 그 방식이다(A-21).",
-      "x-no-example": "코드 그룹을 세우지 않는다 — ⛔ 부르는 화면이 0건이고(02 요구서 §5 미착지 5 — 경로가 고아다) 전이 액션도 없다. 구간 형 리소스라 진행은 requestedAt ↔ receivedAt 의 유무로 판정한다 — 작업 세션·LOT 보류가 쓴 그 방식이다(A-21).",
-      "description": "독립 상태 코드를 사용하지 않는다. 반납 진행은 requestedAt과 receivedAt으로 확인한다."
+      "x-no-code-key": "P-02-03이 소유하지만 현재 등록 흐름에는 상태 전이·도착 수령 액션이 없어 코드 그룹을 세우지 않는다.",
+      "x-no-example": "현재 서버 저장 상수는 내부 구현값이며 화면이 선택하거나 전이시키는 공개 값 목록이 아니다.",
+      "description": "독립 상태 코드를 사용하지 않는다. 현재는 기록 생성만 지원하며 도착 수령 경로가 없어 receivedAt으로 완료 상태를 만들 수 없다."
      },
      "requestedAt": {
       "type": "string",
@@ -4740,7 +4740,7 @@
      "destinationWarehouseId",
      "lines"
     ],
-    "description": "라인은 본문에 싣는다 — 독립 경로를 두지 않는다. 근거: 01 계약 규약 계승"
+    "description": "P-02-03의 W/O 잔여 자재 반출 기록 요청. 라인은 본문에 싣고 독립 경로를 두지 않는다. 현재는 실제 재고 이동·목적 위치·발생 시각·도착 수령을 지원하지 않는다."
    },
    "MaterialReturnLine": {
     "type": "object",
