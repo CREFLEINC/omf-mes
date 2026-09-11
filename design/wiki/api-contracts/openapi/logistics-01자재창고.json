@@ -2769,7 +2769,7 @@
      "logistics"
     ],
     "summary": "출고 등록",
-        "description": "postImmediately 가 참이면 등록과 전기가 같은 트랜잭션이다 — 화면이 한 버튼인 경우다. 전기 시 각 라인의 창고·위치·품목·LOT에 해당하는 재고잔액이 정확히 1건이어야 하며 그 행의 품질·재고 상태와 소유 유형·소유자 거래처를 그대로 사용한다. 후보가 없거나 둘 이상이면 전건을 거부하고 임의의 첫 행을 고르지 않는다. 승인이 필요한 기타 출고(폐기 등)는 거짓으로 등록하고 별도 상신·승인 뒤 전기한다. 현재 서버는 폐기 사유를 판별해 postImmediately=true를 거부하지 못하므로 이를 승인 우회 수단으로 사용하지 않는다. 근거: M-01-08 · W-01-05 · W-01-06",
+    "description": "postImmediately 가 참이면 등록과 전기가 같은 트랜잭션이다 — 화면이 한 버튼인 경우다. 기존 수량·보류·상태·승인 검증과 함께 각 라인의 창고·위치·품목·LOT에 해당하는 재고잔액이 정확히 1건인지 검사하며 그 행의 품질·재고 상태와 소유 유형·소유자 거래처를 그대로 사용한다. 후보가 없거나 둘 이상이면 전건을 거부하고 임의의 첫 행을 고르지 않는다. 승인이 필요한 기타 출고(폐기 등)는 거짓으로 등록하고 별도 상신·승인 뒤 전기한다. 현재 서버는 폐기 사유를 판별해 postImmediately=true를 거부하지 못하므로 이를 승인 우회 수단으로 사용하지 않는다. 근거: M-01-08 · W-01-05 · W-01-06",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -2812,7 +2812,7 @@
       }
      },
      "400": {
-            "description": "검증 실패. 재고 후보가 없으면 NEGATIVE_BALANCE, 품질·재고 상태 또는 소유 축이 달라 후보가 둘 이상이면 INVALID(field=lines[i].lotId)이며 일부 라인만 전기하지 않는다",
+      "description": "검증 실패. 재고 후보가 없으면 NEGATIVE_BALANCE, 품질·재고 상태 또는 소유 축이 달라 후보가 둘 이상이면 INVALID(field=lines[i].lotId)이며 일부 라인만 전기하지 않는다",
       "content": {
        "application/json": {
         "schema": {
@@ -3043,7 +3043,7 @@
      "logistics"
     ],
     "summary": "출고 전기",
-        "description": "재고가 움직이는 순간이다. 각 라인의 창고·위치·품목·LOT에 해당하는 재고잔액이 정확히 1건일 때 그 행의 품질·재고 상태와 소유 유형·소유자 거래처를 보존해 전기한다. 후보 0건·복수 건은 거부하며 임의 선택하지 않는다. 폐기 출고의 업무 요구는 승인 완료 뒤 전기하는 것이다. 현재 서버의 승인 기록 판정은 APPROVED가 하나라도 있으면 통과하고, APPROVED 없이 PENDING이 있으면 APPROVAL_IN_PROGRESS, 승인 없이 REJECTED만 있으면 APPROVAL_REQUIRED로 거부한다. 승인 요청이 0건이면 통과하므로 폐기 전건 강제는 아직 보장하지 않는다. 근거: W-01-06 §5-5 · 공유계약 B-8",
+    "description": "재고가 움직이는 순간이다. 기존 수량·보류·상태·승인 검증과 함께 각 라인의 창고·위치·품목·LOT에 해당하는 재고잔액이 정확히 1건인지 검사하며 그 행의 품질·재고 상태와 소유 유형·소유자 거래처를 보존해 전기한다. 후보 0건·복수 건은 거부하며 임의 선택하지 않는다. 폐기 출고의 업무 요구는 승인 완료 뒤 전기하는 것이다. 현재 서버의 승인 기록 판정은 APPROVED가 하나라도 있으면 통과하고, APPROVED 없이 PENDING이 있으면 APPROVAL_IN_PROGRESS, 승인 없이 REJECTED만 있으면 APPROVAL_REQUIRED로 거부한다. 승인 요청이 0건이면 통과하므로 폐기 전건 강제는 아직 보장하지 않는다. 근거: W-01-06 §5-5 · 공유계약 B-8",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -8541,7 +8541,7 @@
      "uomId",
      "sourceLocationId"
     ],
-        "description": "라인 전체 치환 항목. goodsIssueLineId 가 없으면 신규 행, 있으면 갱신, 요청에서 빠진 기존 행은 삭제한다. 입력은 창고·위치·품목·LOT을 지정하지만 품질·재고 상태와 소유 유형·소유자 거래처를 지정하지 않는다. 이 축은 전기 시 정확히 한 재고잔액 행에서만 보존되며 복수 후보를 화면이나 서버가 임의 선택하지 않는다. 전기된 전표는 400 STATE_LOCKED, 승인 진행 중은 400 APPROVAL_IN_PROGRESS이며 승인 완료 뒤에도 400 STATE_LOCKED로 라인을 바꿀 수 없다. 근거: 공유계약 A-5 · G-1",
+    "description": "라인 전체 치환 항목. goodsIssueLineId 가 없으면 신규 행, 있으면 갱신, 요청에서 빠진 기존 행은 삭제한다. 입력은 창고·위치·품목·LOT을 지정하지만 품질·재고 상태와 소유 유형·소유자 거래처를 지정하지 않는다. 이 축은 전기의 다른 모든 검증과 함께 정확히 한 재고잔액 행에서만 보존되며 복수 후보를 화면이나 서버가 임의 선택하지 않는다. 전기된 전표는 400 STATE_LOCKED, 승인 진행 중은 400 APPROVAL_IN_PROGRESS이며 승인 완료 뒤에도 400 STATE_LOCKED로 라인을 바꿀 수 없다. 근거: 공유계약 A-5 · G-1",
     "properties": {
      "goodsIssueLineId": {
       "x-source-column": "goods_issue_line_id",

@@ -3807,7 +3807,7 @@
    },
    "ShipmentLinePick": {
     "type": "object",
-    "description": "피킹 확정 요청. 창고·위치·품질·재고 상태·소유 유형·소유자 거래처 입력은 없으며 품목+LOT 재고 후보가 정확히 1건이어야 한다. 사번은 본문이 아니라 X-Worker-No 헤더로 보낸다. businessDate와 occurredAt 입력은 현재 지원하지 않으며 서버 수신 시각의 UTC 날짜가 잔여 유효기간 판정과 예약번호 RS-{YYYYMMDD}-{SEQ4}의 기간 축이다",
+    "description": "피킹 확정 요청. 창고·위치·품질·재고 상태·소유 유형·소유자 거래처 입력은 없으며 기존 보류·가용·배정·유효기간 검증과 별도로 품목+LOT 재고 후보가 정확히 1건이어야 한다. 사번은 본문이 아니라 X-Worker-No 헤더로 보낸다. businessDate와 occurredAt 입력은 현재 지원하지 않으며 서버 수신 시각의 UTC 날짜가 잔여 유효기간 판정과 예약번호 RS-{YYYYMMDD}-{SEQ4}의 기간 축이다",
     "required": [
      "lotId",
      "pickedQty",
