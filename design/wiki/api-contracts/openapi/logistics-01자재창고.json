@@ -7319,8 +7319,8 @@
        "string",
        "null"
       ],
-      "description": "역트랜잭션 번호",
-      "example": "TX-2026-0011"
+      "description": "역트랜잭션 번호. 전기 취소는 원 거래 번호에 -R을 붙인다.",
+      "example": "TX-EXAMPLE-001-R"
      },
      "reversalBusinessDate": {
       "type": [
@@ -7328,7 +7328,7 @@
        "null"
       ],
       "format": "date",
-      "description": "역트랜잭션 영업일 — 원장 조회에 함께 쓴다",
+      "description": "역트랜잭션 영업일. 취소 실행일이 아니라 원 거래 영업일을 그대로 쓰며 원장 조회에 함께 쓴다.",
       "example": "2026-08-07"
      }
     }
@@ -7568,7 +7568,7 @@
       "type": "string",
       "example": "GOODS_RECEIPT",
       "x-code-key": "CD-DOCUMENT-SUCCESSOR-TYPE",
-      "description": "A-10 다형 참조 판별자 — 값이 «대상 리소스 이름»이고 짝 id 가 그 리소스의 식별자다. ⭐ 대응표는 «설계»가 정한다(A-10 규칙 1 · 2026-09-03 사용자 결정). 후속이 무엇인가 — 입고 · 출고 · 피킹 · 수불 원장 · 자재 투입. ⭐ W-01-13 §5-3 이 「후속 판정이 두 갈래」로 이미 적어 두었다 — 앞 넷은 sourceDocument* 로 거꾸로 조회하는 «문서 하류»이고, 자재 투입은 원천 문서가 아니라 LOT 을 가리키는 «재고 사용»이다. ⛔ 취소하려면 이것들을 역순으로 먼저 취소해야 한다.",
+      "description": "A-10 다형 참조 판별자. 입고·출고·피킹은 sourceDocument 역조회의 문서 하류이고 INVENTORY_TRANSACTION과 MATERIAL_CONSUMPTION은 이 문서가 만든 LOT의 재고 사용 축이다. 현재 출고의 실제 사용, P/O의 입하, 생산창고 수령 전표는 후속 유형·매핑이 없어 판정하지 않는다. 취소하려면 반환된 후속을 역순으로 먼저 취소해야 한다.",
       "enum": [
        "GOODS_RECEIPT",
        "GOODS_ISSUE",
