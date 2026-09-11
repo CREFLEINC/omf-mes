@@ -118,7 +118,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -242,7 +252,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -417,7 +437,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/app/approval-routes/{approvalRouteId}:activate": {
@@ -549,7 +579,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -806,7 +846,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "W-CO-09·W-01-02·M-01-13 호출. 통보 189의 W-01-02·M-01-13 권한 수동표는 서버 반영 완료이며 요구서 호출표를 정합했다. 기반영 통보 181의 네 품질 경로와 M-01-13 목록은 다시 변경하지 않는다. 모바일 작업자 식별 목표는 공유계약 D-5·F-2와 omf-mes#335에 남아 있다. 물류 출고 전표 승인 요청 식별자의 물리 모델 차이는 공유계약 #29가 추적한다."
    }
   },
@@ -868,7 +918,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/app/approval-requests/{approvalRequestId}:approve": {
@@ -1312,7 +1372,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/app/document-issues/{documentIssueLogId}/rendition": {
@@ -1399,7 +1469,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "통보 I-27 최종결정(omf-mes#516): 바이너리 생성 원천 부재로 현재 기술적 제외다. 설계상 출력 계약은 보존하지만 발행 API 완료를 이 경로의 렌디션 생성·문서9종 물리출력 완료로 표현하지 않는다."
    }
   },
@@ -1474,7 +1554,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "귀속 필수판이다. 부르는 화면은 P-01-01·P-01-02·P-04-01 셋 전부 현장 단말이고 관리웹은 부르지 않는다 — W-05-13 은 QR 이미지 생성까지이고 물리 인쇄가 범위 밖이다(06-API-요구서-05설비툴.md §3-12). 같은 계열의 POST /app/document-issues 가 선택판인 것은 그쪽만 W-05-13 이 겸용하기 때문이다. 이 자리는 요구서가 POST …:report-print 로 축약해 적어 omf-mes#178 의 전수 스캔에 걸리지 않았다. 근거: 공유계약 D-5 · omf-mes#178."
    }
   },
@@ -1529,7 +1619,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/app/document-issues/summary": {
@@ -2399,7 +2499,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "표시 순서(확인 요구 먼저·최신순)는 W-CO-04 §8 미결 5 — 권고 단계이지 확정이 아니다."
    },
    "post": {
@@ -2505,7 +2615,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -2661,7 +2781,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/app/notices/{noticeId}:close": {
@@ -2730,7 +2860,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/app/notices/{noticeId}:acknowledge": {
@@ -2792,7 +2932,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/app/notices/{noticeId}/acknowledgements": {
@@ -2884,7 +3034,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/app/dashboard-summary": {
@@ -2936,7 +3096,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/app/operation-policies": {
@@ -3046,7 +3216,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -3180,7 +3360,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/app/operation-policies/{operationPolicyId}": {
@@ -3221,7 +3411,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -3397,7 +3597,7 @@
      "app"
     ],
     "summary": "첨부 목록",
-    "description": "한 대상에 붙은 첨부를 낸다.",
+    "description": "첨부 목록. targetTypeCode와 targetId는 각각 독립인 선택 필터이며 하나만 보내도 된다. 다형 식별자의 의미가 섞이지 않게 화면은 둘을 함께 보내는 것을 기본으로 한다. 페이지네이션 없이 일치하는 전건을 내리고, uploadedAt 내림차순 뒤 attachmentId 내림차순으로 고정 정렬한다. 없는 대상과 첨부가 없는 대상은 모두 200 빈 items다.",
     "parameters": [
      {
       "name": "targetTypeCode",
@@ -3445,7 +3645,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/app/attachments/{attachmentId}/content": {
@@ -3502,7 +3712,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "이 계약에서 application/json 이 아닌 두 번째 응답이다 — 첫째는 출력물 rendition 이다(06-API-요구서-app공통출력물.md §6 편차 2)."
    }
   },
