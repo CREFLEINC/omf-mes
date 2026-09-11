@@ -12127,7 +12127,7 @@
       "x-source-column": "source_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "LOT 이 어디서 생겼나 — 입하 라인(INBOUND_RECEIPT_LINE) · 재생재 등록(RECYCLE_ENTRY). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_SOURCE_TYPE 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "LOT 이 어디서 생겼나 — 입하 라인(INBOUND_RECEIPT_LINE) · 재생재 등록(RECYCLE_ENTRY) · 작업지시 선발행(WORK_ORDER). 시스템 소유라 고객이 편집하면 안 된다. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_SOURCE_TYPE 로 받으며 채번 식별자를 하드코딩하지 않는다.",
       "example": "INBOUND_RECEIPT_LINE",
       "x-internal-note": "⛔ 응답이라 닫지 않았다(2026-09-02 · omf-mes#354). 응답 스키마에서 값 목록을 좁히면 «항상 오던 값이 목록 밖»이 될 수 있어 그 값을 그대로 그리던 화면이 깨진다 — uiux-client-handoff 의 「필수 여부는 방향이 아니라 누가 그 값을 읽는가로 가른다」와 같은 축이다. 요청 자리(LotCreate)는 A-16 판별자 판정으로 닫았다.",
       "x-code-key": "CD-LOT-SOURCE-TYPE"
