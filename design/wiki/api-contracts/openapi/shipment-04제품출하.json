@@ -1555,7 +1555,7 @@
      "shipment"
     ],
     "summary": "출하 취소 요청",
-    "description": "미확정 구간에서만 된다. 사유가 필수다. 승인은 공통 계약이 소유한다. 01 자재창고가 쓰는 :request-cancel 과 같은 형태다. 근거: W-04-12 §5-8",
+    "description": "미확정 구간에서만 된다. 사유가 필수다. 승인 대기(PENDING) 요청이 있으면 409 CANCEL_IN_PROGRESS이고, 반려된 요청은 열린 요청이 아니므로 다시 상신할 수 있다. 승인은 공통 계약이 소유한다. 근거: W-04-12 §5-8",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
