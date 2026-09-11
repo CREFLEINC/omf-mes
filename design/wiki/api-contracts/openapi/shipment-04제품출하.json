@@ -3547,7 +3547,6 @@
    },
    "ShipmentRequestCreate": {
     "type": "object",
-    "description": "출하작업지시 생성 요청. 응답 번호의 기본 형식은 SR-{YYYYMMDD}-{SEQ4}이며 requestedShipDate가 기간 축이다. 동일 SR 접두어를 쓰는 다른 문서와 카운터·식별자는 분리되고 기존 번호를 다시 매기지 않는다",
     "properties": {
      "salesOrderId": {
       "type": [
@@ -3596,7 +3595,7 @@
      "requestedShipDate",
      "lines"
     ],
-    "description": "편성. 라인은 1건 이상이고 각 라인의 요청·배정 수량은 0보다 커야 한다. 배정 수량은 요청 수량을 넘을 수 없다(W-04-01 §5-1·§5-7). ⛔ 편성 취소를 두지 않는다 — 출하작업지시 취소는 범위 밖이다"
+    "description": "편성. 라인은 1건 이상이고 각 라인의 요청·배정 수량은 0보다 커야 한다. 배정 수량은 요청 수량을 넘을 수 없다(W-04-01 §5-1·§5-7). 응답 번호의 기본 형식은 SR-{YYYYMMDD}-{SEQ4}이며 requestedShipDate가 기간 축이다. 동일 SR 접두어를 쓰는 다른 문서와 카운터·식별자는 분리되고 기존 번호를 다시 매기지 않는다. ⛔ 편성 취소를 두지 않는다 — 출하작업지시 취소는 범위 밖이다"
    },
    "ShipmentRequestLine": {
     "type": "object",
