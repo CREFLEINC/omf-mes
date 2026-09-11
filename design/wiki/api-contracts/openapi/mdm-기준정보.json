@@ -140,7 +140,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "공유계약 G-8(유효성 판정은 서버가 한다)"
    },
    "post": {
@@ -238,7 +248,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "공유계약 B-4(참조 건수를 응답에 담는다 — 화면이 세지 않는다)"
    },
    "put": {
@@ -378,7 +398,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/warehouses/{warehouseId}:activate": {
@@ -439,7 +469,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/locations": {
@@ -530,7 +570,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "공유계약 G-8(유효성 판정은 서버가 한다)"
    },
    "post": {
@@ -628,7 +678,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "공유계약 B-4(참조 건수를 응답에 담는다 — 화면이 세지 않는다)"
    },
    "put": {
@@ -768,7 +828,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "(허용 여부 자체는 §8-6 미결)"
    }
   },
@@ -830,7 +900,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/app/users": {
@@ -930,7 +1010,17 @@
       },
       "x-internal-note": "§8-8(편집 권한 매트릭스는 미결)"
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "공유계약 G-8(유효성 판정은 서버가 한다)"
    },
    "post": {
@@ -1028,7 +1118,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "미착지 #155 §1 / 공유계약 B-4(참조 건수를 응답에 담는다 — 화면이 세지 않는다)"
    },
    "put": {
@@ -1239,7 +1339,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/app/users/{appUserId}:reset-password": {
@@ -1296,7 +1406,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/app/users/{appUserId}/roles": {
@@ -1328,7 +1448,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -1428,7 +1558,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -1614,7 +1754,17 @@
       },
       "x-internal-note": "§8-8(편집 권한 매트릭스는 미결)"
      }
-    },
+    ,
+     "400": {
+      "description": "페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "공유계약 G-8(유효성 판정은 서버가 한다)"
    },
    "post": {
@@ -1712,7 +1862,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "공유계약 B-4(참조 건수를 응답에 담는다 — 화면이 세지 않는다)"
    },
    "put": {
@@ -1924,7 +2084,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/app/roles/{roleId}/permissions": {
@@ -1956,7 +2126,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -2065,7 +2245,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "공유계약 G-8(유효성 판정은 서버가 한다)"
    },
    "post": {
@@ -2161,7 +2351,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "공유계약 B-4(routingCode 참조 건수를 응답에 담는다 — 화면이 세지 않는다)"
    },
    "put": {
@@ -2458,7 +2658,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/planning/routings/{routingId}/operations": {
@@ -2490,7 +2700,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -2587,7 +2807,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -2743,7 +2973,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "공유계약 G-8(유효성 판정은 서버가 한다)"
    },
    "post": {
@@ -2841,7 +3081,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "공유계약 B-4(참조 건수를 응답에 담는다 — 화면이 세지 않는다)"
    },
    "put": {
@@ -2981,7 +3231,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/code-groups/{codeGroupId}:activate": {
@@ -3042,7 +3302,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/code-values": {
@@ -3241,7 +3511,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -3379,7 +3659,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/code-values/{codeValueId}:activate": {
@@ -3440,7 +3730,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/judgment-type-controls": {
@@ -3513,7 +3813,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "신설 2026-09-03 — PUT 이 If-Match 를 «필수»로 요구하는데 토큰을 실을 GET 이 없었다(목록 GET 은 ETag 를 내지 않고, 낸다 해도 «어느 행의» 판인지 뜻이 서지 않는다). 같은 형태를 이미 푼 선례가 있다 — GET /planning/boms/{bomId}/components/{bomComponentId}(2026-08-03 사용자 결정 · 요구서 §3-6 「행 단위 GET 을 신설했다」)."
    },
    "put": {
@@ -3561,7 +3871,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/departments": {
@@ -3639,7 +3959,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -3736,7 +4066,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -3874,7 +4214,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/departments/{departmentId}:activate": {
@@ -3935,7 +4285,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/workers": {
@@ -4039,7 +4399,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/workers/{workerId}": {
@@ -4080,7 +4450,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "⭐ ETag 신설 2026-09-03 — :update-name-translation 이 If-Match 를 요구하는데 토큰 원천이 선언돼 있지 않았다(공유계약 B-1-1 ②)."
    }
   },
@@ -4159,7 +4539,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/workers/{workerId}/qualifications": {
@@ -4200,7 +4590,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -4415,7 +4815,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "공유계약 G-8(유효성 판정은 서버가 한다)"
    }
   },
@@ -4457,7 +4867,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -4576,7 +4996,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -4730,7 +5160,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -4882,7 +5322,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -5043,7 +5493,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/planning/boms/{bomId}": {
@@ -5075,7 +5535,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/planning/boms/{bomId}:set-default": {
@@ -5165,7 +5635,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/planning/boms/{bomId}/components/{bomComponentId}": {
@@ -5215,7 +5695,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "(§5 미착지 16 해소 — 2026-08-03 사용자 결정)"
    },
    "put": {
@@ -5381,7 +5871,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "공유계약 G-8(유효성 판정은 서버가 한다)"
    },
    "post": {
@@ -5478,7 +5978,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -5614,7 +6124,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/quality/inspection-plans/{inspectionPlanId}:activate": {
@@ -5674,7 +6194,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/quality/inspection-plans/{inspectionPlanId}:approve": {
@@ -5765,7 +6295,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -5860,7 +6400,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -6141,7 +6691,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -6285,7 +6845,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -6380,7 +6950,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "공유계약 B-4(참조처는 defect_record — FK 실재라 셀 수 있다)"
    },
    "put": {
@@ -6517,7 +7097,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/quality/defect-codes/{defectCodeId}:activate": {
@@ -6577,7 +7167,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/quality/defect-codes/{defectCodeId}/processes": {
@@ -6620,7 +7220,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -6674,7 +7284,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/quality/defect-codes/{defectCodeId}/processes/{processId}": {
@@ -6723,7 +7343,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/quality/cause-codes": {
@@ -6801,7 +7431,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -6896,7 +7536,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "공유계약 B-4(참조처는 defect_record.suspected_cause_code_id·confirmed_cause_code_id — FK 실재)"
    },
    "put": {
@@ -7033,7 +7683,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/quality/cause-codes/{causeCodeId}:activate": {
@@ -7093,7 +7753,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/integration/messages": {
@@ -7276,7 +7946,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "노출 범위 미결 — W-06-10 §8-4(내보내기 기능과 함께 판단해야 한다)"
    }
   },
@@ -7623,7 +8303,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/partners": {
@@ -7712,7 +8402,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/legal-entities": {
@@ -7783,7 +8483,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 06-API-요구서 §4-3"
    }
   },
@@ -7863,7 +8573,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/plants": {
@@ -7950,7 +8670,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/production-lines": {
@@ -8029,7 +8759,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": " ⧉ 공개 설명에서 걷은 근거 표기(client#102 · 2026-08-12): 06-API-요구서 §4-3"
    }
   },
@@ -8101,7 +8841,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "✅ 해소 2026-09-03 — 공정 마스터의 관리 화면은 W-06-01 《공정 마스터》 탭이다(사용자 확정). 근거 — ① WF06 S4 Action 이 이미 「공정 순서·«공정코드»·외주공정 구분 … 직접 CRUD」를 이 화면에 배정했다 ② REQ-PR-0026 이 MES 정본임을 확정했다(ERP 에서 오지 않으므로 만드는 곳이 없으면 데이터가 생길 길이 없다) ③ 화면명이 이미 「Routing(공정) 등록·관리」다. 흡수 선례 = quality.cause_code → W-06-03(2026-08-03 사용자 확정)."
    },
    "post": {
@@ -8197,7 +8947,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "참조처(전부 FK) — planning.routing_operation.process_id(W-06-01 §4-B) · W-06-02 §4-A 검사 대상 공정 · W-06-03 §4-A·§4-C · W-06-05 §4-F · W-06-06 §4-E 자격 대상 공정"
    },
    "put": {
@@ -8334,7 +9094,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/processes/{processId}:activate": {
@@ -8394,7 +9164,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/equipments": {
@@ -8531,7 +9311,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -8674,7 +9464,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "W-06-14(적치 규칙 마스터)는 화면 상세 스펙이 아직 없다 — 마스터 형 패턴이 형태를 정하고 필드는 물리 모델이 전부 갖고 있어 먼저 쓴 것이다. 화면 고유 요구가 나오면 조정한다. 차단 판정의 근거가 되는 화면은 M-01-05 §5-2-1."
    },
    "post": {
@@ -8787,7 +9587,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -8922,7 +9732,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/logistics/putaway-rules/{putawayRuleId}:activate": {
@@ -9057,7 +9877,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/partners/{partnerId}/roles": {
@@ -9104,7 +9934,17 @@
      "404": {
       "description": "없다"
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -9261,7 +10101,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -9399,7 +10249,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -9555,7 +10415,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/terminals/{terminalId}:issue-token": {
@@ -9612,7 +10482,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/terminals/{terminalId}/processes": {
@@ -9697,7 +10577,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -9848,7 +10738,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -9989,7 +10889,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/equipment-groups": {
@@ -10076,7 +10986,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -10171,7 +11091,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "상위 그룹 순환(A→B→A)은 물리 제약이 막지 않는다 — 직계 자기참조만 막힌다. 서버가 진다(공유계약 A-9 등급 2). mdm.department 도 같은 형태라 서버 공통 검증으로 한 번에 간다."
    },
    "put": {
@@ -10478,7 +11408,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "공유계약 D-5의 기존 기준정보 읽기 규칙 유지. P-05-02 §4-A·§5-1, W-05-12 §4-B. 요청 #536의 비가동 공정 원천을 EquipmentDetailResponse.equipment.processId로 연결한다."
    },
    "put": {
@@ -10879,7 +11819,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "품질 검사 항목과 경로를 나눈 이유는 W-05-12 §4-C-1 — 소유·대상·쓰임이 다르다. 2단계 규약은 /mdm/inspection-items 로 적었으나 이 계약에 품질 검사 항목이 이미 있어 이름을 갈랐다."
    },
    "post": {
@@ -10976,7 +11926,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "사용 중지는 별도 경로를 두지 않고 isActive 로 받는다 — 화면에 버튼이 없다."
    },
    "put": {
@@ -11095,7 +12055,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -11212,7 +12182,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -11541,7 +12521,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -11636,7 +12626,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -12109,7 +13109,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -12204,7 +13214,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -12479,7 +13499,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -12702,7 +13732,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -12797,7 +13837,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -13004,7 +14054,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -13141,7 +14201,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -13230,7 +14300,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/integration/interface-definitions": {
@@ -13334,7 +14414,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -13429,7 +14519,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -13710,7 +14810,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/integration/outbound-item-settings": {
@@ -13870,7 +14980,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/mdm/spare-parts/{sparePartId}/molds": {
@@ -13911,7 +15031,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
