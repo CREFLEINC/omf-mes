@@ -1555,7 +1555,7 @@
      "shipment"
     ],
     "summary": "출하 취소 요청",
-    "description": "미확정 구간에서만 된다. 사유가 필수다. 승인은 공통 계약이 소유한다. 01 자재창고가 쓰는 :request-cancel 과 같은 형태다. 근거: W-04-12 §5-8",
+    "description": "미확정 구간에서만 된다. 사유가 필수다. 승인 대기(PENDING) 요청이 있으면 409 CANCEL_IN_PROGRESS이고, 반려된 요청은 열린 요청이 아니므로 다시 상신할 수 있다. 승인은 공통 계약이 소유한다. 근거: W-04-12 §5-8",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -2919,12 +2919,13 @@
        "string",
        "null"
       ],
-      "example": "값"
+      "example": "값",
+      "description": "현재 서버는 값을 받지만 저장하지 않는다. 취소 사유 이력은 상신 요청의 reason에 남는다."
      },
      "businessDate": {
       "type": "string",
       "format": "date",
-      "description": "영업일(발생일). 취소는 재고를 되돌리므로 원장을 지난다 — 유일 제약에 영업일이 들어 있다(공유계약 C-8 · W-04-12 §5-8).",
+      "description": "필수 입력으로 받지만 현재 서버는 원 거래 영업일과 비교하거나 역전기 기준으로 쓰지 않는다. 역전기는 원 거래 영업일을 사용한다.",
       "example": "2026-08-06"
      },
      "occurredAt": {
@@ -2938,7 +2939,7 @@
      "businessDate",
      "occurredAt"
     ],
-    "description": "취소 실행. ⭐ 승인 완료만으로 통과시키지 않는다 — 실행 시점에 후속을 다시 판정한다(공유계약 J-8). 그 사이에 확정됐으면 409 ALREADY_CONFIRMED 다"
+    "description": "취소 실행. 승인만으로 통과시키지 않고 실행 시점에 상태를 다시 판정하며 그 사이 확정됐으면 409 ALREADY_CONFIRMED다. businessDate는 수신하지만 역전기는 원 거래 영업일을 사용하고 remarks는 저장하지 않는다."
    },
    "ShipmentCancelRequest": {
     "type": "object",
