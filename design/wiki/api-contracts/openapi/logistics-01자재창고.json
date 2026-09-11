@@ -4020,7 +4020,8 @@
      "logistics"
     ],
     "summary": "W/O 품목별 소요·기출고·부족",
-    "description": "추가 자재 출고 요청 화면(W-02-10 §3 ②)의 표를 이 한 호출이 채운다 — 「BOM 소요량 불러오기」 버튼이 부르는 것이 이 경로다. 자재 명세(BOM) 조회를 화면이 따로 하지 않는다. 근거: W-02-10 §5 · 공유계약 L-2",
+    "description": "한 작업지시의 품목별 소요량·기출고량·부족량을 반환한다. 소요량은 작업지시 공정과 같은 자재 명세(BOM) 구성품만 requiredQty × (orderQty ÷ baseQty)로 계산하며 공정 미지정 구성품과 스크랩률은 제외한다. 기출고량은 전기 완료된 출고 전표를 피킹 지시와 자재 출고요청을 거쳐 작업지시로 연결해 품목별로 합산한다. 요청 상세 라인의 issuedQty는 이 집계에 사용하지 않는다. 응답은 품목·단위 ID만 제공하며 표시 코드·명칭은 각 기준정보에서 조회한다.",
+    "x-internal-note": "화면 W-02-10의 BOM 소요량 불러오기 호출. 공유계약 L-2 및 통보 037·046·047 반영.",
     "parameters": [
      {
       "name": "workOrderId",
@@ -12580,7 +12581,8 @@
      "destinationLocationId",
      "statusCode"
     ],
-    "description": "자재 출고 요청. 01 화면은 읽기만 한다 — 요청을 만드는 것은 생산 도메인이다. 근거: M-01-08",
+    "description": "자재 출고 요청. 응답은 작업지시와 도착 위치의 식별자만 제공하며 번호·위치 코드·명칭은 각 리소스에서 조회한다.",
+    "x-internal-note": "M-01-08은 읽기만 하며 요청 생성은 W/O 배포 또는 추가 자재 출고 요청이 소유한다. 통보 047 반영.",
     "properties": {
      "materialIssueRequestId": {
       "x-source-column": "material_issue_request_id",
@@ -12849,7 +12851,7 @@
       "type": "number",
       "minimum": 0,
       "readOnly": true,
-      "description": "누적 출고 수량. 요청 수량을 넘지 않는다",
+      "description": "요청 라인의 저장된 출고 수량. 현재 출고 처리에서 이 값을 갱신하는 경로가 없어 품목별 기출고 누계로 사용하지 않는다. 기출고 누계는 부족 조회가 전기 완료된 출고 전표에서 별도로 계산한다.",
       "example": 0.0
      },
      "uomId": {
@@ -12869,7 +12871,7 @@
      "issuedQty",
      "shortageQty"
     ],
-    "description": "한 W/O 의 품목별 소요·기출고·부족 한 줄",
+    "description": "한 작업지시의 품목별 소요·기출고·부족 한 줄. 품목 코드·명칭과 단위 표시명은 포함하지 않는다.",
     "properties": {
      "itemId": {
       "type": "integer",
@@ -12891,17 +12893,17 @@
      },
      "requiredQty": {
       "type": "number",
-      "description": "자재 명세(BOM) 소요량 — 이 W/O 의 지시수량 기준",
+      "description": "작업지시 공정과 같은 자재 명세(BOM) 구성품의 requiredQty × (orderQty ÷ baseQty). 공정 미지정 구성품과 스크랩률은 제외한다.",
       "example": 200.0
      },
      "issuedQty": {
       "type": "number",
-      "description": "기출고 누계 — 이 W/O 앞으로 출고된 수량의 합. ⛔ 화면이 요청 건별 상세를 훑어 더하지 않는다(공유계약 L-2)",
+      "description": "전기 완료된 출고 전표를 피킹 지시와 자재 출고요청을 거쳐 작업지시로 연결해 계산한 품목별 출고 수량 합계. 요청 상세의 issuedQty를 합산하지 않는다.",
       "example": 120.0
      },
      "shortageQty": {
       "type": "number",
-      "description": "부족 = 소요 − 기출고. 음수면 0 으로 낸다",
+      "description": "max(소요량 − 기출고량, 0)",
       "example": 80.0
      }
     }
@@ -14235,6 +14237,7 @@
       "x-source-column": "issued_qty",
       "type": "number",
       "minimum": 0,
+      "description": "입고 등록 시 실제 출고 라인 수량과 일치함을 검증해 저장한 출고 수량.",
       "example": 100.0
      },
      "receivedQty": {
@@ -14306,6 +14309,7 @@
       "x-source-column": "issued_qty",
       "type": "number",
       "minimum": 0,
+      "description": "선택한 출고 라인의 issueQty를 그대로 보낸다. 서버가 goodsIssueLineId의 실제 출고 수량과 대조하며 다르면 400 INVALID로 거부하고 덮어쓰지 않는다.",
       "example": 100.0
      },
      "receivedQty": {
