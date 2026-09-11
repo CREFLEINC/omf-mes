@@ -267,7 +267,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "기존 납품 라벨 번호로 배분을 찾는다. ⛔ 최초 출하 선택에는 쓰지 않는다 — 그때는 GET /logistics/shipments 의 q 로 출하 번호를 검색한다. 이 질의는 통합 화면 재진입·재출력 때만 쓴다. 범위는 납품 라벨 번호 하나다 — LOT 번호는 lotId 를, 포장은 handlingUnitId 를 쓴다. 일치하는 배분이 없으면 «빈 목록»이다. ⛔ 404 를 내지 않는다. ⭐ 부분 일치 · 대소문자를 가리지 않는다(2026-09-06 게이트 승인)."
+      "description": "기존 납품 라벨 번호로 배분을 찾는 재진입·재출력용 목표 질의다. 최초 출하 선택은 GET /logistics/shipments로 한다. 목표는 납품 라벨 번호의 부분 일치·대소문자 무시 검색이며 LOT·HU 번호로 대체하지 않는다. 현재는 납품 라벨 번호를 저장·조회하는 원천이 없어 다른 요청 검증을 통과한 유효한 요청에서도 q 조회 조건이 항상 거짓이라 빈 목록을 내린다. 이 빈 목록은 라벨 부재를 뜻하지 않는다. 출하번호·목록 뒤 unpackedOnly=true 조회는 최초 포장용이며 이미 포장한 재출력 대상을 공급하지 않으므로, 지원 전까지 화면은 q를 호출하지 않고 납품 라벨 번호 재진입·재출력 미지원으로 안내한다."
      },
      {
       "name": "lotQ",
@@ -275,7 +275,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "스캔한 생산 LOT 값. shipmentId 와 함께 주면 서버가 「이 출하의 배분에 이 LOT 이 있는가」를 판정한다 — 화면이 목록을 받아 비교하지 않는다(P-04-01 §5-1 · 공유계약 C-6). ⭐ shipmentId 는 최초 진입이면 GET /logistics/shipments 의 출하 선택 결과에서, 재진입이면 기존 납품 라벨 q 응답에서 얻는다."
+      "description": "스캔한 생산 LOT 값. shipmentId 와 함께 주면 서버가 「이 출하의 배분에 이 LOT 이 있는가」를 판정한다 — 화면이 목록을 받아 비교하지 않는다(P-04-01 §5-1 · 공유계약 C-6). ⭐ 현재 shipmentId 는 최초 진입과 재진입 모두 GET /logistics/shipments 의 출하 선택 결과에서 얻는다. 납품 라벨 q 검색이 지원되면 재진입 응답에서 얻는 목표는 유지한다."
      },
      {
       "name": "page",
@@ -1020,7 +1020,7 @@
      "shipment"
     ],
     "summary": "제품 LOT 피킹 확정",
-    "description": "현장이 집은 제품 LOT 과 수량을 이 라인에 확정 기록한다. 확정 후 되돌림은 현재 지원하지 않으므로 보내기 전 LOT·수량을 재확인한다. 0·음수 피킹은 취소가 아니라 `RANGE` 검증 실패다. ⭐ 화면이 예약을 직접 쓰지 않는다 — 서버가 이 피킹의 결과로 inventory_reservation 을 걸고 푼다(01 자재창고 계약 · M-01-08 §5-5 와 같은 규약). 자재 피킹의 :pick 과 대칭이다. ⛔ 오프라인 대상이 아니다 — Release 판정값을 캐시할 수 없어 이 화면은 온라인에서만 돈다(공유계약 C-6 · M-04-01 §5-6). 권장 외 LOT 을 집어도 막지 않는다 — 경고 후 통과이고 사유는 남기지 않는다(M-04-01 §5-5). 근거: M-04-01 §5-7",
+    "description": "현장이 집은 제품 LOT 과 수량을 이 라인에 확정 기록한다. 확정 후 되돌림은 현재 지원하지 않으므로 보내기 전 LOT·수량을 재확인한다. 0·음수 피킹은 취소가 아니라 `RANGE` 검증 실패다. ⭐ 화면이 예약을 직접 쓰지 않는다 — 서버가 이 피킹의 결과로 inventory_reservation 을 걸고 푼다(01 자재창고 계약 · M-01-08 §5-5 와 같은 규약). 요청은 영업일·발생시각을 받지 않으며 현재 서버는 수신 시각의 UTC 날짜 하나를 잔여 유효기간 판정의 오늘과 예약번호 기간 축에 함께 쓴다. ⛔ 오프라인 대상이 아니다 — Release 판정값을 캐시할 수 없어 이 화면은 온라인에서만 돈다(공유계약 C-6 · M-04-01 §5-6). 권장 외 LOT 을 집어도 막지 않는다 — 경고 후 통과이고 사유는 남기지 않는다(M-04-01 §5-5). 근거: M-04-01 §5-7",
     "parameters": [
      {
       "name": "shipmentRequestId",
@@ -3232,7 +3232,7 @@
      "shipmentRequestNo": {
       "type": "string",
       "example": "SR-2026-0813-0108",
-      "description": "이 출하가 속한 출하작업지시(ShipmentRequest)의 번호 — P-04-01 헤더가 그린다(§3 「SR-2026-0456」). ⭐ 서버가 shipment.shipmentRequestId 를 거슬러 풀어 준다(화면이 따로 조회하지 않는다 · 공유계약 L-2). 근거: P-04-01 §3 · omf-mes#330"
+      "description": "이 출하가 속한 출하작업지시(ShipmentRequest)의 번호 — P-04-01 헤더가 그린다(§3 「SR-2026-0456」). SR 접두어는 현장 입고 번호와 겹치므로 문자열만으로 문서 종류를 판정하지 않고 shipmentRequestId와 출하작업지시 문맥으로 구분한다. ⭐ 서버가 shipment.shipmentRequestId 를 거슬러 풀어 준다(화면이 따로 조회하지 않는다 · 공유계약 L-2). 근거: P-04-01 §3 · omf-mes#330"
      },
      "customerName": {
       "type": "string",
@@ -3392,7 +3392,8 @@
      },
      "shipmentRequestNo": {
       "type": "string",
-      "example": "SR-2026-0813-0108"
+      "example": "SR-2026-0813-0108",
+      "description": "출하작업지시 번호. 기본 발번은 SR-{YYYYMMDD}-{SEQ4}이고 기간 축은 requestedShipDate다. SR 접두어가 현장 입고 번호와 겹치므로 번호만으로 문서 유형을 식별하지 않고 shipmentRequestId와 자원 문맥을 함께 쓴다. 기존 발번 번호는 바꾸지 않는다"
      },
      "salesOrderId": {
       "type": [
@@ -3594,7 +3595,7 @@
      "requestedShipDate",
      "lines"
     ],
-    "description": "편성. 라인은 1건 이상이고 각 라인의 요청·배정 수량은 0보다 커야 한다. 배정 수량은 요청 수량을 넘을 수 없다(W-04-01 §5-1·§5-7). ⛔ 편성 취소를 두지 않는다 — 출하작업지시 취소는 범위 밖이다"
+    "description": "편성. 라인은 1건 이상이고 각 라인의 요청·배정 수량은 0보다 커야 한다. 배정 수량은 요청 수량을 넘을 수 없다(W-04-01 §5-1·§5-7). 응답 번호의 기본 형식은 SR-{YYYYMMDD}-{SEQ4}이며 requestedShipDate가 기간 축이다. 동일 SR 접두어를 쓰는 다른 문서와 카운터·식별자는 분리되고 기존 번호를 다시 매기지 않는다. ⛔ 편성 취소를 두지 않는다 — 출하작업지시 취소는 범위 밖이다"
    },
    "ShipmentRequestLine": {
     "type": "object",
@@ -3806,7 +3807,7 @@
    },
    "ShipmentLinePick": {
     "type": "object",
-    "description": "피킹 확정 요청. 사번은 본문이 아니라 X-Worker-No 헤더로 보낸다",
+    "description": "피킹 확정 요청. 사번은 본문이 아니라 X-Worker-No 헤더로 보낸다. businessDate와 occurredAt 입력은 현재 지원하지 않으며 서버 수신 시각의 UTC 날짜가 잔여 유효기간 판정과 예약번호 RS-{YYYYMMDD}-{SEQ4}의 기간 축이다",
     "required": [
      "lotId",
      "pickedQty",
