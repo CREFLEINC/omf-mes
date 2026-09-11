@@ -3216,7 +3216,7 @@
        "REJECTED",
        "HELD"
       ],
-      "description": "이 배분이 매달린 출하작업지시 라인의 출하검사 상태. 그 라인이 피킹한 LOT 집합을 후보로 삼는다. LOT 대상 OQC는 lotId가 있으면 이를, 없으면 targetId를 그 집합과 대조한다. 출하작업지시 대상 OQC는 targetId가 같은 지시이고 lotId가 있으면 해당 LOT 라인에만, 없으면 같은 지시의 모든 검사 대상 라인에 적용한다. CONFIRMED 결과 중 의뢰별 최신 회차만 세고, 매칭 결과가 0건일 때만 PENDING이다. 결과가 있으면 REJECTED > HELD > PASSED 순으로 판정하며 피킹 LOT마다 결과 하나를 요구하지 않는다. NOT_REQUIRED=검사 절차 없음 · PENDING=결과 대기 · PASSED=합격 · REJECTED=불합격 · HELD=보류. 화면은 이 값을 그대로 표시하고 자체 조합하지 않는다.",
+      "description": "목표 계약 필드이며 현재 서버의 배분 조회 응답에는 아직 제공되지 않는다. 공급되면 이 배분이 매달린 출하작업지시 라인의 출하검사 상태를 나타낸다. 그 라인이 피킹한 LOT 집합을 후보로 삼는다. LOT 대상 OQC는 lotId가 있으면 이를, 없으면 targetId를 그 집합과 대조한다. 출하작업지시 대상 OQC는 targetId가 같은 지시이고 lotId가 있으면 해당 LOT 라인에만, 없으면 같은 지시의 모든 검사 대상 라인에 적용한다. CONFIRMED 결과 중 의뢰별 최신 회차만 세고, 매칭 결과가 0건일 때만 PENDING이다. 결과가 있으면 REJECTED > HELD > PASSED 순으로 판정하며 피킹 LOT마다 결과 하나를 요구하지 않는다. NOT_REQUIRED=검사 절차 없음 · PENDING=결과 대기 · PASSED=합격 · REJECTED=불합격 · HELD=보류. 공급 전 화면은 oqcPassed만으로 세부 상태를 추정하지 않는다.",
       "example": "NOT_REQUIRED",
       "x-code-key": "CD-SHIPPING-INSPECTION-STATUS",
       "x-internal-note": "목표 계약 필드는 유지한다. 현재 서버 shipment-allocation-view는 oqcPassed만 반환하고 이 필드는 매핑하지 않아 P-04-01 세부 상태 표시가 미지원이다. omf-mes#599 잔여."
