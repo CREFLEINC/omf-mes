@@ -1066,7 +1066,7 @@
       }
      },
      "409": {
-      "description": "부적합이 이미 DECIDED이면 LOT 전이 시도 전에 INVALID_STATE로 거부한다. 남은 수량을 초과하면 DISPOSITION_QTY_EXCEEDED다.",
+      "description": "충돌",
       "content": {
        "application/json": {
         "schema": {
@@ -1467,7 +1467,7 @@
       }
      },
      "409": {
-      "description": "충돌",
+      "description": "부적합이 이미 DECIDED이면 LOT 전이 시도 전에 INVALID_STATE로 거부한다. 남은 수량을 초과하면 DISPOSITION_QTY_EXCEEDED다.",
       "content": {
        "application/json": {
         "schema": {
@@ -3390,7 +3390,7 @@
      "uomId"
     ],
     "description": "W-03-10 ② 「남은 수량」 구획. 목록(items)과 같은 모집단이라 한 응답에 함께 담는다 — 요약 전용 경로를 두지 않는다(공유계약 L-1). 근거: W-03-10 §3 · §9-1 · omf-mes#253",
-    "x-internal-note": "한 부적합은 한 품목이라(nonconformance.item_id NOT NULL) 대상 LOT 의 단위가 하나라는 전제 위에 합을 낸다. 단위가 섞인 부적합이 실제로 성립하면 합을 내리지 말고 화면이 두 값을 그대로 보여야 한다(공유계약 A-11 보강). 추적은 W-03-10 §8 미결이 갖는다. 잔량의 정의는 같은 파일 POST …/disposition-decisions 의 내부 주석과 한 글자도 다르지 않아야 한다 — 두 자리가 갈리면 화면이 보이는 수와 서버가 거절하는 기준이 어긋난다(공유계약 L-2 보강)."
+    "x-internal-note": "부적합 등록 요청은 lots:minItems:1이고 assertCreateShape가 입력 lots[0].uomId를 기준으로 나머지 입력 단위를 검사하여 혼합이면 전건 거부한다. LOT 마스터의 단위와 대조한다는 보장은 아니다. 잔량의 정의는 같은 파일 POST …/disposition-decisions 의 내부 주석과 한 글자도 다르지 않아야 한다 — 두 자리가 갈리면 화면이 보이는 수와 서버가 거절하는 기준이 어긋난다(공유계약 L-2 보강)."
    },
    "DispositionDecisionCreate": {
     "type": "object",
