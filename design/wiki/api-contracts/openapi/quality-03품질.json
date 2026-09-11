@@ -1467,7 +1467,7 @@
       }
      },
      "409": {
-      "description": "부적합이 이미 DECIDED이면 LOT 전이 시도 전에 INVALID_STATE로 거부한다. 남은 수량을 초과하면 DISPOSITION_QTY_EXCEEDED다.",
+      "description": "충돌",
       "content": {
        "application/json": {
         "schema": {
@@ -2708,7 +2708,7 @@
       }
      },
      "409": {
-      "description": "충돌",
+      "description": "부적합이 이미 DECIDED이면 LOT 전이 시도 전에 INVALID_STATE로 거부한다. 남은 수량을 초과하면 DISPOSITION_QTY_EXCEEDED다.",
       "content": {
        "application/json": {
         "schema": {
