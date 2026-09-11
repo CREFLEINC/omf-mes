@@ -128,7 +128,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/quality/concessions/{concessionId}": {
@@ -171,7 +181,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "승인·반려는 app-공통 계약이다(POST /app/approval-requests/{id}:approve · :reject). ⛔ 조건 수정 경로를 두지 않는다 — 결재는 예/아니오이고 값을 바꾸면 무엇을 승인했는지가 흐려진다(공유계약 J-10 · W-03-09 §5-4). 반려 사유로 돌려보낸다. ⛔ 생성 경로도 없다 — 특채 요청을 만드는 화면이 아직 특정되지 않았다(W-03-09 §8-4). nonconformance_id 가 NOT NULL 이라 부적합(04 계약)이 선행한다. #594 · 서버 통보 089 §2~3 정합."
    }
   },
@@ -415,7 +435,7 @@
      "quality"
     ],
     "summary": "처분 결정 목록",
-    "description": "W-03-10 의 처리 이력이고, 동시에 W-04-10(폐기) · W-04-11(재등록)의 진입 목록이다 — 처분 유형으로 걸러 각자의 대상을 찾는다. P-04-03(재작업 실적)은 진입이 02 W/O 목록이고 이 값을 상세의 「미처리 수량」으로 쓴다(P-04-03 §3 ④·§6). 근거: W-03-10 §3 · 네 화면 §5",
+    "description": "처분 결정 처리 이력이며 폐기·재등록 후속 화면이 조회한다. 재작업 실적 화면의 진입 목록은 작업지시 조회다. REWORK는 실적이 특정 처분 결정을 가리키지 않아 결정별 후속 수량을 확인할 수 없으므로, followUpQty 0과 NOT_STARTED를 실제 미완료로 해석하지 않는다.",
     "parameters": [
      {
       "name": "dispositionTypeCode",
@@ -496,7 +516,7 @@
        "type": "boolean",
        "example": true
       },
-      "description": "재고로 되돌릴 수 있는 결정만. 처분이 정상이거나, 처분이 재작업이고 그 재작업이 끝난 것을 서버가 한 축으로 판정해 낸다 — 화면이 두 조건을 각각 질의해 합치지 않는다(공유계약 L-2). ⛔ 폐기 결정은 포함하지 않는다"
+      "description": "재고로 되돌릴 수 있는 결정만. 목표 판정은 정상 처분 또는 완료된 재작업 처분이다. 현재는 NORMAL만 판정하고 REWORK 완료를 결정별로 확인할 수 없으며, NORMAL의 재등록 누계도 이 조회에 아직 반영되지 않는다. 화면이 결정별 완료를 추정하지 않는다. 폐기 결정은 포함하지 않는다"
      },
      {
       "name": "followUpPending",
@@ -505,7 +525,7 @@
        "type": "boolean",
        "example": true
       },
-      "description": "후속 처리가 남은 결정만. ⭐ W-04-10(폐기 요청)·W-04-11(재고 재등록)의 진입 목록이 이 오퍼레이션이다 — 처리한 건이 계속 남으면 같은 건을 두 번 처리한다. P-04-03(재작업 실적)은 진입이 02 W/O 목록이고 이 값을 상세의 「미처리 수량」으로 쓴다(P-04-03 §3 ④·§6). 근거: W-04-07 §5-5(부분 처분이 정상)"
+      "description": "후속 처리가 남은 결정만 거르는 조회 필터다. 응답 필드가 아니다. 현재 서버가 결정별 처리량을 실제로 롤업하는 것은 전기된 폐기 출고뿐이다. `true`로 조회하면 완료되지 않은 SCRAP만 포함하고 NORMAL·REWORK는 포함하지 않는다. `false`로 조회하면 NORMAL·REWORK를 포함한다. REWORK는 실적 귀속 축이 없고 NORMAL은 재등록 연결은 있지만 이 조회 롤업에 아직 반영되지 않는다. 따라서 `false` 조회에 포함됐다는 사실을 후속 완료 증거로 사용하지 않는다"
      },
      {
       "name": "page",
@@ -605,7 +625,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/quality/inspection-requests": {
@@ -737,7 +767,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/quality/inspection-requests/{inspectionRequestId}": {
@@ -780,7 +820,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "등록 경로를 두지 않았다 — 화면 7장에 「의뢰 등록」 버튼이 0건이다. 서버가 입고(01)·생산 실적(02)에서 만든다. 검사 기준 버전이 NOT NULL 이라 기준이 없으면 의뢰 자체가 생기지 않고 화면은 진입할 수 없다(P-02-13 §5-2 · omf-mes#64 묶음 A)."
    }
   },
@@ -1329,7 +1379,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -1503,7 +1563,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/quality/inspection-results/{inspectionResultId}:confirm": {
@@ -1593,7 +1663,7 @@
       }
      }
     },
-    "x-internal-note": "관리웹·온라인 전용이다 — 오프라인 큐는 서버가 만든 inspectionResultId 를 모르므로 이 경로를 부를 수 없다. 큐는 POST /quality/inspection-results 에 statusCode=확정 으로 보낸다(03 계약 3단계 §3). ⚠ 자동 해제의 사유 값이 미결이다 — LOT_HOLD_RELEASE_REASON 초기 시드 네 값(RETEST_PASS·RETEST_FAIL·INVESTIGATION_CLEARED·MANAGER_OVERRIDE) 중 「IQC 최초 합격」에 해당하는 것이 없다. 형제 선례 둘은 사유를 required 로 받는다(LotHoldRelease · StockReinstatementCreate). 판정은 W-01-01 §8 미결 8 이 갖는다 — omf-mes#451 재실측에서 드러났다. ⛔ 초안은 「이 해제에는 사유 코드를 요구하지 않는다」로 규범을 지어냈고 리뷰가 반증했다 — 인용한 근거(W-01-01 §5 · 요구서 03 §3) 어디에도 없는 말이었다."
+    "x-internal-note": "관리웹·온라인 전용이다 — 오프라인 큐는 서버가 만든 inspectionResultId 를 모르므로 이 경로를 부를 수 없다. 큐는 POST /quality/inspection-results 에 statusCode=확정 으로 보낸다(03 계약 3단계 §3). 자동 해제 사유는 서버 inspection-confirm.service가 쓰는 INCOMING_INSPECTION_PASSED로 정합했다(문의 087 · omf-mes#555). 기존 네 값은 재판정·조사·관리자 해제 의미를 보존한다."
    }
   },
   "/quality/lot-hold-events": {
@@ -1885,7 +1955,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "⛔ Lot Status 변경이력 테이블이 없다 — trace 7테이블에 previous_status 류가 0건이다. 그래서 이 목록이 낼 수 있는 것은 보류 등록·해제뿐이고, 전이 9건 중 5건이 사라지고 2건은 반쪽이다. 화면이 결과 표 머리에 그 사실을 적는다(공유계약 A-11). 전용 테이블이냐 audit_event 규약이냐의 선후는 omf-mes#64·#68 에 코멘트로 나가 있고 전용 테이블을 권고했다(W-03-01 §5-2). ⚠ 그 두 이슈는 2026-08-25 에 닫혔다 — 코멘트는 그 자리에 남아 있고, 지금 살아 있는 추적처는 omf-mes-server#42(#64)·omf-mes-server#74(#68) 다."
    },
    "post": {
@@ -2017,7 +2097,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/quality/lot-holds/{lotHoldId}:release": {
@@ -2228,7 +2318,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "⭐ 질의는 목록(/quality/lot-statuses)과 «같다» — page·size·sort 만 뺀다. 요약은 필터 전체 기준, 목록은 페이지 기준이라(공유계약 L-1) 두 요청이 같은 모집단을 봐야 한다. ⛔ 한쪽에만 있는 필터를 두지 않는다 — 화면이 필터를 걸면 카드와 목록이 서로 다른 것을 세게 된다(omf-mes#175). ⚠ 목록에 질의를 더할 때 이 경로도 «같은 판»으로 고친다 — #175 로 맞춘 짝이 #225(transitionFrom·transitionTo 신설) 때 다시 갈렸다."
    }
   },
@@ -2272,7 +2372,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/quality/lot-statuses": {
@@ -2449,7 +2559,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "01 계약의 GET /trace/lots 와 겹치지 않는다 — 그쪽은 물류 축(LOT 자체의 속성)이고 이쪽은 품질 축(판정 상태 + 보류 요약)이다. 창고 필터·보류 수량·최근 전이·전량 보류 여부는 01 스키마에 없어 세 화면을 그릴 수 없었다. 같은 경로를 두지 않는다는 규칙은 지킨다(03 계약 2단계 §3)."
    }
   },
@@ -2502,14 +2622,24 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
      "quality"
     ],
     "summary": "처분 판정 저장",
-    "description": "W-03-10 「판정 저장」. 처분 판정 단계에는 승인이 필요하지 않다. 폐기 실행 승인은 별개로 기존 규칙을 유지한다(2026-09-08 사용자 확정). 부적합 하나를 수량으로 갈라 여러 번 부를 수 있다 — 일부 재작업 · 일부 폐기가 성립한다. ⭐ 판정 저장과 Lot Status 전이는 한 트랜잭션이다(공유계약 B-8) — 처분만 남고 LOT 이 안 바뀌면 다음 화면이 잘못된 대상을 집는다. 근거: W-03-10 §5-1·§5-2 · DR-008 확정 3-A ⭐ 도착 상태는 처분에 따라 갈린다 — 재작업 → INSPECTION_PENDING(검사 대기) · 폐기 → SCRAPPED(폐기) · 정상 → NORMAL(정상). 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 가 갖는다. ⭐ If-Match 값은 이 경로의 GET 이 아니라 부적합 상세(GET /quality/nonconformances/{nonconformanceId} · 제품출하 계약)의 ETag 를 담는다 — 잠그는 대상이 처분 결정 한 건이 아니라 부적합이기 때문이다. ⛔ 이 경로의 목록 GET 에는 ETag 가 없다.",
+    "description": "W-03-10 「판정 저장」. 처분 판정 단계에는 승인이 필요하지 않다. 폐기 실행 승인은 별개로 기존 규칙을 유지한다(2026-09-08 사용자 확정). 부적합 하나를 수량으로 갈라 여러 번 판정 기록을 만들 수 있다. 판정 저장과 LOT 상태 전이는 한 트랜잭션이며 도착 상태는 재작업 → INSPECTION_PENDING(검사 대기) · 폐기 → SCRAPPED(폐기) · 정상 → NORMAL(정상)이다. ⛔ 현재 서버는 판정 수량을 LOT별로 귀속하지 않고 연결 LOT 전건에 같은 전이를 시도하며, 일부 LOT만 이동 가능해도 판정을 저장할 수 있다. 따라서 성공 응답을 수량별 LOT 상태 반영으로 해석하지 않는다. 수량별·LOT별 상태 보존과 전건 원자 전이는 현재 미지원이다. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_STATUS 가 갖는다. ⭐ If-Match 값은 이 경로의 GET 이 아니라 부적합 상세(GET /quality/nonconformances/{nonconformanceId} · 제품출하 계약)의 ETag 를 담는다 — 잠그는 대상이 처분 결정 한 건이 아니라 부적합이기 때문이다. ⛔ 이 경로의 목록 GET 에는 ETag 가 없다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -2548,7 +2678,7 @@
       }
      },
      "400": {
-      "description": "검증 실패. 고쳐야 풀린다",
+      "description": "검증 실패. 대상 LOT가 모두 현재 처분 전이를 시작할 수 없으면 STATE_LOCKED이며 판정 기록과 LOT 전이를 함께 롤백한다. SCRAPPED에는 나가는 전이가 없어 후속 판정으로 복구할 수 없다.",
       "content": {
        "application/json": {
         "schema": {
@@ -2578,7 +2708,7 @@
       }
      },
      "409": {
-      "description": "충돌",
+      "description": "부적합이 이미 DECIDED이면 LOT 전이 시도 전에 INVALID_STATE로 거부한다. 남은 수량을 초과하면 DISPOSITION_QTY_EXCEEDED다.",
       "content": {
        "application/json": {
         "schema": {
@@ -2588,7 +2718,7 @@
       }
      }
     },
-    "x-internal-note": "409 는 둘이다 — 남은 수량을 넘겨 정하려 할 때, 그리고 이미 닫힌 부적합(status_code)일 때. 남은 수량 = nonconformance_lot.affected_qty 합 − 이 부적합의 decision_qty 합이고 서버가 판정한다(공유계약 L-2 — 잔액은 클라이언트가 계산하지 않는다). ⚠ disposition_type_code 값 목록은 미확정이다 — 2차 값 목록 제안안 대상. 토큰을 선택에서 필수로 조였다 — 이 화면은 관리웹 전용이고 오프라인 대상이 아니라(W-03-10 §6) IfMatchVersionOptional 의 완화 조건에 해당하지 않았다. 두 사람이 같은 부적합을 동시에 판정하는 경합을 이 토큰이 잡는다(W-03-03 §5-5 와 같은 형태). ⭐ 토큰을 받는 곳은 부적합 상세다 — 04 제품출하 계약 GET /quality/nonconformances/{nonconformanceId} 의 ETag 를 그대로 담는다. 잠그는 대상은 처분 결정 한 건이 아니라 부적합이다(잔량이 부적합 단위로 정해지기 때문). ⚠ 그래서 판정 저장은 nonconformance.version_no 를 올려야 한다 — 올리지 않으면 이 토큰이 경합을 못 잡는다. 📨 데이터 모델 통지 대상이고 추적은 W-03-10 §8 이 갖는다. ⚠ 토큰 원천 검사기는 한 파일 안에서만 후보를 찾아 이 자리를 못 본다 — 원천이 다른 계약에 있는 첫 사례다. 근거: omf-mes#253"
+    "x-internal-note": "409 는 둘이다 — 남은 수량을 넘겨 정하려 할 때, 그리고 이미 닫힌 부적합(status_code)일 때. 남은 수량 = nonconformance_lot.affected_qty 합 − 이 부적합의 decision_qty 합이고 서버가 판정한다(공유계약 L-2 — 잔액은 클라이언트가 계산하지 않는다). ⚠ disposition_type_code 값 목록은 미확정이다 — 2차 값 목록 제안안 대상. 토큰을 선택에서 필수로 조였다 — 이 화면은 관리웹 전용이고 오프라인 대상이 아니라(W-03-10 §6) IfMatchVersionOptional 의 완화 조건에 해당하지 않았다. 두 사람이 같은 부적합을 동시에 판정하는 경합을 이 토큰이 잡는다(W-03-03 §5-5 와 같은 형태). ⭐ 토큰을 받는 곳은 부적합 상세다 — 04 제품출하 계약 GET /quality/nonconformances/{nonconformanceId} 의 ETag 를 그대로 담는다. 잠그는 대상은 처분 결정 한 건이 아니라 부적합이다(잔량이 부적합 단위로 정해지기 때문). ⚠ 그래서 판정 저장은 nonconformance.version_no 를 올려야 한다 — 올리지 않으면 이 토큰이 경합을 못 잡는다. 📨 데이터 모델 통지 대상이고 추적은 W-03-10 §8 이 갖는다. ⚠ 토큰 원천 검사기는 한 파일 안에서만 후보를 찾아 이 자리를 못 본다 — 원천이 다른 계약에 있는 첫 사례다. 부분·복수 LOT 전이 결손은 omf-mes#592로 추적한다. 근거: omf-mes#253"
    }
   },
   "/quality/inspection-results/{inspectionResultId}/measurement-summary": {
@@ -2648,7 +2778,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   }
  },
@@ -3189,14 +3329,14 @@
        "PARTIAL",
        "COMPLETED"
       ],
-      "description": "후속 처리 진행. NOT_STARTED=아직 안 함 · PARTIAL=일부 수량 처리 · COMPLETED=처리 수량 = decisionQty. ⭐ 서버가 후속 전표를 롤업해 낸다(공유계약 L-2). ⛔ 화면이 후속 전표를 세어 판정하지 않는다",
+      "description": "후속 처리 진행. SCRAP은 전기된 폐기 출고를 결정별로 롤업하며 NOT_STARTED=처리량 0, PARTIAL=0 초과 decisionQty 미만, COMPLETED=decisionQty 이상이다. NORMAL·REWORK는 현재 0/NOT_STARTED 고정이며 실제 미완료를 뜻하지 않는다. 화면은 두 유형을 미확인으로 표시하고 후속 전표를 직접 세어 보완하지 않는다",
       "example": "NOT_STARTED",
       "x-code-key": "CD-DISPOSITION-PROGRESS"
      },
      "followUpQty": {
       "type": "number",
       "format": "double",
-      "description": "이미 후속 처리된 수량. 남은 수량 = decisionQty − followUpQty",
+      "description": "결정별로 확인된 후속 처리 수량. SCRAP은 전기된 폐기 출고 합이다. NORMAL·REWORK는 현재 0 고정이며 실제 미처리량 또는 완료량을 뜻하지 않는다",
       "example": 0
      }
     },
@@ -3213,7 +3353,7 @@
      "followUpQty"
     ],
     "description": "처분 결정. 부적합 하나에 여러 건이 달릴 수 있다 — 같은 부적합을 수량으로 갈라 일부는 재작업, 일부는 폐기로 정할 수 있다(decisionQty)",
-    "x-internal-note": "followUpStatusCode·followUpQty 는 결정 «건별» 롤업이 안 서는 자리다 — 후속 전표(폐기=logistics.goods_issue · 정상=logistics.stock_transfer · 재작업=production.production_result)와는 LOT 축까지만 이어지고, 한 LOT 에 처분 결정이 여럿 달릴 수 있어 건별 귀속이 갈리지 않는다. 서버가 그 갈래를 어떻게 정하는지는 아직 계약에 없다."
+    "x-internal-note": "현재 구현은 SCRAP만 goods_issue.source_document_id로 결정별 POSTED 라인을 합산한다. REWORK는 work_order.rework_source_nonconformance_id까지만 이어지고 production_result에 처분 결정 FK가 없다. NORMAL은 stock_transfer.disposition_decision_id가 있지만 현재 품질 조회 롤업이 소비하지 않는다. 두 유형은 0/NOT_STARTED 고정이며 연결·롤업 지원은 omf-mes#593 잔여다."
    },
    "DispositionRemainingSummary": {
     "type": "object",
@@ -3250,7 +3390,7 @@
      "uomId"
     ],
     "description": "W-03-10 ② 「남은 수량」 구획. 목록(items)과 같은 모집단이라 한 응답에 함께 담는다 — 요약 전용 경로를 두지 않는다(공유계약 L-1). 근거: W-03-10 §3 · §9-1 · omf-mes#253",
-    "x-internal-note": "한 부적합은 한 품목이라(nonconformance.item_id NOT NULL) 대상 LOT 의 단위가 하나라는 전제 위에 합을 낸다. 단위가 섞인 부적합이 실제로 성립하면 합을 내리지 말고 화면이 두 값을 그대로 보여야 한다(공유계약 A-11 보강). 추적은 W-03-10 §8 미결이 갖는다. 잔량의 정의는 같은 파일 POST …/disposition-decisions 의 내부 주석과 한 글자도 다르지 않아야 한다 — 두 자리가 갈리면 화면이 보이는 수와 서버가 거절하는 기준이 어긋난다(공유계약 L-2 보강)."
+    "x-internal-note": "부적합 등록 요청은 lots:minItems:1이고 assertCreateShape가 입력 lots[0].uomId를 기준으로 나머지 입력 단위를 검사하여 혼합이면 전건 거부한다. LOT 마스터의 단위와 대조한다는 보장은 아니다. 잔량의 정의는 같은 파일 POST …/disposition-decisions 의 내부 주석과 한 글자도 다르지 않아야 한다 — 두 자리가 갈리면 화면이 보이는 수와 서버가 거절하는 기준이 어긋난다(공유계약 L-2 보강)."
    },
    "DispositionDecisionCreate": {
     "type": "object",
@@ -4250,7 +4390,7 @@
       ],
       "maxLength": 50,
       "example": "RETEST_PASS",
-      "description": "보류를 «왜» 풀었는가. ⭐ eventTypeCode=RELEASED 인 사건에만 있다 — 등록(HELD) 사건에는 null 이다(등록 사유는 reasonCode 가 담는다). 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_RELEASE_REASON 로 받는다(공유계약 G-32). ⭐ 고객이 늘린다 — 값은 초기 시드다(공유계약 G-31). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "보류를 «왜» 풀었는가. eventTypeCode=RELEASED 인 사건에만 있고 등록(HELD) 사건에는 null 이다. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_RELEASE_REASON 로 받는다. INCOMING_INSPECTION_PASSED는 1회차 수입검사 합격 자동 해제의 시스템 필수값이며 고객 운영값은 늘릴 수 있다. 채번 식별자를 하드코딩하지 않는다.",
       "x-code-key": "CD-LOT-HOLD-RELEASE-REASON"
      },
      "targetLotStatusCode": {

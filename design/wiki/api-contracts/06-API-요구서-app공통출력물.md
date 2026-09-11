@@ -108,7 +108,7 @@
 | 미리보기 | `GET /app/document-issues/{id}/rendition` | K-5 |
 | 출력 시 실적 저장 | **02 계약** `POST /production/production-results` 성공 후 이 계약의 발행 경로를 호출한다. 출력 재시도는 실적을 다시 만들지 않는다 | `P-02-04` §3-1 |
 | 부착 라벨 스캔 후 LOT 마감 | **01 계약** `POST /trace/lots/{lotId}:complete` — 현재 LOT 일치 확인 후 호출하고 다음 LOT으로 전환한다 | `P-02-04` §3-3 |
-| ⭐ **LOT 발생 원천 표시명** | **`GET /mdm/code-values?codeGroupCode=LOT_SOURCE_TYPE`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `INBOUND_RECEIPT_LINE`·`RECYCLE_ENTRY`(**2026-09-02 등재**) | G-32 |
+| ⭐ **LOT 발생 원천 표시명** | **`GET /mdm/code-values?codeGroupCode=LOT_SOURCE_TYPE`** — 시스템 소유 값 = `INBOUND_RECEIPT_LINE`·`RECYCLE_ENTRY`·`WORK_ORDER`. 마지막 값은 작업지시 선발행 원천이다 | G-32 |
 | ⭐ **LOT 생명주기 표시명** | **`GET /mdm/code-values?codeGroupCode=LOT_LIFECYCLE_STATUS`** — ⛔ 계약은 코드만 내리고 표시명을 안 내린다. 값 = `WAITING`·`ACTIVE`·`VOIDED`(**2026-09-02 등재**) | G-32 |
 
 ⭐ **A-10 규칙 3(FK 우선)이 여기서 갈린다.** LOT 라벨은 `targetId` 와 `lotId` 가 같은 값이고 인식표는 다르다 → **`targetTypeCode` 로 먼저 판정한다.** 계약의 `DocumentTarget.targetTypeCode` 가 그 판정 입력이다.

@@ -22,7 +22,7 @@
 | 무엇 | 정본 | 규모 | 세는 명령 |
 | --- | --- | :-: | --- |
 | **계약** | `wiki/api-contracts/openapi/*.json` **7파일** | **경로 353 · 오퍼레이션 492 · 스키마 514** | `python3 design/schema/generators/openapi/check-structure.py` |
-| **근거** — 화면 액션이 어느 경로에 대응하나 | `design/wiki/api-contracts/06-API-요구서*.md` **9장** | 인용 **1024** 전건 계약에 실재 | `python3 design/schema/generators/verify-doc-citations.py` |
+| **근거** — 화면 액션이 어느 경로에 대응하나 | `design/wiki/api-contracts/06-API-요구서*.md` **9장** | 인용 **1027** 전건 계약에 실재 | `python3 design/schema/generators/verify-doc-citations.py` |
 | **덮은 화면** | 요구서 §3 소절 | **113 / 113** | `python3 design/schema/generators/build-screen-progress.py` |
 
 **실측일: 2026-08-25**(design 이관 시 verify-counts.py 재측정으로 정정 — 아래 변경 이력 참조).
@@ -58,6 +58,12 @@
 ---
 
 ## 3. ⭐ 계약을 읽을 때 알아야 하는 것 넷
+
+### 경로·질의 정수의 현재 검증 경계
+
+경로·질의의 `format: int64` 값은 서버 허용 구간 **`-2^63 < value < 2^63`** 밖에서 400 `INVALID`다. PostgreSQL int64의 닫힌 하한 `-2^63`도 현재 Prisma 전달 한계 때문에 거부되며, 이는 int64 자체의 정의가 아니라 현 구현 한계다. 반대로 `2^53`을 넘지만 위 구간 안인 값은 계약 검증을 통과해 JavaScript 숫자 정밀도 때문에 인접한 다른 식별자로 반올림될 수 있다. 실무 채번은 이 구간에 닿지 않지만, 이를 막으려면 식별자 계약 상한을 별도 결정해야 한다.
+
+페이지 오류는 `page` 값 자체의 int64 판정이 아니다. 서버가 정규화한 `page`와 상한을 적용한 `size`로 계산한 **`skip = (page - 1) × size`**가 JavaScript 안전 정수 범위를 벗어나면 400 `RANGE`다. 각 operation의 400 설명은 실제로 가진 `int64` 경로·질의와 `page` 축만 적는다.
 
 ### 3-1. `x-internal-note` 는 «생성 타입에 실리지 않는다» — `description` 은 실린다
 

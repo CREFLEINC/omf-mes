@@ -123,7 +123,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -241,7 +251,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/inventory/adjustments/{inventoryAdjustmentId}/lines": {
@@ -273,7 +293,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -849,7 +879,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -964,7 +1004,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/inventory/counts/{inventoryCountId}/lines": {
@@ -1049,7 +1099,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -1209,7 +1269,7 @@
      "inventory"
     ],
     "summary": "취급 단위 목록",
-    "description": "근거: M-01-10 §5-6 · P-01-02",
+    "description": "취급 단위 목록. lotId는 해당 LOT을 직접 담은 HU로 좁히는 목표 계약이지만 현재 서버 조회는 이 필터를 소비하지 않아 전체 HU를 반환할 수 있다. 자식 HU만 담은 상위 파렛트를 찾는 하위 조회도 없다. 이 경로만으로 출고 파렛트 후보를 확정하지 않는다. 근거: M-01-10 §5-6 · P-01-02",
     "parameters": [
      {
       "name": "warehouseId",
@@ -1260,7 +1320,7 @@
        "type": "integer",
        "format": "int64"
       },
-      "description": "이 LOT 을 담은 취급 단위만(handling_unit_content 경유). 출고 시 파렛트를 좁히는 축 — 창고 전체가 아니라 이 출고 라인의 LOT 이 실제로 실린 파렛트만 낸다. 근거: P-01-02 §5-2(2026-09-06 게이트 승인 · M-01-08 이 만든 취급 단위를 조회만 한다)"
+      "description": "이 LOT을 직접 담은 취급 단위만 조회하기 위한 목표 필터다. 현재 서버는 이 값을 조회 조건으로 소비하지 않아 전체 HU가 올 수 있으므로 응답을 출고 파렛트 후보로 확정하지 않는다. 자식 HU를 통한 간접 포함도 현재 조회할 수 없다."
      },
      {
       "name": "handlingUnitNo",
@@ -1321,7 +1381,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -1439,7 +1509,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "delete": {
     "tags": [
@@ -1492,7 +1572,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "통보 211·omf-mes#562: 서버 라우트·서비스 미구현. 향후 정책은 재포장 이력 0까지 요구하며 이력 cascade 삭제와 새 상태 코드는 채택하지 않았다. 공유계약 B-8-1③의 미래 요구는 P-04-01에 보존한다. P-02-08은 원자 생성이라 호출하지 않는다. 확정 후 해체·일반 재편성은 별도 범위다."
    }
   },
@@ -1513,7 +1603,7 @@
      "inventory"
     ],
     "summary": "취급 단위 구성 목록",
-    "description": "근거: M-01-10 §5-2",
+    "description": "경로의 취급 단위에 직접 연결된 LOT 구성만 조회한다. 자식 취급 단위와 그 하위 내용은 포함하지 않는다. 빈 items는 실제 빈 포장일 수도 있고 자식 HU만 담은 중첩 파렛트일 수도 있으며, 현재 계약만으로 둘을 구분할 수 없다. 근거: M-01-10 §5-2",
     "responses": {
      "200": {
       "description": "구성",
@@ -1525,7 +1615,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -1650,7 +1750,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/inventory/handling-units/{handlingUnitId}:pack": {
@@ -1848,7 +1958,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "도출 단계에서 「예약/해제」를 적었으나 화면이 직접 쓰지 않는다고 못박았다(M-01-08 §5-5) — 쓰기 경로를 두지 않는다."
    }
   },
@@ -2044,7 +2164,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "id 만으로는 행을 찾을 수 없다 — 복합 키를 URL 에 그대로 드러낸다."
    }
   },
@@ -2159,7 +2289,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "ERP 수신본이라 등록·수정·삭제가 없다(W-01-09 §5-3)."
    }
   },
@@ -2202,7 +2342,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/logistics/asns/{asnId}/lines": {
@@ -2234,7 +2384,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/logistics/document-progress": {
@@ -2449,7 +2609,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/logistics/goods-issues": {
@@ -2582,14 +2752,24 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
      "logistics"
     ],
     "summary": "출고 등록",
-    "description": "postImmediately 가 참이면 등록과 전기가 같은 트랜잭션이다 — 화면이 한 버튼인 경우다. 승인을 먼저 받는 기타 출고는 거짓으로 보낸다. 근거: M-01-08 · W-01-05 · W-01-06",
+    "description": "postImmediately 가 참이면 등록과 전기가 같은 트랜잭션이다 — 화면이 한 버튼인 경우다. 승인이 필요한 기타 출고(폐기 등)는 거짓으로 등록하고 별도 상신·승인 뒤 전기한다. 현재 서버는 폐기 사유를 판별해 postImmediately=true를 거부하지 못하므로 이를 승인 우회 수단으로 사용하지 않는다. 근거: M-01-08 · W-01-05 · W-01-06",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -2713,7 +2893,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/logistics/goods-issues/{goodsIssueId}/lines": {
@@ -2745,14 +2935,24 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
      "logistics"
     ],
     "summary": "출고 라인 치환",
-    "description": "전기된 전표의 라인은 바꿀 수 없다. 근거: 공유계약 A-5 · G-1 ⭐ 이 경로의 조회는 ETag 를 내리지 않는다 — If-Match 에 담을 토큰은 부모 자원 GET /logistics/goods-issues/{goodsIssueId} 200 의 ETag 다. 잠그는 단위가 부모이기 때문이다. 근거: 공유계약 B-1-1",
+    "description": "전기된 전표와 승인 진행 중·승인 완료된 전표의 라인은 바꿀 수 없다. 승인자가 본 라인과 실제 전기 라인이 달라지지 않게 한다. 근거: 공유계약 A-5 · G-1 ⭐ 이 경로의 조회는 ETag 를 내리지 않는다 — If-Match 에 담을 토큰은 부모 자원 GET /logistics/goods-issues/{goodsIssueId} 200 의 ETag 다. 잠그는 단위가 부모이기 때문이다. 근거: 공유계약 B-1-1",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -2843,7 +3043,7 @@
      "logistics"
     ],
     "summary": "출고 전기",
-    "description": "재고가 움직이는 순간이다. 승인이 필요한 전표는 승인이 끝나기 전에는 400 이다. 근거: W-01-06 §5-5 · 공유계약 B-8",
+    "description": "재고가 움직이는 순간이다. 폐기 출고의 업무 요구는 승인 완료 뒤 전기하는 것이다. 현재 서버의 승인 기록 판정은 APPROVED가 하나라도 있으면 통과하고, APPROVED 없이 PENDING이 있으면 APPROVAL_IN_PROGRESS, 승인 없이 REJECTED만 있으면 APPROVAL_REQUIRED로 거부한다. 승인 요청이 0건이면 통과하므로 폐기 전건 강제는 아직 보장하지 않는다. 근거: W-01-06 §5-5 · 공유계약 B-8",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -3098,14 +3298,24 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
      "logistics"
     ],
     "summary": "입고 처리",
-    "description": "입고 전표 생성과 전기가 한 번에 일어난다. LOT 상태 전이·수불 원장·잔액·ERP 송신 적재가 같은 트랜잭션이며 ERP 실제 전송만 밖이다. 근거: W-01-10 §5-4 · 공유계약 B-8 ⭐ 적치 지시는 라인마다 서버가 함께 만들고, 응답의 GoodsReceiptLine.putawayTaskId 가 그 식별자를 싣는다 — 화면은 그 값으로 라인 수만큼 적치 완료를 부른다. ⛔ 입고와 적치 완료는 한 트랜잭션이 아니다 — 입고만 성공하고 적치가 남는 상태는 오류가 아니라 표현 가능한 상태이고, GET /logistics/putaway-tasks?goodsReceiptId= 로 되찾는다(공유계약 B-8 의 경계는 전표 안까지다).",
+    "description": "입고 전표 생성과 전기가 한 번에 일어난다. LOT 상태 전이·수불 원장·잔액·ERP 송신 적재가 같은 트랜잭션이며 ERP 실제 전송만 밖이다. 근거: W-01-10 §5-4 · 공유계약 B-8 ⭐ 적치 지시는 라인마다 서버가 함께 만들고, 응답의 GoodsReceiptLine.putawayTaskId 가 그 식별자를 싣는다 — 화면은 그 값으로 라인 수만큼 적치 완료를 부른다. ⛔ 입고와 적치 완료는 한 트랜잭션이 아니다 — 입고만 성공하고 적치가 남는 상태는 오류가 아니라 표현 가능한 상태이고, GET /logistics/putaway-tasks?goodsReceiptId= 로 되찾는다(공유계약 B-8 의 경계는 전표 안까지다). 현재 요청에는 소유 구분·소유처 입력이 없고 이 오퍼레이션으로 새로 전기하는 재고는 자사 소유(OWNED)로만 기록된다. 고객지급·위탁재고 등록은 지원하지 않으며, 이 제한을 다른 재고 흐름의 기존 소유를 변경하는 규칙으로 적용하지 않는다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -3156,7 +3366,7 @@
       }
      }
     },
-    "x-internal-note": "화면이 「입고 처리」 한 버튼이므로 :confirm·:post 로 쪼개지 않는다(02-URL동작규약 §2-2). 한도승인 건은 ERP 메시지를 적재하지 않는다(W-01-10 §5-5)."
+    "x-internal-note": "화면이 「입고 처리」 한 버튼이므로 :confirm·:post 로 쪼개지 않는다(02-URL동작규약 §2-2). 한도승인 건은 ERP 메시지를 적재하지 않는다(W-01-10 §5-5). 소유 고정의 구현 원천은 receipt-posting의 OWNERSHIP이며 지원 잔여는 omf-mes#569다."
    }
   },
   "/logistics/goods-receipts/{goodsReceiptId}": {
@@ -3207,7 +3417,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/logistics/goods-receipts/{goodsReceiptId}/lines": {
@@ -3239,7 +3459,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/logistics/inbound-receipt-lines/{inboundReceiptLineId}/variances": {
@@ -3272,7 +3502,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -3450,7 +3690,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -3581,7 +3831,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -3708,7 +3968,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -3943,7 +4213,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -4097,7 +4377,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/logistics/picking-orders": {
@@ -4185,7 +4475,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/logistics/picking-orders/{pickingOrderId}": {
@@ -4227,7 +4527,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/logistics/picking-orders/{pickingOrderId}/lines/{pickingLineId}:pick": {
@@ -4445,7 +4755,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -4560,7 +4880,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -4669,7 +4999,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -4943,7 +5283,17 @@
        }
       }
      }
-    },
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }},
     "x-internal-note": "temporaryOnly 는 M-01-07 §5-2 가 요구한 구분이다 — 임시와 정상이 섞이면 M-01-10 의 복귀 경로가 끊긴다."
    }
   },
@@ -4995,7 +5345,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/logistics/putaway-tasks/{putawayTaskId}:complete": {
@@ -5315,7 +5675,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -5428,7 +5798,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/logistics/stock-transfers": {
@@ -5543,7 +5923,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다. 페이지 오프셋(skip=(정규화 page−1)×상한 적용 size)이 안전 정수 범위를 벗어나면 RANGE다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "post": {
     "tags": [
@@ -5674,7 +6064,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/logistics/stock-transfers/{stockTransferId}/lines": {
@@ -5706,7 +6106,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -6221,7 +6631,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -6330,7 +6750,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    },
    "put": {
     "tags": [
@@ -6451,7 +6881,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/trace/lot-status-events": {
@@ -6538,7 +6978,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/trace/lot-lifecycle-events": {
@@ -6615,7 +7065,17 @@
        }
       }
      }
-    }
+    ,
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }}
    }
   },
   "/trace/lots/{lotId}:request-iqc-skip": {
@@ -7319,8 +7779,8 @@
        "string",
        "null"
       ],
-      "description": "역트랜잭션 번호",
-      "example": "TX-2026-0011"
+      "description": "역트랜잭션 번호. 전기 취소는 원 거래 번호에 -R을 붙인다.",
+      "example": "TX-EXAMPLE-001-R"
      },
      "reversalBusinessDate": {
       "type": [
@@ -7328,7 +7788,7 @@
        "null"
       ],
       "format": "date",
-      "description": "역트랜잭션 영업일 — 원장 조회에 함께 쓴다",
+      "description": "역트랜잭션 영업일. 취소 실행일이 아니라 원 거래 영업일을 그대로 쓰며 원장 조회에 함께 쓴다.",
       "example": "2026-08-07"
      }
     }
@@ -7568,7 +8028,7 @@
       "type": "string",
       "example": "GOODS_RECEIPT",
       "x-code-key": "CD-DOCUMENT-SUCCESSOR-TYPE",
-      "description": "A-10 다형 참조 판별자 — 값이 «대상 리소스 이름»이고 짝 id 가 그 리소스의 식별자다. ⭐ 대응표는 «설계»가 정한다(A-10 규칙 1 · 2026-09-03 사용자 결정). 후속이 무엇인가 — 입고 · 출고 · 피킹 · 수불 원장 · 자재 투입. ⭐ W-01-13 §5-3 이 「후속 판정이 두 갈래」로 이미 적어 두었다 — 앞 넷은 sourceDocument* 로 거꾸로 조회하는 «문서 하류»이고, 자재 투입은 원천 문서가 아니라 LOT 을 가리키는 «재고 사용»이다. ⛔ 취소하려면 이것들을 역순으로 먼저 취소해야 한다.",
+      "description": "A-10 다형 참조 판별자. 입고·출고·피킹은 sourceDocument 역조회의 문서 하류이고 INVENTORY_TRANSACTION과 MATERIAL_CONSUMPTION은 이 문서가 만든 LOT의 재고 사용 축이다. 현재 출고의 실제 사용, P/O의 입하, 생산창고 수령 전표는 후속 유형·매핑이 없어 판정하지 않는다. 취소하려면 반환된 후속을 역순으로 먼저 취소해야 한다.",
       "enum": [
        "GOODS_RECEIPT",
        "GOODS_ISSUE",
@@ -7821,7 +8281,7 @@
      "occurredAt",
      "lines"
     ],
-    "description": "출고 전표 등록. postImmediately 가 참이면 등록과 전기가 같은 트랜잭션에서 일어난다 — 「출고 확정」·「반품 처리」처럼 화면이 한 버튼인 경우다. 승인을 먼저 받아야 하는 기타 출고는 거짓으로 보내고 나중에 전기한다. 근거: M-01-08 §5-8 · W-01-05 §5-7 · W-01-06 §5-7",
+    "description": "출고 전표 등록. postImmediately 가 참이면 등록과 전기가 같은 트랜잭션에서 일어난다 — 「출고 확정」·「반품 처리」처럼 화면이 한 버튼인 경우다. 승인이 필요한 기타 출고(폐기 등)는 거짓으로 보내고 나중에 전기한다. 현재 서버는 폐기 사유를 판별해 참 값을 거부하지 못하므로 폐기 화면은 이를 승인 우회 수단으로 사용하지 않는다. 근거: M-01-08 §5-8 · W-01-05 §5-7 · W-01-06 §5-7",
     "properties": {
      "issueTypeCode": {
       "x-source-column": "issue_type_code",
@@ -7922,7 +8382,7 @@
      "postImmediately": {
       "type": "boolean",
       "default": false,
-      "description": "참이면 등록과 동시에 전기한다. 두 번 호출로 나누면 오프라인 큐에 중간 상태가 남는다",
+      "description": "참이면 등록과 동시에 전기한다. 두 번 호출로 나누면 오프라인 큐에 중간 상태가 남는다. 폐기 출고는 승인 요청을 먼저 만들어야 하므로 거짓으로 보낸다. 현재 서버는 폐기 사유의 참 값을 거부하지 못한다.",
       "example": true
      },
      "remarks": {
@@ -8081,7 +8541,7 @@
      "uomId",
      "sourceLocationId"
     ],
-    "description": "라인 전체 치환 항목. goodsIssueLineId 가 없으면 신규 행, 있으면 갱신, 요청에서 빠진 기존 행은 삭제한다. 전기된 전표의 라인은 바꿀 수 없다 — 400 STATE_LOCKED. 근거: 공유계약 A-5 · G-1",
+    "description": "라인 전체 치환 항목. goodsIssueLineId 가 없으면 신규 행, 있으면 갱신, 요청에서 빠진 기존 행은 삭제한다. 전기된 전표는 400 STATE_LOCKED, 승인 진행 중은 400 APPROVAL_IN_PROGRESS이며 승인 완료 뒤에도 400 STATE_LOCKED로 라인을 바꿀 수 없다. 근거: 공유계약 A-5 · G-1",
     "properties": {
      "goodsIssueLineId": {
       "x-source-column": "goods_issue_line_id",
@@ -8547,7 +9007,7 @@
      "inventoryStatusCode",
      "destinationLocationId"
     ],
-    "description": "입고 라인 등록 항목.",
+    "description": "입고 라인 등록 항목. 소유 구분과 소유처는 입력하지 않는다. 현재 서버는 이 입고로 새로 전기하는 재고를 OWNED로 고정하므로 고객지급·위탁재고 및 소유처가 있는 재고의 등록은 지원하지 않는다. receiptTypeCode·qualityStatusCode·inventoryStatusCode를 소유 구분으로 해석하지 않는다.",
     "properties": {
      "inboundReceiptLineId": {
       "x-source-column": "inbound_receipt_line_id",
@@ -11667,7 +12127,7 @@
       "x-source-column": "source_type_code",
       "type": "string",
       "maxLength": 50,
-      "description": "LOT 이 어디서 생겼나 — 입하 라인(INBOUND_RECEIPT_LINE) · 재생재 등록(RECYCLE_ENTRY). ⛔ 시스템 소유다 — 고객이 W-06-06 에서 이 값을 편집하면 안 된다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_SOURCE_TYPE 로 받는다(공유계약 G-32 · 2026-09-02 등재). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "LOT 이 어디서 생겼나 — 입하 라인(INBOUND_RECEIPT_LINE) · 재생재 등록(RECYCLE_ENTRY) · 작업지시 선발행(WORK_ORDER). 시스템 소유라 고객이 편집하면 안 된다. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_SOURCE_TYPE 로 받으며 채번 식별자를 하드코딩하지 않는다.",
       "example": "INBOUND_RECEIPT_LINE",
       "x-internal-note": "⛔ 응답이라 닫지 않았다(2026-09-02 · omf-mes#354). 응답 스키마에서 값 목록을 좁히면 «항상 오던 값이 목록 밖»이 될 수 있어 그 값을 그대로 그리던 화면이 깨진다 — uiux-client-handoff 의 「필수 여부는 방향이 아니라 누가 그 값을 읽는가로 가른다」와 같은 축이다. 요청 자리(LotCreate)는 A-16 판별자 판정으로 닫았다.",
       "x-code-key": "CD-LOT-SOURCE-TYPE"
