@@ -115,7 +115,7 @@ CD-<계열>-<축>
 코드 문자열이 없다~~ — 그 문장은 `#405` 가 썼고 **같은 날 `#408` 이 값을 채웠는데도
 남아 있었다.** ⑦ 이 키·자리·그룹만 대조해 못 잡았다 — 그래서 ⑦ 에 ⬜ 계수를 더했다)»
 
-⚠ 값 뒤에 ⬜ 가 붙은 «부분» ⬜ 인 키는 **9** — **결손이 아니다.** 값은 있고 「더 늘 수
+⚠ 값 뒤에 ⬜ 가 붙은 «부분» ⬜ 인 키는 **10** — **결손이 아니다.** 값은 있고 「더 늘 수
 있다」는 표시다(`registry` 8 · `registry-system` 1). 그 값 목록이 완전한가는 «소유» 열이
 말한다(위 표).
 
@@ -232,11 +232,11 @@ CD-<계열>-<축>
 | `CD-LOT-CREATE-SOURCE-TYPE` | `INBOUND_RECEIPT_LINE` | — | `sourceTypeCode` | `enum` | 1 | ⭐ 쓰는 쪽은 **1값으로 닫혀 있다**(`#354`). 읽는 쪽(`CD-LOT-SOURCE-TYPE`)과 «값집합이 달라» 키를 가른다 — `B-28` |
 | `CD-LOT-EXTERNAL-IDENTIFIER-TYPE` | `SUPPLIER_LOT` `ERP_LOT` `CUSTOMER_LOT` `SUBCONTRACTOR_LOT` | `LOT_EXTERNAL_IDENTIFIER_TYPE` | `identifierTypeCode` | `registry` | 2 | LOT 외부식별자 유형. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
 | `CD-LOT-HOLD-REASON` | `INCOMING_INSPECTION_WAIT` `FOREIGN_MATTER_SUSPECTED` `DIMENSION_ABNORMAL` `APPEARANCE_ABNORMAL` `CLAIM_RECALL` `OTHER` | `LOT_HOLD_REASON` | `holdReasonCode` `reasonCode` | `registry` | 8 | LOT 보류 사유. `omf-mes#198` 시드(`design/raw/…/2026-08-13-공통코드값목록-제안안`) |
-| `CD-LOT-HOLD-RELEASE-REASON` | `RETEST_PASS` `RETEST_FAIL` `INVESTIGATION_CLEARED` `MANAGER_OVERRIDE` | `LOT_HOLD_RELEASE_REASON` | `releaseReasonCode` | `registry` | 5 | 공유계약 `G-32` 등록부 표의 근거 칸에서 옮겼다 |
+| `CD-LOT-HOLD-RELEASE-REASON` | `RETEST_PASS` `RETEST_FAIL` `INVESTIGATION_CLEARED` `MANAGER_OVERRIDE` `INCOMING_INSPECTION_PASSED` ⬜ | `LOT_HOLD_RELEASE_REASON` | `releaseReasonCode` | `registry` | 5 | 앞 네 값은 고객 운영 초기값이다. `INCOMING_INSPECTION_PASSED`(수입검사 합격)는 1회차 IQC 합격 시 서버가 자동 해제에 쓰는 시스템 필수값이다(문의 087). 고객이 다른 운영값을 늘릴 수 있어도 이 값은 삭제·코드 변경하면 안 된다 |
 | `CD-LOT-LIFECYCLE-EVENT-SOURCE-DOCUMENT-TYPE` | `PRODUCTION_RESULT` `WORK_ORDER_CLOSING` `WORK_ORDER` | — | `sourceDocumentTypeCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `LotLifecycleHistoryEvent`(`logistics-01자재창고`). ⭐ 전이 셋(`L1`·`L2`·`L3`)의 산문이 이미 뒤 둘을 적어 두었다 |
 | `CD-LOT-LIFECYCLE-HISTORY-EVENT-TRANSITION` | `L1` `L2` `L3` | — | `transitionCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `LotLifecycleHistoryEvent`(`logistics-01자재창고`) |
 | `CD-LOT-LIFECYCLE-STATUS` | `WAITING` `ACTIVE` `VOIDED` | `LOT_LIFECYCLE_STATUS` | `lifecycleStatusCode` | `registry-system` | 3 | LOT 선발행 슬롯 생명주기 — 품질 판정 축과 다르다 |
-| `CD-LOT-SOURCE-TYPE` | `INBOUND_RECEIPT_LINE` `RECYCLE_ENTRY` | `LOT_SOURCE_TYPE` | `sourceTypeCode` | `registry-system` | 1 | CD-LOT-SOURCE-TYPE 는 LOT 발생 원천 |
+| `CD-LOT-SOURCE-TYPE` | `INBOUND_RECEIPT_LINE` `RECYCLE_ENTRY` `WORK_ORDER` | `LOT_SOURCE_TYPE` | `sourceTypeCode` | `registry-system` | 1 | LOT 발생 원천. `WORK_ORDER`는 작업지시 배포 때 만든 선발행 슬롯이며 서버 시드·조회가 사용하는 시스템 고정값이다(문의 036) |
 | `CD-LOT-STATUS` | `NORMAL` `DEFECTIVE` `INSPECTION_PENDING` `SCRAPPED` | `LOT_STATUS` | `fromQualityStatusCode` `lotStatusCode` `qualityStatusCode` `statusCode` `targetLotStatusCode` `toQualityStatusCode` | `registry-system` | 27 | 계약 `description` 산문에 이미 적혀 있던 값을 꺼냈다 |
 | `CD-LOT-STATUS-EVENT-SOURCE-DOCUMENT-TYPE` | `DISPOSITION_DECISION` `INSPECTION_RESULT` `LOT_HOLD` `NONCONFORMANCE` `STOCK_TRANSFER` | — | `sourceDocumentTypeCode` | `enum` | 1 | 계약이 `enum` 으로 닫은 값 — `LotStatusHistoryEvent`(`logistics-01자재창고`). 처분 전이 C17~C19는 처분 판정, 재등록 C20은 재고 이동을 가리킨다 |
 | `CD-LOT-STATUS-HISTORY-EVENT-TRANSITION` | `C10` `C14` `C15` `C17` `C18` `C19` `C20` `C4` `C5` `C6` `C7` `C8` `C9` | — | `transitionCode` | `enum` | 2 | 계약이 `enum` 으로 닫은 값 — `LotStatusHistoryEvent`(`logistics-01자재창고`) |

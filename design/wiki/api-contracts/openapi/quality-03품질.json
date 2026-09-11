@@ -1593,7 +1593,7 @@
       }
      }
     },
-    "x-internal-note": "관리웹·온라인 전용이다 — 오프라인 큐는 서버가 만든 inspectionResultId 를 모르므로 이 경로를 부를 수 없다. 큐는 POST /quality/inspection-results 에 statusCode=확정 으로 보낸다(03 계약 3단계 §3). ⚠ 자동 해제의 사유 값이 미결이다 — LOT_HOLD_RELEASE_REASON 초기 시드 네 값(RETEST_PASS·RETEST_FAIL·INVESTIGATION_CLEARED·MANAGER_OVERRIDE) 중 「IQC 최초 합격」에 해당하는 것이 없다. 형제 선례 둘은 사유를 required 로 받는다(LotHoldRelease · StockReinstatementCreate). 판정은 W-01-01 §8 미결 8 이 갖는다 — omf-mes#451 재실측에서 드러났다. ⛔ 초안은 「이 해제에는 사유 코드를 요구하지 않는다」로 규범을 지어냈고 리뷰가 반증했다 — 인용한 근거(W-01-01 §5 · 요구서 03 §3) 어디에도 없는 말이었다."
+    "x-internal-note": "관리웹·온라인 전용이다 — 오프라인 큐는 서버가 만든 inspectionResultId 를 모르므로 이 경로를 부를 수 없다. 큐는 POST /quality/inspection-results 에 statusCode=확정 으로 보낸다(03 계약 3단계 §3). 자동 해제 사유는 서버 inspection-confirm.service가 쓰는 INCOMING_INSPECTION_PASSED로 정합했다(문의 087 · omf-mes#555). 기존 네 값은 재판정·조사·관리자 해제 의미를 보존한다."
    }
   },
   "/quality/lot-hold-events": {
@@ -4250,7 +4250,7 @@
       ],
       "maxLength": 50,
       "example": "RETEST_PASS",
-      "description": "보류를 «왜» 풀었는가. ⭐ eventTypeCode=RELEASED 인 사건에만 있다 — 등록(HELD) 사건에는 null 이다(등록 사유는 reasonCode 가 담는다). 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_RELEASE_REASON 로 받는다(공유계약 G-32). ⭐ 고객이 늘린다 — 값은 초기 시드다(공유계약 G-31). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "description": "보류를 «왜» 풀었는가. eventTypeCode=RELEASED 인 사건에만 있고 등록(HELD) 사건에는 null 이다. 값 목록은 GET /mdm/code-values?codeGroupCode=LOT_HOLD_RELEASE_REASON 로 받는다. INCOMING_INSPECTION_PASSED는 1회차 수입검사 합격 자동 해제의 시스템 필수값이며 고객 운영값은 늘릴 수 있다. 채번 식별자를 하드코딩하지 않는다.",
       "x-code-key": "CD-LOT-HOLD-RELEASE-REASON"
      },
      "targetLotStatusCode": {
