@@ -3105,7 +3105,7 @@
      "logistics"
     ],
     "summary": "입고 처리",
-    "description": "입고 전표 생성과 전기가 한 번에 일어난다. LOT 상태 전이·수불 원장·잔액·ERP 송신 적재가 같은 트랜잭션이며 ERP 실제 전송만 밖이다. 근거: W-01-10 §5-4 · 공유계약 B-8 ⭐ 적치 지시는 라인마다 서버가 함께 만들고, 응답의 GoodsReceiptLine.putawayTaskId 가 그 식별자를 싣는다 — 화면은 그 값으로 라인 수만큼 적치 완료를 부른다. ⛔ 입고와 적치 완료는 한 트랜잭션이 아니다 — 입고만 성공하고 적치가 남는 상태는 오류가 아니라 표현 가능한 상태이고, GET /logistics/putaway-tasks?goodsReceiptId= 로 되찾는다(공유계약 B-8 의 경계는 전표 안까지다).",
+    "description": "입고 전표 생성과 전기가 한 번에 일어난다. LOT 상태 전이·수불 원장·잔액·ERP 송신 적재가 같은 트랜잭션이며 ERP 실제 전송만 밖이다. 근거: W-01-10 §5-4 · 공유계약 B-8 ⭐ 적치 지시는 라인마다 서버가 함께 만들고, 응답의 GoodsReceiptLine.putawayTaskId 가 그 식별자를 싣는다 — 화면은 그 값으로 라인 수만큼 적치 완료를 부른다. ⛔ 입고와 적치 완료는 한 트랜잭션이 아니다 — 입고만 성공하고 적치가 남는 상태는 오류가 아니라 표현 가능한 상태이고, GET /logistics/putaway-tasks?goodsReceiptId= 로 되찾는다(공유계약 B-8 의 경계는 전표 안까지다). 현재 요청에는 소유 구분·소유처 입력이 없고 이 오퍼레이션으로 새로 전기하는 재고는 자사 소유(OWNED)로만 기록된다. 고객지급·위탁재고 등록은 지원하지 않으며, 이 제한을 다른 재고 흐름의 기존 소유를 변경하는 규칙으로 적용하지 않는다.",
     "parameters": [
      {
       "$ref": "#/components/parameters/IdempotencyKey"
@@ -3156,7 +3156,7 @@
       }
      }
     },
-    "x-internal-note": "화면이 「입고 처리」 한 버튼이므로 :confirm·:post 로 쪼개지 않는다(02-URL동작규약 §2-2). 한도승인 건은 ERP 메시지를 적재하지 않는다(W-01-10 §5-5)."
+    "x-internal-note": "화면이 「입고 처리」 한 버튼이므로 :confirm·:post 로 쪼개지 않는다(02-URL동작규약 §2-2). 한도승인 건은 ERP 메시지를 적재하지 않는다(W-01-10 §5-5). 소유 고정의 구현 원천은 receipt-posting의 OWNERSHIP이며 지원 잔여는 omf-mes#569다."
    }
   },
   "/logistics/goods-receipts/{goodsReceiptId}": {
@@ -7319,8 +7319,8 @@
        "string",
        "null"
       ],
-      "description": "역트랜잭션 번호",
-      "example": "TX-2026-0011"
+      "description": "역트랜잭션 번호. 전기 취소는 원 거래 번호에 -R을 붙인다.",
+      "example": "TX-EXAMPLE-001-R"
      },
      "reversalBusinessDate": {
       "type": [
@@ -7328,7 +7328,7 @@
        "null"
       ],
       "format": "date",
-      "description": "역트랜잭션 영업일 — 원장 조회에 함께 쓴다",
+      "description": "역트랜잭션 영업일. 취소 실행일이 아니라 원 거래 영업일을 그대로 쓰며 원장 조회에 함께 쓴다.",
       "example": "2026-08-07"
      }
     }
@@ -7568,7 +7568,7 @@
       "type": "string",
       "example": "GOODS_RECEIPT",
       "x-code-key": "CD-DOCUMENT-SUCCESSOR-TYPE",
-      "description": "A-10 다형 참조 판별자 — 값이 «대상 리소스 이름»이고 짝 id 가 그 리소스의 식별자다. ⭐ 대응표는 «설계»가 정한다(A-10 규칙 1 · 2026-09-03 사용자 결정). 후속이 무엇인가 — 입고 · 출고 · 피킹 · 수불 원장 · 자재 투입. ⭐ W-01-13 §5-3 이 「후속 판정이 두 갈래」로 이미 적어 두었다 — 앞 넷은 sourceDocument* 로 거꾸로 조회하는 «문서 하류»이고, 자재 투입은 원천 문서가 아니라 LOT 을 가리키는 «재고 사용»이다. ⛔ 취소하려면 이것들을 역순으로 먼저 취소해야 한다.",
+      "description": "A-10 다형 참조 판별자. 입고·출고·피킹은 sourceDocument 역조회의 문서 하류이고 INVENTORY_TRANSACTION과 MATERIAL_CONSUMPTION은 이 문서가 만든 LOT의 재고 사용 축이다. 현재 출고의 실제 사용, P/O의 입하, 생산창고 수령 전표는 후속 유형·매핑이 없어 판정하지 않는다. 취소하려면 반환된 후속을 역순으로 먼저 취소해야 한다.",
       "enum": [
        "GOODS_RECEIPT",
        "GOODS_ISSUE",
@@ -8547,7 +8547,7 @@
      "inventoryStatusCode",
      "destinationLocationId"
     ],
-    "description": "입고 라인 등록 항목.",
+    "description": "입고 라인 등록 항목. 소유 구분과 소유처는 입력하지 않는다. 현재 서버는 이 입고로 새로 전기하는 재고를 OWNED로 고정하므로 고객지급·위탁재고 및 소유처가 있는 재고의 등록은 지원하지 않는다. receiptTypeCode·qualityStatusCode·inventoryStatusCode를 소유 구분으로 해석하지 않는다.",
     "properties": {
      "inboundReceiptLineId": {
       "x-source-column": "inbound_receipt_line_id",
