@@ -1,0 +1,947 @@
+{
+ "openapi": "3.1.0",
+ "info": {
+  "title": "omf-mes 사출 생산 통합 모니터링 대시보드 API (초안)",
+  "version": "0.1.0",
+  "description": "사출 생산 통합 모니터링 대시보드 계약. 부품사업부 사출기를 대상으로 한 읽기 전용 집계 셋을 덮는다 — 통합 상황판, 제품군별 불량 현황, 호기별 생산 현황이다.\n\n파생 값은 전부 서버가 계산한다. 화면은 받은 수를 다시 계산하지 않는다(공유계약 L-2).\n\n날짜 단위는 조업일이다 — 오전 08:00 에 시작해 자정을 넘겨도 같은 날로 센다. 전사 고정이고 운영 정책이 그 시각을 갖는다. 달력 날짜가 아니다.\n\n모든 수치는 실적이 올라온 시점까지의 값이다. 설비를 직접 연동해 받는 값이 아니므로 현장에서 입력이 늦으면 그만큼 늦게 반영된다.\n\n이 계약은 쓰기 경로를 두지 않는다. 알림을 읽음으로 표시하는 것처럼 쓰기가 필요한 동작은 공통 계약의 기존 경로를 그대로 쓴다.\n\n정지 시간은 작업 세션의 중단과 재개 구간으로 센다. 설비 보전이 따로 기록하는 비가동 구간과 모집단이 다르므로 같은 설비·같은 날에도 두 값이 다를 수 있다 — 비교할 값이 아니다.\n\n인증 규약은 이 파일이 오퍼레이션마다 선언하지 않는다. 관리웹 계정 토큰의 운반 수단이 아직 확정되지 않아 오퍼레이션별 security 배선을 «의도적으로» 비워 두었다. 비어 있음은 「인증이 없다」가 아니다. 규약 정본은 공유계약 D-5 다.",
+  "x-internal-note": "대시보드 전달본이다. 근거는 omf-mes#660 의 2026-09-12 확정 요구다. 기존 계약 일곱 벌을 고치지 않기로 한 사용자 확정에 따라 별도 파일로 낸다 — 통합 회차에 정본으로 합친다. 무엇이 신설이고 무엇이 기존 변경인지는 같은 전달본의 「신설·변경 대조표」가 갖는다. W-CO-05 재정의 · W-CO-12 · W-CO-13 신설이 이 계약의 소비 화면이다."
+ },
+ "servers": [
+  {
+   "url": "/api",
+   "description": "온프레미스 설치형"
+  }
+ ],
+ "tags": [
+  {
+   "name": "dashboard",
+   "description": "사출 생산 통합 모니터링 — 읽기 전용 집계. 관리웹 상황판 세 장이 함께 쓴다."
+  }
+ ],
+ "paths": {
+  "/dashboard/injection/overview": {
+   "get": {
+    "tags": [
+     "dashboard"
+    ],
+    "summary": "사출 생산 통합 모니터링 집계",
+    "description": "상황판 한 장이 한 번에 받는 집계다. 설비 모수는 설비 유형이 사출기이고 사용 중이며 자산 수명주기가 운용인 설비 전체다. 종합 가동률은 가동 상태인 설비 수를 전체 설비 수로 나눈 백분율이고, 종합 불량률은 불량 합계를 총생산으로 나눈 백분율이다. 소수점 한 자리로 낸다. 화면은 열 분 주기로 다시 부른다.",
+    "parameters": [
+     {
+      "name": "baseDate",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date",
+       "example": "2026-09-12"
+      },
+      "description": "기준 조업일. 비우면 오늘 조업일이다 — 조업일은 오전 08:00 에 시작하고 자정을 넘겨도 같은 날로 센다. 달력 날짜가 아니다."
+     },
+     {
+      "name": "plantId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      },
+      "description": "공장으로 좁힌다. 비우면 전체다."
+     },
+     {
+      "name": "businessUnitId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      },
+      "description": "사업부로 좁힌다. 설비 마스터에 사업부 칸이 없어 서버가 공장을 거쳐 푼다. 비우면 전체다."
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "집계",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/InjectionOverviewSummary"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/dashboard/injection/defect-families": {
+   "get": {
+    "tags": [
+     "dashboard"
+    ],
+    "summary": "제품군별 불량 현황",
+    "description": "제품군마다 불량률과 불량 유형 상위 몇 가지를 낸다. 모집단은 공정검사가 기록한 불량만이다 — 현장·출하검사·수리·클레임이 기록한 불량은 들어가지 않는다. 불량 유형은 불량코드의 상세 계층으로 센다. 제품군 목록과 표시 순서는 제품군 마스터가 정하므로 화면이 열 수를 고정하지 않는다.",
+    "parameters": [
+     {
+      "name": "baseDate",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date",
+       "example": "2026-09-12"
+      },
+      "description": "기준 조업일. 비우면 오늘 조업일이다 — 조업일은 오전 08:00 에 시작하고 자정을 넘겨도 같은 날로 센다. 달력 날짜가 아니다."
+     },
+     {
+      "name": "plantId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      },
+      "description": "공장으로 좁힌다. 비우면 전체다."
+     },
+     {
+      "name": "businessUnitId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      },
+      "description": "사업부로 좁힌다. 설비 마스터에 사업부 칸이 없어 서버가 공장을 거쳐 푼다. 비우면 전체다."
+     },
+     {
+      "name": "worstSize",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 5,
+       "minimum": 1,
+       "maximum": 20,
+       "example": 5
+      },
+      "description": "제품군마다 낼 불량 유형의 개수. 화면 기본은 다섯이다."
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "집계",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/InjectionDefectFamilySummary"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/dashboard/injection/equipments/{equipmentId}": {
+   "get": {
+    "tags": [
+     "dashboard"
+    ],
+    "summary": "호기별 생산 현황",
+    "description": "설비 한 대의 그 조업일 생산 현황이다. 현재 금형과 기종은 지금 진행 중인 작업 세션이 정하며, 비가동이면 비어 있다. 정지 시간은 작업 세션의 중단과 재개 구간을 사유별로 합한 값이다 — 설비 보전이 따로 기록하는 비가동 구간과 모집단이 다르다.",
+    "parameters": [
+     {
+      "name": "equipmentId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      }
+     },
+     {
+      "name": "baseDate",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "format": "date",
+       "example": "2026-09-12"
+      },
+      "description": "기준 조업일. 비우면 오늘 조업일이다 — 조업일은 오전 08:00 에 시작하고 자정을 넘겨도 같은 날로 센다. 달력 날짜가 아니다."
+     },
+     {
+      "name": "plantId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      },
+      "description": "공장으로 좁힌다. 비우면 전체다."
+     },
+     {
+      "name": "businessUnitId",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "format": "int64",
+       "example": 1001
+      },
+      "description": "사업부로 좁힌다. 설비 마스터에 사업부 칸이 없어 서버가 공장을 거쳐 푼다. 비우면 전체다."
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "집계",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/InjectionEquipmentSummary"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "경로·질의 int64 값이 서버 허용 구간(-2^63 초과, 2^63 미만)을 벗어나면 INVALID다.",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "없다",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ErrorResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "components": {
+  "schemas": {
+   "ErrorResponse": {
+    "type": "object",
+    "required": [
+     "errors"
+    ],
+    "properties": {
+     "errors": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/ErrorItem"
+      }
+     }
+    }
+   },
+   "ErrorItem": {
+    "type": "object",
+    "required": [
+     "scope",
+     "code",
+     "message"
+    ],
+    "properties": {
+     "scope": {
+      "type": "string",
+      "enum": [
+       "field",
+       "screen"
+      ],
+      "description": "한 필드의 문제는 인라인, 화면 수준 문제는 배너. 근거: 공유계약 G-1",
+      "example": "screen"
+     },
+     "field": {
+      "type": "string",
+      "description": "scope=field 일 때 대상 프로퍼티명",
+      "example": "baseDate"
+     },
+     "code": {
+      "type": "string",
+      "description": "REQUIRED · RANGE · INVALID · PERMISSION_DENIED 등.",
+      "example": "INVALID"
+     },
+     "message": {
+      "type": "string",
+      "example": "기준 조업일 형식을 확인하세요."
+     }
+    }
+   },
+   "InjectionOverviewSummary": {
+    "type": "object",
+    "required": [
+     "baseDate",
+     "asOf",
+     "equipmentTotalCount",
+     "equipmentRunningCount",
+     "operationRatePercent",
+     "totalQty",
+     "goodQty",
+     "defectQty",
+     "defectRatePercent",
+     "families",
+     "equipments"
+    ],
+    "properties": {
+     "baseDate": {
+      "type": "string",
+      "format": "date",
+      "description": "기준 조업일.",
+      "example": "2026-09-12"
+     },
+     "asOf": {
+      "type": "string",
+      "format": "date-time",
+      "description": "서버 집계 기준 시각 — 화면이 「기준 HH:MM」 으로 보인다. 브라우저 수신 시각이 아니다",
+      "example": "2026-09-12T16:46:54+09:00"
+     },
+     "plantId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "description": "걸린 공장. 비어 있으면 전체다",
+      "example": 1001
+     },
+     "businessUnitId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "description": "걸린 사업부. 비어 있으면 전체다",
+      "example": 1001
+     },
+     "equipmentTotalCount": {
+      "type": "integer",
+      "description": "모수 설비 수 — 설비 유형이 사출기이고 사용 중이며 자산 수명주기가 운용인 설비의 수다.",
+      "example": 71
+     },
+     "equipmentRunningCount": {
+      "type": "integer",
+      "description": "가동 상태인 설비 수.",
+      "example": 60
+     },
+     "operationRatePercent": {
+      "type": "number",
+      "format": "double",
+      "description": "종합 가동률 = 가동 설비 수 ÷ 전체 설비 수 × 100. ⛔ 서버가 계산한다 — 화면이 다시 계산하지 않는다. 소수점 한 자리다.",
+      "example": 84.5
+     },
+     "totalQty": {
+      "type": "number",
+      "format": "double",
+      "description": "금일 총생산 = 양품 + 불량. 불량은 세부 불량·보류·재작업의 합이고 손실은 들어가지 않는다. ⛔ 서버가 계산한다 — 화면이 다시 계산하지 않는다.",
+      "example": 63730.0
+     },
+     "goodQty": {
+      "type": "number",
+      "format": "double",
+      "description": "양품 합계.",
+      "example": 61570.0
+     },
+     "defectQty": {
+      "type": "number",
+      "format": "double",
+      "description": "불량 합계 — 세부 불량·보류·재작업의 합이다. ⛔ 서버가 계산한다 — 화면이 다시 계산하지 않는다.",
+      "example": 2160.0
+     },
+     "scrapQty": {
+      "type": "number",
+      "format": "double",
+      "description": "손실 합계. 총생산에 들어가지 않는다.",
+      "example": 120.0
+     },
+     "defectRatePercent": {
+      "type": "number",
+      "format": "double",
+      "description": "종합 불량률 = 불량 합계 ÷ 총생산 × 100. ⛔ 서버가 계산한다 — 화면이 다시 계산하지 않는다. 소수점 한 자리다. ⚠ 검사 수량 기준 불량률과 분모가 다르다 — 이 값의 분모는 생산 수량이다.",
+      "example": 3.4
+     },
+     "families": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/InjectionFamilyRow"
+      },
+      "description": "제품군별 요약. 제품군 마스터의 표시 순서대로 낸다 — 화면이 열 수를 고정하지 않는다."
+     },
+     "equipments": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/InjectionEquipmentTile"
+      },
+      "description": "설비 타일. 모수 설비 전건이다."
+     },
+     "unassignedRunningSessionCount": {
+      "type": "integer",
+      "description": "설비가 지정되지 않아 어느 타일에도 들지 않은 진행 중 작업 세션 수. 0 과 「모른다」를 같은 모양으로 그리지 않기 위해 건수로 낸다.",
+      "example": 0
+     },
+     "latestUnreadAlarm": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/InjectionDashboardAlarm"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "확인하지 않은 가장 최근 알람 한 건. 설비와 금형 알람만 낸다. 없으면 비어 있다. ⚠ 화면이 다시 부를 때 새 알람이 있으면 그것으로 바뀐다 — 발생과 표시 사이에 갱신 주기만큼 지연이 있다.",
+      "x-no-example": "하위 프로퍼티가 각각 example 을 갖는다 — 객체 통째 예시는 중복이다"
+     }
+    }
+   },
+   "InjectionFamilyRow": {
+    "type": "object",
+    "required": [
+     "familyCode",
+     "familyName",
+     "totalQty",
+     "defectQty",
+     "defectRatePercent"
+    ],
+    "properties": {
+     "familyCode": {
+      "type": "string",
+      "description": "제품군 코드. 고객이 마스터에서 값을 채우므로 계약이 목록을 닫지 않는다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PRODUCT_FAMILY 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "ADT",
+      "x-code-key": "CD-PRODUCT-FAMILY"
+     },
+     "familyName": {
+      "type": "string",
+      "description": "제품군 표시명. 사용자 언어에 맞는 명칭을 서버가 고른다.",
+      "example": "표시명"
+     },
+     "totalQty": {
+      "type": "number",
+      "format": "double",
+      "description": "그 제품군의 총생산 = 양품 + 불량.",
+      "example": 18240.0
+     },
+     "defectQty": {
+      "type": "number",
+      "format": "double",
+      "description": "그 제품군의 불량 합계.",
+      "example": 612.0
+     },
+     "defectRatePercent": {
+      "type": "number",
+      "format": "double",
+      "description": "불량 합계 ÷ 총생산 × 100. ⛔ 서버가 계산한다 — 화면이 다시 계산하지 않는다. 소수점 한 자리다.",
+      "example": 3.4
+     }
+    }
+   },
+   "InjectionEquipmentTile": {
+    "type": "object",
+    "required": [
+     "equipmentId",
+     "equipmentName",
+     "operationStateCode"
+    ],
+    "properties": {
+     "equipmentId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "equipmentName": {
+      "type": "string",
+      "description": "설비 마스터의 설비명. 호기와 톤수 표기가 이 이름 안에 들어 있다 — 마스터에 따로 칸이 없다.",
+      "example": "사출기 3호"
+     },
+     "operationStateCode": {
+      "type": "string",
+      "enum": [
+       "RUNNING",
+       "STOPPED",
+       "WAITING",
+       "IDLE"
+      ],
+      "description": "설비 운전 상태 — 가동(RUNNING) · 정지(STOPPED) · 대기(WAITING) · 비가동(IDLE) 네 값. 저장된 코드가 아니라 서버가 작업 세션과 오늘 계획으로 판정해 낸다. 가동은 그 설비를 쓰는 작업 세션이 진행 중인 것이고, 정지는 그 세션이 중단된 것이며, 대기는 오늘 계획이 있으나 아직 시작하지 않은 것이고, 비가동은 그 밖이다. ⚠ 일이 끝난 설비와 오늘 일이 없던 설비가 같은 비가동으로 보인다. ⚠ 계획에 설비가 지정되지 않은 작업지시는 그 설비를 비가동으로 만든다.",
+      "example": "RUNNING",
+      "x-no-code-key": "코드 그룹이 아니다 — 저장 컬럼이 없는 파생 판정이다(공유계약 A-14 의 「조건」 축). 작업 세션 상태와 오늘 계획 유무로 서버가 그때그때 판정하므로 공통코드 마스터에 같은 목록을 두면 두 벌이 된다(L-2-1)."
+     },
+     "itemCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "지금 만들고 있는 품번. 가동이 아니면 비어 있다.",
+      "example": "ITM-0001",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 품목 마스터의 행을 가리킨다 — Item.itemCode 가 같은 판정으로 이미 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
+     },
+     "totalQty": {
+      "type": [
+       "number",
+       "null"
+      ],
+      "format": "double",
+      "description": "그 설비의 금일 총생산. 가동 이력이 없으면 비어 있다 — 0 으로 채우지 않는다.",
+      "example": 1117.0
+     },
+     "defectRatePercent": {
+      "type": [
+       "number",
+       "null"
+      ],
+      "format": "double",
+      "description": "그 설비의 불량률. 총생산이 0 이면 비어 있다 — 화면은 산출 불가로 그린다.",
+      "example": 4.3
+     },
+     "stoppedSinceMinutes": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "description": "정지 상태로 지난 시간(분). 정지가 아니면 비어 있다.",
+      "example": 34
+     }
+    }
+   },
+   "InjectionDashboardAlarm": {
+    "type": "object",
+    "required": [
+     "notificationId",
+     "message",
+     "occurredAt",
+     "targetTypeCode"
+    ],
+    "properties": {
+     "notificationId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "알림 식별자. 읽음 처리는 공통 계약의 알림 경로가 한다.",
+      "example": 1001
+     },
+     "message": {
+      "type": "string",
+      "description": "알람 본문. 서버가 만든다. ⛔ 화면이 한 문자열을 쪼개지도 조립하지도 않는다.",
+      "example": "사출기 3호 · 유압 누유"
+     },
+     "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "발생 시각.",
+      "example": "2026-09-12T16:40:00+09:00"
+     },
+     "targetTypeCode": {
+      "type": "string",
+      "enum": [
+       "EQUIPMENT",
+       "MOLD",
+       "INSTRUMENT",
+       "PURCHASE_ORDER",
+       "INTEGRATION_SYNC",
+       "APPROVAL_REQUEST",
+       "LOT",
+       "WORK_ORDER",
+       "NONCONFORMANCE"
+      ],
+      "description": "무엇에 대한 알림인가. ⚠ 이 경로는 설비(EQUIPMENT)와 금형(MOLD) 두 유형만 내려준다 — 나머지는 서버가 거른다. 값 목록 자체는 알림 계약과 같다.",
+      "example": "EQUIPMENT",
+      "x-code-key": "CD-NOTIFICATION-TARGET-TYPE"
+     },
+     "targetId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "description": "알람 대상의 식별자.",
+      "example": 1001
+     },
+     "locationPath": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "알람 위치를 «계층 텍스트»로 준다 — 평면 배치·도면 구획을 쓰지 않는다. 확정 원천이 없으면 비어 있다.",
+      "example": "1공장 > A라인 > 사출기 3호"
+     }
+    }
+   },
+   "InjectionDefectFamilySummary": {
+    "type": "object",
+    "required": [
+     "baseDate",
+     "asOf",
+     "totalQty",
+     "defectQty",
+     "defectRatePercent",
+     "families"
+    ],
+    "properties": {
+     "baseDate": {
+      "type": "string",
+      "format": "date",
+      "description": "기준 조업일.",
+      "example": "2026-09-12"
+     },
+     "asOf": {
+      "type": "string",
+      "format": "date-time",
+      "description": "서버 집계 기준 시각 — 화면이 「기준 HH:MM」 으로 보인다. 브라우저 수신 시각이 아니다",
+      "example": "2026-09-12T16:46:54+09:00"
+     },
+     "totalQty": {
+      "type": "number",
+      "format": "double",
+      "description": "금일 총생산 = 양품 + 불량. 불량은 세부 불량·보류·재작업의 합이고 손실은 들어가지 않는다. ⛔ 서버가 계산한다 — 화면이 다시 계산하지 않는다.",
+      "example": 63730.0
+     },
+     "defectQty": {
+      "type": "number",
+      "format": "double",
+      "description": "불량 합계 — 세부 불량·보류·재작업의 합이다. ⛔ 서버가 계산한다 — 화면이 다시 계산하지 않는다. 모집단은 공정검사가 기록한 불량만이다.",
+      "example": 2160.0
+     },
+     "defectRatePercent": {
+      "type": "number",
+      "format": "double",
+      "description": "종합 불량률 = 불량 합계 ÷ 총생산 × 100. ⛔ 서버가 계산한다 — 화면이 다시 계산하지 않는다. 소수점 한 자리다. ⚠ 검사 수량 기준 불량률과 분모가 다르다 — 이 값의 분모는 생산 수량이다.",
+      "example": 3.4
+     },
+     "families": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/InjectionDefectFamilyCard"
+      }
+     }
+    }
+   },
+   "InjectionDefectFamilyCard": {
+    "type": "object",
+    "required": [
+     "familyCode",
+     "familyName",
+     "totalQty",
+     "defectQty",
+     "defectRatePercent",
+     "defectTypeCount",
+     "worstDefects"
+    ],
+    "properties": {
+     "familyCode": {
+      "type": "string",
+      "description": "제품군 코드. 고객이 마스터에서 값을 채우므로 계약이 목록을 닫지 않는다. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=PRODUCT_FAMILY 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다.",
+      "example": "ADT",
+      "x-code-key": "CD-PRODUCT-FAMILY"
+     },
+     "familyName": {
+      "type": "string",
+      "description": "제품군 표시명. 사용자 언어에 맞는 명칭을 서버가 고른다.",
+      "example": "표시명"
+     },
+     "totalQty": {
+      "type": "number",
+      "format": "double",
+      "description": "그 제품군의 총생산 = 양품 + 불량.",
+      "example": 18240.0
+     },
+     "defectQty": {
+      "type": "number",
+      "format": "double",
+      "description": "그 제품군의 불량 합계.",
+      "example": 612.0
+     },
+     "defectRatePercent": {
+      "type": "number",
+      "format": "double",
+      "description": "불량 합계 ÷ 총생산 × 100. ⛔ 서버가 계산한다 — 화면이 다시 계산하지 않는다. 소수점 한 자리다.",
+      "example": 3.4
+     },
+     "defectTypeCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "그 제품군에서 불량이 난 유형이 모두 몇 종인지. worstDefects 는 많은 순 상위 일부만 담으므로, 화면이 「상위 몇 종만 보이고 있다」를 밝히려면 이 수가 필요하다. ⛔ 서버가 센다. 불량이 없으면 0 이다 — 모르는 값이 아니다.",
+      "example": 14
+     },
+     "worstDefects": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/InjectionDefectTypeRow"
+      },
+      "description": "불량 유형 상위 목록. 개수는 질의 worstSize 가 정하고 많은 순으로 낸다."
+     }
+    }
+   },
+   "InjectionDefectTypeRow": {
+    "type": "object",
+    "required": [
+     "rank",
+     "defectCodeId",
+     "defectName",
+     "defectQty"
+    ],
+    "properties": {
+     "rank": {
+      "type": "integer",
+      "description": "많은 순 순위. 1 부터 센다.",
+      "example": 1
+     },
+     "defectCodeId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "불량코드 식별자. 상세 계층의 코드다 — 대분류가 아니다.",
+      "example": 1001
+     },
+     "defectName": {
+      "type": "string",
+      "description": "불량코드 표시명. 사용자 언어에 맞는 명칭을 서버가 고른다.",
+      "example": "표시명"
+     },
+     "defectQty": {
+      "type": "number",
+      "format": "double",
+      "description": "그 유형의 불량 수량.",
+      "example": 168.0
+     },
+     "sharePercent": {
+      "type": "number",
+      "format": "double",
+      "description": "그 제품군 불량 합계에서 차지하는 비율. ⛔ 서버가 계산한다 — 화면이 다시 계산하지 않는다.",
+      "example": 27.5
+     }
+    }
+   },
+   "InjectionStopReasonRow": {
+    "type": "object",
+    "required": [
+     "reasonCode",
+     "reasonName",
+     "minutes"
+    ],
+    "properties": {
+     "reasonCode": {
+      "type": "string",
+      "description": "정지 사유. ⭐ 값 목록은 GET /mdm/code-values?codeGroupCode=WORK_SESSION_EVENT_REASON 로 받는다(공유계약 G-32). ⚠ 채번 식별자(codeGroupId)를 하드코딩하지 않는다 — 환경마다 다르다. ⚠ 휴식과 계획 정지는 이 목록에 없어 정지 시간에 들어가지 않는다.",
+      "example": "MOLD_CHANGE",
+      "x-code-key": "CD-WORK-SESSION-EVENT-REASON"
+     },
+     "reasonName": {
+      "type": "string",
+      "description": "사유 표시명.",
+      "example": "표시명"
+     },
+     "minutes": {
+      "type": "integer",
+      "description": "그 사유로 멈춘 시간의 합(분). 중단 사건과 그 뒤 재개 사건 사이를 더한다.",
+      "example": 25
+     }
+    }
+   },
+   "InjectionEquipmentSummary": {
+    "type": "object",
+    "required": [
+     "equipmentId",
+     "equipmentName",
+     "operationStateCode",
+     "baseDate",
+     "asOf",
+     "totalQty",
+     "goodQty",
+     "defectQty",
+     "defectRatePercent",
+     "defectTypeCount",
+     "worstDefects",
+     "stopReasons"
+    ],
+    "properties": {
+     "equipmentId": {
+      "type": "integer",
+      "format": "int64",
+      "example": 1001
+     },
+     "equipmentName": {
+      "type": "string",
+      "description": "설비 마스터의 설비명. 호기와 톤수 표기가 이 이름 안에 들어 있다 — 마스터에 따로 칸이 없다.",
+      "example": "사출기 3호"
+     },
+     "operationStateCode": {
+      "type": "string",
+      "enum": [
+       "RUNNING",
+       "STOPPED",
+       "WAITING",
+       "IDLE"
+      ],
+      "description": "설비 운전 상태 — 가동(RUNNING) · 정지(STOPPED) · 대기(WAITING) · 비가동(IDLE) 네 값. 저장된 코드가 아니라 서버가 작업 세션과 오늘 계획으로 판정해 낸다. 가동은 그 설비를 쓰는 작업 세션이 진행 중인 것이고, 정지는 그 세션이 중단된 것이며, 대기는 오늘 계획이 있으나 아직 시작하지 않은 것이고, 비가동은 그 밖이다. ⚠ 일이 끝난 설비와 오늘 일이 없던 설비가 같은 비가동으로 보인다. ⚠ 계획에 설비가 지정되지 않은 작업지시는 그 설비를 비가동으로 만든다.",
+      "example": "RUNNING",
+      "x-no-code-key": "코드 그룹이 아니다 — 저장 컬럼이 없는 파생 판정이다(공유계약 A-14 의 「조건」 축). 작업 세션 상태와 오늘 계획 유무로 서버가 그때그때 판정하므로 공통코드 마스터에 같은 목록을 두면 두 벌이 된다(L-2-1)."
+     },
+     "baseDate": {
+      "type": "string",
+      "format": "date",
+      "description": "기준 조업일.",
+      "example": "2026-09-12"
+     },
+     "asOf": {
+      "type": "string",
+      "format": "date-time",
+      "description": "서버 집계 기준 시각 — 화면이 「기준 HH:MM」 으로 보인다. 브라우저 수신 시각이 아니다",
+      "example": "2026-09-12T16:46:54+09:00"
+     },
+     "moldId": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "format": "int64",
+      "description": "지금 물려 있는 금형. 진행 중 작업 세션이 정한다 — 가동이 아니면 비어 있다.",
+      "example": 1001
+     },
+     "moldName": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "금형 표시명.",
+      "example": "하우징 프레스 금형"
+     },
+     "cavityCount": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "description": "그 금형의 캐비티 수. 금형 마스터가 갖는 한 값이며 표준과 실제를 나누지 않는다. 금형이 비어 있으면 비어 있다.",
+      "example": 4
+     },
+     "itemCode": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "지금 만들고 있는 품번. 가동이 아니면 비어 있다.",
+      "example": "ITM-0001",
+      "x-no-code-key": "코드 그룹이 아니다 — 개체 «식별자»다(공유계약 A-16 · 2026-09-02 판정). 품목 마스터의 행을 가리킨다 — Item.itemCode 가 같은 판정으로 이미 닫혔다. ⛔ 코드 사전 키를 붙이지 않는다 — 값의 목록을 공통코드가 갖는다는 뜻이 되어, 실제로 마스터 표가 갖는 행 목록과 두 벌이 된다(L-2-1)."
+     },
+     "itemName": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "지금 만들고 있는 기종의 품명.",
+      "example": "하우징 커버 A"
+     },
+     "runningMinutes": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "description": "그 조업일에 가동한 시간의 합(분). 작업 세션 구간을 더한 값이다.",
+      "example": 470
+     },
+     "stoppedMinutes": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "description": "그 조업일에 정지한 시간의 합(분). ⚠ 설비 보전이 따로 기록하는 비가동 시간과 모집단이 다르다 — 이 값은 작업 세션의 중단 구간만 센다.",
+      "example": 110
+     },
+     "stoppedSinceMinutes": {
+      "type": [
+       "integer",
+       "null"
+      ],
+      "description": "지금 정지 상태로 지난 시간(분). 정지가 아니면 비어 있다.",
+      "example": 34
+     },
+     "plannedQty": {
+      "type": [
+       "number",
+       "null"
+      ],
+      "format": "double",
+      "description": "그 조업일 계획 수량. 계획이 없으면 비어 있다 — 0 으로 채우지 않는다.",
+      "example": 6289.0
+     },
+     "progressRatePercent": {
+      "type": [
+       "number",
+       "null"
+      ],
+      "format": "double",
+      "description": "계획 대비 진도 = 총생산 ÷ 계획 수량 × 100. 계획이 없으면 비어 있다 — 화면은 산출 불가로 그린다. ⛔ 서버가 계산한다 — 화면이 다시 계산하지 않는다.",
+      "example": 19.8
+     },
+     "totalQty": {
+      "type": "number",
+      "format": "double",
+      "description": "금일 총생산 = 양품 + 불량. 불량은 세부 불량·보류·재작업의 합이고 손실은 들어가지 않는다. ⛔ 서버가 계산한다 — 화면이 다시 계산하지 않는다.",
+      "example": 1248.0
+     },
+     "goodQty": {
+      "type": "number",
+      "format": "double",
+      "description": "양품 합계.",
+      "example": 1196.0
+     },
+     "defectQty": {
+      "type": "number",
+      "format": "double",
+      "description": "불량 합계 — 세부 불량·보류·재작업의 합이다. ⛔ 서버가 계산한다 — 화면이 다시 계산하지 않는다.",
+      "example": 52.0
+     },
+     "scrapQty": {
+      "type": "number",
+      "format": "double",
+      "description": "손실 합계. 총생산에 들어가지 않는다.",
+      "example": 4.0
+     },
+     "defectRatePercent": {
+      "type": "number",
+      "format": "double",
+      "description": "종합 불량률 = 불량 합계 ÷ 총생산 × 100. ⛔ 서버가 계산한다 — 화면이 다시 계산하지 않는다. 소수점 한 자리다. ⚠ 검사 수량 기준 불량률과 분모가 다르다 — 이 값의 분모는 생산 수량이다.",
+      "example": 4.2
+     },
+     "defectTypeCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "그 설비에서 불량이 난 유형이 모두 몇 종인지. 화면이 구획 제목에 「불량 유형 (N종)」으로 보인다. worstDefects 가 상위 일부만 담을 때 「몇 종 중 몇 종을 보고 있는지」를 가르는 값이다. ⛔ 서버가 센다. 불량이 없으면 0 이다 — 모르는 값이 아니다.",
+      "example": 14
+     },
+     "worstDefects": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/InjectionDefectTypeRow"
+      },
+      "description": "그 설비의 불량 유형 목록. 모집단은 공정검사가 기록한 불량만이다."
+     },
+     "stopReasons": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/InjectionStopReasonRow"
+      },
+      "description": "사유별 정지 시간. 많은 순으로 낸다."
+     }
+    }
+   }
+  }
+ }
+}
